@@ -1,3 +1,425 @@
+2008-10-11  jbednar
+
+	* [r9427] examples/lissom.ty:
+	  Added separate control over LGN density. Set up appropriate
+	  default preference maps for run_batch to measure
+
+	* [r9426] topo/command/analysis.py:
+	  Added speed preference plots to Direction Preference plotgroup
+
+	* [r9425] topo/command/basic.py:
+	  Added option to run_batch for saving a snapshot
+
+2008-10-10  ceball
+
+	* [r9424]
+	  topo/tests/testtkparameterizedobject.py:
+	  Updated test now None is a possible value for Selector
+	  Parameters.
+
+2008-10-10  antolikjan
+
+	* [r9423] contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Minor parameter changes
+
+	* [r9422] contrib/sparse_connectivity_model.ty:
+	  
+
+2008-10-09  jbednar
+
+	* [r9421] topo/command/analysis.py:
+	  Removed accidental import of pylabplots; fixes bug #2155124
+
+2008-10-09  antolikjan
+
+	* [r9420]
+	  contrib/sparese_connectivity_model.ty:
+	  Added simple V1Complex layer
+
+	* [r9419]
+	  contrib/sparese_connectivity_model.ty:
+	  A LISSOM analogue model utilising sparse lateral connectivity and
+	  BCM learning rule
+
+2008-10-09  jbednar
+
+	* [r9418] topo/tkgui/templateplotgrouppanel.py:
+	  Added missing right-click menu option for printing a plot matrix
+
+2008-10-08  ceball
+
+	* [r9417] topo/param/parameterized.py:
+	  script_repr() now handles function pointers. (Partially addresses
+	  SF #2072507.)
+
+	* [r9416] topo/param/tk.py:
+	  Changes on a right-click properties window now cause the same
+	  changes as changes on the parent window.
+
+	* [r9415] topo/tkgui/testpattern.py:
+	  Temporary changes to handle None in the 'edit sheet' list.
+
+	* [r9414] topo/param/__init__.py:
+	  Enabled 'allow_None' for ObjectSelectors.
+
+	* [r9413] topo/param/tk.py:
+	  None is now handled properly for all selector parameter
+	  translators.
+
+2008-10-07  jbednar
+
+	* [r9412] topo/command/basic.py:
+	  Fixed typo in run_batch in previous checkin.
+
+	* [r9411] topo/command/basic.py:
+	  Made pattern_present handle typical case of one input either to
+	  one sheet or to all sheets more easily. Generalized
+	  default_analysis_function to work with any set of input sheet
+	  names. Added time scaling to run_batch.
+
+	* [r9410] doc/Downloads/cvs_text.php,
+	  doc/Downloads/index_text.php:
+	  Cleaned up SVN docs
+
+2008-10-07  ceball
+
+	* [r9409] topo/tkgui/topoconsole.py:
+	  SF.net #2125087 (a window no longer has the simulation title
+	  repeatedly prefixed to its title when docked repeatedly).
+
+	* [r9408] external/Makefile:
+	  Fixed SF.net #2127024 (make always rebuilt on OS X and Win).
+
+2008-10-06  jbednar
+
+	* [r9407] contrib/wordcolor.ty:
+	  Made initial changes to match Alessio's sim
+
+	* [r9406] contrib/wordcolor.ty:
+	  Copied from lissom_oo_or.ty r9405
+
+	* [r9405] examples/lissom_oo_or.ty:
+	  Made default_area be controllable separately from the bounding
+	  boxes
+
+	* [r9404] topo/command/analysis.py:
+	  Reverted to revision 9401; need to figure out how to handle the
+	  background offset level for the masked patterns
+
+	* [r9403] external/Makefile,
+	  external/readline-5.2.tar.gz:
+	  Added readline to try to get it to be used on all platforms; on
+	  some platforms it was not being found for some reason
+
+2008-10-06  judelaw
+
+	* [r9402] topo/command/analysis.py:
+	  changed teststimuli patterns to be SineGratings with masks
+	  instead of SineGratingDisk and SineGratingRectangle
+
+2008-10-04  jbednar
+
+	* [r9401] doc/Tutorials/lissom_oo_or_text.php:
+	  Added notes about using mask_shape
+
+	* [r9400] doc/News/index_text.php,
+	  doc/Tutorials/lissom_oo_or_text.php:
+	  Added notes about using mask_shape
+
+	* [r9399] topo/base/patterngenerator.py:
+	  Changed mask_shape to be a ClassSelector to allow it to be
+	  selected in the GUI
+
+	* [r9398] topo/param/__init__.py:
+	  Added None to the list of possible objects for ClassSelector;
+	  still should be added to ObjectSelector
+
+2008-10-04  ceball
+
+	* [r9397] topo/param/tk.py:
+	  Added hack to compensate for missing variable traces.
+
+2008-10-04  jbednar
+
+	* [r9396] topo/pattern/basic.py:
+	  Trivial formatting fix
+
+2008-10-03  ceball
+
+	* [r9395] topo/param/tk.py:
+	  Fixed faulty handling of None by CSPTranslator.
+
+	* [r9394] doc/buildbot/bbanalysis.py:
+	  Fixed minor syntax error.
+
+	* [r9393] doc/buildbot/bbanalysis.py:
+	  Cleaned up and added some real information for the legend.
+
+	* [r9392] doc/buildbot/bbanalysis.py:
+	  Cleaned up labeling.
+
+	* [r9391] doc/buildbot/bbanalysis.py:
+	  Times are looked up automatically if left as None.
+
+	* [r9390] doc/buildbot/bbanalysis.py:
+	  More simplification of performance graph plotting.
+
+2008-10-03  jbednar
+
+	* [r9389] doc/User_Manual/noise_text.php:
+	  Trivial typo fix
+
+	* [r9388] topo/base/patterngenerator.py,
+	  topo/pattern/random.py:
+	  Moved mask application to a method to allow it to be called from
+	  Constant and Random
+
+	* [r9387] topo/base/cf.py:
+	  Added note
+
+2008-10-03  judelaw
+
+	* [r9386] contrib/lesi.ty:
+	  current version - has full homeostatic (scaling+ triesch) in
+	  excitatory sheet and option to have triesch rule in inhibitory
+	  sheet, works ok with gaussians and natural images but still work
+	  in progress
+
+2008-10-03  ceball
+
+	* [r9385] doc/buildbot/bbanalysis.py:
+	  Added version to legend.
+
+2008-10-03  jbednar
+
+	* [r9384] topo/pattern/basic.py:
+	  Fixed scale and offset for Composite patterns -- had been
+	  applying once per subpattern, instead of simply applying to the
+	  complete Composite pattern array. Also fixed missing import; was
+	  preventing GaussiansCorner from working.
+
+2008-10-03  ceball
+
+	* [r9383] doc/buildbot/bbanalysis.py:
+	  Corrected mistake in previous checkin.
+
+2008-10-03  jbednar
+
+	* [r9382] topo/pattern/teststimuli.py:
+	  Cleaned up docstrings and comments. Added commented-out example
+	  of using mask_shape to construct these patterns
+
+	* [r9381] topo/base/patterngenerator.py:
+	  Added mask_shape parameter, to make it simple to use a
+	  PatternGenerator for the mask. The mask parameter is now hidden,
+	  and perhaps should change to an attribute rather than a parameter
+
+	* [r9380] topo/param/__init__.py:
+	  Added support for Parameters that can allow None to be a valid
+	  value
+
+	* [r9379] topo/pattern/random.py:
+	  Added aspect_ratio parameter to GaussianCloud. Changed to
+	  evaluate parameters when called, rather than when constructed,
+	  for use in the Test Pattern window
+
+	* [r9378] topo/param/tk.py:
+	  Removed redundant method
+
+2008-10-03  ceball
+
+	* [r9377] doc/buildbot/bbanalysis.py:
+	  Changed key to be a KeyedList rather than dict so order is
+	  maintained.
+
+	* [r9376] doc/buildbot/bbanalysis.py:
+	  Fixed error in path to image.
+
+	* [r9375] doc/buildbot/bbanalysis.py:
+	  Added function to write out results to a web page.
+
+2008-10-03  antolikjan
+
+	* [r9374]
+	  topo/tests/lissom_oo_or_t000100.00_Contrast_Response.data,
+	  topo/tests/lissom_oo_or_t000100.00_Corner_OR_Preference.data,
+	  topo/tests/lissom_oo_or_t000100.00_Orientation_Preference.data,
+	  topo/tests/lissom_oo_or_t000100.00_Orientation_Tuning.data,
+	  topo/tests/lissom_oo_or_t000100.00_Orientation_Tuning_Fullfield.data,
+	  topo/tests/lissom_oo_or_t000100.00_Position_Preference.data,
+	  topo/tests/lissom_oo_or_t000100.00_Size_Tuning.data,
+	  topo/tests/lissom_oo_or_t000100.00_Spatial_Frequency_Preference.data:
+	  measure maps tests have been changed because of the difference to
+	  apply_output_fn parameter handling
+
+	* [r9373] topo/command/basic.py:
+	  changed pattern_present such that only sheets with measure_maps
+	  True have their apply_output_fn parameter changed
+
+	* [r9372] topo/command/analysis.py:
+	  removed wipe_out_activity and event_clear from PatternPresenter -
+	  not needed anymore
+
+	* [r9371] contrib/cc_lissom_oo_or_simple_rv.ty:
+	  removed Habituation
+
+2008-10-03  judelaw
+
+	* [r9370] topo/projection/basic.py:
+	  added ability to use a coordmapperfunction on a Shared
+	  WeightCFProjection
+
+	* [r9369] topo/outputfn/basic.py:
+	  added saving of first_call state to HomeostaticMaxEnt to avoid
+	  errors when pushing/popping state and measuring maps before any
+	  patterns have been presented
+
+2008-10-02  ceball
+
+	* [r9368] doc/buildbot/bbanalysis.py:
+	  Gave up hope of having reasonable key on the plot itself.
+
+2008-10-02  jbednar
+
+	* [r9367] topo/tkgui/plotgrouppanel.py,
+	  topo/tkgui/projectionpanel.py:
+	  Cleaned up plot titles
+
+2008-10-02  ceball
+
+	* [r9366] doc/buildbot/bbanalysis.py:
+	  Added missing import.
+
+	* [r9365] doc/buildbot/bbanalysis.py:
+	  Attempt at adding a key to bb graph.
+
+	* [r9364] doc/buildbot/bbanalysis.py:
+	  Now doesn't print any information after first exclusion.
+
+	* [r9363] doc/buildbot/bbanalysis.py:
+	  Invalid results permanently excluded (rather than being
+	  re-checked every time).
+
+2008-10-02  jbednar
+
+	* [r9362] doc/News/index_text.php,
+	  doc/User_Manual/noise_text.php,
+	  topo/base/cf.py:
+	  Changed share_mask_for_connection_fields to
+	  same_cf_shape_for_all_cfs, to make the connection to cf_shape
+	  clear
+
+2008-10-02  ceball
+
+	* [r9361] doc/buildbot/bbanalysis.py:
+	  Fixed 'exclusions' and cleaned up a little.
+
+2008-10-02  jbednar
+
+	* [r9360] images/ellen_arthur.pgm:
+	  Committed change missed from last week
+
+	* [r9359] topo/base/functionfamily.py,
+	  topo/misc/robotics.py,
+	  topo/sheet/lissom.py:
+	  Cleaned up docstrings and line formatting. Changed Parameter to
+	  HookList where appropriate
+
+	* [r9358] topo/analysis/featureresponses.py,
+	  topo/command/basic.py:
+	  Fixed broken snapshot tests by adding clear_event_queue instead
+	  of storing topo.sim.event_clear in a Parameter as-is
+
+	* [r9357] topo/plotting/plotgroup.py:
+	  Cleaned up docstring formatting
+
+	* [r9356] topo/misc/robotics.py,
+	  topo/param/__init__.py:
+	  Added HookList parameter type since they are becoming ubiquitous
+
+2008-10-02  antolikjan
+
+	* [r9355] contrib/jacommands.py:
+	  "Minor parameter adjustment"
+
+	* [r9354] contrib/jacommands.py:
+	  moved CascadeHomeostatic here
+
+	* [r9353] topo/outputfn/basic.py:
+	  Removed CascadeHomeostatic and moving into jacommands
+
+	* [r9352] contrib/cc_lissom_oo_or_simple_rv.ty,
+	  contrib/gc_lissom_oo_or_homeostatic_new.ty,
+	  contrib/lgn_lateral.ty:
+	  "moved the still active example files from examples to contrib"
+
+	* [r9351] topo/tkgui/testpattern.py:
+	  event_clear has now default parameter EPConnection so I removed
+	  it from the code
+
+	* [r9350] topo/sheet/lissom.py:
+	  Made LISSOM to have also hook lists - one is activated at the
+	  beginning of new iteration and one at the end
+
+	* [r9349] topo/learningfn/optimized.py:
+	  added CFPLF_Scaled_opt and BCMFixed_opt
+
+	* [r9348] topo/command/pylabplots.py:
+	  tiny bug correction in plot_modulation_ratio
+
+	* [r9347] topo/analysis/featureresponses.py:
+	  made FeatureResponses to inherit from PatternDrivenAnalysis and
+	  the related modifications
+
+	* [r9346] topo/analysis/vision.py:
+	  minor changes to update commands of measure complexity
+
+	* [r9345] topo/base/simulation.py:
+	  made the function event_clear parameter event_type a default
+	  EPConnectionEvent
+
+	* [r9344] topo/base/cf.py:
+	  Made it possible for each CF have different mask
+
+	* [r9343] topo/base/functionfamily.py:
+	  Added the class PatternDrivenAnalysis
+
+	* [r9342]
+	  examples/cc_lissom_oo_or_simple_rv.ty:
+	  Added possibility to have Homeostatic plasticity, moved from
+	  Translator to Jiterrer
+
+	* [r9341] contrib/jacommands.py:
+	  Added new Class Jiterrer and Habituation and few other minor
+	  modifications
+
+2008-10-02  jbednar
+
+	* [r9340] doc/News/index_text.php:
+	  Added more news
+
+2008-10-02  ceball
+
+	* [r9339] doc/buildbot/bbanalysis.py:
+	  Exclude an invalid result from the buildbot speed graph.
+
+	* [r9338] topo/tests/test_script.py:
+	  Fixed bug in reading old speed-test data files: first digit from
+	  number of iterations was being missed.
+
+2008-10-02  judelaw
+
+	* [r9337] topo/base/cf.py:
+	  re-added CFPLF_PluginScaled, somehow got l;ost in last update
+
+2008-10-02  jbednar
+
+	* [r9336] ChangeLog.txt:
+	  Updated
+
+	* [r9335] Makefile:
+	  Removed unnecessary targets
+
 2008-10-01  ceball
 
 	* [r9334] Makefile:
