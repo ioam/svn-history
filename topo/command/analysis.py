@@ -1296,6 +1296,8 @@ pg.add_plot('Direction Preference',[('Hue','DirectionPreference')])
 pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
                                                 ('Confidence','DirectionSelectivity')])
 pg.add_plot('Direction Selectivity',[('Strength','DirectionSelectivity')])
+pg.add_plot('Speed Preference',[('Strength','SpeedPreference')])
+pg.add_plot('Speed Selectivity',[('Strength','SpeedSelectivity')])
 pg.add_static_image('Color Key','topo/command/dr_key_white_vert_small.png')
 
 
