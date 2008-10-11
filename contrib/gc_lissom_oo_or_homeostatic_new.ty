@@ -20,8 +20,9 @@ from topo.sheet.optimized import LISSOM_Opt,compute_joint_norm_totals_opt
 from topo.sheet.generator import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
-from topo.base.cf import CFSheet, CFPLF_PluginScaled
+from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
+from topo.learningfn.projfn import CFPLF_PluginScaled
 from topo.learningfn.optimized import CFPLF_Hebbian_opt,CFPLF_Scaled_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF
