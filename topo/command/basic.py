@@ -306,7 +306,7 @@ def default_analysis_function():
 # in any case.
 def run_batch(script_file,output_directory="Output",
               analysis_fn = default_analysis_function,
-              times = 1.0,**params):
+              times = 1.0,snapshot=True,**params):
     """
     Run a Topographica simulation in batch mode.
 
@@ -354,8 +354,11 @@ def run_batch(script_file,output_directory="Output",
     construct a unique topo.sim.name for the file, and they will be
     encoded into the simulation directory name, to make it clear how
     each simulation differs from the others.
+
+    If requested by setting snapshot=True, saves a snapshot at the
+    end of the simulation.
     """
-    import sys # CEBALERT: why I have to import this again? (Also done elsewhere below.)
+    import sys # CEBALERT: why do I have to import this again? (Also done elsewhere below.)
     
    
     from topo.misc.commandline import auto_import_commands
@@ -439,6 +442,10 @@ def run_batch(script_file,output_directory="Output",
             elapsedtime=time.time()-starttime
             param.Parameterized(name="run_batch").message(
                 "Elapsed real time %02d:%02d." % (int(elapsedtime/60),int(elapsedtime%60)))
+
+        if snapshot:
+           save_snapshot()
+            
     except:
         import traceback
         traceback.print_exc(file=sys.stdout)
