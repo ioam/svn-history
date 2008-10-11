@@ -258,13 +258,13 @@ for e in eyes:
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+'LGN'+l+n]=sheet.CFSheet(
-                    nominal_density=locals().get('default_retina_density',24.0),
+                    nominal_density=locals().get('default_lgn_density',24.0),
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius),
                     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
             for channel in xrange(2,sf_channels+1):
                 topo.sim[e+'LGN'+l+n+'SF'+str(channel)]=sheet.CFSheet(
-                    nominal_density=locals().get('default_retina_density',24.0),
+                    nominal_density=locals().get('default_lgn_density',24.0),
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(channel-1)),
                     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
@@ -459,3 +459,23 @@ for e in eyes:
  
 topo.sim.grid_layout([vs,ls,es], xstep=70/len(eyes), ystep=200, item_scale=0.75/len(eyes))
 
+
+### Set up appropriate defaults for analysis
+import topo.command
+
+preference_maps={
+'or': ['Orientation Preference'],
+'od': ['Ocular Preference'],
+'dr': ['Direction Preference'],
+'dy': ['PhaseDisparity Preference'],
+'cr': ['Hue Preference'],
+'rg': ['Hue Preference'],
+'sf': ['Spatial Frequency Preference'],
+}
+
+pgs=[]
+for d in dims:
+    pgs += preference_maps[d]
+pgs += ['Position Preference','Activity']
+
+topo.command.basic.default_analysis_plotgroups=pgs
