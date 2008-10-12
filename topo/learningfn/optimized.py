@@ -48,7 +48,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
         
         irows,icols = input_activity.shape
         cf_type = iterator.proj.cf_type
-        hebbian_code = """
+        code = """
             // CEBALERT: should provide a macro for getting offset
 
             ///// GET WEIGHTS OFFSET
@@ -120,13 +120,21 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
             }
         """
 
-        inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols',
-                              'icols', 'cfs', 'single_connection_learning_rate',
-                              'cf_type'],
+        inline(code, ['input_activity', 'output_activity','rows', 'cols',
+                      'icols', 'cfs', 'single_connection_learning_rate','cf_type'],
                local_dict=locals(),
                headers=['<structmember.h>'])               
 
 
+class CFPLF_Hebbian(CFPLF_Plugin):
+    """Same as CFPLF_Plugin(single_cf_fn=Hebbian()); just for non-optimized fallback."""
+    single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),readonly=True)
+provide_unoptimized_equivalent("CFPLF_Hebbian_opt","CFPLF_Hebbian",locals())
+
+
+
+
+# JABALERT: Is this really a fixed-threshold BCM rule?  If so, is that really useful?
 class CFPLF_BCMFixed_opt(CFPLearningFn):
     """
     CF-aware BCM learning rule.
@@ -155,7 +163,7 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
         
         irows,icols = input_activity.shape
         cf_type = iterator.proj.cf_type
-        hebbian_code = """
+        code = """
             // CEBALERT: should provide a macro for getting offset
 
             ///// GET WEIGHTS OFFSET
@@ -229,11 +237,17 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
             }
         """
 
-        inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols',
-                              'icols', 'cfs', 'single_connection_learning_rate','unit_threshold',
-                              'cf_type'],
+        inline(code, ['input_activity', 'output_activity','rows', 'cols',
+                      'icols', 'cfs', 'single_connection_learning_rate',
+		      'unit_threshold','cf_type'],
                local_dict=locals(),
                headers=['<structmember.h>'])               
+
+
+class CFPLF_BCMFixed(CFPLF_Plugin):
+    """Same as CFPLF_Plugin(single_cf_fn=BCMFixed()); just for non-optimized fallback."""
+    single_cf_fn = param.ClassSelector(LearningFn,default=BCMFixed(),readonly=True)
+provide_unoptimized_equivalent("CFPLF_BCMFixed_opt","CFPLF_Hebbian",locals())
 
 
 
@@ -264,7 +278,7 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
             return
         
         irows,icols = input_activity.shape
-        hebbian_code = """
+        code = """
             double *x = output_activity;
             double *sclr = learning_rate_scaling_factor;
             for (int r=0; r<rows; ++r) {
@@ -326,20 +340,13 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
             
         """
 
-        inline(hebbian_code, ['input_activity','learning_rate_scaling_factor', 'output_activity','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], compiler='gcc',local_dict=locals())
-
-class CFPLF_Hebbian(CFPLF_Plugin):
-    """
-    Wrapper written to allow transparent non-optimized fallback; 
-    equivalent to CFPLF_Plugin(single_cf_fn=Hebbian()).
-    """
-    # CB: single_cf_fn should probably be declared here (as readonly)
-    def __init__(self,**params):
-        super(CFPLF_Hebbian,self).__init__(single_cf_fn=Hebbian(),**params)
+        inline(code, ['input_activity','learning_rate_scaling_factor', 'output_activity','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], compiler='gcc',local_dict=locals())
 
 
-provide_unoptimized_equivalent("CFPLF_Hebbian_opt","CFPLF_Hebbian",locals())
-
+class CFPLF_Scaled(CFPLF_PluginScaled):
+    """Same as CFPLF_PluginScaled(single_cf_fn=Hebbian()); just for non-optimized fallback."""
+    single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),readonly=True)
+provide_unoptimized_equivalent("CFPLF_Scaled_opt","CFPLF_Scaled",locals())
 
 
 
@@ -370,7 +377,7 @@ class CFPLF_Trace_opt(CFPLearningFn):
         self.traces = (self.trace_strength*output_activity)+((1-self.trace_strength)*self.traces)
         traces = self.traces
         
-        trace_code = """
+        code = """
             double *x = traces;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
@@ -428,7 +435,7 @@ class CFPLF_Trace_opt(CFPLearningFn):
             }
         """
 
-        inline(trace_code, ['input_activity', 'traces','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
+        inline(code, ['input_activity', 'traces','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
 
 
 provide_unoptimized_equivalent("CFPLF_Trace_opt","CFPLF_Trace",locals())
