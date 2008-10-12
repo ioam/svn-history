@@ -1,5 +1,5 @@
-<p><b>02 October 2008:</b> Updates since the 0.9.5 release
-(currently available in the latest SVN version):
+<p><b>12 October 2008:</b> Version 0.9.6 soon to be released;
+updates are currently available in the latest SVN version:
 
 <center>
 <table width="100%" cellpadding="5">
@@ -54,9 +54,17 @@
   <?php classref('topo.outputfn.basic','HalfRectifyAndPower')?></div>
   <div class="i2">- Sheets: 
   <?php classref('topo.sheet.basic','ActivityCopy')?></div>
+  <div class="i2">- LearningFns: 
+  <?php classref('topo.learningfn.optimized','CFPLF_BCMFixed_opt')?>,
+  <?php classref('topo.learningfn.optimized','CFPLF_Scaled_opt')?></div>
   <div class="i2">- Added mask_shape parameter to 
   <?php classref('topo.sheet.basic','PatternGenerator')?>
   to make it easy to specify a mask for any pattern, e.g. in the GUI</div>
+  <div class="i2">- Added <?php classref('topo.param','HookList')?>
+  parameters to
+  <?php classref('topo.analysis.featureresponses','FeatureResponses')?> and
+  <?php classref('topo.sheet.basic','LISSOM')?> to make it easier to
+  add user-defined functionality.</div>
 </dd>
 </font>
 </dl>
