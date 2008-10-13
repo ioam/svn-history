@@ -16,8 +16,8 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBALERT: we'll need more documentation above (eventually, when
-# params becomes a separate directory and then package).
+# CEBALERT: we need more documentation above, now that params is a
+# separate directory and will be a separate package.
 
 import types
 
@@ -453,13 +453,15 @@ class Boolean(Parameter):
 
 
 class String(Parameter):
+    __slots__ = ['allow_None']
 
-    def __init__(self,default="",**params):
+    def __init__(self,default="",allow_None=False,**params):
         """Initialize a string parameter."""
         Parameter.__init__(self,default=default,**params)
+        self.allow_None = (default is None or allow_None)
         
     def __set__(self,obj,val):
-        if not isinstance(val,str):
+        if not isinstance(val,str) and not (self.allow_None and val is None):
             raise ValueError("String '%s' only takes a string value."%self._attrib_name)
 
         super(String,self).__set__(obj,val)
