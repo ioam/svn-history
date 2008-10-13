@@ -144,6 +144,10 @@ v1aff_radius=0.27083                # sf
 lgnaff_radius=0.375                 # sf
 
 dims=locals().get('dims',['or','od','dr','dy'])
+
+# Convenient shortcut:
+if dims='All': dims=['or','od','dr','dy','cr','sf']
+
 topo.sim.name = "lissom_oo_" + '_'.join(dims)
 if 'od' in dims or 'dy' in dims:
     eyes=['Left','Right']
