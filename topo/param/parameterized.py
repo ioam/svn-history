@@ -427,6 +427,22 @@ class Parameter(object):
             setattr(self,k,v)    
 
 
+# Define one particular type of Parameter that is used in this file
+class String(Parameter):
+    __slots__ = ['allow_None']
+
+    def __init__(self,default="",allow_None=False,**params):
+        """Initialize a string parameter."""
+        Parameter.__init__(self,default=default,**params)
+        self.allow_None = (default is None or allow_None)
+        
+    def __set__(self,obj,val):
+        if not isinstance(val,str) and not (self.allow_None and val is None):
+            raise ValueError("String '%s' only takes a string value."%self._attrib_name)
+
+        super(String,self).__set__(obj,val)
+
+
 
 class ParameterizedMetaclass(type):
     """
@@ -762,8 +778,7 @@ class Parameterized(object):
 
     __metaclass__ = ParameterizedMetaclass
 
-    ## CEBALERT: should be StringParameter, right?
-    name           = Parameter(default=None,constant=True,doc="""
+    name           = String(default=None,constant=True,doc="""
     String identifier for this object.""")
     
     ### JABALERT: Should probably make this an Enumeration instead.

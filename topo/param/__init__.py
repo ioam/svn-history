@@ -21,7 +21,7 @@ __version__='$Revision$'
 
 import types
 
-from parameterized import Parameterized, Parameter, descendents
+from parameterized import Parameterized, Parameter, String, descendents
 
 class Enumeration(Parameter):
     """
@@ -450,21 +450,6 @@ class Boolean(Parameter):
                 raise ValueError("Boolean '%s' must be True or False."%self._attrib_name)
 
         super(Boolean,self).__set__(obj,val)
-
-
-class String(Parameter):
-    __slots__ = ['allow_None']
-
-    def __init__(self,default="",allow_None=False,**params):
-        """Initialize a string parameter."""
-        Parameter.__init__(self,default=default,**params)
-        self.allow_None = (default is None or allow_None)
-        
-    def __set__(self,obj,val):
-        if not isinstance(val,str) and not (self.allow_None and val is None):
-            raise ValueError("String '%s' only takes a string value."%self._attrib_name)
-
-        super(String,self).__set__(obj,val)
 
 
 class NumericTuple(Parameter):
