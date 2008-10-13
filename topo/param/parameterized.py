@@ -949,8 +949,8 @@ class Parameterized(object):
         # Suppresses automatically generated names and print_levels.
         settings=[]
         for name,val in self.get_param_values(onlychanged=script_repr_suppress_defaults):
-
-            if name == 'name' and re.match('^'+self.__class__.__name__+'[0-9]+$',val):
+            if name == 'name' and (val is not None and
+                                   re.match('^'+self.__class__.__name__+'[0-9]+$',val)):
                 rep=None
             elif name == 'print_level':
                 rep=None
