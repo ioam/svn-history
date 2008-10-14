@@ -30,7 +30,7 @@ from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import Projection, ProjectionSheet
 from topo.sheet.generator import GeneratorSheet
-from topo.misc.util import ExtraPickler,MultiOut
+from topo.misc.util import ExtraPickler,MultiFile
 from topo.misc.filepath import normalize_path
 from topo.misc import filepath
 
@@ -425,7 +425,7 @@ def run_batch(script_file,output_directory="Output",
     ### Shadow stdout to batch_output.
     # From this point onwards, print statements etc will go to both
     # the file batch_output and to stdout.
-    sys.stdout = MultiOut(batch_output,sys.stdout)
+    sys.stdout = MultiFile(batch_output,sys.stdout)
     # CB: why don't we also shadow stderr to the output file?
 
     # Default case: times is just a number that scales a standard list of times

@@ -301,7 +301,9 @@ def signabs(x):
     return sgn,abs(x)
 
 
-class MultiOut(object):
+# CB: note that this has only really been tested for output;
+# I've never tried using it to e.g. read multiple files.
+class MultiFile(object):
     """
     For all file_like_objs passed on initialization, provides a
     convenient way to call any of file's methods (on all of them).
@@ -312,7 +314,7 @@ class MultiOut(object):
     import sys
     f1 = open('file1','w')
     f2 = open('file2','w')
-    m = MultiOut(f1,f2,sys.stdout)
+    m = MultiFile(f1,f2,sys.stdout)
     m.write('test')
     """
     def __init__(self,*file_like_objs):
