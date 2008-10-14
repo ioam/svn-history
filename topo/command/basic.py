@@ -426,13 +426,13 @@ def run_batch(script_file,output_directory="Output",
     # From this point onwards, print statements etc will go to both
     # the file batch_output and to stdout.
     sys.stdout = MultiFile(batch_output,sys.stdout)
-    # CB: why don't we also shadow stderr to the output file?
 
     # Default case: times is just a number that scales a standard list of times
     if not isinstance(times,list):
         times=[t*times for t in [50,100,500,1000,2000,3000,4000,5000,10000]]
 
     # Run script in main
+    error_count = 0
     try:
         execfile(script_file,__main__.__dict__)
 
@@ -451,20 +451,23 @@ def run_batch(script_file,output_directory="Output",
            save_snapshot()
             
     except:
+        error_count+=1
         import traceback
         traceback.print_exc(file=sys.stdout)
         sys.stderr.write("Warning -- Error detected: execution halted.\n")
 
 
-    print "Batch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
-                                                       time.gmtime())
+    print "\nBatch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
+                                                         time.gmtime())
+    print "Number of errors: %s"%error_count
 
     # restore stdout
     sys.stdout = sys.__stdout__
     batch_output.close()
     
-    # ALERT: Need to count number of errors and warnings and put that on stdout
-    # and at the end of the .out file, so that they will be sure to be noticed.
+    # ALERT: Need to count number of warnings and put that on stdout
+    # and at the end of the .out file, so that they will be sure to be
+    # noticed.
     
 
 
