@@ -30,7 +30,7 @@ from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import Projection, ProjectionSheet
 from topo.sheet.generator import GeneratorSheet
-from topo.misc.util import ExtraPickler
+from topo.misc.util import ExtraPickler,MultiOut
 from topo.misc.filepath import normalize_path
 from topo.misc import filepath
 
@@ -298,6 +298,7 @@ def default_analysis_function():
     save_plotgroup("Activity",saver_params={"filename_suffix":"_45d"})
 
 
+            
 # JAB: Should also have some sort of time scaling, so that sims with
 # different lengths don't need an entirely new set of analysis times.
 # Should encode the cvs state somehow in the output directory, in a
@@ -416,13 +417,16 @@ def run_batch(script_file,output_directory="Output",
 	os.mkdir(filepath.output_path)
         print "Batch run output will be in " + filepath.output_path
 
-    ##################################
-    # capture stdout
-    #
-    import StringIO
-    stdout = StringIO.StringIO()
-    sys.stdout = stdout
-    ##################################
+
+    batch_output = open(normalize_path(simname+".out"),'w')
+    batch_output.write(command_used_to_start+"\n")
+    batch_output.write(startnote+"\n")
+
+    ### Shadow stdout to batch_output.
+    # From this point onwards, print statements etc will go to both
+    # the file batch_output and to stdout.
+    sys.stdout = MultiOut(batch_output,sys.stdout)
+    # CB: why don't we also shadow stderr to the output file?
 
     # Default case: times is just a number that scales a standard list of times
     if not isinstance(times,list):
@@ -452,24 +456,16 @@ def run_batch(script_file,output_directory="Output",
         sys.stderr.write("Warning -- Error detected: execution halted.\n")
 
 
-    endnote = "Batch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
-                                                           time.gmtime())
+    print "Batch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
+                                                       time.gmtime())
 
-    ##################################
-    # Write stdout to output file and restore original stdout
-    stdout_file = open(normalize_path(simname+".out"),'w')
-    stdout_file.write(command_used_to_start+"\n")
-    stdout_file.write(startnote+"\n")
-    stdout_file.write(stdout.getvalue())
-    stdout_file.write(endnote+"\n")
-    stdout.close()
+    # restore stdout
     sys.stdout = sys.__stdout__
-    ##################################
-
+    batch_output.close()
+    
     # ALERT: Need to count number of errors and warnings and put that on stdout
     # and at the end of the .out file, so that they will be sure to be noticed.
     
-    print endnote
 
 
 def wipe_out_activity():
