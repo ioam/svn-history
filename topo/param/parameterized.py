@@ -552,6 +552,9 @@ class ParameterizedMetaclass(type):
                 # (For instance, python's own pickling mechanism
                 # caches __slotnames__ on the class:
                 # http://mail.python.org/pipermail/python-checkins/2003-February/033517.html.)
+                # CEBALERT: this warning bypasses the usual
+                # mechanisms, which has have consequences for warning
+                # counts, warnings as exceptions, etc.
                 if not attribute_name.startswith('_'):
                     print ("Warning: Setting non-Parameter class attribute %s.%s = %s "
                            % (mcs.__name__,attribute_name,`value`))
