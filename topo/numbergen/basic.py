@@ -61,6 +61,13 @@ class BinaryOperator(NumberGenerator):
         optional arguments to be provided to the operator when calling
         it on the two operands.
         """
+        # CEBALERT: note that it's currently not possible to set
+        # parameters in the superclass when creating an instance,
+        # because **args is used by this class itself. Should we have
+        # a general plan for dealing with this kind of thing, or not
+        # worry about it in general (i.e. remove the alert).
+        super(BinaryOperator,self).__init__()
+
         if reverse:
             self.lhs=rhs
             self.rhs=lhs
@@ -73,7 +80,7 @@ class BinaryOperator(NumberGenerator):
     def __call__(self):
         return self.operator(self.lhs() if callable(self.lhs) else self.lhs,
                              self.rhs() if callable(self.rhs) else self.rhs, **self.args)
-
+    
 
 
 class UnaryOperator(NumberGenerator):
@@ -85,6 +92,9 @@ class UnaryOperator(NumberGenerator):
         optional arguments to be provided to the operator when calling
         it on the operand.
         """
+        # Same ALERT as for BinaryOperator.
+        super(UnaryOperator,self).__init__()
+        
         self.operand=operand
         self.operator=operator
         self.args=args
