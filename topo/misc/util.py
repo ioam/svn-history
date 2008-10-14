@@ -13,6 +13,8 @@ import random
 import numpy
 import cProfile
 import pstats
+import sys
+import functools
 
 
 def NxN(tuple):
@@ -297,6 +299,45 @@ def signabs(x):
         sgn = 1
 
     return sgn,abs(x)
+
+
+class MultiOut(object):
+    """
+    For all file_like_objs passed on initialization, provides a
+    convenient way to call any of file's methods (on all of them).
+
+    E.g. The following would cause 'test' to be written into two
+    files, as well as to stdout:
+
+    import sys
+    f1 = open('file1','w')
+    f2 = open('file2','w')
+    m = MultiOut(f1,f2,sys.stdout)
+    m.write('test')
+    """
+    def __init__(self,*file_like_objs):
+        self.file_like_objs=file_like_objs
+        self.__provide_file_methods()
+
+    def __provide_file_methods(self):
+        # Provide a version of all the methods of the type file that
+        # don't start with '_'. In each case, the provided version
+        # loops over all the file_like_objs, calling the file method
+        # on all of them.
+        file_methods = [attr for attr in file.__dict__
+                        if not attr.startswith('_')
+                        and callable(file.__dict__[attr])]
+
+        for method in file_methods:
+            def looped_method(method_,*args,**kw):
+                all_out = []
+                for output in self.file_like_objs:
+                    out = getattr(output,method_)(*args,**kw)
+                    all_out.append(out)
+                return all_out
+
+            setattr(self,method,functools.partial(looped_method,method))
+            
 
 
 
