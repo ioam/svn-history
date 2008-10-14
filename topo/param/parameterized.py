@@ -28,6 +28,7 @@ min_print_level = NORMAL
 warnings_as_exceptions = False
 
 object_count = 0
+warning_count = 0
 
 
 import inspect
@@ -1025,6 +1026,8 @@ class Parameterized(object):
         containing the arguments.
         """
         if not warnings_as_exceptions:
+            global warning_count
+            warning_count+=1
             self.__db_print(WARNING,"Warning:",*args)
         else:
             raise Exception, ' '.join(["Warning:",]+[str(x) for x in args])

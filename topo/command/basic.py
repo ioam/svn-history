@@ -433,6 +433,7 @@ def run_batch(script_file,output_directory="Output",
 
     # Run script in main
     error_count = 0
+    initial_warning_count = param.parameterized.warning_count
     try:
         execfile(script_file,__main__.__dict__)
 
@@ -459,6 +460,7 @@ def run_batch(script_file,output_directory="Output",
 
     print "\nBatch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
                                                          time.gmtime())
+    print "Number of warnings: %s"%(param.parameterized.warning_count-initial_warning_count)
     print "Number of errors: %s"%error_count
 
     # restore stdout
