@@ -1491,7 +1491,23 @@ class ParamOverrides(dict):
         """As dict.__repr__, but indicate the overridden object."""
         # something like...
         return dict.__repr__(self)+" overriding params from %s"%repr(self.overridden)
- 
+
+
+# CB: need to make a better attempt at documenting.
+class ParameterizedFunction(Parameterized):
+    """
+    A subclass of Parameterized that, when created, returns the result
+    of __call__.
+
+    I.e. this is a Parameterized class that cannot be instantiated
+    directly.
+    """
+    def __new__(class_,**params):
+        inst=object.__new__(class_)
+        return inst.__call__(**params)
+
+    def __call__(self,*args,**kw):
+        raise NotImplementedError("Subclasses must implement __call__.")
 
 
 ## CB: would allow all instance methods to pickle, but we use cPickle

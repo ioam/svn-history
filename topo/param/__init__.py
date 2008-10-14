@@ -21,7 +21,8 @@ __version__='$Revision$'
 
 import types
 
-from parameterized import Parameterized, Parameter, String, descendents
+from parameterized import Parameterized, Parameter, String, \
+     descendents, ParameterizedFunction
 
 class Enumeration(Parameter):
     """

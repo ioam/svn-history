@@ -136,9 +136,39 @@ class TestParameterized(unittest.TestCase):
         assert t.inspect_value('dyn')!=orig
         t.state_pop()
         assert t.inspect_value('dyn')==orig
-        
-        
 
 
+
+from topo.param import parameterized
+
+class some_fn(param.ParameterizedFunction):
+   num_phase = param.Number(18)
+   frequencies = param.List([99])
+   scale = param.Number(0.3)
+
+   def __call__(self,**params_to_override):
+       params = parameterized.ParamOverrides(self,params_to_override)
+       num_phase = params['num_phase']
+       frequencies = params['frequencies']
+       scale = params['scale']
+       return scale,num_phase,frequencies
+
+
+
+class TestParameterizedFunction(unittest.TestCase):
+
+    def test_parameterized_function(self):
+
+        self.assertEqual(some_fn(),(0.3,18,[99]))
+        self.assertEqual(some_fn(frequencies=[1,2,3]),(0.3,18,[1,2,3]))
+        self.assertEqual(some_fn(),(0.3,18,[99]))
+        
+        some_fn.frequencies=[10,20,30]
+        self.assertEqual(some_fn(frequencies=[1,2,3]),(0.3,18,[1,2,3]))
+        self.assertEqual(some_fn(),(0.3,18,[10,20,30]))
+
+
+        
 suite = unittest.TestSuite()
-suite.addTest(unittest.makeSuite(TestParameterized))
+cases = [TestParameterized,TestParameterizedFunction]
+suite.addTests([unittest.makeSuite(case) for case in cases])
