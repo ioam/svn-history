@@ -652,14 +652,17 @@ def script_repr(val,imports,prefix,settings):
     """
     Variant of repr() designed for generating a runnable script.
 
-    Types that require special handling can use the script_repr_reg
-    dictionary. Using the type as a key, add a function that returns a
-    suitable representation of instances of that type, and adds the
-    required import statement.
+    Instances of types that require special handling can use the
+    script_repr_reg dictionary. Using the type as a key, add a
+    function that returns a suitable representation of instances of
+    that type, and adds the required import statement.
     """
     # CB: doc prefix & settings or realize they don't need to be
     # passed around, etc.
-    if type(val) in script_repr_reg:
+    if isinstance(val,type):
+        rep = type_script_repr(val,imports,prefix,settings)
+
+    elif type(val) in script_repr_reg:
         rep = script_repr_reg[type(val)](val,imports,prefix,settings)
 
     elif hasattr(val,'script_repr'):
@@ -700,7 +703,12 @@ def function_script_repr(fn,imports,prefix,settings):
     module = fn.__module__
     imports.append('import %s'%module)
     return module+'.'+name
-    
+
+def type_script_repr(type_,imports,prefix,settings):
+    module = type.__module__
+    if module!='__builtin__':
+        imports.append('import %s'%module)
+    return module+'.'+type_.__name__
 
 script_repr_reg[list]=container_script_repr
 script_repr_reg[tuple]=container_script_repr
