@@ -547,7 +547,7 @@ class Composite(Parameter):
     returns a list of the values of the constituents of the composite,
     in the order specified.  Likewise, setting the parameter takes a
     sequence of values and sets the value of the constituent
-    attributes sets all the constituents
+    attributes.
     """
     __slots__=['attribs','objtype']
 
