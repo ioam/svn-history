@@ -232,7 +232,7 @@ topo.sim.connect('Retina','LGNOff',delay=0.05,
 
 topo.sim.connect('LGNOn','V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,
-                 learning_fn=, CFPLF_Scaled_opt(),
+                 learning_fn=CFPLF_Scaled_opt(),
                  strength=1.0,name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
@@ -240,7 +240,7 @@ topo.sim.connect('LGNOn','V1',delay=0.05, dest_port=('Activity','JointNormalize'
                		 
 topo.sim.connect('LGNOff','V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
 		 connection_type=CFProjection,
-                 learning_fn=, CFPLF_Scaled_opt(),
+                 learning_fn=CFPLF_Scaled_opt(),
                  strength=1.0,name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
