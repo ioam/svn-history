@@ -54,7 +54,7 @@ from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet, CFPOF_Plugin
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.projfn import CFPLF_PluginScaled
-from topo.learningfn.optimized import CFPLF_Hebbian_opt
+from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Scaled_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF 
 from topo.outputfn.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
@@ -351,7 +351,7 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,
-                 learning_fn=CFPLF_PluginScaled(),
+                 learning_fn=CFPLF_Scaled_opt(),
                  strength=1.0,name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
@@ -359,7 +359,7 @@ topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','J
                		 
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
 		 connection_type=CFProjection,
-                 learning_fn=CFPLF_PluginScaled(),
+                 learning_fn=CFPLF_Scaled_opt(),
                  strength=1.0,name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
