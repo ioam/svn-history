@@ -8,10 +8,7 @@ import cPickle as pickle
 import gnosis.xml.pickle
 from xml.parsers.expat import ExpatError
 
-import time
-import string
-import re
-import os
+import os,sys,re,string,time
 
 import __main__
 
@@ -257,6 +254,25 @@ def save_script_repr(script_name=None):
     script_file.write(script)
 
 
+
+def _print_vc_info(filename):
+    """Save the version control status of the current code to the specified file."""
+
+    try:
+        import os,subprocess
+        
+        orig_path=os.getcwd()
+        os.chdir(filepath.application_path)
+        file = open(normalize_path(filename),'w')
+        file.write("Differences from Topographica version %s:\n" % topo.version)
+        p=subprocess.Popen(["svn","diff"],stdout=file,stderr=subprocess.STDOUT)
+        os.chdir(orig_path)
+        
+    except:
+        print "Unable to retrieve version control information."
+
+
+
 # Used only by default_analysis_function
 # Should be in order they are needed; e.g. Activity after map measurement,
 # in case Activity plot includes map subplots
@@ -298,16 +314,10 @@ def default_analysis_function():
     save_plotgroup("Activity",saver_params={"filename_suffix":"_45d"})
 
 
-            
-# JAB: Should also have some sort of time scaling, so that sims with
-# different lengths don't need an entirely new set of analysis times.
-# Should encode the cvs state somehow in the output directory, in a
-# form that could be used to recreate the CVS version of each file
-# used.  Should at least copy the script file into the output directory,
-# in any case.
+
 def run_batch(script_file,output_directory="Output",
               analysis_fn = default_analysis_function,
-              times = 1.0,snapshot=True,**params):
+              times = 1.0,snapshot=True,vc_info=True,**params):
     """
     Run a Topographica simulation in batch mode.
 
@@ -358,33 +368,23 @@ def run_batch(script_file,output_directory="Output",
 
     If requested by setting snapshot=True, saves a snapshot at the
     end of the simulation.
+
+    If available and requested by setting vc_info=True, prints
+    the revision number and any outstanding diffs from the version
+    control system.
     """
     import sys # CEBALERT: why do I have to import this again? (Also done elsewhere below.)
-    
-   
-    from topo.misc.commandline import auto_import_commands
-    auto_import_commands()
-    
-    command_used_to_start = string.join(sys.argv)
-    
-    starttime=time.time()
-    startnote = "Batch run started at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
-                                                           time.gmtime())
-    print startnote
+    import os
+    import shutil
 
-    # Ensure that saved state includes all parameter values
-    from topo.command.basic import save_script_repr
-    param.parameterized.script_repr_suppress_defaults=False
-
-    # Make sure pylab plots are saved to disk
-
-    # Construct simulation name
+    # Construct simulation name, etc.
     scriptbase= re.sub('.ty$','',os.path.basename(script_file))
     prefix = ""
     prefix += time.strftime("%Y%m%d%H%M")
     prefix += "_" + scriptbase
-
     simname = prefix
+
+
 
     # Construct parameter-value portion of filename; should do more filtering
     for a in params.keys():
@@ -395,11 +395,9 @@ def run_batch(script_file,output_directory="Output",
                  else str(params[a]))
         prefix += "," + a + "=" + valstr
 
-
     # Set provided parameter values in main namespace
     for a in params.keys():
         __main__.__dict__[a] = params[a]
-
 
     # Create output directories
     if not os.path.isdir(normalize_path(output_directory)):
@@ -408,9 +406,10 @@ def run_batch(script_file,output_directory="Output",
     filepath.output_path = normalize_path(os.path.join(output_directory,prefix))
     
     if os.path.isdir(filepath.output_path):
-	print "Batch run: Warning -- directory: " +  \
-              filepath.output_path + \
-              " already exists! Run aborted; rename directory or wait one minute before trying again."
+	print "Batch run: Warning -- directory already exists!"
+        print "Run aborted; wait one minute before trying again, or else rename existing directory: \n" + \
+              filepath.output_path
+
         import sys
         sys.exit(-1)
     else:
@@ -418,15 +417,35 @@ def run_batch(script_file,output_directory="Output",
         print "Batch run output will be in " + filepath.output_path
 
 
+    if vc_info:
+        _print_vc_info(simname+".diffs")
+
+    starttime=time.time()
+    startnote = "Batch run started at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
+                                                           time.gmtime())
+    command_used_to_start = string.join(sys.argv)
+
+    # Shadow stdout to a .out file in the output directory, so that
+    # print statements will go to both the file and to stdout.
     batch_output = open(normalize_path(simname+".out"),'w')
     batch_output.write(command_used_to_start+"\n")
-    batch_output.write(startnote+"\n")
-
-    ### Shadow stdout to batch_output.
-    # From this point onwards, print statements etc will go to both
-    # the file batch_output and to stdout.
     sys.stdout = MultiFile(batch_output,sys.stdout)
 
+    print startnote
+
+    from topo.misc.commandline import auto_import_commands
+    auto_import_commands()
+    
+    # Ensure that saved state includes all parameter values
+    from topo.command.basic import save_script_repr
+    param.parameterized.script_repr_suppress_defaults=False
+
+    # Save a copy of the script file for reference
+    shutil.copy2(script_file, filepath.output_path)
+    shutil.move(normalize_path(scriptbase+".ty"),
+                normalize_path(simname+".ty"))
+
+    
     # Default case: times is just a number that scales a standard list of times
     if not isinstance(times,list):
         times=[t*times for t in [50,100,500,1000,2000,3000,4000,5000,10000]]
@@ -460,16 +479,14 @@ def run_batch(script_file,output_directory="Output",
 
     print "\nBatch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
                                                          time.gmtime())
-    print "Number of warnings: %s"%(param.parameterized.warning_count-initial_warning_count)
-    print "Number of errors: %s"%error_count
-
+    print "There were %d error(s) and %d warning(s)%s." % \
+          (error_count,(param.parameterized.warning_count-initial_warning_count),
+           ((" (plus %d warning(s) prior to entering run_batch)"%initial_warning_count
+             if initial_warning_count>0 else "")))
+    
     # restore stdout
     sys.stdout = sys.__stdout__
     batch_output.close()
-    
-    # ALERT: Need to count number of warnings and put that on stdout
-    # and at the end of the .out file, so that they will be sure to be
-    # noticed.
     
 
 
