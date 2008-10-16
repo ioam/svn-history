@@ -28,7 +28,7 @@ from ..param import tk
 import topo
 
 from topo.base.sheetview import SheetView
-from topo.base.patterngenerator import PatternGenerator
+from topo.base.patterngenerator import PatternGenerator, Constant
 from topo.sheet.generator import GeneratorSheet
 from topo.command.basic import pattern_present, wipe_out_activity
 from topo.plotting.plot import make_template_plot
@@ -40,7 +40,6 @@ from plotgrouppanel import SheetPanel
 
 
 class TestPatternPlotGroup(SheetPlotGroup):
-
     def _plot_list(self):
         plot_list = []
         for sheet in self._sheets():
@@ -66,15 +65,19 @@ class TestPattern(SheetPanel):
     
     dock = param.Boolean(False)
 
-    edit_sheet = param.ObjectSelector(doc="""Sheet for which to edit pattern properties.""")
+    edit_sheet = param.ObjectSelector(doc="""
+        Sheet for which to edit pattern properties.""")
 
-    plastic = param.Boolean(default=False,doc="""Whether to enable plasticity during presentation.""")
-    duration = param.Number(default=1.0,doc="""How long to run the simulator when presenting.""",
-                      softbounds=(0.0,10.0))
+    plastic = param.Boolean(default=False,doc="""
+        Whether to enable plasticity during presentation.""")
+    
+    duration = param.Number(default=1.0, softbounds=(0.0,10.0),doc="""
+        How long to run the simulation for each presentation.""")
 
     Present = tk.Button(doc="""Present this pattern to the simulation.""")
 
-    pattern_generator = param.ClassSelector(class_=PatternGenerator, doc="""Type of pattern to present. Each type has various parameters that can be changed.""")
+    pattern_generator = param.ClassSelector(default=Constant(), class_=PatternGenerator, doc="""
+        Type of pattern to present. Each type has various parameters that can be changed.""")
 
 
 
@@ -105,10 +108,9 @@ class TestPattern(SheetPanel):
         self.params_frame.hide_param('Refresh')
 
         # CEB: 'new_default=True' is temporary so that the current
-        # behavior is the same as before. See ALERT below about None
-        # becoming the default & meaning 'apply to all sheets'.
-        self.pack_param('edit_sheet',parent=self.pg_control_pane,on_modify=self.switch_sheet,widget_options={'new_default':True,
-                            'sort_fn_args':{'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
+        # behavior is the same as before; shoudl make None the
+        # default and mean 'apply to all sheets'.
+        self.pack_param('edit_sheet',parent=self.pg_control_pane,on_modify=self.switch_sheet,widget_options={'new_default':True,'sort_fn_args':{'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
         self.pack_param('pattern_generator',parent=self.pg_control_pane,
                         on_modify=self.change_pattern_generator,side="top")
         
@@ -133,11 +135,8 @@ class TestPattern(SheetPanel):
 
 
     def switch_sheet(self):
-        # CEBALERT: temporary hack (test pattern window going to be
-        # changed so that None means apply to all sheets).
         if self.edit_sheet is not None:
             self.pattern_generator = self.edit_sheet.input_generator
-
         self.change_pattern_generator()
 
         
@@ -176,7 +175,8 @@ class TestPattern(SheetPanel):
         topo.sim.state_push()
         wipe_out_activity()
         topo.sim.event_clear()
-        input_dict = dict([(sheet.name,sheet.input_generator) for sheet in self.plotgroup._sheets()])
+        input_dict = dict([(sheet.name,sheet.input_generator) \
+                           for sheet in self.plotgroup._sheets()])
         pattern_present(input_dict,self.duration,
                         plastic=self.plastic,overwrite_previous=False)
         topo.guimain.auto_refresh()
