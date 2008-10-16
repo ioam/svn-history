@@ -33,6 +33,7 @@ updates are currently available in the latest SVN version:
 <dd>
   <div class="i2">- -v option to print verbose messages</div>
   <div class="i2">- -d option to print debugging messages</div>
+  <div class="i2">new options to <A target="_top" HREF="../Reference_Manual/topo.command.basic-module.html#run_batch">run_batch</A> and better progress messages</div>
 </dd>
 </font>
 </dl>
