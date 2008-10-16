@@ -21,7 +21,8 @@ orientation map network (a .typ file), which can be done by running
 
 <P>Depending on the speed of your machine, you may want to go get a
 snack at this point; on a 3GHz 512MB machine this training process
-currently takes about half an hour.<!--lodestar: 34m-->
+currently takes from 7-15 minutes (depending on the amount of level
+2 cache).<!--lodestar: 15:46 ; cortex: 7:31 -->
 </p>
 
 
