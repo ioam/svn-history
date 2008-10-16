@@ -1510,12 +1510,14 @@ class ParamOverrides(dict):
 # CB: need to make a better attempt at documenting.
 class ParameterizedFunction(Parameterized):
     """
-    A subclass of Parameterized that, when created, returns the result
-    of __call__.
+    Acts like a Python function, but with arguments that are Parameters.
 
-    I.e. this is a Parameterized class that cannot be instantiated
-    directly.
+    Implemented as a subclass of Parameterized that, when instantiated,
+    automatically invokes __call__ and returns the result, instead of
+    returning an instance of the class.
     """
+    __abstract = True
+
     def __new__(class_,**params):
         inst=object.__new__(class_)
         return inst.__call__(**params)
