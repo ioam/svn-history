@@ -560,6 +560,8 @@ class run_batch2(ParameterizedFunction):
 
     vc_info=param.Boolean(True)
 
+    args=param.Dict(default={})
+
     def __call__(self,**params_to_override):
         p=ParamOverrides(self,params_to_override)
 
@@ -574,19 +576,16 @@ class run_batch2(ParameterizedFunction):
         prefix += "_" + scriptbase
         simname = prefix
     
-# Disabled because it conflicts with Parameter processing    
-#        # Construct parameter-value portion of filename; should do more filtering
-#        for a in params.keys():
-#            val=params[a]
-#            
-#            # Special case to give reasonable filenames for lists
-#            valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
-#                     else str(params[a]))
-#            prefix += "," + a + "=" + valstr
-#    
-#        # Set provided parameter values in main namespace
-#        for a in params.keys():
-#            __main__.__dict__[a] = params[a]
+        # Construct parameter-value portion of filename; should do more filtering
+        for a,val in p['args'].items():
+            # Special case to give reasonable filenames for lists
+            valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
+                     else str(val))
+            prefix += "," + a + "=" + valstr
+    
+        # Set provided parameter values in main namespace
+        for a,val in p['args'].items():
+            __main__.__dict__[a] = val
     
         # Create output directories
         if not os.path.isdir(normalize_path(p['output_directory'])):
