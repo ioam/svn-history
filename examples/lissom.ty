@@ -467,6 +467,7 @@ topo.sim.grid_layout([vs,ls,es], xstep=70/len(eyes), ystep=200, item_scale=0.75/
 ### Set up appropriate defaults for analysis
 import topo.command
 
+
 preference_maps={
 'or': ['Orientation Preference'],
 'od': ['Ocular Preference'],
