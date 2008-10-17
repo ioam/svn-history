@@ -34,6 +34,7 @@ from sheetcoords import SheetCoordinateSystem
 # anyone ever uses such an object in a PatternGenerator.  Will also
 # need to support Composite patterns.
 
+
 class PatternGenerator(param.Parameterized):
     """
     A class hierarchy for callable objects that can generate 2D patterns.
@@ -112,43 +113,34 @@ class PatternGenerator(param.Parameterized):
         Optional function to apply to the pattern array after it has been created.
         This function can be used for normalization, thresholding, etc.""")
 
-    def __call__(self,**params_to_override):
+    def __call__(self,**params):
         """
-        Call the subclasses 'function' method on a rotated and scaled coordinate system.
+        Call the subclass's 'function' method on a rotated and scaled coordinate system.
 
         Creates and fills an array with the requested pattern.  If
         called without any params, uses the values for the Parameters
         as currently set on the object. Otherwise, any params
         specified override those currently set on the object.
         """
-        self._check_params(params_to_override)                
-        self.debug(lambda:"params = %s"%params_to_override)
-        params = ParamOverrides(self,params_to_override)
+        self._check_params(params)
+        p=ParamOverrides(self,params)
 
-        bounds=params['bounds']
-        xdensity=params['xdensity']
-        ydensity=params['ydensity']
-        x=params['x']
-        y=params['y']
-        orientation=params['orientation']
-        position=params_to_override.get('position',None)
+        # ALERT: position parameter is not currently supported:
+        # position=params_to_override.get('position',None)
+        # if position is not None:
+        #   x,y = position
 
-        if position is not None:
-            x,y = position
-
-        self.__setup_xy(bounds,xdensity,ydensity,x,y,orientation)
+        self.__setup_xy(p.bounds,p.xdensity,p.ydensity,p.x,p.y,p.orientation)
+        result = p.scale*self.function(p)+p.offset
+        self._apply_mask(p,result)
             
-        result = params['scale']*self.function(params)+params['offset']
-
-        self._apply_mask(params,result)
-            
-        output_fn = params['output_fn']
         # Optimization (not clear that is helps; does make small (-0.5s out of 75s)
         # difference to startup time of lissom_oo_or)
+        output_fn = p.output_fn
         if not isinstance(output_fn,IdentityOF): 
-            output_fn(result)  
+            output_fn(result)
                                
-        return result          
+        return result
                                
 
     def __setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
