@@ -1506,6 +1506,9 @@ class ParamOverrides(dict):
         # something like...
         return dict.__repr__(self)+" overriding params from %s"%repr(self.overridden)
 
+    def __getattr__(self,name):
+        return self.__getitem__(name)
+
 
 # CB: need to make a better attempt at documenting.
 class ParameterizedFunction(Parameterized):
