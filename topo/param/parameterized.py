@@ -1521,9 +1521,9 @@ class ParameterizedFunction(Parameterized):
     """
     __abstract = True
 
-    def __new__(class_,**params):
+    def __new__(class_,*args,**params):
         inst=object.__new__(class_)
-        return inst.__call__(**params)
+        return inst.__call__(*args,**params)
 
     def __call__(self,*args,**kw):
         raise NotImplementedError("Subclasses must implement __call__.")
