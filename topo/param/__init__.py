@@ -458,9 +458,10 @@ class NumericTuple(Parameter):
 
     def __init__(self,default=(0,0),length=None,**params):
         """
-        Initialize a numeric tuple parameter with a fixed length.
-        The length is determined by the initial default value, and
-        is not allowed to change after instantiation.
+        Initialize a numeric tuple parameter with a fixed length
+        (number of elements).  The length is determined by the initial
+        default value, and is not allowed to change after
+        instantiation.
         """
         if length is None:
             self.length = len(default)
