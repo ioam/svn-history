@@ -22,6 +22,8 @@ import pickle
 
 from numpy.testing import assert_array_almost_equal
 
+import topo
+
 from topo.misc.filepath import resolve_path, normalize_path
 from topo.command.analysis import *
 from topo.plotting.plotgroup import plotgroups
