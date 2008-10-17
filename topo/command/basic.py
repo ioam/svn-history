@@ -547,9 +547,6 @@ class run_batch2(ParameterizedFunction):
     the revision number and any outstanding diffs from the version
     control system.
     """
-
-    script_file=param.String("")
-
     output_directory=param.String("Output")
 
     analysis_fn = param.Callable(default_analysis_function)
@@ -562,7 +559,7 @@ class run_batch2(ParameterizedFunction):
 
     args=param.Dict(default={})
 
-    def __call__(self,**params_to_override):
+    def __call__(self,script_file,**params_to_override):
         p=ParamOverrides(self,params_to_override)
 
         import sys # CEBALERT: why do I have to import this again? (Also done elsewhere below.)
@@ -570,7 +567,7 @@ class run_batch2(ParameterizedFunction):
         import shutil
     
         # Construct simulation name, etc.
-        scriptbase= re.sub('.ty$','',os.path.basename(p['script_file']))
+        scriptbase= re.sub('.ty$','',os.path.basename(script_file))
         prefix = ""
         prefix += time.strftime("%Y%m%d%H%M")
         prefix += "_" + scriptbase
@@ -629,7 +626,7 @@ class run_batch2(ParameterizedFunction):
         param.parameterized.script_repr_suppress_defaults=False
     
         # Save a copy of the script file for reference
-        shutil.copy2(p['script_file'], filepath.output_path)
+        shutil.copy2(script_file, filepath.output_path)
         shutil.move(normalize_path(scriptbase+".ty"),
                     normalize_path(simname+".ty"))
     
@@ -643,7 +640,7 @@ class run_batch2(ParameterizedFunction):
         error_count = 0
         initial_warning_count = param.parameterized.warning_count
         try:
-            execfile(p['script_file'],__main__.__dict__)
+            execfile(script_file,__main__.__dict__)
     
             topo.sim.name=simname
     
