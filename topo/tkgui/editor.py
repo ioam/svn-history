@@ -45,13 +45,14 @@ from topo.base.projection import Projection
 ## WINDOW
 ###########################################################################
 
-canvas_region = (0, 0, 1200, 1200)
-"""Size of the canvas, as a bounding box (xl yl xh yh)."""
-
 # These can be customized, e.g. in .topographicarc; they should probably be parameters
 # somewhere.
+canvas_width = 1200
 scaling_factor = topo.sim.item_scale
 enlarging_factor = 1.25
+
+canvas_region = (0, 0, canvas_width, canvas_width)
+"""Size of the canvas, as a bounding box (xl yl xh yh)."""
 
 
 class EditorCanvas(Canvas):
