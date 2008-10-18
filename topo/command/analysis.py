@@ -519,10 +519,10 @@ class MeasureResponseFunction(ParameterizedFunction):
     __abstract = True
 
 
-    def __call__(self,**params_to_override):
+    def __call__(self,**params):
         """Measure the response to the specified pattern and create maps from them."""
         
-        p=ParamOverrides(self,params_to_override)
+        p=ParamOverrides(self,params)
         x=FeatureMaps(self.feature_list(p))
         static_params = dict([(s,p[s]) for s in p.static_parameters])
         x.collect_feature_responses(p.pattern_presenter,static_params,
@@ -599,6 +599,39 @@ class PositionMeasurementFunction(MeasureResponseFunction):
 
         
 
+
+class ProjectionSheetMeasurementFunction(ParameterizedFunction):
+    """A callable Parameterized command for measuring or plotting a specified Sheet."""
+
+    sheet_name = param.String(default='',doc="""
+        Name of the sheet to use in measurements.""")
+
+    __abstract = True
+
+
+
+class SingleInputResponseFunction(MeasureResponseFunction):
+    """A callable Parameterized command for measuring the response to input on a specified Sheet."""
+
+    input_sheet_name = param.String(default='',doc="""
+        Name of the sheet where input should be drawn.""")
+
+    scale = param.Number(default=30.0)
+
+    offset = param.Number(default=0.5)
+
+    # JABALERT: Presumably the size is overridden in the call, right?
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(Rectangle(size=0.1,aspect_ratio=1.0),True,duration=1.0))
+
+    static_parameters = param.List(default=["scale","offset","size"])
+
+    weighted_average = None # Disabled unused parameter
+
+    __abstract = True
+
+
+
 # Module variables for passing values to the commands.
 coordinate = (0,0)
 sheet_name = ''
@@ -663,19 +696,21 @@ pg= create_plotgroup(name='Connection Fields',category="Basic",
                      plot_immediately=True, normalize=True, situate=True)
 pg.add_plot('Connection Fields',[('Strength','Weights')])
 
+class update_connectionfields(ProjectionSheetMeasurementFunction):
+    """A callable Parameterized command for measuring or plotting a unit from a Projection."""
 
-def update_connectionfields():
-    """
-    Add SheetViews for the weights of one unit in a CFSheet, 
-    for use in template-based plots.
-    """
-    sheets = topo.sim.objects(Sheet).values()
-    x = coordinate[0]
-    y = coordinate[1]
-    for s in sheets:
-	if (s.name == sheet_name and isinstance(s,CFSheet)):
-	    s.update_unit_view(x,y)
+    coords = param.List(default=[(0,0)],doc="""
+        List of coordinates of units to measure.""")
 
+    proj_name = param.String(default='',doc="""
+        Name of the projection to measure; the empty string means all projections.""")
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        s = topo.sim.objects(CFSheet).get(p.sheet_name)
+        if s is not None:
+            for x,y in p.coords:
+                s.update_unit_view(x,y,p.proj_name)
 
 
 ## ###############################################################################
@@ -686,16 +721,15 @@ pg= create_plotgroup(name='Projection',category="Basic",
 pg.add_plot('Projection',[('Strength','Weights')])
 
 
-def update_projections():
-    """
-    Add SheetViews for the weights in one CFProjection,
-    for use in template-based plots.
-    """
-    sheets = topo.sim.objects(Sheet).values()
-    for s in sheets:
-	if (s.name == sheet_name and isinstance(s,CFSheet)):
-	    for x,y in proj_coords:
-		s.update_unit_view(x,y,proj_name)
+class update_projections(update_connectionfields):
+    """A callable Parameterized command for measuring or plotting a set of units from a Projection."""
+
+    # Can consider eliminating this class; it simply keeps its defaults
+    # separate from UnitMeasurementFunction
+    coords = param.List(default=[(0,0)])
+
+    proj_name = param.String(default='')
+
 
 
 ## ###############################################################################
@@ -706,14 +740,16 @@ pg =  create_plotgroup(name='Projection Activity',category="Basic",
 pg.add_plot('Projection Activity',[('Strength','ProjectionActivity')])
 
 
-def update_projectionactivity():
+class update_projectionactivity(ProjectionSheetMeasurementFunction):
     """
     Add SheetViews for all of the Projections of the ProjectionSheet
     specified by sheet_name, for use in template-based plots.
     """
     
-    for s in topo.sim.objects(Sheet).values():
-	if (s.name == sheet_name and isinstance(s,ProjectionSheet)):
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        s = topo.sim.objects(ProjectionSheet).get(p.sheet_name)
+        if s is not None:
             for p in s.in_connections:
                 if not isinstance(p,Projection):
                     topo.sim.debug("Skipping non-Projection "+p.name)
@@ -761,10 +797,7 @@ pg= create_plotgroup(name='RF Projection',category="Other",
     normalize=True)
 pg.add_plot('RFs',[('Strength','RFs')])
 
-
-def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=True,
-                pattern_presenter=PatternPresenter(Rectangle(size=0.1,aspect_ratio=1.0),True,duration=1.00),
-                x_range=(-0.2,0.2),y_range=(-0.2,0.2)):
+class measure_rfs(SingleInputResponseFunction):
     """
     Map receptive fields by reverse correlation.
 
@@ -777,7 +810,7 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=True,
     lieu of receptive fields, because they take all circuitry in
     between the input and the target unit into account.
 
-    Note that it is crucial to set the scale parameter properly when
+    Note also that it is crucial to set the scale parameter properly when
     using units with a hard activation threshold (as opposed to a
     smooth sigmoid), because the input pattern used here may not be a
     very effective way to drive the unit to activate.  The value
@@ -785,42 +818,41 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=True,
     some of the time there is a pattern on the input.
     """
     
-    # RFHACK: Should improve how parameters are passed, and add a
-    # default value for this parameter
-
-    if not input_sheet_name:
-        raise ValueError("Must set topo.command.analysis.input_sheet_name before calling measure_rfs")
-
-    input_sheet = topo.sim[input_sheet_name]
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
     
-    # CBERRORALERT: pattern's actually being presented on all GeneratorSheets.
-    # Need to alter PatternPresenter to accept an input sheet. For 0.9.4 need
-    # to document that same pattern is drawn on all generator sheets.
+        # RFHACK: Should add a default value for this parameter
+        if p.input_sheet_name == '':
+            raise ValueError("Must set topo.command.analysis.SingleInputResponseFunction.input_sheet_name before calling measure_rfs")
+    
+        input_sheet = topo.sim[p.input_sheet_name]
+        
+        # CBERRORALERT: pattern's actually being presented on all GeneratorSheets.
+        # Need to alter PatternPresenter to accept an input sheet. For 0.9.4 need
+        # to document that same pattern is drawn on all generator sheets.
+    
+        # CEBALERT: various things in here need to be arguments
 
-    # CEBALERT: various things in here need to be arguments
+        # Presents the pattern at each pixel location
+        l,b,r,t = input_sheet.nominal_bounds.lbrt()
+        density=input_sheet.nominal_density*1.0 # Could make into a parameter
+        divisions = density*(r-l)-1
+        size = 1.0/density
+        x_range=(r-size/2,l)
+        y_range=(t-size,b)
+        p['size']=size
+    
+        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
+                          Feature(name="scale",range=(-p.scale,p.scale),step=p.scale*2)]   
 
-    # Presents the pattern at each pixel location
-    resolution = 100 # percentage, 100 is max, 0 is min
-    l,b,r,t = input_sheet.nominal_bounds.lbrt()
-    density=resolution*input_sheet.nominal_density/100.0
-    divisions = density*(r-l)-1
-    size = 1.0/(density)
-    x_range=(r-size/2,l)
-    y_range=(t-size,b)
-    size=size*1
-
-
-    if divisions <= 0:
-        raise ValueError("Divisions must be greater than 0")
-
-    feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                      Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
-                      Feature(name="scale",range=(-scale,scale),step=scale*2)]   
-               
-    param_dict = {"size":size,"scale":scale,"offset":offset}
-
-    x=ReverseCorrelation(feature_values,input_sheet=input_sheet) #+change argument
-    x.collect_feature_responses(pattern_presenter,param_dict,display,feature_values)
+        #JABALERT: What does it mean to have scale in both the
+        #feature list and the static parameters?  Presumably one
+        #overrides the other, and the overriden one should be
+        #eliminated.
+        static_params = dict([(s,p[s]) for s in p.static_parameters])
+        x=ReverseCorrelation(feature_values,input_sheet=input_sheet) #+change argument
+        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,feature_values)
 
 
 
@@ -831,28 +863,47 @@ pg= create_plotgroup(name='RF Projection (noise)',category="Other",
            plot_command='',normalize=True)
 pg.add_plot('RFs',[('Strength','RFs')])
 
-### JABALERT: Why is the scale and offset set twice?                                    
-def measure_rfs_noise(divisions=99,scale=0.5,offset=0.5,display=False,
-                      pattern_presenter=PatternPresenter(GaussianRandom(scale=0.5,offset=0.5),True,duration=1.0),
-                      x_range=(-1.0,1.0),y_range=(-1.0,1.0)):
+
+class measure_rfs_noise(SingleInputResponseFunction):
     """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
 
-    # RFHACK: Should improve how parameters are passed, and add a
-    # default value for this parameter
-    if not input_sheet_name:
-        raise ValueError("Must set topo.command.analysis.input_sheet_name before calling measure_rfs")
-    input_sheet = topo.sim[input_sheet_name]
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(GaussianRandom(),True,duration=1.0))
+
+    scale = param.Number(default=0.5)
+
+    static_parameters = param.List(default=["scale","offset"])
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+
+        # RFHACK: Should add a default value for this parameter
+        if p.input_sheet_name == '':
+            raise ValueError("Must set topo.command.analysis.SingleInputResponseFunction.input_sheet_name before calling measure_rfs")
     
-    if divisions <= 0:
-        raise ValueError("Divisions must be greater than 0")
+        ### JABALERT: What was this function supposed to do?  It steps
+        ### through a range of x and y, yet a GaussianRandom pattern
+        ### ignores x and y, so all it really seems to be doing is
+        ### ending up with about 10000 noise patterns.  Surely there
+        ### is a better way to do that?  For now, divisions, xrange,
+        ### and y_range are no longer parameters, because they are
+        ### nonsensical, but a proper parameter (e.g. number of random
+        ### presentations) should be added and these removed.
+        ### Alternatively, maybe it was supposed to be a GaussianCloud
+        ### pattern, in which case these should be made into
+        ### Parameters (or calculated like in measure_rfs).
+        divisions=99
+        x_range=(-1.0,1.0)
+        y_range=(-1.0,1.0)
 
-    feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                      Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
-                      
-    param_dict = {"scale":scale,"offset":offset}
-
-    x=ReverseCorrelation(feature_values,input_sheet=input_sheet)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,feature_values)
+        input_sheet = topo.sim[p.input_sheet_name]
+        
+        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
+                          
+        static_params = dict([(s,p[s]) for s in p.static_parameters])        
+        x=ReverseCorrelation(feature_values,input_sheet=input_sheet)
+        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,feature_values)
 
 
 
