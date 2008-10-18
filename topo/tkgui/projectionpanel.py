@@ -263,8 +263,7 @@ class RFProjectionPanel(PlotMatrixPanel):
     def __init__(self,master,plotgroup,**params):
         super(RFProjectionPanel,self).__init__(master,plotgroup,**params)
         self.pack_param('input_sheet',parent=self.control_frame_3,
-                        on_modify=self.redraw_plots,side='left',expand=1,
-                        widget_options={'new_default':True})
+                        on_modify=self.redraw_plots,side='left',expand=1)
                         
         self.pack_param('density',parent=self.control_frame_4)
 
@@ -276,7 +275,6 @@ class RFProjectionPanel(PlotMatrixPanel):
         sheets = topo.sim.objects(GeneratorSheet).values()
         self.plotgroup.params()['input_sheet'].objects = sheets
         self.plotgroup.input_sheet=sheets[0]
-
 
     def _plot_title(self):
         return 'RFs of %s on %s at time %s'%(self.sheet.name,self.plotgroup.input_sheet.name,
