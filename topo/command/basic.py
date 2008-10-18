@@ -557,10 +557,8 @@ class run_batch2(ParameterizedFunction):
 
     vc_info=param.Boolean(True)
 
-    args=param.Dict(default={})
-
     def __call__(self,script_file,**params_to_override):
-        p=ParamOverrides(self,params_to_override)
+        p=ParamOverrides(self,params_to_override,allow_extra_keywords=True)
 
         import sys # CEBALERT: why do I have to import this again? (Also done elsewhere below.)
         import os
@@ -574,14 +572,14 @@ class run_batch2(ParameterizedFunction):
         simname = prefix
     
         # Construct parameter-value portion of filename; should do more filtering
-        for a,val in p['args'].items():
+        for a,val in p.extra_keywords.items():
             # Special case to give reasonable filenames for lists
             valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
                      else str(val))
             prefix += "," + a + "=" + valstr
     
         # Set provided parameter values in main namespace
-        for a,val in p['args'].items():
+        for a,val in p.extra_keywords.items():
             __main__.__dict__[a] = val
     
         # Create output directories
