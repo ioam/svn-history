@@ -65,7 +65,6 @@ class RandomDotStereogram(PatternGenerator):
     def __call__(self,**params_to_override):
 
         # Gather parameters
-        self._check_params(params_to_override)
         params = ParamOverrides(self,params_to_override)
         
         bounds      = params['bounds']

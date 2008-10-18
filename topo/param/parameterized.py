@@ -1101,20 +1101,6 @@ class Parameterized(object):
             setattr(self,name,val)
 
 
-    def _check_params(self,params):
-        """
-        Print a warning if params contains something that is
-        not a Parameter of this object.
-
-        Typically invoked by a __call__() method that accepts keyword
-        arguments for parameter setting.
-        """
-        self_params = self.params()
-        for item in params:
-            if item not in self_params:
-                self.warning("'%s' will be ignored (not a Parameter)."%item)
-
-
     def get_param_values(self,onlychanged=False):
         """Return a list of name,value pairs for all Parameters of this object"""
         vals = []
@@ -1476,17 +1462,25 @@ class PicklableClassAttributes(object):
 
 
 
-# CEBALERT: we should incorporate overridden._check_params() here
-# rather than making __call__ methods do it
-# (that is, if we want to keep _check_params at all).
 class ParamOverrides(dict):
     """
-    A dictionary that returns the attribute of an object if that attribute is not
-    present in itself.
+    A dictionary that returns the attribute of an object if that
+    attribute is not present in itself.
 
     Used to override the parameters of an object.
     """
-    def __init__(self,overridden,dict_): 
+    def __init__(self,overridden,dict_,allow_extra_keywords=False):
+        """
+        
+        If allow_extra_keywords is False, then all keys in the
+        supplied dict_ must match parameter names on the overridden
+        object (otherwise a warning will be printed).
+
+        If allow_extra_keywords is True, then any items in the
+        supplied dict_ that are not also parameters of the overridden
+        object will be available through the attribute
+        'extra_keywords'.
+        """
         # we'd like __init__ to be fast because it's going to be
         # called a lot. What's the fastest way to move the existing
         # params dictionary into this one? Would
@@ -1495,7 +1489,13 @@ class ParamOverrides(dict):
         #      dict.__init__(self,**kw)
         # be faster/easier to use?
         self.overridden = overridden
-        dict.__init__(self,dict_)        
+        dict.__init__(self,dict_)
+
+        if allow_extra_keywords:
+            self.extra_keywords=self._extract_extra_keywords(dict_)
+        else:
+            self._check_params(dict_)
+            
  
     def __missing__(self,attr):
         """Return the attribute from overridden object."""
@@ -1507,7 +1507,34 @@ class ParamOverrides(dict):
         return dict.__repr__(self)+" overriding params from %s"%repr(self.overridden)
 
     def __getattr__(self,name):
+        # Provide 'dot' access to entries in the dictionary.
         return self.__getitem__(name)
+
+
+    def _check_params(self,params):
+        """
+        Print a warning if params contains something that is not a
+        Parameter of the overridden object.
+        """
+        overridden_object_params = self.overridden.params().keys()
+        for item in params:
+            if item not in overridden_object_params:
+                self.warning("'%s' will be ignored (not a Parameter)."%item)
+
+    def _extract_extra_keywords(self,params):
+        """
+        Remove and return any items in params that are not also
+        parameters of the overridden object.
+        """
+        extra_keywords = {}
+        overridden_object_params = self.overridden.params()
+        for name,val in params.items():
+            if name not in overridden_object_params:
+                extra_keywords[name]=val
+                # CEBALERT: and should we remove name from params,
+                # so that it's only available via extra_keywords?
+                # I think we don't need to do that.
+        return extra_keywords
 
 
 # CB: need to make a better attempt at documenting.

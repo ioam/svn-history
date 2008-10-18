@@ -53,7 +53,6 @@ class RandomGenerator(PatternGenerator):
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params_to_override):
-        self._check_params(params_to_override)
         params = ParamOverrides(self,params_to_override)
 
         shape = SheetCoordinateSystem(params['bounds'],params['xdensity'],params['ydensity']).shape
