@@ -12,6 +12,8 @@ from colorsys import hsv_to_rgb
 from numpy.oldnumeric import array, zeros, Float,size, shape, maximum, add, ones
 
 from .. import param
+from ..param.parameterized import PicklableClassAttributes, ParameterizedFunction
+from ..param.parameterized import ParamOverrides
 
 import topo
 from topo.base.arrayutil import octave_output, centroid, wrap
@@ -301,10 +303,7 @@ class PatternPresenter(param.Parameterized):
                      apply_output_fn=self.apply_output_fn)
 
 
-
-
-
-
+# JABALERT: presumably this should be moved elsewhere in the file
 def save_plotgroup(name,saver_params={},**params):
     """
     Convenience command for saving a set of plots to disk.  Examples:
@@ -336,6 +335,7 @@ def save_plotgroup(name,saver_params={},**params):
     
     plotgroup.make_plots()
     plotgroup.filesaver.save_to_disk(**saver_params)
+
 
 
 class Subplotting(param.Parameterized):
@@ -412,6 +412,192 @@ class Subplotting(param.Parameterized):
         Subplotting.subplotting_declared=True
 
 
+###############################################################################
+###############################################################################
+###############################################################################
+#
+# 20081017 JABNOTE: This implementation could be improved.  
+#
+# It currently requires every subclass to implement the feature_list
+# method, which constructs a list of features using various parameters
+# to determine how many and which values each feature should have.  It
+# would be good to replace the feature_list method with a Parameter or
+# set of Parameters, since it is simply a special data structure, and
+# this would make more detailed control feasible for users. For
+# instance, instead of something like num_orientations being used to
+# construct the orientation Feature, the user could specify the
+# appropriate Feature directly, so that they could e.g. supply a
+# specific list of orientations instead of being limited to a fixed
+# spacing.
+# 
+# However, when we implemented this, we ran into two problems:
+#
+# 1. It's difficult for users to modify an open-ended list of
+#     Features.  E.g., if features is a List:
+#
+#      features=param.List(doc="List of Features to vary""",default=[
+#          Feature(name="frequency",values=[2.4]),
+#          Feature(name="orientation",range=(0.0,pi),step=pi/4,cyclic=True),
+#          Feature(name="phase",range=(0.0,2*pi),step=2*pi/18,cyclic=True)])
+#
+#    then it it's easy to replace the entire list, but tough to
+#    change just one Feature.  Of course, features could be a
+#    dictionary, but that doesn't help, because when the user
+#    actually calls the function, they want the arguments to
+#    affect only that call, whereas looking up the item in a
+#    dictionary would only make permanent changes easy, not
+#    single-call changes.
+#    
+#    Alternatively, one could make each feature into a separate     
+#    parameter, and then collect them using a naming convention like:
+#
+#     def feature_list(self,p):
+#         fs=[]
+#         for n,v in self.get_param_values():
+#             if n in p: v=p[n]
+#             if re.match('^[^_].*_feature$',n):
+#                 fs+=[v]
+#         return fs
+#    
+#    But that's quite hacky, and doesn't solve problem 2.
+# 
+# 2. Even if the users can somehow access each Feature, the same
+#    problem occurs for the individual parts of each Feature.  E.g.
+#    using the separate feature parameters above, Spatial Frequency
+#    map measurement would require:
+#
+#      update_command='from topo.command.analysis import Feature ; \
+#         from math import pi; measure_or_pref( \
+#         frequency_feature=Feature(name="frequency",values=frange(1.0,6.0,0.2)), \
+#         phase_feature=Feature(name="phase",range=(0.0,2*pi),step=2*pi/15,cyclic=True), \
+#         orientation_feature=Feature(name="orientation",range=(0.0,pi),step=pi/4,cyclic=True))')
+#   
+#    rather than the current, much more easily controllable implementation:
+#   
+#      update_command='measure_or_pref(frequencies=frange(1.0,6.0,0.2),\
+#         num_phase=15,num_orientation=4)')
+#
+#    I.e., to change anything about a Feature, one has to supply an
+#    entirely new Feature, because otherwise the original Feature
+#    would be changed for all future calls.  Perhaps there's some way
+#    around this by copying objects automatically at the right time,
+#    but if so it's not obvious.  Meanwhile, the current
+#    implementation is reasonably clean and easy to use, if not as
+#    flexible as it could be.
+
+
+class MeasureResponseFunction(ParameterizedFunction):
+    """Parameterized command for presenting input patterns and measuring responses."""
+      
+    scale = param.Number(default=1.0,softbounds=(0.0,2.0),doc="""
+        Multiplicative strength of input pattern.""")
+    
+    offset = param.Number(default=0.0,softbounds=(-1.0,1.0),doc="""
+        Additive offset to input pattern.""")
+
+    display = param.Boolean(default=False,doc="""
+        Whether to update a GUI display (if any) during the map measurement.""")
+
+    weighted_average= param.Boolean(default=True, doc="""
+        Whether to compute results using a weighted average, or just
+        discrete values.  A weighted average can give more precise
+        results, without being limited to a set of discrete values,
+        but the results can have systematic biases due to the
+        averaging, especially for non-cyclic parameters.""")
+
+    pattern_presenter = param.Callable(default=None,doc="""
+        Callable object that will present a parameter-controlled pattern to a
+        set of Sheets.  Needs to be supplied by a subclass or in the call.""")
+    
+    static_parameters = param.List(class_=str,default=["scale","offset"],doc="""
+        List of names of parameters of this class to pass to the
+        pattern_presenter as static parameters, i.e. values that
+        will be fixed to a single value during measurement.""")
+
+    subplot = param.String("",doc="""Name of map to register as a subplot, if any.""")
+  
+    __abstract = True
+
+
+    def __call__(self,**params_to_override):
+        """Measure the response to the specified pattern and create maps from them."""
+        
+        p=ParamOverrides(self,params_to_override)
+        x=FeatureMaps(self.feature_list(p))
+        static_params = dict([(s,p[s]) for s in p.static_parameters])
+        x.collect_feature_responses(p.pattern_presenter,static_params,
+                                    p.display,p.weighted_average)
+
+        if p.subplot != "":
+            Subplotting.set_subplots(p.subplot,force=True)
+
+        return x._fullmatrix
+
+
+    def feature_list(self,p):
+        """Return the list of features to vary; must be implemented by each subclass."""
+        raise NotImplementedError
+
+
+    
+
+class SinusoidalMeasureResponseFunction(MeasureResponseFunction):
+    """Parameterized command for presenting sine gratings and measuring responses."""
+    
+    # Could consider having scripts set a variable for the duration,
+    # based on their own particular model setup, and to have it read
+    # from here.  Instead, assumes a fixed default duration right now...
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175),doc="""
+        Callable object that will present a parameter-controlled pattern to a
+        set of Sheets.  By default, uses a SineGrating presented for a short
+	duration.  By convention, most Topographica example files
+        are designed to have a suitable activity pattern computed by
+        that time, but the duration will need to be changed for other
+        models that do not follow that convention.""")
+
+    frequencies = param.List(class_=float,default=[2.4],doc="Sine grating frequencies to test.")
+    
+    num_phase = param.Integer(default=18,bounds=(1,None),softbounds=(1,48),
+                              doc="Number of phases to test.")
+
+    num_orientation = param.Integer(default=4,bounds=(1,None),softbounds=(1,24),
+                                    doc="Number of orientations to test.")
+
+    scale = param.Number(default=0.3)
+
+    __abstract = True
+
+    
+
+
+class PositionMeasurementFunction(MeasureResponseFunction):
+    """Parameterized command for measuring topographic position."""
+
+    divisions=param.Integer(default=6,bounds=(1,None),doc="""
+        The number of different positions to measure in X and in Y.""")
+    
+    x_range=param.NumericTuple((-0.5,0.5),doc="""
+        The range of X values to test.""")
+
+    y_range=param.NumericTuple((-0.5,0.5),doc="""
+        The range of Y values to test.""")
+
+    size=param.Number(default=0.5,bounds=(0,None),doc="""
+        The size of the pattern to present.""")
+    
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(Gaussian(aspect_ratio=1.0),False,0.175),doc="""
+        Callable object that will present a parameter-controlled
+        pattern to a set of Sheets.  For measuring position, the
+        pattern_presenter should be spatially localized, yet also able
+        to activate the appropriate neurons reliably.""")
+
+    static_parameters = param.List(default=["scale","offset","size"])
+  
+    __abstract = True
+
+        
 
 # Module variables for passing values to the commands.
 coordinate = (0,0)
@@ -554,32 +740,17 @@ pg.add_plot('Y Preference',[('Strength','YPreference')])
 pg.add_plot('Position Preference',[('Red','XPreference'),
                                     ('Green','YPreference')])
 
-def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
-                          pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,0.175),
-                          x_range=(-0.5,0.5),y_range=(-0.5,0.5),weighted_average=True):
-    """
-    Measure position preference map, using a circular Gaussian by default.
+class measure_position_pref(PositionMeasurementFunction):
+    """Measure a position preference map by collating the response to patterns."""
+    
+    scale = param.Number(default=0.3)
 
-    Measures maps by collating the responses to a set of input
-    patterns controlled by some parameters.  The parameter ranges and
-    number of input patterns in each range are determined by the
-    divisions parameter.  The particular pattern used is determined by the
-    size, scale, offset, and pattern_presenter arguments.
-    """
+    def feature_list(self,p):
+        width =1.0*p.x_range[1]-p.x_range[0]
+        height=1.0*p.y_range[1]-p.y_range[0]
+        return [Feature(name="x",range=p.x_range,step=width/p.divisions),
+                Feature(name="y",range=p.y_range,step=height/p.divisions)]
 
-    if divisions <= 0:
-        raise ValueError("Divisions must be greater than 0")
-
-    # JABALERT: Will probably need some work to support multiple input regions
-    feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                      Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
-                      
-                                  
-                          
-                      
-    param_dict = {"size":size,"scale":scale,"offset":offset}
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
 
 ###############################################################################
@@ -860,46 +1031,17 @@ pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
 
 
-def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=False,weighted_average=True,
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
-    """
-    Measure orientation maps, using a sine grating by default.
+class measure_or_pref(SinusoidalMeasureResponseFunction):
+    """Measure an orientation preference map by collating the response to patterns."""
 
-    Measures maps by collating the responses to a set of input
-    patterns controlled by some parameters.  The parameter ranges and
-    number of input patterns in each range are determined by the
-    num_phase, num_orientation, and frequencies parameters.  The
-    particular pattern used is determined by the pattern_presenter
-    argument, which defaults to a sine grating presented for a short
-    duration.  By convention, most Topographica example files
-    are designed to have a suitable activity pattern computed by
-    that time, but the duration will need to be changed for other
-    models that do not follow that convention.
-    """
-    # Could consider having scripts set a variable for the duration,
-    # based on their own particular model setup, and to have it read
-    # from here.  Instead, assumes a fixed default duration right now...
-
-    if num_phase <= 0 or num_orientation <= 0:
-        raise ValueError("num_phase and num_orientation must be greater than 0")
-
-    step_phase=2*pi/num_phase
-    step_orientation=pi/num_orientation
+    subplot = param.String("Orientation")
     
+    def feature_list(self,p):
+        return [Feature(name="frequency",values=p.frequencies),
+                Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
+                Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
 
-    
-    feature_values = [Feature(name="frequency",values=frequencies),
-                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
-    param_dict = {"scale":scale,"offset":offset}
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-    fm = x._fullmatrix
-
-    Subplotting.set_subplots("Orientation",force=True)
-    return fm
 
 ###############################################################################
 pg= create_plotgroup(name='Ocular Preference',category="Preference Maps",
@@ -909,42 +1051,19 @@ pg.add_plot('Ocular Preference',[('Strength','OcularPreference')])
 pg.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
 
 
+class measure_od_pref(SinusoidalMeasureResponseFunction):
+    """Measure an ocular dominance preference map by collating the response to patterns."""
 
-### JABALERT: Shouldn't there be a num_ocularities argument as well, to
-### present various combinations of left and right eye activity?        
-def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=False,weighted_average=True,
-		    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                   apply_output_fn=False,duration=0.175)):
-    """
-    Measure ocular dominance maps, using a sine grating by default.
-
-    Measures maps by collating the responses to a set of input
-    patterns controlled by some parameters.  The parameter ranges and
-    number of input patterns in each range are determined by the
-    num_phase, num_orientation, and frequencies parameters.  The
-    particular pattern used is determined by the pattern_presenter
-    argument, which defaults to a sine grating presented for a short
-    duration.  By convention, most Topographica example files
-    are designed to have a suitable activity pattern computed by
-    that time, but the duration will need to be changed for other
-    models that do not follow that convention.
-    """
+    ### JABALERT: Shouldn't there be a num_ocularities parameter as
+    ### well, to present various combinations of left and right eye
+    ### activity?  And shouldn't this just be combined with
+    ### measure_or_pref, using num_ocularities=1 by default?
     
-    if num_phase <= 0 or num_orientation <= 0:
-        raise ValueError("num_phase and num_orientation must be greater than 0")
-
-    step_phase=2*pi/num_phase
-    step_orientation=pi/num_orientation
-
-    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                      Feature(name="frequency",values=frequencies),
-                      Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0])]  
-
-    param_dict = {"scale":scale,"offset":offset}
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    def feature_list(self,p):
+        return [Feature(name="frequency",values=p.frequencies),
+                Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
+                Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+                Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0])]
   
 
 ###############################################################################
@@ -955,6 +1074,7 @@ pg.add_plot('Spatial Frequency Preference',[('Strength','FrequencyPreference')])
 pg.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity')])
 # Just calls measure_or_pref with different defaults, and plots different maps.
 
+
 ###############################################################################
 pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",
              doc='Measure preference for sine gratings differing in phase between two sheets.',
@@ -964,41 +1084,21 @@ pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity
 pg.add_static_image('Color Key','topo/command/disp_key_white_vert_small.png')
 
 
-def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
-                           scale=0.3,offset=0.0,display=False,weighted_average=True,
-                           pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                              apply_output_fn=False,duration=0.175)):
-    """
-    Measure disparity maps, using sine gratings by default.
+class measure_phasedisparity(SinusoidalMeasureResponseFunction):
+    """Measure a phase disparity preference map by collating the response to patterns."""
 
-    Measures maps by collating the responses to a set of input
-    patterns controlled by some parameters.  The parameter ranges and
-    number of input patterns in each range are determined by the
-    num_phase, num_orientation, num_disparity, and frequencies
-    parameters.  The particular pattern used is determined by the
+    ### JABALERT: Shouldn't this just be combined with measure_or_pref
+    ### and measure_od_pref, using num_disparity=1 by default?
 
-    pattern_presenter argument, which defaults to a sine grating presented
-    for a short duration.  By convention, most Topographica example
-    files are designed to have a suitable activity pattern computed by
-    that time, but the duration will need to be changed for other
-    models that do not follow that convention.
-    """
+    num_disparity = param.Integer(default=12,bounds=(1,None),softbounds=(1,48),
+                                  doc="Number of disparity values to test.")
 
-    if num_phase <= 0 or num_orientation <= 0 or num_disparity <= 0:
-        raise ValueError("num_phase, num_disparity and num_orientation must be greater than 0")
-
-    step_phase=2*pi/num_phase
-    step_orientation=pi/num_orientation
-    step_disparity=2*pi/num_disparity
-
-    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                      Feature(name="frequency",values=frequencies),
-                      Feature(name="phasedisparity",range=(0.0,2*pi),step=step_disparity,cyclic=True)]    
-
-    param_dict = {"scale":scale,"offset":offset}
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    def feature_list(self,p):
+        return [Feature(name="frequency",values=p.frequencies),
+                Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
+                Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+                Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0]),
+                Feature(name="phasedisparity",range=(0.0,2*pi),step=2*pi/p.num_disparity,cyclic=True)]
 
 
 ###############################################################################
@@ -1263,33 +1363,28 @@ pg.add_plot('Speed Selectivity',[('Strength','SpeedSelectivity')])
 pg.add_static_image('Color Key','topo/command/dr_key_white_vert_small.png')
 
 
+class measure_dr_pref(SinusoidalMeasureResponseFunction):
+    """Measure a direction preference map by collating the response to patterns."""
 
-def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
-                    frequencies=[2.4],scale=0.3,offset=0.0, 
-                    display=False, weighted_average=True,
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
+    num_phase = param.Integer(default=12)
+    
+    num_direction = param.Integer(default=6,bounds=(1,None),softbounds=(1,48),
+                                  doc="Number of directions to test.")
 
-    if num_phase <= 0 or num_direction <= 0:
-        raise ValueError("num_phase and num_direction must be greater than 0")
+    num_speeds = param.Integer(default=4,bounds=(1,None),softbounds=(1,10),
+                               doc="Number of speeds to test.")
 
-    step_phase=2*pi/num_phase
-    step_direction=2*pi/num_direction 
-    step_speed=float(max_speed)/num_speeds
+    max_speed = param.Number(default=2.0/24.0,bounds=(0,None),doc="""
+        The maximum speed to measure (with zero always the minimum).""")
 
-    feature_values = [Feature(name="speed",range=(0.0,max_speed),step=step_speed,
-                              cyclic=False),
-                      Feature(name="frequency",values=frequencies),
-                      Feature(name="direction",range=(0.0,2*pi),step=step_direction, 
-                              cyclic=True),
-                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+    subplot = param.String("Direction")
 
-    param_dict = {"scale":scale,"offset":offset}
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-    fm = x._fullmatrix
-        
-    Subplotting.set_subplots("Direction",force=True)	 
-    return fm
+    def feature_list(self,p):
+        return [Feature(name="speed",range=(0.0,p.max_speed),step=float(p.max_speed)/p.num_speeds,cyclic=False),
+                Feature(name="frequency",values=p.frequencies),
+                Feature(name="direction",range=(0.0,2*pi),step=2*pi/p.num_direction,cyclic=True),
+                Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
+
   
 ###############################################################################
 pg= create_plotgroup(name='Hue Preference',category="Preference Maps",
@@ -1300,30 +1395,26 @@ pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence'
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
 
 
-def measure_hue_pref(num_orientation=4,num_phase=12,
-                     num_hue=8,frequencies=[2.4], 
-                     display=False, weighted_average=True,
-                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
+class measure_hue_pref(SinusoidalMeasureResponseFunction):
+    """Measure a hue preference map by collating the response to patterns."""
 
-    if num_hue <= 0:
-        raise ValueError("number of hues must be greater than 0")
+    num_phase = param.Integer(default=12)
+    
+    num_hue = param.Integer(default=8,bounds=(1,None),softbounds=(1,48),
+                            doc="Number of hues to test.")
 
-    else:
-        step_hue=1.0/num_hue
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
+    subplot = param.String("Hue")
 
-    feature_values = [Feature(name="frequency",values=frequencies),
-                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                      Feature(name="hue", range=(0.0,1.0),step=step_hue,cyclic=True),
-                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+    # For backwards compatibility; not sure why it needs to differ from the default
+    static_parameters = param.List(default=[])
 
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,{},display,weighted_average)
-    fm = x._fullmatrix
-        
-    Subplotting.set_subplots("Hue",force=True)	 
-    return fm
+    def feature_list(self,p):
+        return [Feature(name="frequency",values=p.frequencies),
+                Feature(name="orientation",range=(0,pi),step=pi/p.num_orientation,cyclic=True),
+                Feature(name="hue",range=(0.0,1.0),step=1.0/p.num_hue,cyclic=True),
+                Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
+
+
     
 ###############################################################################	
 def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=(0.0,1.0), cyclic=True, weighted_average=True):
@@ -1363,14 +1454,13 @@ def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=
 
 
 ###############################################################################
-gaussian_corner = topo.pattern.basic.Composite(operator = maximum,
-                                            generators = [topo.pattern.basic.Gaussian(
-                                                            size = 0.06,orientation=0,aspect_ratio=7,x=0.3),
-                                                            topo.pattern.basic.Gaussian(
-                                                            size = 0.06,orientation=pi/2,aspect_ratio=7,y=0.3)])
+gaussian_corner = topo.pattern.basic.Composite(
+    operator = maximum, generators = [
+        topo.pattern.basic.Gaussian(size = 0.06,orientation=0,aspect_ratio=7,x=0.3),
+        topo.pattern.basic.Gaussian(size = 0.06,orientation=pi/2,aspect_ratio=7,y=0.3)])
 
 
-pg=  create_plotgroup(name='Corner OR Preference',category="Preference Maps",
+pg= create_plotgroup(name='Corner OR Preference',category="Preference Maps",
              doc='Measure orientation preference for corner shape (or other complex stimuli that cannot be represented as fullfield patterns).',
              update_command='measure_corner_or_pref()',
              plot_command='topographic_grid()',
@@ -1381,31 +1471,33 @@ pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPref
 pg.add_plot('Corner Orientation Selectivity',[('Strength','OrientationSelectivity')])
 
 
-def measure_corner_or_pref(divisions=10,num_orientation=4,scale=1.0,offset=0.0,display=False,
-                           pattern_presenter=PatternPresenter(gaussian_corner,apply_output_fn=True,duration=1.0),
-                          x_range=(-1.2,1.2),y_range=(-1.2,1.2),weighted_average=True):
-    """
-    Measure orientation preference map, using a corner formed by two gaussians by default.
+class measure_corner_or_pref(PositionMeasurementFunction):
+    """Measure a corner preference map by collating the response to patterns."""
+    
+    scale = param.Number(default=1.0)
 
-    Measures maps by collating the responses to a set of input
-    patterns controlled by some parameters.  The parameter ranges and
-    number of input patterns in each range are determined by the
-    divisions parameter.  The particular pattern used is determined by the
-    size, scale, offset, and pattern_presenter arguments.
-    """
-    if divisions <= 0 or num_orientation <= 0:
-        raise ValueError("divisions and num_orientation must be greater than 0")
+    divisions=param.Integer(default=10)
 
-    step_orientation=2*pi/num_orientation
-    # JABALERT: Will probably need some work to support multiple input regions
-    feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                      Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
-                      Feature(name="orientation",range=(0.0,2*pi),step=step_orientation,cyclic=True)
-                     ]          
-                      
-    param_dict = {"scale":scale,"offset":offset}
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    pattern_presenter = param.Callable(PatternPresenter(gaussian_corner,apply_output_fn=True,duration=1.0))
+
+    x_range=param.NumericTuple((-1.2,1.2))
+
+    y_range=param.NumericTuple((-1.2,1.2))
+
+    num_orientation = param.Integer(default=4,bounds=(1,None),softbounds=(1,24),
+                                    doc="Number of orientations to test.")
+
+    # JABALERT: Presumably this should be omitted, so that size is included?
+    static_parameters = param.List(default=["scale","offset"])
+
+    def feature_list(self,p):
+        width =1.0*p.x_range[1]-p.x_range[0]
+        height=1.0*p.y_range[1]-p.y_range[0]
+        return [Feature(name="x",range=p.x_range,step=width/p.divisions),
+                Feature(name="y",range=p.y_range,step=height/p.divisions),
+                Feature(name="orientation",range=(0,2*pi),step=2*pi/p.num_orientation,cyclic=True)]
+
+
 
 ###############################################################################
 pg=create_plotgroup(name='Retinotopy',category="Other",
@@ -1564,3 +1656,12 @@ def measure_orientation_contrast(contrasts=[0,10,20,30,40,50,60,70,80,90,100],re
         param_dict.update(curve)
         curve_label='Orientation = %.4f rad' % curve["orientationsurround"] 
         x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
+
+
+
+
+import types
+__all__ = list(set([k for k,v in locals().items()
+                    if isinstance(v,types.FunctionType) or 
+                    (isinstance(v,type) and issubclass(v,ParameterizedFunction))
+                    and not v.__name__.startswith('_')]))
