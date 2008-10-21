@@ -548,6 +548,7 @@ class SinusoidalMeasureResponseFunction(MeasureResponseFunction):
     # based on their own particular model setup, and to have it read
     # from here.  Instead, assumes a fixed default duration right now...
     pattern_presenter = param.Callable(
+        # JABALERT: Should pull out apply_output_fn and duration to be class Parameters to allow control
         default=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175),doc="""
         Callable object that will present a parameter-controlled pattern to a
         set of Sheets.  By default, uses a SineGrating presented for a short
@@ -911,7 +912,7 @@ class measure_rfs_noise(SingleInputResponseFunction):
 ###############################################################################
 pg= create_plotgroup(name='Center of Gravity',category="Preference Maps",
              doc='Measure the center of gravity of each ConnectionField in a Projection.',
-             update_command='measure_cog(proj_name="Afferent")',
+             update_command='measure_cog(proj_name="")',
              plot_command='topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',
              normalize=True)
 pg.add_plot('X CoG',[('Strength','XCoG')])
@@ -961,51 +962,78 @@ pg= create_plotgroup(name='Orientation, Ocular and Direction Preference',categor
 
 ####################################################################################
 
-def measure_cog(proj_name ="Afferent"):    
+class measure_cog(ParameterizedFunction):
     """
     Calculate center of gravity (CoG) for each CF of each unit in each CFSheet.
 
     Unlike measure_position_pref and other measure commands, this one
     does not work by collating the responses to a set of input patterns.
-    Instead, the CoG is calculated directly from each set of afferent
+    Instead, the CoG is calculated directly from each set of incoming
     weights.  The CoG value thus is an indirect estimate of what
     patterns the neuron will prefer, but is not limited by the finite
     number of test patterns as the other measure commands are.
 
-    At present, the name of the projection to use must be specified
-    in the argument to this function, and a model using any other
-    name must specify that explicitly when this function is called.
+    Measures only one projection for each sheet, as specified by the
+    proj_name parameter.  The default proj_name of '' selects the
+    first non-self connection, which is usually useful to examine for
+    simple feedforward networks, but will not necessarily be useful in
+    other cases.
     """
-    ### JABHACKALERT: Should be updated to support multiple projections
-    ### to each sheet, not requiring the name to be specified.
+      
+    proj_name = param.String(default='',doc="""
+        Name of the projection to measure; the empty string means 'the first
+        non-self connection available'.""")
 
-    # ALERT: Use a list comprehension instead?
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
-    
-    for sheet in measured_sheets:
-	for proj in sheet.in_connections:
-	    if proj.name == proj_name:
-		rows,cols=sheet.activity.shape
-		xpref=zeros((rows,cols),Float)
-		ypref=zeros((rows,cols),Float)
-		for r in xrange(rows):
-		    for c in xrange(cols):
-			cf=proj.cfs[r,c]
-			r1,r2,c1,c2 = cf.input_sheet_slice
-			row_centroid,col_centroid = centroid(cf.weights)
-			xcentroid, ycentroid = proj.src.matrix2sheet(
-			        r1+row_centroid+0.5,
-				c1+col_centroid+0.5)
-                    
-			xpref[r][c]= xcentroid
-			ypref[r][c]= ycentroid
-                    
-			new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-			sheet.sheet_views['XCoG']=new_view
-			new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-			sheet.sheet_views['YCoG']=new_view
-           
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        
+        measured_sheets = [s for s in topo.sim.objects(CFSheet).values()
+                           if hasattr(s,'measure_maps') and s.measure_maps]
+
+        # Could easily be extended to measure CoG of all projections
+        # and e.g. register them using different names (e.g. "Afferent
+        # XCoG"), but then it's not clear how the PlotGroup would be
+        # able to find them automatically (as it currently supports
+        # only a fixed-named plot).
+        requested_proj=p.proj_name
+        for sheet in measured_sheets:
+            for proj in sheet.in_connections:
+                if (proj.name == requested_proj) or \
+                   (requested_proj == '' and (proj.src != sheet)):
+                    self._update_proj_cog(proj)
+                    if requested_proj=='':
+                        print "measure_cog: Measured %s projection %s from %s" % \
+                              (proj.dest.name,proj.name,proj.src.name)
+                        break
+
+
+    def _update_proj_cog(self,proj):
+        """Measure the CoG of the specified projection and register corresponding SheetViews."""
+        
+        sheet=proj.dest
+        rows,cols=sheet.activity.shape
+        xpref=zeros((rows,cols),Float)
+        ypref=zeros((rows,cols),Float)
+        
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf=proj.cfs[r,c]
+                r1,r2,c1,c2 = cf.input_sheet_slice
+                row_centroid,col_centroid = centroid(cf.weights)
+                xcentroid, ycentroid = proj.src.matrix2sheet(
+                        r1+row_centroid+0.5,
+                        c1+col_centroid+0.5)
+            
+                xpref[r][c]= xcentroid
+                ypref[r][c]= ycentroid
+            
+                sheet.sheet_views['XCoG']=SheetView((xpref,sheet.bounds), sheet.name,
+                                                    sheet.precedence,topo.sim.time())
+                
+                sheet.sheet_views['YCoG']=SheetView((ypref,sheet.bounds), sheet.name,
+                                                    sheet.precedence,topo.sim.time())
+
+
 
 ###############################################################################
 ## JABALERT: Currently disabled, because it is not useful while the
