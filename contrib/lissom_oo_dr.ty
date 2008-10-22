@@ -147,9 +147,7 @@ topo.sim.connect(
 
 
 ### Actions scheduled to occur as the simulation proceeds.
-# CB: No scheduled actions yet.
-# JAB: Why not just use these?
-#sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/num_inputs,aff_name="Afferent")
+sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/num_inputs,aff_name="Afferent")
 
 
 ### Default locations for model editor
