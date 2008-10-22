@@ -96,7 +96,6 @@ class PatternPresenter(param.Parameterized):
         self.divisions=params.get('divisions',self.divisions)
 
     def __call__(self,features_values,param_dict):
-
         for param,value in param_dict.iteritems():
            self.gen.__setattr__(param,value)
                
@@ -1557,7 +1556,7 @@ class measure_corner_or_pref(PositionMeasurementFunction):
 
     divisions=param.Integer(default=10)
 
-    pattern_presenter = param.Callable(PatternPresenter(gaussian_corner))
+    pattern_presenter = param.Callable(PatternPresenter(gaussian_corner,apply_output_fn=False,duration=0.175))
 
     x_range=param.NumericTuple((-1.2,1.2))
 
