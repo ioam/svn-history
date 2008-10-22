@@ -264,7 +264,7 @@ def AddV2():
 
     topo.sim["V1Simple"].in_connections[0].strength=2.5
     topo.sim["V1Simple"].in_connections[1].strength=2.5
-    topo.sim["V1Complex"].output_fn.output_fns[1].r=7
+    #topo.sim["V1Complex"].output_fn.output_fns[1].r=7
     topo.sim["V1Simple"].plastic=False
     topo.sim["V1Complex"].plastic=False
     
@@ -292,19 +292,18 @@ def AddGC():
     from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
     from topo.projection.basic import CFProjection, SharedWeightCFProjection
     from topo.base.boundingregion import BoundingBox
-    lgn_surroundg = Gaussian(size=locals().get('LGNLatSurroundSize',0.5),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+    lgn_surroundg = Gaussian(size=__main__.__dict__.get('LGNLatSurroundSize',0.5),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
 
     topo.sim.connect('LGNOn','LGNOn',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
-                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',10),
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',135),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOn',
                     weights_generator=lgn_surroundg)
     
     topo.sim.connect('LGNOff','LGNOff',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
-                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',10),
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',135),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOff',
                     weights_generator=lgn_surroundg)
-    
     
     topo.sim["LGNOn"].tsettle = 2
     topo.sim["LGNOff"].tsettle = 2
@@ -351,18 +350,24 @@ class SimpleHomeo(OutputFnWithState):
     b_init = param.Number(default=-4,doc="Additive parameter controlling the exponential.")
     eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
     smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
+    randomized_init = param.Boolean(False, doc="whether to randomized the initial B parameter")
+    noise_magnitued =  param.Number(default=0.1, doc="The magnitued of tha aditive noise to apply to the B parameter at initialization")
 
     def __init__(self,**params):
         super(SimpleHomeo,self).__init__(**params)
-	self.first_call = True
+        self.first_call = True
 
     def __call__(self,x):
-        
-	if self.first_call:
-	    self.first_call = False
-	    self.a = ones(x.shape, x.dtype.char) * self.a_init
-	    self.b = ones(x.shape, x.dtype.char) * self.b_init
-	    self.y_avg = zeros(x.shape, x.dtype.char) * self.mu
+       
+        if self.first_call:
+            self.first_call = False
+            self.a = ones(x.shape, x.dtype.char) * self.a_init
+            if self.randomized_init:
+                self.b = ones(x.shape, x.dtype.char) * self.b_init  + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitued*2
+            else:
+                self.b = ones(x.shape, x.dtype.char) * self.b_init
+            
+            self.y_avg = zeros(x.shape, x.dtype.char) * self.mu
 
         x_orig = copy(x)
         x *= 0.0
@@ -370,7 +375,6 @@ class SimpleHomeo(OutputFnWithState):
 
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
-            # Update a and b
 	    self.b -= self.eta * (self.y_avg - self.mu)
 
 
@@ -481,9 +485,9 @@ def save_movie():
     print 'Saving movie to %s...' % ActivityMovie.filename_prefix
     movie.save()
     
-def randomize_V1Simple_relative_LGN_strength():
-    lgn_on_proj =  topo.sim["V1Simple"].in_connections[0]
-    lgn_off_proj = topo.sim["V1Simple"].in_connections[1]
+def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple",prob=0.1):
+    lgn_on_proj =  topo.sim[sheet_name].in_connections[0]
+    lgn_off_proj = topo.sim[sheet_name].in_connections[1]
     
     rand = UniformRandom()
     
@@ -498,8 +502,8 @@ def randomize_V1Simple_relative_LGN_strength():
             cf_off._has_norm_total=False
 
             ra = rand()
-            a = 0.1
-            if ra>=0.5: a = 0.9
+            a = prob
+            if ra>=0.5: a = (1-a)
             
             cf_on.weights*=a 
             cf_off.weights*=(1-a)
@@ -596,15 +600,15 @@ class ActivityHysteresis(OutputFnWithState):
     """
 
     time_constant  = param.Number(default = 0.3,doc="""Time constant of the continouse projection input calculation.""")
-
+    
     def __init__(self,**params):
         super(ActivityHysteresis,self).__init__(**params)
         self.first_call = True
         self.old_a = 0 
         import topo.sheet.lissom
         import topo.base.functionfamily
-        topo.sheet.lissom.LISSOM.beginning_of_iteration.append(self.reset)
-        topo.base.functionfamily.PatternDrivenAnalysis.before_analysis_session.append(self.reset)
+        #topo.sheet.lissom.LISSOM.beginning_of_iteration.append(self.reset)
+        topo.base.functionfamily.PatternDrivenAnalysis.before_pattern_presentation.append(self.reset)
         
     def __call__(self,x):
         if (self.first_call == True):
