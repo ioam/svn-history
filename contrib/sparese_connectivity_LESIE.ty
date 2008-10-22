@@ -97,8 +97,8 @@ LGN_off_output_fn=HalfRectify()
 t  = locals().get('treshold',0.0)	
 e =  locals().get('exponent',1.0)
 #V1_OF=PiecewiseLinear(lower_bound=0.3,upper_bound=0.7)
-V1_OF = SimpleHomeo(a_init=10,b_init=-3.5,mu=locals().get('SMU',0.02),eta=0.03,randomized_init=True,noise_magnitued=3)
-V1_OFInh = SimpleHomeo(a_init=10,b_init=-3.5,mu=locals().get('SMU',0.02),eta=0.03,randomized_init=True,noise_magnitued=3)
+V1_OF = SimpleHomeo(a_init=10,b_init=-3.5,mu=locals().get('SMU',0.02),eta=0.01,smoothing=0.95,randomized_init=True,noise_magnitued=3)
+V1_OFInh = SimpleHomeo(a_init=10,b_init=-3.5,mu=locals().get('SMU',0.02),eta=0.01,smoothing=0.95,randomized_init=True,noise_magnitued=3)
 V1C_OF=HalfRectifyAndPower(e=e,t=t)
 
 ###########################################
@@ -260,5 +260,5 @@ if dataset == 'Natural':
 
 import contrib.jacommands
 
-contrib.jacommands.randomize_V1Simple_relative_LGN_strength(sheet_name="V1Inh")
-contrib.jacommands.randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple")
+contrib.jacommands.randomize_V1Simple_relative_LGN_strength(sheet_name="V1Inh",prob=0.7)
+contrib.jacommands.randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple",prob=0.7)
