@@ -661,6 +661,48 @@ class SingleInputResponseFunction(MeasureResponseFunction):
 
 
 
+class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
+    """A callable Parameterized command for measuring tuning curves."""
+
+    num_orientation = param.Integer(default=12)
+
+    sheet_name = param.String(default='',doc="""
+        Name of the sheet to use in measurements.""")
+
+    units = param.String(default='%',doc="""
+        Units for labeling the curve_parameters in figure legends.
+        The default is %, for use with contrast, but could be any 
+        units (or the empty string).""")
+
+    static_parameters = param.List(default=[])
+
+    # JABALERT: Might want to accept a list of values for a given
+    # parameter to make the simple case easier; then maybe could do
+    # the crossproduct of them?
+    curve_parameters=param.Parameter([{"contrast":30},{"contrast":60},{"contrast":80},{"contrast":90}],doc="""
+        List of parameter values for which to measure a curve.""")
+
+    __abstract = True
+
+    def __call__(self,**params):
+        """Measure the response to the specified pattern and create maps from them."""
+        p=ParamOverrides(self,params)
+        sheet=topo.sim[p.sheet_name]
+        
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+                          Feature(name="orientation",range=(0,pi),step=pi/p.num_orientation,cyclic=True),
+                          Feature(name="frequency",values=p.frequencies)]
+        
+        x_axis='orientation'
+        x=FeatureCurves(feature_values,sheet,x_axis)
+        for curve in p.curve_parameters:
+            static_params = dict([(s,p[s]) for s in p.static_parameters])
+            static_params.update(curve)
+            curve_label="; ".join(['%s = %s%s' % (n.capitalize(),str(v),p.units) for n,v in curve.items()])
+            x.collect_feature_responses(feature_values,p.pattern_presenter,static_params,curve_label,p.display)
+
+
+
 # Module variables for passing values to the commands.
 coordinate = (0,0)
 sheet_name = ''
@@ -1225,38 +1267,20 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',
         plot_command='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")')
 
 
-def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
-                                curve_parameters=[{"contrast":30},{"contrast":60},{"contrast":80},{"contrast":90}],
-                                display=False,
-                                pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                                   apply_output_fn=True,duration=1.0,
-                                                                   contrast_parameter="michelson_contrast")):
+class measure_or_tuning_fullfield(FeatureCurveFunction):
     """
-    Measures orientation tuning curve of a particular unit using a full field grating stimulus. 
-    michelson_contrast can be replaced by another variable(s) eg. scale, weber_contrast or
-    any other contrast definition, provided it is defined in PatternPresenter. 
+    Measures orientation tuning curve of a particular unit using a
+    full-field grating stimulus.  The parameter name
+    michelson_contrast can be replaced by other parameter(s),
+    e.g. scale, weber_contrast, or any other contrast definition,
+    provided it is defined in the pattern_presenter.
     """
-    sheet=topo.sim[sheet_name]
-    
-    if num_phase <= 0 or num_orientation <= 0:
-        raise ValueError("num_phase and num_orientation must be greater than 0")
-    
-    step_phase=2*pi/num_phase
-    step_orientation=pi/num_orientation
-    
-    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                    Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
-                    Feature(name="frequency",values=frequencies)]     
-    
-    x_axis='orientation'
-    x=FeatureCurves(feature_values,sheet,x_axis)
-    
-    for curve in curve_parameters:
-        param_dict={}
-        param_dict.update(curve)
-        curve_label='Contrast = '+str(curve["contrast"])+'%'
-        x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_label,display)
-	  
+
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(pattern_generator=SineGrating(),
+                                 contrast_parameter="michelson_contrast"))
+
+
 
 ###############################################################################
 create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="Tuning Curves",doc="""

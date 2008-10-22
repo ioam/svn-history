@@ -823,6 +823,7 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
 class FeatureCurvePlotGroup(UnitPlotGroup):
 
     def _exec_update_command(self):
+        topo.command.analysis.FeatureCurveFunction.sheet_name = self.sheet.name
         super(FeatureCurvePlotGroup,self)._exec_update_command()          
         self.get_curve_time()
 

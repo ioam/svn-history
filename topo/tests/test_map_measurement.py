@@ -34,6 +34,7 @@ sim_name = 'lissom_oo_or'
 
 # For or tuning (and possibly others)
 topo.command.analysis.sheet_name = 'V1'
+topo.command.analysis.FeatureCurveFunction.sheet_name = 'V1'
 
 # CEB: tests should store params of commands
 # so we don't have to update data if someone
