@@ -769,13 +769,17 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
 
         
     def _exec_update_command(self):
-	topo.command.analysis.coordinate = (self.x,self.y)
-        topo.command.analysis.update_connectionfields.coords = [(self.x,self.y)]
+        coords=(self.x,self.y)
+	topo.command.analysis.coordinate = coords
+        topo.command.analysis.update_connectionfields.coords = [coords]
+        topo.command.analysis.measure_or_tuning.coords = [coords]
 	super(UnitPlotGroup,self)._exec_update_command()
 
     def _exec_plot_command(self):
-	topo.command.analysis.coordinate = (self.x,self.y)
-        topo.command.analysis.update_connectionfields.coords = [(self.x,self.y)]
+        coords=(self.x,self.y)
+	topo.command.analysis.coordinate = coords
+        topo.command.analysis.update_connectionfields.coords = [coords]
+        topo.command.analysis.measure_or_tuning.coords = [coords]
 	super(UnitPlotGroup,self)._exec_plot_command()
 
 
