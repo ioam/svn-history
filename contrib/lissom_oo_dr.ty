@@ -1,0 +1,157 @@
+"""
+A LISSOM-based direction map (with ON/OFF channels).
+
+Under construction: moving away from the '4 eyes' approach.
+
+$Id$
+"""
+__version__='$Revision$'
+
+
+from math import pi, sqrt
+import numpy
+
+from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet 
+
+import topo.learningfn.optimized
+import topo.learningfn.projfn 
+import topo.outputfn.optimized 
+import topo.pattern.random
+import topo.responsefn.optimized 
+import topo.sheet.lissom
+import topo.sheet.optimized
+
+
+### Specify weight initialization, response function, and learning function
+projection.CFProjection.cf_shape = pattern.Disk(smoothing=0.0)
+projection.CFProjection.weights_generator = pattern.Constant()
+projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
+projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
+projection.CFProjection.weights_output_fn=outputfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
+projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
+
+
+### Input patterns
+num_inputs=1
+input_type=pattern.Gaussian
+inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+                   y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
+                   orientation=0,size=0.088388, aspect_ratio=4.66667, scale=1.0,
+                   bounds=sheet.BoundingBox(radius=0.8))
+        for i in xrange(num_inputs)]
+sub_inputs=pattern.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
+
+                                 
+# Number of separate delay lines in the LGN
+num_lags=4
+
+
+### Sheets
+retina_density = locals().get('default_retina_density',24.0)
+lgn_density = locals().get('default_lgn_density',24.0)
+
+for i in xrange(num_lags):
+
+    topo.sim['Retina'+str(i)]=sheet.GeneratorSheet(
+        nominal_density=retina_density,period=1.0,phase=0.05,
+        nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.375),
+        input_generator=pattern.Sweeper(generator=copy.deepcopy(sub_inputs),
+                                step=i,speed=1.0/retina_density,
+                                orientation=numbergen.UniformRandom(lbound=-pi,
+                                                                    ubound=pi,seed=88)))
+
+    topo.sim['LGNOn' +str(i)]=sheet.CFSheet(
+        nominal_density=lgn_density,
+        nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
+        output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+        measure_maps=False)
+    
+    topo.sim['LGNOff'+str(i)]=sheet.CFSheet(
+        nominal_density=lgn_density,
+        nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
+        output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+        measure_maps=False)
+
+
+
+topo.sim['V1'] = sheet.lissom.LISSOM(
+    nominal_density=locals().get('default_density',48.0),
+    nominal_bounds=sheet.BoundingBox(radius=0.5),tsettle=9,
+    output_fn=outputfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633),
+    joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt)
+
+
+
+### Connections
+
+# DoG weights for the LGN
+centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,
+                             output_fn=outputfn.optimized.DivisiveNormalizeL1())
+surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,
+                             output_fn=outputfn.optimized.DivisiveNormalizeL1())
+
+on_weights = pattern.Composite(
+    generators=[centerg,surroundg],operator=numpy.subtract)
+
+off_weights = pattern.Composite(
+    generators=[surroundg,centerg],operator=numpy.subtract)
+
+    
+for i in xrange(num_lags):
+
+    topo.sim.connect('Retina'+str(i),'LGNOn'+str(i),delay=0.05,
+                     connection_type=projection.SharedWeightCFProjection,strength=2.38,
+                     nominal_bounds_template=sheet.BoundingBox(radius=0.375),
+                     name='Afferent',weights_generator=on_weights)
+    
+    topo.sim.connect('Retina'+str(i),'LGNOff'+str(i),delay=0.05,
+                     connection_type=projection.SharedWeightCFProjection,strength=2.38,
+                     nominal_bounds_template=sheet.BoundingBox(radius=0.375),
+                     name='Afferent',weights_generator=off_weights)
+
+
+    topo.sim.connect(
+        'LGNOn'+str(i),'V1',delay=0.05,
+        dest_port=('Activity','JointNormalize', 'Afferent'),
+        connection_type=projection.CFProjection,strength=1.0,
+        name='LGNOnAfferent'+str(i),
+        nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
+        learning_rate=0.9590/2,
+        weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
+
+    topo.sim.connect(
+        'LGNOff'+str(i),'V1',delay=0.05,
+        dest_port=('Activity','JointNormalize', 'Afferent'),
+        connection_type=projection.CFProjection,strength=1.0,
+        name='LGNOffAfferent'+str(i),
+        nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
+        learning_rate=0.9590/2,
+        weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
+
+
+
+topo.sim.connect(
+    'V1','V1',delay=0.05,name='LateralExcitatory',
+    connection_type=projection.CFProjection,strength=0.9,
+    nominal_bounds_template=sheet.BoundingBox(radius=0.10417),
+    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.10417),
+    learning_rate=2.55528) 
+            
+topo.sim.connect(
+    'V1','V1',delay=0.05,name='LateralInhibitory',
+    connection_type=projection.CFProjection,strength=-0.9,
+    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.22917),
+    nominal_bounds_template=sheet.BoundingBox(radius=0.22917),
+    learning_rate=1.80873)  
+
+
+
+# CB: No scheduled actions yet.
+
+
+# default locations for model editor
+topo.sim.grid_layout([[None, 'V1'],
+                      [('LGNOn' +str(i)) for i in xrange(num_lags)],
+                      [('LGNOff'+str(i)) for i in xrange(num_lags)],
+                      [('Retina'+str(i)) for i in xrange(num_lags)]],
+                     xstart=150, xstep=300)
