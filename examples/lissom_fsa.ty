@@ -132,3 +132,10 @@ topo.sim['FSA'   ].layout_location=(306,225)
 topo.sim['LGNOn' ].layout_location=(432,345)
 topo.sim['LGNOff'].layout_location=(150,345)
 topo.sim['Retina'].layout_location=(279,500)
+
+
+# Measure feature maps based on unthresholded initial response for
+# speed and reliability
+from topo.command.analysis import MeasureResponseFunction
+MeasureResponseFunction.duration=0.175
+MeasureResponseFunction.apply_output_fn=False

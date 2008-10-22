@@ -504,13 +504,20 @@ topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  weights_generator=topo.pattern.random.UniformRandom(),
                  nominal_bounds_template=BoundingBox(radius=locals().get("inhib_radius",0.6)),learning_rate=1.0) 
 
-### Actions scheduled to occur as the simulation proceeds.
+
+### Set up appropriate defaults for analysis
 
 Subplotting.set_subplots("Deflection",force=False)
 
 #topo.sim.schedule_command(999,'color_MEAs()')
 #topo.sim.schedule_command(999,'WhiskerArray.save_plot=True')
 #topo.sim.schedule_command(999,'plot_deflections_on=True')
+
+# Measure feature maps based on unthresholded initial response for
+# speed and reliability
+from topo.command.analysis import MeasureResponseFunction
+MeasureResponseFunction.duration=0.175
+MeasureResponseFunction.apply_output_fn=False
 
 
 

@@ -68,12 +68,6 @@ class Feature(object):
 
 
 
-# CEBALERT: apart from any significant changes, this class needs minor
-# cleanups. For instance: __init__ doesn't call the superclass's
-# __init__ (is that why the line
-# 'self.contrast_parameter=params.get...'  has been put in?);
-# "x.haskey('y')" is going to disappear from python, I think, and
-# anyway "'y' in x" is clearer. There might also be other things.
 class PatternPresenter(param.Parameterized):
     """
     Function object for presenting PatternGenerator-created patterns.
@@ -85,16 +79,38 @@ class PatternPresenter(param.Parameterized):
     Subclasses can provide additional mechanisms for doing this in
     different ways.
     """
+    
+    # JABALERT: Needs documenting, and probably also a clearer name
     contrast_parameter = param.Parameter('michelson_contrast')
-    divisions = param.Parameter()
-   
-    def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0,**params):
-        self.apply_output_fn=apply_output_fn
-        self.duration=duration
-        self.gen = pattern_generator
-        self.contrast_parameter=params.get('contrast_parameter',self.contrast_parameter)
-        self.divisions=params.get('divisions',self.divisions)
 
+    # JABALERT: Needs documenting; apparently only for retinotopy?
+    divisions = param.Parameter()
+
+    apply_output_fn = param.Boolean(default=True, doc="""
+        When presenting a pattern, whether to apply each sheet's
+        output function.  If False, for many networks the response
+        will be linear, which requires fewer test patterns to measure
+        a meaningful response, but it may not correspond to the actual
+        preferences of each neuron under other conditions.  If True,
+        callers will need to ensure that the input patterns are in a
+        suitable range to drive the neurons to generate meaningful
+        output, because e.g. a threshold-based output function might
+        result in no activity for inputs that are too weak..""")
+
+    duration = param.Number(default=1.0,doc="""
+        Amount of simulation time for which to present each test pattern.
+	By convention, most Topographica example files are designed to
+        have a suitable activity pattern computed by the
+        default time, but the duration will need to be changed for
+        other models that do not follow that convention or if a
+        linear response is desired.""")
+
+
+    def __init__(self,pattern_generator,**params):
+        super(PatternPresenter,self).__init__(**params)
+        self.gen = pattern_generator # Why not a Parameter?
+        
+        
     def __call__(self,features_values,param_dict):
         for param,value in param_dict.iteritems():
            self.gen.__setattr__(param,value)
@@ -302,6 +318,7 @@ class PatternPresenter(param.Parameterized):
                      apply_output_fn=self.apply_output_fn)
 
 
+
 # JABALERT: presumably this should be moved elsewhere in the file
 def save_plotgroup(name,saver_params={},**params):
     """
@@ -506,7 +523,9 @@ class MeasureResponseFunction(ParameterizedFunction):
 
     pattern_presenter = param.Callable(default=None,doc="""
         Callable object that will present a parameter-controlled pattern to a
-        set of Sheets.  Needs to be supplied by a subclass or in the call.""")
+        set of Sheets.  Needs to be supplied by a subclass or in the call.
+        The attributes duration and apply_output_fn (if non-None) will
+        be set on this object, and it should respect those if possible.""")
     
     static_parameters = param.List(class_=str,default=["scale","offset"],doc="""
         List of names of parameters of this class to pass to the
@@ -514,7 +533,17 @@ class MeasureResponseFunction(ParameterizedFunction):
         will be fixed to a single value during measurement.""")
 
     subplot = param.String("",doc="""Name of map to register as a subplot, if any.""")
-  
+
+    apply_output_fn = param.Boolean(default=None, doc="""
+        If non-None, pattern_presenter.apply_output_fn will be
+        set to this value.  Provides a simple way to set
+        this commonly changed option of PatternPresenter.""")
+
+    duration = param.Number(default=None,doc="""
+        If non-None, pattern_presenter.duration will be
+        set to this value.  Provides a simple way to set
+        this commonly changed option of PatternPresenter.""")
+
     __abstract = True
 
 
@@ -524,6 +553,10 @@ class MeasureResponseFunction(ParameterizedFunction):
         p=ParamOverrides(self,params)
         x=FeatureMaps(self.feature_list(p))
         static_params = dict([(s,p[s]) for s in p.static_parameters])
+        if p.duration is not None:
+            p.pattern_presenter.duration=p.duration
+        if p.apply_output_fn is not None:
+            p.pattern_presenter.apply_output_fn=p.apply_output_fn
         x.collect_feature_responses(p.pattern_presenter,static_params,
                                     p.display,p.weighted_average)
 
@@ -543,12 +576,8 @@ class MeasureResponseFunction(ParameterizedFunction):
 class SinusoidalMeasureResponseFunction(MeasureResponseFunction):
     """Parameterized command for presenting sine gratings and measuring responses."""
     
-    # Could consider having scripts set a variable for the duration,
-    # based on their own particular model setup, and to have it read
-    # from here.  Instead, assumes a fixed default duration right now...
     pattern_presenter = param.Callable(
-        # JABALERT: Should pull out apply_output_fn and duration to be class Parameters to allow control
-        default=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175),doc="""
+        default=PatternPresenter(pattern_generator=SineGrating()),doc="""
         Callable object that will present a parameter-controlled pattern to a
         set of Sheets.  By default, uses a SineGrating presented for a short
 	duration.  By convention, most Topographica example files
@@ -587,7 +616,7 @@ class PositionMeasurementFunction(MeasureResponseFunction):
         The size of the pattern to present.""")
     
     pattern_presenter = param.Callable(
-        default=PatternPresenter(Gaussian(aspect_ratio=1.0),False,0.175),doc="""
+        default=PatternPresenter(Gaussian(aspect_ratio=1.0)),doc="""
         Callable object that will present a parameter-controlled
         pattern to a set of Sheets.  For measuring position, the
         pattern_presenter should be spatially localized, yet also able
@@ -622,7 +651,7 @@ class SingleInputResponseFunction(MeasureResponseFunction):
 
     # JABALERT: Presumably the size is overridden in the call, right?
     pattern_presenter = param.Callable(
-        default=PatternPresenter(Rectangle(size=0.1,aspect_ratio=1.0),True,duration=1.0))
+        default=PatternPresenter(Rectangle(size=0.1,aspect_ratio=1.0)))
 
     static_parameters = param.List(default=["scale","offset","size"])
 
@@ -851,6 +880,10 @@ class measure_rfs(SingleInputResponseFunction):
         #overrides the other, and the overriden one should be
         #eliminated.
         static_params = dict([(s,p[s]) for s in p.static_parameters])
+        if p.duration is not None:
+            p.pattern_presenter.duration=p.duration
+        if p.apply_output_fn is not None:
+            p.pattern_presenter.apply_output_fn=p.apply_output_fn
         x=ReverseCorrelation(feature_values,input_sheet=input_sheet) #+change argument
         x.collect_feature_responses(p.pattern_presenter,static_params,p.display,feature_values)
 
@@ -868,7 +901,7 @@ class measure_rfs_noise(SingleInputResponseFunction):
     """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
 
     pattern_presenter = param.Callable(
-        default=PatternPresenter(GaussianRandom(),True,duration=1.0))
+        default=PatternPresenter(GaussianRandom()))
 
     scale = param.Number(default=0.5)
 
@@ -902,6 +935,10 @@ class measure_rfs_noise(SingleInputResponseFunction):
                           Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
                           
         static_params = dict([(s,p[s]) for s in p.static_parameters])        
+        if p.duration is not None:
+            p.pattern_presenter.duration=p.duration
+        if p.apply_output_fn is not None:
+            p.pattern_presenter.apply_output_fn=p.apply_output_fn
         x=ReverseCorrelation(feature_values,input_sheet=input_sheet)
         x.collect_feature_responses(p.pattern_presenter,static_params,p.display,feature_values)
 

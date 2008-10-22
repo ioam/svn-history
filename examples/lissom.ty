@@ -482,5 +482,12 @@ pgs=[]
 for d in dims:
     pgs += preference_maps[d]
 pgs += ['Position Preference','Activity']
+# Also need to measure Phase Preference maps
 
 topo.command.basic.default_analysis_plotgroups=pgs
+
+# Measure feature maps based on unthresholded initial response for
+# speed and reliability
+from topo.command.analysis import MeasureResponseFunction
+MeasureResponseFunction.duration=0.175
+MeasureResponseFunction.apply_output_fn=False

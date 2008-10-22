@@ -204,3 +204,13 @@ for n in lags:
                   [None]*(len(center_polarities)/2)
 
 topo.sim.grid_layout([vs,ls,es], xstep=70/len(eyes), ystep=200, item_scale=0.75/len(eyes))
+
+
+
+### Set up appropriate defaults for analysis
+
+# Measure feature maps based on unthresholded initial response for
+# speed and reliability
+from topo.command.analysis import MeasureResponseFunction
+MeasureResponseFunction.duration=0.175
+MeasureResponseFunction.apply_output_fn=False
