@@ -65,6 +65,7 @@ plotgroups_to_test = [
     'Orientation Tuning',
     'Size Tuning',
     'Contrast Response',
+    'Retinotopy',
     #'Direction Preference',
     'Corner OR Preference'
     ]
