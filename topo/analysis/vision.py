@@ -67,14 +67,13 @@ def complexity(full_matrix):
             phase_index = i
             break
         i=i+1
-    
     sum = 0.0
     res = 0.0
     average = 0.0
     for x in range(rows):
         for y in range(cols):
             complex_matrix[x,y] = []#
-            max_value=0
+            max_value=-0.01
             global_index = ()
             _complexity_rec(x,y,(),0,full_matrix)
             
@@ -103,7 +102,7 @@ def complexity(full_matrix):
             fftmeasure[x,y] = (2 *abs(fft[first_har]) * abs(fft[first_har]) )/(abs(fft[0]) * abs(fft[0]))
     return fftmeasure
 
-def phase_preference_scatter_plot(sheet_name):
+def phase_preference_scatter_plot(sheet_name,diameter=0.39):
     r = UniformRandom(seed=1023)
     preference_map = topo.sim[sheet_name].sheet_views['PhasePreference']
     offset_magnitude = 0.01
@@ -116,10 +115,10 @@ def phase_preference_scatter_plot(sheet_name):
         rand = r()
         xoff = sin(rand*2*pi)*offset_magnitude
         yoff = cos(rand*2*pi)*offset_magnitude
-        xx = max(min(x+xoff,0.39999),-0.39999)
-        yy = max(min(y+yoff,0.39999),-0.39999)
-        x = max(min(x,0.39999),-0.39999)
-        y = max(min(y,0.39999),-0.39999)
+        xx = max(min(x+xoff,diameter),-diameter)
+        yy = max(min(y+yoff,diameter),-diameter)
+        x = max(min(x,diameter),-diameter)
+        y = max(min(y,diameter),-diameter)
         [xc1,yc1] = topo.sim[sheet_name].sheet2matrixidx(xx,yy)
         [xc2,yc2] = topo.sim[sheet_name].sheet2matrixidx(x,y)
         if((xc1==xc2) &  (yc1==yc2)): continue
@@ -170,4 +169,4 @@ def analyze_complexity(full_matrix):
         complx = array(complexity(full_matrix[sheet]))
         sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
     topo.command.pylabplots.plot_modulation_ratio(full_matrix)               
-    phase_preference_scatter_plot("V1Simple")
+    phase_preference_scatter_plot("V1Simple",diameter=0.24999)
