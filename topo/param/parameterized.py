@@ -1550,6 +1550,7 @@ class ParameterizedFunction(Parameterized):
 
     def __new__(class_,*args,**params):
         inst=object.__new__(class_)
+        Parameterized.__init__(inst)#,name=class_.__name__)
         return inst.__call__(*args,**params)
 
     def __call__(self,*args,**kw):
