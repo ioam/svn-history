@@ -82,6 +82,9 @@ function or method group visually into a single unit, and then to have
 all methods and data in one class group visually into a higher level
 unit.  See the files in topo/base/ for examples.
 
+<P>All variable names, documentation, and comments should be in
+English, using American spelling for consistency.
+
 
 <H2><A NAME="naming">Using consistent names</A></H2>
 
