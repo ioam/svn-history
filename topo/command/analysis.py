@@ -674,6 +674,10 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
         The default is %, for use with contrast, but could be any 
         units (or the empty string).""")
 
+    # Make constant in subclasses?
+    x_axis = param.String(default='orientation',doc="""
+        Parameter to use for the x axis of tuning curves.""")
+
     static_parameters = param.List(default=[])
 
     # JABALERT: Might want to accept a list of values for a given
@@ -691,7 +695,7 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
         self.compute_curves(p,sheet)
 
     def compute_curves(self,p,sheet):
-        x=FeatureCurves(self.feature_list(p),sheet=sheet,x_axis='orientation')
+        x=FeatureCurves(self.feature_list(p),sheet=sheet,x_axis=self.x_axis)
         for curve in p.curve_parameters:
             static_params = dict([(s,p[s]) for s in p.static_parameters])
             static_params.update(curve)
@@ -704,6 +708,22 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
                 Feature(name="orientation",range=(0,pi),step=pi/p.num_orientation,cyclic=True),
                 Feature(name="frequency",values=p.frequencies)]
         
+
+    def sheetview_unit(self,sheet,sheet_coord,map_name,default=0.0):
+        """Look up and return the value of a SheetView for a specified unit."""
+        matrix_coords = sheet.sheet2matrixidx(*sheet_coord)
+
+        if(map_name in sheet.sheet_views):
+            pref = sheet.sheet_views[map_name].view()[0]
+            val = pref[matrix_coords]
+        else:
+            self.warning(("%s should be measured before plotting this tuning curve -- " + 
+                          "using default value of %s for %s unit (%d,%d).") % \
+                         (map_name,default,sheet.name,sheet_coord[0],sheet_coord[1]))
+            val = default
+
+        return val
+
 
 # Module variables for passing values to the commands.
 coordinate = (0,0)
@@ -1272,10 +1292,17 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',
 class measure_or_tuning_fullfield(FeatureCurveFunction):
     """
     Measures orientation tuning curve(s) of a particular unit using a
-    full-field grating stimulus.  The parameter name
-    michelson_contrast can be replaced by other parameter(s),
-    e.g. scale, weber_contrast, or any other contrast definition,
-    provided it is defined in the pattern_presenter.
+    full-field sine grating stimulus.  
+
+    The curve can be plotted at various different values of the
+    contrast (or actually any other parameter) of the stimulus.  If
+    using contrast and the network contains an LGN layer, then one
+    would usually specify michelson_contrast as the
+    contrast_parameter. If there is no explicit LGN, then scale
+    (offset=0.0) can be used to define the contrast.  Other relevant
+    contrast definitions (or other parameters) can also be used,
+    provided they are defined in PatternPresenter and the units
+    parameter is changed as appropriate.
     """
 
     pattern_presenter = param.Callable(
@@ -1298,11 +1325,16 @@ class measure_or_tuning(FeatureCurveFunction):
     Measures orientation tuning curve(s) of a particular unit.
 
     Uses a circular sine grating patch as the stimulus on the
-    retina. If the network contains an LGN layer, then weber_contrast
-    can be used as the contrast_parameter. If there is no LGN then
-    scale (offset=0.0) can be used to define the contrast.  Other
-    relevant contrast definitions can also be used, provided they are
-    defined in PatternPresenter and the units parameter is changed as
+    retina. 
+
+    The curve can be plotted at various different values of the
+    contrast (or actually any other parameter) of the stimulus.  If
+    using contrast and the network contains an LGN layer, then one
+    would usually specify weber_contrast as the contrast_parameter. If
+    there is no explicit LGN, then scale (offset=0.0) can be used to
+    define the contrast.  Other relevant contrast definitions (or
+    other parameters) can also be used, provided they are defined in
+    PatternPresenter and the units parameter is changed as
     appropriate.
     """
 
@@ -1325,22 +1357,9 @@ class measure_or_tuning(FeatureCurveFunction):
         p=ParamOverrides(self,params)
         sheet=topo.sim[p.sheet_name]
 
-        # Compute curves for each specified unit
-        for coordinate in p.coords:
-            sheet_x,sheet_y = coordinate
-            matrix_coords = sheet.sheet2matrixidx(sheet_x,sheet_y)
-            if(('XPreference' in sheet.sheet_views) and
-               ('YPreference' in sheet.sheet_views)):
-        	x_pref = sheet.sheet_views['XPreference'].view()[0]
-        	y_pref = sheet.sheet_views['YPreference'].view()[0]
-        	x_value=x_pref[matrix_coords]
-        	y_value=y_pref[matrix_coords]
-            else:
-                topo.sim.warning("Position Preference should be measured before plotting Orientation Tuning -- using default values for "+sheet_name)
-                x_value=coordinate[0]
-                y_value=coordinate[1]
-            self.x=x_value
-            self.y=y_value
+        for coord in p.coords:
+            self.x=self.sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self.sheetview_unit(sheet,coord,'YPreference',default=coord[1])
             self.compute_curves(p,sheet)
                
 
@@ -1351,13 +1370,8 @@ create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning 
         plot_command='tuning_curve(x_axis="size",plot_type=pylab.plot,unit="Diameter of stimulus")',
         prerequisites=['OrientationPreference','XPreference'])
 
-
-def measure_size_response(num_phase=18,
-                          curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80},{"contrast":90}],
-                          num_sizes=10,display=False,
-                          pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
-                                                             apply_output_fn=True,duration=1.0,
-                                                             contrast_parameter="weber_contrast")):
+# JABALERT: Is there some reason not to call it measure_size_tuning?
+class measure_size_response(FeatureCurveFunction):
     """
     Measure receptive field size of one unit of a sheet.
 
@@ -1367,57 +1381,53 @@ def measure_size_response(num_phase=18,
     measuring size response.
 
     The curve can be plotted at various different values of the
-    contrast of the stimulus. If the network contains an LGN layer
-    then weber_contrast can be used as the contrast_parameter.
-    If there is no LGN then scale (offset=0.0) can be used to define
-    the contrast. Other relevant contrast definitions can also be used
-    provided they are defined in PatternPresenter.
-    (The curve_label should also be changed to reflect new units)
+    contrast (or actually any other parameter) of the stimulus.  If
+    using contrast and the network contains an LGN layer, then one
+    would usually specify weber_contrast as the contrast_parameter. If
+    there is no explicit LGN, then scale (offset=0.0) can be used to
+    define the contrast.  Other relevant contrast definitions (or
+    other parameters) can also be used, provided they are defined in
+    PatternPresenter and the units parameter is changed as
+    appropriate.
     """
+
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(pattern_generator=SineGratingDisk(),
+                                 contrast_parameter="weber_contrast"))
     
-    sheet=topo.sim[sheet_name]
-
-    matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
-    if('OrientationPreference' in sheet.sheet_views):
-        or_pref = sheet.sheet_views['OrientationPreference'].view()[0]
-        or_value = or_pref[matrix_coords]*pi # Orientations are stored as a normalized value beween 0 and 1.
-                                             # The factor of pi is the norm_factor and is the range of orientation in measure_or_pref.
-    else:
-        topo.sim.warning("Orientation Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
-        or_value = 0.0
-
-  
-
-    if(('XPreference' in sheet.sheet_views) and
-       ('YPreference' in sheet.sheet_views)):
-        x_pref = sheet.sheet_views['XPreference'].view()[0]
-        y_pref = sheet.sheet_views['YPreference'].view()[0]
-        x_value=x_pref[matrix_coords]
-        y_value=y_pref[matrix_coords]
-    else:
-        topo.sim.warning("Position Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
-        x_value=coordinate[0]
-        y_value=coordinate[1]
-
-  
-
-    if num_phase <= 0:
-        raise ValueError("num_phase must be greater than 0")
-
-    step_phase=2*pi/num_phase
-    step_size=1.0/num_sizes
+    size=param.Number(default=0.5,bounds=(0,None),doc="""
+        The size of the pattern to present.""")
     
-    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                      Feature(name="size",range=(0.1,1.0),step=step_size,cyclic=False)]
+    coords = param.List(default=[(0,0)],doc="""
+        List of coordinates of units to measure.""")
 
-    x_axis='size'
-    x=FeatureCurves(feature_values,sheet,x_axis)
-      
-    for curve in curve_parameters:
-        param_dict = {"x":x_value,"y":y_value,"orientation":or_value}
-        param_dict.update(curve)
-        curve_label='Contrast = '+str(curve["contrast"])+'%'
-        x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
+    static_parameters = param.List(default=["orientation","x","y"])
+
+    num_sizes = param.Integer(default=10,bounds=(1,None),softbounds=(1,50),
+                              doc="Number of different sizes to test.")
+
+    x_axis = param.String(default='size',constant=True)
+
+
+    def __call__(self,**params):
+        """Measure the response to the specified pattern and create maps from them."""
+        p=ParamOverrides(self,params)
+        sheet=topo.sim[p.sheet_name]
+
+        for coord in p.coords:
+            # Orientations are stored as a normalized value beween 0
+            # and 1, so we scale them by pi to get the true orientations.
+            self.orientation=pi*self.sheetview_unit(sheet,coord,'OrientationPreference')
+            self.x=self.sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self.sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            self.compute_curves(p,sheet)
+
+
+    # Why not vary frequency too?  Usually it's just one number, but it could be otherwise.
+    def feature_list(self,p):
+        return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+               #Feature(name="frequency",values=p.frequencies),
+                Feature(name="size",range=(0.1,1.0),step=1.0/p.num_sizes,cyclic=False)]
 
 
 ###############################################################################
