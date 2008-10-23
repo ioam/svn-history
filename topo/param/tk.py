@@ -2242,12 +2242,19 @@ class ParametersFrame(TkParameterized,T.Frame):
         self.currently_displaying = dict([(param_name,self.representations[param_name])
                                           for param_name in self.displayed_params])
         #self.event_generate("<<SizeRight>>")
-            
+
+
+    def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
+        w,l = TkParameterized._create_widget(self,name,master,widget_options,on_change,on_modify)
+        
+        w.bind('<<right-click>>',lambda event: self.__right_click(event, w))
+        return w,l
+           
         
     def _create_selector_widget(self,frame,name,widget_options):
         """As for the superclass, but binds <<right-click>> event for opening menu."""
         w = TkParameterized._create_selector_widget(self,frame,name,widget_options)
-        w.bind('<<right-click>>',lambda event: self.__right_click(event, w))
+        #w.bind('<<right-click>>',lambda event: self.__right_click(event, w))
         return w
 
 
@@ -2256,7 +2263,20 @@ class ParametersFrame(TkParameterized,T.Frame):
         Popup the right-click menu.
         """
         self.__currently_selected_widget = widget
-        self.menu.tk_popup(event.x_root, event.y_root)
+
+        # need an actual mechanism for populating the menu, rather than this!!
+        ### copied from edit_PO_in_currently...
+        param_name = None
+        for name,representation in self.representations.items():
+            if self.__currently_selected_widget is representation['widget']:
+                param_name=name
+                break
+        # CEBALERT: should have used get_parameter_value(param_name)?
+        PO_to_edit = self._string2object(param_name,self._tkvars[param_name].get()) 
+        ###
+        
+        if hasattr(PO_to_edit,'params'):
+            self.menu.tk_popup(event.x_root, event.y_root)
 
 
     # CEBALERT: rename
