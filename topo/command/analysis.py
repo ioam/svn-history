@@ -1663,7 +1663,7 @@ pg.add_plot('Retinotopy',[('Hue','RetinotopyPreference')])
 pg.add_plot('Retinotopy Selectivity',[('Hue','RetinotopyPreference'),('Confidence','RetinotopySelectivity')])
 
 def measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[2.4],divisions=4,scale=1.0,
-                       offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0):
+                       offset=0.0,display=False, weighted_average=False, apply_output_fn=False,duration=0.175):
     """
     Measures peak retinotopy preference (as in Schuett et. al Journal
     of Neuroscience 22(15):6549-6559, 2002). The retina is divided
@@ -1699,7 +1699,7 @@ def measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[2.4],division
                       Feature(name="orientation",range=(0.0,2*pi),step=step_orientation,cyclic=True),
                       Feature(name="frequency",values=frequencies),
                       Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]          
-                      
+
     param_dict = {"size":size,"scale":scale,"offset":offset}
     x=FeatureMaps(feature_values)
     x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
