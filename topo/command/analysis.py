@@ -694,14 +694,22 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
         sheet=topo.sim[p.sheet_name]
         self.compute_curves(p,sheet)
 
-    def compute_curves(self,p,sheet):
+
+    def compute_curves(self,p,sheet,val_format='%s'):
+        """
+        Compute a set of curves for the specified sheet, using the
+        specified val_format to print a label for each value of a
+        curve_parameter.
+        """
+
         x=FeatureCurves(self.feature_list(p),sheet=sheet,x_axis=self.x_axis)
         for curve in p.curve_parameters:
             static_params = dict([(s,p[s]) for s in p.static_parameters])
             static_params.update(curve)
-            curve_label="; ".join(['%s = %s%s' % (n.capitalize(),str(v),p.units) for n,v in curve.items()])
+            curve_label="; ".join([('%s = '+val_format+'%s') % (n.capitalize(),v,p.units) for n,v in curve.items()])
             # JABALERT: Why is the feature list duplicated here?
             x.collect_feature_responses(self.feature_list(p),p.pattern_presenter,static_params,curve_label,p.display)
+
 
     def feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
@@ -1438,67 +1446,68 @@ create_plotgroup(template_plot_type="curve",name='Contrast Response',category="T
         prerequisites=['OrientationPreference','XPreference'])
 
 
-def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relative_orientations=[0.0, pi/6, pi/4, pi/2],
-                              size=0.5,display=False,frequency=2.4,
-                              num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
-                                                                              apply_output_fn=True,duration=1.0,
-                                                                              contrast_parameter="weber_contrast")):
+class measure_contrast_response(FeatureCurveFunction):
     """
     Measures contrast response curves for a particular unit.
 
-    Uses a circular sine grating patch as the stimulus on the retina.
-    If the network contains an LGN layer then weber_contrast can be
-    used as the contrast_parameter. If there is no LGN then scale (offset=0.0)
-    can be used to define the contrast. Other relevant contrast
-    definitions can also be used provided they are defined in PatternPresenter
-    (The curve_label should also be changed to reflect new units)
+    Uses a circular sine grating stimulus at the preferred
+    orientation and retinal position of the specified unit.
+    Orientation and position preference must be calulated before
+    measuring contrast response.
 
-    The stimulus is presented at the preferred orientation and
-    retinal position of the unit.Orientation preference and position
-    preference must be measured before measuring the contrast response.
+    The curve can be plotted at various different values of the
+    contrast (or actually any other parameter) of the stimulus.  If
+    using contrast and the network contains an LGN layer, then one
+    would usually specify weber_contrast as the contrast_parameter. If
+    there is no explicit LGN, then scale (offset=0.0) can be used to
+    define the contrast.  Other relevant contrast definitions (or
+    other parameters) can also be used, provided they are defined in
+    PatternPresenter and the units parameter is changed as
+    appropriate.
     """
 
-    sheet=topo.sim[sheet_name]
-    matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(pattern_generator=SineGratingDisk(),
+                                 contrast_parameter="weber_contrast"))
 
-    if('OrientationPreference' in sheet.sheet_views):
-        or_pref = sheet.sheet_views['OrientationPreference'].view()[0]
-        or_value = or_pref[matrix_coords]*pi # Orientations are stored as a normalized value beween 0 and 1.
-                                             # The factor of pi is the norm_factor and is the range of orientation in measure_or_pref.
-    else:
-        topo.sim.warning("Orientation Preference should be measured before plotting Contrast Response -- using default values for "+sheet_name)
-        or_value = 0.0
-   
-
-    if(('XPreference' in sheet.sheet_views) and
-       ('YPreference' in sheet.sheet_views)):
-        x_pref = sheet.sheet_views['XPreference'].view()[0]
-        y_pref = sheet.sheet_views['YPreference'].view()[0]
-        x_value=x_pref[matrix_coords]
-        y_value=y_pref[matrix_coords]
-    else:
-        topo.sim.warning("Position Preference should be measured before plotting Contrast Response -- using default values for "+sheet_name)
-        x_value=coordinate[0]
-        y_value=coordinate[1]
- 
-    curve_parameters=[{"orientation":or_value+ro} for ro in relative_orientations]
+    size=param.Number(default=0.5,bounds=(0,None),doc="""
+        The size of the pattern to present.""")
     
-     
-    if num_phase <= 0 :
-        raise ValueError("num_phase must be greater than 0")
+    coords = param.List(default=[(0,0)],doc="""
+        List of coordinates of units to measure.""")
 
-    step_phase=2*pi/num_phase
+    static_parameters = param.List(default=["size","x","y"])
+
+    contrasts = param.List(class_=int,default=[10,20,30,40,50,60,70,80,90,100])
+
+    relative_orientations = param.List(class_=float,default=[0.0, pi/6, pi/4, pi/2])
     
-    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                      Feature(name="contrast",values=contrasts,cyclic=False)]  
-    x_axis='contrast'
-    x=FeatureCurves(feature_values,sheet,x_axis)
-   
-    for curve in curve_parameters:
-        param_dict = {"x":x_value,"y":y_value,"frequency":frequency, "size":size}
-        param_dict.update(curve)
-        curve_label='Orientation = %.4f rad' % curve["orientation"] 
-        x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
+    x_axis = param.String(default='contrast',constant=True)
+
+    units = param.String(default=" rad")
+
+    def __call__(self,**params):
+        """Measure the response to the specified pattern and create maps from them."""
+        p=ParamOverrides(self,params)
+        sheet=topo.sim[p.sheet_name]
+
+        for coord in p.coords:
+            # Orientations are stored as a normalized value beween 0
+            # and 1, so we scale them by pi to get the true orientations.
+            orientation=pi*self.sheetview_unit(sheet,coord,'OrientationPreference')
+            self.curve_parameters=[{"orientation":orientation+ro} for ro in self.relative_orientations]
+
+            self.x=self.sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self.sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            
+            self.compute_curves(p,sheet,val_format="%.4f")
+
+    def feature_list(self,p):
+        return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+                Feature(name="frequency",values=p.frequencies),
+                Feature(name="contrast",values=p.contrasts,cyclic=False)]
+
+# curve_label='Orientation =  rad' % curve["orientation"] 
 
 
 ###############################################################################
