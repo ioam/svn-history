@@ -566,7 +566,7 @@ class TkParameterizedBase(Parameterized):
         # (Note that, for instance, we don't include Number:DoubleVar.
         # This is because we use Number to control the type, so we
         # don't need restrictions from DoubleVar.)
-        self.__param_to_tkvar = {Boolean:T.BooleanVar,
+        self._param_to_tkvar = {Boolean:T.BooleanVar,
                                  Parameter:T.StringVar}
 
         # CEBALERT: Parameter is the base parameter class, but ... 
@@ -619,7 +619,7 @@ class TkParameterizedBase(Parameterized):
         # CEBALERT: should probably delete any existing tkvar for name
         self._create_translator(name,param)
 
-        tkvar = lookup_by_class(self.__param_to_tkvar,type(param))()
+        tkvar = lookup_by_class(self._param_to_tkvar,type(param))()
         self._tkvars[name] = tkvar
 
         # overwrite Variable's set() with one that will handle
@@ -751,7 +751,7 @@ class TkParameterizedBase(Parameterized):
             val = self._string2object(param_name,tkvar._original_get())
 
             try: 
-                self.__set_parameter(param_name,val)
+                self._set_parameter(param_name,val)
             except: # everything
                 tkvar.set(tkvar._last_good_val)
                 raise # whatever the parameter-setting error was
@@ -793,12 +793,13 @@ class TkParameterizedBase(Parameterized):
         Return the Parameterized which contains the parameter 'name'.
         """
         sources = self._source_POs()
-        
+
         for po in sources:
             if name in po.params():
                 return po
 
-        raise AttributeError(self.__attr_err_msg(name,sources))
+
+        raise AttributeError(self._attr_err_msg(name,sources))
 
         
     # CB: change with_location to with_source
@@ -874,7 +875,7 @@ class TkParameterizedBase(Parameterized):
             if hasattr(extraPO,name):
                 return getattr(extraPO,name) # HIDDEN!
 
-            raise AttributeError(self.__attr_err_msg(name,[self,extraPO]))
+            raise AttributeError(self._attr_err_msg(name,[self,extraPO]))
                     
 
     def __setattr__(self,name,val):
@@ -965,7 +966,7 @@ class TkParameterizedBase(Parameterized):
 
 ######################################################################
 
-    def __attr_err_msg(self,attr_name,objects):
+    def _attr_err_msg(self,attr_name,objects):
         """
         Helper method: return the 'attr_name is not in objects' message.
         """
@@ -979,7 +980,7 @@ class TkParameterizedBase(Parameterized):
         return error_string
 
 
-    def __set_parameter(self,param_name,val):
+    def _set_parameter(self,param_name,val):
         """
         Helper method:
         """
@@ -1114,6 +1115,9 @@ class TkParameterized(TkParameterizedBase):
 
         # CEBALER: doc
         self.allow_dynamic = []
+
+
+
         
         self.param_immediately_apply_change = {Boolean:True,
                                                Selector:True,
@@ -1125,6 +1129,7 @@ class TkParameterized(TkParameterizedBase):
                                      **params)
 
         self.balloon = Balloon(master)
+
 
         # CEBALERT: what about subclasses of Number (e.g. Integer,
         # which should get a slider that jumps between integers...
@@ -1150,7 +1155,74 @@ class TkParameterized(TkParameterizedBase):
                             variable=self.dynamic_var)
 
 
-    def __update_dynamic_menu_entry(self,param_name):
+        ### Right-click menu for widgets
+        master.option_add("*Menu.tearOff", "0") 
+        self.menu = Menu(master)
+        self.menu.insert_command('end',label='Properties',
+            command=lambda:self._edit_PO_in_currently_selected_widget())
+
+
+
+    def _right_click(self, event, widget):
+        """
+        Popup the right-click menu.
+        """
+        self._currently_selected_widget = widget
+
+        # need an actual mechanism for populating the menu, rather than this!!
+        ### copied from edit_PO_in_currently...
+        param_name = None
+        for name,representation in self.representations.items():
+            if self._currently_selected_widget is representation['widget']:
+                param_name=name
+                break
+        # CEBALERT: should have used get_parameter_value(param_name)?
+        PO_to_edit = self._string2object(param_name,self._tkvars[param_name].get()) 
+        ###
+        
+        if hasattr(PO_to_edit,'params'):
+            self.menu.tk_popup(event.x_root, event.y_root)
+
+
+    # CEBALERT: rename
+    def _edit_PO_in_currently_selected_widget(self):
+        """
+        Open a new window containing a ParametersFrame (actually, a
+        type(self)) for the PO in _currently_selected_widget.
+        """
+        # CEBALERT: simplify this lookup by value
+        param_name = None
+        for name,representation in self.representations.items():
+            if self._currently_selected_widget is representation['widget']:
+                param_name=name
+                break
+
+        # CEBALERT: should have used get_parameter_value(param_name)?
+        PO_to_edit = self._string2object(param_name,self._tkvars[param_name].get()) 
+
+        parameter_window = AppWindow(self)
+        parameter_window.title(PO_to_edit.name+' parameters')
+
+        ### CEBALERT: confusing? ###
+        title=T.Label(parameter_window, text="("+param_name + " of " + (self._extraPO.name or 'class '+self._extraPO.__name__) + ")")
+        title.pack(side = "top")
+        self.balloon.bind(title,getdoc(self.get_parameter_object(param_name)))
+        ############################
+
+        # uh-oh 
+        if not isinstance(self,ParametersFrame):
+            p_type = ParametersFrameWithApply
+            parameter_frame = p_type(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler)
+
+        else:
+            p_type = type(self)
+            parameter_frame = p_type(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler,on_change=self.on_change,on_modify=self.on_modify)
+
+        parameter_frame.pack()
+
+
+
+    def _update_dynamic_menu_entry(self,param_name):
         """Keep track of status of dynamic entry."""
         param,po = self.get_parameter_object(param_name,with_location=True)
         currently_dynamic = param_is_dynamically_generated(param,po)
@@ -1167,7 +1239,7 @@ class TkParameterized(TkParameterizedBase):
 
     def _param_right_click(self,event,param_name):
         """Display a popup menu when user right clicks on a parameter."""
-        self.__update_dynamic_menu_entry(param_name)
+        self._update_dynamic_menu_entry(param_name)
         self.popup_menu.tk_popup(event.x_root,event.y_root)
 
 
@@ -1500,12 +1572,14 @@ class TkParameterized(TkParameterizedBase):
         if is_button(widget): 
             label = None
         else:
-            label = T.Label(master,text=self.__pretty_print(name))
+            label = T.Label(master,text=self._pretty_print(name))
 
         # disable widgets for constant params
         if param_obj.constant and isinstance(source_po,Parameterized):
             # (need to be able to set on class, hence check it's PO not POMetaclass
             widget.config(state='disabled')
+        
+        widget.bind('<<right-click>>',lambda event: self._right_click(event, widget))
 
         return widget,label
 
@@ -1550,7 +1624,7 @@ class TkParameterized(TkParameterizedBase):
             button['image']=image
             #button['relief']='flat'
         else:
-            button['text']=self.__pretty_print(name)
+            button['text']=self._pretty_print(name)
             
 
         # and set size from Button
@@ -1756,7 +1830,7 @@ class TkParameterized(TkParameterizedBase):
 
 
 
-    def __pretty_print(self,s):
+    def _pretty_print(self,s):
         """
         Convert a Parameter name s to a string suitable for display,
         if pretty_parameters is True.
@@ -2011,13 +2085,8 @@ class ParametersFrame(TkParameterized,T.Frame):
             self.set_PO(parameterized_object,on_change=on_change,
                         on_modify=on_modify)
 
-        self.__create_button_panel()
+        self._create_button_panel()
 
-        ### Right-click menu for widgets
-        self.option_add("*Menu.tearOff", "0") 
-        self.menu = Menu(self)
-        self.menu.insert_command('end',label='Properties',
-            command=lambda:self.__edit_PO_in_currently_selected_widget())
 
         # CEBALERT: just because callers assume this pack()s itself.
         # Really it should be left to callers i.e. this should be removed.
@@ -2031,7 +2100,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         return precedence<self.display_threshold
         
 
-    def __create_button_panel(self):
+    def _create_button_panel(self):
         """
         Add the buttons in their own panel (frame).
         """
@@ -2166,7 +2235,7 @@ class ParametersFrame(TkParameterized,T.Frame):
 ##         raise TypeError("ParametersFrame arranges all parameters together in a grid.")
 
 
-    def __grid_param(self,parameter_name,row):
+    def _grid_param(self,parameter_name,row):
         widget = self.representations[parameter_name]['widget']
         label = self.representations[parameter_name]['label']
 
@@ -2207,7 +2276,7 @@ class ParametersFrame(TkParameterized,T.Frame):
 
 
 
-    def __make_representation(self,name,on_change=None,on_modify=None):
+    def _make_representation(self,name,on_change=None,on_modify=None):
         widget,label = self._create_widget(name,self._params_frame,
                                            on_change=on_change or self.on_change,
                                            on_modify=on_modify or self.on_modify)
@@ -2232,63 +2301,44 @@ class ParametersFrame(TkParameterized,T.Frame):
             
         ### create the labels & widgets
         for name in self.displayed_params:
-            self.__make_representation(name,on_change,on_modify)
+            self._make_representation(name,on_change,on_modify)
             
         ### add widgets & labels to screen in a grid
         rows = range(len(sorted_parameter_names))
         for row,parameter_name in zip(rows,sorted_parameter_names): 
-            self.__grid_param(parameter_name,row)
+            self._grid_param(parameter_name,row)
 
         self.currently_displaying = dict([(param_name,self.representations[param_name])
                                           for param_name in self.displayed_params])
         #self.event_generate("<<SizeRight>>")
 
 
-    def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
-        w,l = TkParameterized._create_widget(self,name,master,widget_options,on_change,on_modify)
-        
-        w.bind('<<right-click>>',lambda event: self.__right_click(event, w))
-        return w,l
+#    def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
+#        w,l = TkParameterized._create_widget(self,name,master,widget_options,on_change,on_modify)
+#        
+#        w.bind('<<right-click>>',lambda event: self._right_click(event, w))
+#        return w,l
            
         
     def _create_selector_widget(self,frame,name,widget_options):
         """As for the superclass, but binds <<right-click>> event for opening menu."""
         w = TkParameterized._create_selector_widget(self,frame,name,widget_options)
-        #w.bind('<<right-click>>',lambda event: self.__right_click(event, w))
+        #w.bind('<<right-click>>',lambda event: self._right_click(event, w))
         return w
 
 
-    def __right_click(self, event, widget):
-        """
-        Popup the right-click menu.
-        """
-        self.__currently_selected_widget = widget
-
-        # need an actual mechanism for populating the menu, rather than this!!
-        ### copied from edit_PO_in_currently...
-        param_name = None
-        for name,representation in self.representations.items():
-            if self.__currently_selected_widget is representation['widget']:
-                param_name=name
-                break
-        # CEBALERT: should have used get_parameter_value(param_name)?
-        PO_to_edit = self._string2object(param_name,self._tkvars[param_name].get()) 
-        ###
-        
-        if hasattr(PO_to_edit,'params'):
-            self.menu.tk_popup(event.x_root, event.y_root)
 
 
     # CEBALERT: rename
-    def __edit_PO_in_currently_selected_widget(self):
+    def _edit_PO_in_currently_selected_widget(self):
         """
         Open a new window containing a ParametersFrame (actually, a
-        type(self)) for the PO in __currently_selected_widget.
+        type(self)) for the PO in _currently_selected_widget.
         """
         # CEBALERT: simplify this lookup by value
         param_name = None
         for name,representation in self.representations.items():
-            if self.__currently_selected_widget is representation['widget']:
+            if self._currently_selected_widget is representation['widget']:
                 param_name=name
                 break
 
@@ -2339,8 +2389,8 @@ class ParametersFrame(TkParameterized,T.Frame):
         param = self.get_parameter_object(param_name)
         
         self._create_translator(param_name,param)
-        self.__make_representation(param_name)
-        self.__grid_param(param_name,row)
+        self._make_representation(param_name)
+        self._grid_param(param_name,row)
 
             
 
