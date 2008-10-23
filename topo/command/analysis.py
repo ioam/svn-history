@@ -690,11 +690,10 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
         sheet=topo.sim[p.sheet_name]
         self.compute_curves(p,sheet)
 
-    def compute_curves(self,p,sheet,extra_params={}):
+    def compute_curves(self,p,sheet):
         x=FeatureCurves(self.feature_list(p),sheet=sheet,x_axis='orientation')
         for curve in p.curve_parameters:
             static_params = dict([(s,p[s]) for s in p.static_parameters])
-            static_params.update(extra_params)
             static_params.update(curve)
             curve_label="; ".join(['%s = %s%s' % (n.capitalize(),str(v),p.units) for n,v in curve.items()])
             # JABALERT: Why is the feature list duplicated here?
@@ -1319,7 +1318,7 @@ class measure_or_tuning(FeatureCurveFunction):
     coords = param.List(default=[(0,0)],doc="""
         List of coordinates of units to measure.""")
 
-    static_parameters = param.List(default=["size"])
+    static_parameters = param.List(default=["size","x","y"])
 
     def __call__(self,**params):
         """Measure the response to the specified pattern and create maps from them."""
@@ -1340,8 +1339,9 @@ class measure_or_tuning(FeatureCurveFunction):
                 topo.sim.warning("Position Preference should be measured before plotting Orientation Tuning -- using default values for "+sheet_name)
                 x_value=coordinate[0]
                 y_value=coordinate[1]
-                
-            self.compute_curves(p,sheet,extra_params={"x":x_value,"y":y_value})
+            self.x=x_value
+            self.y=y_value
+            self.compute_curves(p,sheet)
                
 
 ###############################################################################
