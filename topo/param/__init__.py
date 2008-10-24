@@ -598,7 +598,9 @@ class ObjectSelector(Selector):
     """
     __slots__ = ['objects','allow_None']
 
-    def __init__(self,default=None,objects=[],instantiate=True,allow_None=False,**params):
+    # ObjectSelector is usually used to allow selection from a list of
+    # existing objects, therefore instantiate is False by default.
+    def __init__(self,default=None,objects=[],instantiate=False,allow_None=False,**params):
         self.objects = objects
         self.allow_None = (default is None or allow_None)
         self._check_value(default)
