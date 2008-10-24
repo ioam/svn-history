@@ -1249,7 +1249,7 @@ class Parameterized(object):
 
 
     @classmethod
-    def params(cls):
+    def params(cls,parameter_name=None):
         """
         Return the Parameters of this class as the
         dictionary {name: parameter_object}
@@ -1260,7 +1260,7 @@ class Parameterized(object):
         # CB: we cache the parameters because this method is called
         # often, and new parameters cannot be added (or deleted)
         try:
-            return getattr(cls,'_%s__params'%cls.__name__)
+            pdict=getattr(cls,'_%s__params'%cls.__name__)
         except AttributeError:
             paramdict = {}
             for class_ in classlist(cls):
@@ -1273,8 +1273,13 @@ class Parameterized(object):
             # runtime (if we were to mangle it now, it would be
             # _Parameterized.__params for all classes).
             setattr(cls,'_%s__params'%cls.__name__,paramdict)
-            return paramdict
+            pdict= paramdict
         
+        if parameter_name is None:
+            return pdict
+        else:
+            return pdict[parameter_name]
+       
 
 
     @classmethod
