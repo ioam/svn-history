@@ -655,7 +655,7 @@ class ObjectSelector(Selector):
 
         (Returns the dictionary {object.name:object}.)
         """
-        d=dict([(obj.name,obj) for obj in self.objects])
+        d=dict([(obj.name,obj) for obj in self.objects if obj is not None])
         if self.allow_None:
             d['None']=None
         return d
