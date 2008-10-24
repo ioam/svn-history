@@ -775,6 +775,25 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
         return val
 
 
+class UnitCurveFunction(FeatureCurveFunction):
+    """
+    Measures tuning curve(s) of particular unit(s).
+    """
+
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(pattern_generator=SineGratingDisk(),
+                                 contrast_parameter="weber_contrast"))
+
+    size=param.Number(default=0.5,bounds=(0,None),doc="""
+        The size of the pattern to present.""")
+    
+    coords = param.List(default=[(0,0)],doc="""
+        List of coordinates of units to measure.""")
+
+    __abstract = True
+
+
+
 # Module variables for passing values to the commands.
 coordinate = (0,0)
 sheet_name = ''
@@ -1294,7 +1313,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="
         prerequisites=['XPreference'])
 
 
-class measure_or_tuning(FeatureCurveFunction):
+class measure_or_tuning(UnitCurveFunction):
     """
     Measures orientation tuning curve(s) of a particular unit.
 
@@ -1312,17 +1331,7 @@ class measure_or_tuning(FeatureCurveFunction):
     appropriate.
     """
 
-    pattern_presenter = param.Callable(
-        default=PatternPresenter(pattern_generator=SineGratingDisk(),
-                                 contrast_parameter="weber_contrast"))
-
     num_orientation = param.Integer(default=12)
-
-    size=param.Number(default=0.5,bounds=(0,None),doc="""
-        The size of the pattern to present.""")
-    
-    coords = param.List(default=[(0,0)],doc="""
-        List of coordinates of units to measure.""")
 
     static_parameters = param.List(default=["size","x","y"])
 
@@ -1344,7 +1353,7 @@ create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning 
         prerequisites=['OrientationPreference','XPreference'])
 
 # JABALERT: Is there some reason not to call it measure_size_tuning?
-class measure_size_response(FeatureCurveFunction):
+class measure_size_response(UnitCurveFunction):
     """
     Measure receptive field size of one unit of a sheet.
 
@@ -1363,16 +1372,7 @@ class measure_size_response(FeatureCurveFunction):
     PatternPresenter and the units parameter is changed as
     appropriate.
     """
-
-    pattern_presenter = param.Callable(
-        default=PatternPresenter(pattern_generator=SineGratingDisk(),
-                                 contrast_parameter="weber_contrast"))
-    
-    size=param.Number(default=0.5,bounds=(0,None),doc="""
-        The size of the pattern to present.""")
-    
-    coords = param.List(default=[(0,0)],doc="""
-        List of coordinates of units to measure.""")
+    size=None # 
 
     static_parameters = param.List(default=["orientation","x","y"])
 
@@ -1410,7 +1410,7 @@ create_plotgroup(template_plot_type="curve",name='Contrast Response',category="T
         prerequisites=['OrientationPreference','XPreference'])
 
 
-class measure_contrast_response(FeatureCurveFunction):
+class measure_contrast_response(UnitCurveFunction):
     """
     Measures contrast response curves for a particular unit.
 
@@ -1429,16 +1429,6 @@ class measure_contrast_response(FeatureCurveFunction):
     PatternPresenter and the units parameter is changed as
     appropriate.
     """
-
-    pattern_presenter = param.Callable(
-        default=PatternPresenter(pattern_generator=SineGratingDisk(),
-                                 contrast_parameter="weber_contrast"))
-
-    size=param.Number(default=0.5,bounds=(0,None),doc="""
-        The size of the pattern to present.""")
-    
-    coords = param.List(default=[(0,0)],doc="""
-        List of coordinates of units to measure.""")
 
     static_parameters = param.List(default=["size","x","y"])
 
@@ -1741,7 +1731,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category
 
 
 
-class measure_orientation_contrast(FeatureCurveFunction):
+class measure_orientation_contrast(UnitCurveFunction):
     """
     Measures the response to a center sine grating disk and a surround
     sine grating ring at different contrasts of the central disk. 
@@ -1756,16 +1746,15 @@ class measure_orientation_contrast(FeatureCurveFunction):
         default=PatternPresenter(pattern_generator=OrientationContrastPattern(),
                                  contrast_parameter="weber_contrast"))
 
-    # Maybe instead use size and some relative parameter, to allow easy scaling?
+    size=None # Disabled unused parameter
+    # Maybe instead of the below, use size and some relative parameter, to allow easy scaling?
+
     # ALERT: Rename to center.
     size_centre=param.Number(default=0.5,bounds=(0,None),doc="""
         The size of the central pattern to present.""")
 
     size_surround=param.Number(default=1.0,bounds=(0,None),doc="""
         The size of the surround pattern to present.""")
-
-    coords = param.List(default=[(0,0)],doc="""
-        List of coordinates of units to measure.""")
 
     contrasts = param.List(class_=int,default=[10,20,30,40,50,60,70,80,90,100])
 
