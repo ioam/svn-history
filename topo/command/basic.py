@@ -287,25 +287,16 @@ def default_analysis_function():
     import topo
     from topo.command.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.generator import GeneratorSheet
-
-    # Build a list of all sheets worth measuring
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
-    input_sheets = topo.sim.objects(GeneratorSheet).values()
-    
-    # Set potentially reasonable defaults; not necessarily useful
-    topo.command.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
 
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
         save_plotgroup(pg)
 
-    # Save at least one projection plot
-    if measured_sheets:
-        for p in measured_sheets[0].in_connections:
+    # Plot projections from each measured map
+    measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
+                       if hasattr(s,'measure_maps') and s.measure_maps]
+    for s in measured_sheets:
+        for p in s.in_connections:
             save_plotgroup("Projection",projection=p)
 
     # Test response to a standardized pattern

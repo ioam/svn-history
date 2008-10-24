@@ -572,17 +572,35 @@ class MeasureResponseFunction(ParameterizedFunction):
 
 
     def _input_sheet(self,name):
-        """Look up up and return the specified input sheet, defaulting to the first found."""
+        """Look up and return the specified input sheet, defaulting to the first found."""
         # Should probably remove this method and simply make
         # input_sheet_name, where used, into a proper Sheet parameter
         # (defaulting to None at first?) rather than a string.
         if name == '':
-            inputs=topo.sim.objects(GeneratorSheet).values()
-            if len(inputs)<1:
+            sheets=topo.sim.objects(GeneratorSheet).values()
+            if len(sheets)<1:
                 raise ValueError("Unable to find a suitable input sheet.")
-            sht=inputs[0]
-            if len(inputs)>1:
+            sht=sheets[0]
+            if len(sheets)>1:
                 self.message("Using input sheet %s." % sht.name)
+        else:
+            sht = topo.sim[name]
+        return sht
+
+
+    def _sheet(self,name):
+        """Look up and return the specified sheet, defaulting to the first for which measure_maps is True."""
+        # Should probably remove this method and simply make
+        # sheet_name, where used, into a proper Sheet parameter
+        # (defaulting to None at first?) rather than a string.
+        if name == '':
+            sheets = [s for s in topo.sim.objects(Sheet).values()
+                      if hasattr(s,'measure_maps') and s.measure_maps]
+            if len(sheets)<1:
+                raise ValueError("Unable to find a suitable sheet.")
+            sht=sheets[0]
+            if len(sheets)>1:
+                self.message("Using sheet %s." % sht.name)
         else:
             sht = topo.sim[name]
         return sht
@@ -715,7 +733,7 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
     def __call__(self,**params):
         """Measure the response to the specified pattern and store the data in each sheet."""
         p=ParamOverrides(self,params)
-        sheet=topo.sim[p.sheet_name]
+        sheet=self._sheet(p.sheet_name)
         self._compute_curves(p,sheet)
 
 
@@ -1310,8 +1328,8 @@ class measure_or_tuning(FeatureCurveFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        sheet=topo.sim[p.sheet_name]
-
+        sheet=self._sheet(p.sheet_name)
+        
         for coord in p.coords:
             self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
             self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
@@ -1366,7 +1384,7 @@ class measure_size_response(FeatureCurveFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        sheet=topo.sim[p.sheet_name]
+        sheet=self._sheet(p.sheet_name)
 
         for coord in p.coords:
             # Orientations are stored as a normalized value beween 0
@@ -1434,7 +1452,7 @@ class measure_contrast_response(FeatureCurveFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        sheet=topo.sim[p.sheet_name]
+        sheet=self._sheet(p.sheet_name)
 
         for coord in p.coords:
             orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
@@ -1765,7 +1783,7 @@ class measure_orientation_contrast(FeatureCurveFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        sheet=topo.sim[p.sheet_name]
+        sheet=self._sheet(p.sheet_name)
 
         for coord in p.coords:
             orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
