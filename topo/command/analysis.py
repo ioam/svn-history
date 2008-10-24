@@ -12,6 +12,14 @@ dictionary, while the Activity PlotGroupTemplate specifies which
 SheetViews should be plotted in which combination.  See the help for
 PlotGroupTemplate for more information.
 
+Some of the commands are ordinary Python functions, but the rest are
+ParameterizedFunctions, which act like Python functions but support
+Parameters with defaults, bounds, inheritance, etc.  These commands
+are usually grouped together using inheritance so that they share a
+set of parameters and some code, and only the bits that are specific
+to that particular plot or analysis appear below.  See the
+superclasses for the rest of the parameters and code.
+
 $Id$
 """
 __version__='$Revision$'
@@ -595,7 +603,7 @@ class measure_size_response(UnitCurveCommand):
     PatternPresenter and the units parameter is changed as
     appropriate.
     """
-    size=None # 
+    size=None # Disabled unused parameter
 
     static_parameters = param.List(default=["orientation","x","y"])
 
