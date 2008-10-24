@@ -33,6 +33,7 @@ from topo.sheet.generator import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 
+# JABALERT: Make helper functions notationally private
 
 
 class Feature(object):
@@ -548,7 +549,7 @@ class MeasureResponseFunction(ParameterizedFunction):
 
 
     def __call__(self,**params):
-        """Measure the response to the specified pattern and create maps from them."""
+        """Measure the response to the specified pattern and store the data in each sheet."""
         
         p=ParamOverrides(self,params)
         x=FeatureMaps(self.feature_list(p))
@@ -1144,70 +1145,6 @@ class measure_cog(ParameterizedFunction):
 
 
 ###############################################################################
-## JABALERT: Currently disabled, because it is not useful while the
-## RFs have a large constant offset value.
-#
-#pg= create_plotgroup(name='RF Center of Gravity',category="Preference Maps",
-#            doc="""Measure the center of gravity of each Receptive
-#            Field of a sheet.  Requires measure_rfs() to have been
-#            called previously for that sheet.""",
-#            update_command='measure_rfcog(sheet_name="V1",input_sheet_name="Retina")',
-#            plot_command='topographic_grid(xsheet_view_name="XRFCoG",ysheet_view_name="YRFCoG")',
-#            normalize=True)
-#pg.add_plot('X RF CoG',[('Strength','XRFCoG')])
-#pg.add_plot('Y RF CoG',[('Strength','YRFCoG')])
-#pg.add_plot('RFCoG',[('Red','XRFCoG'),('Green','YRFCoG')])
-
-
-
-def measure_rfcog(sheet_name='V1',input_sheet_name='Retina'):
-   """
-   Calculate center of gravity (CoG) for each RF of the specified sheet.
-
-   The RFs are assumed to have been measured previously using
-   measure_rfs().  The CoG is then calculated as in measure_cog().
-
-   At present, the names of the input and target sheets to use must
-   be specified in the arguments to this function, and a model using
-   any other names must specify those explicitly when this function is
-   called.
-   """
-   sheet = topo.sim.objects(CFSheet)[sheet_name]
-   input_sheet = topo.sim.objects(GeneratorSheet)[input_sheet_name]
-
-   rows,cols=sheet.activity.shape
-   xpref=zeros((rows,cols),Float)
-   ypref=zeros((rows,cols),Float)
-   
-   for r in xrange(rows):
-       for c in xrange(cols):
-           x,y = sheet.matrixidx2sheet(r,c)
-           sv = input_sheet.sheet_views.get(('RFs',sheet.name,x,y))
-           if sv is None:
-              topo.sim.warning("measure_rfs() must first be called for input_sheet %s"%input_sheet.name)
-              return
-           
-           rf=sv.view()[0]
-           
-           row_centroid,col_centroid = centroid(rf)
-           xcentroid,ycentroid =input_sheet.matrix2sheet(row_centroid+0.5,
-                                                         col_centroid+0.5)
-           
-           xpref[r][c]= xcentroid
-           ypref[r][c]= ycentroid
-
-           new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-           sheet.sheet_views['XRFCoG']=new_view
-           new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-           sheet.sheet_views['YRFCoG']=new_view
-
-
-
-
-
-
-
-###############################################################################
 pg= create_plotgroup(name='Orientation Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
              update_command='measure_or_pref()')
@@ -1489,8 +1426,6 @@ class measure_contrast_response(FeatureCurveFunction):
         sheet=topo.sim[p.sheet_name]
 
         for coord in p.coords:
-            # Orientations are stored as a normalized value beween 0
-            # and 1, so we scale them by pi to get the true orientations.
             orientation=pi*self.sheetview_unit(sheet,coord,'OrientationPreference')
             self.curve_parameters=[{"orientation":orientation+ro} for ro in self.relative_orientations]
 
@@ -1662,8 +1597,8 @@ pg=create_plotgroup(name='Retinotopy',category="Other",
 pg.add_plot('Retinotopy',[('Hue','RetinotopyPreference')])
 pg.add_plot('Retinotopy Selectivity',[('Hue','RetinotopyPreference'),('Confidence','RetinotopySelectivity')])
 
-def measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[2.4],divisions=4,scale=1.0,
-                       offset=0.0,display=False, weighted_average=False, apply_output_fn=False,duration=0.175):
+
+class measure_retinotopy(SinusoidalMeasureResponseFunction):
     """
     Measures peak retinotopy preference (as in Schuett et. al Journal
     of Neuroscience 22(15):6549-6559, 2002). The retina is divided
@@ -1672,81 +1607,109 @@ def measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[2.4],division
     For each unit, the retinotopic position with the highest response
     at the preferred orientation and phase is recorded and assigned a
     color according to the retinotopy color key.
-
     """
 
-    from topo.command.pylabplots import matrixplot_hsv
-
+    divisions=param.Integer(default=4,bounds=(1,None),doc="""
+        The number of different positions to measure in X and in Y.""")
     
-    input_sheet_name="Retina"
-    if divisions <= 0 or num_orientation <= 0 or num_phase <= 0 :
-        raise ValueError("divisions and num_orientation and num_phase must be greater than 0")
-    
-    input_sheet = topo.sim[input_sheet_name]
-    
-    l,b,r,t = input_sheet.nominal_bounds.lbrt()
-    x_range=(r,l)
-    y_range=(t,b)
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(SineGratingRectangle()),doc="""
+        Callable object that will present a parameter-controlled
+        pattern to a set of Sheets.  For measuring position, the
+        pattern_presenter should be spatially localized, yet also able
+        to activate the appropriate neurons reliably.""")
 
-    step_phase=2*pi/num_phase
-    step_orientation=2*pi/num_orientation
-   
-    size=float((x_range[0]-x_range[1]))/divisions
-    retinotopy=range(divisions*divisions)
-    pattern_presenter=PatternPresenter(SineGratingRectangle(),apply_output_fn=apply_output_fn,duration=duration, divisions=divisions)
-    
-    feature_values = [Feature(name="retinotopy",values=retinotopy),
-                      Feature(name="orientation",range=(0.0,2*pi),step=step_orientation,cyclic=True),
-                      Feature(name="frequency",values=frequencies),
-                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]          
-
-    param_dict = {"size":size,"scale":scale,"offset":offset}
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-
-    #Generate automatic plot of color key
-    #JLALERT Coordinates also calculated above - could maybe combine this
-    coordinate_x=[]
-    coordinate_y=[]
-    coordinates=[]
-    mat_coords=[]
-
-    x_div=float(r-l)/(divisions*2)
-    y_div=float(t-b)/(divisions*2)
-    ret_matrix = ones(input_sheet.shape, float)
- 
-    for i in range(divisions):
-        if not bool(divisions%2):
-            if bool(i%2):
-                coordinate_x.append(i*x_div)
-                coordinate_y.append(i*y_div)
-                coordinate_x.append(i*-x_div)
-                coordinate_y.append(i*-y_div)
-        else:
-            if not bool(i%2):
-                coordinate_x.append(i*x_div)
-                coordinate_y.append(i*y_div)
-                coordinate_x.append(i*-x_div)
-                coordinate_y.append(i*-y_div)
+    static_parameters = param.List(default=["size","scale","offset"])
   
-    for x in coordinate_x:
-        for y in coordinate_y:
-            coordinates.append((x,y))
-            
-      
-    for r in retinotopy:
-        x_coord=coordinates[r][0]
-        y_coord=coordinates[r][1]
-        x_top, y_top = input_sheet.sheet2matrixidx(x_coord+x_div,y_coord+y_div)
-        x_bot, y_bot = input_sheet.sheet2matrixidx(x_coord-x_div,y_coord-y_div)
-        norm_ret=float((r+1.0)/(divisions*divisions))
+    scale = param.Number(default=1.0)
+
+    # JABALERT: Shouldn't have hard-coded default
+    input_sheet_name = param.String(default='Retina',doc="""
+        Name of the sheet where input should be drawn.""")
+
+    weighted_average= param.Boolean(default=False)
+
+
+    def __call__(self,**params):
+        result=super(measure_retinotopy,self).__call__(**params)
+        # This should be plotted in the plot_command, not the update_command, if possible
+        self.retinotopy_key(params)
+
+
+    def feature_list(self,p):
+        # RFHACK: Should add a default value for this parameter
+        if p.input_sheet_name == '':
+            raise ValueError("Must set topo.command.analysis.measure_retinotopy.input_sheet_name before calling measure_retinotopy")
+    
+        input_sheet = topo.sim[p.input_sheet_name]
+    
+        l,b,r,t = input_sheet.nominal_bounds.lbrt()
+        x_range=(r,l)
+        y_range=(t,b)
+    
+        self.size=float((x_range[0]-x_range[1]))/p.divisions
+        self.retinotopy=range(p.divisions*p.divisions)
+
+        p.pattern_presenter.divisions=p.divisions
         
-        for x in range(min(x_bot,x_top),max(x_bot,x_top)):
-            for y in range(min(y_bot,y_top),max(y_bot,y_top)):
-                ret_matrix[x][y] += norm_ret
-               
-    #Plot the color key
-    matrixplot_hsv(ret_matrix, title="Color Key")
+        return [Feature(name="retinotopy",values=self.retinotopy),
+                Feature(name="orientation",range=(0.0,2*pi),step=2*pi/p.num_orientation,cyclic=True),
+                Feature(name="frequency",values=p.frequencies),
+                Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
+
+
+    def retinotopy_key(self,params):
+        """Automatic plot of retinotopy color key."""
+
+        p=ParamOverrides(self,params)
+
+        input_sheet = topo.sim[p.input_sheet_name]
+        l,b,r,t = input_sheet.nominal_bounds.lbrt()
+
+        coordinate_x=[]
+        coordinate_y=[]
+        coordinates=[]
+        mat_coords=[]
+    
+        x_div=float(r-l)/(p.divisions*2)
+        y_div=float(t-b)/(p.divisions*2)
+        ret_matrix = ones(input_sheet.shape, float)
+     
+        for i in range(p.divisions):
+            if not bool(p.divisions%2):
+                if bool(i%2):
+                    coordinate_x.append(i*x_div)
+                    coordinate_y.append(i*y_div)
+                    coordinate_x.append(i*-x_div)
+                    coordinate_y.append(i*-y_div)
+            else:
+                if not bool(i%2):
+                    coordinate_x.append(i*x_div)
+                    coordinate_y.append(i*y_div)
+                    coordinate_x.append(i*-x_div)
+                    coordinate_y.append(i*-y_div)
+      
+        for x in coordinate_x:
+            for y in coordinate_y:
+                coordinates.append((x,y))
+                
+          
+        for r in self.retinotopy:
+            x_coord=coordinates[r][0]
+            y_coord=coordinates[r][1]
+            x_top, y_top = input_sheet.sheet2matrixidx(x_coord+x_div,y_coord+y_div)
+            x_bot, y_bot = input_sheet.sheet2matrixidx(x_coord-x_div,y_coord-y_div)
+            norm_ret=float((r+1.0)/(p.divisions*p.divisions))
+            
+            for x in range(min(x_bot,x_top),max(x_bot,x_top)):
+                for y in range(min(y_bot,y_top),max(y_bot,y_top)):
+                    ret_matrix[x][y] += norm_ret
+                   
+        #Plot the color key
+        from topo.command.pylabplots import matrixplot_hsv
+        matrixplot_hsv(ret_matrix, title="Color Key")
+
+
 
 ###############################################################################
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
@@ -1802,8 +1765,6 @@ class measure_orientation_contrast(FeatureCurveFunction):
         sheet=topo.sim[p.sheet_name]
 
         for coord in p.coords:
-            # Orientations are stored as a normalized value beween 0
-            # and 1, so we scale them by pi to get the true orientations.
             orientation=pi*self.sheetview_unit(sheet,coord,'OrientationPreference')
             self.orientationcentre=orientation
             self.curve_parameters=[{"orientationsurround":orientation+ro} for ro in self.relative_orientations]
