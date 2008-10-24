@@ -33,7 +33,6 @@ from topo.sheet.generator import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 
-# JABALERT: Make helper functions notationally private
 
 
 class Feature(object):
@@ -552,7 +551,7 @@ class MeasureResponseFunction(ParameterizedFunction):
         """Measure the response to the specified pattern and store the data in each sheet."""
         
         p=ParamOverrides(self,params)
-        x=FeatureMaps(self.feature_list(p))
+        x=FeatureMaps(self._feature_list(p))
         static_params = dict([(s,p[s]) for s in p.static_parameters])
         if p.duration is not None:
             p.pattern_presenter.duration=p.duration
@@ -567,7 +566,7 @@ class MeasureResponseFunction(ParameterizedFunction):
         return x._fullmatrix
 
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         """Return the list of features to vary; must be implemented by each subclass."""
         raise NotImplementedError
 
@@ -717,32 +716,32 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
         """Measure the response to the specified pattern and store the data in each sheet."""
         p=ParamOverrides(self,params)
         sheet=topo.sim[p.sheet_name]
-        self.compute_curves(p,sheet)
+        self._compute_curves(p,sheet)
 
 
-    def compute_curves(self,p,sheet,val_format='%s'):
+    def _compute_curves(self,p,sheet,val_format='%s'):
         """
         Compute a set of curves for the specified sheet, using the
         specified val_format to print a label for each value of a
         curve_parameter.
         """
 
-        x=FeatureCurves(self.feature_list(p),sheet=sheet,x_axis=self.x_axis)
+        x=FeatureCurves(self._feature_list(p),sheet=sheet,x_axis=self.x_axis)
         for curve in p.curve_parameters:
             static_params = dict([(s,p[s]) for s in p.static_parameters])
             static_params.update(curve)
             curve_label="; ".join([('%s = '+val_format+'%s') % (n.capitalize(),v,p.units) for n,v in curve.items()])
             # JABALERT: Why is the feature list duplicated here?
-            x.collect_feature_responses(self.feature_list(p),p.pattern_presenter,static_params,curve_label,p.display)
+            x.collect_feature_responses(self._feature_list(p),p.pattern_presenter,static_params,curve_label,p.display)
 
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
                 Feature(name="orientation",range=(0,pi),step=pi/p.num_orientation,cyclic=True),
                 Feature(name="frequency",values=p.frequencies)]
         
 
-    def sheetview_unit(self,sheet,sheet_coord,map_name,default=0.0):
+    def _sheetview_unit(self,sheet,sheet_coord,map_name,default=0.0):
         """Look up and return the value of a SheetView for a specified unit."""
         matrix_coords = sheet.sheet2matrixidx(*sheet_coord)
 
@@ -907,7 +906,7 @@ class measure_position_pref(PositionMeasurementFunction):
     
     scale = param.Number(default=0.3)
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         width =1.0*p.x_range[1]-p.x_range[0]
         height=1.0*p.y_range[1]-p.y_range[0]
         return [Feature(name="x",range=p.x_range,step=width/p.divisions),
@@ -952,16 +951,16 @@ class measure_rfs(SingleInputResponseFunction):
     def __call__(self,**params):
         p=ParamOverrides(self,params)
         self.input_sheet=self._input_sheet(p.input_sheet_name)
-        x=ReverseCorrelation(self.feature_list(p),input_sheet=self.input_sheet) #+change argument
+        x=ReverseCorrelation(self._feature_list(p),input_sheet=self.input_sheet) #+change argument
         static_params = dict([(s,p[s]) for s in p.static_parameters])
         if p.duration is not None:
             p.pattern_presenter.duration=p.duration
         if p.apply_output_fn is not None:
             p.pattern_presenter.apply_output_fn=p.apply_output_fn
-        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,self.feature_list(p))
+        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,self._feature_list(p))
 
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         # Present the pattern at each pixel location by default
         l,b,r,t = self.input_sheet.nominal_bounds.lbrt()
         density=self.input_sheet.nominal_density*1.0 # Should make into a parameter
@@ -1172,7 +1171,7 @@ class measure_or_pref(SinusoidalMeasureResponseFunction):
 
     subplot = param.String("Orientation")
     
-    def feature_list(self,p):
+    def _feature_list(self,p):
         return [Feature(name="frequency",values=p.frequencies),
                 Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
@@ -1195,7 +1194,7 @@ class measure_od_pref(SinusoidalMeasureResponseFunction):
     ### activity?  And shouldn't this just be combined with
     ### measure_or_pref, using num_ocularities=1 by default?
     
-    def feature_list(self,p):
+    def _feature_list(self,p):
         return [Feature(name="frequency",values=p.frequencies),
                 Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
@@ -1229,7 +1228,7 @@ class measure_phasedisparity(SinusoidalMeasureResponseFunction):
     num_disparity = param.Integer(default=12,bounds=(1,None),softbounds=(1,48),
                                   doc="Number of disparity values to test.")
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         return [Feature(name="frequency",values=p.frequencies),
                 Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
@@ -1314,9 +1313,9 @@ class measure_or_tuning(FeatureCurveFunction):
         sheet=topo.sim[p.sheet_name]
 
         for coord in p.coords:
-            self.x=self.sheetview_unit(sheet,coord,'XPreference',default=coord[0])
-            self.y=self.sheetview_unit(sheet,coord,'YPreference',default=coord[1])
-            self.compute_curves(p,sheet)
+            self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            self._compute_curves(p,sheet)
                
 
 ###############################################################################
@@ -1372,14 +1371,14 @@ class measure_size_response(FeatureCurveFunction):
         for coord in p.coords:
             # Orientations are stored as a normalized value beween 0
             # and 1, so we scale them by pi to get the true orientations.
-            self.orientation=pi*self.sheetview_unit(sheet,coord,'OrientationPreference')
-            self.x=self.sheetview_unit(sheet,coord,'XPreference',default=coord[0])
-            self.y=self.sheetview_unit(sheet,coord,'YPreference',default=coord[1])
-            self.compute_curves(p,sheet)
+            self.orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
+            self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            self._compute_curves(p,sheet)
 
 
     # Why not vary frequency too?  Usually it's just one number, but it could be otherwise.
-    def feature_list(self,p):
+    def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
                #Feature(name="frequency",values=p.frequencies),
                 Feature(name="size",range=(0.1,1.0),step=1.0/p.num_sizes,cyclic=False)]
@@ -1438,15 +1437,15 @@ class measure_contrast_response(FeatureCurveFunction):
         sheet=topo.sim[p.sheet_name]
 
         for coord in p.coords:
-            orientation=pi*self.sheetview_unit(sheet,coord,'OrientationPreference')
+            orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
             self.curve_parameters=[{"orientation":orientation+ro} for ro in self.relative_orientations]
 
-            self.x=self.sheetview_unit(sheet,coord,'XPreference',default=coord[0])
-            self.y=self.sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
             
-            self.compute_curves(p,sheet,val_format="%.4f")
+            self._compute_curves(p,sheet,val_format="%.4f")
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
                 Feature(name="frequency",values=p.frequencies),
                 Feature(name="contrast",values=p.contrasts,cyclic=False)]
@@ -1481,7 +1480,7 @@ class measure_dr_pref(SinusoidalMeasureResponseFunction):
 
     subplot = param.String("Direction")
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         return [Feature(name="speed",range=(0.0,p.max_speed),step=float(p.max_speed)/p.num_speeds,cyclic=False),
                 Feature(name="frequency",values=p.frequencies),
                 Feature(name="direction",range=(0.0,2*pi),step=2*pi/p.num_direction,cyclic=True),
@@ -1510,7 +1509,7 @@ class measure_hue_pref(SinusoidalMeasureResponseFunction):
     # For backwards compatibility; not sure why it needs to differ from the default
     static_parameters = param.List(default=[])
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         return [Feature(name="frequency",values=p.frequencies),
                 Feature(name="orientation",range=(0,pi),step=pi/p.num_orientation,cyclic=True),
                 Feature(name="hue",range=(0.0,1.0),step=1.0/p.num_hue,cyclic=True),
@@ -1592,7 +1591,7 @@ class measure_corner_or_pref(PositionMeasurementFunction):
     # JABALERT: Presumably this should be omitted, so that size is included?
     static_parameters = param.List(default=["scale","offset"])
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         width =1.0*p.x_range[1]-p.x_range[0]
         height=1.0*p.y_range[1]-p.y_range[0]
         return [Feature(name="x",range=p.x_range,step=width/p.divisions),
@@ -1645,11 +1644,10 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
         p=ParamOverrides(self,params)
         self.input_sheet=self._input_sheet(p.input_sheet_name)
         result=super(measure_retinotopy,self).__call__(**params)
-        # This should be plotted in the plot_command, not the update_command, if possible
         self.retinotopy_key(p)
 
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         l,b,r,t = self.input_sheet.nominal_bounds.lbrt()
         x_range=(r,l)
         y_range=(t,b)
@@ -1665,6 +1663,7 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
 
 
+    # JABALERT: Can't we move this to the plot_command, not the update_command?
     def retinotopy_key(self,p):
         """Automatic plot of retinotopy color key."""
 
@@ -1769,16 +1768,16 @@ class measure_orientation_contrast(FeatureCurveFunction):
         sheet=topo.sim[p.sheet_name]
 
         for coord in p.coords:
-            orientation=pi*self.sheetview_unit(sheet,coord,'OrientationPreference')
+            orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
             self.orientationcentre=orientation
             self.curve_parameters=[{"orientationsurround":orientation+ro} for ro in self.relative_orientations]
             
-            self.x=self.sheetview_unit(sheet,coord,'XPreference',default=coord[0])
-            self.y=self.sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
             
-            self.compute_curves(p,sheet,val_format="%.4f")
+            self._compute_curves(p,sheet,val_format="%.4f")
 
-    def feature_list(self,p):
+    def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
                 Feature(name="frequency",values=p.frequencies),
                 Feature(name="contrastcentre",values=p.contrasts,cyclic=False)]
