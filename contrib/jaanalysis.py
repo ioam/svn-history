@@ -12,21 +12,12 @@ def complex_analysis_function():
     from topo.sheet.generator import GeneratorSheet
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
 
-
-    # Build a list of all sheets worth measuring
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
-    input_sheets = topo.sim.objects(GeneratorSheet).values()
-    
-    # Set potentially reasonable defaults; not necessarily useful
-    topo.command.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
-    
     save_plotgroup("Orientation Preference and Complexity")
     save_plotgroup("Activity")
 
     # Plot all projections for all measured_sheets
+    measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
+                       if hasattr(s,'measure_maps') and s.measure_maps]
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
@@ -48,20 +39,13 @@ def v2_analysis_function():
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
     from topo.misc.filepath import normalize_path
 
-    # Build a list of all sheets worth measuring
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
-    input_sheets = topo.sim.objects(GeneratorSheet).values()
-    
-    # Set potentially reasonable defaults; not necessarily useful
-    topo.command.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
-
     topo.sim["V1Simple"].measure_maps = True
     topo.sim["V1Complex"].measure_maps = True
     save_plotgroup("Orientation Preference and Complexity")    
+
     # Plot all projections for all measured_sheets
+    measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
+                       if hasattr(s,'measure_maps') and s.measure_maps]
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
@@ -89,19 +73,12 @@ def rf_analysis():
     from topo.misc.filepath import normalize_path    
     
     if(float(topo.sim.time()) <=20010): 
-        # Build a list of all sheets worth measuring
-        f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-        measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
-        input_sheets = topo.sim.objects(GeneratorSheet).values()
-    
-        # Set potentially reasonable defaults; not necessarily useful
-        topo.command.analysis.coordinate=(0.0,0.0)
-        if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
-        if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
         save_plotgroup("Orientation Preference")
         save_plotgroup("Activity")
     
         # Plot all projections for all measured_sheets
+        measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
+                           if hasattr(s,'measure_maps') and s.measure_maps]
         for s in measured_sheets:
             for p in s.projections().values():
                 save_plotgroup("Projection",projection=p)

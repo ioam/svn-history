@@ -314,9 +314,6 @@ def AddGC():
 #global parameter holding the activities
 activity_history=numpy.array([])
 def collect_activity_statistics():
-    topo.command.analysis.coordinate = [0.0,0.0]
-    topo.command.analysis.sheet_name = "V1"
-    
     topo.mycommands.activity_history = numpy.concatenate((topo.mycommands.activity_history,topo.sim["V1"].activity.flatten()),axis=1)
 
     if(topo.sim.time() == 5000): 
@@ -847,8 +844,6 @@ def measure_ot(lat_exc,lat_inh,e,t):
     
     filename = "Exc=" + str(lat_exc) + "_Inh=" + str(lat_inh) + "_E=" + str(e) +  "_T="+ str(t) 
      
-    topo.commands.analysis.sheet_name="V1"
-    topo.commands.analysis.coordinate = [0.0,0.0]
     topo.commands.analysis.measure_or_tuning_fullfield(display=True,num_phase=4,num_orientation=80,frequencies=[2.4],
                                curve_parameters=[{"contrast":1},{"contrast":5},{"contrast":10},{"contrast":50},{"contrast":90}])
     

@@ -692,24 +692,13 @@ def param_analysis_function(data_file):
     from topo.command.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
 
-
-    # Build a list of all sheets worth measuring
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
-    input_sheets = topo.sim.objects(GeneratorSheet).values()
-    
-    # Set potentially reasonable defaults; not necessarily useful
-    topo.command.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
-    topo.plotting.plotgroup.RFProjectionPlotGroup.input_sheet=topo.sim["Retina"]
-    topo.plotting.plotgroup.RFProjectionPlotGroup.sheet=topo.sim["V1"]
-    
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
         save_plotgroup(pg)
 
     # Plot all projections for all measured_sheets
+    measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
+                       if hasattr(s,'measure_maps') and s.measure_maps]
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
@@ -804,22 +793,13 @@ def homeostatic_analysis_function():
     from topo.command.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
 
-
-    # Build a list of all sheets worth measuring
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
-    input_sheets = topo.sim.objects(GeneratorSheet).values()
-    
-    # Set potentially reasonable defaults; not necessarily useful
-    topo.command.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
-
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
         save_plotgroup(pg)
 
     # Plot all projections for all measured_sheets
+    measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
+                       if hasattr(s,'measure_maps') and s.measure_maps]
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
@@ -940,22 +920,13 @@ def lesi_analysis_function(data_file, snapshot, rfs):
     from topo.command.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
 
-
-    # Build a list of all sheets worth measuring
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
-    input_sheets = topo.sim.objects(GeneratorSheet).values()
-    
-    # Set potentially reasonable defaults; not necessarily useful
-    topo.command.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
-
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
         save_plotgroup(pg)
 
     # Plot all projections for all measured_sheets
+    measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
+                       if hasattr(s,'measure_maps') and s.measure_maps]
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
@@ -1080,22 +1051,13 @@ def species_analysis_function():
     from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
 
-
-    # Build a list of all sheets worth measuring
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
-    input_sheets = topo.sim.objects(GeneratorSheet).values()
-    
-    # Set potentially reasonable defaults; not necessarily useful
-    topo.command.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
-
     #Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
         save_plotgroup(pg)
 
     #Plot all projections for all measured_sheets
+    measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
+                       if hasattr(s,'measure_maps') and s.measure_maps]
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
@@ -1169,19 +1131,6 @@ def rfs_analysis_function(sheet="V1", sheets_to_measure=["V1"]):
     from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
 
-
-    # Build a list of all sheets worth measuring
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
-    input_sheets = topo.sim.objects(GeneratorSheet).values()
-    
-    # Set potentially reasonable defaults; not necessarily useful
-    topo.command.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
-    topo.command.analysis.input_sheet=topo.sim["Retina"]
-
-       
     #topo.plotting.plotgroup.plotgroups["RF Projection"].update_command="measure_rfs(scale=10.0,display=False,use_full=True,l=-1.0,b=-1.0,r=1.0,t=1.0)"
     #present a pattern without plasticity to ensure that values are initialized at t=0
     pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
