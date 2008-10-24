@@ -502,6 +502,34 @@ class Subplotting(param.Parameterized):
 #    flexible as it could be.
 
 
+
+def default_input_sheet():
+    """Returns the first GeneratorSheet defined, for use as a default value."""
+
+    sheets=topo.sim.objects(GeneratorSheet).values()
+    if len(sheets)<1:
+        raise ValueError("Unable to find a suitable input sheet.")
+    sht=sheets[0]
+    if len(sheets)>1:
+        self.message("Using input sheet %s." % sht.name)
+    return sht
+
+
+
+def default_measureable_sheet():
+    """Returns the first sheet for which measure_maps is True, for use as a default value."""
+
+    sheets = [s for s in topo.sim.objects(Sheet).values()
+              if hasattr(s,'measure_maps') and s.measure_maps]
+    if len(sheets)<1:
+        raise ValueError("Unable to find a suitable measureable sheet.")
+    sht=sheets[0]
+    if len(sheets)>1:
+        self.message("Using sheet %s." % sht.name)
+    return sht
+
+
+
 class MeasureResponseFunction(ParameterizedFunction):
     """Parameterized command for presenting input patterns and measuring responses."""
       
@@ -570,41 +598,6 @@ class MeasureResponseFunction(ParameterizedFunction):
         """Return the list of features to vary; must be implemented by each subclass."""
         raise NotImplementedError
 
-
-    def _input_sheet(self,name):
-        """Look up and return the specified input sheet, defaulting to the first found."""
-        # Should probably remove this method and simply make
-        # input_sheet_name, where used, into a proper Sheet parameter
-        # (defaulting to None at first?) rather than a string.
-        if name == '':
-            sheets=topo.sim.objects(GeneratorSheet).values()
-            if len(sheets)<1:
-                raise ValueError("Unable to find a suitable input sheet.")
-            sht=sheets[0]
-            if len(sheets)>1:
-                self.message("Using input sheet %s." % sht.name)
-        else:
-            sht = topo.sim[name]
-        return sht
-
-
-    def _sheet(self,name):
-        """Look up and return the specified sheet, defaulting to the first for which measure_maps is True."""
-        # Should probably remove this method and simply make
-        # sheet_name, where used, into a proper Sheet parameter
-        # (defaulting to None at first?) rather than a string.
-        if name == '':
-            sheets = [s for s in topo.sim.objects(Sheet).values()
-                      if hasattr(s,'measure_maps') and s.measure_maps]
-            if len(sheets)<1:
-                raise ValueError("Unable to find a suitable sheet.")
-            sht=sheets[0]
-            if len(sheets)>1:
-                self.message("Using sheet %s." % sht.name)
-        else:
-            sht = topo.sim[name]
-        return sht
-
     
 
 class SinusoidalMeasureResponseFunction(MeasureResponseFunction):
@@ -666,7 +659,8 @@ class PositionMeasurementFunction(MeasureResponseFunction):
 class ProjectionSheetMeasurementFunction(ParameterizedFunction):
     """A callable Parameterized command for measuring or plotting a specified Sheet."""
 
-    sheet_name = param.String(default='',doc="""
+    sheet = param.ObjectSelector(
+        default=None,compute_default_fn=default_measureable_sheet,doc="""
         Name of the sheet to use in measurements.""")
 
     __abstract = True
@@ -683,8 +677,9 @@ class SingleInputResponseFunction(MeasureResponseFunction):
     """
     # CBERRORALERT: Need to alter PatternPresenter to accept an input sheet,
     # to allow it to be presented on only one sheet.
-
-    input_sheet_name = param.String(default='',doc="""
+    
+    input_sheet = param.ObjectSelector(
+        default=None,compute_default_fn=default_input_sheet,doc="""
         Name of the sheet where input should be drawn.""")
 
     scale = param.Number(default=30.0)
@@ -708,7 +703,8 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
 
     num_orientation = param.Integer(default=12)
 
-    sheet_name = param.String(default='',doc="""
+    sheet = param.ObjectSelector(
+        default=None,compute_default_fn=default_measureable_sheet,doc="""
         Name of the sheet to use in measurements.""")
 
     units = param.String(default='%',doc="""
@@ -733,8 +729,8 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
     def __call__(self,**params):
         """Measure the response to the specified pattern and store the data in each sheet."""
         p=ParamOverrides(self,params)
-        sheet=self._sheet(p.sheet_name)
-        self._compute_curves(p,sheet)
+        self.params('sheet').compute_default()
+        self._compute_curves(p,p.sheet)
 
 
     def _compute_curves(self,p,sheet,val_format='%s'):
@@ -869,7 +865,8 @@ class update_connectionfields(ProjectionSheetMeasurementFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        s = topo.sim.objects(CFSheet).get(p.sheet_name)
+        self.params('sheet').compute_default()
+        s = p.sheet
         if s is not None:
             for x,y in p.coords:
                 s.update_unit_view(x,y,p.proj_name)
@@ -905,12 +902,13 @@ pg.add_plot('Projection Activity',[('Strength','ProjectionActivity')])
 class update_projectionactivity(ProjectionSheetMeasurementFunction):
     """
     Add SheetViews for all of the Projections of the ProjectionSheet
-    specified by sheet_name, for use in template-based plots.
+    specified by the sheet parameter, for use in template-based plots.
     """
     
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        s = topo.sim.objects(ProjectionSheet).get(p.sheet_name)
+        self.params('sheet').compute_default()        
+        s = p.sheet
         if s is not None:
             for p in s.in_connections:
                 if not isinstance(p,Projection):
@@ -987,8 +985,8 @@ class measure_rfs(SingleInputResponseFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        self.input_sheet=self._input_sheet(p.input_sheet_name)
-        x=ReverseCorrelation(self._feature_list(p),input_sheet=self.input_sheet) #+change argument
+        self.params('input_sheet').compute_default()
+        x=ReverseCorrelation(self._feature_list(p),input_sheet=p.input_sheet) #+change argument
         static_params = dict([(s,p[s]) for s in p.static_parameters])
         if p.duration is not None:
             p.pattern_presenter.duration=p.duration
@@ -999,8 +997,8 @@ class measure_rfs(SingleInputResponseFunction):
 
     def _feature_list(self,p):
         # Present the pattern at each pixel location by default
-        l,b,r,t = self.input_sheet.nominal_bounds.lbrt()
-        density=self.input_sheet.nominal_density*1.0 # Should make into a parameter
+        l,b,r,t = p.input_sheet.nominal_bounds.lbrt()
+        density=p.input_sheet.nominal_density*1.0 # Should make into a parameter
         divisions = density*(r-l)-1
         size = 1.0/density
         x_range=(r-size/2,l)
@@ -1035,7 +1033,7 @@ class measure_rfs(SingleInputResponseFunction):
 #
 #    def __call__(self,**params):
 #        p=ParamOverrides(self,params)
-#        self.input_sheet=self._input_sheet(p.input_sheet_name)
+#        self.params('input_sheet').compute_default()
 #
 #        ### JABALERT: What was this function supposed to do?  It steps
 #        ### through a range of x and y, yet a GaussianRandom pattern
@@ -1060,7 +1058,7 @@ class measure_rfs(SingleInputResponseFunction):
 #            p.pattern_presenter.duration=p.duration
 #        if p.apply_output_fn is not None:
 #            p.pattern_presenter.apply_output_fn=p.apply_output_fn
-#        x=ReverseCorrelation(feature_values,input_sheet=self.input_sheet)
+#        x=ReverseCorrelation(feature_values,input_sheet=p.input_sheet)
 #        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,feature_values)
 
 
@@ -1337,7 +1335,8 @@ class measure_or_tuning(UnitCurveFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        sheet=self._sheet(p.sheet_name)
+        self.params('sheet').compute_default()
+        sheet=p.sheet
         
         for coord in p.coords:
             self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
@@ -1384,7 +1383,8 @@ class measure_size_response(UnitCurveFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        sheet=self._sheet(p.sheet_name)
+        self.params('sheet').compute_default()
+        sheet=p.sheet
 
         for coord in p.coords:
             # Orientations are stored as a normalized value beween 0
@@ -1442,7 +1442,8 @@ class measure_contrast_response(UnitCurveFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        sheet=self._sheet(p.sheet_name)
+        self.params('sheet').compute_default()
+        sheet=p.sheet
 
         for coord in p.coords:
             orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
@@ -1616,7 +1617,7 @@ pg=create_plotgroup(name='Retinotopy',category="Other",
 pg.add_plot('Retinotopy',[('Hue','RetinotopyPreference')])
 pg.add_plot('Retinotopy Selectivity',[('Hue','RetinotopyPreference'),('Confidence','RetinotopySelectivity')])
 
-
+# Doesn't currently have support in the GUI for controlling the input_sheet
 class measure_retinotopy(SinusoidalMeasureResponseFunction):
     """
     Measures peak retinotopy preference (as in Schuett et. al Journal
@@ -1642,7 +1643,8 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
   
     scale = param.Number(default=1.0)
 
-    input_sheet_name = param.String(default='',doc="""
+    input_sheet = param.ObjectSelector(
+        default=None,compute_default_fn=default_input_sheet,doc="""
         Name of the sheet where input should be drawn.""")
 
     weighted_average= param.Boolean(default=False)
@@ -1650,13 +1652,13 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        self.input_sheet=self._input_sheet(p.input_sheet_name)
+        self.params('input_sheet').compute_default()
         result=super(measure_retinotopy,self).__call__(**params)
         self.retinotopy_key(p)
 
 
     def _feature_list(self,p):
-        l,b,r,t = self.input_sheet.nominal_bounds.lbrt()
+        l,b,r,t = p.input_sheet.nominal_bounds.lbrt()
         x_range=(r,l)
         y_range=(t,b)
     
@@ -1675,7 +1677,7 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
     def retinotopy_key(self,p):
         """Automatic plot of retinotopy color key."""
 
-        l,b,r,t = self.input_sheet.nominal_bounds.lbrt()
+        l,b,r,t = p.input_sheet.nominal_bounds.lbrt()
 
         coordinate_x=[]
         coordinate_y=[]
@@ -1684,7 +1686,7 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
     
         x_div=float(r-l)/(p.divisions*2)
         y_div=float(t-b)/(p.divisions*2)
-        ret_matrix = ones(self.input_sheet.shape, float)
+        ret_matrix = ones(p.input_sheet.shape, float)
      
         for i in range(p.divisions):
             if not bool(p.divisions%2):
@@ -1708,8 +1710,8 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
         for r in self.retinotopy:
             x_coord=coordinates[r][0]
             y_coord=coordinates[r][1]
-            x_top, y_top = self.input_sheet.sheet2matrixidx(x_coord+x_div,y_coord+y_div)
-            x_bot, y_bot = self.input_sheet.sheet2matrixidx(x_coord-x_div,y_coord-y_div)
+            x_top, y_top = p.input_sheet.sheet2matrixidx(x_coord+x_div,y_coord+y_div)
+            x_bot, y_bot = p.input_sheet.sheet2matrixidx(x_coord-x_div,y_coord-y_div)
             norm_ret=float((r+1.0)/(p.divisions*p.divisions))
             
             for x in range(min(x_bot,x_top),max(x_bot,x_top)):
@@ -1772,7 +1774,8 @@ class measure_orientation_contrast(UnitCurveFunction):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        sheet=self._sheet(p.sheet_name)
+        self.params('sheet').compute_default()
+        sheet=p.sheet
 
         for coord in p.coords:
             orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')

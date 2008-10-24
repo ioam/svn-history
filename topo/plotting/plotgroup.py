@@ -541,7 +541,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         # JABALERT: the duplicate topo.command.analysis code should be
         # removed once topo.command.analysis is all using ParameterizedFunction
 	topo.command.analysis.sheet_name = self.sheet.name
-        topo.command.analysis.ProjectionSheetMeasurementFunction.sheet_name = self.sheet.name
+        topo.command.analysis.ProjectionSheetMeasurementFunction.sheet = self.sheet
         super(ProjectionSheetPlotGroup,self)._exec_update_command()
         
 
@@ -673,7 +673,7 @@ class RFProjectionPlotGroup(GridPlotGroup):
 
     def _exec_update_command(self): # RFHACK
 	topo.command.analysis.input_sheet_name = self.input_sheet.name
-        topo.command.analysis.SingleInputResponseFunction.input_sheet_name = self.input_sheet.name
+        topo.command.analysis.SingleInputResponseFunction.input_sheet = self.input_sheet
         super(RFProjectionPlotGroup,self)._exec_update_command()
 
 
@@ -827,7 +827,7 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
 class FeatureCurvePlotGroup(UnitPlotGroup):
 
     def _exec_update_command(self):
-        topo.command.analysis.FeatureCurveFunction.sheet_name = self.sheet.name
+        topo.command.analysis.FeatureCurveFunction.sheet = self.sheet
         super(FeatureCurvePlotGroup,self)._exec_update_command()          
         self.get_curve_time()
 
