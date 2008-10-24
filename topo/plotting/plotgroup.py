@@ -538,9 +538,6 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
     def _exec_update_command(self):
         self._check_sheet_type()
-        # JABALERT: the duplicate topo.command.analysis code should be
-        # removed once topo.command.analysis is all using ParameterizedFunction
-	topo.command.analysis.sheet_name = self.sheet.name
         topo.command.analysis.ProjectionSheetMeasurementFunction.sheet = self.sheet
         super(ProjectionSheetPlotGroup,self)._exec_update_command()
         
@@ -672,7 +669,6 @@ class RFProjectionPlotGroup(GridPlotGroup):
     input_sheet = param.ObjectSelector(default=None,doc="The sheet on which to measure the RFs.")
 
     def _exec_update_command(self): # RFHACK
-	topo.command.analysis.input_sheet_name = self.input_sheet.name
         topo.command.analysis.SingleInputResponseFunction.input_sheet = self.input_sheet
         super(RFProjectionPlotGroup,self)._exec_update_command()
 
@@ -691,9 +687,7 @@ class ProjectionPlotGroup(GridPlotGroup):
 
     def _exec_update_command(self):
         coords=self.generate_coords()
-        topo.command.analysis.proj_coords = coords
         topo.command.analysis.update_projections.coords = coords
-        topo.command.analysis.proj_name = self.projection.name
         topo.command.analysis.update_projections.proj_name = self.projection.name
         super(ProjectionPlotGroup,self)._exec_update_command()
 
@@ -770,14 +764,12 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
         
     def _exec_update_command(self):
         coords=(self.x,self.y)
-	topo.command.analysis.coordinate = coords
         topo.command.analysis.update_connectionfields.coords = [coords]
         topo.command.analysis.measure_or_tuning.coords = [coords]
 	super(UnitPlotGroup,self)._exec_update_command()
 
     def _exec_plot_command(self):
         coords=(self.x,self.y)
-	topo.command.analysis.coordinate = coords
         topo.command.analysis.update_connectionfields.coords = [coords]
         topo.command.analysis.measure_or_tuning.coords = [coords]
 	super(UnitPlotGroup,self)._exec_plot_command()

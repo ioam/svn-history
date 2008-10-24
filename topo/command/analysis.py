@@ -790,20 +790,6 @@ class UnitCurveFunction(FeatureCurveFunction):
 
 
 
-# Module variables for passing values to the commands.
-coordinate = (0,0)
-sheet_name = ''
-input_sheet_name = ''
-proj_coords=[(0,0)]
-proj_name =''
-
-### JABALERT: This mechanism for passing values is a bit awkward, and
-### should be changed to something cleaner.  It might also be better
-### to access a Sheet instance directly, rather than searching by name.
-
-
-
-
 # Most of the rest of this file consists of commands for creating
 # SheetViews, paired with a template for how to construct plots from
 # these SheetViews.
