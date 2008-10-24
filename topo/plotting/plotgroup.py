@@ -687,8 +687,8 @@ class ProjectionPlotGroup(GridPlotGroup):
 
     def _exec_update_command(self):
         coords=self.generate_coords()
-        topo.command.analysis.update_projections.coords = coords
-        topo.command.analysis.update_projections.proj_name = self.projection.name
+        topo.command.analysis.UnitMeasurementFunction.coords = coords
+        topo.command.analysis.UnitMeasurementFunction.proj_name = self.projection.name
         super(ProjectionPlotGroup,self)._exec_update_command()
 
 
@@ -764,14 +764,14 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
         
     def _exec_update_command(self):
         coords=(self.x,self.y)
-        topo.command.analysis.update_connectionfields.coords = [coords]
-        topo.command.analysis.measure_or_tuning.coords = [coords]
+        topo.command.analysis.UnitMeasurementFunction.coords = [coords]
+        topo.command.analysis.UnitCurveFunction.coords = [coords]
 	super(UnitPlotGroup,self)._exec_update_command()
 
     def _exec_plot_command(self):
         coords=(self.x,self.y)
-        topo.command.analysis.update_connectionfields.coords = [coords]
-        topo.command.analysis.measure_or_tuning.coords = [coords]
+        topo.command.analysis.UnitMeasurementFunction.coords = [coords]
+        topo.command.analysis.UnitCurveFunction.coords = [coords]
 	super(UnitPlotGroup,self)._exec_plot_command()
 
 

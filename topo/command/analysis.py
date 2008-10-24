@@ -667,6 +667,26 @@ class ProjectionSheetMeasurementFunction(ParameterizedFunction):
 
 
 
+class UnitMeasurementFunction(ProjectionSheetMeasurementFunction):
+    """A callable Parameterized command for measuring or plotting specified units from a Sheet."""
+
+    coords = param.List(default=[(0,0)],doc="""
+        List of coordinates of unit(s) to measure.""")
+
+    proj_name = param.String(default='',doc="""
+        Name of the projection to measure; the empty string means all projections.""")
+
+    __abstract = True
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        self.params('sheet').compute_default()
+        s = p.sheet
+        if s is not None:
+            for x,y in p.coords:
+                s.update_unit_view(x,y,p.proj_name)
+
+
 class SingleInputResponseFunction(MeasureResponseFunction):
     """
     A callable Parameterized command for measuring the response to input on a specified Sheet.
@@ -840,41 +860,23 @@ pg= create_plotgroup(name='Connection Fields',category="Basic",
                      plot_immediately=True, normalize=True, situate=True)
 pg.add_plot('Connection Fields',[('Strength','Weights')])
 
-class update_connectionfields(ProjectionSheetMeasurementFunction):
+class update_connectionfields(UnitMeasurementFunction):
     """A callable Parameterized command for measuring or plotting a unit from a Projection."""
 
-    coords = param.List(default=[(0,0)],doc="""
-        List of coordinates of unit(s) to measure.""")
+    # Plot all CFs, not just one Projection
+    proj_name = param.String(default='',constant=True)
 
-    proj_name = param.String(default='',doc="""
-        Name of the projection to measure; the empty string means all projections.""")
-
-    def __call__(self,**params):
-        p=ParamOverrides(self,params)
-        self.params('sheet').compute_default()
-        s = p.sheet
-        if s is not None:
-            for x,y in p.coords:
-                s.update_unit_view(x,y,p.proj_name)
 
 
 ## ###############################################################################
 pg= create_plotgroup(name='Projection',category="Basic",
            doc='Plot the weights of an array of ConnectionFields in a Projection.',
-           update_command='update_projections()',
+           update_command='update_projection()',
            plot_immediately=False, normalize=True,sheet_coords=True)
 pg.add_plot('Projection',[('Strength','Weights')])
 
-
-class update_projections(update_connectionfields):
-    """A callable Parameterized command for measuring or plotting a set of units from a Projection."""
-
-    # Can consider eliminating this class; it simply keeps its defaults
-    # separate from UnitMeasurementFunction
-    coords = param.List(default=[(0,0)])
-
-    proj_name = param.String(default='')
-
+class update_projection(UnitMeasurementFunction):
+    """A callable Parameterized command for measuring or plotting units from a Projection."""
 
 
 ## ###############################################################################
