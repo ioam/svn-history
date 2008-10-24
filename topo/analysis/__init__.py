@@ -5,5 +5,9 @@ $Id$
 """
 
 __version__='$Revision$'
-__all__ = ['featuremap']
+
+# Automatically discover all .py files in this directory, and import functions from basic.py. 
+import os,fnmatch
+__all__ = [f.split('.py')[0] for f in os.listdir(__path__[0]) if fnmatch.fnmatch(f,'[!._]*.py')]
+del f,os,fnmatch
 
