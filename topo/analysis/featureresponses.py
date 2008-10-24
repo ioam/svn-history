@@ -905,7 +905,7 @@ class Subplotting(param.Parameterized):
 
 # JABALERT: Rename these to end in Command for clarity?
 
-class MeasureResponseFunction(ParameterizedFunction):
+class MeasureResponseCommand(ParameterizedFunction):
     """Parameterized command for presenting input patterns and measuring responses."""
       
     scale = param.Number(default=1.0,softbounds=(0.0,2.0),doc="""
@@ -975,7 +975,7 @@ class MeasureResponseFunction(ParameterizedFunction):
 
     
 
-class SinusoidalMeasureResponseFunction(MeasureResponseFunction):
+class SinusoidalMeasureResponseCommand(MeasureResponseCommand):
     """Parameterized command for presenting sine gratings and measuring responses."""
     
     pattern_presenter = param.Callable(
@@ -1002,7 +1002,7 @@ class SinusoidalMeasureResponseFunction(MeasureResponseFunction):
     
 
 
-class PositionMeasurementFunction(MeasureResponseFunction):
+class PositionMeasurementCommand(MeasureResponseCommand):
     """Parameterized command for measuring topographic position."""
 
     divisions=param.Integer(default=6,bounds=(1,None),doc="""
@@ -1031,7 +1031,7 @@ class PositionMeasurementFunction(MeasureResponseFunction):
         
 
 
-class SingleInputResponseFunction(MeasureResponseFunction):
+class SingleInputResponseCommand(MeasureResponseCommand):
     """
     A callable Parameterized command for measuring the response to input on a specified Sheet.
 
@@ -1062,7 +1062,7 @@ class SingleInputResponseFunction(MeasureResponseFunction):
 
 
 
-class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
+class FeatureCurveCommand(SinusoidalMeasureResponseCommand):
     """A callable Parameterized command for measuring tuning curves."""
 
     num_orientation = param.Integer(default=12)
@@ -1135,7 +1135,7 @@ class FeatureCurveFunction(SinusoidalMeasureResponseFunction):
         return val
 
 
-class UnitCurveFunction(FeatureCurveFunction):
+class UnitCurveCommand(FeatureCurveCommand):
     """
     Measures tuning curve(s) of particular unit(s).
     """

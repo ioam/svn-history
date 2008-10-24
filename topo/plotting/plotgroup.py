@@ -541,7 +541,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
     def _exec_update_command(self):
         self._check_sheet_type()
-        ProjectionSheetMeasurementFunction.sheet = self.sheet
+        ProjectionSheetMeasurementCommand.sheet = self.sheet
         super(ProjectionSheetPlotGroup,self)._exec_update_command()
 
 
@@ -560,7 +560,7 @@ def default_measureable_sheet():
 
 
 
-class ProjectionSheetMeasurementFunction(ParameterizedFunction):
+class ProjectionSheetMeasurementCommand(ParameterizedFunction):
     """A callable Parameterized command for measuring or plotting a specified Sheet."""
 
     sheet = param.ObjectSelector(
@@ -698,7 +698,7 @@ class RFProjectionPlotGroup(GridPlotGroup):
     input_sheet = param.ObjectSelector(default=None,doc="The sheet on which to measure the RFs.")
 
     def _exec_update_command(self): # RFHACK
-        topo.analysis.featureresponses.SingleInputResponseFunction.input_sheet = self.input_sheet
+        topo.analysis.featureresponses.SingleInputResponseCommand.input_sheet = self.input_sheet
         super(RFProjectionPlotGroup,self)._exec_update_command()
 
 
@@ -716,8 +716,8 @@ class ProjectionPlotGroup(GridPlotGroup):
 
     def _exec_update_command(self):
         coords=self.generate_coords()
-        UnitMeasurementFunction.coords = coords
-        UnitMeasurementFunction.proj_name = self.projection.name
+        UnitMeasurementCommand.coords = coords
+        UnitMeasurementCommand.proj_name = self.projection.name
         super(ProjectionPlotGroup,self)._exec_update_command()
 
 
@@ -736,7 +736,7 @@ def default_input_sheet():
 
 
 
-class UnitMeasurementFunction(ProjectionSheetMeasurementFunction):
+class UnitMeasurementCommand(ProjectionSheetMeasurementCommand):
     """A callable Parameterized command for measuring or plotting specified units from a Sheet."""
 
     coords = param.List(default=[(0,0)],doc="""
@@ -828,14 +828,14 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
         
     def _exec_update_command(self):
         coords=(self.x,self.y)
-        UnitMeasurementFunction.coords = [coords]
-        topo.analysis.featureresponses.UnitCurveFunction.coords = [coords]
+        UnitMeasurementCommand.coords = [coords]
+        topo.analysis.featureresponses.UnitCurveCommand.coords = [coords]
 	super(UnitPlotGroup,self)._exec_update_command()
 
     def _exec_plot_command(self):
         coords=(self.x,self.y)
-        UnitMeasurementFunction.coords = [coords]
-        topo.analysis.featureresponses.UnitCurveFunction.coords = [coords]
+        UnitMeasurementCommand.coords = [coords]
+        topo.analysis.featureresponses.UnitCurveCommand.coords = [coords]
 	super(UnitPlotGroup,self)._exec_plot_command()
 
 
@@ -883,7 +883,7 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
 class FeatureCurvePlotGroup(UnitPlotGroup):
 
     def _exec_update_command(self):
-        topo.analysis.featureresponses.FeatureCurveFunction.sheet = self.sheet
+        topo.analysis.featureresponses.FeatureCurveCommand.sheet = self.sheet
         super(FeatureCurvePlotGroup,self)._exec_update_command()          
         self.get_curve_time()
 

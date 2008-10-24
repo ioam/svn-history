@@ -47,9 +47,9 @@ from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, Feat
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 
 
-from topo.plotting.plotgroup import UnitMeasurementFunction,ProjectionSheetMeasurementFunction,default_input_sheet
+from topo.plotting.plotgroup import UnitMeasurementCommand,ProjectionSheetMeasurementCommand,default_input_sheet
 from topo.analysis.featureresponses import Feature, PatternPresenter, Subplotting
-from topo.analysis.featureresponses import SinusoidalMeasureResponseFunction, PositionMeasurementFunction, SingleInputResponseFunction, FeatureCurveFunction, UnitCurveFunction
+from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand, PositionMeasurementCommand, SingleInputResponseCommand, FeatureCurveCommand, UnitCurveCommand
 
 
 
@@ -120,7 +120,7 @@ pg= create_plotgroup(name='Connection Fields',category="Basic",
                      plot_immediately=True, normalize=True, situate=True)
 pg.add_plot('Connection Fields',[('Strength','Weights')])
 
-class update_connectionfields(UnitMeasurementFunction):
+class update_connectionfields(UnitMeasurementCommand):
     """A callable Parameterized command for measuring or plotting a unit from a Projection."""
 
     # Plot all CFs, not just one Projection
@@ -135,7 +135,7 @@ pg= create_plotgroup(name='Projection',category="Basic",
            plot_immediately=False, normalize=True,sheet_coords=True)
 pg.add_plot('Projection',[('Strength','Weights')])
 
-class update_projection(UnitMeasurementFunction):
+class update_projection(UnitMeasurementCommand):
     """A callable Parameterized command for measuring or plotting units from a Projection."""
 
 
@@ -147,7 +147,7 @@ pg =  create_plotgroup(name='Projection Activity',category="Basic",
 pg.add_plot('Projection Activity',[('Strength','ProjectionActivity')])
 
 
-class update_projectionactivity(ProjectionSheetMeasurementFunction):
+class update_projectionactivity(ProjectionSheetMeasurementCommand):
     """
     Add SheetViews for all of the Projections of the ProjectionSheet
     specified by the sheet parameter, for use in template-based plots.
@@ -179,7 +179,7 @@ pg.add_plot('Y Preference',[('Strength','YPreference')])
 pg.add_plot('Position Preference',[('Red','XPreference'),
                                     ('Green','YPreference')])
 
-class measure_position_pref(PositionMeasurementFunction):
+class measure_position_pref(PositionMeasurementCommand):
     """Measure a position preference map by collating the response to patterns."""
     
     scale = param.Number(default=0.3)
@@ -200,7 +200,7 @@ pg= create_plotgroup(name='RF Projection',category="Other",
     normalize=True)
 pg.add_plot('RFs',[('Strength','RFs')])
 
-class measure_rfs(SingleInputResponseFunction):
+class measure_rfs(SingleInputResponseCommand):
     """
     Map receptive fields by reverse correlation.
 
@@ -264,7 +264,7 @@ class measure_rfs(SingleInputResponseFunction):
 #pg.add_plot('RFs',[('Strength','RFs')])
 #
 #
-#class measure_rfs_noise(SingleInputResponseFunction):
+#class measure_rfs_noise(SingleInputResponseCommand):
 #    """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
 #
 #    pattern_presenter = param.Callable(
@@ -444,7 +444,7 @@ pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
 
 
-class measure_or_pref(SinusoidalMeasureResponseFunction):
+class measure_or_pref(SinusoidalMeasureResponseCommand):
     """Measure an orientation preference map by collating the response to patterns."""
 
     subplot = param.String("Orientation")
@@ -464,7 +464,7 @@ pg.add_plot('Ocular Preference',[('Strength','OcularPreference')])
 pg.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
 
 
-class measure_od_pref(SinusoidalMeasureResponseFunction):
+class measure_od_pref(SinusoidalMeasureResponseCommand):
     """Measure an ocular dominance preference map by collating the response to patterns."""
 
     ### JABALERT: Shouldn't there be a num_ocularities parameter as
@@ -497,7 +497,7 @@ pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity
 pg.add_static_image('Color Key','topo/command/disp_key_white_vert_small.png')
 
 
-class measure_phasedisparity(SinusoidalMeasureResponseFunction):
+class measure_phasedisparity(SinusoidalMeasureResponseCommand):
     """Measure a phase disparity preference map by collating the response to patterns."""
 
     ### JABALERT: Shouldn't this just be combined with measure_or_pref
@@ -523,7 +523,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',
         plot_command='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")')
 
 
-class measure_or_tuning_fullfield(FeatureCurveFunction):
+class measure_or_tuning_fullfield(FeatureCurveCommand):
     """
     Measures orientation tuning curve(s) of a particular unit using a
     full-field sine grating stimulus.  
@@ -554,7 +554,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="
         prerequisites=['XPreference'])
 
 
-class measure_or_tuning(UnitCurveFunction):
+class measure_or_tuning(UnitCurveCommand):
     """
     Measures orientation tuning curve(s) of a particular unit.
 
@@ -595,7 +595,7 @@ create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning 
         prerequisites=['OrientationPreference','XPreference'])
 
 # JABALERT: Is there some reason not to call it measure_size_tuning?
-class measure_size_response(UnitCurveFunction):
+class measure_size_response(UnitCurveCommand):
     """
     Measure receptive field size of one unit of a sheet.
 
@@ -653,7 +653,7 @@ create_plotgroup(template_plot_type="curve",name='Contrast Response',category="T
         prerequisites=['OrientationPreference','XPreference'])
 
 
-class measure_contrast_response(UnitCurveFunction):
+class measure_contrast_response(UnitCurveCommand):
     """
     Measures contrast response curves for a particular unit.
 
@@ -716,7 +716,7 @@ pg.add_plot('Speed Selectivity',[('Strength','SpeedSelectivity')])
 pg.add_static_image('Color Key','topo/command/dr_key_white_vert_small.png')
 
 
-class measure_dr_pref(SinusoidalMeasureResponseFunction):
+class measure_dr_pref(SinusoidalMeasureResponseCommand):
     """Measure a direction preference map by collating the response to patterns."""
 
     num_phase = param.Integer(default=12)
@@ -748,7 +748,7 @@ pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence'
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
 
 
-class measure_hue_pref(SinusoidalMeasureResponseFunction):
+class measure_hue_pref(SinusoidalMeasureResponseCommand):
     """Measure a hue preference map by collating the response to patterns."""
 
     num_phase = param.Integer(default=12)
@@ -824,7 +824,7 @@ pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPref
 pg.add_plot('Corner Orientation Selectivity',[('Strength','OrientationSelectivity')])
 
 
-class measure_corner_or_pref(PositionMeasurementFunction):
+class measure_corner_or_pref(PositionMeasurementCommand):
     """Measure a corner preference map by collating the response to patterns."""
     
     scale = param.Number(default=1.0)
@@ -861,7 +861,7 @@ pg.add_plot('Retinotopy',[('Hue','RetinotopyPreference')])
 pg.add_plot('Retinotopy Selectivity',[('Hue','RetinotopyPreference'),('Confidence','RetinotopySelectivity')])
 
 # Doesn't currently have support in the GUI for controlling the input_sheet
-class measure_retinotopy(SinusoidalMeasureResponseFunction):
+class measure_retinotopy(SinusoidalMeasureResponseCommand):
     """
     Measures peak retinotopy preference (as in Schuett et. al Journal
     of Neuroscience 22(15):6549-6559, 2002). The retina is divided
@@ -976,7 +976,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category
 
 
 
-class measure_orientation_contrast(UnitCurveFunction):
+class measure_orientation_contrast(UnitCurveCommand):
     """
     Measures the response to a center sine grating disk and a surround
     sine grating ring at different contrasts of the central disk. 
