@@ -596,13 +596,15 @@ class ObjectSelector(Selector):
     """
     Parameter whose value is set to an object from its list of possible objects.
     """
-    __slots__ = ['objects','allow_None']
+    __slots__ = ['objects','allow_None','compute_default_fn']
 
     # ObjectSelector is usually used to allow selection from a list of
     # existing objects, therefore instantiate is False by default.
-    def __init__(self,default=None,objects=[],instantiate=False,allow_None=False,**params):
+    def __init__(self,default=None,objects=[],instantiate=False,allow_None=False,
+                 compute_default_fn=None,**params):
         self.objects = objects
         self.allow_None = (default is None or allow_None)
+        self.compute_default_fn = compute_default_fn
         self._check_value(default)
         super(ObjectSelector,self).__init__(default=default,instantiate=instantiate,**params)
         
@@ -612,6 +614,22 @@ class ObjectSelector(Selector):
     # CBNOTE: if the list of objects is changed, the current value for
     # this parameter in existing POs could be out of the new range.
     
+    def compute_default(self):
+        """
+        If this parameter's compute_default_fn is callable, call it
+        and store the result in self.default.
+
+        Also removes None from the list of objects (if the default is
+        no longer None).
+        """
+        if self.default is None and callable(self.compute_default_fn):
+            self.default=self.compute_default_fn() 
+            if self.default not in self.objects:
+                self.objects.append(self.default)
+            # remove None 
+            if self.default is not None and None in self.objects:
+                self.objects.remove(None)
+
     def _check_value(self,val,obj=None):
         """
         val must be None or one of the objects in self.objects.
