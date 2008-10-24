@@ -115,6 +115,6 @@ sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/num_inputs,aff_name="Affere
 
 # Measure feature maps based on unthresholded initial response for
 # speed and reliability
-from topo.command.analysis import MeasureResponseFunction
+from topo.analysis.featureresponses import MeasureResponseFunction
 MeasureResponseFunction.duration=0.175
 MeasureResponseFunction.apply_output_fn=False

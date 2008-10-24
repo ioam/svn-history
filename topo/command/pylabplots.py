@@ -418,8 +418,8 @@ def or_tuning_curve(x_axis,plot_type,unit):
     y_value for the first curve plotted (usually the lowest contrast curve). 
 
     The curve datapoints are collected from the curve_dict for
-    the sheet specified by topo.command.analysis.UnitCurveFunction.sheet
-    and the units specified by topo.command.analysis.UnitCurveFunction.coords
+    the sheet specified by topo.analysis.featureresponses.UnitCurveFunction.sheet
+    and the units specified by topo.analysis.featureresponses.UnitCurveFunction.coords
     (which may be set by the GUI or by hand).
     """
     # There may be cases (ie when the lowest contrast curve gives a lot of zero y_values)
@@ -427,8 +427,8 @@ def or_tuning_curve(x_axis,plot_type,unit):
     # Ideally this should be changed so that the preferred orientation is in the centre.
     # This may also be useful for other tuning curve types, not just orientation ie. direction.
 
-    sheet=topo.command.analysis.UnitCurveFunction.sheet
-    coords=topo.command.analysis.UnitCurveFunction.coords
+    sheet=topo.analysis.featureresponses.UnitCurveFunction.sheet
+    coords=topo.analysis.featureresponses.UnitCurveFunction.coords
     for coordinate in coords:
     
         i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
@@ -486,12 +486,12 @@ def tuning_curve(x_axis,plot_type,unit):
     Plots a tuning curve for the appropriate feature type, such as orientation, contrast or size.
 
     The curve datapoints are collected from the curve_dict for
-    the sheet specified by topo.command.analysis.UnitCurveFunction.sheet
-    and the units specified by topo.command.analysis.UnitCurveFunction.coords
+    the sheet specified by topo.analysis.featureresponses.UnitCurveFunction.sheet
+    and the units specified by topo.analysis.featureresponses.UnitCurveFunction.coords
     (which may be set by the GUI or by hand).
     """
-    sheet=topo.command.analysis.UnitCurveFunction.sheet
-    coords=topo.command.analysis.UnitCurveFunction.coords
+    sheet=topo.analysis.featureresponses.UnitCurveFunction.sheet
+    coords=topo.analysis.featureresponses.UnitCurveFunction.coords
     for coordinate in coords:
         i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
         
