@@ -606,6 +606,9 @@ class ObjectSelector(Selector):
         self._check_value(default)
         super(ObjectSelector,self).__init__(default=default,instantiate=instantiate,**params)
         
+        if default not in self.objects:
+            self.objects.append(default)
+
     # CBNOTE: if the list of objects is changed, the current value for
     # this parameter in existing POs could be out of the new range.
     
