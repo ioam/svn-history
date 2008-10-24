@@ -572,6 +572,22 @@ class MeasureResponseFunction(ParameterizedFunction):
         raise NotImplementedError
 
 
+    def _input_sheet(self,name):
+        """Look up up and return the specified input sheet, defaulting to the first found."""
+        # Should probably remove this method and simply make
+        # input_sheet_name, where used, into a proper Sheet parameter
+        # (defaulting to None at first?) rather than a string.
+        if name == '':
+            inputs=topo.sim.objects(GeneratorSheet).values()
+            if len(inputs)<1:
+                raise ValueError("Unable to find a suitable input sheet.")
+            sht=inputs[0]
+            if len(inputs)>1:
+                self.message("Using input sheet %s." % sht.name)
+        else:
+            sht = topo.sim[name]
+        return sht
+
     
 
 class SinusoidalMeasureResponseFunction(MeasureResponseFunction):
@@ -641,7 +657,15 @@ class ProjectionSheetMeasurementFunction(ParameterizedFunction):
 
 
 class SingleInputResponseFunction(MeasureResponseFunction):
-    """A callable Parameterized command for measuring the response to input on a specified Sheet."""
+    """
+    A callable Parameterized command for measuring the response to input on a specified Sheet.
+
+    Note that at present the input is actually presented to all input sheets; the
+    specified Sheet is simply used to determine various parameters.  In the future,
+    it may be modified to draw the pattern on one input sheet only.
+    """
+    # CBERRORALERT: Need to alter PatternPresenter to accept an input sheet,
+    # to allow it to be presented on only one sheet.
 
     input_sheet_name = param.String(default='',doc="""
         Name of the sheet where input should be drawn.""")
@@ -920,100 +944,88 @@ class measure_rfs(SingleInputResponseFunction):
     some of the time there is a pattern on the input.
     """
     
+    static_parameters = param.List(default=["offset","size"])
+
+    __abstract = True
+
+
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-    
-        # RFHACK: Should add a default value for this parameter
-        if p.input_sheet_name == '':
-            raise ValueError("Must set topo.command.analysis.SingleInputResponseFunction.input_sheet_name before calling measure_rfs")
-    
-        input_sheet = topo.sim[p.input_sheet_name]
-        
-        # CBERRORALERT: pattern's actually being presented on all GeneratorSheets.
-        # Need to alter PatternPresenter to accept an input sheet. For 0.9.4 need
-        # to document that same pattern is drawn on all generator sheets.
-    
-        # CEBALERT: various things in here need to be arguments
-
-        # Presents the pattern at each pixel location
-        l,b,r,t = input_sheet.nominal_bounds.lbrt()
-        density=input_sheet.nominal_density*1.0 # Could make into a parameter
-        divisions = density*(r-l)-1
-        size = 1.0/density
-        x_range=(r-size/2,l)
-        y_range=(t-size,b)
-        p['size']=size
-    
-        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
-                          Feature(name="scale",range=(-p.scale,p.scale),step=p.scale*2)]   
-
-        #JABALERT: What does it mean to have scale in both the
-        #feature list and the static parameters?  Presumably one
-        #overrides the other, and the overriden one should be
-        #eliminated.
+        self.input_sheet=self._input_sheet(p.input_sheet_name)
+        x=ReverseCorrelation(self.feature_list(p),input_sheet=self.input_sheet) #+change argument
         static_params = dict([(s,p[s]) for s in p.static_parameters])
         if p.duration is not None:
             p.pattern_presenter.duration=p.duration
         if p.apply_output_fn is not None:
             p.pattern_presenter.apply_output_fn=p.apply_output_fn
-        x=ReverseCorrelation(feature_values,input_sheet=input_sheet) #+change argument
-        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,feature_values)
+        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,self.feature_list(p))
+
+
+    def feature_list(self,p):
+        # Present the pattern at each pixel location by default
+        l,b,r,t = self.input_sheet.nominal_bounds.lbrt()
+        density=self.input_sheet.nominal_density*1.0 # Should make into a parameter
+        divisions = density*(r-l)-1
+        size = 1.0/density
+        x_range=(r-size/2,l)
+        y_range=(t-size,b)
+        p['size']=size
+
+        return [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
+                Feature(name="scale",range=(-p.scale,p.scale),step=p.scale*2)]
+
 
 
 
 ###############################################################################
-pg= create_plotgroup(name='RF Projection (noise)',category="Other",
-           doc='Measure receptive fields by reverse correlation using random noise.',
-           update_command='measure_rfs_noise()',
-           plot_command='',normalize=True)
-pg.add_plot('RFs',[('Strength','RFs')])
-
-
-class measure_rfs_noise(SingleInputResponseFunction):
-    """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
-
-    pattern_presenter = param.Callable(
-        default=PatternPresenter(GaussianRandom()))
-
-    scale = param.Number(default=0.5)
-
-    static_parameters = param.List(default=["scale","offset"])
-
-    def __call__(self,**params):
-        p=ParamOverrides(self,params)
-
-        # RFHACK: Should add a default value for this parameter
-        if p.input_sheet_name == '':
-            raise ValueError("Must set topo.command.analysis.SingleInputResponseFunction.input_sheet_name before calling measure_rfs")
-    
-        ### JABALERT: What was this function supposed to do?  It steps
-        ### through a range of x and y, yet a GaussianRandom pattern
-        ### ignores x and y, so all it really seems to be doing is
-        ### ending up with about 10000 noise patterns.  Surely there
-        ### is a better way to do that?  For now, divisions, xrange,
-        ### and y_range are no longer parameters, because they are
-        ### nonsensical, but a proper parameter (e.g. number of random
-        ### presentations) should be added and these removed.
-        ### Alternatively, maybe it was supposed to be a GaussianCloud
-        ### pattern, in which case these should be made into
-        ### Parameters (or calculated like in measure_rfs).
-        divisions=99
-        x_range=(-1.0,1.0)
-        y_range=(-1.0,1.0)
-
-        input_sheet = topo.sim[p.input_sheet_name]
-        
-        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
-                          
-        static_params = dict([(s,p[s]) for s in p.static_parameters])        
-        if p.duration is not None:
-            p.pattern_presenter.duration=p.duration
-        if p.apply_output_fn is not None:
-            p.pattern_presenter.apply_output_fn=p.apply_output_fn
-        x=ReverseCorrelation(feature_values,input_sheet=input_sheet)
-        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,feature_values)
+# Disabled until investigated further
+#pg= create_plotgroup(name='RF Projection (noise)',category="Other",
+#           doc='Measure receptive fields by reverse correlation using random noise.',
+#           update_command='measure_rfs_noise()',
+#           plot_command='',normalize=True)
+#pg.add_plot('RFs',[('Strength','RFs')])
+#
+#
+#class measure_rfs_noise(SingleInputResponseFunction):
+#    """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
+#
+#    pattern_presenter = param.Callable(
+#        default=PatternPresenter(GaussianRandom()))
+#
+#    scale = param.Number(default=0.5)
+#
+#    static_parameters = param.List(default=["scale","offset"])
+#
+#    def __call__(self,**params):
+#        p=ParamOverrides(self,params)
+#        self.input_sheet=self._input_sheet(p.input_sheet_name)
+#
+#        ### JABALERT: What was this function supposed to do?  It steps
+#        ### through a range of x and y, yet a GaussianRandom pattern
+#        ### ignores x and y, so all it really seems to be doing is
+#        ### ending up with about 10000 noise patterns.  Surely there
+#        ### is a better way to do that?  For now, divisions, xrange,
+#        ### and y_range are no longer parameters, because they are
+#        ### nonsensical, but a proper parameter (e.g. number of random
+#        ### presentations) should be added and these removed.
+#        ### Alternatively, maybe it was supposed to be a GaussianCloud
+#        ### pattern, in which case these should be made into
+#        ### Parameters (or calculated like in measure_rfs).
+#        divisions=99
+#        x_range=(-1.0,1.0)
+#        y_range=(-1.0,1.0)
+#
+#        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+#                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
+#                          
+#        static_params = dict([(s,p[s]) for s in p.static_parameters])        
+#        if p.duration is not None:
+#            p.pattern_presenter.duration=p.duration
+#        if p.apply_output_fn is not None:
+#            p.pattern_presenter.apply_output_fn=p.apply_output_fn
+#        x=ReverseCorrelation(feature_values,input_sheet=self.input_sheet)
+#        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,feature_values)
 
 
 
@@ -1623,27 +1635,22 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
   
     scale = param.Number(default=1.0)
 
-    # JABALERT: Shouldn't have hard-coded default
-    input_sheet_name = param.String(default='Retina',doc="""
+    input_sheet_name = param.String(default='',doc="""
         Name of the sheet where input should be drawn.""")
 
     weighted_average= param.Boolean(default=False)
 
 
     def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        self.input_sheet=self._input_sheet(p.input_sheet_name)
         result=super(measure_retinotopy,self).__call__(**params)
         # This should be plotted in the plot_command, not the update_command, if possible
-        self.retinotopy_key(params)
+        self.retinotopy_key(p)
 
 
     def feature_list(self,p):
-        # RFHACK: Should add a default value for this parameter
-        if p.input_sheet_name == '':
-            raise ValueError("Must set topo.command.analysis.measure_retinotopy.input_sheet_name before calling measure_retinotopy")
-    
-        input_sheet = topo.sim[p.input_sheet_name]
-    
-        l,b,r,t = input_sheet.nominal_bounds.lbrt()
+        l,b,r,t = self.input_sheet.nominal_bounds.lbrt()
         x_range=(r,l)
         y_range=(t,b)
     
@@ -1658,13 +1665,10 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
 
 
-    def retinotopy_key(self,params):
+    def retinotopy_key(self,p):
         """Automatic plot of retinotopy color key."""
 
-        p=ParamOverrides(self,params)
-
-        input_sheet = topo.sim[p.input_sheet_name]
-        l,b,r,t = input_sheet.nominal_bounds.lbrt()
+        l,b,r,t = self.input_sheet.nominal_bounds.lbrt()
 
         coordinate_x=[]
         coordinate_y=[]
@@ -1673,7 +1677,7 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
     
         x_div=float(r-l)/(p.divisions*2)
         y_div=float(t-b)/(p.divisions*2)
-        ret_matrix = ones(input_sheet.shape, float)
+        ret_matrix = ones(self.input_sheet.shape, float)
      
         for i in range(p.divisions):
             if not bool(p.divisions%2):
@@ -1697,8 +1701,8 @@ class measure_retinotopy(SinusoidalMeasureResponseFunction):
         for r in self.retinotopy:
             x_coord=coordinates[r][0]
             y_coord=coordinates[r][1]
-            x_top, y_top = input_sheet.sheet2matrixidx(x_coord+x_div,y_coord+y_div)
-            x_bot, y_bot = input_sheet.sheet2matrixidx(x_coord-x_div,y_coord-y_div)
+            x_top, y_top = self.input_sheet.sheet2matrixidx(x_coord+x_div,y_coord+y_div)
+            x_bot, y_bot = self.input_sheet.sheet2matrixidx(x_coord-x_div,y_coord-y_div)
             norm_ret=float((r+1.0)/(p.divisions*p.divisions))
             
             for x in range(min(x_bot,x_top),max(x_bot,x_top)):
