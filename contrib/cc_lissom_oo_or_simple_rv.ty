@@ -159,7 +159,7 @@ print topo.sim['V1Simple'].mask
 
 # DoG weights for the LGN
 #centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
-centerg   = Gaussian(size=0.04,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+centerg   = Gaussian(size=0.15,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
 on_weights = topo.pattern.basic.Composite(
@@ -199,7 +199,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNorma
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOn,apply_output_fn_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('S_lr',0.3),
+                               ExponentialDecay(starting_value = locals().get('S_lr',0.5),
                                                 time_constant=locals().get('S_tc',3200)))))
 
 
@@ -211,7 +211,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOff,apply_output_fn_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('S_lr',0.3),
+                               ExponentialDecay(starting_value = locals().get('S_lr',0.5),
                                                 time_constant=locals().get('S_tc',3200)))))
 
 
@@ -286,12 +286,12 @@ def offset_tf():
 def secondStage():
     topo.sim.connect('Retina','LGNOn',delay=0.05,
                     connection_type=SharedWeightCFProjection,strength=2.33,
-                    nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent1',
+                    nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOnAfferent1',
                     weights_generator=on_weights)
     
     topo.sim.connect('Retina','LGNOff',delay = 0.05,
                     connection_type=SharedWeightCFProjection,strength=2.33,
-                    nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent1',
+                    nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOffAfferent1',
                     weights_generator=off_weights)
     
     topo.sim['FakeRetina1'].set_input_generator(zeroInput)
