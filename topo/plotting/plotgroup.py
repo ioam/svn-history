@@ -544,35 +544,6 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         ProjectionSheetMeasurementCommand.sheet = self.sheet
         super(ProjectionSheetPlotGroup,self)._exec_update_command()
 
-
-
-def default_measureable_sheet():
-    """Returns the first sheet for which measure_maps is True, for use as a default value."""
-
-    sheets = [s for s in topo.sim.objects(Sheet).values()
-              if hasattr(s,'measure_maps') and s.measure_maps]
-    if len(sheets)<1:
-        raise ValueError("Unable to find a suitable measureable sheet.")
-    sht=sheets[0]
-    if len(sheets)>1:
-        self.message("Using sheet %s." % sht.name)
-    return sht
-
-
-
-class ProjectionSheetMeasurementCommand(ParameterizedFunction):
-    """A callable Parameterized command for measuring or plotting a specified Sheet."""
-
-    sheet = param.ObjectSelector(
-        default=None,compute_default_fn=default_measureable_sheet,doc="""
-        Name of the sheet to use in measurements.""")
-
-    __abstract = True
-
-
-
-
-
     # Special case: if the Strength is set to self.keyname, we
     # request UnitViews (i.e. by changing the Strength key in
     # the plot_channels). Otherwise, we consider Strength as
@@ -606,6 +577,36 @@ class ProjectionSheetMeasurementCommand(ParameterizedFunction):
 	self.labels = []
 	for plot in self.plots:
 	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
+
+
+
+def default_measureable_sheet():
+    """Returns the first sheet for which measure_maps is True, for use as a default value."""
+
+    sheets = [s for s in topo.sim.objects(Sheet).values()
+              if hasattr(s,'measure_maps') and s.measure_maps]
+    if len(sheets)<1:
+        raise ValueError("Unable to find a suitable measureable sheet.")
+    sht=sheets[0]
+    if len(sheets)>1:
+        self.message("Using sheet %s." % sht.name)
+    return sht
+
+
+
+class ProjectionSheetMeasurementCommand(ParameterizedFunction):
+    """A callable Parameterized command for measuring or plotting a specified Sheet."""
+
+    sheet = param.ObjectSelector(
+        default=None,compute_default_fn=default_measureable_sheet,doc="""
+        Name of the sheet to use in measurements.""")
+
+    __abstract = True
+
+
+
+
+
 
 
 
