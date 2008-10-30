@@ -247,7 +247,7 @@ def get_date_version_time(logfile,timings=None,startups=None):
             startups[script][build] = (date,version,startup,startcpusage)
         else:
             #print "...build %s had %s percent cpu during startup (not >95)"%(build,startcpusage)
-            timings[script][build] = None
+            startups[script][build] = None
 
     return (build,date,version,timing,startup,cpu_usage)
 
