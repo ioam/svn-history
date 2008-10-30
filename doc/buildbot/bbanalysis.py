@@ -44,7 +44,8 @@ annotations = {
     (8247,None):'Use mx.Number.Float for simulation time [r8244]',
     (8383,None):'Use gmpy.mpq for simulation time [r8383]',
     (9157,None):'Provide C code with faster access to weights [r9157]',
-    (9190,None):'Use optimized joint normalization function [r9190]'
+    (9190,None):'Use optimized joint normalization function [r9190]',
+    (9395,None):'Some external cause (i.e. doozy)? [r9395, bb 465]'
     }
 
 
