@@ -152,6 +152,10 @@ def wrap(lower, upper, x):
     Valid for cyclic quantities like orientations or hues.
     """
     #I have no idea how I came up with this algorithm; it should be simplified.
+    #
+    # Note that Python's % operator works on floats and arrays;
+    # usually one can simply use that instead.  E.g. to wrap array or
+    # scalar x into 0,2*pi, just use "x % (2*pi)".
     range_=upper-lower
     return lower + fmod(x-lower + 2*range_*(1-floor(x/(2*range_))), range_)
 
