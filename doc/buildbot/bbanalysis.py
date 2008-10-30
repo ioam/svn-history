@@ -336,7 +336,7 @@ def plott(t,tytle,filename):
             times.append(data[2]*data[3]/99.0)
 
 
-    from topo.commands.pylabplots import vectorplot
+    from topo.command.pylabplots import vectorplot
     figure()
     vectorplot(times,versions,style='bx')
 
