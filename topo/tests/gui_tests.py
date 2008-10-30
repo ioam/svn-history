@@ -65,6 +65,8 @@ def test_test_pattern():
     tp = g['Simulation']['Test Pattern']()
     act = g['Plots']['Activity']()
 
+    tp.gui_set_param('edit_sheet','GS')
+
     ## Test for state_push bug (simulation not run() before Present pressed)
     assert len(topo.sim.eps_to_start)>0, "test must be run before simulation is run()"
     from topo.pattern.basic import Gaussian
