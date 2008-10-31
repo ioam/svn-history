@@ -50,8 +50,6 @@ Priorities:
 
 * (8) boundingregion.py cleanup
 
-* (8) sheetviews: release 1.0 (JAB)
-
 * cf.py
 (8) learning rate moves to learning function rather than cfprojection (CEB)
 (8) where mask created (by cfprojection/cf)  (CEB)
@@ -165,9 +163,6 @@ understanding.  Once that's done for base/, the rest should be much
 easier.
 -->
 
-
-<H4>2008/03/31: private/protected attributes</H4>
-Check that we have _ and __ as we want them, at least for base
 
 
 <H4>2007/10/26: Update tutorial</H4>
