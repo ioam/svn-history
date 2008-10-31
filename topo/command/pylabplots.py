@@ -34,6 +34,7 @@ from topo.base.arrayutil import octave_output
 from topo.base.sheet import Sheet
 from topo.base.arrayutil import wrap
 from topo.misc.filepath import normalize_path
+from topo.misc.util import frange
 from topo.analysis.vision import complexity
 import topo.analysis.vision
 from topo.plotting.plot import make_template_plot, Plot
@@ -84,7 +85,7 @@ def generate_figure(title=None,filename=None,suffix="",format=None):
 
     pylab.show._needmain=False
     if filename is not None:
-        fullname=filename+suffix+str(topo.sim.time())+suffix+format
+        fullname=filename+suffix+str(topo.sim.time())+format
         pylab.savefig(normalize_path(fullname), dpi=default_output_dpi)
     else:
         windowtitle(title)
@@ -518,6 +519,7 @@ def tuning_curve(x_axis,plot_type,unit):
         pylab.show()
       	   
 
+
 def plot_cfproj_mapping(dest,proj='Afferent',style='b-'):
     """
     Given a CF sheet receiving a CFProjection, plot
@@ -528,6 +530,7 @@ def plot_cfproj_mapping(dest,proj='Afferent',style='b-'):
         dest = sim[dest]
     plot_coord_mapping(dest.projections()[proj].coord_mapper,
                        dest,style=style)
+
 
 
 def plot_coord_mapping(mapper,sheet,style='b-'):
@@ -563,6 +566,7 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
 
     hold(hold_on)
     
+
 
 # RFHACK
 ### JABHACKALERT: rename & should be called from the 'Receptive
@@ -600,6 +604,7 @@ def plotrctg():
         pylab.show()
 
 
+
 def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **params):
     """
     Plots parameter values associated with an AttributeTrackingOF.
@@ -635,6 +640,7 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
         generate_figure(title=topo.sim.name+': '+p,filename=filename,suffix=p)
 
 
+
 def matrixplot_hsv(mat,title=None,aspect=None,colorbar=True,filename=None):
     """
     Simple plotting for any matrix as a bitmap with axes.
@@ -648,28 +654,39 @@ def matrixplot_hsv(mat,title=None,aspect=None,colorbar=True,filename=None):
     if colorbar and (mat.min()!= mat.max()): pylab.colorbar()
     generate_figure(title=title,filename=filename)
 
-def plot_modulation_ratio(fullmatrix):
+
+
+# JABALERT: Should be updated to plot for a specified list of sheets,
+# and then the combination of all of them, so that it will work for
+# any network.  Will need to remove the simple_sheet_name and
+# complex_sheet_name parameters once that works.
+def plot_modulation_ratio(fullmatrix,title=None,filename=None,simple_sheet_name=None,complex_sheet_name=None,bins = frange(0,2.0,0.1,inclusive=True)):
     """
-    This function computes the modulation ratios of neurons in the V1Simple and V1Complex area and
-    plots the histogram of them. See analysis.vision.complexity for more info.
+    This function computes the modulation ratios of neurons in the
+    specified sheets and plots their histograms. See
+    analysis.vision.complexity for more info.
     """
-    # Should be using generate_figure() as in matrixplot().
-    if (topo.sim.objects().has_key("V1Complex") & topo.sim.objects().has_key("V1Simple")):
-        bins = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0]
-        v1s = complexity(fullmatrix[topo.sim["V1Simple"]])
-        v1c = complexity(fullmatrix[topo.sim["V1Complex"]])
+
+    if (topo.sim.objects().has_key(simple_sheet_name)):
+        v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]])
         pylab.figure()
         pylab.subplot(311)
         pylab.hist(v1s,bins)
         pylab.axis([0,2.0,0,3500])
+        
+    if (topo.sim.objects().has_key(complex_sheet_name)):
+        v1c = complexity(fullmatrix[topo.sim[complex_sheet_name]])
         pylab.subplot(312)
         pylab.hist(v1c,bins)
         pylab.axis([0,2.0,0,3500])
         pylab.subplot(313)
-        #pylab.hist(numpy.concatenate(array(v1s),array(v1c)),bins)
-        pylab.axis([0,2.0,0,3500])
-        pylab.savefig(normalize_path(str(topo.sim.timestr()) + 'RM.png'))
-        #pylab.show()
+        
+        if (topo.sim.objects().has_key(simple_sheet_name)):
+            # JABALERT: Need to reenable this
+            #pylab.hist(numpy.concatenate(array(v1s),array(v1c)),bins)
+            pylab.axis([0,2.0,0,3500])
+
+    generate_figure(title=title,filename=filename)
 
 
 # JABALERT: Remove duplication with tuning_curve, above.  
