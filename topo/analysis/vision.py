@@ -141,11 +141,36 @@ def phase_preference_scatter_plot(sheet_name,diameter=0.39):
     pylab.grid()
     pylab.savefig(normalize_path(str(topo.sim.timestr()) + sheet_name + "_scatter.png"))
 
-###############################################################################
-pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
 
+
+###############################################################################
+# JABALERT: Should we move this plot and command to analysis.py or
+# pylabplots.py, where all the rest are?
+#
+# In any case, it requires generalization; it should not be hardcoded
+# to any particular map name, and should just do the right thing for
+# most networks for which it makes sense.  E.g. it already measures
+# the ComplexSelectivity for all measured_sheets, but then
+# plot_modulation_ratio only accepts two with specific names.
+# plot_modulation_ratio should just plot whatever it is given, and
+# then analyze_complexity can simply pass in whatever was measured,
+# with the user controlling what is measured using the measure_map
+# attribute of each Sheet.  That way the complexity of any sheet could
+# be measured, which is what we want.
+#
+# Specific changes needed:
+#   - Make plot_modulation_ratio accept a list of sheets and
+#      plot their individual modulation ratios and combined ratio.
+#   - Remove complex_sheet_name argument, which is no longer needed
+#   - Make sure it still works fine even if V1Simple doesn't exist;
+#     as this is just for an optional scatter plot, it's fine to skip
+#     it.
+#   - Preferably remove the filename argument by default, so that
+#     plots will show up in the GUI
+
+pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
-             update_command='from topo.analysis.vision import analyze_complexity; fm = measure_or_pref(frequencies=[3.0],num_orientation=8,scale=0.3,num_phase=32,             pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0));analyze_complexity(fm)')
+             update_command='from topo.analysis.vision import analyze_complexity; fm = measure_or_pref(frequencies=[3.0],num_orientation=8,scale=0.3,num_phase=32); analyze_complexity(fm,simple_sheet_name="V1Simple",complex_sheet_name="V1Complex",filename="ModulationRatio")')
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
@@ -154,19 +179,29 @@ pg.add_plot('Modulation Ratio',[('Strength','ComplexSelectivity')])
 pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
 pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
 
-def analyze_complexity(full_matrix):
+
+def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename=None):
     """
     Compute modulation ratio for each neuron, to distinguish complex from simple cells.
 
-    Uses data obtained from measure_or_pref().
+    Uses full_matrix data obtained from measure_or_pref().
+
+    If there is a sheet named as specified in simple_sheet_name,
+    also plots its phase preference as a scatter plot.
     """
-    # ALERT: Use a list comprehension instead?
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
+    measured_sheets = [s for s in topo.sim.objects(CFSheet).values()
+                       if hasattr(s,'measure_maps') and s.measure_maps]
 
     for sheet in measured_sheets:   
-        #print sheet
         complx = array(complexity(full_matrix[sheet]))
-        sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
-    topo.command.pylabplots.plot_modulation_ratio(full_matrix)               
-    phase_preference_scatter_plot("V1Simple",diameter=0.24999)
+        # Should this be renamed to ModulationRatio?
+        sheet.sheet_views['ComplexSelectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
+
+    topo.command.pylabplots.plot_modulation_ratio(full_matrix,simple_sheet_name=simple_sheet_name,complex_sheet_name=complex_sheet_name,filename=filename)
+
+    # Avoid error if no simple sheet exists
+    try:
+        phase_preference_scatter_plot(simple_sheet_name,diameter=0.24999)
+    except AttributeError:
+        print "Skipping phase preference scatter plot; could not analyze region %s." \
+              % simple_sheet_name
