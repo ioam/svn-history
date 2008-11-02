@@ -478,6 +478,11 @@ class ParameterizedMetaclass(type):
         """
         type.__init__(mcs,name,bases,dict_)
 
+        # Give Parameterized classes a useful 'name' attribute.
+        # (Could instead consider changing the instance Parameter
+        # 'name' to '__name__'?)
+        mcs.name = name
+
         # All objects (with their names) of type Parameter that are
         # defined in this class
         parameters = [(name,obj)
