@@ -3,7 +3,7 @@ Version of lissom_whisker_barrels.ty based on the LESI model.
 
 $Id$
 """
-__version__='$Revision: 8387 $'
+__version__='$Revision: 8387$'
 
 import numpy
 from pylab import*
