@@ -9,6 +9,7 @@ __version__='$Revision$'
 
 
 from math import pi, sqrt
+import copy
 import numpy
 
 from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet 
