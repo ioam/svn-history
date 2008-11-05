@@ -51,29 +51,26 @@ num_lags=4
 retina_density = locals().get('default_retina_density',24.0)
 lgn_density = locals().get('default_lgn_density',24.0)
 
-for i in xrange(num_lags):
+topo.sim['Retina']=sheet.GeneratorSheet(
+    nominal_density=retina_density,period=1.0,phase=0.05,
+    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.375),
+    # Need to update the sweeper to generate 4 patterns over time
+    input_generator=pattern.Sweeper(generator=copy.deepcopy(sub_inputs),
+                                    step=0,speed=1.0/retina_density,
+                                    orientation=numbergen.UniformRandom(lbound=-pi,
+                                                                        ubound=pi,seed=88)))
 
-    topo.sim['Retina'+str(i)]=sheet.GeneratorSheet(
-        nominal_density=retina_density,period=1.0,phase=0.05,
-        nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.375),
-        input_generator=pattern.Sweeper(generator=copy.deepcopy(sub_inputs),
-                                step=i,speed=1.0/retina_density,
-                                orientation=numbergen.UniformRandom(lbound=-pi,
-                                                                    ubound=pi,seed=88)))
+topo.sim['LGNOn']=sheet.CFSheet(
+    nominal_density=lgn_density,
+    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
+    output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+    measure_maps=False)
 
-    topo.sim['LGNOn' +str(i)]=sheet.CFSheet(
-        nominal_density=lgn_density,
-        nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
-        output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
-        measure_maps=False)
-    
-    topo.sim['LGNOff'+str(i)]=sheet.CFSheet(
-        nominal_density=lgn_density,
-        nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
-        output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
-        measure_maps=False)
-
-
+topo.sim['LGNOff']=sheet.CFSheet(
+    nominal_density=lgn_density,
+    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
+    output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+    measure_maps=False)
 
 topo.sim['V1'] = sheet.lissom.LISSOM(
     nominal_density=locals().get('default_density',48.0),
@@ -98,21 +95,21 @@ off_weights = pattern.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
     
+topo.sim.connect('Retina','LGNOn',delay=0.05,
+                 connection_type=projection.SharedWeightCFProjection,strength=2.38,
+                 nominal_bounds_template=sheet.BoundingBox(radius=0.375),
+                 name='Afferent',weights_generator=on_weights)
+
+topo.sim.connect('Retina','LGNOff',delay=0.05,
+                 connection_type=projection.SharedWeightCFProjection,strength=2.38,
+                 nominal_bounds_template=sheet.BoundingBox(radius=0.375),
+                 name='Afferent',weights_generator=off_weights)
+
+
 for i in xrange(num_lags):
 
-    topo.sim.connect('Retina'+str(i),'LGNOn'+str(i),delay=0.05,
-                     connection_type=projection.SharedWeightCFProjection,strength=2.38,
-                     nominal_bounds_template=sheet.BoundingBox(radius=0.375),
-                     name='Afferent',weights_generator=on_weights)
-    
-    topo.sim.connect('Retina'+str(i),'LGNOff'+str(i),delay=0.05,
-                     connection_type=projection.SharedWeightCFProjection,strength=2.38,
-                     nominal_bounds_template=sheet.BoundingBox(radius=0.375),
-                     name='Afferent',weights_generator=off_weights)
-
-
     topo.sim.connect(
-        'LGNOn'+str(i),'V1',delay=0.05,
+        'LGNOn','V1',delay=0.05+i,
         dest_port=('Activity','JointNormalize', 'Afferent'),
         connection_type=projection.CFProjection,strength=1.0,
         name='LGNOnAfferent'+str(i),
@@ -121,7 +118,7 @@ for i in xrange(num_lags):
         weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
 
     topo.sim.connect(
-        'LGNOff'+str(i),'V1',delay=0.05,
+        'LGNOff','V1',delay=0.05+i,
         dest_port=('Activity','JointNormalize', 'Afferent'),
         connection_type=projection.CFProjection,strength=1.0,
         name='LGNOffAfferent'+str(i),
@@ -153,9 +150,9 @@ sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/num_inputs,aff_name="Affere
 
 ### Default locations for model editor
 topo.sim.grid_layout([[None, 'V1'],
-                      [('LGNOn' +str(i)) for i in xrange(num_lags)],
-                      [('LGNOff'+str(i)) for i in xrange(num_lags)],
-                      [('Retina'+str(i)) for i in xrange(num_lags)]],
+                      [('LGNOn' ) for i in xrange(num_lags)],
+                      [('LGNOff') for i in xrange(num_lags)],
+                      [('Retina') for i in xrange(num_lags)]],
                      xstart=150, xstep=300)
 
 
@@ -166,5 +163,5 @@ topo.sim.grid_layout([[None, 'V1'],
 # Appropriate for original DR model; will need updating for 
 # new one.
 from topo.analysis.featureresponses import MeasureResponseCommand
-MeasureResponseCommand.duration=0.175
-MeasureResponseCommand.apply_output_fn=False
+MeasureResponseCommand.duration=4.0
+MeasureResponseCommand.apply_output_fn=True
