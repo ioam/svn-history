@@ -116,8 +116,9 @@ num_inputs=1
 
 # Number of separate delay lines in the LGN
 num_lags=4
+input_period=num_lags # By default
 
-input = Translator(reset_period=num_lags,
+input = Translator(reset_period=input_period,
                    speed=0.04,
                    orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=99),
                    generator=pattern.Gaussian(x=numbergen.UniformRandom(lbound=-0.75,
@@ -222,7 +223,7 @@ topo.sim.connect(
 
 
 ### Actions scheduled to occur as the simulation proceeds.
-sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/num_inputs,aff_name="Afferent")
+sheet.lissom.schedule_events("topo.sim['V1']",st=input_period/num_inputs,aff_name="Afferent")
 
 
 ### Default locations for model editor
