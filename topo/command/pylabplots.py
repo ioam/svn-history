@@ -411,7 +411,7 @@ def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
     return x_values, y_values
 
 
-def or_tuning_curve(x_axis,plot_type,unit):
+def or_tuning_curve(x_axis,plot_type,unit,sheet=None,coords=None,filename=None):
     """
     Plots a tuning curve for orientation which rotates the curve 
     values so that minimum y values are at the minimum x value.
@@ -428,23 +428,24 @@ def or_tuning_curve(x_axis,plot_type,unit):
     # Ideally this should be changed so that the preferred orientation is in the centre.
     # This may also be useful for other tuning curve types, not just orientation ie. direction.
 
-    sheet=topo.analysis.featureresponses.UnitCurveCommand.sheet
-    coords=topo.analysis.featureresponses.UnitCurveCommand.coords
+    if sheet==None:
+        sheet=topo.analysis.featureresponses.UnitCurveCommand.sheet
+    if coords==None:
+        coords=topo.analysis.featureresponses.UnitCurveCommand.coords
+
     for coordinate in coords:
     
         i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
-        
     
         pylab.figure(figsize=(7,7))
         isint=pylab.isinteractive()
         pylab.ioff()
-        manager = pylab.get_current_fig_manager()
-        
+
         pylab.ylabel('Response')
-        pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
-        pylab.title('Sheet '+sheet.name+', coordinate(x,y)='+'('+
-                    str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
-        manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
+        pylab.xlabel('%s (%s)' % (x_axis.capitalize(),unit))
+        pylab.title('Sheet %s, coordinate(x,y)=(%d,%d) at time %s' % 
+                    (sheet.name,coordinate[0],coordinate[1],topo.sim.timestr()))
+        title='%s: %s Tuning Curve' % (topo.sim.name,x_axis.capitalize())
     
         def rotate(seq, n=1):
             n = n % len(seq) # n=hop interval
@@ -477,8 +478,8 @@ def or_tuning_curve(x_axis,plot_type,unit):
              
         if isint: pylab.ion()
         pylab.legend(loc=4)
-        pylab.show._needmain = False 
-        pylab.show()
+
+        generate_figure(title=title,filename=filename)
 
 
 
@@ -729,8 +730,7 @@ def tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x
 
 
 
-# JABALERT: Remove duplication with or_tuning_curve, above.  
-# Should be using generate_figure() as in matrixplot().
+# JABALERT: This function is now obsolete (see or_tuning_curve), and will be removed.
 def or_tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x_axis):
     """
     Plots a tuning curve for orientation which rotates the curve 
