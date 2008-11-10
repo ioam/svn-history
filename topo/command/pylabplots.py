@@ -186,19 +186,6 @@ class matrixplot(PylabPlotCommand):
 
 
 
-# JABALERT: Not sure if there is any reason to keep this command
-# now that matrixplot supports any plot type.
-class matrixplot_hsv(matrixplot):
-    """
-    Simple plotting for any matrix as a bitmap with axes.
-    Same as matrixplot(plot_type=pylab.hsv), i.e., values are colored
-    in hsv colorspace rather than greyscale.
-    """
-    
-    plot_type = param.Parameter(default=pylab.hsv)
-
-
-
 class matrixplot3d(PylabPlotCommand):
     """
     Simple plotting for any matrix as a 3D wireframe with axes.
@@ -783,7 +770,7 @@ class plot_modulation_ratio(PylabPlotCommand):
     """
 
     # JABALERT: All but the first argument should probably be Parameters
-    def __call__(self,fullmatrix,title=None,filename=None,simple_sheet_name=None,complex_sheet_name=None,bins=frange(0,2.0,0.1,inclusive=True),**params):
+    def __call__(self,fullmatrix,simple_sheet_name=None,complex_sheet_name=None,bins=frange(0,2.0,0.1,inclusive=True),**params):
         p=ParamOverrides(self,params,allow_extra_keywords=True)
 
         if (topo.sim.objects().has_key(simple_sheet_name)):

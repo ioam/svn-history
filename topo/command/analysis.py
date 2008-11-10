@@ -913,8 +913,9 @@ class measure_retinotopy(SinusoidalMeasureResponseCommand):
                     ret_matrix[x][y] += norm_ret
                    
         #Plot the color key
-        from topo.command.pylabplots import matrixplot_hsv
-        matrixplot_hsv(ret_matrix, title="Color Key")
+        import pylab
+        from topo.command.pylabplots import matrixplot
+        matrixplot(ret_matrix, plot_type=pylab.hsv, title="Color Key")
 
 
 pg=create_plotgroup(name='Retinotopy',category="Other",
