@@ -537,7 +537,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',
             Although the data takes a long time to collect, once it is ready the plots
             are available immediately for any unit.""",
         update_command='measure_or_tuning_fullfield()',
-        plot_command='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")')
+        plot_command='cyclic_tuning_curve(x_axis="orientation")')
 
 
 
@@ -578,7 +578,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="
             Measure orientation tuning for a specific unit at different contrasts,
             using a pattern chosen to match the preferences of that unit.""",
         update_command='measure_or_tuning()',
-        plot_command='or_tuning_curve(x_axis="orientation",plot_type=pylab.plot,unit="degrees")',
+        plot_command='cyclic_tuning_curve(x_axis="orientation")',
         prerequisites=['XPreference'])
 
 
@@ -637,7 +637,7 @@ class measure_size_response(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
         doc='Measure the size preference for a specific unit.',
         update_command='measure_size_response()',
-        plot_command='tuning_curve(x_axis="size",plot_type=pylab.plot,unit="Diameter of stimulus")',
+        plot_command='tuning_curve(x_axis="size",unit="Diameter of stimulus")',
         prerequisites=['OrientationPreference','XPreference'])
 
 
@@ -695,7 +695,7 @@ class measure_contrast_response(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
         doc='Measure the contrast response function for a specific unit.',
         update_command='measure_contrast_response()',
-        plot_command='tuning_curve(x_axis="contrast",plot_type=pylab.plot,unit="%")',
+        plot_command='tuning_curve(x_axis="contrast",unit="%")',
         prerequisites=['OrientationPreference','XPreference'])
 
 
@@ -988,7 +988,7 @@ class measure_orientation_contrast(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
                  doc='Measure the response of one unit to a centre and surround sine grating disk.',
                  update_command='measure_orientation_contrast()',
-                 plot_command='tuning_curve(x_axis="contrastcentre",plot_type=pylab.plot,unit="%")',
+                 plot_command='tuning_curve(x_axis="contrastcentre",unit="%")',
                  prerequisites=['OrientationPreference','XPreference'])        
 
 
