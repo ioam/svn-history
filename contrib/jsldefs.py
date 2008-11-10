@@ -663,17 +663,21 @@ def save_map(sheet):
     map=topo.sim[sheet].sheet_views['OrientationPreference'].view()[0]
     save(normalize_path("Map"+str(topo.sim.time())),map,fmt='%.6f', delimiter=',')
         
-from topo.command.pylabplots import generate_figure
 
-def two_photon_plot(sheet, projection, preference, size=(10,10), cell_size=100):
-    pylab.hsv()
-    pylab.figure(figsize=size)
-    x,y = coords(projection, sheet)
-    map=topo.sim[sheet].sheet_views[preference].view()[0]
-    data=ravel(map)
-    pylab.scatter(x,y,s=cell_size,c=data,marker='o')
-    pylab.savefig(normalize_path(preference+sheet+str(topo.sim.time())+".png"), dpi=100)
-    generate_figure(title=preference)
+from topo.command.pylabplots import PylabPlotCommand
+class two_photon_plot(PylabPlotCommand)
+    def __call__(self,sheet, projection, preference, size=(10,10), cell_size=100, **params):
+        p=ParamOverrides(self,params)
+        pylab.hsv()
+        pylab.figure(figsize=size)
+        x,y = coords(projection, sheet)
+        map=topo.sim[sheet].sheet_views[preference].view()[0]
+        data=ravel(map)
+        pylab.scatter(x,y,s=cell_size,c=data,marker='o')
+        pylab.savefig(normalize_path(preference+sheet+str(topo.sim.time())+".png"), dpi=100)
+        p.title=preference
+        self._generate_figure(p)
+        
 
 def param_analysis_function(data_file):
     """
@@ -756,22 +760,16 @@ def param_analysis_function(data_file):
     #two_photon_plot("V1","OrientationPreference","LateralExcitatory" size=(5,5), cell_size=10)   
    
 
-    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, 
-                            topo.sim.time(), filename="Afferent", ylabel="Afferent", raw=True)
-    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, 
-                            topo.sim.time(), filename="V1", ylabel="V1", raw=True)
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], filename="Afferent", ylabel="Afferent", raw=True)
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], filename="V1", ylabel="V1", raw=True)
     
 
-    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="On_before", ylabel="On_before")
-    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="Off_before", ylabel="Off_before")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], filename="On_before", ylabel="On_before")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].output_fn.output_fns[1], filename="Off_before", ylabel="Off_before")
 
 
-    plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="LatExBefore", ylabel="LatExBefore")
-    plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], filename="LatExBefore", ylabel="LatExBefore")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], filename="LatInBefore", ylabel="LatInBefore")
 
     #save_snapshot()
     #save_plotgroup("RF Projection")
@@ -866,37 +864,27 @@ def homeostatic_analysis_function():
     if __main__.__dict__['tracking'] == True:
         if __main__.__dict__['triesch'] == True: 
             if __main__.__dict__['scaling'] == True:
-                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, 
-                                        topo.sim.time(), filename="Afferent", ylabel="Afferent", raw=True)
-                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, 
-                                        topo.sim.time(), filename="V1", ylabel="V1", raw=True)
+                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], filename="Afferent", ylabel="Afferent", raw=True)
+                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], filename="V1", ylabel="V1", raw=True)
             else:
                 if __main__.__dict__['lr_scaling']==True:
-                    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, 
-                                            topo.sim.time(), filename="Afferent", ylabel="Afferent", raw=False)
-                    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, 
-                                            topo.sim.time(), filename="V1", ylabel="V1", raw=False)
+                    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], filename="Afferent", ylabel="Afferent")
+                    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], filename="V1", ylabel="V1")
                     
                 else:
-                    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1], 0, 
-                                            topo.sim.time(), filename="Afferent", ylabel="Afferent", raw=False)
+                    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1], filename="Afferent", ylabel="Afferent")
           
         else:
             if __main__.__dict__['scaling'] == True:
-                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, 
-                                        topo.sim.time(), filename="Afferent", ylabel="Afferent", raw=True)
-                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[3], 0, 
-                                        topo.sim.time(), filename="V1", ylabel="V1", raw=True)
+                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], filename="Afferent", ylabel="Afferent", raw=True)
+                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[3], filename="V1", ylabel="V1", raw=True)
             else:
-                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, 
-                                        topo.sim.time(), filename="V1", ylabel="V1", raw=True)
+                plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], filename="V1", ylabel="V1", raw=True)
                 
             
 
-        plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,
-                                topo.sim.time(), filename="LatExBefore", ylabel="LatExBefore")
-        plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,
-                                topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
+        plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], filename="LatExBefore", ylabel="LatExBefore")
+        plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], filename="LatInBefore", ylabel="LatInBefore")
 
 SelectivityExc=StoreMedSelectivity()
 StabilityExc=StoreStability()
@@ -980,36 +968,24 @@ def lesi_analysis_function(data_file, snapshot, rfs):
 
 
    
-    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[0], 0, 
-                            topo.sim.time(),filename="V1Exc", ylabel="V1Exc")
-    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[2], 0, 
-                            topo.sim.time(),filename="V1Exc_of", ylabel="V1Exc_of")
+    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[0], filename="V1Exc", ylabel="V1Exc")
+    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[2], filename="V1Exc_of", ylabel="V1Exc_of")
 
     if __main__.__dict__['homeo_inh'] == True:
-        plot_tracked_attributes(topo.sim["V1Inh"].output_fn.output_fns[1], 0, 
-                                topo.sim.time(), filename="V1Inh", ylabel="V1Inh")
+        plot_tracked_attributes(topo.sim["V1Inh"].output_fn.output_fns[1], filename="V1Inh", ylabel="V1Inh")
     else:
-        plot_tracked_attributes(topo.sim["V1Inh"].output_fn.output_fns[2], 0, 
-                                topo.sim.time(), filename="V1Inh", ylabel="V1Inh")
+        plot_tracked_attributes(topo.sim["V1Inh"].output_fn.output_fns[2], filename="V1Inh", ylabel="V1Inh")
 
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="LGNOnAfferent", ylabel="LGNOnAfferent")
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="LGNOffAfferent", ylabel="LGNOffAfferent")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOnAfferent"].output_fn.output_fns[1], filename="LGNOnAfferent", ylabel="LGNOnAfferent")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOffAfferent"].output_fn.output_fns[1], filename="LGNOffAfferent", ylabel="LGNOffAfferent")
 
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory_local"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="LateralExcitatory_local", ylabel="LateralExcitatory_local")
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="LateralExcitatory", ylabel="LateralExcitatory")
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["V1Inh_to_V1Exc"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="V1Inh_to_V1Exc", ylabel="V1Inh_to_V1Exc")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory_local"].output_fn.output_fns[1], filename="LateralExcitatory_local", ylabel="LateralExcitatory_local")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory"].output_fn.output_fns[1], filename="LateralExcitatory", ylabel="LateralExcitatory")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["V1Inh_to_V1Exc"].output_fn.output_fns[1], filename="V1Inh_to_V1Exc", ylabel="V1Inh_to_V1Exc")
 
-    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Inh_to_V1Inh"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="V1Inh_to_V1Inh", ylabel="V1Inh_to_V1Inh")
-    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh_local"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="V1Exc_to_V1Inh_local", ylabel="V1Exc_to_V1Inh_local")
-    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="V1Exc_to_V1Inh", ylabel="V1Exc_to_V1Inh")
+    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Inh_to_V1Inh"].output_fn.output_fns[1], filename="V1Inh_to_V1Inh", ylabel="V1Inh_to_V1Inh")
+    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh_local"].output_fn.output_fns[1], filename="V1Exc_to_V1Inh_local", ylabel="V1Exc_to_V1Inh_local")
+    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh"].output_fn.output_fns[1], filename="V1Exc_to_V1Inh", ylabel="V1Exc_to_V1Inh")
 
 
     if snapshot:
@@ -1096,20 +1072,15 @@ def species_analysis_function():
     Selectivity("V1", "Selectivity", 0, topo.sim.time())
     Stability("V1", "Stability", 0, topo.sim.time())
    
-    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1], 0, 
-                            topo.sim.time(), filename="V1", ylabel="V1", raw=True)
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1], filename="V1", ylabel="V1", raw=True)
     
 
-    #plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,
-    #                        topo.sim.time(), filename="On_before", ylabel="On_before")
-    #plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,
-    #                        topo.sim.time(), filename="Off_before", ylabel="Off_before")
+    #plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], filename="On_before", ylabel="On_before")
+    #plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].output_fn.output_fns[1], filename="Off_before", ylabel="Off_before")
 
 
-    plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="LatExBefore", ylabel="LatExBefore")
-    plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], filename="LatExBefore", ylabel="LatExBefore")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], filename="LatInBefore", ylabel="LatInBefore")
 
     #save_snapshot()
 

@@ -69,7 +69,7 @@ def rf_analysis():
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
     from topo.command.analysis import measure_or_tuning_fullfield, measure_or_pref
-    from topo.command.pylabplots import or_tuning_curve_batch
+    from topo.command.pylabplots import cyclic_tuning_curve
     from topo.misc.filepath import normalize_path    
     
     if(float(topo.sim.time()) <=20010): 
@@ -84,12 +84,13 @@ def rf_analysis():
                 save_plotgroup("Projection",projection=p)
 
         prefix="WithGC"   
-        measure_or_tuning_fullfield()    
-        or_tuning_curve_batch(prefix,"OrientationTC:V1:[0,0]",pylab.plot,"degrees","V1",[0,0],"orientation")     
-        or_tuning_curve_batch(prefix,"OrientationTC:V1:[0.1,0.1]",pylab.plot,"degrees","V1",[0.1,0.1],"orientation")    
-        or_tuning_curve_batch(prefix,"OrientationTC:V1:[-0.1,-0.1]",pylab.plot,"degrees","V1",[-0.1,-0.1],"orientation")      
-        or_tuning_curve_batch(prefix,"OrientationTC:V1:[0.1,-0.1]",pylab.plot,"degrees","V1",[0.1,-0.1],"orientation")     
-        or_tuning_curve_batch(prefix,"OrientationTC:V1:[-0.1,0.1]",pylab.plot,"degrees","V1",[-0.1,0.1],"orientation") 
+        measure_or_tuning_fullfield()
+        s=topo.sim["V1"]
+        cyclic_tuning_curve(filename_suffix=prefix,filename="OrientationTC:V1:[0,0]",sheet=s,coords=[(0,0)],"orientation")
+        cyclic_tuning_curve(filename_suffix=prefix,filename="OrientationTC:V1:[0.1,0.1]",sheet=s,coords=[(0.1,0.1)],x_axis="orientation")
+        cyclic_tuning_curve(filename_suffix=prefix,filename="OrientationTC:V1:[-0.1,-0.1]",sheet=s,coords=[(-0.1,-0.1)],x_axis="orientation")
+        cyclic_tuning_curve(filename_suffix=prefix,filename="OrientationTC:V1:[0.1,-0.1]",sheet=s,coords=[(0.1,-0.1)],x_axis="orientation")
+        cyclic_tuning_curve(filename_suffix=prefix,filename="OrientationTC:V1:[-0.1,0.1]",sheet=s,coords=[(-0.1,0.1)],x_axis="orientation")
     else:
         topo.command.basic.activity_history = numpy.concatenate((contrib.jacommands.activity_history,topo.sim["V1"].activity.flatten()),axis=1)    
 

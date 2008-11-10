@@ -20,7 +20,7 @@ from topo.outputfn.basic import HomeostaticMaxEnt,OutputFnWithState
 from topo.sheet.lissom import LISSOM
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.plotting.plotfilesaver import * 
-from topo.command.pylabplots import or_tuning_curve_batch, matrixplot
+from topo.command.pylabplots import cyclic_tuning_curve, matrixplot
 from topo.command.analysis import save_plotgroup, measure_or_tuning_fullfield
 from topo.misc.filepath import normalize_path,application_path
 from topo.command.pylabplots import plot_tracked_attributes
@@ -321,7 +321,7 @@ def collect_activity_statistics():
         pylab.hist(topo.mycommands.activity_history,(numpy.arange(20.0)/20.0))
         pylab.savefig("./Output/" + str(topo.sim.time()) + 'activity_histogram.png')
     #    measure_or_tuning_fullfield()
-    #    or_tuning_curve_batch("Output","OrientationTC:V1:[0,0]",pylab.plot,"degrees","V1",[0,0],"orientation")
+    #    cyclic_tuning_curve_batch(filename="OrientationTC:V1:[0,0]",sheet=topo.sim["V1"],coords=[(0,0)],x_axis="orientation")
         save_plotgroup('Activity')
 
 def homeostatic_analysis_function():
@@ -330,13 +330,12 @@ def homeostatic_analysis_function():
     likely to need something similar but highly customized.
     """
     
-  
     #if __main__.__dict__['cascade'] == True: 
-    #plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
-    #plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[2], 0, topo.sim.time(), filename="V1", ylabel="V1")
+    #plot_tracked_attributes(output_fn=topo.sim["V1"].output_fn.output_fns[1].output_fns[0], init_time=0, final_time=topo.sim.time(), filename="Afferent", ylabel="Afferent")
+    #plot_tracked_attributes(output_fn=topo.sim["V1"].output_fn.output_fns[1].output_fns[2], init_time=0, final_time=topo.sim.time(), filename="V1", ylabel="V1")
     #else:
-    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
-    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, topo.sim.time(), filename="V1", ylabel="V1")
+    plot_tracked_attributes(output_fn=topo.sim["V1"].output_fn.output_fns[0], init_time=0, final_timetopo.sim.time(), filename="Afferent", ylabel="Afferent")
+    plot_tracked_attributes(output_fn=topo.sim["V1"].output_fn.output_fns[2], init_time=0, final_timetopo.sim.time(), filename="V1", ylabel="V1")
 
   
     
@@ -847,7 +846,7 @@ def measure_ot(lat_exc,lat_inh,e,t):
     topo.commands.analysis.measure_or_tuning_fullfield(display=True,num_phase=4,num_orientation=80,frequencies=[2.4],
                                curve_parameters=[{"contrast":1},{"contrast":5},{"contrast":10},{"contrast":50},{"contrast":90}])
     
-    topo.commands.pylabplots.or_tuning_curve_batch("./GC_with_LGNGC_HR/",filename,pylab.plot,"degrees","V1",[0,0],"orientation")
+    topo.commands.pylabplots.cyclic_tuning_curve(suffix="GC_with_LGNGC_HR",filename=filename,sheet=topo.sim["V1"],coords=[(0,0)],x_axis="orientation")
     
     
     
