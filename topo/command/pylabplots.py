@@ -116,65 +116,10 @@ class PylabPlotCommand(ParameterizedFunction):
         else:
             self._set_windowtitle(p.title)
             pylab.show()
-    
 
 
 
-def windowtitle(title):
-    """
-    Helper function to set the title of this PyLab plot window to a string.
-
-    At the moment, PyLab does not offer a window-manager-independent
-    means for controlling the window title, so what we do is to try
-    what should work with Tkinter, and then suppress all errors.  That
-    way we should be ok when rendering to a file-based backend, but
-    will get nice titles in Tk windows.  If other toolkits are in use,
-    the title can be set here using a similar try/except mechanism, or
-    else there can be a switch based on the backend type.
-
-    Nothing is done if the title is None.
-    """
-    if title is not None:
-        try: 
-            manager = pylab.get_current_fig_manager()
-            manager.window.title(title)
-        except:
-            pass
-
-
-# Default DPI when rendering to a bitmap.  The nominal size * the dpi
-# gives the final image size in pixels.  
-# E.g.: 4"x4" image * 80 dpi ==> 320x320 pixel image
-# The output can be .png, .ps, .pdf, .svg, etc, as supported by MatPlotLib
-default_output_dpi=100
-default_output_format=".png"
-
-def generate_figure(title=None,filename=None,suffix="",format=None):
-    """
-    Helper function to display a figure on screen or save to a file.
-    
-    The title is used for the window when displaying onscreen. 
-
-    The name of the file is constructed from the provided filename
-    plus the provided suffix plus the current simulator time plus
-    the specified format (defaulting to default_output_format). 
-
-    For bitmap formats, the DPI is determined by default_output_dpi.
-    """
-    if (format==None):
-        format=default_output_format
-
-    pylab.show._needmain=False
-    if filename is not None:
-        fullname=filename+suffix+str(topo.sim.time())+format
-        pylab.savefig(normalize_path(fullname), dpi=default_output_dpi)
-    else:
-        windowtitle(title)
-        pylab.show()
-
-
-
-def vectorplot(vec,xvalues=None,title=None,style='-',label=None,filename=None):
+class vectorplot(PylabPlotCommand):
     """
     Simple line plotting for any vector or list of numbers.
 
@@ -201,15 +146,22 @@ def vectorplot(vec,xvalues=None,title=None,style='-',label=None,filename=None):
     Execution of multiple vectorplot() commands with different styles
     will result in all those styles overlaid on a single plot window.
     """
-    if xvalues is not None:
-        pylab.plot(xvalues, vec, style, label=label)
-    else:
-        pylab.plot(vec, style, label=label)
-    pylab.grid(True)
-    generate_figure(title=title,filename=filename)
+
+    # JABALERT: All but the first two arguments should probably be Parameters
+    def __call__(self,vec,xvalues=None,style='-',label=None,**params):
+        p=ParamOverrides(self,params)
+
+        if xvalues is not None:
+            pylab.plot(xvalues, vec, style, label=label)
+        else:
+            pylab.plot(vec, style, label=label)
+            
+        pylab.grid(True)
+        self._generate_figure(p)
 
 
-def matrixplot(mat,title=None,aspect=None,colorbar=True,filename=None):
+
+class matrixplot(PylabPlotCommand):
     """
     Simple plotting for any matrix as a bitmap with axes.
 
@@ -218,15 +170,36 @@ def matrixplot(mat,title=None,aspect=None,colorbar=True,filename=None):
     prompt.  See MatPlotLib's pylab functions to create more elaborate
     or customized plots; this is just a simple example.
     """
-    pylab.gray()
-    pylab.figure(figsize=(5,5))
-    pylab.imshow(mat,interpolation='nearest',aspect=aspect)
-    if title: windowtitle(title)
-    if colorbar and (mat.min()!= mat.max()): pylab.colorbar()
-    generate_figure(title=title,filename=filename)
+
+    plot_type = param.Parameter(default=pylab.gray,doc="""
+        Matplotlib command to generate the plot, e.g. pylab.gray or pylab.hsv.""")
+    
+    # JABALERT: All but the first two should probably be Parameters
+    def __call__(self,mat,aspect=None,colorbar=True,**params):
+        p=ParamOverrides(self,params)
+        
+        p.plot_type()
+        pylab.figure(figsize=(5,5))
+        pylab.imshow(mat,interpolation='nearest',aspect=aspect)
+        if colorbar and (mat.min()!= mat.max()): pylab.colorbar()
+        self._generate_figure(p)
 
 
-def matrixplot3d(mat,title=None,type="wireframe",filename=None):
+
+# JABALERT: Not sure if there is any reason to keep this command
+# now that matrixplot supports any plot type.
+class matrixplot_hsv(matrixplot):
+    """
+    Simple plotting for any matrix as a bitmap with axes.
+    Same as matrixplot(plot_type=pylab.hsv), i.e., values are colored
+    in hsv colorspace rather than greyscale.
+    """
+    
+    plot_type = param.Parameter(default=pylab.hsv)
+
+
+
+class matrixplot3d(PylabPlotCommand):
     """
     Simple plotting for any matrix as a 3D wireframe with axes.
 
@@ -244,33 +217,39 @@ def matrixplot3d(mat,title=None,type="wireframe",filename=None):
 
     If you have trouble, you can try matrixplot3d_gnuplot instead.
     """
-    from numpy import outer,arange,ones
-    from matplotlib import axes3d
     
-    fig = pylab.figure()
-    ax = axes3d.Axes3D(fig)
-
-    # Construct matrices for r and c values
-    rn,cn = mat.shape
-    c = outer(ones(rn),arange(cn*1.0))
-    r = outer(arange(rn*1.0),ones(cn))
-
-    if type=="wireframe":
-        ax.plot_wireframe(r,c,mat)
-    elif type=="surface":
-        # Sometimes fails for no obvious reason
-        ax.plot_surface(r,c,mat)
-    elif type=="contour":
-        # Works but not usually very useful
-        ax.contour3D(r,c,mat)
-    else:
-        raise ValueError("Unknown plot type "+str(type))
+    # JABALERT: All but the first two arguments should probably be Parameters
+    def __call__(self,mat,type="wireframe",**params):
+        p=ParamOverrides(self,params)
+    
+        from numpy import outer,arange,ones
+        from matplotlib import axes3d
         
-    ax.set_xlabel('R')
-    ax.set_ylabel('C')
-    ax.set_zlabel('Value')
+        fig = pylab.figure()
+        ax = axes3d.Axes3D(fig)
+    
+        # Construct matrices for r and c values
+        rn,cn = mat.shape
+        c = outer(ones(rn),arange(cn*1.0))
+        r = outer(arange(rn*1.0),ones(cn))
+    
+        if type=="wireframe":
+            ax.plot_wireframe(r,c,mat)
+        elif type=="surface":
+            # Sometimes fails for no obvious reason
+            ax.plot_surface(r,c,mat)
+        elif type=="contour":
+            # Works but not usually very useful
+            ax.contour3D(r,c,mat)
+        else:
+            raise ValueError("Unknown plot type "+str(type))
+            
+        ax.set_xlabel('R')
+        ax.set_ylabel('C')
+        ax.set_zlabel('Value')
+    
+        self._generate_figure(p)
 
-    generate_figure(title=title,filename=filename)
 
 
 def matrixplot3d_gnuplot(mat,title=None,outputfilename="tmp.ps"):
@@ -318,7 +297,8 @@ def matrixplot3d_gnuplot(mat,title=None,outputfilename="tmp.ps"):
         raw_input('Please press return to continue...\n')
 
 
-def histogramplot(data,title=None,colors=None,*args,**kw):
+
+class histogramplot(PylabPlotCommand):
     """
     Compute and plot the histogram of the supplied data.
     
@@ -327,23 +307,26 @@ def histogramplot(data,title=None,colors=None,*args,**kw):
     If given, colors is an iterable collection of matplotlib.colors
     (see help (matplotlib.colors) ) specifying the bar colors.
 
-
     Example use:
-     histplot([1,1,1,2,2,3,4,5],title='hist',colors='rgb',bins=3,normed=1)
+        histogramplot([1,1,1,2,2,3,4,5],title='hist',colors='rgb',bins=3,normed=1)
     """
-    pylab.figure(figsize=(4,2))
-    pylab.show._needmain=False
-    n,bins,bars = pylab.hist(data,*args,**kw)
-
-    # if len(bars)!=len(colors), any extra bars won't have their
-    # colors changed, or any extra colors will be ignored.
-    if colors: [bar.set_fc(color) for bar,color in zip(bars,colors)]
     
-    if title: windowtitle(title)
-    pylab.show()
+    # JABALERT: All but the first two arguments should probably be Parameters    
+    def __call__(self,data,colors=None,**params):
+        p=ParamOverrides(self,params,allow_extra_keywords=True)        
+    
+        pylab.figure(figsize=(4,2))
+        n,bins,bars = pylab.hist(data,**(p.extra_keywords))
+    
+        # if len(bars)!=len(colors), any extra bars won't have their
+        # colors changed, or any extra colors will be ignored.
+        if colors: [bar.set_fc(color) for bar,color in zip(bars,colors)]
+
+        self._generate_figure(p)
 
 
-def gradientplot(data,cyclic=True,cyclic_range=1.0,title=None, filename=None):
+
+class gradientplot(matrixplot):
     """
     Compute and show the gradient plot of the supplied data.
     Translated from Octave code originally written by Yoonsuck Choe.
@@ -351,24 +334,30 @@ def gradientplot(data,cyclic=True,cyclic_range=1.0,title=None, filename=None):
     If the data is specified to be cyclic, negative differences will
     be wrapped into the range specified (1.0 by default).
     """
-    r,c = data.shape
-    dx = numpy.diff(data,1,axis=1)[0:r-1,0:c-1]
-    dy = numpy.diff(data,1,axis=0)[0:r-1,0:c-1]
-
-    if cyclic: # Wrap into the specified range
-        # Convert negative differences to an equivalent positive value
-        dx = wrap(0,cyclic_range,dx)
-        dy = wrap(0,cyclic_range,dy)
-        #
-        # Make it increase as gradient reaches the halfway point,
-        # and decrease from there
-        dx = 0.5*cyclic_range-abs(dx-0.5*cyclic_range)
-        dy = 0.5*cyclic_range-abs(dy-0.5*cyclic_range)
-
-    matrixplot(sqrt(dx*dx+dy*dy),title=title,filename=filename)
     
+    # JABALERT: All but the first two arguments should probably be Parameters    
+    def __call__(self,data,cyclic=True,cyclic_range=1.0,**params):
+        p=ParamOverrides(self,params)
+    
+        r,c = data.shape
+        dx = numpy.diff(data,1,axis=1)[0:r-1,0:c-1]
+        dy = numpy.diff(data,1,axis=0)[0:r-1,0:c-1]
+    
+        if cyclic: # Wrap into the specified range
+            # Convert negative differences to an equivalent positive value
+            dx = wrap(0,cyclic_range,dx)
+            dy = wrap(0,cyclic_range,dy)
+            #
+            # Make it increase as gradient reaches the halfway point,
+            # and decrease from there
+            dx = 0.5*cyclic_range-abs(dx-0.5*cyclic_range)
+            dy = 0.5*cyclic_range-abs(dy-0.5*cyclic_range)
 
-def activityplot(sheet,activity=None,title=None,cmap=None):
+        super(gradientplot,self).__call__(sqrt(dx*dx+dy*dy))
+
+
+
+class activityplot(PylabPlotCommand):
     """
     Plots the activity in a sheet.
 
@@ -376,15 +365,24 @@ def activityplot(sheet,activity=None,title=None,cmap=None):
     allows the selection of a colormap.  If activity is not given,
     the sheet's current activity is used.
     """
-    l,b,r,t = sheet.bounds.aarect().lbrt()
-    if activity is None:
-        activity = sheet.activity
-    if cmap is None:
-        cmap=pylab.cm.Greys
-    pylab.imshow(activity, extent=(l,r,b,t),cmap=cmap)
+
+    # JABALERT: All but the first two arguments should probably be Parameters    
+    # Not sure what this command is for or if anyone is using it.
+    def __call__(self,sheet,activity=None,cmap=None,**params):
+        p=ParamOverrides(self,params)
+
+        l,b,r,t = sheet.bounds.aarect().lbrt()
+        if activity is None:
+            activity = sheet.activity
+        if cmap is None:
+            cmap=pylab.cm.Greys
+        pylab.imshow(activity, extent=(l,r,b,t),cmap=cmap)
+
+        self._generate_figure(p)
+        
 
 
-def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreference',axis=[-0.5,0.5,-0.5,0.5],filename=None):
+class topographic_grid(PylabPlotCommand):
     """
     By default, plot the XPreference and YPreference preferences for all
     Sheets for which they are defined, using MatPlotLib.
@@ -392,42 +390,47 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
     If sheet_views other than XPreference and YPreference are desired,
     the names of these can be passed in as arguments.
     """
-    for sheet in topo.sim.objects(Sheet).values():
-        if ((xsheet_view_name in sheet.sheet_views) and
-            (ysheet_view_name in sheet.sheet_views)):
+    
+    # JABALERT: All the arguments should probably be Parameters        
+    def __call__(self,xsheet_view_name='XPreference',ysheet_view_name='YPreference',axis=[-0.5,0.5,-0.5,0.5],**params):
+        p=ParamOverrides(self,params)
 
-            x = sheet.sheet_views[xsheet_view_name].view()[0]
-            y = sheet.sheet_views[ysheet_view_name].view()[0]
-
-            pylab.figure(figsize=(5,5))
-
-            # This one-liner works in Octave, but in matplotlib it
-            # results in lines that are all connected across rows and columns,
-            # so here we plot each line separately:
-            #   pylab.plot(x,y,"k-",transpose(x),transpose(y),"k-")
-            # Here, the "k-" means plot in black using solid lines;
-            # see matplotlib for more info.
-            isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
-            pylab.ioff()
-            for r,c in zip(y,x):
-                pylab.plot(c,r,"k-")
-            for r,c in zip(transpose(y),transpose(x)):
-                pylab.plot(c,r,"k-")
+        for sheet in topo.sim.objects(Sheet).values():
+            if ((xsheet_view_name in sheet.sheet_views) and
+                (ysheet_view_name in sheet.sheet_views)):
+    
+                x = sheet.sheet_views[xsheet_view_name].view()[0]
+                y = sheet.sheet_views[ysheet_view_name].view()[0]
+    
+                pylab.figure(figsize=(5,5))
+    
+                # This one-liner works in Octave, but in matplotlib it
+                # results in lines that are all connected across rows and columns,
+                # so here we plot each line separately:
+                #   pylab.plot(x,y,"k-",transpose(x),transpose(y),"k-")
+                # Here, the "k-" means plot in black using solid lines;
+                # see matplotlib for more info.
+                isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
+                pylab.ioff()
+                for r,c in zip(y,x):
+                    pylab.plot(c,r,"k-")
+                for r,c in zip(transpose(y),transpose(x)):
+                    pylab.plot(c,r,"k-")
+                
+                pylab.xlabel('x')
+                pylab.ylabel('y')
+                # Currently sets the input range arbitrarily; should presumably figure out
+                # what the actual possible range is for this simulation (which would presumably
+                # be the maximum size of any GeneratorSheet?).
+                pylab.axis(axis)
+                title='Topographic mapping to '+sheet.name+' at time '+topo.sim.timestr()
+    
+                if isint: pylab.ion()
+                p.filename_suffix="_"+sheet.name
+                self._generate_figure(p)
             
-            pylab.xlabel('x')
-            pylab.ylabel('y')
-            # Currently sets the input range arbitrarily; should presumably figure out
-            # what the actual possible range is for this simulation (which would presumably
-            # be the maximum size of any GeneratorSheet?).
-            pylab.axis(axis)
-            title='Topographic mapping to '+sheet.name+' at time '+topo.sim.timestr()
 
-            if isint: pylab.ion()
-
-            generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
-            
-#########################################################################################
-def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],overlay=[('contours','OcularPreference',0.5,'black'),('arrows','DirectionPreference','DirectionSelectivity','white')],filename=None,normalize=False):   
+class overlaid_plots(PylabPlotCommand):
     """
     Use matplotlib to make a plot from a bitmap constructed using the
     specified plot_template, plus additional overlaid line contour
@@ -435,45 +438,50 @@ def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],overlay=[('co
     quadruples and/or overlaid arrows plot(s) specified with ('arrows',map-name for arrows location,
     map-name for arrows scaling,arrow-color) quadruples.
     """
-   
-    for template in plot_template:
     
-        for sheet in topo.sim.objects(Sheet).values():
-            name=template.keys().pop(0)
-            plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,normalize,name=template[name])        
-            if plot:
-                bitmap=plot.bitmap
-            	
-                pylab.figure(figsize=(5,5))
-                isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
-                pylab.ioff()					 # Turn interactive mode off 
-                                    
-                pylab.imshow(bitmap.image,origin='lower',interpolation='nearest')				
-                pylab.axis('off')
+    # JABALERT: All but the first two arguments should probably be Parameters    
+    def __call__(self,plot_template=[{'Hue':'OrientationPreference'}],overlay=[('contours','OcularPreference',0.5,'black'),('arrows','DirectionPreference','DirectionSelectivity','white')],normalize=False,**params):
+        p=ParamOverrides(self,params)
 
-                for (t,pref,sel,c) in overlay:
-                    p = pylab.flipud(sheet.sheet_views[pref].view()[0])
-                    
-                    if (t=='contours'):
-                        pylab.contour(p,[sel,sel],colors=c,linewidths=2)
+        for template in plot_template:
+        
+            for sheet in topo.sim.objects(Sheet).values():
+                name=template.keys().pop(0)
+                plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,normalize,name=template[name])        
+                if plot:
+                    bitmap=plot.bitmap
+                	
+                    pylab.figure(figsize=(5,5))
+                    isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
+                    pylab.ioff()					 # Turn interactive mode off 
+                                        
+                    pylab.imshow(bitmap.image,origin='lower',interpolation='nearest')				
+                    pylab.axis('off')
+    
+                    for (t,pref,sel,c) in overlay:
+                        v = pylab.flipud(sheet.sheet_views[pref].view()[0])
                         
-                    if (t=='arrows'):							
-                        s = pylab.flipud(sheet.sheet_views[sel].view()[0])
-                        scale=int(pylab.ceil(log10(len(p))))
-                        X=pylab.array([x for x in xrange(len(p)/scale)])                  
-                        p_sc=pylab.zeros((len(p)/scale,len(p)/scale))
-                        s_sc=pylab.zeros((len(p)/scale,len(p)/scale))
-                        for i in X:
-                            for j in X:
-                                p_sc[i][j]=p[scale*i][scale*j]
-                                s_sc[i][j]=s[scale*i][scale*j]
-                        pylab.quiver(scale*X,scale*X,-cos(2*pi*p_sc)*s_sc,-sin(2*pi*p_sc)*s_sc,color=c,edgecolors=c,minshaft=3,linewidths=1) 						
-							
-                title='%s overlaid with %s at time %s' %(plot.name,pref,topo.sim.timestr())
-                if isint: pylab.ion()
-                generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
+                        if (t=='contours'):
+                            pylab.contour(v,[sel,sel],colors=c,linewidths=2)
+                            
+                        if (t=='arrows'):							
+                            s = pylab.flipud(sheet.sheet_views[sel].view()[0])
+                            scale=int(pylab.ceil(log10(len(v))))
+                            X=pylab.array([x for x in xrange(len(v)/scale)])                  
+                            v_sc=pylab.zeros((len(v)/scale,len(v)/scale))
+                            s_sc=pylab.zeros((len(v)/scale,len(v)/scale))
+                            for i in X:
+                                for j in X:
+                                    v_sc[i][j]=v[scale*i][scale*j]
+                                    s_sc[i][j]=s[scale*i][scale*j]
+                            pylab.quiver(scale*X,scale*X,-cos(2*pi*v_sc)*s_sc,-sin(2*pi*v_sc)*s_sc,color=c,edgecolors=c,minshaft=3,linewidths=1) 						
+    							
+                    title='%s overlaid with %s at time %s' %(plot.name,pref,topo.sim.timestr())
+                    if isint: pylab.ion()
+                    p.filename_suffix="_"+sheet.name                    
+                    self._generate_figure(p)
                 
-######################################################################################
+
 
 class tuning_curve(PylabPlotCommand):
     """
@@ -559,7 +567,6 @@ class tuning_curve(PylabPlotCommand):
 
 
 
-
 class cyclic_tuning_curve(tuning_curve):
     """
     Same as tuning_curve, but rotates the curve so that minimum y
@@ -573,8 +580,8 @@ class cyclic_tuning_curve(tuning_curve):
     (usually the lowest contrast curve).
     """
 
-    period = param.Number(default=pi,bounds=(0,None),softbounds=(0,10),doc="""
-        Period of the cyclic quantity (e.g. pi for the orientation of
+    cyclic_range = param.Number(default=pi,bounds=(0,None),softbounds=(0,10),doc="""
+        Range of the cyclic quantity (e.g. pi for the orientation of
         a symmetric stimulus, or 2*pi for motion direction or the
         orientation of a non-symmetric stimulus).""")
     
@@ -610,7 +617,7 @@ class cyclic_tuning_curve(tuning_curve):
             y_values=self._rotate(y_values, n=min_arg)
             self.ticks=self._rotate(x_values, n=min_arg)
             self.ticks+=[x_min]
-            x_max=min(x_values)+self.period
+            x_max=min(x_values)+self.cyclic_range
             x_values.append(x_max)
             y_values.append(y_min)
 
@@ -621,134 +628,6 @@ class cyclic_tuning_curve(tuning_curve):
         return self.x_values,y_values,self.ticks
 
             
-
-
-
-def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
-    """
-    Collect data for one tuning curve from the curve_dict of each sheet.
-
-    The unit to plot is specified as a matrix index (i_value,j_value).
-    There may be many possible curves in the curve_dict; the specific
-    one is determined by the x_axis (i.e., what feature to plot), and
-    the curve_label (which determines other parameters that specify a
-    particular plot).  Returns the feature values (the x_values,
-    i.e. locations along the x axis), x_values) and the corresponding
-    responses (the y_values).
-    """
-    x_values= sorted(sheet.curve_dict[x_axis][curve_label].keys())
-    y_values=[sheet.curve_dict[x_axis][curve_label][key].view()[0][i_value,j_value] for key in x_values]
-    return x_values, y_values
-
-
-def or_tuning_curve(x_axis,plot_type,unit,sheet=None,coords=None,filename=None):
-    """
-    Plots a tuning curve for orientation which rotates the curve 
-    values so that minimum y values are at the minimum x value.
-    The y_values and labels are rotated by an amount determined by the minmum 
-    y_value for the first curve plotted (usually the lowest contrast curve). 
-
-    The curve datapoints are collected from the curve_dict for
-    the sheet specified by topo.analysis.featureresponses.UnitCurveCommand.sheet
-    and the units specified by topo.analysis.featureresponses.UnitCurveCommand.coords
-    (which may be set by the GUI or by hand).
-    """
-    # There may be cases (ie when the lowest contrast curve gives a lot of zero y_values)
-    # in which the maximum is not in the centre.
-    # Ideally this should be changed so that the preferred orientation is in the centre.
-    # This may also be useful for other tuning curve types, not just orientation ie. direction.
-
-    if sheet==None:
-        sheet=topo.analysis.featureresponses.UnitCurveCommand.sheet
-    if coords==None:
-        coords=topo.analysis.featureresponses.UnitCurveCommand.coords
-
-    for coordinate in coords:
-        i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
-    
-        pylab.figure(figsize=(7,7))
-        isint=pylab.isinteractive()
-        pylab.ioff()
-
-        pylab.ylabel('Response')
-        pylab.xlabel('%s (%s)' % (x_axis.capitalize(),unit))
-        pylab.title('Sheet %s, coordinate(x,y)=(%d,%d) at time %s' % 
-                    (sheet.name,coordinate[0],coordinate[1],topo.sim.timestr()))
-        title='%s: %s Tuning Curve' % (topo.sim.name,x_axis.capitalize())
-    
-        def rotate(seq, n=1):
-            n = n % len(seq) # n=hop interval
-            return seq[n:] + seq[:n]
-    
-        first_curve=True
-        for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
-            if first_curve==True:
-                x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
-                min_arg=argmin(y_values)
-                x_min=x_values[min_arg] 
-                y_min=y_values[min_arg]
-                y_values=rotate(y_values, n=min_arg)
-                ticks=rotate(x_values, n=min_arg)
-                label_min=ticks[0]
-                x_max=min(x_values)+pi
-                x_values.append(x_max)
-                y_values.append(y_min)
-                first_curve=False
-            else:
-                y_values=[sheet.curve_dict[x_axis][curve_label][key].view()[0][i_value,j_value] for key in ticks]
-                y_min=sheet.curve_dict[x_axis][curve_label][x_min].view()[0][i_value,j_value] 
-                y_values.append(y_min)
-                
-            labels = copy.copy(ticks)
-            labels.append(label_min)
-            labels= [x*180/pi for x in labels]
-            labels_new = [str(int(x)) for x in labels]
-            pylab.xticks(x_values, labels_new)
-            plot_type(x_values, y_values, label=curve_label)
-             
-        if isint: pylab.ion()
-        pylab.legend(loc=4)
-
-        generate_figure(title=title,filename=filename)
-
-
-def tuning_curve_old(x_axis,plot_type,unit,sheet=None,coords=None,filename=None):
-    """
-    Plots a tuning curve for the appropriate feature type, such as orientation, contrast or size.
-
-    The curve datapoints are collected from the curve_dict for
-    the sheet specified by topo.analysis.featureresponses.UnitCurveCommand.sheet
-    and the units specified by topo.analysis.featureresponses.UnitCurveCommand.coords
-    (which may be set by the GUI or by hand).
-    """
-
-    if sheet==None:
-        sheet=topo.analysis.featureresponses.UnitCurveCommand.sheet
-    if coords==None:
-        coords=topo.analysis.featureresponses.UnitCurveCommand.coords
-
-    for coordinate in coords:
-        i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
-    
-        pylab.figure(figsize=(7,7))
-        isint=pylab.isinteractive()
-        pylab.ioff()
-        
-        pylab.ylabel('Response')
-        pylab.xlabel('%s (%s)' % (x_axis.capitalize(),unit))
-        pylab.title('Sheet %s, coordinate(x,y)=(%d,%d) at time %s' % 
-                    (sheet.name,coordinate[0],coordinate[1],topo.sim.timestr()))
-        title='%s: %s Tuning Curve' % (topo.sim.name,x_axis.capitalize())    
-    
-        for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
-            x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
-            plot_type(x_values, y_values, label=curve_label)
-             
-        if isint: pylab.ion()
-        pylab.legend(loc=4)
-        
-        generate_figure(title=title,filename=filename)      	   
-
 
 def plot_cfproj_mapping(dest,proj='Afferent',style='b-'):
     """
@@ -762,7 +641,7 @@ def plot_cfproj_mapping(dest,proj='Afferent',style='b-'):
                        dest,style=style)
 
 
-
+# JABALERT: not sure whether this is currently used
 def plot_coord_mapping(mapper,sheet,style='b-'):
     """
     Plot a coordinate mapping for a sheet.
@@ -803,7 +682,7 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
 ### Fields*' pgts in topo/command/analysis.py & should share the
 ### implementation of topographic_grid (because that's what is
 ### intended to be visualized here).
-### Should be using generate_figure() as in matrixplot().
+### Should also be rewritten using PylabPlotCommand.
 def plotrctg():
     
     import matplotlib
@@ -835,54 +714,60 @@ def plotrctg():
 
 
 
-def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **params):
+# JABALERT: Untested as of Mon Nov 10 12:59:54 GMT 2008
+class plot_tracked_attributes(PylabPlotCommand):
     """
     Plots parameter values associated with an AttributeTrackingOF.
     Example call:
     VT=AttributeTrackingOF(function=HE, debug_params=['a', 'b',], units=[(0,0),(1,1)], step=1)
-    plot_tracked_attributes(VT,0,10000,debug_params=['a'],units=[(0,0)], filename='V1')
+    plot_tracked_attributes(VT,0,10000,attrib_names=['a'],units=[(0,0)], filename='V1')
     """
-    raw = params.get('raw', False)
 
-    for p in params.get('attrib_names',output_fn.attrib_names):
-        pylab.figure(figsize=(6,4))
-        isint=pylab.isinteractive()
-        pylab.ioff()
-        pylab.grid(True)
-        ylabel=params.get('ylabel', "")
-        pylab.ylabel(p+" "+ylabel)
-        pylab.xlabel('Iteration Number')
-        
-        for unit in params.get('units',output_fn.units):
-            y_data=[y for (x,y) in output_fn.values[p][unit]]
-            x_data=[x for (x,y) in output_fn.values[p][unit]]
-            if raw==True:
-                plot_data=zip(x_data,y_data)
-                pylab.save(normalize_path(filename+p+'(%.2f, %.2f)' %(unit[0], unit[1])),plot_data,fmt='%.6f', delimiter=',')
+    # JABALERT: These parameters need to be documented.
+    raw = param.Boolean(default=False)
+
+    attrib_names = param.List(default=[])
+    
+    ylabel = param.String(default="")
+
+    # Should be renamed to coords to match other commands
+    units = param.List(default=[])
+
+    ybounds = param.Parameter(default=(None,None))
+   
+
+    # JABALERT: All but the first two arguments should probably be Parameters
+    def __call__(self,output_fn,init_time,final_time,**params):
+        p=ParamOverrides(self,params)
+
+        attrs = p.attrib_names if len(p.attrib_names)>0 else output_fn.attrib_names
+        for a in attrs:
+            pylab.figure(figsize=(6,4))
+            isint=pylab.isinteractive()
+            pylab.ioff()
+            pylab.grid(True)
+            ylabel=p.ylabel
+            pylab.ylabel(a+" "+ylabel)
+            pylab.xlabel('Iteration Number')
             
-            
-            pylab.plot(x_data,y_data, label='Unit (%.2f, %.2f)' %(unit[0], unit[1]))
-            (ymin,ymax)=params.get('ybounds',(None,None))
-            pylab.axis(xmin=init_time,xmax=final_time, ymin=ymin, ymax=ymax) 
+            coords = p.units if len(p.units)>0 else output_fn.units
+            for coord in coords:
+                y_data=[y for (x,y) in output_fn.values[a][coord]]
+                x_data=[x for (x,y) in output_fn.values[a][coord]]
+                if p.raw==True:
+                    plot_data=zip(x_data,y_data)
+                    pylab.save(normalize_path(filename+a+'(%.2f, %.2f)' %(coord[0], coord[1])),plot_data,fmt='%.6f', delimiter=',')
                 
-        if isint: pylab.ion()
-        pylab.legend(loc=0)
-        generate_figure(title=topo.sim.name+': '+p,filename=filename,suffix=p)
-
-
-
-def matrixplot_hsv(mat,title=None,aspect=None,colorbar=True,filename=None):
-    """
-    Simple plotting for any matrix as a bitmap with axes.
-    As for matrixplot above except values are coloured in
-    hsv colorspace rather than greyscale.
-    """
-    pylab.hsv()
-    pylab.figure(figsize=(5,5))
-    pylab.imshow(mat,interpolation='nearest',aspect=aspect)
-    if title: windowtitle(title)
-    if colorbar and (mat.min()!= mat.max()): pylab.colorbar()
-    generate_figure(title=title,filename=filename)
+                
+                pylab.plot(x_data,y_data, label='Unit (%.2f, %.2f)' %(coord[0], coord[1]))
+                (ymin,ymax)=p.ybounds
+                pylab.axis(xmin=init_time,xmax=final_time,ymin=ymin,ymax=ymax)
+                    
+            if isint: pylab.ion()
+            pylab.legend(loc=0)
+            p.title=topo.sim.name+': '+a
+            p.filename_suffix=a
+            self._generate_figure(p)
 
 
 
@@ -890,140 +775,35 @@ def matrixplot_hsv(mat,title=None,aspect=None,colorbar=True,filename=None):
 # and then the combination of all of them, so that it will work for
 # any network.  Will need to remove the simple_sheet_name and
 # complex_sheet_name parameters once that works.
-def plot_modulation_ratio(fullmatrix,title=None,filename=None,simple_sheet_name=None,complex_sheet_name=None,bins = frange(0,2.0,0.1,inclusive=True)):
+class plot_modulation_ratio(PylabPlotCommand):
     """
     This function computes the modulation ratios of neurons in the
     specified sheets and plots their histograms. See
     analysis.vision.complexity for more info.
     """
 
-    if (topo.sim.objects().has_key(simple_sheet_name)):
-        v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]])
-        pylab.figure()
-        pylab.subplot(311)
-        pylab.hist(v1s,bins)
-        pylab.axis([0,2.0,0,3500])
-        
-    if (topo.sim.objects().has_key(complex_sheet_name)):
-        v1c = complexity(fullmatrix[topo.sim[complex_sheet_name]])
-        pylab.subplot(312)
-        pylab.hist(v1c,bins)
-        pylab.axis([0,2.0,0,3500])
-        pylab.subplot(313)
-        
+    # JABALERT: All but the first argument should probably be Parameters
+    def __call__(self,fullmatrix,title=None,filename=None,simple_sheet_name=None,complex_sheet_name=None,bins=frange(0,2.0,0.1,inclusive=True),**params):
+        p=ParamOverrides(self,params,allow_extra_keywords=True)
+
         if (topo.sim.objects().has_key(simple_sheet_name)):
-            # JABALERT: Need to reenable this
-            #pylab.hist(numpy.concatenate(array(v1s),array(v1c)),bins)
+            v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]])
+            pylab.figure()
+            pylab.subplot(311)
+            pylab.hist(v1s,bins)
             pylab.axis([0,2.0,0,3500])
-
-    generate_figure(title=title,filename=filename)
-
-
-# JABALERT: Remove duplication with tuning_curve, above.  
-# Should be using generate_figure() as in matrixplot().
-def tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x_axis):
-    """
-    Saves a plot of the tuning curve for the appropriate feature type, such as orientation, contrast or size into a file.
-
-    The curve datapoints are collected from the curve_dict for the specified
-    coordinate of the specified sheet.
-    """
-
-    sheet=topo.sim[sheet_name]
-    i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+            
+        if (topo.sim.objects().has_key(complex_sheet_name)):
+            v1c = complexity(fullmatrix[topo.sim[complex_sheet_name]])
+            pylab.subplot(312)
+            pylab.hist(v1c,bins)
+            pylab.axis([0,2.0,0,3500])
+            pylab.subplot(313)
+            
+            if (topo.sim.objects().has_key(simple_sheet_name)):
+                # JABALERT: Jan needs to reenable this
+                #pylab.hist(numpy.concatenate(array(v1s),array(v1c)),bins)
+                pylab.axis([0,2.0,0,3500])
     
-    pylab.figure(figsize=(7,7))
-    isint=pylab.isinteractive()
-    pylab.ioff()
-    manager = pylab.get_current_fig_manager()
-    
-    pylab.ylabel('Response')
-    pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
-    pylab.title('Sheet '+sheet_name+', coordinate(x,y)='+'('+
-	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
-    manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
+        self._generate_figure(p)
 
-
-    for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
-        x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
-        plot_type(x_values, y_values, label=curve_label)
-         
-    if isint: pylab.ion()
-    pylab.legend(loc=4)
-    try:
-        os.makedirs(directory)
-    except os.error, e:
-	if e.errno != errno.EEXIST:
-	    raise
-    pylab.savefig(os.path.join(directory,filename) + '.png')
-
-
-
-# JABALERT: This function is now obsolete (see or_tuning_curve), and will be removed.
-def or_tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x_axis):
-    """
-    Plots a tuning curve for orientation which rotates the curve 
-    values so that minimum y values are at the minimum x value.
-    The y_values and labels are rotated by an amount determined by the minmum 
-    y_value for the first curve plotted (usually the lowest contrast curve). 
-
-    The curve datapoints are collected from the curve_dict for the specified
-    unit of the specified sheet.
-    """
-    # There may be cases (ie when the lowest contrast curve gives a lot of zero y_values)
-    # in which the maximum is not in the centre.
-    # Ideally this should be changed so that the preferred orientation is in the centre.
-    # This may also be useful for other tuning curve types, not just orientation ie. direction.
-    
-    sheet=topo.sim[sheet_name]
-    i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
-    
-
-    pylab.figure(figsize=(7,7))
-    isint=pylab.isinteractive()
-    pylab.ioff()
-    manager = pylab.get_current_fig_manager()
-    
-    pylab.ylabel('Response')
-    pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
-    pylab.title('Sheet '+sheet_name+', coordinate(x,y)='+'('+
-	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
-    #manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
-
-    def rotate(seq, n=1):
-        n = n % len(seq) # n=hop interval
-        return seq[n:] + seq[:n]
-
-    first_curve=True
-    for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
-	if first_curve==True:
-	    x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
-	    min_arg=argmin(y_values)
-	    x_min=x_values[min_arg] 
-	    y_min=y_values[min_arg]
-	    y_values=rotate(y_values, n=min_arg)
-	    ticks=rotate(x_values, n=min_arg)
-	    label_min=ticks[0]
-	    x_max=min(x_values)+pi
-	    x_values.append(x_max)
-	    y_values.append(y_min)
-	    first_curve=False
-	else:
-	    y_values=[sheet.curve_dict[x_axis][curve_label][key].view()[0][i_value,j_value] for key in ticks]
-	    y_min=sheet.curve_dict[x_axis][curve_label][x_min].view()[0][i_value,j_value] 
-	    y_values.append(y_min)
-	labels = copy.copy(ticks)
-	labels.append(label_min)
-	labels= [x*180/pi for x in labels]
-	labels_new = [str(int(x)) for x in labels]
-	pylab.xticks(x_values, labels_new)
-	plot_type(x_values, y_values, label=curve_label)
-         
-    if isint: pylab.ion()
-    pylab.legend(loc=4)
-    try:
-        os.makedirs(directory)
-    except os.error, e:
-	if e.errno != errno.EEXIST:
-	    raise
-    pylab.savefig(normalize_path(directory+filename) + '.png')
