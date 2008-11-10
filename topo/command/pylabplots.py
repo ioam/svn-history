@@ -38,6 +38,87 @@ from topo.misc.util import frange
 from topo.analysis.vision import complexity
 import topo.analysis.vision
 from topo.plotting.plot import make_template_plot, Plot
+from topo import param
+from topo.param import ParameterizedFunction
+from topo.param.parameterized import ParamOverrides
+from topo.plotting.plotgroup import default_measureable_sheet
+
+
+
+class PylabPlotCommand(ParameterizedFunction):
+    """Parameterized command for plotting using Matplotlib/Pylab."""
+      
+    file_dpi = param.Number(
+        default=100.0,bounds=(0,None),softbounds=(0,1000),doc="""
+        Default DPI when rendering to a bitmap.  
+        The nominal size * the dpi gives the final image size in pixels.  
+        E.g.: 4"x4" image * 80 dpi ==> 320x320 pixel image.""")
+                                      
+    file_format = param.String(default="png",doc="""
+        Which image format to use when saving images.
+        The output can be png, ps, pdf, svg, or any other format
+        supported by Matplotlib.""")
+
+    # JABALERT: Should replace this with a filename_format and
+    # associated parameters, as in PlotGroupSaver.  
+    # Also should probably allow interactive display to be controlled
+    # separately from the filename, to make things work more similarly
+    # with and without a GUI.
+    filename = param.String(default=None,doc="""
+        Optional base of the filename to use when saving images;
+        if None the plot will be displayed interactively.
+        
+        The actual name is constructed from the filename base plus the
+        suffix plus the current simulator time plus the file_format.""")
+
+    filename_suffix = param.String(default="",doc="""
+        Optional suffix to be used for disambiguation of the filename.""")
+
+    title = param.String(default=None,doc="""
+        Optional title to be used when displaying the plot interactively.""")
+
+    __abstract = True
+
+
+    def _set_windowtitle(self,title):
+        """
+        Helper function to set the title (if not None) of this PyLab plot window.
+        """
+        
+        # At the moment, PyLab does not offer a window-manager-independent
+        # means for controlling the window title, so what we do is to try
+        # what should work with Tkinter, and then suppress all errors.  That
+        # way we should be ok when rendering to a file-based backend, but
+        # will get nice titles in Tk windows.  If other toolkits are in use,
+        # the title can be set here using a similar try/except mechanism, or
+        # else there can be a switch based on the backend type.
+        if title is not None:
+            try: 
+                manager = pylab.get_current_fig_manager()
+                manager.window.title(title)
+            except:
+                pass
+    
+    
+    def _generate_figure(self,p):
+        """
+        Helper function to display a figure on screen or save to a file.
+        
+        p should be a ParamOverrides instance containing the current
+        set of parameters.
+        """
+
+        pylab.show._needmain=False
+        if p.filename is not None:
+            # JABALERT: need to reformat this as for other plots
+            fullname=p.filename+p.filename_suffix+str(topo.sim.time())+"."+p.file_format
+            pylab.savefig(normalize_path(fullname), dpi=p.file_dpi)
+        else:
+            self._set_windowtitle(p.title)
+            pylab.show()
+    
+
+
 
 def windowtitle(title):
     """
@@ -394,6 +475,155 @@ def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],overlay=[('co
                 
 ######################################################################################
 
+class tuning_curve(PylabPlotCommand):
+    """
+    Plot a tuning curve for a feature, such as orientation, contrast, or size.
+
+    The curve datapoints are collected from the curve_dict for
+    the units at the specified coordinates in the specified sheet
+    (where the units and sheet may be set by a GUI, using 
+    topo.analysis.featureresponses.UnitCurveCommand.sheet and 
+    topo.analysis.featureresponses.UnitCurveCommand.coords, 
+    or by hand).
+    """
+      
+    coords = param.List(default=[(0,0)],doc="""
+        List of coordinates of units to measure.""")
+
+    sheet = param.ObjectSelector(
+        default=None,compute_default_fn=default_measureable_sheet,doc="""
+        Name of the sheet to use in measurements.""")
+
+    x_axis = param.String(default="",doc="""
+        Feature to plot on the x axis of the tuning curve""")
+
+    # Can we list some alternatives here, if there are any
+    # useful ones?
+    plot_type = param.Parameter(default=pylab.plot,doc="""
+        Matplotlib command to generate the plot.""")
+
+    unit = param.String(default="",doc="""
+        String to use in labels to specify the units in which curves are plotted.""")
+
+    __abstract = True
+
+
+    def _format_x_tick_label(self,x):
+        return "%3.1f" % x
+
+    def _rotate(self, seq, n=1):
+        n = n % len(seq) # n=hop interval
+        return seq[n:] + seq[:n]
+
+    def _curve_values(self, i_value, j_value, curve):
+        """Return the x, y, and x ticks values for the specified curve from the curve_dict"""
+        x_values=sorted(curve.keys())
+        y_values=[curve[key].view()[0][i_value,j_value] for key in x_values]
+        return x_values,y_values,x_values
+                    
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        sheet = p.sheet if p.sheet is not None else \
+                topo.analysis.featureresponses.UnitCurveCommand.sheet
+
+        coords = p.coords if p.coords is not None else \
+                 topo.analysis.featureresponses.UnitCurveCommand.coords
+        
+        for coordinate in coords:
+            i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+        
+            pylab.figure(figsize=(7,7))
+            isint=pylab.isinteractive()
+            pylab.ioff()
+    
+            pylab.ylabel('Response')
+            pylab.xlabel('%s (%s)' % (p.x_axis.capitalize(),p.unit))
+            pylab.title('Sheet %s, coordinate(x,y)=(%d,%d) at time %s' % 
+                        (sheet.name,coordinate[0],coordinate[1],topo.sim.timestr()))
+            title='%s: %s Tuning Curve' % (topo.sim.name,p.x_axis.capitalize())
+        
+            self.first_curve=True
+            for curve_label in sorted(sheet.curve_dict[p.x_axis].keys()):
+                x_values,y_values,ticks=self._curve_values(i_value,j_value,sheet.curve_dict[p.x_axis][curve_label])
+                labels = [self._format_x_tick_label(x) for x in ticks]
+                pylab.xticks(x_values, labels)
+
+                p.plot_type(x_values, y_values, label=curve_label)
+                self.first_curve=False
+                 
+            if isint: pylab.ion()
+            pylab.legend(loc=4)
+    
+            self._generate_figure(p)
+
+
+
+
+class cyclic_tuning_curve(tuning_curve):
+    """
+    Same as tuning_curve, but rotates the curve so that minimum y
+    values are at the minimum x value to make the plots easier to
+    interpret.  Such rotation is valid only for periodic quantities
+    like orientation or direction, and only if the correct period
+    is set.
+    
+    At present, the y_values and labels are rotated by an amount
+    determined by the minmum y_value for the first curve plotted
+    (usually the lowest contrast curve).
+    """
+
+    period = param.Number(default=pi,bounds=(0,None),softbounds=(0,10),doc="""
+        Period of the cyclic quantity (e.g. pi for the orientation of
+        a symmetric stimulus, or 2*pi for motion direction or the
+        orientation of a non-symmetric stimulus).""")
+    
+    unit = param.String(default="degrees",doc="""
+        String to use in labels to specify the units in which curves are plotted.""")
+
+
+    # This implementation should work for quantities periodic with
+    # some multiple of pi that we want to express in degrees, but it
+    # will need to be reimplemented in a subclass to work with other
+    # cyclic quantities.
+    def _format_x_tick_label(self,x):
+        return str(int(180*x/pi))
+
+
+    def _curve_values(self, i_value, j_value, curve):
+        """
+        Return the x, y, and x ticks values for the specified curve from the curve_dict.
+
+        With the current implementation, there may be cases (i.e.,
+        when the lowest contrast curve gives a lot of zero y_values)
+        in which the maximum is not in the center.  This may
+        eventually be changed so that the preferred orientation is in
+        the center.
+        """
+        if self.first_curve==True:
+            x_values= sorted(curve.keys())
+            y_values=[curve[key].view()[0][i_value,j_value] for key in x_values]
+            
+            min_arg=argmin(y_values)
+            x_min=x_values[min_arg] 
+            y_min=y_values[min_arg]
+            y_values=self._rotate(y_values, n=min_arg)
+            self.ticks=self._rotate(x_values, n=min_arg)
+            self.ticks+=[x_min]
+            x_max=min(x_values)+self.period
+            x_values.append(x_max)
+            y_values.append(y_min)
+
+            self.x_values=x_values
+        else:
+            y_values=[curve[key].view()[0][i_value,j_value] for key in self.ticks]
+
+        return self.x_values,y_values,self.ticks
+
+            
+
+
+
 def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
     """
     Collect data for one tuning curve from the curve_dict of each sheet.
@@ -434,7 +664,6 @@ def or_tuning_curve(x_axis,plot_type,unit,sheet=None,coords=None,filename=None):
         coords=topo.analysis.featureresponses.UnitCurveCommand.coords
 
     for coordinate in coords:
-    
         i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
     
         pylab.figure(figsize=(7,7))
@@ -469,6 +698,7 @@ def or_tuning_curve(x_axis,plot_type,unit,sheet=None,coords=None,filename=None):
                 y_values=[sheet.curve_dict[x_axis][curve_label][key].view()[0][i_value,j_value] for key in ticks]
                 y_min=sheet.curve_dict[x_axis][curve_label][x_min].view()[0][i_value,j_value] 
                 y_values.append(y_min)
+                
             labels = copy.copy(ticks)
             labels.append(label_min)
             labels= [x*180/pi for x in labels]
@@ -482,8 +712,7 @@ def or_tuning_curve(x_axis,plot_type,unit,sheet=None,coords=None,filename=None):
         generate_figure(title=title,filename=filename)
 
 
-
-def tuning_curve(x_axis,plot_type,unit):
+def tuning_curve_old(x_axis,plot_type,unit,sheet=None,coords=None,filename=None):
     """
     Plots a tuning curve for the appropriate feature type, such as orientation, contrast or size.
 
@@ -492,23 +721,24 @@ def tuning_curve(x_axis,plot_type,unit):
     and the units specified by topo.analysis.featureresponses.UnitCurveCommand.coords
     (which may be set by the GUI or by hand).
     """
-    sheet=topo.analysis.featureresponses.UnitCurveCommand.sheet
-    coords=topo.analysis.featureresponses.UnitCurveCommand.coords
+
+    if sheet==None:
+        sheet=topo.analysis.featureresponses.UnitCurveCommand.sheet
+    if coords==None:
+        coords=topo.analysis.featureresponses.UnitCurveCommand.coords
+
     for coordinate in coords:
         i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
-        
     
         pylab.figure(figsize=(7,7))
         isint=pylab.isinteractive()
         pylab.ioff()
-        manager = pylab.get_current_fig_manager()
         
         pylab.ylabel('Response')
-        pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
-        pylab.title('Sheet '+sheet.name+', coordinate(x,y)='+'('+
-    	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
-        manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
-    
+        pylab.xlabel('%s (%s)' % (x_axis.capitalize(),unit))
+        pylab.title('Sheet %s, coordinate(x,y)=(%d,%d) at time %s' % 
+                    (sheet.name,coordinate[0],coordinate[1],topo.sim.timestr()))
+        title='%s: %s Tuning Curve' % (topo.sim.name,x_axis.capitalize())    
     
         for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
             x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
@@ -516,9 +746,8 @@ def tuning_curve(x_axis,plot_type,unit):
              
         if isint: pylab.ion()
         pylab.legend(loc=4)
-        pylab.show._needmain = False 
-        pylab.show()
-      	   
+        
+        generate_figure(title=title,filename=filename)      	   
 
 
 def plot_cfproj_mapping(dest,proj='Afferent',style='b-'):
