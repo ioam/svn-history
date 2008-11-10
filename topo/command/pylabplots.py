@@ -724,9 +724,12 @@ class plot_tracked_attributes(PylabPlotCommand):
    
 
     # JABALERT: All but the first two arguments should probably be Parameters
-    def __call__(self,output_fn,init_time,final_time,**params):
+    def __call__(self,output_fn,init_time=0,final_time=None,**params):
         p=ParamOverrides(self,params)
 
+        if final_time is None:
+            final_time=topo.sim.time()
+            
         attrs = p.attrib_names if len(p.attrib_names)>0 else output_fn.attrib_names
         for a in attrs:
             pylab.figure(figsize=(6,4))
