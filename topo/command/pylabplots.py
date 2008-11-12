@@ -746,7 +746,7 @@ class plot_tracked_attributes(PylabPlotCommand):
                 x_data=[x for (x,y) in output_fn.values[a][coord]]
                 if p.raw==True:
                     plot_data=zip(x_data,y_data)
-                    pylab.save(normalize_path(filename+a+'(%.2f, %.2f)' %(coord[0], coord[1])),plot_data,fmt='%.6f', delimiter=',')
+                    pylab.save(normalize_path(p.filename+a+'(%.2f, %.2f)' %(coord[0], coord[1])),plot_data,fmt='%.6f', delimiter=',')
                 
                 
                 pylab.plot(x_data,y_data, label='Unit (%.2f, %.2f)' %(coord[0], coord[1]))
