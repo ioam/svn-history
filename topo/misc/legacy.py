@@ -526,6 +526,27 @@ from topo.outputfn import HomeostaticMaxEnt # and what else?
         from topo.base.cf import ConnectionField
         preprocess_state(ConnectionField,cf_bounds_property)
 
+        ## If gmpy.mpq not available, use fixedpoint.FixedPoint. 
+        ## 
+        ## Note that this won't replace gmpy.mpq in the snapshot
+        ## itself, because Simulation.time_type will remain gmpy.mpq.
+        ## This has the advantage of not affecting the snapshot
+        ## itself, but has the disadvantage of showing mpq as the
+        ## time_type when it's actually FixedPoint on this run. We
+        ## could easily replace time_type, too. I'm not sure which is
+        ## better.
+        ##
+        ## (only implements creation of mpq)
+        code = \
+"""
+import fixedpoint
+class mpq(object):
+    def __new__(self,*args,**kw):
+        return fixedpoint.FixedPoint(args[0])
+"""
+        fake_a_module('gmpy',source_code=code)
+
+
 
 # CEBALERT: rename SnapshotSupport and integrate LegacySupport so that
 # the difference is clear.
