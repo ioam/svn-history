@@ -118,21 +118,26 @@ from topo.%s.%s import *
 
 # CB: not fully tested (don't know if it's enough to support all user
 # code).
-def fake_a_module(name,parent,source_code,parent_path=None):
+def fake_a_module(name,parent=None,source_code=None,parent_path=None):
     """Create the module parent.name using source_code."""
     # CB: parent path is necessary (even though it should be available
     # from parent) when faking a package
+
+    assert source_code is not None # hack til I reorder the args!
 
     # create the module
     module = imp.new_module(name)
     exec source_code in module.__dict__
 
-    # install the module
-    if parent_path is None:
-        parent_path = parent.__name__
-        
-    sys.modules[parent_path+'.'+name]=module
-    setattr(parent,name,module)
+    if parent is not None:
+        # install the module
+        if parent_path is None:
+            parent_path = parent.__name__
+
+        sys.modules[parent_path+'.'+name]=module
+        setattr(parent,name,module)
+    else:
+        sys.modules[name]=module
 
 
 class SnapshotSupport(object):
@@ -520,7 +525,6 @@ from topo.outputfn import HomeostaticMaxEnt # and what else?
 
         from topo.base.cf import ConnectionField
         preprocess_state(ConnectionField,cf_bounds_property)
-        
 
 
 # CEBALERT: rename SnapshotSupport and integrate LegacySupport so that
