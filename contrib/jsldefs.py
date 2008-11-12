@@ -42,8 +42,7 @@ def coords(projection_name, sheet):
     data=zip(x,y)
     save(normalize_path("coords"+projection_name),data,fmt='%.6f', delimiter=',')
     return x,y
-
-def run_lesi_batch(script_file,filename,chunk,sheet,value,endtime,full,output_directory="Output",
+def run_lesi_batch(script_file,filename,chunk,sheet,value,endtime,rfs,snapshot,output_directory="Output",
                     **params):
     """
 
@@ -135,9 +134,20 @@ def run_lesi_batch(script_file,filename,chunk,sheet,value,endtime,full,output_di
             elapsedtime=time.time()-starttime
             param.Parameterized(name="run_batch").message(
                 "Elapsed real time %02d:%02d." % (int(elapsedtime/60),int(elapsedtime%60)))
-        data_file.close()    
-        if full:
-            lesi_analysis_function(data_file, True, True)
+
+        if rfs==True:
+            print "in rfsloop"
+            if snapshot:
+                print "in a"
+                lesi_analysis_function(data_file, True, True)
+            else:
+                print "in b"
+                lesi_analysis_function(data_file, False,True)
+
+        if snapshot:
+            lesi_analysis_function(data_file, True, False)
+
+        data_file.close()
 
     except:
         import traceback
@@ -163,7 +173,7 @@ def run_lesi_batch(script_file,filename,chunk,sheet,value,endtime,full,output_di
     # and at the end of the .out file, so that they will be sure to be noticed.
     
     print endnote
-
+    
 def run_param_batch(script_file,filename,chunk,sheet,value,endtime,output_directory="Output",
                     **params):
     """
@@ -554,7 +564,7 @@ class StoreMedSelectivity(param.Parameterized):
         # The size * the dpi gives the final image size
         #   a 4"x4" image * 80 dpi ==> 320x320 pixel image
         pylab.savefig(normalize_path("MedianSelectivity"+sheet+".png"), dpi=100)
-        #save(normalize_path("MedianSelectivity"+sheet),plot_data,fmt='%.6f', delimiter=',') #uncomment if you also want to save the raw data
+        save(normalize_path("MedianSelectivity"+sheet),plot_data,fmt='%.6f', delimiter=',') #uncomment if you also want to save the raw data
 
 
 class StoreStability(param.Parameterized):
@@ -595,7 +605,7 @@ class StoreStability(param.Parameterized):
             
             
         plot_data= zip(times,values)
-        #save(normalize_path(filename+str(topo.sim.time())),plot_data,fmt='%.6f', delimiter=',') # uncomment if you want to save the raw data
+        save(normalize_path(filename+sheet+str(topo.sim.time())),plot_data,fmt='%.6f', delimiter=',') # uncomment if you want to save the raw data
 
         pylab.figure(figsize=(6,4))
         pylab.grid(True)
@@ -665,7 +675,7 @@ def save_map(sheet):
         
 
 from topo.command.pylabplots import PylabPlotCommand
-class two_photon_plot(PylabPlotCommand)
+class two_photon_plot(PylabPlotCommand):
     def __call__(self,sheet, projection, preference, size=(10,10), cell_size=100, **params):
         p=ParamOverrides(self,params)
         pylab.hsv()
@@ -886,6 +896,7 @@ def homeostatic_analysis_function():
         plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], filename="LatExBefore", ylabel="LatExBefore")
         plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], filename="LatInBefore", ylabel="LatInBefore")
 
+
 SelectivityExc=StoreMedSelectivity()
 StabilityExc=StoreStability()
 SelectivityInh=StoreMedSelectivity()
@@ -901,20 +912,30 @@ def lesi_analysis_function(data_file, snapshot, rfs):
     """
     import topo
     import copy
-    from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
+    from topo.command.analysis import save_plotgroup,update_activity #ultragrid!!!
+    from topo.analysis.featureresponses import PatternPresenter
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
     from topo.pattern.basic import Gaussian, SineGrating
-    from topo.command.basic import pattern_present, wipe_out_activity
+    from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
+
+
+    # Build a list of all sheets worth measuring
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
+    input_sheets = topo.sim.objects(GeneratorSheet).values()
+    
+    # Set potentially reasonable defaults; not necessarily useful
+    topo.command.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
 
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
         save_plotgroup(pg)
 
     # Plot all projections for all measured_sheets
-    measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
-                       if hasattr(s,'measure_maps') and s.measure_maps]
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
@@ -923,91 +944,90 @@ def lesi_analysis_function(data_file, snapshot, rfs):
     pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
                     plastic=False,apply_output_fn=True,overwrite_previous=False)        
 
-   
+    topo.sim["V1Exc"].state_push()
+    topo.sim["V1Exc"].output_fn.state_push()
+     
+
+    topo.sim["V1Exc"].sf *=0.0
+    topo.sim["V1Exc"].sf +=1.0
+            
+    topo.sim["V1Exc"].output_fn.output_fns[1].a *=0.0
+    topo.sim["V1Exc"].output_fn.output_fns[1].b *=0.0
+    topo.sim["V1Exc"].output_fn.output_fns[1].a +=12.0
+    topo.sim["V1Exc"].output_fn.output_fns[1].b +=-5.0
 
     save_plotgroup("Orientation Preference")
 
     map_gradient("V1Exc", data_file, topo.sim.time())
-    SelectivityExc("V1Exc", "Selectivity", 0, topo.sim.time())
-    StabilityExc("V1Exc", "Stability", 0, topo.sim.time())
+    SelectivityExc("V1Exc", "SelectivityExc", 0, topo.sim.time())
+    StabilityExc("V1Exc", "StabilityExc", 0, topo.sim.time())
     save_map("V1Exc")
 
     map_gradient("V1Inh", data_file, topo.sim.time())
-    SelectivityInh("V1Inh", "Selectivity", 0, topo.sim.time())
-    StabilityInh("V1Inh", "Stability", 0, topo.sim.time())
+    SelectivityInh("V1Inh", "SelectivityInh", 0, topo.sim.time())
+    StabilityInh("V1Inh", "StabilityInh", 0, topo.sim.time())
     save_map("V1Inh")
 
     topo.command.analysis.sheet_name="V1Exc"
-    #save_plotgroup("Retinotopy")
-    #save_plotgroup("Retinotopy_XY")
-
-    #retinotopy_exc=topo.sim["V1Exc"].sheet_views['RetinotopyPreference'].view()[0]
-    #save(normalize_path("retinotopy_exc"+str(topo.sim.time())),retinotopy_exc,fmt='%.6f', delimiter=',')
-
-    #RetXpref_exc=topo.sim["V1Exc"].sheet_views['RetxPreference'].view()[0]
-    #save(normalize_path("RetXpref_exc"+str(topo.sim.time())),RetXpref_exc,fmt='%.6f', delimiter=',')
-    #RetYpref_exc=topo.sim["V1Exc"].sheet_views['RetyPreference'].view()[0]
-    #save(normalize_path("RetYpref_exc"+str(topo.sim.time())),RetYpref_exc,fmt='%.6f', delimiter=',')
-
-    #retinotopy_inh=topo.sim["V1Inh"].sheet_views['RetinotopyPreference'].view()[0]
-    #save(normalize_path("retinotopy_inh"+str(topo.sim.time())),retinotopy_inh,fmt='%.6f', delimiter=',')
-
     
-    #RetXpref_inh=topo.sim["V1Inh"].sheet_views['RetxPreference'].view()[0]
-    #save(normalize_path("RetXpref_inh"+str(topo.sim.time())),RetXpref_inh,fmt='%.6f', delimiter=',')
-    #RetYpref_inh=topo.sim["V1Inh"].sheet_views['RetyPreference'].view()[0]
-    #save(normalize_path("RetYpref_inh"+str(topo.sim.time())),RetYpref_inh,fmt='%.6f', delimiter=',')
-    
-    #two_photon_plot("V1Exc", "LateralExcitatory","RetxPreference", size=(5,5), cell_size=10)
-    #two_photon_plot("V1Exc", "LateralExcitatory","RetyPreference", size=(5,5), cell_size=10)
-    #two_photon_plot("V1Exc", "LateralExcitatory","OrientationPreference", size=(5,5), cell_size=10) # OR Preference from Retinotopy
-
-    #two_photon_plot("V1Inh", "V1Inh_to_V1Inh", "RetxPreference", size=(5,5), cell_size=10)
-    #two_photon_plot("V1Inh", "V1Inh_to_V1Inh", "RetyPreference", size=(5,5), cell_size=10)
-    #two_photon_plot("V1Inh", "V1Inh_to_V1Inh", "OrientationPreference", size=(5,5), cell_size=10) #ORPreference from retinotopy
-
-
-   
-    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[0], filename="V1Exc", ylabel="V1Exc")
-    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[2], filename="V1Exc_of", ylabel="V1Exc_of")
+    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[0], 0, 
+                            topo.sim.time(),filename="V1Exc", ylabel="V1Exc", raw=True)
+    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[2], 0, 
+                            topo.sim.time(),filename="V1Exc_of", ylabel="V1Exc_of", raw=True)
 
     if __main__.__dict__['homeo_inh'] == True:
-        plot_tracked_attributes(topo.sim["V1Inh"].output_fn.output_fns[1], filename="V1Inh", ylabel="V1Inh")
+        plot_tracked_attributes(topo.sim["V1Inh"].output_fn.output_fns[1], 0, 
+                                topo.sim.time(), filename="V1Inh", ylabel="V1Inh", raw=True)
     else:
-        plot_tracked_attributes(topo.sim["V1Inh"].output_fn.output_fns[2], filename="V1Inh", ylabel="V1Inh")
+        plot_tracked_attributes(topo.sim["V1Inh"].output_fn.output_fns[2], 0, 
+                                topo.sim.time(), filename="V1Inh", ylabel="V1Inh", raw=True)
 
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOnAfferent"].output_fn.output_fns[1], filename="LGNOnAfferent", ylabel="LGNOnAfferent")
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOffAfferent"].output_fn.output_fns[1], filename="LGNOffAfferent", ylabel="LGNOffAfferent")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LGNOnAfferent", ylabel="LGNOnAfferent", raw=True)
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LGNOffAfferent", ylabel="LGNOffAfferent", raw=True)
 
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory_local"].output_fn.output_fns[1], filename="LateralExcitatory_local", ylabel="LateralExcitatory_local")
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory"].output_fn.output_fns[1], filename="LateralExcitatory", ylabel="LateralExcitatory")
-    plot_tracked_attributes(topo.sim["V1Exc"].projections()["V1Inh_to_V1Exc"].output_fn.output_fns[1], filename="V1Inh_to_V1Exc", ylabel="V1Inh_to_V1Exc")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory_local"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LateralExcitatory_local", ylabel="LateralExcitatory_local", raw=True)
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LateralExcitatory", ylabel="LateralExcitatory", raw=True)
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["V1Inh_to_V1Exc"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="V1Inh_to_V1Exc", ylabel="V1Inh_to_V1Exc", raw=True)
 
-    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Inh_to_V1Inh"].output_fn.output_fns[1], filename="V1Inh_to_V1Inh", ylabel="V1Inh_to_V1Inh")
-    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh_local"].output_fn.output_fns[1], filename="V1Exc_to_V1Inh_local", ylabel="V1Exc_to_V1Inh_local")
-    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh"].output_fn.output_fns[1], filename="V1Exc_to_V1Inh", ylabel="V1Exc_to_V1Inh")
-
-
+    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Inh_to_V1Inh"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="V1Inh_to_V1Inh", ylabel="V1Inh_to_V1Inh", raw=True)
+    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh_local"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="V1Exc_to_V1Inh_local", ylabel="V1Exc_to_V1Inh_local", raw=True)
+    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="V1Exc_to_V1Inh", ylabel="V1Exc_to_V1Inh", raw=True)
     if snapshot:
-        save_snaphot()
-
+        save_snapshot()
+        
+    topo.command.analysis.input_sheet=topo.sim["Retina"]
     if rfs:
+        print "measuring rfs"
         topo.plotting.plotgroup.RFProjectionPlotGroup.input_sheet=topo.sim["Retina"]
         topo.plotting.plotgroup.RFProjectionPlotGroup.sheet=topo.sim["V1Exc"]
-        Retina_pix=topo.sim["Retina"].shape[0]
-        V1exc_pix=topo.sim["V1Exc"].shape[0]
+        #Retina_pix=topo.sim["Retina"].shape[0]
+        #V1Exc_pix=topo.sim["V1Exc"].shape[0]
         
-        save_plotgroup("RF Projection")
-        ultragrid_zoom_3(0,0,0,Retina_pix,0,Retina_pix,V1Exc_pix,9999999999,normalize_path("RFS_Exc"+str(topo.sim.time())))
+        save_plotgroup("RF Projection", input_sheet=topo.sim["Retina"], sheet=topo.sim["V1Exc"])
+        #ultragrid_zoom_3(0,0,0,Retina_pix,0,Retina_pix,V1Exc_pix,9999999999,normalize_path("RFS_Exc"+str(topo.sim.time())))
         
-        topo.plotting.plotgroup.RFProjectionPlotGroup.input_sheet=topo.sim["Retina"]
-        topo.plotting.plotgroup.RFProjectionPlotGroup.sheet=topo.sim["V1Inh"]
-        Retina_pix=topo.sim["Retina"].shape[0]
-        V1exc_pix=topo.sim["V1Inh"].shape[0]
+        #topo.plotting.plotgroup.RFProjectionPlotGroup.input_sheet=topo.sim["Retina"]
+        #topo.plotting.plotgroup.RFProjectionPlotGroup.sheet=topo.sim["V1Inh"]
+        #Retina_pix=topo.sim["Retina"].shape[0]
+        #V1Inh_pix=topo.sim["V1Inh"].shape[0]
         
-        save_plotgroup("RF Projection")
-        ultragrid_zoom_3(0,0,0,Retina_pix,0,Retina_pix,V1Inh_pix,9999999999,normalize_path("RFS_Inh"+str(topo.sim.time())))
-        
+        #save_plotgroup("RF Projection", input_sheet=topo.sim["Retina"], sheet=topo.sim["V1Inh"])
+        #ultragrid_zoom_3(0,0,0,Retina_pix,0,Retina_pix,V1Inh_pix,9999999999,normalize_path("RFS_Inh"+str(topo.sim.time())))
+
+    #Restore original values
+    topo.sim["V1Exc"].state_pop()
+    topo.sim["V1Exc"].output_fn.state_pop()
+
+    if snapshot:
+        save_snapshot()
     
 def species_analysis_function():
     """
