@@ -29,10 +29,15 @@ def preprocess_state(class_,state_mod_fn):
     """
     Allow processing of state with state_mod_fn before
     class_.__setstate__(instance,state) is called.
+
+    state_mod_fn must accept two arguments: instance and state.
     """
     old_setstate = class_.__setstate__
     def new_setstate(instance,state):
-        state_mod_fn(state) 
+        # passing instance here allows us to avoid having to list
+        # specific classes in SnapshotSupport, because we can
+        # now test each instance.
+        state_mod_fn(instance,state) 
         old_setstate(instance,state)
     class_.__setstate__ = new_setstate
 
@@ -151,14 +156,14 @@ class SnapshotSupport(object):
         # Haven't yet thought about whether or not it's actually possible
         # to get the version number before unpickling...
 
-        def param_remove_hidden(state):
+        def param_remove_hidden(instance,state):
             # Hidden attribute removed from Parameter in r7861
             if 'hidden' in state:
                 if state['hidden'] is True:
                     state['precedence']=-1
                 del state['hidden']
 
-        def param_add_readonly(state):
+        def param_add_readonly(instance,state):
             # Hidden attribute added to Parameter in r7975
             if 'readonly' not in state:
                 state['readonly']=False
@@ -168,7 +173,7 @@ class SnapshotSupport(object):
         preprocess_state(param.Parameter,param_add_readonly)
 
 
-        def class_selector_remove_suffixtolose(state):
+        def class_selector_remove_suffixtolose(instance,state):
             # suffix_to_lose removed from ClassSelectorParameter in r8031
             if 'suffix_to_lose' in state:
                 del state['suffix_to_lose']
@@ -177,7 +182,7 @@ class SnapshotSupport(object):
 
 
 
-        def cf_rename_slice_array(state):
+        def cf_rename_slice_array(instance,state):
             ## slice_array was renamed to input_sheet_slice in r7548
             if 'slice_array' in state:
                 input_sheet_slice = state['slice_array']
@@ -188,7 +193,7 @@ class SnapshotSupport(object):
         preprocess_state(ConnectionField,cf_rename_slice_array)
 
 
-        def sim_remove_time_type_attr(state):
+        def sim_remove_time_type_attr(instance,state):
             # _time_type attribute added to simulation in r7581
             # and replaced by time_type param in r8215
             if '_time_type' in state:
@@ -400,7 +405,7 @@ from topo.param import Dict as DictParameter
 
         from topo.base.cf import CFProjection
         from numpy import array
-        def cfproj_add_cfs(state):
+        def cfproj_add_cfs(instance,state):
             # cfs attribute added in r8227
             if 'cfs' not in state:
                 cflist = state['_cfs']
@@ -517,7 +522,7 @@ from topo.outputfn import HomeostaticMaxEnt # and what else?
         # actually comes from the slice).
         # (Problem exposed when Parameterized's __setstate__ changed to
         # set all state attributes, rather than just those in __dict__?)        
-        def cf_bounds_property(state):
+        def cf_bounds_property(instance,state):
             try:
                 del state['bounds']
             except KeyError:
