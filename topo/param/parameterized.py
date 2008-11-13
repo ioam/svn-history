@@ -425,7 +425,7 @@ class Parameter(object):
     def __setstate__(self,state):
         # set values of __slots__ (instead of in non-existent __dict__)
         for (k,v) in state.items():
-            setattr(self,k,v)    
+            setattr(self,k,v)
 
 
 # Define one particular type of Parameter that is used in this file
@@ -1422,6 +1422,13 @@ class PicklableClassAttributes(object):
                         Parameterized().message("%s's %s parameter has been renamed to %s."%(class_name,p_name,new_p_name))
                         p_name = new_p_name
 
+                # CEBALERT: This try/except+warning shouldn't be
+                # necessary, because we can always add legacy
+                # support. In fact, because of this warning (rather
+                # than error), buildbot did not catch a problem and it
+                # went unnoticed (at least by me) for at least 100
+                # revisions. Maybe buildbot should be checking for
+                # warnings...
                 try:
                     setattr(class_,p_name,p)
                 except:
