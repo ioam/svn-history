@@ -560,6 +560,17 @@ class mpq(object):
             param.Parameterized().warning("gmpy.mpq not available: using fixedpoint.FixedPoint as a replacement.")
             fake_a_module('gmpy',source_code=code)
 
+        # allow_None added in r9380
+        from topo import param
+        def param_add_allow_None(instance,state):
+            if 'allow_None' not in state and hasattr(instance.__class__,'allow_None'):
+                print instance
+                # have to add to state or else slot won't exist on instance, but will
+                # exist on class (consequence of using __slots__)
+                state['allow_None']=False
+
+        preprocess_state(param.Parameter,param_add_allow_None)
+
 
 
 # CEBALERT: rename SnapshotSupport and integrate LegacySupport so that
