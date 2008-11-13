@@ -537,14 +537,23 @@ from topo.outputfn import HomeostaticMaxEnt # and what else?
         ## better.
         ##
         ## (only implements creation of mpq)
+        ##
+        ## CEBALERT: not sure what precision should be used for
+        ## FixedPoint to replace rational. Should we set the precision
+        ## really high?
         code = \
 """
 import fixedpoint
 class mpq(object):
     def __new__(self,*args,**kw):
-        return fixedpoint.FixedPoint(args[0])
+        return fixedpoint.FixedPoint(args[0],precision=4)
 """
-        fake_a_module('gmpy',source_code=code)
+        # only replace gmpy if necessary
+        try:
+            import gmpy
+        except ImportError:
+            param.Parameterized().warning("gmpy.mpq not available: using fixedpoint.FixedPoint as a replacement.")
+            fake_a_module('gmpy',source_code=code)
 
 
 
