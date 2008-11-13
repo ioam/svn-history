@@ -15,13 +15,10 @@ rule (Jochen Triesch, ICANN 2005, LNCS 3696 pp.65-70), which maintains
 stable activity in V1 given a target average activity.
 
 The afferent target and the target V1 activity are adapted based on
-the frequency of occurance of activation in V1 by setting the
+the frequency of occurence of activation in V1 by setting the
 frequency parameter. A simulation using 2 gaussian patterns per
-iteration as the retinal input has a frequency parameter of 2
-therefore frequency values should be chosen relative to this, i.e. a
-simulation using 4 gaussian patterns per iteration has an optimum
-frequency parameter of ~ 3.56, natural images have a frequency ~ 5.0
-and noisy disks a frequency ~ 7.5. 
+iteration as the retinal input has a frequency parameter of 2, and
+approximate frequencies have been set below for each of the other datasets.
 
 The balance parameter which adjusts the balance between afferent input
 and V1 activity can also be adjusted to improve map organization.
@@ -63,6 +60,9 @@ from topo.pattern.image import Image
 ####Different input types which can be used for development###
 dataset=locals().get('dataset',"Gaussian") #set the input type by choosing the dataset parameter 
 
+# For each dataset, the target frequency is set based on frequency of
+# occurence of V1 activation
+
 if dataset=="Gaussian":
     input_type=Gaussian
     num_inputs=locals().get('num_inputs',2) #in the case where dataset=Gaussian, must also set the number of Gaussians per iteration, default is 2
@@ -74,8 +74,13 @@ if dataset=="Gaussian":
             for i in xrange(num_inputs)]
     
     combined_inputs = topo.pattern.basic.SeparatedComposite(min_separation=0,generators=inputs)
+
+    # Scaling with num_inputs is only approximate; actual frequency for
+    # num_inputs==4 is about 3.56
+    frequency=locals().get('frequency',num_inputs) # 
+    target_lr=locals().get('target_lr',0.045)
     
-elif dataset=="Natural":
+elif dataset=="Nature":
     
     input_type=topo.pattern.image.Image
     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
@@ -88,6 +93,9 @@ elif dataset=="Natural":
 
     combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 
+    frequency=locals().get('frequency',5)
+    target_lr=locals().get('target_lr',0.025)
+    
 elif dataset=="NoisyDisks":
     disk_scale=locals().get('diskscale',0.35)
     #Set the contrast of the disk pattern by setting the disk_scale parameter, map development also depends on the contrast of the disk edges.
@@ -102,6 +110,9 @@ elif dataset=="NoisyDisks":
     #Set the scale of the noise by setting the rand_offset and rand_scale parameters, note that the disk/noise signal ratio also depends on the retinal density      
     combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 
+    frequency=locals().get('frequency',7.5)
+    target_lr=locals().get('target_lr',0.025)
+    
 elif dataset=="Disks":
     disk_scale=locals().get('diskscale',0.5)
     input_type=topo.pattern.basic.Disk
@@ -113,7 +124,10 @@ elif dataset=="Disks":
             
     combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 
-elif dataset=="NoisyDiskstoNatural":
+    frequency=locals().get('frequency',5) # Complete guess
+    target_lr=locals().get('target_lr',0.025) # Complete guess
+    
+elif dataset=="NoisyDiskstoNature":
     #This dataset mimics pre and post eye-opening development - scheduled changes must also be set to ensure the input pattern changes at simulated eye opening
     disk_scale=locals().get('diskscale',0.35)
     disks_input_type=topo.pattern.basic.Composite
@@ -139,10 +153,14 @@ elif dataset=="NoisyDiskstoNatural":
 
     natural_combined_inputs =topo.pattern.basic.Selector(generators=natural_inputs)
 
-###############################################################################
+    frequency=locals().get('frequency',7.5)
+    target_lr=locals().get('target_lr',0.025)
+    
+else:
+    raise ValueError("No dataset '%s' is available"%dataset)
+    
 
-#Set targets based on frequency of occurance of V1 activation
-frequency=locals().get('frequency',2)
+###############################################################################
 
 #Target average afferent activity and target average V1 activity set based on
 #frequency and balance between afferent and lateral activity
@@ -217,7 +235,7 @@ topo.sim['V1'] = JointScaling(nominal_density=locals().get('default_density',48.
                               nominal_bounds=BoundingBox(radius=0.5),tsettle=9,
                               plastic=True,output_fn=V1_OF,
                               target=afferent_target, smoothing=smoothing,
-                              target_lr=locals().get('target_lr',0.045))
+                              target_lr=target_lr)
 
 
 topo.sim.connect('Retina','LGNOn',delay=0.05,
@@ -267,7 +285,7 @@ topo.sim.grid_layout([[None,    'V1',     None],
 
 ### Input pattern changes
 
-if dataset=="NoisyDiskstoNatural":
+if dataset=="NoisyDiskstoNature":
     changetime = locals().get('changetime',6000) #set time of eye-opening
     new_frequency = locals().get('new_frequency',5)
     new_balance = locals().get('new_balance',4)
