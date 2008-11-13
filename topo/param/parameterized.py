@@ -1425,7 +1425,7 @@ class PicklableClassAttributes(object):
                 try:
                     setattr(class_,p_name,p)
                 except:
-                    Parameterized().warning('Problem restoring parameter %s=%s for class %s (Parameter object representing %s may have changed since the snapshot was created).' % (p_name,repr(p),class_name,p_name))
+                    Parameterized().warning('Problem restoring "%s" parameter for class %s (e.g. the default value of %s.%s might not now be the same as when the snapshot was saved). This affects instances of %s if they are using the class default value for %s.' % (p_name,class_name,class_name,p_name,class_name,p_name)) # Indicates that parameter object representing p_name may have changed since the snapshot was created: support could be added in topo.misc.legacy
                 
 
 
