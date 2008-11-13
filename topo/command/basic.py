@@ -448,7 +448,7 @@ class run_batch(ParameterizedFunction):
         # Default case: times is just a number that scales a standard list of times
         times=p['times']
         if not isinstance(times,list):
-            times=[t*times for t in [50,100,500,1000,2000,3000,4000,5000,10000]]
+            times=[t*times for t in [0,50,100,500,1000,2000,3000,4000,5000,10000]]
     
         # Run script in main
         error_count = 0
