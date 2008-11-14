@@ -39,53 +39,67 @@ class Translator(pattern.PatternGenerator):
     PatternGenerator that translates another PatternGenerator over
     time.
 
-    The pattern being translated is drawn at the Translator's current
-    x and y (offset by the pattern's own x and y), and with an
-    orientation perpendicular to the Translator's direction (added to
-    the pattern's own orientation).
+    This PatternGenerator will create a series of episodes, where in
+    each episode the underlying generator is moved in a fixed
+    direction at a fixed speed.  To begin an episode, the Translator's
+    x, y, and direction are evaluated (e.g. from random
+    distributions), and the underlying generator is then drawn at
+    those values plus changes over time that are determined by the
+    speed.  The orientation of the underlying generator should be set
+    to 0 to get motion perpendicular to the generator's orientation
+    (which is typical).
     """
-    generator = param.ClassSelector(default=pattern.Constant(scale=0.0),
+    
+    generator = param.ClassSelector(default=pattern.Gaussian(),
         class_=pattern.PatternGenerator,doc="""Pattern to be translated.""")
 
-    direction = param.Number(default=0,bounds=(-pi,pi),doc="""
+    direction = param.Number(default=0.0,bounds=(-pi,pi),doc="""
         The direction in which the pattern should move, in radians.""")
     
-    speed = param.Number(default=1,bounds=(0.0,None),doc="""
+    speed = param.Number(default=0.01,bounds=(0.0,None),doc="""
         The speed with which the pattern should move,
         in sheet coordinates per simulation time unit.""")
-    
-    reset_period = param.Number(
-        default=1,bounds=(0.0,None),doc="""
-        Period between requesting new (x,y) coordinates from the generator.""")
 
-##     inter_translation_interval = param.Number(
-##         default=0,doc="""Interval between translations.""")
+    reset_period = param.Number(default=1,bounds=(0.0,None),doc="""
+        Period between generating each new translation episode.""")
 
-##     inter_translation_pattern = param.ClassSelector(
-##         default=pattern.Constant(scale=0.0),
-##         class_=pattern.PatternGenerator,
-##         doc="""Pattern to display during inter_translation_interval.""")
+    # ALERT: Not yet implemented
+    episode_interval = param.Number(default=0,doc="""
+        Interval between successive translation episodes.
+        
+        If nonzero, the episode_separator pattern is presented for
+        this amount of simulation time after each episode, e.g. to
+        allow processing of the previous episode to complete.""")
+
+    episode_separator = param.ClassSelector(default=pattern.Constant(scale=0.0),
+         class_=pattern.PatternGenerator,doc="""
+         Pattern to display during the episode_interval, if any.
+         The default is a blank pattern.""")
                                                                               
 
     def _advance_params(self):
+        """
+        Explicitly generate new values for these parameters only
+        when appropriate.
+        """
         for param in ['x','y','direction']:
             self.force_new_dynamic_value(param)
+
        
     def __init__(self,**params):
         super(Translator,self).__init__(**params)
-        # ALERT: going to replace this temporary hack when improving
-        # the whole 'last_time' mechanism
+        # Force generation of new x,y,direction for the first call
         self.last_time = -self.reset_period
+
         
     def __call__(self,**params):
-        """Construct new pattern out of the underlying one."""
         p=ParamOverrides(self,params)
         
         # CB: are the float() calls required because the comparisons
         # involving FixedPoint fail otherwise? Or for some other
         # reason?
-        if (float(topo.sim.time()) >= self.last_time + self.reset_period):
-            self.last_time += self.reset_period
+        if (float(topo.sim.time()) >= self.last_time + p.reset_period):
+            self.last_time += p.reset_period
             self._advance_params()
 
         # compute how much time elapsed from the last reset
@@ -95,16 +109,17 @@ class Translator(pattern.PatternGenerator):
         ## generator and for this one.  (leads to redundant
         ## calculations in current lissom_oo_or usage, but will lead
         ## to problems/limitations in the future).
-        
+
+        # Access parameter values without giving them new values
         x = self.inspect_value('x')
         y = self.inspect_value('y')
         direction = self.inspect_value('direction')
 
         return p.generator(
             xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
-            x=x+t*cos(direction)*self.speed+self.generator.x,
-            y=y+t*sin(direction)*self.speed+self.generator.y,
-            orientation=(direction-pi/2)+self.generator.orientation)
+            x=x+t*cos(direction)*p.speed+p.generator.x,
+            y=y+t*sin(direction)*p.speed+p.generator.y,
+            orientation=(direction-pi/2)+p.generator.orientation)
 
 
 
