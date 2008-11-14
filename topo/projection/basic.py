@@ -7,6 +7,7 @@ $Id$
 
 __version__ = "$Revision$"
 
+from copy import copy
 
 from numpy import exp,ones,zeros,array,nonzero
 
@@ -16,6 +17,7 @@ from .. import param
 from topo.base.projection import Projection
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheet import activity_type
+from topo.base.sheetcoords import Slice
 from topo.base.cf import CFProjection,ConnectionField,MaskedCFIter,\
      CFPLearningFn,CFPLF_Identity,CFPOutputFn
 from topo.base.patterngenerator import PatternGenerator,Constant
@@ -121,10 +123,14 @@ class SharedWeightCFProjection(CFProjection):
         self.center_unitxcenter,self.center_unitycenter=self.src.matrixidx2sheet(center_row,
                                                                                  center_col)
 
+        slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
+                               min_matrix_radius=self.cf_type.min_matrix_radius)
+        self.bounds_template = slice_template.bounds
+
         self.__sharedcf=self.cf_type(self.src,
                                      x=self.center_unitxcenter,
                                      y=self.center_unitycenter,
-                                     template=self.bounds_template,
+                                     template=slice_template,
                                      weights_generator=self.weights_generator,
                                      mask=self.mask_template,
                                      output_fn=self.weights_output_fn.single_cf_fn)
@@ -137,7 +143,7 @@ class SharedWeightCFProjection(CFProjection):
             for x in self.dest.sheet_cols():
                 x_cf,y_cf = self.coord_mapper(x,y)
                 cf = SharedWeightCF(scf,self.src,x=x_cf,y=y_cf, #JUDE ADDED
-                                    template=bounds_template)
+                                    template=slice_template)
                 row.append(cf)
             cflist.append(row)
         self._cfs = cflist
