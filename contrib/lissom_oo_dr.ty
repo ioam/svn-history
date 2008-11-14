@@ -84,12 +84,8 @@ class Translator(pattern.PatternGenerator):
         
     def __call__(self,**params):
         """Construct new pattern out of the underlying one."""
-        generator = params.get('generator', self.generator)
-
-        xdensity=params.get('xdensity',self.xdensity)
-        ydensity=params.get('ydensity',self.ydensity)
-        bounds = params.get('bounds',self.bounds)
-
+        p=ParamOverrides(self,params)
+        
         # CB: are the float() calls required because the comparisons
         # involving FixedPoint fail otherwise? Or for some other
         # reason?
@@ -98,7 +94,7 @@ class Translator(pattern.PatternGenerator):
             self.last_time += self.reset_period
                 
             # time to reset the parameter
-            (self.x, self.y, self.scale) = (generator.x,generator.y,generator.scale)
+            (self.x, self.y, self.scale) = (p.generator.x,p.generator.y,p.generator.scale)
             self._advance_generator()
 
             # CEBALERT: this is to get an initial value for
@@ -117,7 +113,7 @@ class Translator(pattern.PatternGenerator):
         ## calculations in current lissom_oo_or usage, but will lead
         ## to problems/limitations in the future).
         
-        return generator(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+        return p.generator(xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
                          x=self.x+t*cos(self.inspect_value("orientation")+pi/2)*self.speed,
                          y=self.y+t*sin(self.inspect_value("orientation")+pi/2)*self.speed,
                          orientation=self.inspect_value("orientation"))
