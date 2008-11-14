@@ -97,14 +97,11 @@ class Translator(pattern.PatternGenerator):
             (self.x, self.y, self.scale) = (p.generator.x,p.generator.y,p.generator.scale)
             self._advance_generator()
 
-            # CEBALERT: this is to get an initial value for
-            # orientation, but then causes a value to be thrown away
-            # each time.
-            discard = self.orientation
-            
+            orientation = self.orientation
             #self.direction = ((pi +self.inspect_value("orientation") + pi/2.0) % (2*pi)) - pi
+        else:
+            orientation = self.inspect_value('orientation')
 
-       
         # compute how much time elapsed from the last reset
         t = float(topo.sim.time())-self.last_time
 
@@ -113,10 +110,11 @@ class Translator(pattern.PatternGenerator):
         ## calculations in current lissom_oo_or usage, but will lead
         ## to problems/limitations in the future).
         
-        return p.generator(xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
-                         x=self.x+t*cos(self.inspect_value("orientation")+pi/2)*self.speed,
-                         y=self.y+t*sin(self.inspect_value("orientation")+pi/2)*self.speed,
-                         orientation=self.inspect_value("orientation"))
+        return p.generator(
+            xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
+            x=self.x+t*cos(orientation+pi/2)*self.speed,
+            y=self.y+t*sin(orientation+pi/2)*self.speed,
+            orientation=orientation)
 
 
 
