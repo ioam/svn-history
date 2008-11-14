@@ -67,7 +67,13 @@ class Translator(pattern.PatternGenerator):
 ##         class_=pattern.PatternGenerator,
 ##         doc="""Pattern to display during inter_translation_interval.""")
                                                                               
-    
+
+    # CB cf Composite's advance_pattern_generators
+    def _advance_generator(self):
+        # CEBALERT: should advance all parameters 
+        for param in ['x','y','scale']:
+            self.generator.force_new_dynamic_value(param)
+        
 
     def __init__(self,**params):
         super(Translator,self).__init__(**params)
@@ -93,19 +99,15 @@ class Translator(pattern.PatternGenerator):
                 
             # time to reset the parameter
             (self.x, self.y, self.scale) = (generator.x,generator.y,generator.scale)
-            generator.force_new_dynamic_value('x')
-            generator.force_new_dynamic_value('y')
-            generator.force_new_dynamic_value('scale')
-            # ALERT: what is the point of this? To cause the
-            # parameters to be advanced?  Should be removed or
-            # documented.
-            #discards = (self.direction,self.orientation)
+            self._advance_generator()
+
+            # CEBALERT: this is to get an initial value for
+            # orientation, but then causes a value to be thrown away
+            # each time.
             discard = self.orientation
             
             #self.direction = ((pi +self.inspect_value("orientation") + pi/2.0) % (2*pi)) - pi
-            
-        (a,b,c) = (generator.x,generator.y,generator.scale)   
-        
+
        
         # compute how much time elapsed from the last reset
         t = float(topo.sim.time())-self.last_time

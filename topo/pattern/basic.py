@@ -26,7 +26,7 @@ from topo.misc.numbergenerator import UniformRandom
 # background, or to see how sharp a gradient is needed to get a
 # response.
 
-
+# CEBALERT: do we need this? If so, please remove this question.
 class Null(Constant):
     """
     A constant pattern of zero activity.
