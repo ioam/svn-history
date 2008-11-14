@@ -49,7 +49,6 @@ class Translator(pattern.PatternGenerator):
     to 0 to get motion perpendicular to the generator's orientation
     (which is typical).
     """
-    
     generator = param.ClassSelector(default=pattern.Gaussian(),
         class_=pattern.PatternGenerator,doc="""Pattern to be translated.""")
 
@@ -63,7 +62,6 @@ class Translator(pattern.PatternGenerator):
     reset_period = param.Number(default=1,bounds=(0.0,None),doc="""
         Period between generating each new translation episode.""")
 
-    # ALERT: Not yet implemented
     episode_interval = param.Number(default=0,doc="""
         Interval between successive translation episodes.
         
@@ -96,7 +94,13 @@ class Translator(pattern.PatternGenerator):
         p=ParamOverrides(self,params)
         
         if topo.sim.time() >= self.last_time + p.reset_period:
-            self._advance_params()
+            ## Returns early if within episode interval
+            if topo.sim.time()<self.last_time+p.reset_period+p.episode_interval:
+                return p.episode_separator(xdensity=p.xdensity,
+                                           ydensity=p.ydensity,
+                                           bounds=p.bounds)
+            else:
+                self._advance_params()
 
         # Access parameter values without giving them new values
         x = self.inspect_value('x')
