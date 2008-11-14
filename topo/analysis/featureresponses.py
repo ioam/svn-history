@@ -480,7 +480,6 @@ class Feature(object):
          default of the min and max in the list of values is not appropriate.
          """ 
          self.name=name
-         self.step=step
          self.cyclic=cyclic
                      
          if range:  
@@ -672,7 +671,8 @@ class PatternPresenter(param.Parameterized):
                 elif (name.count('Left')):
                     inputs[name].scale=2.0-2*inputs[name].ocular
                 else:
-                    self.warning('Ocularity is defined only when there are inputs for Right and Left retinas.')
+                    self.warning('Skipping input region %s; Ocularity is defined only for Left and Right retinas.' %
+                                 name)
 
         if features_values.has_key("contrastcentre")or param_dict.has_key("contrastcentre"):
             if self.contrast_parameter=='michelson_contrast':
@@ -903,8 +903,6 @@ class Subplotting(param.Parameterized):
 
 
 
-# JABALERT: Rename these to end in Command for clarity?
-
 class MeasureResponseCommand(ParameterizedFunction):
     """Parameterized command for presenting input patterns and measuring responses."""
       
@@ -998,7 +996,6 @@ class SinusoidalMeasureResponseCommand(MeasureResponseCommand):
     scale = param.Number(default=0.3)
 
     __abstract = True
-
     
 
 
