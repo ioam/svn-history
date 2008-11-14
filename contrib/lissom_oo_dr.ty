@@ -71,13 +71,13 @@ class Translator(pattern.PatternGenerator):
     # CB cf Composite's advance_pattern_generators
     def _advance_generator(self):
         # CEBALERT: should advance all parameters 
-        for param in ['x','y','scale']:
+        for param in ['x','y','scale','orientation']:
             self.generator.force_new_dynamic_value(param)
         
 
     def __init__(self,**params):
         super(Translator,self).__init__(**params)
-        self.orientation = params.get('orientation',self.orientation)
+        #self.orientation = params.get('orientation',self.orientation)
         # ALERT: going to replace this temporary hack when improving
         # the whole 'last_time' mechanism
         self.last_time = -self.reset_period
@@ -94,13 +94,10 @@ class Translator(pattern.PatternGenerator):
             self.last_time += self.reset_period
                 
             # time to reset the parameter
-            (self.x, self.y, self.scale) = (p.generator.x,p.generator.y,p.generator.scale)
+            (self.x, self.y, self.scale, self.orientation) = (p.generator.x,p.generator.y,p.generator.scale,p.generator.orientation)
             self._advance_generator()
 
-            orientation = self.orientation
             #self.direction = ((pi +self.inspect_value("orientation") + pi/2.0) % (2*pi)) - pi
-        else:
-            orientation = self.inspect_value('orientation')
 
         # compute how much time elapsed from the last reset
         t = float(topo.sim.time())-self.last_time
@@ -112,9 +109,9 @@ class Translator(pattern.PatternGenerator):
         
         return p.generator(
             xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
-            x=self.x+t*cos(orientation+pi/2)*self.speed,
-            y=self.y+t*sin(orientation+pi/2)*self.speed,
-            orientation=orientation)
+            x=self.x+t*cos(self.orientation+pi/2)*self.speed,
+            y=self.y+t*sin(self.orientation+pi/2)*self.speed,
+            orientation=self.orientation)
 
 
 
@@ -126,15 +123,17 @@ num_inputs=1
 num_lags=4
 input_period=num_lags # By default
 
-input = Translator(reset_period=input_period,
-                   speed=0.04,
-                   orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=99),
-                   generator=pattern.Gaussian(x=numbergen.UniformRandom(lbound=-0.75,
-                                                                        ubound=0.75,seed=12),
-                                              y=numbergen.UniformRandom(lbound=-0.75,
-                                                                        ubound=0.75,seed=34),
-                                              size=0.088388, aspect_ratio=4.66667, scale=1.0,
-                                              bounds=sheet.BoundingBox(radius=0.8)))
+input = Translator(
+    reset_period=input_period,
+    speed=0.04,
+    generator=pattern.Gaussian(x=numbergen.UniformRandom(lbound=-0.75,
+                                                         ubound=0.75,seed=12),
+                               y=numbergen.UniformRandom(lbound=-0.75,
+                                                         ubound=0.75,seed=34),
+                               orientation=numbergen.UniformRandom(lbound=-pi,
+                                                                   ubound=pi,seed=99),
+                               size=0.088388, aspect_ratio=4.66667, scale=1.0,
+                               bounds=sheet.BoundingBox(radius=0.8)))
 
 ### Sheets
 retina_density = locals().get('default_retina_density',24.0)
