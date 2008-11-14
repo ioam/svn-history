@@ -84,37 +84,33 @@ class Translator(pattern.PatternGenerator):
         """
         for param in ['x','y','direction']:
             self.force_new_dynamic_value(param)
+        self.last_time = topo.sim.time()
 
        
     def __init__(self,**params):
         super(Translator,self).__init__(**params)
-        # Force generation of new x,y,direction for the first call
-        self.last_time = -self.reset_period
+        self._advance_params()
 
         
     def __call__(self,**params):
         p=ParamOverrides(self,params)
         
-        # CB: are the float() calls required because the comparisons
-        # involving FixedPoint fail otherwise? Or for some other
-        # reason?
-        if (float(topo.sim.time()) >= self.last_time + p.reset_period):
-            self.last_time += p.reset_period
+        if topo.sim.time() >= self.last_time + p.reset_period:
             self._advance_params()
-
-        # compute how much time elapsed from the last reset
-        t = float(topo.sim.time())-self.last_time
-
-        ## CEBALERT: mask gets applied twice, both for the underlying
-        ## generator and for this one.  (leads to redundant
-        ## calculations in current lissom_oo_or usage, but will lead
-        ## to problems/limitations in the future).
 
         # Access parameter values without giving them new values
         x = self.inspect_value('x')
         y = self.inspect_value('y')
         direction = self.inspect_value('direction')
 
+        # compute how much time elapsed from the last reset
+        # float(t) required because time could be e.g. gmpy.mpq
+        t = float(topo.sim.time()-self.last_time)
+
+        ## CEBALERT: mask gets applied twice, both for the underlying
+        ## generator and for this one.  (leads to redundant
+        ## calculations in current lissom_oo_or usage, but will lead
+        ## to problems/limitations in the future).
         return p.generator(
             xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
             x=x+t*cos(direction)*p.speed+p.generator.x,
