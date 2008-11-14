@@ -49,12 +49,12 @@ class Gaussian(PatternGenerator):
       exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
     """
     
-    aspect_ratio = param.Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio = param.Number(default=1/0.31,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc="""
         Ratio of the width to the height.
         Specifically, xsigma=ysigma*aspect_ratio (see size).""")
     
-    size = param.Number(default=0.5,doc="""
+    size = param.Number(default=0.155,doc="""
         Overall size of the Gaussian, defined by:
         exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
         where ysigma=size/2 and xsigma=size/2*aspect_ratio.""")
