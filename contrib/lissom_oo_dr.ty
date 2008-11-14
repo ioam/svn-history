@@ -40,8 +40,9 @@ class Translator(pattern.PatternGenerator):
     time.
 
     The pattern being translated is drawn at the Translator's current
-    x and y, and with an orientation perpendicular to the Translator's
-    direction.
+    x and y (offset by the pattern's own x and y), and with an
+    orientation perpendicular to the Translator's direction (added to
+    the pattern's own orientation).
     """
     generator = param.ClassSelector(default=pattern.Constant(scale=0.0),
         class_=pattern.PatternGenerator,doc="""Pattern to be translated.""")
@@ -101,9 +102,9 @@ class Translator(pattern.PatternGenerator):
 
         return p.generator(
             xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
-            x=x+t*cos(direction)*self.speed,
-            y=y+t*sin(direction)*self.speed,
-            orientation=direction-pi/2)
+            x=x+t*cos(direction)*self.speed+self.generator.x,
+            y=y+t*sin(direction)*self.speed+self.generator.y,
+            orientation=(direction-pi/2)+self.generator.orientation)
 
 
 
