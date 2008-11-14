@@ -36,20 +36,18 @@ projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotPr
 from topo import param
 class Translator(pattern.PatternGenerator):
     """
-    PatternGenerator that moves another PatternGenerator over time.
-    
-    To create a pattern at a new location, asks the underlying
-    PatternGenerator to create a new pattern at a location translated
-    by an amount based on the global time.
-    """
+    PatternGenerator that translates another PatternGenerator over
+    time.
 
+    The pattern being translated is drawn at the Translator's current
+    x and y, and with an orientation perpendicular to the Translator's
+    direction.
+    """
     generator = param.ClassSelector(default=pattern.Constant(scale=0.0),
         class_=pattern.PatternGenerator,doc="""Pattern to be translated.""")
 
-##     # ALERT: currently, direction parameter is ignored (and is
-##     # computed from the orientation)
-##     direction = param.Number(default=0,bounds=(-pi,pi),doc="""
-##         The direction in which the pattern should move, in radians.""")
+    direction = param.Number(default=0,bounds=(-pi,pi),doc="""
+        The direction in which the pattern should move, in radians.""")
     
     speed = param.Number(default=1,bounds=(0.0,None),doc="""
         The speed with which the pattern should move,
@@ -68,16 +66,12 @@ class Translator(pattern.PatternGenerator):
 ##         doc="""Pattern to display during inter_translation_interval.""")
                                                                               
 
-    # CB cf Composite's advance_pattern_generators
-    def _advance_generator(self):
-        # CEBALERT: should advance all parameters 
-        for param in ['x','y','scale','orientation']:
-            self.generator.force_new_dynamic_value(param)
-        
-
+    def _advance_params(self):
+        for param in ['x','y','direction']:
+            self.force_new_dynamic_value(param)
+       
     def __init__(self,**params):
         super(Translator,self).__init__(**params)
-        #self.orientation = params.get('orientation',self.orientation)
         # ALERT: going to replace this temporary hack when improving
         # the whole 'last_time' mechanism
         self.last_time = -self.reset_period
@@ -90,14 +84,8 @@ class Translator(pattern.PatternGenerator):
         # involving FixedPoint fail otherwise? Or for some other
         # reason?
         if (float(topo.sim.time()) >= self.last_time + self.reset_period):
-        
             self.last_time += self.reset_period
-                
-            # time to reset the parameter
-            (self.x, self.y, self.scale, self.orientation) = (p.generator.x,p.generator.y,p.generator.scale,p.generator.orientation)
-            self._advance_generator()
-
-            #self.direction = ((pi +self.inspect_value("orientation") + pi/2.0) % (2*pi)) - pi
+            self._advance_params()
 
         # compute how much time elapsed from the last reset
         t = float(topo.sim.time())-self.last_time
@@ -107,11 +95,15 @@ class Translator(pattern.PatternGenerator):
         ## calculations in current lissom_oo_or usage, but will lead
         ## to problems/limitations in the future).
         
+        x = self.inspect_value('x')
+        y = self.inspect_value('y')
+        direction = self.inspect_value('direction')
+
         return p.generator(
             xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
-            x=self.x+t*cos(self.orientation+pi/2)*self.speed,
-            y=self.y+t*sin(self.orientation+pi/2)*self.speed,
-            orientation=self.orientation)
+            x=x+t*cos(direction)*self.speed,
+            y=y+t*sin(direction)*self.speed,
+            orientation=direction-pi/2)
 
 
 
@@ -124,16 +116,17 @@ num_lags=4
 input_period=num_lags # By default
 
 input = Translator(
+    x=numbergen.UniformRandom(lbound=-0.75,
+                              ubound=0.75,seed=12),
+    y=numbergen.UniformRandom(lbound=-0.75,
+                              ubound=0.75,seed=34),
+    direction=numbergen.UniformRandom(lbound=-pi,
+                                      ubound=pi,seed=99),
+    generator=pattern.Gaussian(size=0.088388, aspect_ratio=4.66667, scale=1.0,
+                               bounds=sheet.BoundingBox(radius=0.8)),
     reset_period=input_period,
-    speed=0.04,
-    generator=pattern.Gaussian(x=numbergen.UniformRandom(lbound=-0.75,
-                                                         ubound=0.75,seed=12),
-                               y=numbergen.UniformRandom(lbound=-0.75,
-                                                         ubound=0.75,seed=34),
-                               orientation=numbergen.UniformRandom(lbound=-pi,
-                                                                   ubound=pi,seed=99),
-                               size=0.088388, aspect_ratio=4.66667, scale=1.0,
-                               bounds=sheet.BoundingBox(radius=0.8)))
+    speed=0.04)
+
 
 ### Sheets
 retina_density = locals().get('default_retina_density',24.0)
