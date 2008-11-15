@@ -177,6 +177,11 @@ if 'cr' in dims:
 if 'sf' in dims:
     sf_channels=2 # Useful values are 2,3,4.
 
+# Should rewrite the code below in terms of these lists for
+# consistency and to allow arbitrary lists of sizes.
+sf_channel_nums=range(1,sf_channels+1)
+sf_relative_sizes=[sf_spacing**(channel-1) for channel in sf_channel_nums]
+
 
 ### Input patterns and LGN sheets
 num_inputs=1
@@ -467,7 +472,6 @@ topo.sim.grid_layout([vs,ls,es], xstep=70/len(eyes), ystep=200, item_scale=0.75/
 ### Set up appropriate defaults for analysis
 import topo.command
 
-
 preference_maps={
 'or': ['Orientation Preference'],
 'od': ['Ocular Preference'],
@@ -482,9 +486,19 @@ pgs=[]
 for d in dims:
     pgs += preference_maps[d]
 pgs += ['Position Preference','Activity']
-# Also need to measure Phase Preference maps
-
 topo.command.basic.default_analysis_plotgroups=pgs
+
+from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand
+from topo.command.analysis import measure_sine_pref # Move to featureresponses?
+
+# (Measures over the range of afferent sizes used plus one that is
+# half the size of the smallest and one twice the size of the largest.)
+relative_sizes_to_test = [0.5*sf_relative_sizes[0]] + sf_relative_sizes + [2.0*sf_relative_sizes[-1]]
+if 'sf' in dims: SinusoidalMeasureResponseCommand.frequencies = [2.4*s for s in relative_sizes_to_test]
+if 'od' in dims: measure_sine_pref.num_ocularity=2
+if 'dy' in dims: measure_sine_pref.num_disparity=12
+if 'cr' in dims: measure_sine_pref.num_hue=8
+if 'rg' in dims: measure_sine_pref.num_hue=8
 
 # Measure feature maps based on unthresholded initial response for
 # speed and reliability
