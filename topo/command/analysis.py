@@ -60,8 +60,7 @@ from topo.analysis.featureresponses import Feature, PatternPresenter, Subplottin
 from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand, PositionMeasurementCommand, SingleInputResponseCommand, FeatureCurveCommand, UnitCurveCommand
 
 
-
-def save_plotgroup(name,saver_params={},**params):
+class save_plotgroup(ParameterizedFunction):
     """
     Convenience command for saving a set of plots to disk.  Examples:
 
@@ -75,23 +74,48 @@ def save_plotgroup(name,saver_params={},**params):
     (To pass an optional parameter to the PlotFileSaver itself, the
     saver_params dictionary can be used.)
     """
-    plotgroup = copy.deepcopy(plotgroups[name])
 
-    # JABALERT: Why does a Projection plot need a Sheet parameter?
-    # CB: It shouldn't, of course, since we know the sheet when we have
-    # the projection object - it's just leftover from when we passed the
-    # names instead. There should be an ALERT already about this somewhere
-    # in projectionpanel.py or plotgroup.py (both need to be changed).
-    if 'projection' in params:
-        params['sheet'] = params['projection'].dest
+    # Class variables to cache values from previous invocations
+    previous_times=[-1]
+    previous_commands=[]
 
-    plotgroup._set_name(name)
-    # save_plotgroup's **params are passed to the plotgroup
-    for param,val in params.items():
-        setattr(plotgroup,param,val)
+    # The use_cached_results option is experimental, and is not
+    # typically safe to use (as commands can have different results
+    # depending on changes in class defaults, even if the command
+    # string is identical).
+    def __call__(self,name,saver_params={},use_cached_results=False,**params):
+        p=ParamOverrides(self,params,allow_extra_keywords=True)
+
+        plotgroup = copy.deepcopy(plotgroups[name])
     
-    plotgroup.make_plots()
-    plotgroup.filesaver.save_to_disk(**saver_params)
+        # JABALERT: Why does a Projection plot need a Sheet parameter?
+        # CB: It shouldn't, of course, since we know the sheet when we have
+        # the projection object - it's just leftover from when we passed the
+        # names instead. There should be an ALERT already about this somewhere
+        # in projectionpanel.py or plotgroup.py (both need to be changed).
+        if 'projection' in params:
+            params['sheet'] = params['projection'].dest
+    
+        plotgroup._set_name(name)
+        # save_plotgroup's **params are passed to the plotgroup
+        for param,val in params.items():
+            setattr(plotgroup,param,val)
+
+        # Cache commands to ensure that each is run only once per simulation time
+        if (topo.sim.time() != self.previous_times[0]):
+            del self.previous_commands[:]
+            del self.previous_times[:]
+            self.previous_times.append(topo.sim.time())
+
+        if use_cached_results and plotgroup.update_command in self.previous_commands:
+            update=False
+        else:
+            update=True
+            self.previous_commands.append(plotgroup.update_command)
+
+        #print "Plotting %s (with update==%s)" % (plotgroup.name,update)
+        plotgroup.make_plots(update=update)
+        plotgroup.filesaver.save_to_disk(**saver_params)
 
 
 
@@ -432,6 +456,42 @@ pg.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
 
 
 
+class measure_sine_pref(SinusoidalMeasureResponseCommand):
+    """
+    Measure preferences for sine gratings in various combinations.
+    Can measure orientation, spatial frequency, spatial phase,
+    ocular dominance, and horizontal phase disparity.
+    """
+
+    num_ocularity = param.Integer(default=1,bounds=(1,None),softbounds=(1,3),doc="""
+        Number of ocularity values to test; set to 1 to disable or 2 to enable.""")
+
+    num_disparity = param.Integer(default=1,bounds=(1,None),softbounds=(1,48),doc="""
+        Number of disparity values to test; set to 1 to disable or e.g. 12 to enable.""")
+
+    num_hue = param.Integer(default=1,bounds=(1,None),softbounds=(1,48),doc="""
+        Number of hues to test; set to 1 to disable or e.g. 8 to enable.""")
+
+    subplot = param.String("Orientation")
+    
+    def _feature_list(self,p):
+        features = \
+            [Feature(name="frequency",values=p.frequencies),
+             Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
+             Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
+
+        if p.num_ocularity>1: features += \
+            [Feature(name="ocular",range=(0.0,1.0),step=1.0/p.num_ocularity)]
+
+        if p.num_disparity>1: features += \
+            [Feature(name="phasedisparity",range=(0.0,2*pi),step=2*pi/p.num_disparity,cyclic=True)]
+
+        if p.num_hue>1: features += \
+            [Feature(name="hue",range=(0.0,1.0),step=1.0/p.num_hue,cyclic=True)]
+            
+        return features
+
+
 class measure_or_pref(SinusoidalMeasureResponseCommand):
     """Measure an orientation preference map by collating the response to patterns."""
 
@@ -445,17 +505,19 @@ class measure_or_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Orientation Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
-             update_command='measure_or_pref()')
+             update_command='measure_sine_pref()')
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
+pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
+pg.add_plot('Phase Selectivity',[('Strength','PhaseSelectivity')])
 pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
 
 
 pg= create_plotgroup(name='Spatial Frequency Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation and frequency.',
-             update_command='measure_or_pref(frequencies=frange(1.0,6.0,0.2),num_phase=15,num_orientation=4)')
+             update_command='measure_sine_pref(frequencies=frange(1.0,6.0,0.2),num_phase=15,num_orientation=4)')
 pg.add_plot('Spatial Frequency Preference',[('Strength','FrequencyPreference')])
 pg.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity')])
 # Just calls measure_or_pref with different defaults, and plots different maps.
@@ -479,7 +541,7 @@ class measure_od_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Ocular Preference',category="Preference Maps",
              doc='Measure preference for sine gratings between two eyes.',
-             update_command='measure_od_pref()')
+             update_command='measure_sine_pref()')
 pg.add_plot('Ocular Preference',[('Strength','OcularPreference')])
 pg.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
 
@@ -504,7 +566,7 @@ class measure_phasedisparity(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",
              doc='Measure preference for sine gratings differing in phase between two sheets.',
-             update_command='measure_phasedisparity()',normalize=True)
+             update_command='measure_sine_pref()',normalize=True)
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
 pg.add_static_image('Color Key','topo/command/disp_key_white_vert_small.png')
