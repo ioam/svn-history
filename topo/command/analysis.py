@@ -517,10 +517,10 @@ pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
 
 pg= create_plotgroup(name='Spatial Frequency Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation and frequency.',
-             update_command='measure_sine_pref(frequencies=frange(1.0,6.0,0.2),num_phase=15,num_orientation=4)')
+             update_command='measure_sine_pref()')
 pg.add_plot('Spatial Frequency Preference',[('Strength','FrequencyPreference')])
 pg.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity')])
-# Just calls measure_or_pref with different defaults, and plots different maps.
+# Just calls measure_sine_pref to plot different maps.
 
 
 
