@@ -59,7 +59,7 @@ class PlotGroup(param.Parameterized):
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.
     """
-    update_command = param.String(default="",doc="""
+    update_command = param.Parameter(default="",doc="""
     Command to execute before updating this plot, e.g. to calculate sheet views.
     
     The command can be any Python code, and will be evaluated in the main namespace
@@ -67,7 +67,7 @@ class PlotGroup(param.Parameterized):
     the template for this plot, but various arguments can be passed, a modified
     version substituted, etc.""")
 
-    plot_command = param.String(default="",doc="""
+    plot_command = param.Parameter(default="",doc="""
     Command to execute when updating sheet or coordinate of unit to be plotted
     when the simulator time has not changed (i.e. no further measurement of
     responses is required).
@@ -110,10 +110,16 @@ class PlotGroup(param.Parameterized):
 
     # CB: (subclasses add more commands)
     def _exec_update_command(self):
-        exec self.update_command in __main__.__dict__
+        if type(self.update_command) is str:
+            exec self.update_command in __main__.__dict__
+        else:
+            self.update_command()
 
     def _exec_plot_command(self):
-        exec self.plot_command in __main__.__dict__
+        if type(self.plot_command) is str:
+            exec self.plot_command in __main__.__dict__
+        else:
+            self.plot_command()
 
         
     def _plot_list(self):
@@ -540,9 +546,12 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         return [self.sheet]
 
     def _exec_update_command(self):
-        self._check_sheet_type()
-        ProjectionSheetMeasurementCommand.sheet = self.sheet
+        if self.sheet is not None:
+            self._check_sheet_type()
+            ProjectionSheetMeasurementCommand.sheet = self.sheet
         super(ProjectionSheetPlotGroup,self)._exec_update_command()
+        if self.sheet is None:
+            self.sheet=ProjectionSheetMeasurementCommand.sheet
 
     # Special case: if the Strength is set to self.keyname, we
     # request UnitViews (i.e. by changing the Strength key in
@@ -884,8 +893,11 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
 class FeatureCurvePlotGroup(UnitPlotGroup):
 
     def _exec_update_command(self):
-        topo.analysis.featureresponses.FeatureCurveCommand.sheet = self.sheet
+        if self.sheet is not None:
+            topo.analysis.featureresponses.FeatureCurveCommand.sheet = self.sheet
         super(FeatureCurvePlotGroup,self)._exec_update_command()          
+        if self.sheet is None:
+            self.sheet=topo.analysis.featureresponses.FeatureCurveCommand.sheet
         self.get_curve_time()
 
     def _exec_plot_command(self):
