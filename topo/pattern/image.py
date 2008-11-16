@@ -359,7 +359,10 @@ class GenericImage(PatternGenerator):
         Load the object's state (as in the superclass), but replace
         the '_image' string with an actual Image object.
         """
-        if '_image' in state:
+        # CEBALERT: Need to figure out how state['_image'] could ever
+        # actually be None; apparently it is sometimes (see SF
+        # #2276819).
+        if '_image' in state and state['_image'] is not None:
             import StringIO
             state['_image'] = PIL.open(StringIO.StringIO(state['_image']))
         super(GenericImage,self).__setstate__(state)
