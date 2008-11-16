@@ -56,7 +56,7 @@ topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,
                  learning_rate=numbergen.ExponentialDecay(starting_value = 0.5,
                                                           time_constant=-10000/8.0,
                                                           base=0.5),
-                 weights_generator = pattern.Gaussian(),
+                 weights_generator = pattern.Gaussian(size=0.5,aspect_ratio=0.3),
                  nominal_bounds_template=sheet.BoundingBox(radius=0.1),
                  response_fn = responsefn.optimized.CFPRF_DotProduct_opt(),
                  learning_fn=learningfn.projfn.CFPLF_EuclideanHebbian())
