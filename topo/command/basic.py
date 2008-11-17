@@ -291,7 +291,7 @@ def default_analysis_function():
 
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
-        save_plotgroup(pg)
+        save_plotgroup(pg,use_cached_results=True)
 
     # Plot projections from each measured map
     measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
