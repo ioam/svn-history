@@ -174,7 +174,7 @@ def update_activity():
 
 pg = create_plotgroup(name='Activity',category='Basic',
              doc='Plot the activity for all Sheets.', auto_refresh=True,
-             update_command='update_activity()', plot_immediately=True)
+             update_command=update_activity, plot_immediately=True)
 pg.add_plot('Activity',[('Strength','Activity')])
 
 
@@ -188,7 +188,7 @@ class update_connectionfields(UnitMeasurementCommand):
 
 pg= create_plotgroup(name='Connection Fields',category="Basic",
                      doc='Plot the weight strength in each ConnectionField of a specific unit of a Sheet.',
-                     update_command='update_connectionfields()',
+                     update_command=update_connectionfields,
                      plot_immediately=True, normalize=True, situate=True)
 pg.add_plot('Connection Fields',[('Strength','Weights')])
 
@@ -200,7 +200,7 @@ class update_projection(UnitMeasurementCommand):
 
 pg= create_plotgroup(name='Projection',category="Basic",
            doc='Plot the weights of an array of ConnectionFields in a Projection.',
-           update_command='update_projection()',
+           update_command=update_projection,
            plot_immediately=False, normalize=True,sheet_coords=True)
 pg.add_plot('Projection',[('Strength','Weights')])
 
@@ -228,7 +228,7 @@ class update_projectionactivity(ProjectionSheetMeasurementCommand):
 
 pg =  create_plotgroup(name='Projection Activity',category="Basic",
              doc='Plot the activity in each Projection that connects to a Sheet.',
-             update_command='update_projectionactivity()',
+             update_command=update_projectionactivity,
              plot_immediately=True, normalize=True,auto_refresh=True)
 pg.add_plot('Projection Activity',[('Strength','ProjectionActivity')])
 
@@ -249,7 +249,7 @@ class measure_position_pref(PositionMeasurementCommand):
 
 pg= create_plotgroup(name='Position Preference',category="Preference Maps",
            doc='Measure preference for the X and Y position of a Gaussian.',
-           update_command='measure_position_pref()',
+           update_command=measure_position_pref,
            plot_command='topographic_grid()',
            normalize=True)
 
@@ -315,7 +315,7 @@ class measure_rfs(SingleInputResponseCommand):
 
 pg= create_plotgroup(name='RF Projection',category="Other",
     doc='Measure receptive fields.',
-    update_command='measure_rfs()',
+    update_command=measure_rfs,
     plot_command='',
     normalize=True)
 pg.add_plot('RFs',[('Strength','RFs')])
@@ -367,7 +367,7 @@ pg.add_plot('RFs',[('Strength','RFs')])
 #
 #pg= create_plotgroup(name='RF Projection (noise)',category="Other",
 #           doc='Measure receptive fields by reverse correlation using random noise.',
-#           update_command='measure_rfs_noise()',
+#           update_command=measure_rfs_noise,
 #           plot_command='',normalize=True)
 #pg.add_plot('RFs',[('Strength','RFs')])
 
@@ -447,7 +447,7 @@ class measure_cog(ParameterizedFunction):
 
 pg= create_plotgroup(name='Center of Gravity',category="Preference Maps",
              doc='Measure the center of gravity of each ConnectionField in a Projection.',
-             update_command='measure_cog(proj_name="")',
+             update_command=measure_cog,
              plot_command='topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',
              normalize=True)
 pg.add_plot('X CoG',[('Strength','XCoG')])
@@ -505,7 +505,7 @@ class measure_or_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Orientation Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
-             update_command='measure_sine_pref()')
+             update_command=measure_sine_pref)
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
@@ -517,7 +517,7 @@ pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
 
 pg= create_plotgroup(name='Spatial Frequency Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation and frequency.',
-             update_command='measure_sine_pref()')
+             update_command=measure_sine_pref)
 pg.add_plot('Spatial Frequency Preference',[('Strength','FrequencyPreference')])
 pg.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity')])
 # Just calls measure_sine_pref to plot different maps.
@@ -541,7 +541,7 @@ class measure_od_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Ocular Preference',category="Preference Maps",
              doc='Measure preference for sine gratings between two eyes.',
-             update_command='measure_sine_pref()')
+             update_command=measure_sine_pref)
 pg.add_plot('Ocular Preference',[('Strength','OcularPreference')])
 pg.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
 
@@ -566,7 +566,7 @@ class measure_phasedisparity(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",
              doc='Measure preference for sine gratings differing in phase between two sheets.',
-             update_command='measure_sine_pref()',normalize=True)
+             update_command=measure_sine_pref,normalize=True)
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
 pg.add_static_image('Color Key','topo/command/disp_key_white_vert_small.png')
@@ -598,7 +598,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',
             Plot orientation tuning curves for a specific unit, measured using full-field sine gratings.
             Although the data takes a long time to collect, once it is ready the plots
             are available immediately for any unit.""",
-        update_command='measure_or_tuning_fullfield()',
+        update_command=measure_or_tuning_fullfield,
         plot_command='cyclic_tuning_curve(x_axis="orientation")')
 
 
@@ -639,7 +639,7 @@ class measure_or_tuning(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="Tuning Curves",doc="""
             Measure orientation tuning for a specific unit at different contrasts,
             using a pattern chosen to match the preferences of that unit.""",
-        update_command='measure_or_tuning()',
+        update_command=measure_or_tuning,
         plot_command='cyclic_tuning_curve(x_axis="orientation")',
         prerequisites=['XPreference'])
 
@@ -698,7 +698,7 @@ class measure_size_response(UnitCurveCommand):
 
 create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
         doc='Measure the size preference for a specific unit.',
-        update_command='measure_size_response()',
+        update_command=measure_size_response,
         plot_command='tuning_curve(x_axis="size",unit="Diameter of stimulus")',
         prerequisites=['OrientationPreference','XPreference'])
 
@@ -756,7 +756,7 @@ class measure_contrast_response(UnitCurveCommand):
 
 create_plotgroup(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
         doc='Measure the contrast response function for a specific unit.',
-        update_command='measure_contrast_response()',
+        update_command=measure_contrast_response,
         plot_command='tuning_curve(x_axis="contrast",unit="%")',
         prerequisites=['OrientationPreference','XPreference'])
 
@@ -787,7 +787,7 @@ class measure_dr_pref(SinusoidalMeasureResponseCommand):
   
 pg= create_plotgroup(name='Direction Preference',category="Preference Maps",
              doc='Measure preference for sine grating movement direction.',
-             update_command='measure_dr_pref()')
+             update_command=measure_dr_pref)
 pg.add_plot('Direction Preference',[('Hue','DirectionPreference')])
 pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
                                                 ('Confidence','DirectionSelectivity')])
@@ -820,7 +820,7 @@ class measure_hue_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Hue Preference',category="Preference Maps",
              doc='Measure preference for colors.',
-             update_command='measure_hue_pref()',normalize=True)
+             update_command=measure_hue_pref,normalize=True)
 pg.add_plot('Hue Preference',[('Hue','HuePreference')])
 pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence','HueSelectivity')])
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
@@ -863,7 +863,7 @@ class measure_corner_or_pref(PositionMeasurementCommand):
 
 pg= create_plotgroup(name='Corner OR Preference',category="Preference Maps",
              doc='Measure orientation preference for corner shape (or other complex stimuli that cannot be represented as fullfield patterns).',
-             update_command='measure_corner_or_pref()',
+             update_command=measure_corner_or_pref,
              plot_command='topographic_grid()',
              normalize=True)
 pg.add_plot('Corner Orientation Preference',[('Hue','OrientationPreference')])
@@ -981,7 +981,7 @@ class measure_retinotopy(SinusoidalMeasureResponseCommand):
 
 
 pg=create_plotgroup(name='Retinotopy',category="Other",
-                    doc='Measure retinotopy',update_command='measure_retinotopy()',
+                    doc='Measure retinotopy',update_command=measure_retinotopy,
                     normalize=True)
 pg.add_plot('Retinotopy',[('Hue','RetinotopyPreference')])
 pg.add_plot('Retinotopy Selectivity',[('Hue','RetinotopyPreference'),('Confidence','RetinotopySelectivity')])
@@ -1050,7 +1050,7 @@ class measure_orientation_contrast(UnitCurveCommand):
 
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
                  doc='Measure the response of one unit to a centre and surround sine grating disk.',
-                 update_command='measure_orientation_contrast()',
+                 update_command=measure_orientation_contrast,
                  plot_command='tuning_curve(x_axis="contrastcentre",unit="%")',
                  prerequisites=['OrientationPreference','XPreference'])        
 
