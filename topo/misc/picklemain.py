@@ -32,7 +32,6 @@ class PickleMain(object):
         self.pickled_bytecode = StringIO()
         self.pickler = pickle.Pickler(self.pickled_bytecode,-1)
 
-        import picklesupport
         self.pickler.dispatch[new.code] = save_code
         self.pickler.dispatch[new.function] = save_function
         self.pickler.dispatch[dict] = save_module_dict
