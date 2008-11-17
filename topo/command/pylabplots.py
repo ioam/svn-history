@@ -663,44 +663,6 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
     hold(hold_on)
     
 
-
-# RFHACK
-### JABHACKALERT: rename & should be called from the 'Receptive
-### Fields*' pgts in topo/command/analysis.py & should share the
-### implementation of topographic_grid (because that's what is
-### intended to be visualized here).
-### Should also be rewritten using PylabPlotCommand.
-def plotrctg():
-    
-    import matplotlib
-    import pylab
-    from numpy import fabs
-    from topo.base.arrayutil import centroid
-
-    # CEBALERT: make clearer (by doing in a more numpy way)
-    # CEBHACKALERT: only last plot hangs around because plots are overwritten
-    pylab.show._needmain = False
-
-    # CEBHACKALERT: needs to be better linked!
-    from topo.analysis.featureresponses import grid
-    
-    for g in grid.values():
-        xx=[]
-        yy=[]
-        rows,cols = g.shape
-        for iii in range(rows): 
-            for jjj in range(cols):
-                # The abs() ensures the centroid is taken over both 
-                # positive and negative correlations
-                xxx,yyy = centroid(fabs(g[iii,jjj]))
-                xx.append(xxx)
-                yy.append(yyy)
-
-        pylab.scatter(xx,yy)
-        pylab.show()
-
-
-
 # JABALERT: Untested as of Mon Nov 10 12:59:54 GMT 2008
 class plot_tracked_attributes(PylabPlotCommand):
     """
@@ -774,7 +736,7 @@ class plot_modulation_ratio(PylabPlotCommand):
 
     # JABALERT: All but the first argument should probably be Parameters
     def __call__(self,fullmatrix,simple_sheet_name=None,complex_sheet_name=None,bins=frange(0,2.0,0.1,inclusive=True),**params):
-        p=ParamOverrides(self,params,allow_extra_keywords=True)
+        p=ParamOverrides(self,params)
 
         if (topo.sim.objects().has_key(simple_sheet_name)):
             v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]])
