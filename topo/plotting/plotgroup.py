@@ -727,7 +727,7 @@ class ProjectionPlotGroup(GridPlotGroup):
     def _exec_update_command(self):
         coords=self.generate_coords()
         UnitMeasurementCommand.coords = coords
-        UnitMeasurementCommand.proj_name = self.projection.name
+        UnitMeasurementCommand.projection = self.projection
         super(ProjectionPlotGroup,self)._exec_update_command()
 
 
@@ -752,8 +752,8 @@ class UnitMeasurementCommand(ProjectionSheetMeasurementCommand):
     coords = param.List(default=[(0,0)],doc="""
         List of coordinates of unit(s) to measure.""")
 
-    proj_name = param.String(default='',doc="""
-        Name of the projection to measure; the empty string means all projections.""")
+    projection = param.ObjectSelector(default=None,doc="""
+        Name of the projection to measure; None means all projections.""")
 
     __abstract = True
 
@@ -763,7 +763,7 @@ class UnitMeasurementCommand(ProjectionSheetMeasurementCommand):
         s = p.sheet
         if s is not None:
             for x,y in p.coords:
-                s.update_unit_view(x,y,p.proj_name)
+                s.update_unit_view(x,y,'' if p.projection is None else p.projection.name)
 
 
 

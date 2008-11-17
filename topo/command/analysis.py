@@ -182,8 +182,8 @@ pg.add_plot('Activity',[('Strength','Activity')])
 class update_connectionfields(UnitMeasurementCommand):
     """A callable Parameterized command for measuring or plotting a unit from a Projection."""
 
-    # Plot all CFs, not just one Projection
-    proj_name = param.String(default='',constant=True)
+    # Force plotting of all CFs, not just one Projection
+    projection = param.ObjectSelector(default=None,constant=True)
 
 
 pg= create_plotgroup(name='Connection Fields',category="Basic",
