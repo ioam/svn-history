@@ -1371,15 +1371,6 @@ class PicklableClassAttributes(object):
         Return a dictionary of self.module's PO classes' attributes, plus
         self.startup_commands.
         """
-        # warn that classes & functions defined in __main__ won't unpickle
-        import types
-        for k,v in __main__.__dict__.items():
-            # there's classes and functions...what else?
-            if isinstance(v,type) or isinstance(v,types.FunctionType):
-                if v.__module__ == "__main__":
-                    Parameterized().warning("%s (type %s) has source in __main__; it will only be found on unpickling if the class is explicitly defined (e.g. by running the same script first) before unpickling."%(k,type(v)))
-
-        
         class_attributes = {}
         self.get_PO_class_attributes(self.module,class_attributes,[],exclude=self.exclude)
 
