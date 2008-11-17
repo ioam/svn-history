@@ -60,6 +60,29 @@ from topo.analysis.featureresponses import Feature, PatternPresenter, Subplottin
 from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand, PositionMeasurementCommand, SingleInputResponseCommand, FeatureCurveCommand, UnitCurveCommand
 
 
+# Helper function for save_plotgroup
+def _equivalent_for_plotgroup_update(p1,p2):
+    """
+    Helper function for save_plotgroup.
+    
+    Comparison operator for deciding whether make_plots(update==False) is
+    safe for one plotgroup if the other has already been updated.
+    
+    Treats plotgroups as the same if the specified list of attributes
+    (if present) match in both plotgroups.
+    """
+
+    attrs_to_check = ['update_command','keyname','sheet','x','y','projection','input_sheet','density','coords']
+
+    for a in attrs_to_check:
+        if hasattr(p1,a) or hasattr(p2,a):
+            if not (hasattr(p1,a) and hasattr(p2,a) and getattr(p1,a)== getattr(p2,a)):
+                return False
+
+    return True
+
+
+
 class save_plotgroup(ParameterizedFunction):
     """
     Convenience command for saving a set of plots to disk.  Examples:
@@ -70,20 +93,29 @@ class save_plotgroup(ParameterizedFunction):
                                   
     Some plotgroups accept optional parameters, which can be passed
     like projection above.
-
-    (To pass an optional parameter to the PlotFileSaver itself, the
-    saver_params dictionary can be used.)
     """
 
-    # Class variables to cache values from previous invocations
-    previous_times=[-1]
-    previous_commands=[]
+    equivalence_fn = param.Callable(default=_equivalent_for_plotgroup_update,doc="""
+        Function to call on plotgroups p1,p2 to determine if calling update_command
+        on one of them is sufficient to update both plots.  Should return False
+        unless the commands are exact equivalents, including all relevant parameters.""")
 
-    # The use_cached_results option is experimental, and is not
-    # typically safe to use (as commands can have different results
-    # depending on changes in class defaults, even if the command
-    # string is identical).
-    def __call__(self,name,saver_params={},use_cached_results=False,**params):
+    use_cached_results = param.Boolean(default=False,doc="""
+        If True, will use the equivalence_fn to determine cases where
+        the update_command for a plotgroup can safely be skipped, to
+        avoid lengthy redundant computation.  Should usually be
+        False for safety, but can be enabled for e.g. batch mode
+        runs using a related batch of plots.""")
+
+    saver_params = param.Dict(default={},doc="""
+        Optional parameters to pass to the underlying PlotFileSaver object.""")
+
+
+    # Class variables to cache values from previous invocations
+    previous_time=[-1]
+    previous_plotgroups=[]
+
+    def __call__(self,name,**params):
         p=ParamOverrides(self,params,allow_extra_keywords=True)
 
         plotgroup = copy.deepcopy(plotgroups[name])
@@ -94,28 +126,34 @@ class save_plotgroup(ParameterizedFunction):
         # names instead. There should be an ALERT already about this somewhere
         # in projectionpanel.py or plotgroup.py (both need to be changed).
         if 'projection' in params:
-            params['sheet'] = params['projection'].dest
+            setattr(plotgroup,'sheet',params['projection'].dest)
     
         plotgroup._set_name(name)
         # save_plotgroup's **params are passed to the plotgroup
-        for param,val in params.items():
+        for param,val in p.extra_keywords.items():
             setattr(plotgroup,param,val)
 
-        # Cache commands to ensure that each is run only once per simulation time
-        if (topo.sim.time() != self.previous_times[0]):
-            del self.previous_commands[:]
-            del self.previous_times[:]
-            self.previous_times.append(topo.sim.time())
-
-        if use_cached_results and plotgroup.update_command in self.previous_commands:
-            update=False
+        # Reset plot cache when time changes
+        if (topo.sim.time() != self.previous_time[0]):
+            del self.previous_time[:]
+            del self.previous_plotgroups[:]
+            self.previous_time.append(topo.sim.time())
+            
+        # Skip update step if equivalent to prior command at this sim time
+        update=True
+        if p.use_cached_results:
+            for g in self.previous_plotgroups:
+                if p.equivalence_fn(g,plotgroup):
+                    update=False
+                    break
+                
+        if update:
+            self.previous_plotgroups.append(plotgroup)
         else:
-            update=True
-            self.previous_commands.append(plotgroup.update_command)
+            self.message("Using cached update_command results for %s" % plotgroup.name)
 
-        #print "Plotting %s (with update==%s)" % (plotgroup.name,update)
         plotgroup.make_plots(update=update)
-        plotgroup.filesaver.save_to_disk(**saver_params)
+        plotgroup.filesaver.save_to_disk(**(p.saver_params))
 
 
 
