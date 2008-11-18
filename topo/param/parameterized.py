@@ -1559,22 +1559,15 @@ class ParameterizedFunction(Parameterized):
     __abstract = True
 
     @classmethod
-    def instance(class_,use_class_name=False):
-        """
-        Return an instance of this class.
-
-        use_class_name causes the instance to have the same name as
-        the class (rather than the usual gensym).
-        """
+    def instance(class_,**params):
+        """Return an instance of this class."""
         inst=object.__new__(class_)
-        kw = {}
-        if use_class_name:
-            kw['name']=class_.__name__
-        Parameterized.__init__(inst,**kw)    
+        Parameterized.__init__(inst,**params)    
         return inst
 
     def __new__(class_,*args,**params):
         inst = class_.instance()
+        inst._set_name(class_.__name__)
         return inst.__call__(*args,**params)
 
     def __call__(self,*args,**kw):
