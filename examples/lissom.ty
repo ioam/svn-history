@@ -472,33 +472,35 @@ topo.sim.grid_layout([vs,ls,es], xstep=70/len(eyes), ystep=200, item_scale=0.75/
 ### Set up appropriate defaults for analysis
 import topo.command
 
-preference_maps={
-'or': ['Orientation Preference'],
-'od': ['Ocular Preference'],
-'dr': ['Direction Preference'],
-'dy': ['PhaseDisparity Preference'],
-'cr': ['Hue Preference'],
-'rg': ['Hue Preference'],
-'sf': ['Spatial Frequency Preference'],
-}
-
-pgs=[]
-for d in dims:
-    pgs += preference_maps[d]
-pgs += ['Position Preference','Activity']
+# Declare which maps to measure
+preference_maps=[
+('dy',['PhaseDisparity Preference']),
+('cr',['Hue Preference']),
+('rg',['Hue Preference']),
+('dr',['Direction Preference']),
+('or',['Orientation Preference']),
+('od',['Ocular Preference']),
+('sf',['Spatial Frequency Preference']),
+]
+pgs = [x for y in [m for n,m in preference_maps if n in dims] for x in y] + \
+      ['Position Preference','Activity']
 topo.command.basic.default_analysis_plotgroups=pgs
 
-from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand
-from topo.command.analysis import measure_sine_pref # Move to featureresponses?
 
-# (Measures over the range of afferent sizes used plus one that is
-# half the size of the smallest and one twice the size of the largest.)
-relative_sizes_to_test = [0.5*sf_relative_sizes[0]] + sf_relative_sizes + [2.0*sf_relative_sizes[-1]]
-if 'sf' in dims: SinusoidalMeasureResponseCommand.frequencies = [2.4*s for s in relative_sizes_to_test]
+# By default, measures SF at the sizes of RF used, for speed, but if
+# expand_sf_test_range is True, will also test over a larger range,
+# including half the size of the smallest and twice the size of the
+# largest.
+expand_sf_test_range=locals().get('expand_sf_test_range',False)
+wide_relative_sizes=[0.5*sf_relative_sizes[0]] + sf_relative_sizes + [2.0*sf_relative_sizes[-1]]
+relative_sizes=(wide_relative_sizes if expand_sf_test_range else sf_relative_sizes)
+
+
+# Set up defaults for measure_sine_pref, which is used for or, od, and sf
+from topo.command.analysis import measure_sine_pref
+if 'sf' in dims: measure_sine_pref.frequencies = [2.4*s for s in relative_sizes]
 if 'od' in dims: measure_sine_pref.num_ocularity=2
-if 'dy' in dims: measure_sine_pref.num_disparity=12
-if 'cr' in dims: measure_sine_pref.num_hue=8
-if 'rg' in dims: measure_sine_pref.num_hue=8
+
 
 # Measure feature maps based on unthresholded initial response for
 # speed and reliability
