@@ -1545,7 +1545,7 @@ class ParamOverrides(dict):
         return extra_keywords
 
 
-# CB: need to make a better attempt at documenting.
+
 class ParameterizedFunction(Parameterized):
     """
     Acts like a Python function, but with arguments that are Parameters.
@@ -1553,16 +1553,33 @@ class ParameterizedFunction(Parameterized):
     Implemented as a subclass of Parameterized that, when instantiated,
     automatically invokes __call__ and returns the result, instead of
     returning an instance of the class.
+
+    To obtain an instance of this class, call instance().
     """
     __abstract = True
 
-    def __new__(class_,*args,**params):
+    @classmethod
+    def instance(class_,use_class_name=False):
+        """
+        Return an instance of this class.
+
+        use_class_name causes the instance to have the same name as
+        the class (rather than the usual gensym).
+        """
         inst=object.__new__(class_)
-        Parameterized.__init__(inst,name=class_.__name__)
+        kw = {}
+        if use_class_name:
+            kw['name']=class_.__name__
+        Parameterized.__init__(inst,**kw)    
+        return inst
+
+    def __new__(class_,*args,**params):
+        inst = class_.instance()
         return inst.__call__(*args,**params)
 
     def __call__(self,*args,**kw):
         raise NotImplementedError("Subclasses must implement __call__.")
+
 
 
 ## CB: would allow all instance methods to pickle, but we use cPickle
