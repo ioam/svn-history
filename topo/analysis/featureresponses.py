@@ -206,7 +206,8 @@ class FeatureResponses(PatternDrivenAnalysis):
         self.feature_names=[f.name for f in features]
         values_lists=[f.values for f in features]
         self.permutations = cross_product(values_lists)
-
+        values_description=' * '.join(["%d %s" % (len(f.values),f.name) for f in features])
+        
         self.refresh_act_wins=False
         if display:
             if hasattr(topo,'guimain'):
@@ -221,8 +222,11 @@ class FeatureResponses(PatternDrivenAnalysis):
         timer = copy.copy(topo.sim.timer)
         timer.func = self.present_permutation
 
-        if hasattr(topo,'guimain'): topo.guimain.open_progress_window(timer)
-            
+        if hasattr(topo,'guimain'):
+            topo.guimain.open_progress_window(timer)
+        else:
+            self.message("Presenting %d test patterns (%s)." % (len(self.permutations),values_description))
+
         timer.call_fixed_num_times(self.permutations)
         
         # Run hooks after the analysis session
@@ -336,8 +340,8 @@ class FeatureMaps(FeatureResponses):
         combining selectivity with other plots as using Confidence
         subplots.""")
     
-    def __init__(self,features):
-        super(FeatureMaps,self).__init__(features)
+    def __init__(self,features,**params):
+        super(FeatureMaps,self).__init__(features,**params)
         self.features=features
         
     def collect_feature_responses(self,pattern_presenter,param_dict,display,weighted_average=True):
@@ -952,7 +956,7 @@ class MeasureResponseCommand(ParameterizedFunction):
         """Measure the response to the specified pattern and store the data in each sheet."""
         
         p=ParamOverrides(self,params)
-        x=FeatureMaps(self._feature_list(p))
+        x=FeatureMaps(self._feature_list(p),name="FeatureMaps_for_"+self.name)
         static_params = dict([(s,p[s]) for s in p.static_parameters])
         if p.duration is not None:
             p.pattern_presenter.duration=p.duration
