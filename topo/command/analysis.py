@@ -130,8 +130,8 @@ class save_plotgroup(ParameterizedFunction):
     
         plotgroup._set_name(name)
         # save_plotgroup's **params are passed to the plotgroup
-        for param,val in p.extra_keywords.items():
-            setattr(plotgroup,param,val)
+        for n,v in p.extra_keywords.items():
+            setattr(plotgroup,n,v)
 
         # Reset plot cache when time changes
         if (topo.sim.time() != self.previous_time[0]):
@@ -146,11 +146,14 @@ class save_plotgroup(ParameterizedFunction):
                 if p.equivalence_fn(g,plotgroup):
                     update=False
                     break
-                
+
+        keywords=" ".join(["%s" % (v.name if isinstance(v,param.Parameterized) else str(v)) for n,v in p.extra_keywords.items()])
+        plot_description="%s%s%s" % (plotgroup.name," " if keywords else "",keywords)
         if update:
             self.previous_plotgroups.append(plotgroup)
+            self.message("%s: Running update_command" % plot_description)
         else:
-            self.message("Using cached update_command results for %s" % plotgroup.name)
+            self.message("%s: Using cached update_command results" % plot_description)
 
         plotgroup.make_plots(update=update)
         plotgroup.filesaver.save_to_disk(**(p.saver_params))
@@ -499,6 +502,15 @@ class measure_sine_pref(SinusoidalMeasureResponseCommand):
     Measure preferences for sine gratings in various combinations.
     Can measure orientation, spatial frequency, spatial phase,
     ocular dominance, and horizontal phase disparity.
+
+    In practice, this command is useful for any subset of the possible
+    combinations, but if all combinations are included, the number of
+    input patterns quickly grows quite large, much larger than the
+    typical number of patterns required for an entire simulation.
+    Thus typically this command will be used for the subset of
+    dimensions that need to be evaluated together, while simpler
+    special-purpose routines are provided below for other dimensions
+    (such as hue and disparity).
     """
 
     num_ocularity = param.Integer(default=1,bounds=(1,None),softbounds=(1,3),doc="""
@@ -545,8 +557,8 @@ pg= create_plotgroup(name='Orientation Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
              update_command=measure_sine_pref)
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
-pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
-						   ('Confidence','OrientationSelectivity')])
+pg.add_plot('Orientation Preference&Selectivity',
+            [('Hue','OrientationPreference'), ('Confidence','OrientationSelectivity')])
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
 pg.add_plot('Phase Selectivity',[('Strength','PhaseSelectivity')])
@@ -561,21 +573,14 @@ pg.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity')
 # Just calls measure_sine_pref to plot different maps.
 
 
-
 class measure_od_pref(SinusoidalMeasureResponseCommand):
     """Measure an ocular dominance preference map by collating the response to patterns."""
 
-    ### JABALERT: Shouldn't there be a num_ocularities parameter as
-    ### well, to present various combinations of left and right eye
-    ### activity?  And shouldn't this just be combined with
-    ### measure_or_pref, using num_ocularities=1 by default?
-    
     def _feature_list(self,p):
         return [Feature(name="frequency",values=p.frequencies),
                 Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
                 Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0])]
-  
 
 pg= create_plotgroup(name='Ocular Preference',category="Preference Maps",
              doc='Measure preference for sine gratings between two eyes.',
@@ -585,26 +590,29 @@ pg.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
 
 
 
+
 class measure_phasedisparity(SinusoidalMeasureResponseCommand):
     """Measure a phase disparity preference map by collating the response to patterns."""
-
-    ### JABALERT: Shouldn't this just be combined with measure_or_pref
-    ### and measure_od_pref, using num_disparity=1 by default?
 
     num_disparity = param.Integer(default=12,bounds=(1,None),softbounds=(1,48),
                                   doc="Number of disparity values to test.")
 
+    orientation = param.Number(default=pi/2,softbounds=(0.0,2*pi),doc="""
+        Orientation of the test pattern; typically vertical to measure
+        horizontal disparity.""")
+    
+    static_parameters = param.List(default=["orientation","scale","offset"])
+
     def _feature_list(self,p):
         return [Feature(name="frequency",values=p.frequencies),
-                Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
-                Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0]),
                 Feature(name="phasedisparity",range=(0.0,2*pi),step=2*pi/p.num_disparity,cyclic=True)]
 
 
-pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",
-             doc='Measure preference for sine gratings differing in phase between two sheets.',
-             update_command=measure_sine_pref,normalize=True)
+pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",doc="""
+    Measure preference for sine gratings at a specific orentation differing in phase
+    between two input sheets.""",
+             update_command=measure_phasedisparity,normalize=True)
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
 pg.add_static_image('Color Key','topo/command/disp_key_white_vert_small.png')
