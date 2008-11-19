@@ -146,7 +146,16 @@ class FullMatrix(param.Parameterized):
 
 
 
+
 # CB: FeatureResponses and ReverseCorrelation need cleanup; I began but haven't finished.
+# JABALERT: At least:
+# - Move features out of __init__ and into measure_responses
+# - Change measure_responses to __call__, as it's the only thing this
+#   class really does
+# - Make the other methods private (_) since they are for internal use
+# - Possibly -- make the __call__ methods have the same signature?
+# - Clean up the inheritance hierarchy?
+
 
 class FeatureResponses(PatternDrivenAnalysis):
     """
@@ -193,7 +202,6 @@ class FeatureResponses(PatternDrivenAnalysis):
         return  [x for x in topo.sim.objects(Sheet).values()
                  if hasattr(x,'measure_maps') and x.measure_maps]
         
-        
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
         
@@ -202,11 +210,14 @@ class FeatureResponses(PatternDrivenAnalysis):
 
         self.param_dict=param_dict
         self.pattern_presenter = pattern_presenter
+        
+        features_to_permute = [f for f in features if f.compute_fn is None]
+        self.features_to_compute = [f for f in self.features if f.compute_fn is not None]
 
-        self.feature_names=[f.name for f in features]
-        values_lists=[f.values for f in features]
+        self.feature_names=[f.name for f in features_to_permute]
+        values_lists=[f.values for f in features_to_permute]
         self.permutations = cross_product(values_lists)
-        values_description=' * '.join(["%d %s" % (len(f.values),f.name) for f in features])
+        values_description=' * '.join(["%d %s" % (len(f.values),f.name) for f in features_to_permute])
         
         self.refresh_act_wins=False
         if display:
@@ -245,16 +256,22 @@ class FeatureResponses(PatternDrivenAnalysis):
         for f in self.after_pattern_presentation: f()
 
         if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
-        self._update(permutation)
+
+        # Calculate computed features and update distributions using
+        # both permuted and computed values
+        feature_vals=zip(self.feature_names, permutation)
+        for f in self.features_to_compute:
+            feature_vals+=[(f.name,f.compute_fn(feature_vals))]
+        self._update(feature_vals)
+
         topo.sim.state_pop()
 
-
-    def _update(self,permutation):
+    def _update(self,current_values):
         # Update each DistributionMatrix with (activity,bin)
         for sheet in self.sheets_to_measure():
-            for feature,value in zip(self.feature_names, permutation):
+            for feature,value in current_values:
                 self._featureresponses[sheet][feature].update(sheet.activity, value)
-            self._fullmatrix[sheet].update(sheet.activity,zip(self.feature_names, permutation))
+            self._fullmatrix[sheet].update(sheet.activity,current_values)
 
 
 
@@ -312,8 +329,8 @@ class ReverseCorrelation(FeatureResponses):
         super(ReverseCorrelation,self).measure_responses(pattern_presenter,param_dict,
                                                          features,display)
                                                          
-
-    def _update(self,permutation):
+    # Ignores current_values; they simply provide distinct patterns on the retina
+    def _update(self,current_values):
         for sheet in self.sheets_to_measure():
             rows,cols = sheet.activity.shape
             for ii in range(rows): 
@@ -337,7 +354,7 @@ class FeatureMaps(FeatureResponses):
         Factor by which to multiply the calculated selectivity values
         before plotting them.  Usually set much greater than 1.0 to
         highlight particularly unselective areas, especially when
-        combining selectivity with other plots as using Confidence
+        combining selectivity with other plots as when using Confidence
         subplots.""")
     
     def __init__(self,features,**params):
@@ -477,14 +494,18 @@ class Feature(object):
     Stores the parameters required for generating a map of one input feature.
     """
 
-    def __init__(self, name, range=None, step=0.0, values=None, cyclic=False):
+    def __init__(self, name, range=None, step=0.0, values=None, cyclic=False, compute_fn=None):
          """
          Users can provide either a range and a step size, or a list of values.
          If a list of values is supplied, the range can be omitted unless the
          default of the min and max in the list of values is not appropriate.
+
+         If non-None, the compute_fn should be a function that when given a list 
+         of parameter values, computes and appends the value for this feature.
          """ 
          self.name=name
          self.cyclic=cyclic
+         self.compute_fn=compute_fn
                      
          if range:  
              self.range=range

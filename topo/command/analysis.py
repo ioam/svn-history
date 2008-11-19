@@ -808,6 +808,11 @@ create_plotgroup(template_plot_type="curve",name='Contrast Response',category="T
 
 
 
+def compute_orientation_from_direction(current_values):
+    return ((dict(current_values)['direction'])+pi/2) % pi
+
+
+
 class measure_dr_pref(SinusoidalMeasureResponseCommand):
     """Measure a direction preference map by collating the response to patterns."""
 
@@ -825,12 +830,19 @@ class measure_dr_pref(SinusoidalMeasureResponseCommand):
     subplot = param.String("Direction")
 
     def _feature_list(self,p):
+        # orientation is computed from direction
+        dr = Feature(name="direction",range=(0.0,2*pi),step=2*pi/p.num_direction,cyclic=True)
+        or_values = list(set([compute_orientation_from_direction([("direction",v)]) for v in dr.values]))
+        or_values.sort()
+
         return [Feature(name="speed",range=(0.0,p.max_speed),step=float(p.max_speed)/p.num_speeds,cyclic=False),
                 Feature(name="frequency",values=p.frequencies),
                 Feature(name="direction",range=(0.0,2*pi),step=2*pi/p.num_direction,cyclic=True),
-                Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
+                Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+                Feature(name="orientation",range=(0.0,pi),values=or_values,cyclic=True,
+                        compute_fn=compute_orientation_from_direction)]
 
-  
+
 pg= create_plotgroup(name='Direction Preference',category="Preference Maps",
              doc='Measure preference for sine grating movement direction.',
              update_command=measure_dr_pref)
