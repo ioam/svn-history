@@ -233,7 +233,7 @@ for e in eyes:
 
             elif dataset=="Nature":
                 scalingfactor=[1.4*0.9,1.4,1.4*0.97] if 'cr' in dims else [1.0,1.0,1.0]
-                if 'cr' in dims:   image_filenames=["images/colormap/rgb/%02d_%d.pgm"%(i,cone_types.index(cone)) \
+                if 'cr' in dims:   image_filenames=["images/colormap/rgb/%02d_%d.png"%(i,cone_types.index(cone)) \
                                                     for i in xrange(1,26)]
                 elif 'rg' in dims: image_filenames=["images/colormap/%02d_%d.png"%(i,cone_types.index(cone)) \
                                                     for i in xrange(5)]
