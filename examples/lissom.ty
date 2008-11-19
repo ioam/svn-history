@@ -25,7 +25,7 @@ OR/OD/DR/DY is the default.
 You can also select different training datasets:
  Gaussians:      ./topographica -c "dataset='Gaussian'" examples/lissom.ty
  Natural images: ./topographica -c "dataset='Nature'"   examples/lissom.ty  
-
+ Color images:   ./topographica -c "dataset='colormap'" examples/lissom.ty  
 Gaussian is the default.
 
 These simulations are intended to be close (but approximate) matches
@@ -83,7 +83,7 @@ various map simulations in:
 Specifically:
     dataset='Gaussian',    dims=['or','dy']:           ramtohul:msc06
     dataset='Nature',      dims=['or','rg']:           jbednar:neurocomputing05
-    dataset='Nature',      dims=['or','cr']:           depaula:phd07
+    dataset='colormap',    dims=['or','cr']:           depaula:phd07
     dataset='Nature',      dims=['or','sf']:           palmer:sfn07
 
 $Id$
@@ -186,15 +186,23 @@ sf_relative_sizes=[sf_spacing**(channel-1) for channel in sf_channel_nums]
 ### Input patterns and LGN sheets
 num_inputs=1
 dataset=locals().get('dataset',"Gaussian")
+
+# CB: not sure this is the clearest way to do it...
+# (also need to rename 'colormap').
+natural_image_sets = ['Nature','colormap']
+# Could we avoid some of the various ifs in this file by using
+# dictionaries?
+# I haven't yet used this file enough to know what's best...
+    
 if dataset=="Gaussian":
     input_type=pattern.Gaussian
     ids=1.0
-elif dataset=="Nature":
+elif dataset in natural_image_sets:
     input_type=pattern.image.FileImage
     ids=4.0
         
 default_retina_density=locals().get('default_retina_density',48.0 \
-                                    if dataset=="Nature" or 'dy' in dims else 24.0)
+                                    if dataset in natural_image_sets or 'dy' in dims else 24.0)
 
 # helper fns for synthesizing a specified hue
 def h_to_r(h): return hsv_to_rgb(h,1.0,1.0)[0]
@@ -231,13 +239,19 @@ for e in eyes:
                 for i in xrange(num_inputs)]
                 input_composite=pattern.SeparatedComposite(min_separation=2.2*v1aff_radius,generators=inputs)
 
-            elif dataset=="Nature":
+            elif dataset in natural_image_sets:
                 scalingfactor=[1.4*0.9,1.4,1.4*0.97] if 'cr' in dims else [1.0,1.0,1.0]
-                if 'cr' in dims:   image_filenames=["images/colormap/rgb/%02d_%d.png"%(i,cone_types.index(cone)) \
-                                                    for i in xrange(1,26)]
-                elif 'rg' in dims: image_filenames=["images/colormap/%02d_%d.png"%(i,cone_types.index(cone)) \
-                                                    for i in xrange(5)]
-                else:              image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+                if dataset=="colormap":
+                    if 'rg' in dims:
+                        image_filenames=["images/colormap/%02d_%d.png"%(i,cone_types.index(cone))
+                                         for i in xrange(5)]
+                    else:
+                        image_filenames=["images/colormap/rgb/%02d_%d.png"%(i,cone_types.index(cone))
+                                         for i in xrange(1,26)]
+
+                else:
+                    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+
                 inputs=[input_type(
                     filename=f, size=10.0, cache_image=False,
                     x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12) + \
@@ -282,8 +296,8 @@ for e in eyes:
 topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=locals().get('default_density',48.0),
                                      tsettle=9,nominal_bounds=sheet.BoundingBox(radius=0.5))
 
-topo.sim['V1'].output_fn.lower_bound=0.076 if dataset=="Nature" else 0.083
-topo.sim['V1'].output_fn.upper_bound=0.626 if dataset=="Nature" else 0.633
+topo.sim['V1'].output_fn.lower_bound=0.076 if dataset in natural_image_sets else 0.083
+topo.sim['V1'].output_fn.upper_bound=0.626 if dataset in natural_image_sets else 0.633
 
 # DoG weights for the LGN
 centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,
@@ -292,7 +306,7 @@ surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,
                              output_fn=outputfn.DivisiveNormalizeL1())
 
 strength=[2.33, 2.38, 2.53, 2.8] # 2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
-if dataset=="Nature":
+if dataset in natural_image_sets:
     strength=[4.7, 4.8, 5.1, 5.8] 
 
 # Convenience variable; number of afferent connections to V1
@@ -421,24 +435,24 @@ for e in eyes:
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=projection.CFProjection,
-                 strength=1.2 if dataset=="Nature" else 0.9,
+                 strength=1.2 if dataset in natural_image_sets else 0.9,
                  weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.10417),
                  nominal_bounds_template=sheet.BoundingBox(radius=0.10417),
                  learning_rate=2.55528/ids) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=projection.CFProjection,
-                 strength=-1.75 if dataset=="Nature" else -0.9, 
+                 strength=-1.75 if dataset in natural_image_sets else -0.9, 
                  weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.22917),
                  nominal_bounds_template=sheet.BoundingBox(radius=0.22917),
-                 learning_rate=1.80873/ids/5 if dataset=="Nature" else 1.80873/ids)
+                 learning_rate=1.80873/ids/5 if dataset in natural_image_sets else 1.80873/ids)
 
 
 ### Actions scheduled to occur as the simulation proceeds.
-st=(1.0/2.0 if dataset=="Nature" else 1.0/num_inputs)
+st=(1.0/2.0 if dataset in natural_image_sets else 1.0/num_inputs)
 sheet.lissom.schedule_events("topo.sim['V1']",st=st,
                              aff_name="Afferent",ids=ids,
-                             increase_inhibition=(dataset=="Nature"))
+                             increase_inhibition=(dataset in natural_image_sets))
 
 # These simulations are slow, so we want more progress reports
 topo.sim.schedule_command(25*st,'pass')
