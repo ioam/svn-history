@@ -212,7 +212,7 @@ class FeatureResponses(PatternDrivenAnalysis):
         self.pattern_presenter = pattern_presenter
         
         features_to_permute = [f for f in features if f.compute_fn is None]
-        self.features_to_compute = [f for f in self.features if f.compute_fn is not None]
+        self.features_to_compute = [f for f in features if f.compute_fn is not None]
 
         self.feature_names=[f.name for f in features_to_permute]
         values_lists=[f.values for f in features_to_permute]
@@ -243,27 +243,28 @@ class FeatureResponses(PatternDrivenAnalysis):
         # Run hooks after the analysis session
         for f in self.after_analysis_session: f()
 
-
     def present_permutation(self,permutation):
         """Present a pattern with the specified set of feature values."""
-        
         topo.sim.state_push()
-        settings = dict(zip(self.feature_names, permutation))
-        
-        # Run hooks before and after pattern presentation
+
+        # Calculate complete set of settings
+        permuted_settings = zip(self.feature_names, permutation)
+        complete_settings = permuted_settings + \
+            [(f.name,f.compute_fn(permuted_settings)) for f in self.features_to_compute]
+            
+        # Run hooks before and after pattern presentation.
+        # Could use complete_settings here, to avoid some
+        # PatternPresenter special cases, but that might cause
+        # conflicts with the existing PatternPresenter code.
         for f in self.before_pattern_presentation: f()
-        self.pattern_presenter(settings,self.param_dict)
+        #valstring = " ".join(["%s=%s" % (n,v) for n,v in complete_settings])
+        #self.message("Presenting pattern %s" % valstring)
+        self.pattern_presenter(dict(permuted_settings),self.param_dict)
         for f in self.after_pattern_presentation: f()
 
         if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
 
-        # Calculate computed features and update distributions using
-        # both permuted and computed values
-        feature_vals=zip(self.feature_names, permutation)
-        for f in self.features_to_compute:
-            feature_vals+=[(f.name,f.compute_fn(feature_vals))]
-        self._update(feature_vals)
-
+        self._update(complete_settings)
         topo.sim.state_pop()
 
     def _update(self,current_values):
@@ -494,34 +495,35 @@ class Feature(object):
     Stores the parameters required for generating a map of one input feature.
     """
 
-    def __init__(self, name, range=None, step=0.0, values=None, cyclic=False, compute_fn=None):
+    def __init__(self, name, range=None, step=0.0, values=None, cyclic=False, compute_fn=None, offset=0):
          """
          Users can provide either a range and a step size, or a list of values.
          If a list of values is supplied, the range can be omitted unless the
          default of the min and max in the list of values is not appropriate.
 
          If non-None, the compute_fn should be a function that when given a list 
-         of parameter values, computes and appends the value for this feature.
-         """ 
+         of other parameter values, computes and returns the value for this feature.
+
+         If supplied, the offset is added to the given or computed values to allow
+         the starting value to be specified.
+         """
          self.name=name
          self.cyclic=cyclic
          self.compute_fn=compute_fn
+         self.range=range
                      
-         if range:  
-             self.range=range
-         elif values:
-             self.range=(min(values),max(values))
+         if values is not None:
+             self.values=values if offset == 0 else [v+offset for v in values]
+             if not self.range:
+                 self.range=(min(self.values),max(self.values))
          else:
-             raise ValueError('The range or values must be specified')
-             
-         if values:  
-             self.values=values
-         else:
+             if range is None:
+                 raise ValueError('The range or values must be specified.')
              low_bound,up_bound = self.range
-             self.values=(frange(low_bound,up_bound,step,not cyclic))
-
-
-
+             values=(frange(low_bound,up_bound,step,not cyclic))
+             self.values = values if offset == 0 else \
+                           [(v+offset)%(up_bound-low_bound) if cyclic else (v+offset)
+                            for v in values]
 
 
 
@@ -597,14 +599,21 @@ class PatternPresenter(param.Parameterized):
         ### interaction between or differences between patterns.           
 
         if features_values.has_key('direction'):
-            orientation = features_values['direction']+pi/2            
+            orientation = features_values['direction']+pi/2
             from topo.pattern.basic import Sweeper            
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
-                try: 
-                    inputs[name] = Sweeper(generator=inputs[name],step=int(name[-1]),speed=features_values['speed'])
-                    setattr(inputs[name],'orientation',orientation)
+                speed=features_values['speed']
+                try:
+                    step=int(name[-1])
                 except:
-                    self.warning('Direction is defined only when there are different input lags (numbered at the end of their name).')
+                    if not hasattr(self,'direction_warned'):
+                        self.warning('Assuming step is zero; no input lag number specified at the end of the input sheet name.')
+                        self.direction_warned=True
+                    step=0
+                speed=features_values['speed']
+                inputs[name] = Sweeper(generator=inputs[name],step=step,speed=speed)
+                setattr(inputs[name],'orientation',orientation)
+
            
 
         if features_values.has_key('hue'):
