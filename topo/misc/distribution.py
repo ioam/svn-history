@@ -152,6 +152,13 @@ class Distribution(object):
         return self._counts.values()
 
 
+    def bins(self):
+        """
+        Return a list of bins that have been populated.
+        """
+        return self._data.keys()
+
+
     def add(self, new_data):
         """
         Add a set of new data in the form of a dictionary of (bin,
