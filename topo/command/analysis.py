@@ -809,7 +809,19 @@ create_plotgroup(template_plot_type="curve",name='Contrast Response',category="T
 
 
 def compute_orientation_from_direction(current_values):
-    return ((dict(current_values)['direction'])+pi/2) % pi
+    """ 
+    Return the orientation corresponding to the given direction. 
+
+    Wraps the value to be in the range [0,pi), and rounds it slightly
+    so that wrapped values are precisely the same (to avoid biases
+    caused by vector averaging with keep_peak=True).
+
+    Note that in very rare cases (1 in 10^-13?), rounding could lead
+    to different values for a wrapped quantity, and thus a heavily
+    biased orientation map.  In that case, just choose a different
+    number of divisions for direction.
+    """
+    return round(((dict(current_values)['direction'])+(pi/2)) % pi,13)
 
 
 
@@ -821,8 +833,8 @@ class measure_dr_pref(SinusoidalMeasureResponseCommand):
     num_direction = param.Integer(default=6,bounds=(1,None),softbounds=(1,48),
                                   doc="Number of directions to test.")
 
-    num_speeds = param.Integer(default=4,bounds=(1,None),softbounds=(1,10),
-                               doc="Number of speeds to test.")
+    num_speeds = param.Integer(default=4,bounds=(0,None),softbounds=(0,10),doc="""
+        Number of speeds to test (where zero means only static patterns).""")
 
     max_speed = param.Number(default=2.0/24.0,bounds=(0,None),doc="""
         The maximum speed to measure (with zero always the minimum).""")
@@ -835,7 +847,8 @@ class measure_dr_pref(SinusoidalMeasureResponseCommand):
         or_values = list(set([compute_orientation_from_direction([("direction",v)]) for v in dr.values]))
         or_values.sort()
 
-        return [Feature(name="speed",range=(0.0,p.max_speed),step=float(p.max_speed)/p.num_speeds,cyclic=False),
+        return [Feature(name="speed",values=[0],cyclic=False) if p.num_speeds is 0 else
+                Feature(name="speed",range=(0.0,p.max_speed),step=float(p.max_speed)/p.num_speeds,cyclic=False),
                 Feature(name="frequency",values=p.frequencies),
                 Feature(name="direction",range=(0.0,2*pi),step=2*pi/p.num_direction,cyclic=True),
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
