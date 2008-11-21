@@ -663,8 +663,8 @@ class PatternPresenter(param.Parameterized):
                 
           
         if features_values.has_key("phasedisparity"):
-            temp_phase1=inputs[input_sheet_names[0]].phase - inputs[input_sheet_names[0]].phasedisparity/2.0
-            temp_phase2=inputs[input_sheet_names[len(input_sheet_names)-1]].phase + inputs[input_sheet_names[len(input_sheet_names)-1]].phasedisparity/2.0
+            temp_phase1=features_values['phase']-features_values['phasedisparity']/2.0
+            temp_phase2=features_values['phase']+features_values['phasedisparity']/2.0
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
                 if (name.count('Right')):
                     inputs[name].phase=wrap(0,2*pi,temp_phase1)
@@ -701,9 +701,9 @@ class PatternPresenter(param.Parameterized):
         if features_values.has_key("ocular"):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
                 if (name.count('Right')):
-                    inputs[name].scale=2*inputs[name].ocular
+                    inputs[name].scale=2*features_values['ocular']
                 elif (name.count('Left')):
-                    inputs[name].scale=2.0-2*inputs[name].ocular
+                    inputs[name].scale=2.0-2*features_values['ocular']
                 else:
                     self.warning('Skipping input region %s; Ocularity is defined only for Left and Right retinas.' %
                                  name)
