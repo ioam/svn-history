@@ -514,6 +514,12 @@ relative_sizes=(wide_relative_sizes if expand_sf_test_range else sf_relative_siz
 from topo.command.analysis import measure_sine_pref
 if 'sf' in dims: measure_sine_pref.frequencies = [2.4*s for s in relative_sizes]
 if 'od' in dims: measure_sine_pref.num_ocularity=2
+# Including the rest in measure_sine_pref is usually not computationally feasible:
+#if 'dr' in dims: measure_sine_pref.num_direction=6
+#if 'dr' in dims: measure_sine_pref.num_speeds=4
+#if 'rg' in dims: measure_sine_pref.num_hue=8
+#if 'cr' in dims: measure_sine_pref.num_hue=8
+#if 'dy' in dims: measure_sine_pref.num_disparity=6 # 12
 
 
 # Measure feature maps based on unthresholded initial response for
