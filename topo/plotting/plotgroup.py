@@ -929,9 +929,6 @@ Global repository of PlotGroups, to which users can add their own as
 needed.
 """
 
-from topo.misc.util import ExtraPickler
-ExtraPickler().add(('topo.plotting.plotgroup','plotgroups'))
-
 plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
                    'Projection': CFProjectionPlotGroup,
                    'RF Projection':RFProjectionPlotGroup,

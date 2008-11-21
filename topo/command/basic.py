@@ -228,6 +228,17 @@ def load_snapshot(snapshot_name):
 
     snapshot.close()
 
+    # Restore subplotting prefs without worrying if there is a
+    # problem (e.g. if topo/analysis/ is not present)
+    try: 
+        from topo.analysis.featureresponses import Subplotting
+        Subplotting.restore_subplots()
+    except:
+        p = param.Parameterized(name="load_snapshot")
+        p.message("Unable to restore Subplotting settings")
+
+
+
 
 def save_script_repr(script_name=None):
     """

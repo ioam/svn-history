@@ -800,6 +800,8 @@ class Subplotting(param.Parameterized):
     subplotting_declared = param.Boolean(default=False,
         doc="Whether set_subplots has previously been called")
     
+    _last_args = param.Parameter(default=())
+    
     @staticmethod    
     def set_subplots(prefix=None,hue="",confidence="",force=True):
         """
@@ -837,6 +839,8 @@ class Subplotting(param.Parameterized):
            Subplotting.set_subplots()
              - Remove subplots from all the plotgroups_to_subplot.
         """
+
+        Subplotting._last_args=(prefix,hue,confidence,force)
         
         if Subplotting.subplotting_declared and not force:
             return
@@ -859,6 +863,11 @@ class Subplotting(param.Parameterized):
 
         Subplotting.subplotting_declared=True
 
+
+    @staticmethod    
+    def restore_subplots():
+        args=Subplotting._last_args
+        if args != (): Subplotting.set_subplots(*(Subplotting._last_args))
 
 
 
