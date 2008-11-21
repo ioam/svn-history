@@ -496,12 +496,31 @@ pg.add_plot('Y CoG',[('Strength','YCoG')])
 pg.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
 
 
+# Helper function for measuring direction maps
+def compute_orientation_from_direction(current_values):
+    """ 
+    Return the orientation corresponding to the given direction. 
+
+    Wraps the value to be in the range [0,pi), and rounds it slightly
+    so that wrapped values are precisely the same (to avoid biases
+    caused by vector averaging with keep_peak=True).
+
+    Note that in very rare cases (1 in 10^-13?), rounding could lead
+    to different values for a wrapped quantity, and thus give a
+    heavily biased orientation map.  In that case, just choose a
+    different number of directions to test, to avoid that floating
+    point boundary.
+    """
+    return round(((dict(current_values)['direction'])+(pi/2)) % pi,13)
+
+
 
 class measure_sine_pref(SinusoidalMeasureResponseCommand):
     """
     Measure preferences for sine gratings in various combinations.
     Can measure orientation, spatial frequency, spatial phase,
-    ocular dominance, and horizontal phase disparity.
+    ocular dominance, horizontal phase disparity, color hue, motion
+    direction, and speed of motion.
 
     In practice, this command is useful for any subset of the possible
     combinations, but if all combinations are included, the number of
@@ -522,13 +541,31 @@ class measure_sine_pref(SinusoidalMeasureResponseCommand):
     num_hue = param.Integer(default=1,bounds=(1,None),softbounds=(1,48),doc="""
         Number of hues to test; set to 1 to disable or e.g. 8 to enable.""")
 
+    num_direction = param.Integer(default=0,bounds=(0,None),softbounds=(0,48),doc="""
+        Number of directions to test.  If nonzero, overrides num_orientation, 
+        because the orientation is calculated to be perpendicular to the direction.""")
+
+    num_speeds = param.Integer(default=4,bounds=(0,None),softbounds=(0,10),doc="""
+        Number of speeds to test (where zero means only static patterns).
+        Ignored when num_direction=0.""")
+
+    max_speed = param.Number(default=2.0/24.0,bounds=(0,None),doc="""
+        The maximum speed to measure (with zero always the minimum).""")
+
     subplot = param.String("Orientation")
+
     
     def _feature_list(self,p):
+        # Always varies frequency and phase; everything else depends on parameters.
+
         features = \
-            [Feature(name="frequency",values=p.frequencies),
-             Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True),
-             Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
+            [Feature(name="frequency",values=p.frequencies)]
+
+        if p.num_direction==0: features += \
+            [Feature(name="orientation",range=(0.0,pi),step=pi/p.num_orientation,cyclic=True)]
+
+        features += \
+            [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
 
         if p.num_ocularity>1: features += \
             [Feature(name="ocular",range=(0.0,1.0),step=1.0/p.num_ocularity)]
@@ -539,7 +576,22 @@ class measure_sine_pref(SinusoidalMeasureResponseCommand):
         if p.num_hue>1: features += \
             [Feature(name="hue",range=(0.0,1.0),step=1.0/p.num_hue,cyclic=True)]
             
+        if p.num_direction>0 and p.num_speeds==0: features += \
+            [Feature(name="speed",values=[0],cyclic=False)]
+        
+        if p.num_direction>0 and p.num_speeds>0: features += \
+            [Feature(name="speed",range=(0.0,p.max_speed),step=float(p.max_speed)/p.num_speeds,cyclic=False)]
+
+        if p.num_direction>0:
+            # Compute orientation from direction
+            dr = Feature(name="direction",range=(0.0,2*pi),step=2*pi/p.num_direction,cyclic=True)
+            or_values = list(set([compute_orientation_from_direction([("direction",v)]) for v in dr.values]))
+            features += [dr, \
+                 Feature(name="orientation",range=(0.0,pi),values=or_values,cyclic=True,
+                         compute_fn=compute_orientation_from_direction)]
+
         return features
+
 
 
 class measure_or_pref(SinusoidalMeasureResponseCommand):
@@ -808,23 +860,6 @@ create_plotgroup(template_plot_type="curve",name='Contrast Response',category="T
 
 
 
-def compute_orientation_from_direction(current_values):
-    """ 
-    Return the orientation corresponding to the given direction. 
-
-    Wraps the value to be in the range [0,pi), and rounds it slightly
-    so that wrapped values are precisely the same (to avoid biases
-    caused by vector averaging with keep_peak=True).
-
-    Note that in very rare cases (1 in 10^-13?), rounding could lead
-    to different values for a wrapped quantity, and thus a heavily
-    biased orientation map.  In that case, just choose a different
-    number of divisions for direction.
-    """
-    return round(((dict(current_values)['direction'])+(pi/2)) % pi,13)
-
-
-
 class measure_dr_pref(SinusoidalMeasureResponseCommand):
     """Measure a direction preference map by collating the response to patterns."""
 
@@ -845,7 +880,6 @@ class measure_dr_pref(SinusoidalMeasureResponseCommand):
         # orientation is computed from direction
         dr = Feature(name="direction",range=(0.0,2*pi),step=2*pi/p.num_direction,cyclic=True)
         or_values = list(set([compute_orientation_from_direction([("direction",v)]) for v in dr.values]))
-        or_values.sort()
 
         return [Feature(name="speed",values=[0],cyclic=False) if p.num_speeds is 0 else
                 Feature(name="speed",range=(0.0,p.max_speed),step=float(p.max_speed)/p.num_speeds,cyclic=False),
