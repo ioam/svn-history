@@ -284,6 +284,11 @@ class Sweeper(PatternGenerator):
         Number of steps at the given speed to move in the sweep direction.
         The distance moved is speed*step.""")
 
+    # Provide access to value needed for measuring maps
+    def __get_phase(self): return self.generator.phase
+    def __set_phase(self,new_val): self.generator.phase = new_val
+    phase = property(__get_phase,__set_phase)
+
     def function(self,params):
         """Selects and returns one of the patterns in the list."""
         bounds = params['bounds']
