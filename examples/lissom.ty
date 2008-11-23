@@ -25,7 +25,7 @@ OR/OD/DR/DY is the default.
 You can also select different training datasets:
  Gaussians:      ./topographica -c "dataset='Gaussian'" examples/lissom.ty
  Natural images: ./topographica -c "dataset='Nature'"   examples/lissom.ty  
- Color images:   ./topographica -c "dataset='colormap'" examples/lissom.ty  
+ Color images:   ./topographica -c "dataset='FoliageB'" examples/lissom.ty  
 Gaussian is the default.
 
 These simulations are intended to be close (but approximate) matches
@@ -82,8 +82,8 @@ various map simulations in:
 
 Specifically:
     dataset='Gaussian',    dims=['or','dy']:           ramtohul:msc06
-    dataset='colormap',    dims=['or','rg']:           jbednar:neurocomputing05
-    dataset='colormap',    dims=['or','cr']:           depaula:phd07
+    dataset='FoliageA',    dims=['or','rg']:           jbednar:neurocomputing05
+    dataset='FoliageB',    dims=['or','cr']:           depaula:phd07
     dataset='Nature',      dims=['or','sf']:           palmer:sfn07
 
 $Id$
@@ -189,7 +189,7 @@ dataset=locals().get('dataset',"Gaussian")
 
 # CB: not sure this is the clearest way to do it...
 # (also need to rename 'colormap').
-natural_image_sets = ['Nature','colormap']
+natural_image_sets = ['Nature','FoliageA','FoliageB']
 # Could we avoid some of the various ifs in this file by using
 # dictionaries?
 # I haven't yet used this file enough to know what's best...
@@ -241,16 +241,16 @@ for e in eyes:
 
             elif dataset in natural_image_sets:
                 scalingfactor=[1.4*0.9,1.4,1.4*0.97] if 'cr' in dims else [1.0,1.0,1.0]
-                if dataset=="colormap":
-                    if 'rg' in dims:
-                        image_filenames=["images/colormap/%02d_%d.png"%(i,cone_types.index(cone))
-                                         for i in xrange(5)]
-                    else:
-                        image_filenames=["images/colormap/rgb/%02d_%d.png"%(i,cone_types.index(cone))
-                                         for i in xrange(1,26)]
-
-                else:
+                if dataset=="FoliageA":
+                    image_filenames=["images/mcgill/foliage_a/%02d_%d.png"%(i,cone_types.index(cone))
+                                     for i in xrange(5)]
+                elif dataset=="FoliageB":
+                    image_filenames=["images/mcgill/foliage_b/%02d_%d.png"%(i,cone_types.index(cone))
+                                     for i in xrange(1,26)]
+                elif dataset=="Natural":
                     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+                else:
+                    raise ValueError("Unknown dataset '%s'"%dataset)
 
                 inputs=[input_type(
                     filename=f, size=10.0, cache_image=False,
