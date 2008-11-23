@@ -249,8 +249,6 @@ for e in eyes:
                                      for i in xrange(1,26)]
                 elif dataset=="Natural":
                     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-                else:
-                    raise ValueError("Unknown dataset '%s'"%dataset)
 
                 inputs=[input_type(
                     filename=f, size=10.0, cache_image=False,
@@ -264,6 +262,10 @@ for e in eyes:
                     numbergen.UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[cone_types.index(cone)])
                 for f in image_filenames]
                 input_composite=pattern.Selector(generators=inputs)
+
+            else:
+                raise ValueError("Unknown dataset '%s'"%dataset)
+
 
             if n != '':
                 input_moved=pattern.Sweeper(
