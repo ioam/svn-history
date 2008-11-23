@@ -82,7 +82,7 @@ various map simulations in:
 
 Specifically:
     dataset='Gaussian',    dims=['or','dy']:           ramtohul:msc06
-    dataset='Nature',      dims=['or','rg']:           jbednar:neurocomputing05
+    dataset='colormap',    dims=['or','rg']:           jbednar:neurocomputing05
     dataset='colormap',    dims=['or','cr']:           depaula:phd07
     dataset='Nature',      dims=['or','sf']:           palmer:sfn07
 
