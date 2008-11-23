@@ -1559,9 +1559,9 @@ class ParameterizedFunction(Parameterized):
     __abstract = True
 
     @classmethod
-    def instance(class_,**params):
+    def instance(class_,*args,**params):
         """Return an instance of this class."""
-        inst=class_._true_new(class_)
+        inst=class_._true_new(class_,*args)
         Parameterized.__init__(inst,**params)
         return inst
 
@@ -1576,7 +1576,7 @@ class ParameterizedFunction(Parameterized):
     @classmethod
     def _true_new(class_,*args):
         # what the original __new__ method would have been
-        return object.__new__(class_,*args)
+        return Parameterized.__new__(class_,*args)
 
     def __reduce__(self):
         # control pickle and copy: ensure that _true_new() is called,
