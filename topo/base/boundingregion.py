@@ -22,8 +22,6 @@ class BoundingRegion(param.Parameterized):
     """
     __abstract = True
     
-    def __init__(self,**args):
-        super(BoundingRegion,self).__init__(**args)
     def contains(self,x,y):
         raise NotImplementedError
     def scale(self,xs,ys):
