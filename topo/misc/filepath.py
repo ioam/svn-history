@@ -45,7 +45,7 @@ class Filename(param.Parameter):
         try:
             resolve_path(val,self.search_paths)
         except IOError, e:
-            param.Parameterized(name="%s.%s"%(str(obj),self.attrib_name(obj))).warning('%s'%(e.args[0]))
+            param.Parameterized(name="%s.%s"%(obj.name,self._attrib_name)).warning('%s'%(e.args[0]))
 
         super(Filename,self).__set__(obj,val)
         
