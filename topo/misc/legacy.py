@@ -486,6 +486,15 @@ from topo.misc.patternfn import *
         fake_a_module('patternfns',topo.misc,code)
         
 
+        # r9617 removed ExtraPickler
+        class ExtraPicklerSkipper(object):
+            def __setstate__(self,state):
+                # print warning of what's being skipped?
+                pass
+        fake_a_class(topo.misc.util,"ExtraPickler",
+                     ExtraPicklerSkipper)
+
+
         # rXXXX renamed topo.misc.utils
         import topo.misc.util
         code = \
