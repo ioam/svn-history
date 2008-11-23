@@ -1579,8 +1579,9 @@ class ParameterizedFunction(Parameterized):
         return Parameterized.__new__(class_,*args)
 
     def __reduce__(self):
-        # control pickle and copy: ensure that _true_new() is called,
-        # rather than __new__(), to reconstruct objects
+        # control reconstruction (during unpickling and copying):
+        # ensure that _true_new() is called, rather than __new__(), to
+        # reconstruct objects
         state = ParameterizedFunction.__getstate__(self)
         return (ParameterizedFunction._true_new,(),state)
         
