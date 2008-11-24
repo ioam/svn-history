@@ -247,7 +247,7 @@ for e in eyes:
                 elif dataset=="FoliageB":
                     image_filenames=["images/mcgill/foliage_b/%02d_%d.png"%(i,cone_types.index(cone))
                                      for i in xrange(1,26)]
-                elif dataset=="Natural":
+                elif dataset=="Nature":
                     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
 
                 inputs=[input_type(
