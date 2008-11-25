@@ -13,7 +13,6 @@ from numpy.oldnumeric import zeros, ones, Float, divide,ravel,clip,array
 
 from .. import param
 
-from topo.base.sheetview import SheetView
 from topo.base.sheetcoords import SheetCoordinateSystem,Slice
 
 from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
