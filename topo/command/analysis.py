@@ -363,57 +363,6 @@ pg.add_plot('RFs',[('Strength','RFs')])
 
 
 
-###############################################################################
-# Disabled until investigated further
-#class measure_rfs_noise(SingleInputResponseCommand):
-#    """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
-#
-#    pattern_presenter = param.Callable(
-#        default=PatternPresenter(GaussianRandom()))
-#
-#    scale = param.Number(default=0.5)
-#
-#    static_parameters = param.List(default=["scale","offset"])
-#
-#    def __call__(self,**params):
-#        p=ParamOverrides(self,params)
-#        self.params('input_sheet').compute_default()
-#
-#        ### JABALERT: What was this function supposed to do?  It steps
-#        ### through a range of x and y, yet a GaussianRandom pattern
-#        ### ignores x and y, so all it really seems to be doing is
-#        ### ending up with about 10000 noise patterns.  Surely there
-#        ### is a better way to do that?  For now, divisions, xrange,
-#        ### and y_range are no longer parameters, because they are
-#        ### nonsensical, but a proper parameter (e.g. number of random
-#        ### presentations) should be added and these removed.
-#        ### Alternatively, maybe it was supposed to be a GaussianCloud
-#        ### pattern, in which case these should be made into
-#        ### Parameters (or calculated like in measure_rfs).
-#        divisions=99
-#        x_range=(-1.0,1.0)
-#        y_range=(-1.0,1.0)
-#
-#        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-#                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
-#                          
-#        static_params = dict([(s,p[s]) for s in p.static_parameters])        
-#        if p.duration is not None:
-#            p.pattern_presenter.duration=p.duration
-#        if p.apply_output_fn is not None:
-#            p.pattern_presenter.apply_output_fn=p.apply_output_fn
-#        x=ReverseCorrelation(feature_values,input_sheet=p.input_sheet)
-#        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,feature_values)
-#
-#
-#pg= create_plotgroup(name='RF Projection (noise)',category="Other",
-#           doc='Measure receptive fields by reverse correlation using random noise.',
-#           update_command=measure_rfs_noise,
-#           plot_command='',normalize=True)
-#pg.add_plot('RFs',[('Strength','RFs')])
-
-
-
 class measure_cog(ParameterizedFunction):
     """
     Calculate center of gravity (CoG) for each CF of each unit in each CFSheet.
