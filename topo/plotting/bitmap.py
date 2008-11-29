@@ -40,13 +40,14 @@ from topo.misc.filepath import application_path, resolve_path
 # serves as an example of what needs to be fixed in the Windows
 # versions.
 try:
-    # should just use resolve_path('/lib/py.../Vera.ttf') here
-    TITLE_FONT = ImageFont.truetype(resolve_path('lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
+    vera_path = resolve_path('lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf')
 except:
     try:
-        TITLE_FONT = ImageFont.truetype(resolve_path('python_topo/Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
+        vera_path = resolve_path('python_topo/Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf')
     except:
-        TITLE_FONT = ImageFont.truetype(resolve_path('Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
+        vera_path = resolve_path('Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf')
+
+TITLE_FONT = ImageFont.truetype(vera_path,20)
 
 ### JCALERT: To do:
 ###        - Update the test file.
