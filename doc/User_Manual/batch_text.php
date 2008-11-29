@@ -46,7 +46,7 @@ current script_repr() of the simulation to record the parameter
 settings from that time.  In practice you will want to supply your own
 function, defined either in your .ty file or in a separate script or
 module executed before you call run_batch.  In this case you can start
-from the default_analysis_function in topo/misc/commandline.py as an
+from the default_analysis_function in topo/command/basic.py as an
 example.  Your analysis_fn should avoid using any GUI functions (i.e.,
 should not import anything from topo.tkgui), and it should save all of
 its results into files.  For more information about commands that can
