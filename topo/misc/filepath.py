@@ -92,17 +92,21 @@ def resolve_path(path,search_paths=[]):
     """
     path = os.path.normpath(path)
 
-    if os.path.isabs(path): return path
+    if os.path.isabs(path):
+        if os.path.isfile(path):
+            return path
+        else:
+            raise IOError('File "%s" not found.'%path)
+    else:
+        all_search_paths = search_paths + [os.getcwd()] + [application_path]
 
-    all_search_paths = search_paths + [os.getcwd()] + [application_path]
+        paths_tried = []
+        for prefix in set(all_search_paths): # does set() keep order?            
+            try_path = os.path.join(os.path.normpath(prefix),path)
+            if os.path.isfile(try_path): return try_path
+            paths_tried.append(try_path)
 
-    paths_tried = []
-    for prefix in set(all_search_paths): # does set() keep order?            
-        try_path = os.path.join(os.path.normpath(prefix),path)
-        if os.path.isfile(try_path): return try_path
-        paths_tried.append(try_path)
-
-    raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
+        raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
 
 
 def normalize_path(path="",prefix=None):
