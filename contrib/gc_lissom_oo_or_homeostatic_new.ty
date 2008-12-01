@@ -157,7 +157,7 @@ topo.sim['LGNOff']=LISSOM(nominal_density=locals().get('default_retinal_density'
 
 
 topo.sim['V1'] = JointScaling(nominal_density=locals().get('default_density',48.0),
-                              nominal_bounds=BoundingBox(radius=0.5),tsettle=9,
+                              nominal_bounds=BoundingBox(radius=0.5),tsettle=16,
                               plastic=True,
                               output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),V1_OF]),
                               target=afferent_target, smoothing=smoothing,
@@ -208,7 +208,7 @@ topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,
                  strength=locals().get('exc_strength',1.0),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('exc_size',0.04)),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('exc_size',0.04)),learning_rate=0.0) 
+                 nominal_bounds_template=BoundingBox(radius=locals().get('exc_size',0.04)),learning_rate=locals().get('exc_lat_lr',0.0)) 
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,
