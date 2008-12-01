@@ -1606,11 +1606,12 @@ class ParameterizedFunction(Parameterized):
     @classmethod
     def instance(class_,*args,**params):
         """Return an instance of this class."""
-        inst=class_._true_new(class_,*args)
+        inst=Parameterized.__new__(class_,*args)
         Parameterized.__init__(inst,**params)
         return inst
 
     def __new__(class_,*args,**params):
+        # Create and __call__() an instance of this class.
         inst = class_.instance()
         inst._set_name(class_.__name__)
         return inst.__call__(*args,**params)
@@ -1618,17 +1619,11 @@ class ParameterizedFunction(Parameterized):
     def __call__(self,*args,**kw):
         raise NotImplementedError("Subclasses must implement __call__.")
 
-    @classmethod
-    def _true_new(class_,*args):
-        # what the original __new__ method would have been
-        return Parameterized.__new__(class_,*args)
-
     def __reduce__(self):
-        # control reconstruction (during unpickling and copying):
-        # ensure that _true_new() is called, rather than __new__(), to
-        # reconstruct objects
+        # Control reconstruction (during unpickling and copying):
+        # ensure that ParameterizedFunction.__new__ is skipped
         state = ParameterizedFunction.__getstate__(self)
-        return (ParameterizedFunction._true_new,(),state)
+        return (Parameterized.__new__,(self.__class__,),state)
         
 
 ## CB: would allow all instance methods to pickle, but we use cPickle
