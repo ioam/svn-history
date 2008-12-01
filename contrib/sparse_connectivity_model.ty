@@ -158,7 +158,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNorma
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  learning_rate=BoundedNumber(bounds=(0.0,None),
                                              generator=ExponentialDecay(starting_value=locals().get('afferent_lr',1.0),
-                                                                        time_constant=3200/num_inputs)))
+                                                                        time_constant=locals().get('afferent_tc',3200)/num_inputs)))
 
 topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=8,name='OffAfferent',coord_mapper=jitterOff,
@@ -168,7 +168,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  learning_rate=BoundedNumber(bounds=(0.0,None),
                                              generator=ExponentialDecay(starting_value=locals().get('afferent_lr',1.0),
-                                                                        time_constant=3200/num_inputs)))
+                                                                        time_constant=locals().get('afferent_tc',3200)/num_inputs)))
 
 CFProjection.same_cf_shape_for_all_cfs=False
 CFProjection.cf_shape=topo.pattern.basic.Composite(operator=numpy.multiply,generators=[topo.pattern.basic.Disk(smoothing=0.0),topo.pattern.random.BinaryUniformRandom(on_probability=locals().get('ExcDen',0.1))])
