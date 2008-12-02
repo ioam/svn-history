@@ -2689,10 +2689,10 @@ class Menu(T.Menu):
         
         T.Menu.add(self,itemType,cnf,**kw)
         i = self.index("last") 
-        self.indexname2index[indexname or i] = i
+        self.indexname2index[indexname or str(i)] = i
 
         # this pain is to keep the actual item, if it's a menu or a command, available to access
-        self.entries[indexname or i] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
+        self.entries[indexname or str(i)] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
         
         
     def insert(self, index, itemType, cnf={}, **kw):
