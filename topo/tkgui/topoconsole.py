@@ -691,7 +691,7 @@ class ControllableMenu(tk.Menu):
     ** Not truly compatible with Tkinter; work in progress **
     """
     def __getitem__(self,name):
-        return self.entries[name]
+        return self.named_commands[name]
 
 
 # CB: temporary - will later be able to import from Tile
