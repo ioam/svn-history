@@ -298,9 +298,11 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         # http://news.hping.org/comp.lang.tcl.archive/4679.html
 
         self.__simulation_menu()
-        self.__plots_menu()
+        self.__create_plots_menu()
+        self.refresh_plots_menu()
         self.__help_menu()
 
+        
         ### Running the simulation
         run_frame = Frame(self.content)
         run_frame.pack(side='top',fill='x',padx=4,pady=8)
@@ -370,11 +372,25 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
     def open_test_pattern(self):
         return open_plotgroup_panel(TestPattern)
 
-    def __plots_menu(self):
+
+    
+    
+
+
+    def __create_plots_menu(self):
         """
         Add the plot menu to the menubar, with Basic plots on the menu itself and
         others in cascades by category (the plots come from plotgroup_templates).
         """
+        plots_menu = ControllableMenu(self.menubar,tearoff=0)
+        self.menubar.add_cascade(label='Plots',menu=plots_menu)
+        
+
+    # CEBALERT: should split other menus in same way as plots (create/refresh)
+    def refresh_plots_menu(self):
+        plots_menu = self['Plots']
+        plots_menu.delete(0,'end')
+
         # create menu entries, and get list of categories
         entries=KeyedList() # keep the order of plotgroup_templates (which is also KL)
         categories = []
@@ -383,9 +399,6 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
             categories.append(plotgroup.category)
         categories = sorted(set(categories))
 
-        # 'Plots' menu
-        plots_menu = ControllableMenu(self.menubar,tearoff=0)
-        self.menubar.add_cascade(label='Plots',menu=plots_menu)
         
         # The Basic category items appear on the menu itself.
         assert 'Basic' in categories, "'Basic' is the category for the standard Plots menu entries."
