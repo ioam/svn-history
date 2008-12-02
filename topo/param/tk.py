@@ -2676,7 +2676,7 @@ class Menu(T.Menu):
     ########## METHODS OVERRIDDEN to keep track of contents
     def __init__(self, master=None, cnf={}, **kw):
         self.indexname2index = {}  # rename to indexnames2index or similar
-        self.entries = {}
+        self.named_commands = {}
         T.Menu.__init__(self,master,cnf,**kw)
 
 
@@ -2692,11 +2692,12 @@ class Menu(T.Menu):
         self.indexname2index[indexname or str(i)] = i
 
         # this pain is to keep the actual item, if it's a menu or a command, available to access
-        self.entries[indexname or str(i)] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
+        if indexname is not None:
+            self.named_commands[indexname] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
         
         
     def insert(self, index, itemType, cnf={}, **kw):
-        indexname = cnf.pop('indexname',kw.pop('indexname',str(index)))
+        indexname = cnf.pop('indexname',kw.pop('indexname',index))
 
         # take indexname as label if indexname isn't actually specified
         if indexname is None:
@@ -2706,14 +2707,15 @@ class Menu(T.Menu):
         T.Menu.insert(self,index,itemType,cnf,**kw)
 
         # this pain is to keep the actual item, if it's a menu or a command, available to access
-        self.entries[indexname] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
+        if indexname is not None:
+            self.named_commands[indexname] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
 
         
     def delete(self, index1, index2=None):
         assert index2 is None, "I only thought about single-item deletions: code needs to be upgraded..."
 
         i1 = self.index(index1)
-        self.entries.pop(self.index2indexname(i1))
+        self.named_commands.pop(self.index2indexname(i1),None)
         T.Menu.delete(self,index1,index2)
         self.indexname2index.pop(self.index2indexname(i1))
 
