@@ -2650,27 +2650,46 @@ class Menu(T.Menu):
     """
     ## (Original Menu class is in lib/python2.4/lib-tk/Tkinter.py)
     
-    ## Note that I added a separate indexname rather than using label
-    ## or some other existing name because those could change, and
-    ## they're different for different widgets.  Unfortunately this
-    ## means sometimes specifying label="Something" and
-    ## indexname="Something".
-    ## CB: It's probably possible to remove the requirement
-    ## for a separate indexname, taking label or whatever instead. I've tried
-    ## that (taking label if indexname not supplied).
+    ## Note that I added a separate 'indexname' rather than just using
+    ## 'label' or some other existing name because those could change
+    ## (for the same command), and e.g. 'label' isn't available for
+    ## all widgets.
     
-    def index2indexname(self,index):
-        for name,i in self.indexname2index.items():
-            if index==i: return name
-        raise ValueError("%s not in Tkinter.Menu %s"%(index,self))
+    # CB: need to check the statement above and use label as indexname
+    # if possible!
 
-    def index_convert(self,index):
-        """Return the Tkinter index, whether given an indexname or index."""
+    # rename to get_tkinter_index() 
+    def get_tkinter_index(self,index):
+        """
+        Return the Tkinter index, whether given an indexname or index
+        (where index could be an int or Tkinter position e.g. 'end').
+        """
         if isinstance(index,str):
-            i=self.indexname2index[index]
+            if index in self.indexname2index:
+                i=self.indexname2index[index]
+            else:
+                # pass through tkinter to get 'end' etc converted to index
+                i=self.index(index)
         else:
             i=index
         return i
+
+    def get_indexname(self,index):
+        """
+        Return the indexname, whether given an indexname or index
+        (where index could be an int or Tkinter position e.g. 'end').
+
+        The returned value will be None if index refers to an unnamed
+        entry.
+        """
+        if index in self.indexname2index:
+            return index
+        else:
+            for name,i in self.indexname2index.items():
+                if self.index(index)==i:
+                    return name
+        return None
+                
 
 
     ########## METHODS OVERRIDDEN to keep track of contents
@@ -2679,51 +2698,74 @@ class Menu(T.Menu):
         self.named_commands = {}
         T.Menu.__init__(self,master,cnf,**kw)
 
+    def _find_indexname(self,cnf,kw):
+        # indexname will be as specified by 'indexname' in cnf or kw,
+        # or else as specified by 'label' in cnf or kw.
+        # 
+        # indexname will be None if neither indexname nor label is
+        # specified in cnf or kw.
+        indexname=cnf.pop('indexname',kw.pop('indexname',None))
+        if indexname is None:
+            indexname = cnf.get('label',kw.get('label',None))
+        return indexname
+
+    def _update_indices(self,index,cnf,kw):
+        indexname = self._find_indexname(cnf,kw)
+        
+        if indexname is not None:
+            self.indexname2index[indexname] = index
+            # this pain is to keep the actual item, if it's a menu or a command, available to access
+            self.named_commands[indexname] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
+
+    def _check_new_indexname(self,cnf,kw):
+        # if there is an indexname, it must be unique
+        indexname = self._find_indexname(cnf,kw)
+        assert indexname not in self.indexname2index
+        
 
     def add(self, itemType, cnf={}, **kw):
-        indexname = cnf.pop('indexname',kw.pop('indexname',None))
-
-        # take indexname as label if indexname isn't actually specified
-        if indexname is None:
-            indexname = cnf.get('label',kw.get('label',None))
-        
+        self._check_new_indexname(cnf,kw)
         T.Menu.add(self,itemType,cnf,**kw)
-        i = self.index("last") 
-        self.indexname2index[indexname or str(i)] = i
+        self._update_indices(self.index("last"),cnf,kw)
+        
 
-        # this pain is to keep the actual item, if it's a menu or a command, available to access
-        if indexname is not None:
-            self.named_commands[indexname] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
-        
-        
     def insert(self, index, itemType, cnf={}, **kw):
-        indexname = cnf.pop('indexname',kw.pop('indexname',index))
-
-        # take indexname as label if indexname isn't actually specified
-        if indexname is None:
-            indexname = cnf.get('label',kw.get('label',None))
-
-        self.indexname2index[indexname] = index
+        self._check_new_indexname(cnf,kw)
+        # increase index of any item after insertion point
+        for name,i in self.indexname2index.items():
+            if i>=index:
+                self.indexname2index[name]+=1
         T.Menu.insert(self,index,itemType,cnf,**kw)
+        self._update_indices(index,cnf,kw)
 
-        # this pain is to keep the actual item, if it's a menu or a command, available to access
-        if indexname is not None:
-            self.named_commands[indexname] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
 
-        
     def delete(self, index1, index2=None):
-        assert index2 is None, "I only thought about single-item deletions: code needs to be upgraded..."
 
-        i1 = self.index(index1)
-        self.named_commands.pop(self.index2indexname(i1),None)
-        T.Menu.delete(self,index1,index2)
-        self.indexname2index.pop(self.index2indexname(i1))
+        if index2 is not None:
+            # assumes index1 and index2 are tk menu index values
+            # (doesn't make sense to specify a range with names)
+            T.Menu.delete(self,index1,index2)
+        else:
+            i1 = self.get_tkinter_index(index1)
+            indexname1 = self.get_indexname(index1)
+
+            assert (indexname1 in self.indexname2index or indexname1 is None)
+
+            # decrease index of any item after deletion point
+            for name,i in self.indexname2index.items():
+                if i>i1:
+                    self.indexname2index[name]-=1
+            
+            self.named_commands.pop(indexname1,None)
+            self.indexname2index.pop(indexname1,None)
+            T.Menu.delete(self,i1,None)
+
 
 
     ########## METHODS OVERRIDDEN FOR CONVENIENCE
     def entryconfigure(self, index, cnf=None, **kw):
         """Configure a menu item at INDEX."""
-        i = self.index_convert(index)
+        i = self.get_tkinter_index(index)
         T.Menu.entryconfigure(self,i,cnf,**kw)
         
     entryconfig = entryconfigure
@@ -2731,7 +2773,7 @@ class Menu(T.Menu):
     def invoke(self, index):
         """Invoke a menu item identified by INDEX and execute
         the associated command."""
-        return T.Menu.invoke(self,self.index_convert(index))
+        return T.Menu.invoke(self,self.get_tkinter_index(index))
 
     # other methods can be overriden if they're needed
 
