@@ -2738,27 +2738,38 @@ class Menu(T.Menu):
         T.Menu.insert(self,index,itemType,cnf,**kw)
         self._update_indices(index,cnf,kw)
 
+    def __delete(self,index1):
+        i1 = self.get_tkinter_index(index1)
+        indexname1 = self.get_indexname(index1)
+
+        assert (indexname1 in self.indexname2index or indexname1 is None)
+
+        # decrease index of any item after deletion point
+        for name,i in self.indexname2index.items():
+            if i>i1:
+                self.indexname2index[name]-=1
+
+        self.named_commands.pop(indexname1,None)
+        self.indexname2index.pop(indexname1,None)
+        T.Menu.delete(self,i1,None)
+        
 
     def delete(self, index1, index2=None):
-
+        """
+        If index2 is not specified, deletes the menu item at index1
+        (an indexname or tk integer index).
+        
+        If index2 is specified, deletes menu items in
+        range(index1,index2+1).
+        """
         if index2 is not None:
-            # assumes index1 and index2 are tk menu index values
-            # (doesn't make sense to specify a range with names)
-            T.Menu.delete(self,index1,index2)
+            start = self.index(index1)
+            end = self.index(index2)
+            if start is not None and end is not None:
+                for i in range(start,end+1):
+                    self.__delete(i)
         else:
-            i1 = self.get_tkinter_index(index1)
-            indexname1 = self.get_indexname(index1)
-
-            assert (indexname1 in self.indexname2index or indexname1 is None)
-
-            # decrease index of any item after deletion point
-            for name,i in self.indexname2index.items():
-                if i>i1:
-                    self.indexname2index[name]-=1
-            
-            self.named_commands.pop(indexname1,None)
-            self.indexname2index.pop(indexname1,None)
-            T.Menu.delete(self,i1,None)
+            self.__delete(index1)
 
 
 
