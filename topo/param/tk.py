@@ -2696,7 +2696,7 @@ class Menu(T.Menu):
         
         
     def insert(self, index, itemType, cnf={}, **kw):
-        indexname = cnf.pop('indexname',kw.pop('indexname',index))
+        indexname = cnf.pop('indexname',kw.pop('indexname',str(index)))
 
         # take indexname as label if indexname isn't actually specified
         if indexname is None:
