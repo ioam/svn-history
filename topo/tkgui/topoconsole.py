@@ -404,7 +404,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
             plots_menu.add_cascade(label=category,menu=category_menu)
 
             # could probably search more efficiently than this
-            for label,entry in entries:
+            for label,entry in sorted(entries):
                 if entry.plotgroup.category==category:
                     category_menu.add_command(label=label,command=entry.__call__)
 
