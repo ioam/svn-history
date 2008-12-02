@@ -2713,10 +2713,9 @@ class Menu(T.Menu):
         assert index2 is None, "I only thought about single-item deletions: code needs to be upgraded..."
 
         i1 = self.index(index1)
-        self.indexname2index.pop(self.index2name(i1))
-        self.entries.pop(self.index2name(i1))
-
+        self.entries.pop(self.index2indexname(i1))
         T.Menu.delete(self,index1,index2)
+        self.indexname2index.pop(self.index2indexname(i1))
 
 
     ########## METHODS OVERRIDDEN FOR CONVENIENCE
