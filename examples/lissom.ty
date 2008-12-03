@@ -569,7 +569,14 @@ combined_preference_maps = {
         doc='Plot the orientation preference overlaid with ocular dominance boundaries and direction preference arrows.',
         update_command='',
         plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black"),("arrows","DirectionPreference","DirectionSelectivity","white")])',            
-        normalize=False)
+        normalize=False),
+
+    ('od','cr'):dict(
+        name='Ocular and Hue Preference',
+        doc='Plot the ocular preference overlaid with hue preference boundaries.',
+        update_command='',
+        plot_command='overlaid_plots(plot_template=[{"Hue":"OcularPreference","Confidence":"OcularSelectivity"},{"Strength":"OcularSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")],normalize=True)',            
+        normalize=True)
     }
 
 
