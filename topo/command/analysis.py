@@ -1110,49 +1110,6 @@ create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category
 
 
 
-# JABALERT: Should eliminate the combined preference maps and do something in lissom.ty instead.
-
-pg= create_plotgroup(name='Orientation and Ocular Preference',category="Combined Preference Maps",
-             doc='Plot the orientation preference overlaid with ocular dominance boundaries.',
-             update_command='',
-             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black")])',            
-             normalize=False)
-
-
-
-pg= create_plotgroup(name='Orientation and Direction Preference',category="Combined Preference Maps",
-             doc='Plot the orientation preference overlaid with direction preference arrows.',
-             update_command='',
-             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"}],overlay=[("arrows","DirectionPreference","DirectionSelectivity","white")])',            
-             normalize=False)
-
-
-
-pg= create_plotgroup(name='Orientation and PhaseDisparity Preference',category="Combined Preference Maps",
-             doc='Plot the orientation preference overlaid with phase disparity preference boundaries.',
-             update_command='',
-             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","PhasedisparityPreference",0.83,"magenta"),("contours","PhasedisparityPreference",0.08,"yellow")])',            
-             normalize=False)
-
-
-
-pg= create_plotgroup(name='Orientation and Hue Preference',category="Combined Preference Maps",
-             doc='Plot the orientation preference overlaid with hue preference boundaries.',
-             update_command='',
-             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")],normalize=True)',            
-             normalize=True)
-
-
-
-pg= create_plotgroup(name='Orientation, Ocular and Direction Preference',category="Combined Preference Maps",
-             doc='Plot the orientation preference overlaid with ocular dominance boundaries and direction preference arrows.',
-             update_command='',
-             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black"),("arrows","DirectionPreference","DirectionSelectivity","white")])',            
-             normalize=False)
-
-
-
-
 import types
 __all__ = list(set([k for k,v in locals().items()
                     if isinstance(v,types.FunctionType) or 

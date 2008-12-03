@@ -501,7 +501,7 @@ preference_maps=[
 pgs = [x for y in [m for n,m in preference_maps if n in dims] for x in y] + \
       ['Position Preference','Activity']
 topo.command.basic.default_analysis_plotgroups=pgs
-
+    
 
 # By default, measures SF at the sizes of RF used, for speed, but if
 # expand_sf_test_range is True, will also test over a larger range,
@@ -529,3 +529,57 @@ if 'od' in dims: measure_sine_pref.num_ocularity=2
 from topo.analysis.featureresponses import MeasureResponseCommand
 MeasureResponseCommand.duration=0.175
 MeasureResponseCommand.apply_output_fn=False
+
+
+# CB: I guess we should actually have the specification for these back
+# in topo.command.analysis...but not create the objects there. We
+# already do that elsewhere with plotgrouptemplates for
+# templateplotgroups, right?
+combined_preference_maps = {
+    ('or','od'):dict(
+        name='Orientation and Ocular Preference',
+        doc='Plot the orientation preference overlaid with ocular dominance boundaries.',
+        update_command='',
+        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black")])',
+        normalize=False),
+
+    ('or','dr'):dict(
+        name='Orientation and Direction Preference',
+        doc='Plot the orientation preference overlaid with direction preference arrows.',
+        update_command='',
+        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"}],overlay=[("arrows","DirectionPreference","DirectionSelectivity","white")])',            
+        normalize=False),
+
+    ('or','dy'):dict(
+        name='Orientation and PhaseDisparity Preference',
+        doc='Plot the orientation preference overlaid with phase disparity preference boundaries.',
+        update_command='',
+        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","PhasedisparityPreference",0.83,"magenta"),("contours","PhasedisparityPreference",0.08,"yellow")])',            
+        normalize=False),
+
+    ('or','cr'):dict(
+        name='Orientation and Hue Preference',
+        doc='Plot the orientation preference overlaid with hue preference boundaries.',
+        update_command='',
+        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")],normalize=True)',            
+        normalize=True),
+
+    ('or','od','dr'):dict(
+        name='Orientation, Ocular and Direction Preference',
+        doc='Plot the orientation preference overlaid with ocular dominance boundaries and direction preference arrows.',
+        update_command='',
+        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black"),("arrows","DirectionPreference","DirectionSelectivity","white")])',            
+        normalize=False)
+    }
+
+
+## Create appropriate combined plots 
+from topo.plotting.plotgroup import create_plotgroup
+for combined_dimensions,plotgroup_spec in combined_preference_maps.items():
+    plotgroup_spec['category']="Combined Preference Maps"
+    if set(dims).issuperset(set(combined_dimensions)):
+        create_plotgroup(**plotgroup_spec)
+
+# CB: could this be in create_plotgroup?
+if hasattr(topo,'guimain'):
+    topo.guimain.refresh_plots_menu()
