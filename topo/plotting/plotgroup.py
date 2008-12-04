@@ -120,6 +120,8 @@ class PlotGroup(param.Parameterized):
     def _exec_plot_command(self):
         if type(self.plot_command) is str:
             exec self.plot_command in __main__.__dict__
+        elif type(self.plot_command) is list:
+            for f in self.plot_command: f()
         else:
             self.plot_command()
 
