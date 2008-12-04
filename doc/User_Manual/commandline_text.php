@@ -499,7 +499,8 @@ so that progress will be displayed in an open Activity window:
 
 <pre>
   o.sheet_coords=False
-  o.update_command='update_activity(display=True)'
+  for f in o.update_command:
+     f.display=True
 </pre>
 
 <P>At present, not all GUI operations can be controlled easily from the commandline,
