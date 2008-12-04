@@ -27,7 +27,10 @@ except ImportError:
     print "Warning: Could not import matplotlib; pylab plots will not work."
 
 import numpy
-from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin, cos, sin, log10
+from math import pi
+# JABALERT: Import all of these from numpy instead?
+from numpy.oldnumeric import arange, sqrt, array, floor, transpose, argmax, argmin, cos, sin, log10
+from numpy import outer,arange,ones
 
 import topo
 from topo.base.arrayutil import octave_output
@@ -41,7 +44,13 @@ from topo.plotting.plot import make_template_plot, Plot
 from topo import param
 from topo.param import ParameterizedFunction
 from topo.param.parameterized import ParamOverrides
-from topo.plotting.plotgroup import default_measureable_sheet
+from topo.pattern.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
+from topo.pattern.basic import SineGrating, Rectangle
+from topo.plotting.plotgroup import default_measureable_sheet, create_plotgroup, plotgroups
+
+from topo.plotting.plotgroup import default_input_sheet
+from topo.analysis.featureresponses import Feature, PatternPresenter, FeatureCurves
+from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand, PositionMeasurementCommand, SingleInputResponseCommand, FeatureCurveCommand, UnitCurveCommand
 
 
 
@@ -209,7 +218,6 @@ class matrixplot3d(PylabPlotCommand):
     def __call__(self,mat,type="wireframe",**params):
         p=ParamOverrides(self,params)
     
-        from numpy import outer,arange,ones
         from matplotlib import axes3d
         
         fig = pylab.figure()
@@ -759,3 +767,490 @@ class plot_modulation_ratio(PylabPlotCommand):
     
         self._generate_figure(p)
 
+
+
+class measure_position_pref(PositionMeasurementCommand):
+    """Measure a position preference map by collating the response to patterns."""
+    
+    scale = param.Number(default=0.3)
+
+    def _feature_list(self,p):
+        width =1.0*p.x_range[1]-p.x_range[0]
+        height=1.0*p.y_range[1]-p.y_range[0]
+        return [Feature(name="x",range=p.x_range,step=width/p.divisions),
+                Feature(name="y",range=p.y_range,step=height/p.divisions)]
+
+
+pg= create_plotgroup(name='Position Preference',category="Preference Maps",
+           doc='Measure preference for the X and Y position of a Gaussian.',
+           update_command=[measure_position_pref.instance()],
+           plot_command='topographic_grid()',
+           normalize=True)
+
+pg.add_plot('X Preference',[('Strength','XPreference')])
+pg.add_plot('Y Preference',[('Strength','YPreference')])
+pg.add_plot('Position Preference',[('Red','XPreference'),
+                                   ('Green','YPreference')])
+
+
+
+class measure_cog(ParameterizedFunction):
+    """
+    Calculate center of gravity (CoG) for each CF of each unit in each CFSheet.
+
+    Unlike measure_position_pref and other measure commands, this one
+    does not work by collating the responses to a set of input patterns.
+    Instead, the CoG is calculated directly from each set of incoming
+    weights.  The CoG value thus is an indirect estimate of what
+    patterns the neuron will prefer, but is not limited by the finite
+    number of test patterns as the other measure commands are.
+
+    Measures only one projection for each sheet, as specified by the
+    proj_name parameter.  The default proj_name of '' selects the
+    first non-self connection, which is usually useful to examine for
+    simple feedforward networks, but will not necessarily be useful in
+    other cases.
+    """
+      
+    proj_name = param.String(default='',doc="""
+        Name of the projection to measure; the empty string means 'the first
+        non-self connection available'.""")
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        
+        measured_sheets = [s for s in topo.sim.objects(CFSheet).values()
+                           if hasattr(s,'measure_maps') and s.measure_maps]
+
+        # Could easily be extended to measure CoG of all projections
+        # and e.g. register them using different names (e.g. "Afferent
+        # XCoG"), but then it's not clear how the PlotGroup would be
+        # able to find them automatically (as it currently supports
+        # only a fixed-named plot).
+        requested_proj=p.proj_name
+        for sheet in measured_sheets:
+            for proj in sheet.in_connections:
+                if (proj.name == requested_proj) or \
+                   (requested_proj == '' and (proj.src != sheet)):
+                    self._update_proj_cog(proj)
+                    if requested_proj=='':
+                        print "measure_cog: Measured %s projection %s from %s" % \
+                              (proj.dest.name,proj.name,proj.src.name)
+                        break
+
+
+    def _update_proj_cog(self,proj):
+        """Measure the CoG of the specified projection and register corresponding SheetViews."""
+        
+        sheet=proj.dest
+        rows,cols=sheet.activity.shape
+        xpref=zeros((rows,cols),Float)
+        ypref=zeros((rows,cols),Float)
+        
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf=proj.cfs[r,c]
+                r1,r2,c1,c2 = cf.input_sheet_slice
+                row_centroid,col_centroid = centroid(cf.weights)
+                xcentroid, ycentroid = proj.src.matrix2sheet(
+                        r1+row_centroid+0.5,
+                        c1+col_centroid+0.5)
+            
+                xpref[r][c]= xcentroid
+                ypref[r][c]= ycentroid
+            
+                sheet.sheet_views['XCoG']=SheetView((xpref,sheet.bounds), sheet.name,
+                                                    sheet.precedence,topo.sim.time())
+                
+                sheet.sheet_views['YCoG']=SheetView((ypref,sheet.bounds), sheet.name,
+                                                    sheet.precedence,topo.sim.time())
+
+
+pg= create_plotgroup(name='Center of Gravity',category="Preference Maps",
+             doc='Measure the center of gravity of each ConnectionField in a Projection.',
+             update_command=[measure_cog.instance()],
+             plot_command='topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',
+             normalize=True)
+pg.add_plot('X CoG',[('Strength','XCoG')])
+pg.add_plot('Y CoG',[('Strength','YCoG')])
+pg.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
+
+
+class measure_or_tuning_fullfield(FeatureCurveCommand):
+    """
+    Measures orientation tuning curve(s) of a particular unit using a
+    full-field sine grating stimulus.  
+
+    The curve can be plotted at various different values of the
+    contrast (or actually any other parameter) of the stimulus.  If
+    using contrast and the network contains an LGN layer, then one
+    would usually specify michelson_contrast as the
+    contrast_parameter. If there is no explicit LGN, then scale
+    (offset=0.0) can be used to define the contrast.  Other relevant
+    contrast definitions (or other parameters) can also be used,
+    provided they are defined in PatternPresenter and the units
+    parameter is changed as appropriate.
+    """
+
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(pattern_generator=SineGrating(),
+                                 contrast_parameter="michelson_contrast"))
+
+
+create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
+            Plot orientation tuning curves for a specific unit, measured using full-field sine gratings.
+            Although the data takes a long time to collect, once it is ready the plots
+            are available immediately for any unit.""",
+        update_command=[measure_or_tuning_fullfield.instance()],
+        plot_command='cyclic_tuning_curve(x_axis="orientation")')
+
+
+
+class measure_or_tuning(UnitCurveCommand):
+    """
+    Measures orientation tuning curve(s) of a particular unit.
+
+    Uses a circular sine grating patch as the stimulus on the
+    retina. 
+
+    The curve can be plotted at various different values of the
+    contrast (or actually any other parameter) of the stimulus.  If
+    using contrast and the network contains an LGN layer, then one
+    would usually specify weber_contrast as the contrast_parameter. If
+    there is no explicit LGN, then scale (offset=0.0) can be used to
+    define the contrast.  Other relevant contrast definitions (or
+    other parameters) can also be used, provided they are defined in
+    PatternPresenter and the units parameter is changed as
+    appropriate.
+    """
+
+    num_orientation = param.Integer(default=12)
+
+    static_parameters = param.List(default=["size","x","y"])
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        self.params('sheet').compute_default()
+        sheet=p.sheet
+        
+        for coord in p.coords:
+            self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            self._compute_curves(p,sheet)
+               
+
+create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="Tuning Curves",doc="""
+            Measure orientation tuning for a specific unit at different contrasts,
+            using a pattern chosen to match the preferences of that unit.""",
+        update_command=[measure_or_tuning.instance()],
+        plot_command='cyclic_tuning_curve(x_axis="orientation")',
+        prerequisites=['XPreference'])
+
+
+
+# JABALERT: Is there some reason not to call it measure_size_tuning?
+class measure_size_response(UnitCurveCommand):
+    """
+    Measure receptive field size of one unit of a sheet.
+
+    Uses an expanding circular sine grating stimulus at the preferred
+    orientation and retinal position of the specified unit.
+    Orientation and position preference must be calulated before
+    measuring size response.
+
+    The curve can be plotted at various different values of the
+    contrast (or actually any other parameter) of the stimulus.  If
+    using contrast and the network contains an LGN layer, then one
+    would usually specify weber_contrast as the contrast_parameter. If
+    there is no explicit LGN, then scale (offset=0.0) can be used to
+    define the contrast.  Other relevant contrast definitions (or
+    other parameters) can also be used, provided they are defined in
+    PatternPresenter and the units parameter is changed as
+    appropriate.
+    """
+    size=None # Disabled unused parameter
+
+    static_parameters = param.List(default=["orientation","x","y"])
+
+    num_sizes = param.Integer(default=10,bounds=(1,None),softbounds=(1,50),
+                              doc="Number of different sizes to test.")
+
+    x_axis = param.String(default='size',constant=True)
+
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        self.params('sheet').compute_default()
+        sheet=p.sheet
+
+        for coord in p.coords:
+            # Orientations are stored as a normalized value beween 0
+            # and 1, so we scale them by pi to get the true orientations.
+            self.orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
+            self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            self._compute_curves(p,sheet)
+
+
+    # Why not vary frequency too?  Usually it's just one number, but it could be otherwise.
+    def _feature_list(self,p):
+        return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+               #Feature(name="frequency",values=p.frequencies),
+                Feature(name="size",range=(0.1,1.0),step=1.0/p.num_sizes,cyclic=False)]
+
+
+create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
+        doc='Measure the size preference for a specific unit.',
+        update_command=[measure_size_response.instance()],
+        plot_command='tuning_curve(x_axis="size",unit="Diameter of stimulus")',
+        prerequisites=['OrientationPreference','XPreference'])
+
+
+
+class measure_contrast_response(UnitCurveCommand):
+    """
+    Measures contrast response curves for a particular unit.
+
+    Uses a circular sine grating stimulus at the preferred
+    orientation and retinal position of the specified unit.
+    Orientation and position preference must be calulated before
+    measuring contrast response.
+
+    The curve can be plotted at various different values of the
+    contrast (or actually any other parameter) of the stimulus.  If
+    using contrast and the network contains an LGN layer, then one
+    would usually specify weber_contrast as the contrast_parameter. If
+    there is no explicit LGN, then scale (offset=0.0) can be used to
+    define the contrast.  Other relevant contrast definitions (or
+    other parameters) can also be used, provided they are defined in
+    PatternPresenter and the units parameter is changed as
+    appropriate.
+    """
+
+    static_parameters = param.List(default=["size","x","y"])
+
+    contrasts = param.List(class_=int,default=[10,20,30,40,50,60,70,80,90,100])
+
+    relative_orientations = param.List(class_=float,default=[0.0, pi/6, pi/4, pi/2])
+    
+    x_axis = param.String(default='contrast',constant=True)
+
+    units = param.String(default=" rad")
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        self.params('sheet').compute_default()
+        sheet=p.sheet
+
+        for coord in p.coords:
+            orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
+            self.curve_parameters=[{"orientation":orientation+ro} for ro in self.relative_orientations]
+
+            self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            
+            self._compute_curves(p,sheet,val_format="%.4f")
+
+    def _feature_list(self,p):
+        return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+                Feature(name="frequency",values=p.frequencies),
+                Feature(name="contrast",values=p.contrasts,cyclic=False)]
+
+
+create_plotgroup(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
+        doc='Measure the contrast response function for a specific unit.',
+        update_command=[measure_contrast_response.instance()],
+        plot_command='tuning_curve(x_axis="contrast",unit="%")',
+        prerequisites=['OrientationPreference','XPreference'])
+
+
+
+# Doesn't currently have support in the GUI for controlling the input_sheet
+class measure_retinotopy(SinusoidalMeasureResponseCommand):
+    """
+    Measures peak retinotopy preference (as in Schuett et. al Journal
+    of Neuroscience 22(15):6549-6559, 2002). The retina is divided
+    into squares (each assigned a color in the color key) which are
+    activated by sine gratings of various phases and orientations.
+    For each unit, the retinotopic position with the highest response
+    at the preferred orientation and phase is recorded and assigned a
+    color according to the retinotopy color key.
+    """
+
+    divisions=param.Integer(default=4,bounds=(1,None),doc="""
+        The number of different positions to measure in X and in Y.""")
+    
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(SineGratingRectangle()),doc="""
+        Callable object that will present a parameter-controlled
+        pattern to a set of Sheets.  For measuring position, the
+        pattern_presenter should be spatially localized, yet also able
+        to activate the appropriate neurons reliably.""")
+
+    static_parameters = param.List(default=["size","scale","offset"])
+  
+    scale = param.Number(default=1.0)
+
+    input_sheet = param.ObjectSelector(
+        default=None,compute_default_fn=default_input_sheet,doc="""
+        Name of the sheet where input should be drawn.""")
+
+    weighted_average= param.Boolean(default=False)
+
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        self.params('input_sheet').compute_default()
+        result=super(measure_retinotopy,self).__call__(**params)
+        self.retinotopy_key(p)
+
+
+    def _feature_list(self,p):
+        l,b,r,t = p.input_sheet.nominal_bounds.lbrt()
+        x_range=(r,l)
+        y_range=(t,b)
+    
+        self.size=float((x_range[0]-x_range[1]))/p.divisions
+        self.retinotopy=range(p.divisions*p.divisions)
+
+        p.pattern_presenter.divisions=p.divisions
+        
+        return [Feature(name="retinotopy",values=self.retinotopy),
+                Feature(name="orientation",range=(0.0,2*pi),step=2*pi/p.num_orientation,cyclic=True),
+                Feature(name="frequency",values=p.frequencies),
+                Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
+
+
+    # JABALERT: Can't we move this to the plot_command, not the update_command?
+    def retinotopy_key(self,p):
+        """Automatic plot of retinotopy color key."""
+
+        l,b,r,t = p.input_sheet.nominal_bounds.lbrt()
+
+        coordinate_x=[]
+        coordinate_y=[]
+        coordinates=[]
+        mat_coords=[]
+    
+        x_div=float(r-l)/(p.divisions*2)
+        y_div=float(t-b)/(p.divisions*2)
+        ret_matrix = ones(p.input_sheet.shape, float)
+     
+        for i in range(p.divisions):
+            if not bool(p.divisions%2):
+                if bool(i%2):
+                    coordinate_x.append(i*x_div)
+                    coordinate_y.append(i*y_div)
+                    coordinate_x.append(i*-x_div)
+                    coordinate_y.append(i*-y_div)
+            else:
+                if not bool(i%2):
+                    coordinate_x.append(i*x_div)
+                    coordinate_y.append(i*y_div)
+                    coordinate_x.append(i*-x_div)
+                    coordinate_y.append(i*-y_div)
+      
+        for x in coordinate_x:
+            for y in coordinate_y:
+                coordinates.append((x,y))
+                
+          
+        for r in self.retinotopy:
+            x_coord=coordinates[r][0]
+            y_coord=coordinates[r][1]
+            x_top, y_top = p.input_sheet.sheet2matrixidx(x_coord+x_div,y_coord+y_div)
+            x_bot, y_bot = p.input_sheet.sheet2matrixidx(x_coord-x_div,y_coord-y_div)
+            norm_ret=float((r+1.0)/(p.divisions*p.divisions))
+            
+            for x in range(min(x_bot,x_top),max(x_bot,x_top)):
+                for y in range(min(y_bot,y_top),max(y_bot,y_top)):
+                    ret_matrix[x][y] += norm_ret
+                   
+        #Plot the color key
+        import pylab
+        from topo.command.pylabplots import matrixplot
+        matrixplot(ret_matrix, plot_type=pylab.hsv, title="Color Key")
+
+
+pg=create_plotgroup(name='Retinotopy',category="Other",
+                    doc='Measure retinotopy',update_command=[measure_retinotopy.instance()],
+                    normalize=True)
+pg.add_plot('Retinotopy',[('Hue','RetinotopyPreference')])
+pg.add_plot('Retinotopy Selectivity',[('Hue','RetinotopyPreference'),('Confidence','RetinotopySelectivity')])
+
+
+
+class measure_orientation_contrast(UnitCurveCommand):
+    """
+    Measures the response to a center sine grating disk and a surround
+    sine grating ring at different contrasts of the central disk. 
+
+    The central disk is set to the preferred orientation of the unit
+    to be measured. The surround disk orientation (relative to the
+    central grating) and contrast can be varied, as can the size of
+    both disks.
+    """
+
+    pattern_presenter = param.Callable(
+        default=PatternPresenter(pattern_generator=OrientationContrastPattern(),
+                                 contrast_parameter="weber_contrast"))
+
+    size=None # Disabled unused parameter
+    # Maybe instead of the below, use size and some relative parameter, to allow easy scaling?
+
+    # ALERT: Rename to center.
+    size_centre=param.Number(default=0.5,bounds=(0,None),doc="""
+        The size of the central pattern to present.""")
+
+    size_surround=param.Number(default=1.0,bounds=(0,None),doc="""
+        The size of the surround pattern to present.""")
+
+    contrasts = param.List(class_=int,default=[10,20,30,40,50,60,70,80,90,100])
+
+    relative_orientations = param.List(class_=float,default=[0.0, pi/2])
+
+    thickness=param.Number(default=0.5,bounds=(0,None),softbounds=(0,1.5),doc=""" """)
+    
+    contrastsurround=param.Number(default=80,bounds=(0,100),doc=""" """)
+    
+    x_axis = param.String(default='contrastcentre',constant=True)
+
+    units = param.String(default=" rad")
+
+    static_parameters = param.List(default=["x","y","size_centre","size_surround","orientationcentre","contrastsurround","thickness"])
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        self.params('sheet').compute_default()
+        sheet=p.sheet
+
+        for coord in p.coords:
+            orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
+            self.orientationcentre=orientation
+            self.curve_parameters=[{"orientationsurround":orientation+ro} for ro in self.relative_orientations]
+            
+            self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
+            self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
+            
+            self._compute_curves(p,sheet,val_format="%.4f")
+
+    def _feature_list(self,p):
+        return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+                Feature(name="frequency",values=p.frequencies),
+                Feature(name="contrastcentre",values=p.contrasts,cyclic=False)]
+
+
+create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
+                 doc='Measure the response of one unit to a centre and surround sine grating disk.',
+                 update_command=[measure_orientation_contrast.instance()],
+                 plot_command='tuning_curve(x_axis="contrastcentre",unit="%")',
+                 prerequisites=['OrientationPreference','XPreference'])        
+
+
+
+
+import types
+__all__ = list(set([k for k,v in locals().items()
+                    if isinstance(v,types.FunctionType) or 
+                    (isinstance(v,type) and issubclass(v,ParameterizedFunction))
+                    and not v.__name__.startswith('_')]))
