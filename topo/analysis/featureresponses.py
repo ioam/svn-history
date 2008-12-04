@@ -596,25 +596,38 @@ class PatternPresenter(param.Parameterized):
         ### pattern, e.g. in the Test Pattern window.  In this way we
         ### should be able to provide general support for manipulating
         ### both pattern parameters and parameters controlling
-        ### interaction between or differences between patterns.           
+        ### interaction between or differences between patterns.
 
-        if features_values.has_key('direction'):
-            orientation = features_values['direction']+pi/2
-            from topo.pattern.basic import Sweeper            
-            for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
-                speed=features_values['speed']
-                try:
-                    step=int(name[-1])
-                except:
-                    if not hasattr(self,'direction_warned'):
-                        self.warning('Assuming step is zero; no input lag number specified at the end of the input sheet name.')
-                        self.direction_warned=True
-                    step=0
-                speed=features_values['speed']
-                inputs[name] = Sweeper(generator=inputs[name],step=step,speed=speed)
-                setattr(inputs[name],'orientation',orientation)
+        if 'direction' in features_values:
+            import __main__
+            if '_new_motion_model' in __main__.__dict__ and __main__.__dict__['_new_motion_model']:
+            #### new motion model ####
+                from topo.pattern import Translator
+                for name in inputs:
+                    setattr(inputs[name],'orientation',0.0) # CBALERT! Do I need to reset this?
+                    inputs[name] = Translator(generator=inputs[name],
+                                              direction=features_values['direction'],
+                                              speed=features_values['speed'],
+                                              reset_period=self.duration) 
+            ##########################
+            else:
+            #### old motion model ####
+                orientation = features_values['direction']+pi/2
+                from topo.pattern.basic import Sweeper            
+                for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+                    speed=features_values['speed']
+                    try:
+                        step=int(name[-1])
+                    except:
+                        if not hasattr(self,'direction_warned'):
+                            self.warning('Assuming step is zero; no input lag number specified at the end of the input sheet name.')
+                            self.direction_warned=True
+                        step=0
+                    speed=features_values['speed']
+                    inputs[name] = Sweeper(generator=inputs[name],step=step,speed=speed)
+                    setattr(inputs[name],'orientation',orientation)
+            ##########################
 
-           
 
         if features_values.has_key('hue'):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):

@@ -31,12 +31,6 @@ projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
 projection.CFProjection.weights_output_fn=outputfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 
-
-## ALERT: clean up then move into topo/
-#from topo import param
-
-
-
 ### Input patterns
 num_inputs=1
 
@@ -167,8 +161,11 @@ topo.sim.grid_layout([[None, 'V1'],
 
 # Measure feature maps based on unthresholded initial response for
 # speed and reliability.
-# Appropriate for original DR model; will need updating for 
-# new one.
+# (CB: may need to update for new motion model)
 from topo.analysis.featureresponses import MeasureResponseCommand
 MeasureResponseCommand.duration=4.0
 MeasureResponseCommand.apply_output_fn=True
+
+# CB: temporary (to get new direction map measurement)
+_new_motion_model=True
+

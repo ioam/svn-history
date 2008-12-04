@@ -116,6 +116,7 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
                     '%s not a valid Sheet name for pattern_present.' % each)
 
     topo.sim.event_push()
+    # CBENHANCEMENT: would be nice to break this up for visualizing motion
     topo.sim.run(duration) 
     topo.sim.event_pop()
 
