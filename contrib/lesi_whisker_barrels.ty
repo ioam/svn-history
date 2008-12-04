@@ -292,27 +292,15 @@ def color_MEAs():
 
 # Deflection preference map plotting, based on measure_or_pref in analysis.py
 
-from topo.plotting.plotgroup import create_plotgroup
-pg= create_plotgroup(name='Deflection Preference',category="Preference Maps",
-                     doc='Measure preference for direction stimulus for a lagged model.',
-                     update_command='measure_deflection_pref()')
-pg.add_plot('Deflection Preference',[('Hue','DeflectionPreference')])
-pg.add_plot('Deflection Preference&Selectivity',[('Hue','DeflectionPreference'),
-						   ('Confidence','DeflectionSelectivity')])
-pg.add_plot('Deflection Selectivity',[('Strength','DeflectionSelectivity')])
-pg.add_plot('Whisker Preference',[('Strength','WhiskerPreference')])
-pg.add_plot('Whisker Selectivity',[('Strength','WhiskerSelectivity')])
-pg.add_static_image('Color Key','topo/command/dfl_key_white_vert.png')
-
 def measure_deflection_pref(num_deflection=50,
-                    scale=0.3,offset=0.0,display=False,weighted_average=False,
-                   
-pattern_presenter=PatternPresenter(pattern_generator=TestWhiskerArray(),apply_output_fn=False,duration=0.175)):
-    
+			    scale=0.3,offset=0.0,display=False,weighted_average=False,
+			    pattern_presenter=PatternPresenter(pattern_generator=TestWhiskerArray(),
+							       apply_output_fn=False,duration=0.175)):
     """  
     Measure deflection maps, by collating the responses to a set of
     whisker deflections in different directions.
     """
+
     if num_deflection <= 0:
         raise ValueError("num_deflection must be greater than 0")
 
@@ -328,6 +316,19 @@ pattern_presenter=PatternPresenter(pattern_generator=TestWhiskerArray(),apply_ou
 
     Subplotting.set_subplots("Deflection",force=False)
     
+
+from topo.plotting.plotgroup import create_plotgroup
+pg= create_plotgroup(name='Deflection Preference',category="Preference Maps",
+                     doc='Measure preference for direction stimulus for a lagged model.',
+                     update_command=[measure_deflection_pref])
+pg.add_plot('Deflection Preference',[('Hue','DeflectionPreference')])
+pg.add_plot('Deflection Preference&Selectivity',[('Hue','DeflectionPreference'),
+						   ('Confidence','DeflectionSelectivity')])
+pg.add_plot('Deflection Selectivity',[('Strength','DeflectionSelectivity')])
+pg.add_plot('Whisker Preference',[('Strength','WhiskerPreference')])
+pg.add_plot('Whisker Selectivity',[('Strength','WhiskerSelectivity')])
+pg.add_static_image('Color Key','topo/command/dfl_key_white_vert.png')
+
 
 def measure_sweep_pref(num_deflection=50,
                     scale=0.3,offset=0.0,display=False,weighted_average=False,

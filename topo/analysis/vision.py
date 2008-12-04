@@ -168,17 +168,6 @@ def phase_preference_scatter_plot(sheet_name,diameter=0.39):
 #   - Preferably remove the filename argument by default, so that
 #     plots will show up in the GUI
 
-pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
-             doc='Measure preference for sine grating orientation.',
-             update_command='from topo.analysis.vision import analyze_complexity; fm = measure_or_pref(frequencies=[3.0],num_orientation=8,scale=0.3,num_phase=32); analyze_complexity(fm,simple_sheet_name="V1Simple",complex_sheet_name="V1Complex",filename="ModulationRatio")')
-pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
-pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
-						   ('Confidence','OrientationSelectivity')])
-pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-pg.add_plot('Modulation Ratio',[('Strength','ComplexSelectivity')])
-pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
-pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
-
 
 def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename=None):
     """
@@ -205,3 +194,24 @@ def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename
     except AttributeError:
         print "Skipping phase preference scatter plot; could not analyze region %s." \
               % simple_sheet_name
+
+
+def measure_and_analyze_complexity():
+    """Macro for measuring orientation preference and then analyzing its complexity."""
+    from topo.command.analysis import measure_or_pref
+    fm = measure_or_pref(frequencies=[3.0],num_orientation=8,scale=0.3,num_phase=32)
+    analyze_complexity(fm,simple_sheet_name="V1Simple",complex_sheet_name="V1Complex",filename="ModulationRatio")
+
+
+pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
+             doc='Measure preference for sine grating orientation.',
+             update_command=[measure_and_analyze_complexity])
+pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
+pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
+						   ('Confidence','OrientationSelectivity')])
+pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
+pg.add_plot('Modulation Ratio',[('Strength','ComplexSelectivity')])
+pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
+pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
+
+

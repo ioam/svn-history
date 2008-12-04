@@ -112,6 +112,8 @@ class PlotGroup(param.Parameterized):
     def _exec_update_command(self):
         if type(self.update_command) is str:
             exec self.update_command in __main__.__dict__
+        elif type(self.update_command) is list:
+            for f in self.update_command: f()
         else:
             self.update_command()
 
@@ -415,7 +417,7 @@ class TemplatePlotGroup(SheetPlotGroup):
         
       plotgroups['Activity'] =
           TemplatePlotGroup(name='Activity', category='Basic',
-              update_command='measure_activity()',
+              update_command=[measure_activity],
               plot_templates=[('Activity',
                   {'Strength': 'Activity', 'Hue': 'OrientationPreference', 'Confidence': None})])
     
@@ -433,7 +435,7 @@ class TemplatePlotGroup(SheetPlotGroup):
     in the same PlotGroup::
 
       TemplatePlotGroup(name='Orientation Preference', category='Basic'
-          update_command='measure_or_pref()',
+          update_command=[measure_or_pref.instance()],
           plot_templates=
               [('Orientation Preference',
                   {'Strength': None, 'Hue': 'OrientationPreference'}),

@@ -626,7 +626,9 @@ class PatternPresenter(param.Parameterized):
                 elif (name.count('Blue')):
                     inputs[name].scale=b
                 else: 
-                    self.warning('Hue is defined only when there are different input sheets with names with Red, Green or Blue substrings.')
+                    if not hasattr(self,'hue_warned'):
+                        self.warning('Unable to measure hue preference, because hue is defined only when there are different input sheets with names with Red, Green or Blue substrings.')
+                        self.hue_warned=True
 
 
         if features_values.has_key('retinotopy'):
@@ -671,7 +673,9 @@ class PatternPresenter(param.Parameterized):
                 elif (name.count('Left')):
                     inputs[name].phase=wrap(0,2*pi,temp_phase2)
                 else:
-                    self.warning('Disparity is defined only when there are inputs for Right and Left retinas.')
+                    if not hasattr(self,'disparity_warned'):
+                        self.warning('Unable to measure disparity preference, because disparity is defined only when there are inputs for Right and Left retinas.')
+                        self.disparity_warned=True
                 
           
         ## Not yet used; example only
@@ -925,16 +929,17 @@ class Subplotting(param.Parameterized):
 #    using the separate feature parameters above, Spatial Frequency
 #    map measurement would require:
 #
-#      update_command='from topo.command.analysis import Feature ; \
-#         from math import pi; measure_or_pref( \
+#      from topo.command.analysis import Feature
+#      from math import pi
+#      update_command=[measure_or_pref.instance( \
 #         frequency_feature=Feature(name="frequency",values=frange(1.0,6.0,0.2)), \
 #         phase_feature=Feature(name="phase",range=(0.0,2*pi),step=2*pi/15,cyclic=True), \
-#         orientation_feature=Feature(name="orientation",range=(0.0,pi),step=pi/4,cyclic=True))')
+#         orientation_feature=Feature(name="orientation",range=(0.0,pi),step=pi/4,cyclic=True)])
 #   
 #    rather than the current, much more easily controllable implementation:
 #   
-#      update_command='measure_or_pref(frequencies=frange(1.0,6.0,0.2),\
-#         num_phase=15,num_orientation=4)')
+#      update_command=[measure_or_pref.instance(frequencies=frange(1.0,6.0,0.2),\
+#         num_phase=15,num_orientation=4)]
 #
 #    I.e., to change anything about a Feature, one has to supply an
 #    entirely new Feature, because otherwise the original Feature
