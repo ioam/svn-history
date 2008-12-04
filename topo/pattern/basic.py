@@ -574,4 +574,96 @@ class GaussiansCorner(PatternGenerator):
 	return numpy.maximum(patterns[0],patterns[1])
 
 
+
+
+class Translator(PatternGenerator):
+    """
+    PatternGenerator that translates another PatternGenerator over
+    time.
+
+    This PatternGenerator will create a series of episodes, where in
+    each episode the underlying generator is moved in a fixed
+    direction at a fixed speed.  To begin an episode, the Translator's
+    x, y, and direction are evaluated (e.g. from random
+    distributions), and the underlying generator is then drawn at
+    those values plus changes over time that are determined by the
+    speed.  The orientation of the underlying generator should be set
+    to 0 to get motion perpendicular to the generator's orientation
+    (which is typical).
+    """
+    generator = param.ClassSelector(default=Gaussian(),
+        class_=PatternGenerator,doc="""Pattern to be translated.""")
+
+    direction = param.Number(default=0.0,softbounds=(-pi,pi),doc="""
+        The direction in which the pattern should move, in radians.""")
+    
+    speed = param.Number(default=0.01,bounds=(0.0,None),doc="""
+        The speed with which the pattern should move,
+        in sheet coordinates per simulation time unit.""")
+
+    reset_period = param.Number(default=1,bounds=(0.0,None),doc="""
+        Period between generating each new translation episode.""")
+
+    episode_interval = param.Number(default=0,doc="""
+        Interval between successive translation episodes.
+        
+        If nonzero, the episode_separator pattern is presented for
+        this amount of simulation time after each episode, e.g. to
+        allow processing of the previous episode to complete.""")
+
+    episode_separator = param.ClassSelector(default=Constant(scale=0.0),
+         class_=PatternGenerator,doc="""
+         Pattern to display during the episode_interval, if any.
+         The default is a blank pattern.""")
+                                                                              
+
+    def _advance_params(self):
+        """
+        Explicitly generate new values for these parameters only
+        when appropriate.
+        """
+        for param in ['x','y','direction']:
+            self.force_new_dynamic_value(param)
+        self.last_time = topo.sim.time()
+
+       
+    def __init__(self,**params):
+        super(Translator,self).__init__(**params)
+        self._advance_params()
+
+        
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        
+        if topo.sim.time() >= self.last_time + p.reset_period:
+            ## Returns early if within episode interval
+            if topo.sim.time()<self.last_time+p.reset_period+p.episode_interval:
+                return p.episode_separator(xdensity=p.xdensity,
+                                           ydensity=p.ydensity,
+                                           bounds=p.bounds)
+            else:
+                self._advance_params()
+
+        # Access parameter values without giving them new values
+        x = self.inspect_value('x')
+        y = self.inspect_value('y')
+        direction = self.inspect_value('direction')
+
+        # compute how much time elapsed from the last reset
+        # float(t) required because time could be e.g. gmpy.mpq
+        t = float(topo.sim.time()-self.last_time)
+
+        ## CEBALERT: mask gets applied twice, both for the underlying
+        ## generator and for this one.  (leads to redundant
+        ## calculations in current lissom_oo_or usage, but will lead
+        ## to problems/limitations in the future).
+        return p.generator(
+            xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
+            x=x+t*cos(direction)*p.speed+p.generator.x,
+            y=y+t*sin(direction)*p.speed+p.generator.y,
+            orientation=(direction-pi/2)+p.generator.orientation)
+
+
+
+
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,PatternGenerator)]))
