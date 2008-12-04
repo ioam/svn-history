@@ -59,25 +59,27 @@ class PlotGroup(param.Parameterized):
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.
     """
-    update_command = param.Parameter(default="",doc="""
-    Command to execute before updating this plot, e.g. to calculate sheet views.
-    
-    The command can be any Python code, and will be evaluated in the main namespace
-    (as if it were typed into a .ty script).  The initial value is determined by
-    the template for this plot, but various arguments can be passed, a modified
-    version substituted, etc.""")
 
-    plot_command = param.Parameter(default="",doc="""
-    Command to execute when updating sheet or coordinate of unit to be plotted
-    when the simulator time has not changed (i.e. no further measurement of
-    responses is required).
-    In the case of a full-field stimulus, responses do not need to be re-measured
-    since the necessary values are already stored. 
-    
-    The command can be any Python code, and will be evaluated in the main namespace
-    (as if it were typed into a .ty script).  The initial value is determined by
-    the template for this plot, but various arguments can be passed, a modified
-       version substituted, etc.""")
+    update_command = param.Parameter(default=[],doc="""
+        Commands to execute before updating this plot, e.g. to calculate sheet views.
+        
+        The commands can be any callable Python objects, i.e. any x for
+        which x() is valid.  The initial value is determined by the
+        template for this plot, but various arguments can be passed, a
+        modified version substituted, etc.""")
+
+    plot_command = param.Parameter(default=[],doc="""
+        Commands to execute when redrawing a plot rather than regenerating data.
+
+        E.g, for a plot with data measured once but displayed one
+        sheet or unit at at time, this command will be called whenever
+        the sheet or coordinate of unit to be plotted (or the
+        simulator time) has changed.
+        
+        The commands can be any callable Python objects, i.e. any x for
+        which x() is valid.  The initial value is determined by the
+        template for this plot, but various arguments can be passed, a
+        modified version substituted, etc.""")
 
     # CB: make clear the distinction between self.plots and self.plot_list
     

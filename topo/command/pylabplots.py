@@ -29,11 +29,12 @@ except ImportError:
 import numpy
 from math import pi
 # JABALERT: Import all of these from numpy instead?
-from numpy.oldnumeric import arange, sqrt, array, floor, transpose, argmax, argmin, cos, sin, log10
-from numpy import outer,arange,ones
+from numpy.oldnumeric import arange, sqrt, array, floor, transpose, argmax, argmin, cos, sin, log10, Float
+from numpy import outer,arange,ones,zeros
 
 import topo
-from topo.base.arrayutil import octave_output
+from topo.base.sheetview import SheetView
+from topo.base.arrayutil import octave_output, centroid, wrap
 from topo.base.sheet import Sheet
 from topo.base.arrayutil import wrap
 from topo.misc.filepath import normalize_path
@@ -47,6 +48,7 @@ from topo.param.parameterized import ParamOverrides
 from topo.pattern.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
 from topo.pattern.basic import SineGrating, Rectangle
 from topo.plotting.plotgroup import default_measureable_sheet, create_plotgroup, plotgroups
+from topo.base.cf import CFSheet
 
 from topo.plotting.plotgroup import default_input_sheet
 from topo.analysis.featureresponses import Feature, PatternPresenter, FeatureCurves
@@ -180,7 +182,7 @@ class matrixplot(PylabPlotCommand):
     or customized plots; this is just a simple example.
     """
 
-    plot_type = param.Parameter(default=pylab.gray,doc="""
+    plot_type = param.Callable(default=pylab.gray,doc="""
         Matplotlib command to generate the plot, e.g. pylab.gray or pylab.hsv.""")
     
     # JABALERT: All but the first two should probably be Parameters
@@ -386,16 +388,24 @@ class topographic_grid(PylabPlotCommand):
     the names of these can be passed in as arguments.
     """
     
-    # JABALERT: All the arguments should probably be Parameters        
-    def __call__(self,xsheet_view_name='XPreference',ysheet_view_name='YPreference',axis=[-0.5,0.5,-0.5,0.5],**params):
+    xsheet_view_name = param.String(default='XPreference',doc="""
+        Name of the SheetView holding the X position locations.""")
+    
+    ysheet_view_name = param.String(default='YPreference',doc="""
+        Name of the SheetView holding the Y position locations.""")
+    
+    axis = param.Parameter(default=[-0.5,0.5,-0.5,0.5],doc="""
+        Four-element list of the plot bounds, i.e. [xmin, xmax, ymin, ymax].""")
+    
+    def __call__(self,**params):
         p=ParamOverrides(self,params)
 
         for sheet in topo.sim.objects(Sheet).values():
-            if ((xsheet_view_name in sheet.sheet_views) and
-                (ysheet_view_name in sheet.sheet_views)):
+            if ((p.xsheet_view_name in sheet.sheet_views) and
+                (p.ysheet_view_name in sheet.sheet_views)):
     
-                x = sheet.sheet_views[xsheet_view_name].view()[0]
-                y = sheet.sheet_views[ysheet_view_name].view()[0]
+                x = sheet.sheet_views[p.xsheet_view_name].view()[0]
+                y = sheet.sheet_views[p.ysheet_view_name].view()[0]
     
                 pylab.figure(figsize=(5,5))
     
@@ -417,7 +427,7 @@ class topographic_grid(PylabPlotCommand):
                 # Currently sets the input range arbitrarily; should presumably figure out
                 # what the actual possible range is for this simulation (which would presumably
                 # be the maximum size of any GeneratorSheet?).
-                pylab.axis(axis)
+                pylab.axis(p.axis)
                 title='Topographic mapping to '+sheet.name+' at time '+topo.sim.timestr()
     
                 if isint: pylab.ion()
@@ -502,7 +512,7 @@ class tuning_curve(PylabPlotCommand):
 
     # Can we list some alternatives here, if there are any
     # useful ones?
-    plot_type = param.Parameter(default=pylab.plot,doc="""
+    plot_type = param.Callable(default=pylab.plot,doc="""
         Matplotlib command to generate the plot.""")
 
     unit = param.String(default="",doc="""
@@ -784,7 +794,7 @@ class measure_position_pref(PositionMeasurementCommand):
 pg= create_plotgroup(name='Position Preference',category="Preference Maps",
            doc='Measure preference for the X and Y position of a Gaussian.',
            update_command=[measure_position_pref.instance()],
-           plot_command='topographic_grid()',
+           plot_command=[topographic_grid.instance()],
            normalize=True)
 
 pg.add_plot('X Preference',[('Strength','XPreference')])
@@ -869,7 +879,7 @@ class measure_cog(ParameterizedFunction):
 pg= create_plotgroup(name='Center of Gravity',category="Preference Maps",
              doc='Measure the center of gravity of each ConnectionField in a Projection.',
              update_command=[measure_cog.instance()],
-             plot_command='topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',
+             plot_command=[topographic_grid.instance(xsheet_view_name="XCoG",ysheet_view_name="YCoG")],
              normalize=True)
 pg.add_plot('X CoG',[('Strength','XCoG')])
 pg.add_plot('Y CoG',[('Strength','YCoG')])
@@ -902,7 +912,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',
             Although the data takes a long time to collect, once it is ready the plots
             are available immediately for any unit.""",
         update_command=[measure_or_tuning_fullfield.instance()],
-        plot_command='cyclic_tuning_curve(x_axis="orientation")')
+        plot_command=[cyclic_tuning_curve.instance(x_axis="orientation")])
 
 
 
@@ -943,7 +953,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="
             Measure orientation tuning for a specific unit at different contrasts,
             using a pattern chosen to match the preferences of that unit.""",
         update_command=[measure_or_tuning.instance()],
-        plot_command='cyclic_tuning_curve(x_axis="orientation")',
+        plot_command=[cyclic_tuning_curve.instance(x_axis="orientation")],
         prerequisites=['XPreference'])
 
 
@@ -1002,7 +1012,7 @@ class measure_size_response(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
         doc='Measure the size preference for a specific unit.',
         update_command=[measure_size_response.instance()],
-        plot_command='tuning_curve(x_axis="size",unit="Diameter of stimulus")',
+        plot_command=[tuning_curve.instance(x_axis="size",unit="Diameter of stimulus")],
         prerequisites=['OrientationPreference','XPreference'])
 
 
@@ -1060,7 +1070,7 @@ class measure_contrast_response(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
         doc='Measure the contrast response function for a specific unit.',
         update_command=[measure_contrast_response.instance()],
-        plot_command='tuning_curve(x_axis="contrast",unit="%")',
+        plot_command=[tuning_curve.instance(x_axis="contrast",unit="%")],
         prerequisites=['OrientationPreference','XPreference'])
 
 
@@ -1243,7 +1253,7 @@ class measure_orientation_contrast(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
                  doc='Measure the response of one unit to a centre and surround sine grating disk.',
                  update_command=[measure_orientation_contrast.instance()],
-                 plot_command='tuning_curve(x_axis="contrastcentre",unit="%")',
+                 plot_command=[tuning_curve.instance(x_axis="contrastcentre",unit="%")],
                  prerequisites=['OrientationPreference','XPreference'])        
 
 
