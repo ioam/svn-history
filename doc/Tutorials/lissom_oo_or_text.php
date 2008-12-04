@@ -280,8 +280,7 @@ Returning to the <span class='w_title'>Test pattern</span> window,
 try presenting a vertical line
 (<span_class='t_item'>orientation</span> of <code>pi/2</code>) and
 then, in the <span class='w_title'>Activity</span> window, right click
-on one of the cyan-colored patches of activity (for instance, around unit
-41,24 on the plot above; your own plot will likely be different) <!--CB: bit out of date, but fortunately still close.-->. This will bring up a menu:
+on one of the cyan-colored patches of activity. This will bring up a menu:
 
 <p class="center">
 <img src="images/lissom_oo_or_activity_rightclick.png" alt="Right-click menu"
@@ -450,7 +449,9 @@ stepsize of 1.0 lets the user see the results after each input pattern
 has been presented and the cortex has come to a steady state, but
 results can also be examined at a finer timescale.  Be sure to leave
 the time clock at an even multiple of 1.0 before you do anything else,
-so that the network will be in a well-defined state.
+so that the network will be in a well-defined state.  (To do this,
+just type the fractional part into the "Run for:" box, i.e. 0.95 if
+the time is currently 10002.05, and then press "Go".)
 </li>
 </ol>
 
