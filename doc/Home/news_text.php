@@ -5,7 +5,7 @@ print '<table width="100%" cellpadding="5"><tr><td bgcolor="'.$banner_bg_color.'
 <i>
 <b>Recent news:</b>
 
-<p><b>12 October 2008:</b> Version 0.9.6 soon to be released;
+<p><b>25 November 2008:</b> Version 0.9.6 is in preparation;
 updates are currently available in the latest SVN version.  See the 
 <A target="_top" href="../News/index.html">News</A> page for more details.<BR>
   
