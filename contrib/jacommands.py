@@ -342,8 +342,8 @@ class SimpleHomeoSigmoid(OutputFnWithState):
     b_init = param.Number(default=-4,doc="Additive parameter controlling the exponential.")
     eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
     smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
-    randomized_init = param.Boolean(False, doc="whether to randomized the initial B parameter")
-    noise_magnitued =  param.Number(default=0.1, doc="The magnitued of tha aditive noise to apply to the B parameter at initialization")
+    randomized_init = param.Boolean(False, doc="Whether to randomize the initial B parameter")
+    noise_magnitude =  param.Number(default=0.1, doc="The magnitude of the additive noise to apply to the B parameter at initialization")
 
     def __init__(self,**params):
         super(SimpleHomeoSigmoid,self).__init__(**params)
@@ -355,7 +355,7 @@ class SimpleHomeoSigmoid(OutputFnWithState):
             self.first_call = False
             self.a = ones(x.shape, x.dtype.char) * self.a_init
             if self.randomized_init:
-                self.b = ones(x.shape, x.dtype.char) * self.b_init  + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitued*2
+                self.b = ones(x.shape, x.dtype.char) * self.b_init  + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitude*2
             else:
                 self.b = ones(x.shape, x.dtype.char) * self.b_init
             
@@ -375,8 +375,8 @@ class SimpleHomeoLinear(OutputFnWithState):
     t_init = param.Number(default=-0.0,doc="Threshold parameter")
     eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
     smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
-    randomized_init = param.Boolean(False, doc="whether to randomized the initial t parameter")
-    noise_magnitued =  param.Number(default=0.1, doc="The magnitued of tha aditive noise to apply to the B parameter at initialization")
+    randomized_init = param.Boolean(False, doc="Whether to randomize the initial t parameter")
+    noise_magnitude =  param.Number(default=0.1, doc="The magnitude of the additive noise to apply to the B parameter at initialization")
 
     def __init__(self,**params):
         super(SimpleHomeoLinear,self).__init__(**params)
@@ -387,7 +387,7 @@ class SimpleHomeoLinear(OutputFnWithState):
         if self.first_call:
             self.first_call = False
             if self.randomized_init:
-                self.t = ones(x.shape, x.dtype.char) * self.t_init  + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitued*2
+                self.t = ones(x.shape, x.dtype.char) * self.t_init  + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitude*2
             else:
                 self.t = ones(x.shape, x.dtype.char) * self.t_init
             
@@ -406,8 +406,8 @@ class SimpleHomeoLinearRelative(OutputFnWithState):
     t_init = param.Number(default=-0.0,doc="Threshold parameter")
     eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
     smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
-    randomized_init = param.Boolean(False, doc="whether to randomized the initial t parameter")
-    noise_magnitued =  param.Number(default=0.1, doc="The magnitued of tha aditive noise to apply to the B parameter at initialization")
+    randomized_init = param.Boolean(False, doc="Whether to randomize the initial t parameter")
+    noise_magnitude =  param.Number(default=0.1, doc="The magnitude of the additive noise to apply to the B parameter at initialization")
         
     def __init__(self,**params):
         super(SimpleHomeoLinearRelative,self).__init__(**params)
@@ -418,7 +418,7 @@ class SimpleHomeoLinearRelative(OutputFnWithState):
         if self.first_call:
             self.first_call = False
             if self.randomized_init:
-                self.t = ones(x.shape, x.dtype.char) * self.t_init  + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitued*2
+                self.t = ones(x.shape, x.dtype.char) * self.t_init  + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitude*2
             else:
                 self.t = ones(x.shape, x.dtype.char) * self.t_init
             
