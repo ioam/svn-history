@@ -47,10 +47,9 @@ from topo.param import ParameterizedFunction
 from topo.param.parameterized import ParamOverrides
 from topo.pattern.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
 from topo.pattern.basic import SineGrating, Rectangle
-from topo.plotting.plotgroup import default_measureable_sheet, create_plotgroup, plotgroups
+from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.base.cf import CFSheet
 
-from topo.plotting.plotgroup import default_input_sheet
 from topo.analysis.featureresponses import Feature, PatternPresenter, FeatureCurves
 from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand, PositionMeasurementCommand, SingleInputResponseCommand, FeatureCurveCommand, UnitCurveCommand
 
@@ -504,7 +503,7 @@ class tuning_curve(PylabPlotCommand):
         List of coordinates of units to measure.""")
 
     sheet = param.ObjectSelector(
-        default=None,compute_default_fn=default_measureable_sheet,doc="""
+        default=None,doc="""
         Name of the sheet to use in measurements.""")
 
     x_axis = param.String(default="",doc="""
@@ -902,11 +901,13 @@ class measure_or_tuning_fullfield(FeatureCurveCommand):
     parameter is changed as appropriate.
     """
 
+    coords = param.Parameter(default=None,doc="""Ignored; here just to suppress warning.""")
+    
     pattern_presenter = param.Callable(
         default=PatternPresenter(pattern_generator=SineGrating(),
                                  contrast_parameter="michelson_contrast"))
 
-
+    
 create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
             Plot orientation tuning curves for a specific unit, measured using full-field sine gratings.
             Although the data takes a long time to collect, once it is ready the plots
@@ -1102,7 +1103,7 @@ class measure_retinotopy(SinusoidalMeasureResponseCommand):
     scale = param.Number(default=1.0)
 
     input_sheet = param.ObjectSelector(
-        default=None,compute_default_fn=default_input_sheet,doc="""
+        default=None,doc="""
         Name of the sheet where input should be drawn.""")
 
     weighted_average= param.Boolean(default=False)

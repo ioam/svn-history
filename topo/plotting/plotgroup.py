@@ -24,7 +24,7 @@ from topo.misc.filepath import resolve_path
 from plot import make_template_plot, Plot
 from plotfilesaver import PlotGroupSaver,CFProjectionPlotGroupSaver
 
-from topo.param.parameterized import ParameterizedFunction,ParamOverrides
+from topo.param.parameterized import ParameterizedFunction,ParamOverrides,Parameterized
 
 from topo.sheet import GeneratorSheet
 
@@ -60,7 +60,7 @@ class PlotGroup(param.Parameterized):
     the plots and other special parameters.
     """
 
-    update_command = param.Parameter(default=[],doc="""
+    update_command = param.HookList(default=[],doc="""
         Commands to execute before updating this plot, e.g. to calculate sheet views.
         
         The commands can be any callable Python objects, i.e. any x for
@@ -68,7 +68,7 @@ class PlotGroup(param.Parameterized):
         template for this plot, but various arguments can be passed, a
         modified version substituted, etc.""")
 
-    plot_command = param.Parameter(default=[],doc="""
+    plot_command = param.HookList(default=[],doc="""
         Commands to execute when redrawing a plot rather than regenerating data.
 
         E.g, for a plot with data measured once but displayed one
@@ -111,21 +111,14 @@ class PlotGroup(param.Parameterized):
     
 
     # CB: (subclasses add more commands)
-    def _exec_update_command(self):
-        if type(self.update_command) is str:
-            exec self.update_command in __main__.__dict__
-        elif type(self.update_command) is list:
-            for f in self.update_command: f()
-        else:
-            self.update_command()
+    def _exec_update_command(self,**args):
+        for f in self.update_command: 
+            f(**args)
 
-    def _exec_plot_command(self):
-        if type(self.plot_command) is str:
-            exec self.plot_command in __main__.__dict__
-        elif type(self.plot_command) is list:
-            for f in self.plot_command: f()
-        else:
-            self.plot_command()
+
+    def _exec_plot_command(self,**args):
+        for f in self.plot_command: 
+            f(**args)
 
         
     def _plot_list(self):
@@ -522,6 +515,20 @@ class TemplatePlotGroup(SheetPlotGroup):
 
 
 
+def default_measureable_sheet():
+    """Returns the first sheet for which measure_maps is True, for use as a default value."""
+
+    sheets = [s for s in topo.sim.objects(Sheet).values()
+              if hasattr(s,'measure_maps') and s.measure_maps]
+    if len(sheets)<1:
+        raise ValueError("Unable to find a suitable measureable sheet.")
+    sht=sheets[0]
+    if len(sheets)>1:
+        Parameterized().message("Using sheet %s." % sht.name)
+    return sht
+
+
+
 class ProjectionSheetPlotGroup(TemplatePlotGroup):
     """
     Abstract PlotGroup for visualizations of the Projections of one ProjectionSheet.
@@ -534,7 +541,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
     keyname = "ProjectionSheet" # CB: what is this keyname?
 
-    sheet = param.ObjectSelector(default=None,doc="""
+    sheet = param.ObjectSelector(default=None,compute_default_fn=default_measureable_sheet,doc="""
     The Sheet from which to produce plots.""")
 
     sheet_type = ProjectionSheet
@@ -543,7 +550,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     # themselves. Right now we have it provide a useful error message
     # to users (which is useful).
     def _check_sheet_type(self):
-        if not isinstance(self.sheet,self.sheet_type):
+        if self.sheet is not None and not isinstance(self.sheet,self.sheet_type):
             raise TypeError(
                 "%s's sheet Parameter must be set to a %s instance (currently %s, type %s)." \
                 %(self,self.sheet_type,self.sheet,type(self.sheet))) 
@@ -551,13 +558,14 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     def _sheets(self):
         return [self.sheet]
 
-    def _exec_update_command(self):
-        if self.sheet is not None:
-            self._check_sheet_type()
-            ProjectionSheetMeasurementCommand.sheet = self.sheet
-        super(ProjectionSheetPlotGroup,self)._exec_update_command()
-        if self.sheet is None:
-            self.sheet=ProjectionSheetMeasurementCommand.sheet
+    def _exec_update_command(self,**args):
+        self.params('sheet').compute_default()
+        self._check_sheet_type()
+        super(ProjectionSheetPlotGroup,self)._exec_update_command(sheet=self.sheet,**args)
+
+    def _exec_plot_command(self,**args):
+        super(ProjectionSheetPlotGroup,self)._exec_plot_command(sheet=self.sheet,**args)
+
 
     # Special case: if the Strength is set to self.keyname, we
     # request UnitViews (i.e. by changing the Strength key in
@@ -595,25 +603,10 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
 
 
-def default_measureable_sheet():
-    """Returns the first sheet for which measure_maps is True, for use as a default value."""
-
-    sheets = [s for s in topo.sim.objects(Sheet).values()
-              if hasattr(s,'measure_maps') and s.measure_maps]
-    if len(sheets)<1:
-        raise ValueError("Unable to find a suitable measureable sheet.")
-    sht=sheets[0]
-    if len(sheets)>1:
-        self.message("Using sheet %s." % sht.name)
-    return sht
-
-
-
 class ProjectionSheetMeasurementCommand(ParameterizedFunction):
     """A callable Parameterized command for measuring or plotting a specified Sheet."""
 
-    sheet = param.ObjectSelector(
-        default=None,compute_default_fn=default_measureable_sheet,doc="""
+    sheet = param.ObjectSelector(default=None,doc="""
         Name of the sheet to use in measurements.""")
 
     __abstract = True
@@ -708,14 +701,37 @@ class GridPlotGroup(ProjectionSheetPlotGroup):
 
 
 
+def default_input_sheet():
+    """Returns the first GeneratorSheet defined, for use as a default value."""
+
+    sheets=topo.sim.objects(GeneratorSheet).values()
+    if len(sheets)<1:
+        raise ValueError("Unable to find a suitable input sheet.")
+    sht=sheets[0]
+    if len(sheets)>1:
+        self.message("Using input sheet %s." % sht.name)
+    return sht
+
+
+
 class RFProjectionPlotGroup(GridPlotGroup):
-
     keyname='RFs'
-    input_sheet = param.ObjectSelector(default=None,doc="The sheet on which to measure the RFs.")
+    input_sheet = param.ObjectSelector(default=None,compute_default_fn=default_input_sheet,
+                                       doc="The sheet on which to measure the RFs.")
 
-    def _exec_update_command(self): # RFHACK
-        topo.analysis.featureresponses.SingleInputResponseCommand.input_sheet = self.input_sheet
-        super(RFProjectionPlotGroup,self)._exec_update_command()
+    def _exec_update_command(self,**args): # RFHACK
+        self.params('input_sheet').compute_default()
+        super(RFProjectionPlotGroup,self)._exec_update_command(input_sheet=self.input_sheet,**args)
+
+
+class RetinotopyPlotGroup(TemplatePlotGroup):
+    input_sheet = param.ObjectSelector(default=None,compute_default_fn=default_input_sheet,
+                                       doc="The sheet on which to measure the RFs.")
+
+    def _exec_update_command(self,**args): # RFHACK
+        self.params('input_sheet').compute_default()
+        super(RetinotopyPlotGroup,self)._exec_update_command(
+            input_sheet=self.input_sheet,**args)
 
 
 
@@ -730,25 +746,10 @@ class ProjectionPlotGroup(GridPlotGroup):
         plot_channels['Strength']=key
         return plot_channels
 
-    def _exec_update_command(self):
+    def _exec_update_command(self,**args):
         coords=self.generate_coords()
-        UnitMeasurementCommand.coords = coords
-        UnitMeasurementCommand.projection = self.projection
-        super(ProjectionPlotGroup,self)._exec_update_command()
+        super(ProjectionPlotGroup,self)._exec_update_command(coords=coords,projection=self.projection,**args)
 
-
-
-
-def default_input_sheet():
-    """Returns the first GeneratorSheet defined, for use as a default value."""
-
-    sheets=topo.sim.objects(GeneratorSheet).values()
-    if len(sheets)<1:
-        raise ValueError("Unable to find a suitable input sheet.")
-    sht=sheets[0]
-    if len(sheets)>1:
-        self.message("Using input sheet %s." % sht.name)
-    return sht
 
 
 
@@ -765,7 +766,6 @@ class UnitMeasurementCommand(ProjectionSheetMeasurementCommand):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        self.params('sheet').compute_default()
         s = p.sheet
         if s is not None:
             for x,y in p.coords:
@@ -787,9 +787,9 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
         super(CFProjectionPlotGroup,self).__init__(**params)    
         self.filesaver = CFProjectionPlotGroupSaver(self)
 
-    def _exec_update_command(self): 
+    def _exec_update_command(self,**args): 
         self._check_projection_type()
-        super(CFProjectionPlotGroup,self)._exec_update_command()
+        super(CFProjectionPlotGroup,self)._exec_update_command(**args)
 
     # CB: same comment for ProjectionSheetPlotGroup's _check_sheet_type.
     def _check_projection_type(self):
@@ -842,17 +842,11 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
         return plot_channels
 
         
-    def _exec_update_command(self):
-        coords=(self.x,self.y)
-        UnitMeasurementCommand.coords = [coords]
-        topo.analysis.featureresponses.UnitCurveCommand.coords = [coords]
-	super(UnitPlotGroup,self)._exec_update_command()
+    def _exec_update_command(self,**args):
+	super(UnitPlotGroup,self)._exec_update_command(coords=[(self.x,self.y)],**args)
 
-    def _exec_plot_command(self):
-        coords=(self.x,self.y)
-        UnitMeasurementCommand.coords = [coords]
-        topo.analysis.featureresponses.UnitCurveCommand.coords = [coords]
-	super(UnitPlotGroup,self)._exec_plot_command()
+    def _exec_plot_command(self,**args):
+	super(UnitPlotGroup,self)._exec_plot_command(coords=[(self.x,self.y)],**args)
 
 
 
@@ -898,16 +892,12 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
 
 class FeatureCurvePlotGroup(UnitPlotGroup):
 
-    def _exec_update_command(self):
-        if self.sheet is not None:
-            topo.analysis.featureresponses.FeatureCurveCommand.sheet = self.sheet
-        super(FeatureCurvePlotGroup,self)._exec_update_command()          
-        if self.sheet is None:
-            self.sheet=topo.analysis.featureresponses.FeatureCurveCommand.sheet
+    def _exec_update_command(self,**args):
+        super(FeatureCurvePlotGroup,self)._exec_update_command(**args)
         self.get_curve_time()
 
-    def _exec_plot_command(self):
-        super(FeatureCurvePlotGroup,self)._exec_plot_command()
+    def _exec_plot_command(self,**args):
+        super(FeatureCurvePlotGroup,self)._exec_plot_command(**args)
         self.get_curve_time()
 
     def get_curve_time(self):
@@ -938,7 +928,7 @@ needed.
 plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
                    'Projection': CFProjectionPlotGroup,
                    'RF Projection':RFProjectionPlotGroup,
-                   'RF Projection (noise)':RFProjectionPlotGroup,                   
+                   'Retinotopy': RetinotopyPlotGroup,
                    'Projection Activity': ProjectionActivityPlotGroup}
 
 

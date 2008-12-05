@@ -1101,7 +1101,7 @@ class SingleInputResponseCommand(MeasureResponseCommand):
     # to allow it to be presented on only one sheet.
     
     input_sheet = param.ObjectSelector(
-        default=None,compute_default_fn=default_input_sheet,doc="""
+        default=None,doc="""
         Name of the sheet where input should be drawn.""")
 
     scale = param.Number(default=30.0)
@@ -1126,7 +1126,7 @@ class FeatureCurveCommand(SinusoidalMeasureResponseCommand):
     num_orientation = param.Integer(default=12)
 
     sheet = param.ObjectSelector(
-        default=None,compute_default_fn=default_measureable_sheet,doc="""
+        default=None,doc="""
         Name of the sheet to use in measurements.""")
 
     units = param.String(default='%',doc="""
@@ -1151,7 +1151,6 @@ class FeatureCurveCommand(SinusoidalMeasureResponseCommand):
     def __call__(self,**params):
         """Measure the response to the specified pattern and store the data in each sheet."""
         p=ParamOverrides(self,params)
-        self.params('sheet').compute_default()
         self._compute_curves(p,p.sheet)
 
 
