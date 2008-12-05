@@ -319,7 +319,7 @@ def default_analysis_function():
     save_plotgroup("Activity",saver_params={"filename_suffix":"_45d"})
 
 
-
+# ALERT: Need to move docs into params.
 class run_batch(ParameterizedFunction):
     """
     Run a Topographica simulation in batch mode.
