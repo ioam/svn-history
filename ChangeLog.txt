@@ -1,4 +1,1309 @@
+2008-11-24  ceball
+
+	* [r9630] examples/lissom.ty:
+	  Fixed typo.
+
+2008-11-23  jbednar
+
+	* [r9629] examples/lissom_oo_or_cr.ty:
+	  Updated path to images that have been moved.
+
+2008-11-23  ceball
+
+	* [r9628] examples/lissom.ty:
+	  Corrected position of ValueError for unknown dataset.
+
+	* [r9627] images/mcgill/foliage_a,
+	  images/mcgill/foliage_a/00_0.png,
+	  images/mcgill/foliage_a/00_1.png,
+	  images/mcgill/foliage_a/00_2.png,
+	  images/mcgill/foliage_a/01_0.png,
+	  images/mcgill/foliage_a/01_1.png,
+	  images/mcgill/foliage_a/01_2.png,
+	  images/mcgill/foliage_a/02_0.png,
+	  images/mcgill/foliage_a/02_1.png,
+	  images/mcgill/foliage_a/02_2.png,
+	  images/mcgill/foliage_a/03_0.png,
+	  images/mcgill/foliage_a/03_1.png,
+	  images/mcgill/foliage_a/03_2.png,
+	  images/mcgill/foliage_a/04_0.png,
+	  images/mcgill/foliage_a/04_1.png,
+	  images/mcgill/foliage_a/04_2.png,
+	  images/mcgill/foliage_a/05_0.png,
+	  images/mcgill/foliage_a/05_1.png,
+	  images/mcgill/foliage_a/05_2.png:
+	  Images missed (by Subversion, in my opinion) from the previous
+	  commit.
+
+	* [r9626] examples/lissom.ty,
+	  images/colormap,
+	  images/mcgill,
+	  images/mcgill/foliage_b,
+	  images/mcgill/foliage_b/01_0.png,
+	  images/mcgill/foliage_b/01_1.png,
+	  images/mcgill/foliage_b/01_2.png,
+	  images/mcgill/foliage_b/02_0.png,
+	  images/mcgill/foliage_b/02_1.png,
+	  images/mcgill/foliage_b/02_2.png,
+	  images/mcgill/foliage_b/03_0.png,
+	  images/mcgill/foliage_b/03_1.png,
+	  images/mcgill/foliage_b/03_2.png,
+	  images/mcgill/foliage_b/04_0.png,
+	  images/mcgill/foliage_b/04_1.png,
+	  images/mcgill/foliage_b/04_2.png,
+	  images/mcgill/foliage_b/05_0.png,
+	  images/mcgill/foliage_b/05_1.png,
+	  images/mcgill/foliage_b/05_2.png,
+	  images/mcgill/foliage_b/06_0.png,
+	  images/mcgill/foliage_b/06_1.png,
+	  images/mcgill/foliage_b/06_2.png,
+	  images/mcgill/foliage_b/07_0.png,
+	  images/mcgill/foliage_b/07_1.png,
+	  images/mcgill/foliage_b/07_2.png,
+	  images/mcgill/foliage_b/08_0.png,
+	  images/mcgill/foliage_b/08_1.png,
+	  images/mcgill/foliage_b/08_2.png,
+	  images/mcgill/foliage_b/09_0.png,
+	  images/mcgill/foliage_b/09_1.png,
+	  images/mcgill/foliage_b/09_2.png,
+	  images/mcgill/foliage_b/10_0.png,
+	  images/mcgill/foliage_b/10_1.png,
+	  images/mcgill/foliage_b/10_2.png,
+	  images/mcgill/foliage_b/11_0.png,
+	  images/mcgill/foliage_b/11_1.png,
+	  images/mcgill/foliage_b/11_2.png,
+	  images/mcgill/foliage_b/12_0.png,
+	  images/mcgill/foliage_b/12_1.png,
+	  images/mcgill/foliage_b/12_2.png,
+	  images/mcgill/foliage_b/13_0.png,
+	  images/mcgill/foliage_b/13_1.png,
+	  images/mcgill/foliage_b/13_2.png,
+	  images/mcgill/foliage_b/14_0.png,
+	  images/mcgill/foliage_b/14_1.png,
+	  images/mcgill/foliage_b/14_2.png,
+	  images/mcgill/foliage_b/15_0.png,
+	  images/mcgill/foliage_b/15_1.png,
+	  images/mcgill/foliage_b/15_2.png,
+	  images/mcgill/foliage_b/16_0.png,
+	  images/mcgill/foliage_b/16_1.png,
+	  images/mcgill/foliage_b/16_2.png,
+	  images/mcgill/foliage_b/17_0.png,
+	  images/mcgill/foliage_b/17_1.png,
+	  images/mcgill/foliage_b/17_2.png,
+	  images/mcgill/foliage_b/18_0.png,
+	  images/mcgill/foliage_b/18_1.png,
+	  images/mcgill/foliage_b/18_2.png,
+	  images/mcgill/foliage_b/19_0.png,
+	  images/mcgill/foliage_b/19_1.png,
+	  images/mcgill/foliage_b/19_2.png,
+	  images/mcgill/foliage_b/20_0.png,
+	  images/mcgill/foliage_b/20_1.png,
+	  images/mcgill/foliage_b/20_2.png,
+	  images/mcgill/foliage_b/21_0.png,
+	  images/mcgill/foliage_b/21_1.png,
+	  images/mcgill/foliage_b/21_2.png,
+	  images/mcgill/foliage_b/22_0.png,
+	  images/mcgill/foliage_b/22_1.png,
+	  images/mcgill/foliage_b/22_2.png,
+	  images/mcgill/foliage_b/23_0.png,
+	  images/mcgill/foliage_b/23_1.png,
+	  images/mcgill/foliage_b/23_2.png,
+	  images/mcgill/foliage_b/24_0.png,
+	  images/mcgill/foliage_b/24_1.png,
+	  images/mcgill/foliage_b/24_2.png,
+	  images/mcgill/foliage_b/25_0.png,
+	  images/mcgill/foliage_b/25_1.png,
+	  images/mcgill/foliage_b/25_2.png:
+	  Moved images/colormap/*.png to images/mcgill/foliage_a, and moved
+	  images/colormap/rgb/*.png to images/mcgill/foliage_b.
+
+	* [r9625] examples/lissom.ty:
+	  Corrected mistake in docstring, introduced when I added the
+	  'colormap' label.
+
+	* [r9624] topo/param/parameterized.py:
+	  Added commented-out __deepcopy__ method for Parameterized.
+
+	* [r9623] topo/base/boundingregion.py:
+	  Removed redundant method.
+
+	* [r9622] topo/param/parameterized.py:
+	  Clarified comment.
+
+	* [r9621] topo/command/basic.py,
+	  topo/misc/util.py:
+	  Files accidentally missed from previous commit.
+
+	* [r9620] topo/misc/legacy.py:
+	  Removed ExtraPickler. Includes no longer restoring things that
+	  had been held in ExtraPickler (I assume that was only
+	  topo.plotting.plotgroups).
+
+	* [r9619] topo/param/parameterized.py:
+	  Should be no visible change: changed ParameterizedFunction's
+	  _true_new() to use Parameterized.__new__ rather than
+	  object.__new__, and allowed args to be passed to _true_new when
+	  creating an instance.
+
+	* [r9618] topo/param/parameterized.py:
+	  Fix bug with ParameterizedFunction: control copy/pickle's use of
+	  __new__ (avoids calling instance when trying to recreate it).
+
+	* [r9617] topo/misc/filepath.py:
+	  Fixed warning message that hadn't been updated (Parameter's
+	  attrib_name() method was removed some time ago).
+
+2008-11-21  jbednar
+
+	* [r9616] topo/analysis/featureresponses.py,
+	  topo/command/basic.py,
+	  topo/plotting/plotgroup.py:
+	  Changed Subplotting to keep track of last arguments and restore
+	  them on load_snapshot. Removed pickling of plotgroups, which
+	  should no longer be necessary (and was causing many problems).
+
+	* [r9615] examples/lissom.ty:
+	  Added commented-out examples of generating complete list of
+	  combinations in measure_sine_pref
+
+	* [r9614] topo/command/analysis.py:
+	  Added direction and speed to the list of features supported by
+	  measure_sine_pref
+
+	* [r9613] topo/analysis/featureresponses.py:
+	  Changed PatternGenerator to use given ocular and phasedisparity
+	  rather than relying on them being set on the input generators
+
+	* [r9612] topo/pattern/basic.py:
+	  Added phase property to Sweeper for use in measure_sine_pref.
+
+2008-11-20  jbednar
+
+	* [r9611] topo/command/analysis.py:
+	  Fixed bug in orientation maps measured using measure_dr_pref by
+	  adding round(x,13) to compute_orientation_from_direction so that
+	  wrapped orientations have exactly the same value. Previously the
+	  OR map was heavily biased towards 0.5/pi, because one wrapped
+	  value was nearly but not identical to the unwrapped one. Usually
+	  that would have no effect on a vector sum, but with
+	  keep_peak=True, the result is to weight the duplicated value
+	  twice as strongly, pulling all values towards it. Made
+	  num_speeds=0 legal to allow strict comparison between
+	  measure_sine_pref and measure_dr_pref.
+
+	* [r9610] topo/analysis/featureresponses.py:
+	  Cleaned up present_permutation; no change in behavior. Added
+	  optional offset for a Feature. Relaxed direction handling in
+	  PatternPresenter so that it will work on any network, at speed 0.
+
+	* [r9609] topo/misc/distribution.py:
+	  Added bins() method
+
+	* [r9608] images/colormap/rgb/11_0.pgm:
+	  Fixed stray uncommitted change
+
+2008-11-19  ceball
+
+	* [r9607] examples/lissom.ty:
+	  Added dataset label 'colormap' to distinguish from Nature
+	  (Shouval) images. (Need a better label than 'colormap'.)
+
+2008-11-19  jbednar
+
+	* [r9606] examples/lissom.ty,
+	  examples/lissom_oo_or_cr.ty,
+	  images/colormap/rgb/01_0.pgm,
+	  images/colormap/rgb/01_0.png,
+	  images/colormap/rgb/01_1.pgm,
+	  images/colormap/rgb/01_1.png,
+	  images/colormap/rgb/01_2.pgm,
+	  images/colormap/rgb/01_2.png,
+	  images/colormap/rgb/02_0.pgm,
+	  images/colormap/rgb/02_0.png,
+	  images/colormap/rgb/02_1.pgm,
+	  images/colormap/rgb/02_1.png,
+	  images/colormap/rgb/02_2.pgm,
+	  images/colormap/rgb/02_2.png,
+	  images/colormap/rgb/03_0.pgm,
+	  images/colormap/rgb/03_0.png,
+	  images/colormap/rgb/03_1.pgm,
+	  images/colormap/rgb/03_1.png,
+	  images/colormap/rgb/03_2.pgm,
+	  images/colormap/rgb/03_2.png,
+	  images/colormap/rgb/04_0.pgm,
+	  images/colormap/rgb/04_0.png,
+	  images/colormap/rgb/04_1.pgm,
+	  images/colormap/rgb/04_1.png,
+	  images/colormap/rgb/04_2.pgm,
+	  images/colormap/rgb/04_2.png,
+	  images/colormap/rgb/05_0.pgm,
+	  images/colormap/rgb/05_0.png,
+	  images/colormap/rgb/05_1.pgm,
+	  images/colormap/rgb/05_1.png,
+	  images/colormap/rgb/05_2.pgm,
+	  images/colormap/rgb/05_2.png,
+	  images/colormap/rgb/06_0.pgm,
+	  images/colormap/rgb/06_0.png,
+	  images/colormap/rgb/06_1.pgm,
+	  images/colormap/rgb/06_1.png,
+	  images/colormap/rgb/06_2.pgm,
+	  images/colormap/rgb/06_2.png,
+	  images/colormap/rgb/07_0.pgm,
+	  images/colormap/rgb/07_0.png,
+	  images/colormap/rgb/07_1.pgm,
+	  images/colormap/rgb/07_1.png,
+	  images/colormap/rgb/07_2.pgm,
+	  images/colormap/rgb/07_2.png,
+	  images/colormap/rgb/08_0.pgm,
+	  images/colormap/rgb/08_0.png,
+	  images/colormap/rgb/08_1.pgm,
+	  images/colormap/rgb/08_1.png,
+	  images/colormap/rgb/08_2.pgm,
+	  images/colormap/rgb/08_2.png,
+	  images/colormap/rgb/09_0.pgm,
+	  images/colormap/rgb/09_0.png,
+	  images/colormap/rgb/09_1.pgm,
+	  images/colormap/rgb/09_1.png,
+	  images/colormap/rgb/09_2.pgm,
+	  images/colormap/rgb/09_2.png,
+	  images/colormap/rgb/10_0.pgm,
+	  images/colormap/rgb/10_0.png,
+	  images/colormap/rgb/10_1.pgm,
+	  images/colormap/rgb/10_1.png,
+	  images/colormap/rgb/10_2.pgm,
+	  images/colormap/rgb/10_2.png,
+	  images/colormap/rgb/11_0.png,
+	  images/colormap/rgb/11_1.pgm,
+	  images/colormap/rgb/11_1.png,
+	  images/colormap/rgb/11_2.pgm,
+	  images/colormap/rgb/11_2.png,
+	  images/colormap/rgb/12_0.pgm,
+	  images/colormap/rgb/12_0.png,
+	  images/colormap/rgb/12_1.pgm,
+	  images/colormap/rgb/12_1.png,
+	  images/colormap/rgb/12_2.pgm,
+	  images/colormap/rgb/12_2.png,
+	  images/colormap/rgb/13_0.pgm,
+	  images/colormap/rgb/13_0.png,
+	  images/colormap/rgb/13_1.pgm,
+	  images/colormap/rgb/13_1.png,
+	  images/colormap/rgb/13_2.pgm,
+	  images/colormap/rgb/13_2.png,
+	  images/colormap/rgb/14_0.pgm,
+	  images/colormap/rgb/14_0.png,
+	  images/colormap/rgb/14_1.pgm,
+	  images/colormap/rgb/14_1.png,
+	  images/colormap/rgb/14_2.pgm,
+	  images/colormap/rgb/14_2.png,
+	  images/colormap/rgb/15_0.pgm,
+	  images/colormap/rgb/15_0.png,
+	  images/colormap/rgb/15_1.pgm,
+	  images/colormap/rgb/15_1.png,
+	  images/colormap/rgb/15_2.pgm,
+	  images/colormap/rgb/15_2.png,
+	  images/colormap/rgb/16_0.pgm,
+	  images/colormap/rgb/16_0.png,
+	  images/colormap/rgb/16_1.pgm,
+	  images/colormap/rgb/16_1.png,
+	  images/colormap/rgb/16_2.pgm,
+	  images/colormap/rgb/16_2.png,
+	  images/colormap/rgb/17_0.pgm,
+	  images/colormap/rgb/17_0.png,
+	  images/colormap/rgb/17_1.pgm,
+	  images/colormap/rgb/17_1.png,
+	  images/colormap/rgb/17_2.pgm,
+	  images/colormap/rgb/17_2.png,
+	  images/colormap/rgb/18_0.pgm,
+	  images/colormap/rgb/18_0.png,
+	  images/colormap/rgb/18_1.pgm,
+	  images/colormap/rgb/18_1.png,
+	  images/colormap/rgb/18_2.pgm,
+	  images/colormap/rgb/18_2.png,
+	  images/colormap/rgb/19_0.pgm,
+	  images/colormap/rgb/19_0.png,
+	  images/colormap/rgb/19_1.pgm,
+	  images/colormap/rgb/19_1.png,
+	  images/colormap/rgb/19_2.pgm,
+	  images/colormap/rgb/19_2.png,
+	  images/colormap/rgb/20_0.pgm,
+	  images/colormap/rgb/20_0.png,
+	  images/colormap/rgb/20_1.pgm,
+	  images/colormap/rgb/20_1.png,
+	  images/colormap/rgb/20_2.pgm,
+	  images/colormap/rgb/20_2.png,
+	  images/colormap/rgb/21_0.pgm,
+	  images/colormap/rgb/21_0.png,
+	  images/colormap/rgb/21_1.pgm,
+	  images/colormap/rgb/21_1.png,
+	  images/colormap/rgb/21_2.pgm,
+	  images/colormap/rgb/21_2.png,
+	  images/colormap/rgb/22_0.pgm,
+	  images/colormap/rgb/22_0.png,
+	  images/colormap/rgb/22_1.pgm,
+	  images/colormap/rgb/22_1.png,
+	  images/colormap/rgb/22_2.pgm,
+	  images/colormap/rgb/22_2.png,
+	  images/colormap/rgb/23_0.pgm,
+	  images/colormap/rgb/23_0.png,
+	  images/colormap/rgb/23_1.pgm,
+	  images/colormap/rgb/23_1.png,
+	  images/colormap/rgb/23_2.pgm,
+	  images/colormap/rgb/23_2.png,
+	  images/colormap/rgb/24_0.pgm,
+	  images/colormap/rgb/24_0.png,
+	  images/colormap/rgb/24_1.pgm,
+	  images/colormap/rgb/24_1.png,
+	  images/colormap/rgb/24_2.pgm,
+	  images/colormap/rgb/24_2.png,
+	  images/colormap/rgb/25_0.pgm,
+	  images/colormap/rgb/25_0.png,
+	  images/colormap/rgb/25_1.pgm,
+	  images/colormap/rgb/25_1.png,
+	  images/colormap/rgb/25_2.pgm,
+	  images/colormap/rgb/25_2.png:
+	  Changed pgm to png files to save space
+
+	* [r9605] topo/analysis/featureresponses.py,
+	  topo/command/analysis.py:
+	  Added mechanism for computing feature values from other permuted
+	  ones, and added computed orientation map for measure_dr_pref
+
+2008-11-18  jbednar
+
+	* [r9604] examples/lissom.ty:
+	  Changed order of map measurement to make subplotting work and to
+	  ensure that the best versions of each map are used. Made
+	  expand_sf_test_range optional and off by default, for speed.
+	  Removed disparity and hue testing from measure_sine_pref command,
+	  to avoid combinatorial explosion.
+
+	* [r9603] topo/command/analysis.py:
+	  Added more informative messages for save_plotgroup in batch mode.
+	  Changed measure_disparity to use a vertical test pattern, for
+	  speed, rather than being part of measure_sine_pref.
+
+	* [r9602] topo/analysis/featureresponses.py:
+	  Added more informative messages in batch mode. Fixed passing of
+	  parameters by keyword for FeatureMaps (name, in this case)
+
+2008-11-18  ceball
+
+	* [r9601] topo/param/parameterized.py:
+	  Simplified ParameterizedFunction.instance(), and corrected naming
+	  of class object.
+
+	* [r9600] topo/param/parameterized.py:
+	  Added instance() to ParameterizedFunction.
+
+2008-11-17  jbednar
+
+	* [r9599] topo/command/pylabplots.py:
+	  Removed unused plotrctg command. Removed unused extra_keyword
+	  support from plot_modulation_ratio
+
+	* [r9598] topo/command/basic.py:
+	  Enabled result caching for plots; should give significant speedup
+	  for lissom.ty
+
+	* [r9597] topo/command/analysis.py:
+	  Finished save_plotgroup update_command caching support; should be
+	  safe to use now (though it is not turned on by default).
+
+	* [r9596] topo/command/analysis.py:
+	  Changed most update_commands to callable objects rather than
+	  strings, to allow parameters to be edited in the GUI.
+
+2008-11-17  ceball
+
+	* [r9595] topo/misc/picklemain.py:
+	  Removed stray line from previous checkin.
+
+	* [r9594] topo/command/basic.py,
+	  topo/misc/picklemain.py,
+	  topo/misc/util.py:
+	  Moved MainPickler and associated code into a new module,
+	  topo.misc.picklemain.
+
+2008-11-17  jbednar
+
+	* [r9593] topo/command/analysis.py,
+	  topo/plotting/plotgroup.py:
+	  Removed proj_name<->projection conversion from
+	  UnitMeasurementCommands, to simplify it and ensure that
+	  everything is done via Parameters rather than ad-hoc attributes
+
+2008-11-17  ceball
+
+	* [r9592] topo/command/basic.py,
+	  topo/misc/util.py,
+	  topo/param/parameterized.py:
+	  Added support for pickling functions and classes defined in
+	  __main__.
+
+2008-11-16  ceball
+
+	* [r9591] examples/cfsom_or.ty:
+	  Restored cfsom_or's results to previous values (they had changed
+	  in r9582) by explicitly setting parameters of the connection's
+	  weights_generator, rather than relying on defaults (which had
+	  changed).
+
+	* [r9590] topo/pattern/image.py:
+	  Fix for SF #2276819: loading snapshots of simulations using
+	  FileImage now works.
+
+2008-11-16  jbednar
+
+	* [r9589] topo/plotting/plotgroup.py,
+	  topo/tests/test_map_measurement.py:
+	  Added support for update_command and plot_command that are
+	  callable objects rather than strings for exec. For now, this
+	  changes the representation in the GUI to include quotation marks,
+	  but these should go away as we change the various commands to
+	  objects rather than strings
+
+2008-11-15  jbednar
+
+	* [r9588] topo/command/analysis.py,
+	  topo/tests/lissom_oo_or_t000100.00_Spatial_Frequency_Preference.data:
+	  Changed default spatial frequency preference plot to test only
+	  one frequency, primarily for speed but also to avoid enforcing
+	  special defaults that are more difficult for .ty scripts to
+	  override
+
+	* [r9587] examples/lissom.ty:
+	  Added support for measure_sine_pref
+
+	* [r9586] topo/command/analysis.py:
+	  Converted save_plotgroup to a ParameterizedFunction, adding
+	  experimental use_cached_results option (disabled by default).
+	  Added comprehensive measure_sine_pref command, which should
+	  eventually replace measure_or_pref, measure_od_pref,
+	  measure_phasedisparity, measure_hue_pref, etc.
+
+2008-11-14  jbednar
+
+	* [r9585] topo/analysis/featureresponses.py:
+	  Minor tweaks; should be no change in normal behavior
+
+2008-11-14  ceball
+
+	* [r9584] contrib/lissom_oo_dr.ty:
+	  Translator: Implemented episode intervals.
+
+	* [r9583] contrib/lissom_oo_dr.ty:
+	  Translator: simplified 'last_time' and calls to float().
+
+2008-11-14  jbednar
+
+	* [r9582] topo/pattern/basic.py:
+	  Changed default size and aspect_ratio of Gaussian to avoid
+	  confusion -- pattern looked vertical but had an actual
+	  orientation of 0.
+
+	* [r9581] contrib/lissom_oo_dr.ty:
+	  Cleaned up docs, parameter names, defaults, etc. for Translator.
+	  Fixed self references that should have been p.
+
+2008-11-14  ceball
+
+	* [r9580] contrib/lissom_oo_dr.ty:
+	  Translator: when drawing underlying pattern, uses that pattern's
+	  parameters to offset the pattern's position or rotate the
+	  pattern's orientation.
+
+	* [r9579] contrib/lissom_oo_dr.ty:
+	  x, y, and direction are now set on the Translator itself.
+
+	* [r9578] contrib/lissom_oo_dr.ty:
+	  Translator: moved orientation parameter back to generator, to be
+	  consistent with x and y (which are also on the generator).
+
+	* [r9577] contrib/lissom_oo_dr.ty:
+	  Minor changes to Translator (no visible change).
+
+	* [r9576] contrib/lissom_oo_dr.ty:
+	  Changed Translator.__call__ to use ParamOverrides.
+
+	* [r9575] contrib/lissom_oo_dr.ty,
+	  topo/pattern/basic.py:
+	  Continued cleaning up Translator. Should be no change to
+	  behavior, although the random stream might be being used
+	  differently.
+
+	* [r9574] contrib/lissom_oo_dr.ty:
+	  Added missing svn properties.
+
+	* [r9573] contrib/lissom_oo_dr.ty:
+	  Translator: commented out more unused code, altered some
+	  documentation, and added some commented-out parameters. No change
+	  to the behavior.
+
+	* [r9572] topo/projection/basic.py:
+	  Changed SharedWeightCFProjection to handle creation of CF slices
+	  in the same way as CFProjection. (Intermediate checkin: I'm
+	  planning to reorganize the CF hierarchy; meanwhile, this should
+	  improve start times dominated by creation of
+	  SharedWeightCFProjections.)
+
+2008-11-13  jbednar
+
+	* [r9571] topo/command/basic.py:
+	  Added plot measurement at time zero
+
+	* [r9570] contrib/lissom_oo_or_homeostatic.ty:
+	  Made frequency scaling and target_lr be automatic for each
+	  dataset. Changed Natural dataset to Nature, to match the CMVC
+	  book. Added error in case of no dataset specified
+
+2008-11-13  ceball
+
+	* [r9569] topo/misc/legacy.py,
+	  topo/param/parameterized.py:
+	  No visible change: removed stray print statement and added an
+	  ALERT.
+
+	* [r9568] topo/misc/legacy.py:
+	  Support missing allow_None in old snapshots: addresses SF
+	  #2270680. Snapshots saved before allow_None was added to
+	  Parameters will be loaded with allow_None set to False in all
+	  cases.
+
+	* [r9567] topo/misc/legacy.py:
+	  Upgraded preprocess_state() to allow more operations (by having
+	  functions also accept the instance they are working on).
+
+	* [r9566] topo/param/parameterized.py:
+	  Tried to clarify warning message about restoring class
+	  attributes.
+
+	* [r9565] topo/misc/legacy.py:
+	  Snapshot compatibility: Made replacement of gmpy.mpq by
+	  fixedpoint.FixedPoint only happen if gmpy.mpq is not available.
+
+2008-11-12  ceball
+
+	* [r9564] topo/misc/legacy.py:
+	  Added support for loading snapshots when gmpy.mpq is not present
+	  (SF #2221332).
+
+	* [r9563] topo/misc/legacy.py:
+	  Changed fake_a_module() so that parent can be None.
+
+2008-11-12  judelaw
+
+	* [r9562] topo/command/pylabplots.py:
+	  corrected error in plot_tracked_attributes - changed filename to
+	  p.filename
+
+	* [r9561] contrib/jsldefs.py:
+	  corrected error and brought up to date with current version
+
+2008-11-10  jbednar
+
+	* [r9560] contrib/jaanalysis.py,
+	  contrib/jacommands.py,
+	  contrib/jsldefs.py,
+	  contrib/modelfit.py:
+	  Updated contrib files to match changes in pylabplots
+
+	* [r9559] topo/command/pylabplots.py:
+	  Added typical defaults for attribute tracking times
+
+	* [r9558] topo/command/analysis.py,
+	  topo/command/pylabplots.py:
+	  Removed now-unneeded matrixplot_hsv
+
+	* [r9557] topo/command/pylabplots.py:
+	  Converted remaining pylab commands to ParameterizedFunctions
+	  using PylabPlotCommand. The order of arguments accepted will have
+	  changed, but it should be rare that a positional argument is used
+	  beyond the first two, and those have been preserved. All but
+	  plot_tracked_attributes have been tested for basic function, but
+	  there are few automatic tests for these commands, and thus there
+	  may be some new bugs.
+
+	* [r9556] topo/command/analysis.py:
+	  Updated to use new tuning curve commands; should not change any
+	  results relative to previous version
+
+	* [r9555] topo/command/pylabplots.py:
+	  Added tuning curve implementation using ParameterizedFunction;
+	  will allow significant simplification and generalization, but the
+	  old version is still in the file (as tuning_curve_old and
+	  or_tuning_curve, replaced by tuning_curve and
+	  cyclic_tuning_curve) for comparison. The old tuning_curve and
+	  or_tuning_curve commands have been generalized as well, as an
+	  intermediate step, to eliminate the need for tuning_curve_batch
+	  and or_tuning_curve_batch. The only change to results should be
+	  that the x axis will no longer have a gap on the last item for
+	  tuning_curve plots, which changes the tick marks (but not the
+	  quantities plotted).
+
+2008-11-08  ceball
+
+	* [r9554] contrib/lesi_whisker_barrels.ty:
+	  Attempt to correct svn:keywords on
+	  contrib/lesi_whisker_barrels.ty.
+
+2008-11-07  jbednar
+
+	* [r9553] contrib/lissom_oo_dr.ty:
+	  Added input_period variable, and scaled time by it
+
+2008-11-07  ceball
+
+	* [r9552] contrib/lissom_oo_dr.ty:
+	  Inserted a modified version of contrib.jacommands.Translator
+	  (fixed faulty initial reset period; removed Null() every
+	  reset_period; removed index parameter and associated code). Work
+	  in progress.
+
+2008-11-07  jbednar
+
+	* [r9551] topo/command/pylabplots.py:
+	  Merged functionality of or_tuning_curve_batch into
+	  or_tuning_curve
+
+2008-11-05  jbednar
+
+	* [r9550] contrib/lesi_whisker_barrels.ty:
+	  Trivial fix to revision number string
+
+	* [r9549] contrib/lesi_whisker_barrels.ty:
+	  Initial version from Stuart with fixes for the latest version of
+	  Topographica
+
+	* [r9548] contrib/lissom_oo_dr.ty:
+	  Partial update to use a single retina and LGN ON/OFF pair instead
+	  of four of each of those; seems to work but the pattern generator
+	  will need to be updated to present inputs moving over time
+
+	* [r9547] contrib/lissom_oo_dr.ty:
+	  Added missing import
+
+2008-11-04  rczhao
+
+	* [r9546] /trunk/facespace/fs1mf.ty:
+	  Merged with ~/.topographicarc so that simulation of face space
+	  doesn't need specific startup files.
+
+	* [r9545] /trunk/facespace/pattern_fs.py:
+	  minor update
+
+2008-11-02  ceball
+
+	* [r9544] topo/param/parameterized.py:
+	  Parameterized classes now have a name attribute (set to the class
+	  __name__).
+
+2008-10-31  jbednar
+
+	* [r9543] topo/command/pylabplots.py:
+	  Made Orientation Preference and Complexity possible to use with
+	  networks other than contrib/cc_*, but it still needs significant
+	  generalization. Removed duplication of suffix in saved pylab
+	  filenames.
+
+	* [r9542] topo/analysis/vision.py:
+	  Made Orientation Preference and Complexity possible to use with
+	  networks other than contrib/cc_*, but it still needs significant
+	  generalization. Removed duplication of suffix in saved pylab
+	  filenames.
+
+	* [r9541]
+	  contrib/sparese_connectivity_model.ty:
+	  Fixed filename
+
+	* [r9540]
+	  contrib/sparese_connectivity_LESIE.ty,
+	  contrib/sparse_connectivity_LESI.ty:
+	  Fixed filename
+
+2008-10-31  ceball
+
+	* [r9539] doc/Future_Work/current_text.php:
+	  Removed tasks that have been added on sf.net.
+
+2008-10-30  jbednar
+
+	* [r9538] topo/base/arrayutil.py:
+	  Added note about wrap usually being unnecessary.
+
+2008-10-30  ceball
+
+	* [r9537] doc/buildbot/bbanalysis.py:
+	  Added annotation (for r9395) to buildbot graph.
+
+	* [r9536] doc/buildbot/bbanalysis.py:
+	  Updated buildbot analysis script (had previously been running on
+	  an old copy of Topographica).
+
+	* [r9535] doc/buildbot/bbanalysis.py:
+	  Fixed typo in buildbot analysis script.
+
+	* [r9534] topo/tests/gui_tests.py:
+	  Fixed failing Test Pattern window test. (Correct fix would be to
+	  stop None appearing from sheet lists in GUI; we hope to do this
+	  soon.)
+
+	* [r9533] topo/plotting/plotgroup.py:
+	  Fixed copy/paste error from r9521.
+
+2008-10-28  antolikjan
+
+	* [r9532]
+	  contrib/sparese_connectivity_LESIE.ty:
+	  changed the afferent projection initial connection fields
+
+	* [r9531] contrib/cc_lissom_oo_or_simple_rv.ty:
+	  changed parameters and renamed some projections
+
+2008-10-28  rczhao
+
+	* [r9530] /trunk/facespace/face_space_patterns.py:
+	  
+
+	* [r9529] /trunk/facespace/face_space.ty:
+	  
+
+	* [r9528] /trunk/facespace/evofacemodel/fs1mf.m:
+	  Generate a face on a male/female trajectory given a strength
+	  (morphing) value.
+
+	* [r9527] /trunk/facespace/evofacemodel/fs1mf_init.m:
+	  Initialization of the face database
+
+	* [r9526] /trunk/facespace/evofacemodel:
+	  MATLAB codes that generates faces from Evo-Face model database.
+	  Note that the database and some original codes are not included
+	  in this public repository.
+
+2008-10-24  jbednar
+
+	* [r9525] topo/command/analysis.py:
+	  Minor expansion of doc
+
+	* [r9524] topo/command/analysis.py:
+	  Rearranged all of the plot definitions for readability and in
+	  preparation for making update_command into a callable rather than
+	  a string, hopefully without changing anything at all
+
+	* [r9523] contrib/lissom_oo_dr.ty,
+	  examples/lissom.ty,
+	  examples/lissom_fsa.ty,
+	  examples/lissom_oo_or.ty,
+	  examples/lissom_oo_or_cr.ty,
+	  examples/lissom_or.ty,
+	  examples/lissom_whisker_barrels.ty,
+	  topo/analysis/featureresponses.py,
+	  topo/command/analysis.py,
+	  topo/command/pylabplots.py,
+	  topo/plotting/plotgroup.py:
+	  Renamed ParameterizdFunction abstract base classes for commands
+	  to end in Command rather than Function, for clarity
+
+	* [r9522] contrib/jaanalysis.py,
+	  contrib/jacommands.py,
+	  contrib/jsldefs.py,
+	  contrib/lesi.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked.ty:
+	  Updated contrib directory to match changes in commands/analysis
+
+	* [r9521] contrib/lissom_oo_dr.ty,
+	  examples/lissom.ty,
+	  examples/lissom_fsa.ty,
+	  examples/lissom_oo_or.ty,
+	  examples/lissom_oo_or_cr.ty,
+	  examples/lissom_or.ty,
+	  examples/lissom_whisker_barrels.ty,
+	  topo/analysis/featureresponses.py,
+	  topo/command/analysis.py,
+	  topo/command/pylabplots.py,
+	  topo/plotting/plotgroup.py:
+	  Moved abstract ParameterizedFunction definitions to
+	  topo.analysis.featureresponses and topo.plotting.plotgroup
+
+	* [r9520] topo/analysis/__init__.py:
+	  Fixed bogus list of files for __all__
+
+	* [r9519] topo/command/analysis.py,
+	  topo/plotting/plotgroup.py:
+	  Added common base class for connectionfield and projection plots.
+	  Made all analysis parameter setting use abstract classes for
+	  generality
+
+	* [r9518] topo/command/analysis.py,
+	  topo/plotting/plotgroup.py:
+	  Removed now-unused module-level interface to command parameter
+	  defaults
+
+2008-10-24  antolikjan
+
+	* [r9517]
+	  contrib/sparese_connectivity_LESIE.ty:
+	  Made more parameters to be modifiable from command line
+
+2008-10-24  jbednar
+
+	* [r9516] topo/command/analysis.py,
+	  topo/command/pylabplots.py,
+	  topo/plotting/plotgroup.py:
+	  Changed sheet_name and input_sheet name parameters to sheet and
+	  input_sheet, so that they could have defaults computed and then
+	  shared appropriately.
+
+	* [r9515] topo/command/analysis.py:
+	  Added UnitCurveFunction to group FeatureCurveFunctions that work
+	  on a set of units
+
+2008-10-24  rczhao
+
+	* [r9514] /trunk/facespace/pattern_fs.py:
+	  A simpler face generator to replace face-space.ty; currently only
+	  implemented a class dealing with one-dimensional face space with
+	  data from external MATLAB database
+
+2008-10-24  ceball
+
+	* [r9513] topo/param/__init__.py:
+	  Corrected error introduced into get_range() in previous checkin.
+
+2008-10-24  rczhao
+
+	* [r9512] /trunk/facespace/fs1mf.ty:
+	  A simpler face space script to replace face-space.ty; deals with
+	  one-dimensional face space only and get data from external MATLAB
+	  database
+
+2008-10-24  ceball
+
+	* [r9511] topo/param/__init__.py:
+	  Added compute_default() method to ObjectSelector.
+
+	* [r9510] topo/param/__init__.py:
+	  ObjectSelector now ensures that the default value is in its list
+	  of objects.
+
+	* [r9509] topo/param/parameterized.py:
+	  Added optional name argument to params(), so that one parameter
+	  object can be requested.
+
+	* [r9508] topo/param/__init__.py:
+	  ObjectSelector now defaults to having instantiate=False, which
+	  makes more sense because we usually use it to select from a list
+	  of existing objects.
+
+2008-10-24  jbednar
+
+	* [r9507] topo/command/analysis.py,
+	  topo/command/basic.py,
+	  topo/tests/test_map_measurement.py:
+	  Provide global default value for sheet_name parameter
+
+	* [r9506] topo/command/analysis.py:
+	  Made helper functions private
+
+	* [r9505] topo/command/analysis.py:
+	  Consolidated handling of input_sheet_name. Broke up RF Projection
+	  to match other functions. Commented-out RF Projection (noise)
+	  until further investigation.
+
+	* [r9504] topo/command/analysis.py:
+	  Removed unused RF CoG plot. Made measure_retinotopy into a
+	  ParameterizedFunction.
+
+2008-10-23  jbednar
+
+	* [r9503] topo/command/analysis.py,
+	  topo/tests/lissom_oo_or_t000100.00_Retinotopy.data:
+	  Changed measure_retinotopy to use duration=0.175 and
+	  apply_output_fn=False by default, to make map data match once
+	  it's converted to a ParameterizedFunction
+
+	* [r9502]
+	  topo/tests/lissom_oo_or_t000100.00_Retinotopy.data,
+	  topo/tests/test_map_measurement.py:
+	  Added test for Retinotopy
+
+2008-10-23  ceball
+
+	* [r9501] topo/param/tk.py:
+	  Moved (hacked) right-click editing up to TkParameterizedObject so
+	  that it works for any parameter. (Many changes come from changing
+	  various methods to 'protected' rather than 'private'.)
+
+2008-10-23  jbednar
+
+	* [r9500] topo/command/analysis.py:
+	  Made measure_orientation_contrast into a ParameterizedFunction.
+
+	* [r9499] topo/param/parameterized.py:
+	  Changed ParameterizedFunction names to avoid unique number
+
+	* [r9498] doc/Developer_Manual/coding_text.php:
+	  Added note about spelling.
+
+2008-10-23  ceball
+
+	* [r9497] topo/param/tk.py:
+	  ParametersFrame: now you can right click on any Parameterized
+	  instance in a text box to access its properties.
+
+2008-10-23  antolikjan
+
+	* [r9496]
+	  contrib/sparese_connectivity_LESIE.ty:
+	  parameter changes
+
+2008-10-23  ceball
+
+	* [r9495] topo/param/parameterized.py:
+	  When a ParameterizedFunction is called, the temporary instance is
+	  now also initialized. Fixes problem with missing name.
+
+2008-10-23  jbednar
+
+	* [r9494] topo/command/analysis.py:
+	  Added control over curve value printing format. Converted
+	  measure_contrast_response to a ParameterizedFunction.
+
+	* [r9493] topo/command/analysis.py:
+	  Simplified and generalized curve implementation. Updated
+	  docstrings. Converted measure_size_response to a
+	  ParameterizedFunction.
+
+2008-10-23  antolikjan
+
+	* [r9492] topo/analysis/vision.py:
+	  change in parameters
+
+2008-10-23  jbednar
+
+	* [r9491] topo/command/analysis.py:
+	  Minor simplification
+
+	* [r9490] topo/misc/commandline.py:
+	  Fixed intermittent problem with Emacs temporary files interfering
+	  with startup
+
+2008-10-22  jbednar
+
+	* [r9489] topo/command/analysis.py,
+	  topo/plotting/plotgroup.py:
+	  Generalized FeatureCurveFunction to handle or_tuning as well, and
+	  made measure_or_tuning into a ParameterizedFunction based on it.
+	  Made measure_or_tuning support a list of units to measure, though
+	  only in batch mode at present.
+
+2008-10-22  ceball
+
+	* [r9488] contrib/lissom_oo_dr.ty:
+	  Uncommented scheduled events.
+
+2008-10-22  jbednar
+
+	* [r9487] contrib/lissom_oo_dr.ty:
+	  Added hints for the analysis routines
+
+	* [r9486] topo/command/analysis.py,
+	  topo/plotting/plotgroup.py,
+	  topo/tests/test_map_measurement.py:
+	  Made measure_or_tuning_fullfield into a ParameterizedFunction
+
+2008-10-22  antolikjan
+
+	* [r9485] contrib/jacommands.py:
+	  minor changes
+
+2008-10-22  ceball
+
+	* [r9484] contrib/lissom_oo_dr.ty:
+	  File for working on implementation of models of motion. Based on
+	  a cleaned up version of examples/lissom_oo_dr.ty (from r9313).
+
+2008-10-22  antolikjan
+
+	* [r9483]
+	  contrib/sparese_connectivity_LESIE.ty:
+	  parameter changes
+
+	* [r9482]
+	  contrib/sparese_connectivity_LESIE.ty:
+	  The big complex cell model
+
+2008-10-22  jbednar
+
+	* [r9481] examples/lissom.ty,
+	  examples/lissom_fsa.ty,
+	  examples/lissom_oo_or.ty,
+	  examples/lissom_oo_or_cr.ty,
+	  examples/lissom_or.ty,
+	  examples/lissom_whisker_barrels.ty,
+	  topo/command/analysis.py:
+	  Cleaned up handling of duration and apply_output_fn, making the
+	  defaults always be 1.0 and True, but overridable at the
+	  PatternPresenter or MeasureResponseFunction levels (to allow easy
+	  control in the GUI or from scripts). Made scripts that should
+	  typically use 0.175 and False to set that up explicitly. Cleaned
+	  up PatternPresenter's arguments, making them Parameters, except
+	  pattern_generator, which is typically used as a positional
+	  parameter.
+
+	* [r9480] topo/command/analysis.py,
+	  topo/tests/lissom_oo_or_t000100.00_Corner_OR_Preference.data:
+	  Changed default duration and apply_output_fn for Corner
+	  Orientation Preference, in preparation for next revision
+
+	* [r9479] topo/command/analysis.py,
+	  topo/tests/lissom_oo_or_t000100.00_Corner_OR_Preference.data:
+	  Changed default duration and apply_output_fn for Corner
+	  Orientation Preference, in preparation for next revision
+
+2008-10-21  jbednar
+
+	* [r9478] topo/command/analysis.py:
+	  Converted measure_cog to a ParameterizedFunction, and extended it
+	  to have a reasonable default in nearly every feedforward network
+	  (instead of only having a useful default for things with a
+	  projection named Afferent)
+
+	* [r9477] topo/command/basic.py:
+	  Replaced run_batch with ParameterizedFunction version; should be
+	  no change in behavior
+
+2008-10-18  ceball
+
+	* [r9476] topo/command/basic.py:
+	  Replaced 'args' parameter of run_batch2() with access to extra
+	  keywords via ParamOverrides.
+
+	* [r9475] topo/base/patterngenerator.py,
+	  topo/param/parameterized.py,
+	  topo/pattern/random.py,
+	  topo/pattern/rds.py:
+	  Moved _check_params from Parameterized to ParamOverrides. Added
+	  an option to ParamOverrides to allow extra (non-Parameter)
+	  keywords to be handled without printing a warning.
+
+2008-10-18  jbednar
+
+	* [r9474] topo/command/analysis.py,
+	  topo/plotting/plotgroup.py:
+	  Converted unit, projection, and RF plotting to use
+	  ParameterizedFunctions.
+
+	* [r9473] topo/tkgui/projectionpanel.py:
+	  Fixed RF measurement plot broken since r9414
+
+	* [r9472] topo/command/analysis.py:
+	  Reimplemented most map measurement commands as
+	  ParameterizedFunctions so that their default values can be
+	  controlled by users
+
+2008-10-17  jbednar
+
+	* [r9471] topo/base/patterngenerator.py:
+	  Removed support for position parameter, probably temporarily.
+	  Brought closer to using param override decorator syntax, but
+	  still calling ParamOverrides explicitly
+
+2008-10-17  antolikjan
+
+	* [r9470] contrib/sparse_connectivity_model.ty:
+	  further external parametrization added
+
+2008-10-17  ceball
+
+	* [r9469] topo/command/basic.py:
+	  Made run_batch2's script_file be an argument rather than a
+	  parameter.
+
+	* [r9468] topo/param/parameterized.py:
+	  Added support for positional arguments to ParameterizedFunction.
+
+2008-10-17  chrisjeffery
+
+	* [r9467] examples/lissom.ty:
+	  Dummy checkin for testing
+
+2008-10-17  jbednar
+
+	* [r9466] topo/param/__init__.py:
+	  Minor clarification to docstring
+
+	* [r9465] topo/tkgui/editor.py:
+	  Added canvas_width attribute so that it can be overridden
+
+	* [r9464] topo/tests/test_map_measurement.py:
+	  Added missing import
+
+2008-10-17  ceball
+
+	* [r9463] topo/param/parameterized.py:
+	  Added getattr to ParamOverrides (allows dot-style access to the
+	  parameterized object being overridden).
+
+2008-10-16  jbednar
+
+	* [r9462] topo/command/basic.py:
+	  Enabled arg processing for run_batch2
+
+	* [r9461] topo/command/basic.py:
+	  Added test run_batch2 ParameterizedFunction
+
+	* [r9460] topo/param/parameterized.py:
+	  Clarified docstring, and declared ParameterizedFunction to be
+	  __abstract
+
+	* [r9459] topo/tkgui/testpattern.py:
+	  Minor cleanup; shouldn't be any significant change to behavior
+
+	* [r9458] doc/Tutorials/lissom_oo_or_text.php:
+	  Updated runtimes to match performance boost
+
+	* [r9457] doc/News/index_text.php:
+	  More news
+
+2008-10-15  jbednar
+
+	* [r9456] topo/numbergen/basic.py,
+	  topo/param/__init__.py:
+	  Trivial fix to docs and comments
+
+	* [r9455] topo/command/basic.py:
+	  Added version control revision and diff printing and .ty file
+	  copying to run_batch. Reorganized error and message printing.
+
+2008-10-15  judelaw
+
+	* [r9454] contrib/lissom_oo_or_homeostatic.ty:
+	  fixed typing error in last commit
+
+	* [r9453] contrib/lissom_oo_or_homeostatic.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked.ty:
+	  replaced CFPLF_PluginScaled with optimized version
+
+	* [r9452] contrib/lesi.ty:
+	  replaced CFPLF_PluginScaled with optimized version
+
+	* [r9451] contrib/species_cf_jitter.ty:
+	  version of mouse/cat models with connection field jitter
+
+	* [r9450] contrib/species_lateral_sparsity.ty:
+	  version of mouse/cat models with sparse lateral connections
+	  rather than feed-forward jitter
+
+	* [r9449] contrib/jsldefs.py:
+	  latest version of analysis code
+
+2008-10-15  ceball
+
+	* [r9448] topo/param/parameterized.py:
+	  Added handling of types (not just instances of specific types) to
+	  script_repr().
+
+2008-10-14  ceball
+
+	* [r9447] topo/command/basic.py,
+	  topo/param/parameterized.py:
+	  Added warning count.
+
+	* [r9446] topo/param/parameterized.py:
+	  Added ALERT.
+
+	* [r9445] topo/param/__init__.py,
+	  topo/param/parameterized.py,
+	  topo/tests/testparameterizedobject.py:
+	  Added ParameterizedFunction.
+
+	* [r9444] topo/command/basic.py:
+	  Added number of errors to the end of run_batch's output (stdout
+	  and log file).
+
+	* [r9443] topo/command/basic.py,
+	  topo/misc/util.py:
+	  Renamed MultiOut to MultiFile, since it's actually written
+	  generally (in theory...).
+
+	* [r9442] topo/command/basic.py:
+	  Changed run_batch() to shadow - rather than divert - stdout to a
+	  file. run_batch() also now updates the output file as often as it
+	  prints messages to the screen (rather than writing the whole file
+	  at the end of the run.
+
+	* [r9441] topo/misc/util.py:
+	  Added class MultiOut, allowing e.g. output to be sent to multiple
+	  file-like objects.
+
+	* [r9440] topo/numbergen/basic.py:
+	  Added calls to super's __init__ missing from Unary and
+	  BinaryOperator. Fixes problem with instances having name=None.
+
+2008-10-14  jbednar
+
+	* [r9439] topo/command/analysis.py:
+	  Removed duplicate function measure_sf_pref; now just calls
+	  measure_or_pref with more frequencies.
+
+2008-10-13  jbednar
+
+	* [r9438] examples/lissom.ty:
+	  Fixed typo in previous checkin
+
+	* [r9437] topo/param/parameterized.py:
+	  Generalized to handle name=None, now that it is allowed to be
+
+	* [r9436] examples/lissom.ty:
+	  Added shortcut for modelling all dimensions
+
+	* [r9435] topo/param/__init__.py,
+	  topo/param/parameterized.py:
+	  Moved String from param to param.parameterized, in order to make
+	  Parameterized.name be a String
+
+	* [r9434] topo/param/__init__.py:
+	  Generalized String to allow_None
+
+2008-10-13  antolikjan
+
+	* [r9433] examples/cc_lissom_oo_or.ty,
+	  examples/cc_lissom_oo_or_new.ty,
+	  examples/cc_lissom_oo_or_pokus.ty,
+	  examples/cc_lissom_oo_or_simple_rv.ty,
+	  examples/gc_lissom_oo_or_homeostatic.ty,
+	  examples/gc_lissom_oo_or_homeostatic_new.ty,
+	  examples/lgn_lateral.ty:
+	  Deleting files that were moved to contrib
+
+2008-10-12  jbednar
+
+	* [r9432] topo/learningfn/optimized.py:
+	  Added unoptimized equivalents. Cleaned up definition of
+	  CFPLF_Hebbian.
+
+	* [r9431] Makefile:
+	  Updated sf-web-site command to match changes at sf.net
+
+	* [r9430] doc/Home/news_text.php,
+	  doc/News/index_text.php:
+	  Announced upcoming 0.9.6 release
+
 2008-10-11  jbednar
+
+	* [r9429]
+	  contrib/gc_lissom_oo_or_homeostatic_new.ty,
+	  contrib/lesi.ty,
+	  contrib/lissom_oo_or_homeostatic.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked.ty,
+	  examples/gc_lissom_oo_or_homeostatic.ty,
+	  examples/gc_lissom_oo_or_homeostatic_new.ty,
+	  topo/base/cf.py:
+	  Removed duplicate CFPLF_PluginScaled class; the correct version
+	  is in topo.learningfn.projfn
+
+	* [r9428] ChangeLog.txt:
+	  Added recent updates
 
 	* [r9427] examples/lissom.ty:
 	  Added separate control over LGN density. Set up appropriate
