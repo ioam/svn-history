@@ -412,6 +412,7 @@ class SimpleHomeoLinearRelative(OutputFnWithState):
     def __init__(self,**params):
         super(SimpleHomeoLinearRelative,self).__init__(**params)
         self.first_call = True
+        self.mu = 0
 
     def __call__(self,x):
        
@@ -427,12 +428,12 @@ class SimpleHomeoLinearRelative(OutputFnWithState):
         x_orig = copy(x)
         x -= self.t
         clip_lower(x,0)
-
+        self.mu = topo.sim["V1"].lr_x_avg/self.input_output_ratio
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
         self.t += self.eta * (self.y_avg - self.mu)
         # recalculate the mu based on the input/ output ratio
-        self.mu = topo.sim["V1"].lr_x_avg/self.input_output_ratio
+        
 
 
 class Jitter(CoordinateMapperFn):
