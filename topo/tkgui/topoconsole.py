@@ -852,7 +852,6 @@ class ProgressWindow(ProgressController,tk.AppWindow):
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
     plotpanel_classes['RF Projection'] = RFProjectionPanel
-    plotpanel_classes['RF Projection (noise)'] = RFProjectionPanel    
     plotpanel_classes['Projection'] = CFProjectionPanel 
     plotpanel_classes['Projection Activity'] = ProjectionActivityPanel
 
