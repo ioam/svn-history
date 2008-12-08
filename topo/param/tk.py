@@ -2704,14 +2704,13 @@ class Menu(T.Menu):
         # 
         # indexname will be None if neither indexname nor label is
         # specified in cnf or kw.
-        indexname=cnf.pop('indexname',kw.pop('indexname',None))
+        indexname=cnf.get('indexname',kw.get('indexname',None))
         if indexname is None:
             indexname = cnf.get('label',kw.get('label',None))
         return indexname
 
     def _update_indices(self,index,cnf,kw):
         indexname = self._find_indexname(cnf,kw)
-        
         if indexname is not None:
             self.indexname2index[indexname] = index
             # this pain is to keep the actual item, if it's a menu or a command, available to access
@@ -2725,8 +2724,12 @@ class Menu(T.Menu):
 
     def add(self, itemType, cnf={}, **kw):
         self._check_new_indexname(cnf,kw)
+        ## CB: see alert about indexname
+        # (also in index())
+        indexname = cnf.pop('indexname',kw.pop('indexname',None))
         T.Menu.add(self,itemType,cnf,**kw)
-        self._update_indices(self.index("last"),cnf,kw)
+        if indexname:kw['indexname']=indexname
+        self._update_indices(self.index("last") or 0,cnf,kw)
         
 
     def insert(self, index, itemType, cnf={}, **kw):
@@ -2735,7 +2738,10 @@ class Menu(T.Menu):
         for name,i in self.indexname2index.items():
             if i>=index:
                 self.indexname2index[name]+=1
+
+        indexname = cnf.pop('indexname',kw.pop('indexname',None))
         T.Menu.insert(self,index,itemType,cnf,**kw)
+        if indexname:kw['indexname']=indexname
         self._update_indices(index,cnf,kw)
 
     def __delete(self,index1):
