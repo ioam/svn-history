@@ -1,6 +1,7 @@
-<p><b>12 October 2008:</b> Version 0.9.6 soon to be released;
+<p><b>25 November 2008:</b> Version 0.9.6 is in preparation;
 updates are currently available in the latest SVN version:
 
+<!-- So far updated only to r9630 -->
 <center>
 <table width="100%" cellpadding="5">
 <tr>
@@ -18,6 +19,7 @@ updates are currently available in the latest SVN version:
 <dd>
 <!--CB: surely these divs should be some kind of li?-->
   <div class="i2">- significant performance improvements (nearly 2X)</div>
+  <div class="i2">- significant startup time improvements for large networks</div>
   <div class="i2">- minor bugfixes</div>
 <!--  <div class="i2">- updated Windows packages</div> -->
   <div class="i2">- more options for 
@@ -29,28 +31,12 @@ updates are currently available in the latest SVN version:
   <div class="i2">- model editor supports non-Sheet EventProcessors
   and non-CFProjection EPConnections</div>
 </dd>
-<dt>Command-line and batch:</dt>
-<dd>
-  <div class="i2">- -v option to print verbose messages</div>
-  <div class="i2">- -d option to print debugging messages</div>
-  <div class="i2">new options to <A target="_top" HREF="../Reference_Manual/topo.command.basic-module.html#run_batch">run_batch</A> and better progress messages</div>
-</dd>
-</font>
-</dl>
-</td>
-<td width="50%">
-<dl COMPACT>
-<font size="-1">
-<dt>Example scripts:</dt>
-<dd>
-  <div class="i2">- example file for
-  <a href="../User_Manual/interfacing.html">interfacing to external simulators</a>
-  (examples/perrinet_retina.ty)</div>
-  <div class="i2">- removed outdated or in-progress examples</div>
-  <div class="i2">- greatly simplified remaining example scripts</div>
-</dd>
 <dt>Component library:</dt>
 <dd>
+  <div class="i2">- PatternGenerators: 
+  <?php classref('topo.pattern.basic','Translator')?>; 
+    mask_shape parameter also now makes it easy to specify a mask
+    for any pattern, e.g. in the GUI</div>
   <div class="i2">- OutputFns: 
   <?php classref('topo.outputfn.basic','HalfRectifyAndPower')?></div>
   <div class="i2">- Sheets: 
@@ -58,14 +44,45 @@ updates are currently available in the latest SVN version:
   <div class="i2">- LearningFns: 
   <?php classref('topo.learningfn.optimized','CFPLF_BCMFixed_opt')?>,
   <?php classref('topo.learningfn.optimized','CFPLF_Scaled_opt')?></div>
-  <div class="i2">- Added mask_shape parameter to 
-  <?php classref('topo.sheet.basic','PatternGenerator')?>
-  to make it easy to specify a mask for any pattern, e.g. in the GUI</div>
   <div class="i2">- Added <?php classref('topo.param','HookList')?>
   parameters to
   <?php classref('topo.analysis.featureresponses','FeatureResponses')?> and
-  <?php classref('topo.sheet.basic','LISSOM')?> to make it easier to
+  <?php classref('topo.sheet.lissom','LISSOM')?> to make it easier to
   add user-defined functionality.</div>
+</dd>
+</font>
+</dl>
+</td>
+<td width="50%">
+<dl COMPACT>
+<font size="-1">
+<dt>Command-line and batch:</dt>
+<dd>
+  <div class="i2">- -v option to print verbose messages</div>
+  <div class="i2">- -d option to print debugging messages</div>
+  <div class="i2">- new options to
+  <?php classref('topo.command.basic','run_batch')?> and better progress messages</div>
+  <div class="i2">- replaced most commands with
+  <?php classref('topo.param.parameterized','ParameterizedFunction')?>s,
+  which have documented, type and bound-checked arguments and allow
+  inheritance of shared functionality</div>
+  <div class="i2">- replaced map measurement commands in
+  <A target="_top" HREF="../Reference_Manual/topo.command-module.html">topo.command</A>
+  with simpler, general-purpose, easily .ty-file controllable versions (see
+  lissom_oo_or.ty and lissom.ty for examples)</div>
+  <div class="i2">- <?php classref('topo.command.analysis','save_plotgroup')?>: 
+  more useful default values; results can be cached to avoid recomputation</div>
+  <div class="i2">- <?php classref('topo.command.analysis','measure_sine_pref')?>:
+  general purpose measurement for any preference that can be tested
+  with a sine grating</div>
+</dd>
+<dt>Example scripts:</dt>
+<dd>
+  <div class="i2">- example file for
+  <a href="../User_Manual/interfacing.html">interfacing to external simulators</a>
+  (examples/perrinet_retina.ty)</div>
+  <div class="i2">- removed outdated or in-progress examples</div>
+  <div class="i2">- greatly simplified remaining example scripts</div>
 </dd>
 </font>
 </dl>
