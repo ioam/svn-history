@@ -2643,22 +2643,13 @@ class Menu(T.Menu):
     """
     Tkinter Menu, but with a way to access entries by name.
 
-    Supply indexname to any of the add/insert/delete methods and that
-    indexname can be used to get the index of the entry later on (if
-    'indexname' not supplied, uses 'label' instead, if that was
-    supplied).
+    Entries can be accessed via the label supplied when the entry is
+    add()ed or insert()ed. For an entry whose label could change, you
+    can supply 'indexname', which can then be used to access the entry
+    no matter what the label might have become.
     """
     ## (Original Menu class is in lib/python2.4/lib-tk/Tkinter.py)
     
-    ## Note that I added a separate 'indexname' rather than just using
-    ## 'label' or some other existing name because those could change
-    ## (for the same command), and e.g. 'label' isn't available for
-    ## all widgets.
-    
-    # CB: need to check the statement above and use label as indexname
-    # if possible!
-
-    # rename to get_tkinter_index() 
     def get_tkinter_index(self,index):
         """
         Return the Tkinter index, whether given an indexname or index
@@ -2673,6 +2664,7 @@ class Menu(T.Menu):
         else:
             i=index
         return i
+
 
     def get_indexname(self,index):
         """
@@ -2691,14 +2683,14 @@ class Menu(T.Menu):
         return None
                 
 
-
-    ########## METHODS OVERRIDDEN to keep track of contents
     def __init__(self, master=None, cnf={}, **kw):
+        # Creates two internal indexes to track names and commands
         self.indexname2index = {}  # rename to indexnames2index or similar
         self.named_commands = {}
         T.Menu.__init__(self,master,cnf,**kw)
 
-    def _find_indexname(self,cnf,kw):
+
+    def __find_indexname(self,cnf,kw):
         # indexname will be as specified by 'indexname' in cnf or kw,
         # or else as specified by 'label' in cnf or kw.
         # 
@@ -2710,7 +2702,8 @@ class Menu(T.Menu):
         return indexname
 
     def _update_indices(self,index,cnf,kw):
-        indexname = self._find_indexname(cnf,kw)
+        # add entries to the 
+        indexname = self.__find_indexname(cnf,kw)
         if indexname is not None:
             self.indexname2index[indexname] = index
             # this pain is to keep the actual item, if it's a menu or a command, available to access
@@ -2718,14 +2711,12 @@ class Menu(T.Menu):
 
     def _check_new_indexname(self,cnf,kw):
         # if there is an indexname, it must be unique
-        indexname = self._find_indexname(cnf,kw)
+        indexname = self.__find_indexname(cnf,kw)
         assert indexname not in self.indexname2index
         
 
     def add(self, itemType, cnf={}, **kw):
         self._check_new_indexname(cnf,kw)
-        ## CB: see alert about indexname
-        # (also in index())
         indexname = cnf.pop('indexname',kw.pop('indexname',None))
         T.Menu.add(self,itemType,cnf,**kw)
         if indexname:kw['indexname']=indexname
@@ -2743,6 +2734,7 @@ class Menu(T.Menu):
         T.Menu.insert(self,index,itemType,cnf,**kw)
         if indexname:kw['indexname']=indexname
         self._update_indices(index,cnf,kw)
+
 
     def __delete(self,index1):
         i1 = self.get_tkinter_index(index1)
