@@ -2690,50 +2690,51 @@ class Menu(T.Menu):
         T.Menu.__init__(self,master,cnf,**kw)
 
 
-    def __find_indexname(self,cnf,kw):
+    def __extract_indexname(self,cnf,kw):
         # indexname will be as specified by 'indexname' in cnf or kw,
         # or else as specified by 'label' in cnf or kw.
         # 
         # indexname will be None if neither indexname nor label is
         # specified in cnf or kw.
-        indexname=cnf.get('indexname',kw.get('indexname',None))
+        indexname=cnf.pop('indexname',kw.pop('indexname',None))
         if indexname is None:
             indexname = cnf.get('label',kw.get('label',None))
         return indexname
 
-    def _update_indices(self,index,cnf,kw):
-        # add entries to the 
-        indexname = self.__find_indexname(cnf,kw)
+    def _update_indices(self,index,indexname,cnf,kw):
         if indexname is not None:
             self.indexname2index[indexname] = index
             # this pain is to keep the actual item, if it's a menu or a command, available to access
             self.named_commands[indexname] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
 
-    def _check_new_indexname(self,cnf,kw):
-        # if there is an indexname, it must be unique
-        indexname = self.__find_indexname(cnf,kw)
-        assert indexname not in self.indexname2index
-        
 
     def add(self, itemType, cnf={}, **kw):
-        self._check_new_indexname(cnf,kw)
-        indexname = cnf.pop('indexname',kw.pop('indexname',None))
+        """
+        See Tkinter.Menu.add(), but 'indexname' can also be supplied.
+
+        If supplied, indexname must be unique. If label is supplied without
+        indexname, then label must be unique.
+        """
+        indexname = self.__extract_indexname(cnf,kw)
+        assert indexname not in self.indexname2index
         T.Menu.add(self,itemType,cnf,**kw)
-        if indexname:kw['indexname']=indexname
-        self._update_indices(self.index("last") or 0,cnf,kw)
+        self._update_indices(self.index("last") or 0,indexname,cnf,kw)
         
 
     def insert(self, index, itemType, cnf={}, **kw):
-        self._check_new_indexname(cnf,kw)
+        """
+        See Tkinter.Menu.insert(), but index can also be specified as text.
+        """
+        indexname = self.__extract_indexname(cnf,kw)
+        assert indexname not in self.indexname2index
+
         # increase index of any item after insertion point
         for name,i in self.indexname2index.items():
             if i>=index:
                 self.indexname2index[name]+=1
 
-        indexname = cnf.pop('indexname',kw.pop('indexname',None))
         T.Menu.insert(self,index,itemType,cnf,**kw)
-        if indexname:kw['indexname']=indexname
-        self._update_indices(index,cnf,kw)
+        self._update_indices(index,indexname,cnf,kw)
 
 
     def __delete(self,index1):
