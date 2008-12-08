@@ -435,25 +435,36 @@ class topographic_grid(PylabPlotCommand):
 
 class overlaid_plots(PylabPlotCommand):
     """
-    Use matplotlib to make a plot from a bitmap constructed using the
-    specified plot_template, plus additional overlaid line contour
-    plot(s) specified with ('contours',map-name,contour-value,line-color)
-    quadruples and/or overlaid arrows plot(s) specified with ('arrows',map-name for arrows location,
-    map-name for arrows scaling,arrow-color) quadruples.
+    Use matplotlib to make a plot combining a bitmap and line-based overlays.
     """
     
-    # JABALERT: All but the first two arguments should probably be Parameters    
-    def __call__(self,plot_template=[{'Hue':'OrientationPreference'}],overlay=[('contours','OcularPreference',0.5,'black'),('arrows','DirectionPreference','DirectionSelectivity','white')],normalize=False,**params):
+    plot_template = param.List(default=[{'Hue':'OrientationPreference'}],doc="""
+        Template for the underlying bitmap plot.""")
+
+    overlay = param.List(default=[('contours','OcularPreference',0.5,'black'),
+                                ('arrows','DirectionPreference','DirectionSelectivity','white')],doc="""
+        List of overlaid plots, where each list item may be a 4-tuple
+        specifying either a contour line or a field of arrows::
+
+          ('contours',map-name,contour-value,line-color)
+
+          ('arrows',arrow-location-map-name,arrow-size-map-name,arrow-color)
+
+        Any number or combination of contours and arrows may be supplied.""")
+
+    normalize = param.Boolean(default=False,doc="Whether to normalize the bitmap plots.")
+
+
+    def __call__(self,**params):
         p=ParamOverrides(self,params)
 
-        for template in plot_template:
+        for template in p.plot_template:
         
             for sheet in topo.sim.objects(Sheet).values():
                 name=template.keys().pop(0)
-                plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,normalize,name=template[name])        
+                plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,p.normalize,name=template[name])        
                 if plot:
                     bitmap=plot.bitmap
-                	
                     pylab.figure(figsize=(5,5))
                     isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
                     pylab.ioff()					 # Turn interactive mode off 
@@ -461,7 +472,7 @@ class overlaid_plots(PylabPlotCommand):
                     pylab.imshow(bitmap.image,origin='lower',interpolation='nearest')				
                     pylab.axis('off')
     
-                    for (t,pref,sel,c) in overlay:
+                    for (t,pref,sel,c) in p.overlay:
                         v = pylab.flipud(sheet.sheet_views[pref].view()[0])
                         
                         if (t=='contours'):
