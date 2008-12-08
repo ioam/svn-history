@@ -39,7 +39,6 @@ from topo.base.sheet import Sheet
 from topo.base.arrayutil import wrap
 from topo.misc.filepath import normalize_path
 from topo.misc.util import frange
-from topo.analysis.vision import complexity
 import topo.analysis.vision
 from topo.plotting.plot import make_template_plot, Plot
 from topo import param
@@ -754,6 +753,8 @@ class plot_modulation_ratio(PylabPlotCommand):
     # JABALERT: All but the first argument should probably be Parameters
     def __call__(self,fullmatrix,simple_sheet_name=None,complex_sheet_name=None,bins=frange(0,2.0,0.1,inclusive=True),**params):
         p=ParamOverrides(self,params)
+
+        from topo.analysis.vision import complexity
 
         if (topo.sim.objects().has_key(simple_sheet_name)):
             v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]])
