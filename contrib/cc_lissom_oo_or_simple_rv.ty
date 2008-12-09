@@ -30,7 +30,7 @@ from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialD
 from topo.pattern.basic import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
 from topo.base.functionfamily import CoordinateMapperFn
-from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeoSigmoid, Habituation, Jitterer, AddGC
+from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeoSigmoid, Habituation, Jitterer, AddGC, SimpleHomeoLinear
 
 
 topo.sim.name = "CCSimple"
@@ -58,14 +58,6 @@ elif dataset=="Natural":
 				orientation=0)
 			for f in image_filenames]
 	input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),jitter_magnitude=locals().get('JM',0.02))
-
-
-#ring=topo.pattern.basic.Ring(x=UniformRandom(lbound=-1.1,ubound=1.1,seed=1023),
-#                                                            y=UniformRandom(lbound=-1.1,ubound=1.1,seed=511),
-#                                                            size=2, aspect_ratio=1.0, scale=0.8,thickness=locals().get('Thickness',0.03),
-#                                                            offset=0.0,
-#                                                            bounds=BoundingBox(radius=1.125), smoothing=0.02)
-
 
 disk_scale=locals().get('diskscale',0.35)
 ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-1.1,ubound=1.1,seed=12),
@@ -112,6 +104,8 @@ units=[(0.25,0.25),(-0.25,0.25),
 
 if locals().get('SOF',"Sigmoid") == "Homeo":
 	V1Simple_OF = SimpleHomeoSigmoid(a_init=22,b_init=-12,mu=locals().get('SMU',0.01),eta=0.02)
+if locals().get('SOF',"Sigmoid") == "SimpleHomeo":
+    V1Simple_OF = SimpleHomeoLinear(t_init=-4,mu=locals().get('SMU',0.01),eta=0.02)
 else:
 	V1Simple_OF=Sigmoid(r=22,k=-12)
 
