@@ -33,10 +33,15 @@ projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotPr
 
 ### Input patterns
 num_inputs=1
+speed=2.0
+
 
 # Number of separate delay lines in the LGN
 num_lags=4
 input_period=num_lags # By default
+
+retina_density = locals().get('default_retina_density',24.0)
+lgn_density = locals().get('default_lgn_density',24.0)
 
 input = pattern.Translator(
     x=numbergen.UniformRandom(lbound=-0.75,
@@ -48,28 +53,24 @@ input = pattern.Translator(
     generator=pattern.Gaussian(size=0.088388, aspect_ratio=4.66667, scale=1.0,
                                bounds=sheet.BoundingBox(radius=0.8)),
     reset_period=input_period,
-    speed=0.04)
+    speed=speed/retina_density)
 
 
 ### Sheets
-retina_density = locals().get('default_retina_density',24.0)
-lgn_density = locals().get('default_lgn_density',24.0)
-
 topo.sim['Retina']=sheet.GeneratorSheet(
     nominal_density=retina_density,period=1.0,phase=0.05,
-    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.375),
+    nominal_bounds=sheet.BoundingBox(radius=0.5+0.27083+0.375),
     input_generator=input)
-
 
 topo.sim['LGNOn']=sheet.CFSheet(
     nominal_density=lgn_density,
-    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
+    nominal_bounds=sheet.BoundingBox(radius=0.5+0.27083),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
 topo.sim['LGNOff']=sheet.CFSheet(
     nominal_density=lgn_density,
-    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
+    nominal_bounds=sheet.BoundingBox(radius=0.5+0.27083),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
@@ -82,6 +83,8 @@ topo.sim['V1'] = sheet.lissom.LISSOM(
 
 
 ### Connections
+
+strength=[2.33, 2.38, 2.53, 2.8] # 2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
 
 # DoG weights for the LGN
 centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,
@@ -97,12 +100,12 @@ off_weights = pattern.Composite(
 
     
 topo.sim.connect('Retina','LGNOn',delay=0.05,
-                 connection_type=projection.SharedWeightCFProjection,strength=2.38,
+                 connection_type=projection.SharedWeightCFProjection,strength=strength[int(speed)],
                  nominal_bounds_template=sheet.BoundingBox(radius=0.375),
                  name='Afferent',weights_generator=on_weights)
 
 topo.sim.connect('Retina','LGNOff',delay=0.05,
-                 connection_type=projection.SharedWeightCFProjection,strength=2.38,
+                 connection_type=projection.SharedWeightCFProjection,strength=strength[int(speed)],
                  nominal_bounds_template=sheet.BoundingBox(radius=0.375),
                  name='Afferent',weights_generator=off_weights)
 
@@ -115,7 +118,7 @@ for i in xrange(num_lags):
         connection_type=projection.CFProjection,strength=1.0,
         name='LGNOnAfferent'+str(i),
         nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
-        learning_rate=0.9590/2,
+        learning_rate=0.9590/8,
         weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
 
     topo.sim.connect(
@@ -124,7 +127,7 @@ for i in xrange(num_lags):
         connection_type=projection.CFProjection,strength=1.0,
         name='LGNOffAfferent'+str(i),
         nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
-        learning_rate=0.9590/2,
+        learning_rate=0.9590/8,
         weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
 
 
@@ -165,6 +168,7 @@ topo.sim.grid_layout([[None, 'V1'],
 from topo.analysis.featureresponses import MeasureResponseCommand
 MeasureResponseCommand.duration=4.0
 MeasureResponseCommand.apply_output_fn=True
+MeasureResponseCommand.scale=0.5 # CB: I set this for the speed-2 network
 
 # CB: temporary (to get new direction map measurement)
 _new_motion_model=True
