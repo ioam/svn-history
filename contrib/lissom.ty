@@ -539,47 +539,48 @@ MeasureResponseCommand.apply_output_fn=False
 # in topo.command.analysis...but not create the objects there. We
 # already do that elsewhere with plotgrouptemplates for
 # templateplotgroups, right?
+from topo.command.pylabplots import overlaid_plots
 combined_preference_maps = {
     ('or','od'):dict(
         name='Orientation and Ocular Preference',
         doc='Plot the orientation preference overlaid with ocular dominance boundaries.',
         update_command=[],
-        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black")])',
+        plot_command=[overlaid_plots.instance(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black")])],
         normalize=False),
 
     ('or','dr'):dict(
         name='Orientation and Direction Preference',
         doc='Plot the orientation preference overlaid with direction preference arrows.',
         update_command=[],
-        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"}],overlay=[("arrows","DirectionPreference","DirectionSelectivity","white")])',            
+        plot_command=[overlaid_plots.instance(plot_template=[{"Hue":"OrientationPreference"}],overlay=[("arrows","DirectionPreference","DirectionSelectivity","white")])],
         normalize=False),
 
     ('or','dy'):dict(
         name='Orientation and PhaseDisparity Preference',
         doc='Plot the orientation preference overlaid with phase disparity preference boundaries.',
         update_command=[],
-        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","PhasedisparityPreference",0.83,"magenta"),("contours","PhasedisparityPreference",0.08,"yellow")])',            
+        plot_command=[overlaid_plots.instance(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","PhasedisparityPreference",0.83,"magenta"),("contours","PhasedisparityPreference",0.08,"yellow")])],
         normalize=False),
 
     ('or','cr'):dict(
         name='Orientation and Hue Preference',
         doc='Plot the orientation preference overlaid with hue preference boundaries.',
         update_command=[],
-        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")],normalize=True)',            
+        plot_command=[overlaid_plots.instance(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")],normalize=True)],
         normalize=True),
 
     ('or','od','dr'):dict(
         name='Orientation, Ocular and Direction Preference',
         doc='Plot the orientation preference overlaid with ocular dominance boundaries and direction preference arrows.',
         update_command=[],
-        plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black"),("arrows","DirectionPreference","DirectionSelectivity","white")])',            
+        plot_command=[overlaid_plots.instance(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black"),("arrows","DirectionPreference","DirectionSelectivity","white")])],
         normalize=False),
 
     ('od','cr'):dict(
         name='Ocular and Hue Preference',
         doc='Plot the ocular preference overlaid with hue preference boundaries.',
         update_command=[],
-        plot_command='overlaid_plots(plot_template=[{"Hue":"OcularPreference","Confidence":"OcularSelectivity"},{"Strength":"OcularSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")],normalize=True)',            
+        plot_command=[overlaid_plots.instance(plot_template=[{"Hue":"OcularPreference","Confidence":"OcularSelectivity"},{"Strength":"OcularSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")],normalize=True)],
         normalize=True)
     }
 
@@ -594,3 +595,6 @@ for combined_dimensions,plotgroup_spec in combined_preference_maps.items():
 # CB: could this be in create_plotgroup?
 if hasattr(topo,'guimain'):
     topo.guimain.refresh_plots_menu()
+
+# CJ:to use new direction map measurement (temporary)  
+_new_motion_model=True
