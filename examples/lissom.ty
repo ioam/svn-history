@@ -230,11 +230,12 @@ for e in eyes:
                       numbergen.UniformRandom(lbound=1,ubound=sf_spacing**(sf_channels-1),
                                               seed=23+i)**('sf' in dims), 
                     aspect_ratio=4.66667 if 'or' in dims else 1.0,
-                    scale=2.0-2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) - \
+                    scale=1.0 if 'od' not in dims else \
+                     (2.0-2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) - \
                       numbergen.UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims) \
-                      if e=='Right' and 'od' in dims else \
+                      if e=='Right' else \
                       2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) + \
-                      numbergen.UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims),
+                      numbergen.UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims)),
                     bounds=sheet.BoundingBox(radius=0.8))
                 for i in xrange(num_inputs)]
                 input_composite=pattern.SeparatedComposite(min_separation=2.2*v1aff_radius,generators=inputs)
@@ -257,9 +258,10 @@ for e in eyes:
                                             seed=150)*(-1)**(e=='Left'),
                     y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
                     orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),
-                    scale=2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[cone_types.index(cone)] \
-                    if e=='Right' and 'od' in dims else \
-                    numbergen.UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[cone_types.index(cone)])
+                    scale=1.0 if 'od' not in dims else \
+                     (2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[cone_types.index(cone)] \
+                      if e=='Right' else \
+                      numbergen.UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[cone_types.index(cone)]))
                 for f in image_filenames]
                 input_composite=pattern.Selector(generators=inputs)
 
