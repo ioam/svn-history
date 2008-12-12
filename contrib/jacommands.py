@@ -22,7 +22,7 @@ from topo.sheet.lissom import LISSOM
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.plotting.plotfilesaver import * 
 from topo.command.pylabplots import cyclic_tuning_curve, matrixplot
-from topo.command.analysis import save_plotgroup, measure_or_tuning_fullfield
+from topo.command.analysis import save_plotgroup
 from topo.misc.filepath import normalize_path,application_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.functionfamily import CoordinateMapperFn
@@ -372,7 +372,7 @@ class SimpleHomeoSigmoid(OutputFnWithState):
 
 class SimpleHomeoLinear(OutputFnWithState):
     mu = param.Number(default=0.01,doc="Target average activity.")
-    t_init = param.Number(default=-0.0,doc="Threshold parameter")
+    t_init = param.Number(default=0.0,doc="Threshold parameter")
     eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
     smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
     randomized_init = param.Boolean(False, doc="Whether to randomize the initial t parameter")
@@ -431,7 +431,7 @@ class SimpleHomeoLinearRelative(OutputFnWithState):
         self.mu = topo.sim["V1"].lr_x_avg/self.input_output_ratio
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
-        self.t += self.eta * (self.y_avg - self.mu)
+            self.t += self.eta * (self.y_avg - self.mu)
         # recalculate the mu based on the input/ output ratio
         
 
@@ -486,8 +486,19 @@ def measure_histogram(iterations=1000,sheet_name="V1"):
     pylab.subplot(111, yscale='log')
     #pylab.subplot(111)
     
-    pylab.hist(concat_activities,(numpy.arange(20.0)/20.0),normed=True)
-    pylab.axis(ymin=0.0000001,ymax=100)
+    (bins,a,b) =  pylab.hist(concat_activities,(numpy.arange(40.0)/40.0)*2,visible=False)
+    bins = bins *1.0/ sum(bins)
+    exponential = numpy.arange(40,dtype='float32')/40.0
+    # compute the mean of the actual distribution
+    mu=0
+    for x in xrange(0,40):
+        mu += x/40.0*bins[x]
+    print mu
+    exponential=  numpy.exp(-(1/mu)*exponential) / mu
+    pylab.plot(bins)
+    pylab.plot(exponential)
+    pylab.axis(ymin=0.000001,ymax=1)
+    #pylab.axis("tight")
     pylab.show()
       
     
