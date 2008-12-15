@@ -289,5 +289,6 @@ def secondStage():
     #topo.sim['V1Complex'].in_connections[2].strength=__main__.__dict__.get('SSLI_Strength',-0.7)
     randomize_V1Simple_relative_LGN_strength()
     
-    
+from topo.analysis.featureresponses import MeasureResponseCommand
+MeasureResponseCommand.scale=3    
 
