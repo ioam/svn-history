@@ -273,6 +273,9 @@ class GenericImage(PatternGenerator):
         OutputFn,default=DivisiveNormalizeLinf(),precedence=0.96,doc="""
         Function applied to the whole, original image array (before any cropping).""")
 
+    # CB: I guess it's a type rather than an instance because of the
+    # way PatternSampler is written (requiring values of many
+    # parameters on initialization).
     pattern_sampler_type = param.Parameter(default=PatternSampler, doc="""
         The type of PatternSampler to use to resample/resize the image.""")
 
@@ -282,7 +285,7 @@ class GenericImage(PatternGenerator):
         running out of memory.""")
         
 
-    def __setup_pattern_sampler(self):
+    def _create_pattern_sampler(self):
         """
         If a new filename or whole_image_output_fn is supplied, create a
         PatternSampler based on the image found at filename.        
@@ -309,7 +312,7 @@ class GenericImage(PatternGenerator):
 
         if self._get_image(params) or whole_image_output_fn != self.last_wiof:
             self.last_wiof = whole_image_output_fn
-            self.__setup_pattern_sampler()
+            self._create_pattern_sampler()
         result = self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
 
         if not self.cache_image:
