@@ -522,9 +522,8 @@ class Selector(PatternGenerator):
         size=params['size']
         orientation=params['orientation']
         index=params['index']
-        int_index=int(len(self.generators)*wrap(0,1.0,index))
-        pg = self.generators[int_index]
-        
+
+        pg = self.get_current_generator(index=index)
         image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
                          x=x+size*(pg.x*cos(orientation)-pg.y*sin(orientation)),
                          y=y+size*(pg.x*sin(orientation)+pg.y*cos(orientation)),
@@ -532,6 +531,11 @@ class Selector(PatternGenerator):
                          scale=pg.scale*scale,offset=pg.offset+offset)
                        
         return image_array
+
+    def get_current_generator(self,index=None):
+        """Return the generator specified by the current (or supplied) index."""
+        int_index=int(len(self.generators)*wrap(0,1.0,index or self.index))
+        return self.generators[int_index]
 
 
 
