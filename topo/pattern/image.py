@@ -280,19 +280,6 @@ class GenericImage(PatternGenerator):
         running out of memory.""")
         
 
-    def _create_pattern_sampler(self):
-        """
-        If a new filename or whole_image_output_fn is supplied, create a
-        PatternSampler based on the image found at filename.        
-
-        The PatternSampler is given the whole image array after it has
-        been converted to grayscale.
-        """
-        self.ps = self.pattern_sampler_type(image=self._image,
-                                            whole_pattern_output_fn=self.last_wiof,
-                                            background_value_fn=edge_average)
-
-
     def function(self,params):
         xdensity = params['xdensity']
         ydensity = params['ydensity']
@@ -307,7 +294,11 @@ class GenericImage(PatternGenerator):
 
         if self._get_image(params) or whole_image_output_fn != self.last_wiof:
             self.last_wiof = whole_image_output_fn
-            self._create_pattern_sampler()
+
+            self.ps=self.pattern_sampler_type(image=self._image,
+                                              whole_pattern_output_fn=self.last_wiof,
+                                              background_value_fn=edge_average)
+            
         result = self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
 
         if not self.cache_image:
