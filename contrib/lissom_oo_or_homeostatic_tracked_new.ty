@@ -143,7 +143,7 @@ tracking=locals().get('tracking', True) # Turn tracking on or off
 triesch=locals().get('triesch', True) # Turn homeostatic adjustment of V1 output function on or off
 scaling=locals().get('scaling',True) # Turn afferent scaling on or off
 lr_scaling=locals().get('lr_scaling',True) # Turn scaling of afferent learning rate on or off
-
+io_ratio=locals().get('io_ratio',3.6) 
 
 if tracking==True:
     if triesch==True:
@@ -151,24 +151,24 @@ if tracking==True:
             if lr_scaling==True:
                 Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
                 HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,
-                                              eta=locals().get('eta',0.016), mu=mu)
+                                              eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
             else:
                 Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'scaled_x_avg'], units=units)
                 HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,
-                                              eta=locals().get('eta',0.016), mu=mu)
+                                              eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker]) 
         else:
             if lr_scaling==True:
                 Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['lr_sf'], units=units)
                 HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,  
-                                              eta=locals().get('eta',0.016), mu=mu)
+                                              eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
             else:
-                HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing, eta=locals().get('eta',0.016), mu=mu)
+                HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing, eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
                 V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1']", attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[HE, V1_Tracker])
     else:
@@ -185,7 +185,7 @@ if tracking==True:
             V1_OF=PipelineOF(output_fns=[HE, AV, V1_Tracker])
 else:
     if triesch==True:
-        V1_OF=HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.016), mu=mu)
+        V1_OF=HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
     else:
         V1_OF=HalfRectify()
 
@@ -254,17 +254,17 @@ else:
 topo.sim['Retina']=GeneratorSheet(nominal_density=default_retinal_density,
                                   input_generator=combined_inputs,
                                   period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375+0.5))
 
 topo.sim['LGNOn']=LISSOM(nominal_density=default_retinal_density,
-                          nominal_bounds=BoundingBox(radius=0.5+0.25),
+                          nominal_bounds=BoundingBox(radius=0.5+0.25+0.5),
                           output_fn=LGN_on_output_fn,tsettle=0,
                           measure_maps=False)
 
 
 
 topo.sim['LGNOff']=LISSOM(nominal_density=default_retinal_density,
-                           nominal_bounds=BoundingBox(radius=0.5+0.25),
+                           nominal_bounds=BoundingBox(radius=0.5+0.25+0.5),
                            output_fn=LGN_off_output_fn,tsettle=0,
                            measure_maps=False)
 
