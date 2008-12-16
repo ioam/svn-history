@@ -258,10 +258,11 @@ for e in eyes:
                                             seed=150)*(-1)**(e=='Left'),
                     y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
                     orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),
-                    scale=1.0 if 'od' not in dims else \
-                     (2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[cone_types.index(cone)] \
-                      if e=='Right' else \
-                      numbergen.UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[cone_types.index(cone)]))
+                    scale=scalingfactor[cone_types.index(cone)]* \
+                            (1.0 if 'od' not in dims else \
+                            (2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=78) \
+                             if e=='Right' else \
+                             numbergen.UniformRandom(lbound=0,ubound=2,seed=78))))
                 for f in image_filenames]
                 input_composite=pattern.Selector(generators=inputs)
 
