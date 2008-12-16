@@ -366,8 +366,8 @@ class SimpleHomeoSigmoid(OutputFnWithState):
         x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
 
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
-            self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
-	    self.b -= self.eta * (self.y_avg - self.mu)
+            self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg
+            self.b -= self.eta * (self.y_avg - self.mu)
 
 
 class SimpleHomeoLinear(OutputFnWithState):
@@ -399,7 +399,7 @@ class SimpleHomeoLinear(OutputFnWithState):
 
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
-        self.t += self.eta * (self.y_avg - self.mu)
+            self.t += self.eta * (self.y_avg - self.mu)
 
 class SimpleHomeoLinearRelative(OutputFnWithState):
     input_output_ratio = param.Number(default=3.6,doc="The ratio between the average input and output activity")
@@ -428,7 +428,7 @@ class SimpleHomeoLinearRelative(OutputFnWithState):
         x_orig = copy(x)
         x -= self.t
         clip_lower(x,0)
-        self.mu = topo.sim["V1"].lr_x_avg/self.input_output_ratio
+        self.mu = topo.sim["V1"].x_avg/self.input_output_ratio
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
             self.t += self.eta * (self.y_avg - self.mu)
@@ -485,18 +485,18 @@ def measure_histogram(iterations=1000,sheet_name="V1"):
     pylab.figure()
     pylab.subplot(111, yscale='log')
     #pylab.subplot(111)
-    
+    mu = sum(concat_activities)/size(concat_activities)
     (bins,a,b) =  pylab.hist(concat_activities,(numpy.arange(40.0)/40.0)*2,visible=False)
+    bins_axis = numpy.arange(40.0)/40.0*2
     bins = bins *1.0/ sum(bins)
-    exponential = numpy.arange(40,dtype='float32')/40.0
+    exponential = numpy.arange(40,dtype='float32')/40.0*2
     # compute the mean of the actual distribution
-    mu=0
-    for x in xrange(0,40):
-        mu += x/40.0*bins[x]
     print mu
     exponential=  numpy.exp(-(1/mu)*exponential) / mu
-    pylab.plot(bins)
-    pylab.plot(exponential)
+    pylab.plot(bins_axis,bins/0.05)
+    pylab.plot(bins_axis,bins/0.05,'ro')
+    pylab.plot(bins_axis,exponential)
+    pylab.plot(bins_axis,exponential,'go')
     pylab.axis(ymin=0.000001,ymax=1)
     #pylab.axis("tight")
     pylab.show()
