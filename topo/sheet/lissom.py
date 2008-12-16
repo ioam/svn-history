@@ -210,6 +210,8 @@ class JointScaling(LISSOM):
     
     smoothing = param.Number(default=0.999, doc="""
         Influence of previous activity, relative to current, for computing the average.""")
+    
+    apply_scaling = param.Boolean(default=True, doc="""Whether to apply the scaling factors.""")
 
 
     def __init__(self,**params):
@@ -254,12 +256,13 @@ class JointScaling(LISSOM):
                     for proj in projlist:
                         joint_total += proj.activity
                     self.calculate_joint_sf(joint_total)
-                    for proj in projlist:
-                        proj.activity *= self.sf
-                        if hasattr(proj.learning_fn,'learning_rate_scaling_factor'):
-                            proj.learning_fn.update_scaling_factor(self.lr_sf)
-                        else:
-                            raise ValueError("Projections to be joint scaled must have a learning_fn that supports scaling, such as CFPLF_PluginScaled")
+                    if self.apply_scaling:   
+                        for proj in projlist:
+                            proj.activity *= self.sf
+                            if hasattr(proj.learning_fn,'learning_rate_scaling_factor'):
+                                proj.learning_fn.update_scaling_factor(self.lr_sf)
+                            else:
+                                raise ValueError("Projections to be joint scaled must have a learning_fn that supports scaling, such as CFPLF_PluginScaled")
                    
                 else:
                     raise ValueError("Only Afferent scaling currently supported")                  
