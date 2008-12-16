@@ -327,7 +327,7 @@ class JointScaling_lronly(LISSOM):
    
     def __init__(self,**params):
         super(JointScaling_lronly,self).__init__(**params)
-        self.lr_x_avg=None
+        self.x_avg=None
         self.lr_sf=None
         self.__current_state_stack=[]        
 
@@ -341,8 +341,8 @@ class JointScaling_lronly(LISSOM):
       
         if self.plastic:
             self.lr_sf *=0.0
-            self.lr_sf += self.target_lr/self.lr_x_avg
-            self.lr_x_avg = (1.0-self.smoothing)*joint_total + self.smoothing*self.lr_x_avg
+            self.lr_sf += self.target_lr/self.x_avg
+            self.x_avg = (1.0-self.smoothing)*joint_total + self.smoothing*self.x_avg
             
 
 
@@ -385,8 +385,8 @@ class JointScaling_lronly(LISSOM):
         """
         self.activity *= 0.0
 
-        if self.lr_x_avg is None:
-            self.lr_x_avg=self.target_lr*ones(self.shape, activity_type)
+        if self.x_avg is None:
+            self.x_avg=self.target_lr*ones(self.shape, activity_type)
         if self.lr_sf is None:
             self.lr_sf=ones(self.shape, activity_type)
 
@@ -406,13 +406,13 @@ class JointScaling_lronly(LISSOM):
 
     def state_push(self,**args):
         super(JointScaling_lronly,self).state_push(**args)
-        self.__current_state_stack.append((copy.copy(self.lr_x_avg),copy.copy(self.lr_sf)))
+        self.__current_state_stack.append((copy.copy(self.x_avg),copy.copy(self.lr_sf)))
         
         
 
     def state_pop(self,**args):
         super(JointScaling_lronly,self).state_pop(**args)
-        self.lr_x_avg, self.lr_sf=self.__current_state_stack.pop()
+        self.x_avg, self.lr_sf=self.__current_state_stack.pop()
        
 class JointScaling_affonly(LISSOM):
     """
@@ -818,33 +818,33 @@ def homeostatic_analysis_function():
 
    
 
-    topo.sim["V1"].state_push()
-    topo.sim["V1"].output_fn.state_push()
+    #topo.sim["V1"].state_push()
+    #topo.sim["V1"].output_fn.state_push()
      
 
-    if __main__.__dict__['scaling'] == True:
-        if topo.sim["V1"].sf==None:
-            pass
-        else:
-            topo.sim["V1"].sf *=0.0
-            topo.sim["V1"].sf +=1.0
+    #if __main__.__dict__['scaling'] == True:
+    #    if topo.sim["V1"].sf==None:
+    #        pass
+    #    else:
+    #        topo.sim["V1"].sf *=0.0
+    #        topo.sim["V1"].sf +=1.0
             
-    if __main__.__dict__['tracking'] == True:
-        topo.sim["V1"].output_fn.output_fns[1].a *=0.0
-        topo.sim["V1"].output_fn.output_fns[1].b *=0.0
-        topo.sim["V1"].output_fn.output_fns[1].a +=12.0
-        topo.sim["V1"].output_fn.output_fns[1].b +=-5.0
+    #if __main__.__dict__['tracking'] == True:
+    #    topo.sim["V1"].output_fn.output_fns[1].a *=0.0
+    ##   topo.sim["V1"].output_fn.output_fns[1].b *=0.0
+    #    topo.sim["V1"].output_fn.output_fns[1].a +=12.0
+    #    topo.sim["V1"].output_fn.output_fns[1].b +=-5.0
 
-    else:
-        topo.sim["V1"].output_fn.a *=0.0
-        topo.sim["V1"].output_fn.b *=0.0
-        topo.sim["V1"].output_fn.a +=12.0
-        topo.sim["V1"].output_fn.b +=-5.0
+    #else:
+    #    topo.sim["V1"].output_fn.a *=0.0
+    #    topo.sim["V1"].output_fn.b *=0.0
+    #    topo.sim["V1"].output_fn.a +=12.0
+    #    topo.sim["V1"].output_fn.b +=-5.0
         
 
-    if __main__.__dict__['changestrength']==True:
-        topo.sim["LGNOn"].projections()["Afferent"].strength=2.33
-        topo.sim["LGNOff"].projections()["Afferent"].strength=2.33
+    #if __main__.__dict__['changestrength']==True:
+    #    topo.sim["LGNOn"].projections()["Afferent"].strength=2.33
+    #    topo.sim["LGNOff"].projections()["Afferent"].strength=2.33
             
 
     save_plotgroup("Orientation Preference")
@@ -852,12 +852,12 @@ def homeostatic_analysis_function():
     
 
     #Restore original values
-    topo.sim["V1"].state_pop()
-    topo.sim["V1"].output_fn.state_pop()
+    #topo.sim["V1"].state_pop()
+    #topo.sim["V1"].output_fn.state_pop()
 
-    if __main__.__dict__['changestrength']==True:
-        topo.sim["LGNOn"].projections()["Afferent"].strength=__main__.__dict__['new_strength']
-        topo.sim["LGNOff"].projections()["Afferent"].strength=__main__.__dict__['new_strength']
+    #if __main__.__dict__['changestrength']==True:
+    #    topo.sim["LGNOn"].projections()["Afferent"].strength=__main__.__dict__['new_strength']
+    #    topo.sim["LGNOff"].projections()["Afferent"].strength=__main__.__dict__['new_strength']
 
     
     
@@ -896,7 +896,7 @@ def homeostatic_analysis_function():
         plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], filename="LatExBefore", ylabel="LatExBefore")
         plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], filename="LatInBefore", ylabel="LatInBefore")
 
-
+        
 SelectivityExc=StoreMedSelectivity()
 StabilityExc=StoreStability()
 SelectivityInh=StoreMedSelectivity()
@@ -944,17 +944,17 @@ def lesi_analysis_function(data_file, snapshot, rfs):
     pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
                     plastic=False,apply_output_fn=True,overwrite_previous=False)        
 
-    topo.sim["V1Exc"].state_push()
-    topo.sim["V1Exc"].output_fn.state_push()
+    #topo.sim["V1Exc"].state_push()
+    #topo.sim["V1Exc"].output_fn.state_push()
      
 
-    topo.sim["V1Exc"].sf *=0.0
-    topo.sim["V1Exc"].sf +=1.0
+    #topo.sim["V1Exc"].sf *=0.0
+    #topo.sim["V1Exc"].sf +=1.0
             
-    topo.sim["V1Exc"].output_fn.output_fns[1].a *=0.0
-    topo.sim["V1Exc"].output_fn.output_fns[1].b *=0.0
-    topo.sim["V1Exc"].output_fn.output_fns[1].a +=12.0
-    topo.sim["V1Exc"].output_fn.output_fns[1].b +=-5.0
+    #topo.sim["V1Exc"].output_fn.output_fns[1].a *=0.0
+    #topo.sim["V1Exc"].output_fn.output_fns[1].b *=0.0
+    #topo.sim["V1Exc"].output_fn.output_fns[1].a +=12.0
+    #topo.sim["V1Exc"].output_fn.output_fns[1].b +=-5.0
 
     save_plotgroup("Orientation Preference")
 
