@@ -282,8 +282,8 @@ if scaling==False:
                                              smoothing=smoothing,target_lr=locals().get('target_lr',0.045))
     else:
         #option for no scaling 
-        topo.sim['V1'] = LISSOM(nominal_density=default_density,tsettle=9,
-                                nominal_bounds=BoundingBox(radius=0.5),
+        topo.sim['V1'] = JointScaling(nominal_density=default_density,tsettle=9,plastic=True,apply_scaling=False,
+                                nominal_bounds=BoundingBox(radius=0.5),smoothing=smoothing,
                                 output_fn=V1_OF)
         
 
@@ -388,3 +388,8 @@ if changestrength==True:
 
 import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
+topo.analysis.featureresponses.FeatureMaps.num_orientation=64
+topo.analysis.featureresponses.FeatureMaps.num_phase=8
+topo.analysis.featureresponses.FeatureMaps.curve_parameters=[{"contrast":1},{"contrast":5},{"contrast":10},{"contrast":20},{"contrast":40},{"contrast":80},{"contrast":100}]
+
+
