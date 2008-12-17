@@ -190,7 +190,7 @@ jpeg-uninstall:
 ##############################################################
 # PIL (bitmap image library)
 #
-PIL = Imaging-1.1.5
+PIL = Imaging-1.1.6
 PIL_UNINSTALL = ${PYTHON_LIB}/site-packages/PIL
 
 pil: ${PIL}.tgz jpeg python
