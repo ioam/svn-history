@@ -199,7 +199,7 @@ def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename
 def measure_and_analyze_complexity():
     """Macro for measuring orientation preference and then analyzing its complexity."""
     from topo.command.analysis import measure_or_pref
-    fm = measure_or_pref(frequencies=[3.0],num_orientation=8,scale=0.3,num_phase=32)
+    fm = measure_or_pref()
     analyze_complexity(fm,simple_sheet_name="V1Simple",complex_sheet_name="V1Complex",filename="ModulationRatio")
 
 
