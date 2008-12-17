@@ -101,7 +101,7 @@ python-uninstall: blt-uninstall
 ##############################################################
 # Tcl (required by Tk GUI toolkit)
 #
-TCL = tcl8.5.1
+TCL = tcl8.5.5
 TCL_UNINSTALL += bin/tclsh8.5 bin/wish8.5 lib/tclConfig.sh
 TCL_UNINSTALL += lib/tcl8.5 lib.tclConfig.sh lib/libtcl8.5.so lib/libtclstub8.5.a
 TCL_UNINSTALL += include/tcl*.h man/man*
@@ -122,7 +122,7 @@ tcl-uninstall:
 ##############################################################
 # Tk (GUI toolkit)
 #
-TK = tk8.5.1
+TK = tk8.5.5
 
 TK_UNINSTALL += lib/tk8.5 lib/libtk8.5.so lib/libtkstub8.5.a
 TK_UNINSTALL += include/tk*.h lib/tkConfig.sh
