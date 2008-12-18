@@ -32,6 +32,10 @@ from math import pi
 from numpy.oldnumeric import arange, sqrt, array, floor, transpose, argmax, argmin, cos, sin, log10, Float
 from numpy import outer,arange,ones,zeros
 
+from numpy.fft.fftpack import fft2
+from numpy.fft.helper import fftshift
+from numpy import abs
+
 import topo
 from topo.base.sheetview import SheetView
 from topo.base.arrayutil import octave_output, centroid, wrap
@@ -194,7 +198,6 @@ class matrixplot(PylabPlotCommand):
         self._generate_figure(p)
 
 
-
 class matrixplot3d(PylabPlotCommand):
     """
     Simple plotting for any matrix as a 3D wireframe with axes.
@@ -348,9 +351,23 @@ class gradientplot(matrixplot):
             dx = 0.5*cyclic_range-abs(dx-0.5*cyclic_range)
             dy = 0.5*cyclic_range-abs(dy-0.5*cyclic_range)
 
-        super(gradientplot,self).__call__(sqrt(dx*dx+dy*dy))
+        super(gradientplot,self).__call__(sqrt(dx*dx+dy*dy),**p)
 
 
+
+class fftplot(matrixplot):
+    """
+    Compute and show the 2D Fast Fourier Transform (FFT) of the supplied data.
+
+    Example:: fftplot(topo.sim["V1"].sheet_views["OrientationPreference"].view()[0],filename="out")
+    """
+    
+    def __call__(self,data,**params):
+        p=ParamOverrides(self,params)
+        fft_plot=1-abs(fftshift(fft2(data-0.5, s=None, axes=(-2,-1))))
+        super(fftplot,self).__call__(fft_plot,**p)
+
+        
 
 class activityplot(PylabPlotCommand):
     """

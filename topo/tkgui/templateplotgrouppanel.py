@@ -15,10 +15,6 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas, Checkbutton, BooleanVar, DISABLED, NORMAL,NO
 from tkFileDialog import asksaveasfilename
 
-from numpy.fft.fftpack import fft2
-from numpy.fft.helper import fftshift
-from numpy import abs
-
 from .. import param
 from ..param import tk
 
@@ -210,8 +206,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         plot = self._right_click_info['plot']
         description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
-        fft_plot=1-abs(fftshift(fft2(m-0.5, s=None, axes=(-2,-1))))
-        topo.command.pylabplots.matrixplot(fft_plot, title="FFT Plot: " + description)        
+        topo.command.pylabplots.fftplot(m, title="FFT Plot: " + description)
 
     def __histogram(self,channel):
         plot = self._right_click_info['plot']
