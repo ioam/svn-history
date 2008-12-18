@@ -563,13 +563,8 @@ class tuning_curve(PylabPlotCommand):
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
-        sheet = p.sheet if p.sheet is not None else \
-                topo.analysis.featureresponses.UnitCurveCommand.sheet
-
-        coords = p.coords if p.coords is not None else \
-                 topo.analysis.featureresponses.UnitCurveCommand.coords
-        
-        for coordinate in coords:
+        sheet = p.sheet
+        for coordinate in p.coords:
             i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
         
             pylab.figure(figsize=(7,7))
