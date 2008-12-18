@@ -168,7 +168,7 @@ if tracking==True:
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
             else:
-                HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing, eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
+                HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing, eta=locals().get('eta',0.016), input_output_ratio=io_ratio,noise_magnitude=locals().get('noise_magnitued',0.0),randomized_init=True)
                 V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1']", attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[HE, V1_Tracker])
     else:
@@ -387,9 +387,10 @@ if changestrength==True:
 
 
 import topo.analysis.featureresponses
-topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
-topo.analysis.featureresponses.FeatureMaps.num_orientation=64
-topo.analysis.featureresponses.FeatureMaps.num_phase=8
-topo.analysis.featureresponses.FeatureMaps.curve_parameters=[{"contrast":1},{"contrast":5},{"contrast":10},{"contrast":20},{"contrast":40},{"contrast":80},{"contrast":100}]
+topo.analysis.featureresponses.FeatureCurveCommand.selectivity_multiplier=1.0
+topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=64
+topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
+topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fn=True
+topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":5},{"contrast":10},{"contrast":20},{"contrast":40},{"contrast":80},{"contrast":100}]
 
 
