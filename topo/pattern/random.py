@@ -115,8 +115,7 @@ class GaussianRandom(RandomGenerator):
 
 class GaussianCloud(Composite):
     """Uniform random noise masked by a circular Gaussian."""
-    ### JABALERT: Should be possible to eliminate this class; see teststimuli.py.
-    
+
     operator = param.Parameter(numpy.multiply)
     
     gaussian_size = param.Number(default=1.0,doc="Size of the Gaussian pattern.")
