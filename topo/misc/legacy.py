@@ -514,8 +514,11 @@ from topo.misc.trace import *
 
         # rXXXX duplicate SineGratingDisk removed
         import topo.pattern.basic
-        import topo.pattern.teststimuli
-        topo.pattern.basic.SineGratingDisk = topo.pattern.teststimuli.SineGratingDisk
+        # JABALERT: Will this work for faking SineGratingDisk?
+        #class SineGratingDisk(topo.pattern.basicSineGrating):
+        #    """2D sine grating pattern generator with a circular mask."""
+        #    mask_shape = param.Parameter(default=Disk(smoothing=0))
+        #topo.pattern.basic.SineGratingDisk = SineGratingDisk
 
         # rXXXX homeostatic of moved into basic
         code = \
