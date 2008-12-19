@@ -78,7 +78,7 @@ python: ${PYTHON}.tgz tk blt
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
 # 32-bit/64-bit snapshot patch: topo SF.net #2119256
-#	patch -p0 < Python_64bit_pickle.diff
+	patch -p0 < Python_64bit_pickle.diff
 # Configure for specific operating system versions
 ifeq ("$(shell uname -s)","Darwin")
 	patch -p0 < Python_OSX_tk.diff # build python with tcl/tk from /Library/Frameworks
