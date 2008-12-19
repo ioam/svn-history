@@ -168,7 +168,7 @@ if tracking==True:
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
             else:
-                HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing, eta=locals().get('eta',0.016), input_output_ratio=io_ratio,noise_magnitude=locals().get('noise_magnitued',0.0),randomized_init=True)
+                HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing, eta=locals().get('eta',0.016), input_output_ratio=io_ratio,noise_magnitude=locals().get('noise_magnitude',0.0),randomized_init=True)
                 V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1']", attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[HE, V1_Tracker])
     else:
