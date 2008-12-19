@@ -34,8 +34,8 @@ from topo.command.basic import pattern_present,restore_input_generators, save_in
 from topo.command.basic import wipe_out_activity, clear_event_queue
 from topo.misc.distribution import Distribution
 from topo.misc.util import cross_product, frange
-from topo.pattern.basic import SineGrating, Gaussian, Rectangle
-from topo.pattern.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
+from topo.pattern.basic import SineGrating, Gaussian, Rectangle, Disk
+from topo.pattern.teststimuli import OrientationContrastPattern
 from topo.plotting.plotgroup import plotgroups,default_input_sheet,default_measureable_sheet
 from topo.sheet import GeneratorSheet
 
@@ -645,7 +645,7 @@ class PatternPresenter(param.Parameterized):
 
 
         if features_values.has_key('retinotopy'):
-            #Calculates coordinates of the center of each SineGratingRectangle to be presented 
+            #Calculates coordinates of the center of each patch to be presented 
             coordinate_x=[]
             coordinate_y=[]
             coordinates=[]
@@ -737,7 +737,7 @@ class PatternPresenter(param.Parameterized):
                 # Weber_contrast is currently only well defined for
                 # the special case where the background offset is equal
                 # to the target offset in the pattern type
-                # SineGratingDisk
+                # SineGrating(mask_shape=Disk())
                 for g in inputs.itervalues():
                     g.offsetcenter=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scalecenter=2*g.offsetcenter*g.contrastcenter/100.0
@@ -762,7 +762,7 @@ class PatternPresenter(param.Parameterized):
                 # Weber_contrast is currently only well defined for
                 # the special case where the background offset is equal
                 # to the target offset in the pattern type
-                # SineGratingDisk
+                # SineGrating(mask_shape=Disk())
                 for g in inputs.itervalues():
                     g.offsetsurround=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scalesurround=2*g.offsetsurround*g.contrastsurround/100.0
@@ -787,7 +787,7 @@ class PatternPresenter(param.Parameterized):
                 # Weber_contrast is currently only well defined for
                 # the special case where the background offset is equal
                 # to the target offset in the pattern type
-                # SineGratingDisk
+                # SineGrating(mask_shape=Disk())
                 for g in inputs.itervalues():
                     g.offset=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scale=2*g.offset*g.contrast/100.0
@@ -1198,7 +1198,7 @@ class UnitCurveCommand(FeatureCurveCommand):
     """
 
     pattern_presenter = param.Callable(
-        default=PatternPresenter(pattern_generator=SineGratingDisk(),
+        default=PatternPresenter(pattern_generator=SineGrating(mask_shape=Disk(smoothing=0.0)),
                                  contrast_parameter="weber_contrast"))
 
     size=param.Number(default=0.5,bounds=(0,None),doc="""
