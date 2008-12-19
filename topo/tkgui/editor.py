@@ -1077,7 +1077,7 @@ class EditorNode(EditorObject):
         EditorObject.__init__(self, name, canvas)
         self.from_connections = [] # connections from this node
         self.to_connections = [] # connections to this node
-        self.x = pos[0] # set the x and y coords of the centre of this node
+        self.x = pos[0] # set the x and y coords of the center of this node
         self.y = pos[1]
         self.mode = canvas.display_mode
         self.simobj = simobj
@@ -1587,7 +1587,7 @@ class EditorEPConnection(EditorConnection):
         for id in self.id : # remove the old connection
             self.canvas.delete(id)
         self.canvas.delete(self.label)
-        from_position = self.from_node.get_pos() # get the centre points of the two nodes
+        from_position = self.from_node.get_pos() # get the center points of the two nodes
         if (self.to_node == None) :  # if not connected yet, use temporary point.
             to_position = self.to_position
         else:
@@ -1620,7 +1620,7 @@ class EditorEPConnection(EditorConnection):
             self.label = self.canvas.create_text(middle[0] - 
             (20 + len(self.name)*3), middle[1] - (30 + deviation) , text = self.name)
         else :    
-            # create a line between the nodes - use 2 to make arrow in centre.
+            # create a line between the nodes - use 2 to make arrow in center.
             dev = self.deviation
             from_pos = from_position[0] + self.deviation, from_position[1]
             mid = middle[0] + 0.5 * dev, middle[1]
@@ -1720,7 +1720,7 @@ class EditorProjection(EditorEPConnection):
     Represents any topo CFProjection. It is a subclass of EditorEPConnection and fills 
     in the methods that are not defined. Can be represented by a representation of a
     projection's receptive field or by a line with an arrow head in the middle;
-    lateral projections are represented by a dotted ellipse around the centre.
+    lateral projections are represented by a dotted ellipse around the center.
     Can determine if x,y coord is within the triangular receptive field or within an
     area around the arrow head. The same can be determined for a lateral projection 
     ellipse.

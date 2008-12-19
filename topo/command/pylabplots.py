@@ -1234,7 +1234,7 @@ class measure_orientation_contrast(UnitCurveCommand):
     # Maybe instead of the below, use size and some relative parameter, to allow easy scaling?
 
     # ALERT: Rename to center.
-    size_centre=param.Number(default=0.5,bounds=(0,None),doc="""
+    size_center=param.Number(default=0.5,bounds=(0,None),doc="""
         The size of the central pattern to present.""")
 
     size_surround=param.Number(default=1.0,bounds=(0,None),doc="""
@@ -1248,11 +1248,11 @@ class measure_orientation_contrast(UnitCurveCommand):
     
     contrastsurround=param.Number(default=80,bounds=(0,100),doc=""" """)
     
-    x_axis = param.String(default='contrastcentre',constant=True)
+    x_axis = param.String(default='contrastcenter',constant=True)
 
     units = param.String(default=" rad")
 
-    static_parameters = param.List(default=["x","y","size_centre","size_surround","orientationcentre","contrastsurround","thickness"])
+    static_parameters = param.List(default=["x","y","size_center","size_surround","orientationcenter","contrastsurround","thickness"])
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
@@ -1261,7 +1261,7 @@ class measure_orientation_contrast(UnitCurveCommand):
 
         for coord in p.coords:
             orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
-            self.orientationcentre=orientation
+            self.orientationcenter=orientation
             self.curve_parameters=[{"orientationsurround":orientation+ro} for ro in self.relative_orientations]
             
             self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
@@ -1272,13 +1272,13 @@ class measure_orientation_contrast(UnitCurveCommand):
     def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
                 Feature(name="frequency",values=p.frequencies),
-                Feature(name="contrastcentre",values=p.contrasts,cyclic=False)]
+                Feature(name="contrastcenter",values=p.contrasts,cyclic=False)]
 
 
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
-                 doc='Measure the response of one unit to a centre and surround sine grating disk.',
+                 doc='Measure the response of one unit to a center and surround sine grating disk.',
                  update_command=[measure_orientation_contrast.instance()],
-                 plot_command=[tuning_curve.instance(x_axis="contrastcentre",unit="%")],
+                 plot_command=[tuning_curve.instance(x_axis="contrastcenter",unit="%")],
                  prerequisites=['OrientationPreference','XPreference'])        
 
 

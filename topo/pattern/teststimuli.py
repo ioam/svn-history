@@ -177,26 +177,26 @@ class SineGratingRing(PatternGenerator):
 class OrientationContrastPattern(SineGratingRing):
     """A sine grating ring and a disk with parameters (orientation, size, scale and offset) which can be changed independantly"""
  
-    orientationcentre= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    orientationcenter= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                precedence=0.50, doc="Frequency of the sine grating.")
 
     orientationsurround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
 
-    size_centre= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    size_center= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                precedence=0.50, doc="Frequency of the sine grating.")
 
     size_surround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
 
-    scalecentre= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    scalecenter= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                precedence=0.50, doc="Frequency of the sine grating.")
 
     scalesurround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
 
 
-    offsetcentre= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    offsetcenter= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                precedence=0.50, doc="Frequency of the sine grating.")
 
     offsetsurround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
@@ -211,21 +211,21 @@ class OrientationContrastPattern(SineGratingRing):
         y=params['y']
         scalesurround=params['scalesurround']
         offsetsurround=params['offsetsurround']
-        scalecentre=params['scalecentre']
-        offsetcentre=params['offsetcentre']
+        scalecenter=params['scalecenter']
+        offsetcenter=params['offsetcenter']
         size=params['size']
         phase=params['phase']
         frequency=params['frequency']
         aspect_ratio=params['aspect_ratio']
         smoothing=params['smoothing']
         thickness=params['thickness']
-        orientationcentre=params['orientationcentre']
+        orientationcenter=params['orientationcenter']
         orientationsurround=params['orientationsurround']
-        size_centre=params['size_centre']
+        size_center=params['size_center']
         size_surround=params['size_surround']
       
-        input_1=SineGratingDisk(phase=phase, frequency=frequency,orientation=orientationcentre, scale=scalecentre, offset=offsetcentre,
-                                aspect_ratio=aspect_ratio,smoothing=0.0,x=x, y=y,size=size_centre)
+        input_1=SineGratingDisk(phase=phase, frequency=frequency,orientation=orientationcenter, scale=scalecenter, offset=offsetcenter,
+                                aspect_ratio=aspect_ratio,smoothing=0.0,x=x, y=y,size=size_center)
         input_2=SineGratingRing(phase=phase, frequency=frequency, orientation=orientationsurround, scale=scalesurround, offset=offsetsurround,
                                 thickness=thickness,aspect_ratio=aspect_ratio,smoothing=0.0,x=x, y=y, size=size_surround)
         

@@ -49,22 +49,22 @@ if species=="cat":
     #LGN RF sizes
     #Using magnification factor in um/deg
     mag_factor=locals().get('mag_factor',667)
-    #LGN centre size in deg
-    centre_size=locals().get('centre_size',0.515)
+    #LGN center size in deg
+    center_size=locals().get('center_size',0.515)
     #Total Retina size in degrees
     ret_deg_size=patches*330/mag_factor
-    #LGN centre size in sheet coordinates
-    centre_size_sc=centre_size*mag_factor/330
+    #LGN center size in sheet coordinates
+    center_size_sc=center_size*mag_factor/330
     
 
     #retina (average of 10deg from ac) is approx 1.48x1.48 deg 
     #assuming that we are in central 20deg - average X cell diameter = 0.515 deg
 
-    centerg   = Gaussian(size=centre_size_sc,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
-    surroundg = Gaussian(size=centre_size_sc*4,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+    centerg   = Gaussian(size=center_size_sc,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+    surroundg = Gaussian(size=center_size_sc*4,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
     #Receptive field sizes (radii)
-    Afferent_size=centre_size_sc*2 #to account for full surround
+    Afferent_size=center_size_sc*2 #to account for full surround
     LGNAfferent_size=locals().get('LGNAfferent_size',1.5) #500um #990diameter
     Lat_inh_size=locals().get('Lat_inh_size',1.5) #should be 2mm but too big to include - made full extent of V1 area
     Lat_exc_size=locals().get('Lat_exc_size',0.23) #approx 150um diameter
@@ -92,7 +92,7 @@ if species=="cat":
     #Type of input
     dataset=locals().get('dataset',"Natural")
 
-    gauss_size=locals().get('gauss_size',centre_size_sc) 
+    gauss_size=locals().get('gauss_size',center_size_sc) 
     nat_size=locals().get('nat_size', Retina_size/5) 
     aspect_ratio=locals().get('aspect_ratio',4)
     num_inputs=locals().get('num_inputs',2)
@@ -115,17 +115,17 @@ if species=="mouse":
     #LGN RF sizes
     #Using magnification factor in um/deg
     mag_factor=locals().get('mag_factor',15.0)
-    #LGN centre size in deg
-    centre_size=locals().get('centre_size',6.0)
+    #LGN center size in deg
+    center_size=locals().get('center_size',6.0)
     surround_size=locals().get('surround_size',17.0)
     #Total Retina size in degrees
     ret_deg_size=patches*330/mag_factor
-    #LGN centre size in sheet coordinates
-    centre_size_sc=centre_size*mag_factor/330
+    #LGN center size in sheet coordinates
+    center_size_sc=center_size*mag_factor/330
     surround_size_sc=surround_size*mag_factor/330
     
    
-    centerg   = Gaussian(size=centre_size_sc,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+    centerg   = Gaussian(size=center_size_sc,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
     surroundg = Gaussian(size=surround_size_sc,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
     #Receptive field sizes (radii)
@@ -156,7 +156,7 @@ if species=="mouse":
     #Type of input
     dataset=locals().get('dataset',"Natural")
 
-    gauss_size=locals().get('gauss_size',centre_size_sc) 
+    gauss_size=locals().get('gauss_size',center_size_sc) 
     nat_size=locals().get('nat_size', Retina_size/5)
     aspect_ratio=locals().get('aspect_ratio',4)
     num_inputs=locals().get('num_inputs',1)

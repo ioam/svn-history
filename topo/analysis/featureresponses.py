@@ -645,7 +645,7 @@ class PatternPresenter(param.Parameterized):
 
 
         if features_values.has_key('retinotopy'):
-            #Calculates coordinates of the centre of each SineGratingRectangle to be presented 
+            #Calculates coordinates of the center of each SineGratingRectangle to be presented 
             coordinate_x=[]
             coordinate_y=[]
             coordinates=[]
@@ -725,11 +725,11 @@ class PatternPresenter(param.Parameterized):
                     self.warning('Skipping input region %s; Ocularity is defined only for Left and Right retinas.' %
                                  name)
 
-        if features_values.has_key("contrastcentre")or param_dict.has_key("contrastcentre"):
+        if features_values.has_key("contrastcenter")or param_dict.has_key("contrastcenter"):
             if self.contrast_parameter=='michelson_contrast':
                 for g in inputs.itervalues():
-                    g.offsetcentre=0.5
-                    g.scalecentre=2*g.offsetcentre*g.contrastcentre/100.0
+                    g.offsetcenter=0.5
+                    g.scalecenter=2*g.offsetcenter*g.contrastcenter/100.0
 
             
 	
@@ -739,14 +739,14 @@ class PatternPresenter(param.Parameterized):
                 # to the target offset in the pattern type
                 # SineGratingDisk
                 for g in inputs.itervalues():
-                    g.offsetcentre=0.5   #In this case this is the offset of both the background and the sine grating
-                    g.scalecentre=2*g.offsetcentre*g.contrastcentre/100.0
+                    g.offsetcenter=0.5   #In this case this is the offset of both the background and the sine grating
+                    g.scalecenter=2*g.offsetcenter*g.contrastcenter/100.0
             
                 
             elif self.contrast_parameter=='scale':
                 for g in inputs.itervalues():
-                    g.offsetcentre=0.0
-                    g.scalecentre=g.contrastcentre
+                    g.offsetcenter=0.0
+                    g.scalecenter=g.contrastcenter
 
 
 
