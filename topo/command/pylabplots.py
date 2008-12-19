@@ -48,7 +48,7 @@ from topo.plotting.plot import make_template_plot, Plot
 from topo import param
 from topo.param import ParameterizedFunction
 from topo.param.parameterized import ParamOverrides
-from topo.pattern.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
+from topo.pattern.teststimuli import OrientationContrastPattern
 from topo.pattern.basic import SineGrating, Rectangle
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.base.cf import CFSheet
@@ -1114,9 +1114,9 @@ class measure_retinotopy(SinusoidalMeasureResponseCommand):
 
     divisions=param.Integer(default=4,bounds=(1,None),doc="""
         The number of different positions to measure in X and in Y.""")
-    
+
     pattern_presenter = param.Callable(
-        default=PatternPresenter(SineGratingRectangle()),doc="""
+        default=PatternPresenter(SineGrating(mask_shape=Rectangle(),size=0.5)),doc="""
         Callable object that will present a parameter-controlled
         pattern to a set of Sheets.  For measuring position, the
         pattern_presenter should be spatially localized, yet also able
