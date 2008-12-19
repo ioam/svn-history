@@ -180,6 +180,47 @@ class Ring(PatternGenerator):
                     params['thickness'],params['smoothing'])
     
 
+class OrientationContrast(SineGrating):
+    """
+    Circular pattern for testing responses to differences in contrast.
+
+    The pattern contains a sine grating ring surrounding a sine grating disk, each
+    with parameters (orientation, size, scale and offset) that can be
+    changed independently.
+    """
+ 
+    orientationcenter   = param.Number(default=0.0,bounds=(0.0,2*pi), doc="Orientation of the center grating.")
+    orientationsurround = param.Number(default=0.0,bounds=(0.0,2*pi), doc="Orientation of the surround grating.")
+    sizecenter     = param.Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,10.0), doc="Size of the center grating.")
+    sizesurround   = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0), doc="Size of the surround grating.")
+    scalecenter    = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0), doc="Scale of the center grating.")
+    scalesurround  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0), doc="Scale of the surround grating.")
+    offsetcenter   = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,10.0), doc="Offset of the center grating.")
+    offsetsurround = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,10.0), doc="Offset of the surround grating.")
+    smoothing      = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,0.5),  doc="Width of the Gaussian fall-off inside and outside the ring.")
+    thickness      = param.Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),doc="Thickness (line width) of the ring.")
+    aspect_ratio   = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),  doc="Ratio of width to height; size*aspect_ratio gives the overall width.")
+    size           = param.Number(default=0.5)
+
+    def __call__(self,**params):
+        p = ParamOverrides(self,params)
+      
+        input_1=SineGrating(mask_shape=Disk(smoothing=0),phase=p.phase, frequency=p.frequency,
+                            orientation=p.orientationcenter,
+                            scale=p.scalecenter, offset=p.offsetcenter,
+                            aspect_ratio=p.aspect_ratio,smoothing=0.0,x=p.x, y=p.y,size=p.sizecenter)
+        input_2=SineGrating(mask_shape=Ring(smoothing=0),phase=p.phase, frequency=p.frequency,
+                            orientation=p.orientationsurrounfd, scale=p.scalesurround, offset=p.offsetsurround,
+                            thickness=p.thickness,aspect_ratio=p.aspect_ratio,smoothing=0.0,x=p.x, y=p.y, size=p.sizesurround)
+        
+        patterns = [input_1(xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds),
+                    input_2(xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds)]
+                      
+        image_array = numpy.add.reduce(patterns)
+        return image_array
+
+
+
 class Rectangle(PatternGenerator):
     """2D rectangle pattern generator."""
     
@@ -198,7 +239,7 @@ class Rectangle(PatternGenerator):
         return bitwise_and(abs(self.pattern_x)<=width/2.0,
                            abs(self.pattern_y)<=height/2.0)
 
-
+#JABALERT: Can't this be replaced with a Composite?
 class TwoRectangles(Rectangle):
     """Two 2D rectangle pattern generator."""
 

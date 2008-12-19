@@ -34,8 +34,7 @@ from topo.command.basic import pattern_present,restore_input_generators, save_in
 from topo.command.basic import wipe_out_activity, clear_event_queue
 from topo.misc.distribution import Distribution
 from topo.misc.util import cross_product, frange
-from topo.pattern.basic import SineGrating, Gaussian, Rectangle, Disk
-from topo.pattern.teststimuli import OrientationContrastPattern
+from topo.pattern.basic import SineGrating, Gaussian, Rectangle, Disk, OrientationContrast
 from topo.plotting.plotgroup import plotgroups,default_input_sheet,default_measureable_sheet
 from topo.sheet import GeneratorSheet
 

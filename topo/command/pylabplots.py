@@ -48,8 +48,7 @@ from topo.plotting.plot import make_template_plot, Plot
 from topo import param
 from topo.param import ParameterizedFunction
 from topo.param.parameterized import ParamOverrides
-from topo.pattern.teststimuli import OrientationContrastPattern
-from topo.pattern.basic import SineGrating, Rectangle
+from topo.pattern.basic import SineGrating, Rectangle, OrientationContrast
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.base.cf import CFSheet
 
@@ -1227,32 +1226,31 @@ class measure_orientation_contrast(UnitCurveCommand):
     """
 
     pattern_presenter = param.Callable(
-        default=PatternPresenter(pattern_generator=OrientationContrastPattern(),
+        default=PatternPresenter(pattern_generator=OrientationContrast(),
                                  contrast_parameter="weber_contrast"))
 
     size=None # Disabled unused parameter
     # Maybe instead of the below, use size and some relative parameter, to allow easy scaling?
 
-    # ALERT: Rename to center.
-    size_center=param.Number(default=0.5,bounds=(0,None),doc="""
+    sizecenter=param.Number(default=0.5,bounds=(0,None),doc="""
         The size of the central pattern to present.""")
 
-    size_surround=param.Number(default=1.0,bounds=(0,None),doc="""
+    sizesurround=param.Number(default=1.0,bounds=(0,None),doc="""
         The size of the surround pattern to present.""")
 
     contrasts = param.List(class_=int,default=[10,20,30,40,50,60,70,80,90,100])
 
     relative_orientations = param.List(class_=float,default=[0.0, pi/2])
 
-    thickness=param.Number(default=0.5,bounds=(0,None),softbounds=(0,1.5),doc=""" """)
+    thickness=param.Number(default=0.5,bounds=(0,None),softbounds=(0,1.5),doc="""Ring thickness.""")
     
-    contrastsurround=param.Number(default=80,bounds=(0,100),doc=""" """)
+    contrastsurround=param.Number(default=80,bounds=(0,100),doc="""Contrast of the surround.""")
     
     x_axis = param.String(default='contrastcenter',constant=True)
 
     units = param.String(default=" rad")
 
-    static_parameters = param.List(default=["x","y","size_center","size_surround","orientationcenter","contrastsurround","thickness"])
+    static_parameters = param.List(default=["x","y","sizecenter","sizesurround","orientationcenter","contrastsurround","thickness"])
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
