@@ -210,7 +210,7 @@ class OrientationContrast(SineGrating):
                             scale=p.scalecenter, offset=p.offsetcenter,
                             aspect_ratio=p.aspect_ratio,smoothing=0.0,x=p.x, y=p.y,size=p.sizecenter)
         input_2=SineGrating(mask_shape=Ring(smoothing=0),phase=p.phase, frequency=p.frequency,
-                            orientation=p.orientationsurrounfd, scale=p.scalesurround, offset=p.offsetsurround,
+                            orientation=p.orientationsurround, scale=p.scalesurround, offset=p.offsetsurround,
                             thickness=p.thickness,aspect_ratio=p.aspect_ratio,smoothing=0.0,x=p.x, y=p.y, size=p.sizesurround)
         
         patterns = [input_1(xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds),
