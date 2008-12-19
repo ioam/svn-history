@@ -130,8 +130,9 @@ class PatternGenerator(param.Parameterized):
         #   x,y = position
 
         self.__setup_xy(p.bounds,p.xdensity,p.ydensity,p.x,p.y,p.orientation)
-        result = p.scale*self.function(p)+p.offset
-        self._apply_mask(p,result)
+        fn_result = self.function(p)
+        self._apply_mask(p,fn_result)
+        result = p.scale*fn_result+p.offset
             
         # Optimization (not clear that is helps; does make small (-0.5s out of 75s)
         # difference to startup time of lissom_oo_or)
