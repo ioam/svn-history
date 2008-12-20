@@ -1897,11 +1897,13 @@ class DoNothingTranslator(Translator):
     def object2string(self,object_):
         return object_
 
-# seems to be necessary after switching to tk 8.5
-# need to check it's really necessary
+
 class BoolTranslator(DoNothingTranslator):
     def string2object(self,string_):
-        return bool(string_)
+        if string_=='None':
+            return None
+        else:
+            return bool(string_)
 
 
 # Error messages: need to change how they're reported
