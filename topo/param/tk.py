@@ -1907,6 +1907,7 @@ class BoolTranslator(DoNothingTranslator):
 # Error messages: need to change how they're reported
 
 
+from parameterized import script_repr
 
 class Eval_ReprTranslator(Translator):
     """
@@ -1942,12 +1943,12 @@ class Eval_ReprTranslator(Translator):
         self.last_string2object_failed=False
         return self.last_object
 
-        
+
     def object2string(self,object_):
         if object_==self.last_object:
             return self.last_string
         else:
-            string_ = repr(object_)
+            string_=script_repr(object_,[],"",[])
             self.last_object = object_
             self.last_string = string_
             return string_
