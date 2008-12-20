@@ -2053,6 +2053,8 @@ class ParametersFrame(TkParameterized,T.Frame):
 
     display_threshold = Number(default=0,precedence=-10,doc="Parameters with precedence below this value are not displayed.")
 
+    show_labels = Boolean(default=True)
+
     def __init__(self,master,parameterized_object=None,on_change=None,
                  on_modify=None,msg_handler=None,**params):
         """
@@ -2248,11 +2250,11 @@ class ParametersFrame(TkParameterized,T.Frame):
             if help_text is not None:
                 help_text+="\n\nDefault: %s"%self._object2string(parameter_name,param_obj.default,replace=False)
         
+        if self.show_labels:
+            label.grid(row=row,column=0,
+                       padx=2,pady=2,sticky=T.E)
 
-        label.grid(row=row,column=0,
-                   padx=2,pady=2,sticky=T.E)
-
-        self.balloon.bind(label, help_text)
+            self.balloon.bind(label, help_text)
 
         # We want widgets to stretch to both sides...
         posn=T.E+T.W
