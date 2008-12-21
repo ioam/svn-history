@@ -489,6 +489,26 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
             self.redraw_plots()
 
 
+    ### JABALERT: Can we make it simpler to make plots be put onto multiple lines?
+    # (because this is just the smallest change I cpuld think of to
+    # support row precedence, without altering the existing code!)
+    def _determine_layout_of_plots(self,plots):
+        """Calculate self._rows and self._cols, together giving the grid position of each plot."""
+        distinct_precedences = sorted(set([p.row_precedence for p in plots]))
+
+        # 2*i because labels will occupy odd rows
+        precedence2row = dict([ (precedence,2*i)
+                                for precedence,i in zip(distinct_precedences,
+                                                        range(len(distinct_precedences)))])
+        # CB: a 2d array might have been clearer...
+        self._rows = [precedence2row[p.row_precedence] for p in plots]
+        self._cols = []
+        
+        row_counts = dict([(row,0) for row in self._rows])        
+        for row in self._rows:
+            self._cols.append(row_counts[row])
+            row_counts[row]+=1
+
 
     # CEBALERT: this method needs cleaning, along with its versions in subclasses.
     def display_plots(self):
@@ -497,8 +517,8 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
-        ### JABALERT: Can we make it simple to make plots be put onto multiple lines here?
 	plots = self.plotgroup.plots
+        self._determine_layout_of_plots(plots)
         
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
 
@@ -536,7 +556,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
                                     image.height()/2+BORDERWIDTH+1,
                                     image=image)
                 canvas.config(highlightthickness=0,borderwidth=0,relief=FLAT)
-                canvas.grid(row=0,column=i,padx=5)
+                canvas.grid(row=self._rows[i],column=self._cols[i],padx=5)
 
                 
             for c in old_canvases:
@@ -549,7 +569,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
                                       self.zoomed_images,self.canvases):
                 canvas.create_image(image.width()/2+BORDERWIDTH+1,
                                     image.height()/2+BORDERWIDTH+1,image=image)
-                canvas.grid(row=0,column=i,padx=5)
+                canvas.grid(row=self._rows[i],column=self._cols[i],padx=5)
 
 
                 
@@ -599,7 +619,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
             self.plot_labels = [Label(self.plot_container,text=each)
 				 for each in self.plotgroup.labels]
             for i in range(len(self.plot_labels)):
-                self.plot_labels[i].grid(row=1,column=i,sticky=NSEW)
+                self.plot_labels[i].grid(row=self._rows[i]+1,column=self._cols[i],sticky=NSEW)
             for l in old_labels:
                 l.grid_forget()
             self._num_labels = len(self.canvases)
