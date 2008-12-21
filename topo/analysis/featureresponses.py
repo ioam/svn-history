@@ -603,7 +603,6 @@ class PatternPresenter(param.Parameterized):
             #### new motion model ####
                 from topo.pattern import Translator
                 for name in inputs:
-                    setattr(inputs[name],'orientation',0.0) # CBALERT! Do I need to reset this?
                     inputs[name] = Translator(generator=inputs[name],
                                               direction=features_values['direction'],
                                               speed=features_values['speed'],
