@@ -487,6 +487,17 @@ for e in eyes:
  
 topo.sim.grid_layout([vs,ls,es], xstep=70/len(eyes), ystep=200, item_scale=0.75/len(eyes))
 
+### Vertical grouping of sheets for GUI
+for e in eyes:
+    for n in lags:
+        for cone in cone_types:
+            topo.sim[e+cone+'Retina'+n].row_precedence=0.1
+        for l,pol_precedence in zip(center_polarities,range(len(center_polarities))):
+            for opponent in opponent_types:
+                topo.sim[e+opponent+'LGN'+l+n].row_precedence=0.35+0.01*pol_precedence
+            for channel in xrange(2,sf_channels+1):
+                topo.sim[e+'LGN'+l+n+'SF'+str(channel)].row_predecence=0.35+0.01*pol_precedence
+topo.sim['V1'].row_precedence=0.9    
 
 ### Set up appropriate defaults for analysis
 import topo.command
