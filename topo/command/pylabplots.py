@@ -892,10 +892,10 @@ class measure_cog(ParameterizedFunction):
                 ypref[r][c]= ycentroid
             
                 sheet.sheet_views['XCoG']=SheetView((xpref,sheet.bounds), sheet.name,
-                                                    sheet.precedence,topo.sim.time())
+                                                    sheet.precedence,topo.sim.time(),sheet.row_precedence)
                 
                 sheet.sheet_views['YCoG']=SheetView((ypref,sheet.bounds), sheet.name,
-                                                    sheet.precedence,topo.sim.time())
+                                                    sheet.precedence,topo.sim.time(),sheet.row_precedence)
 
 
 pg= create_plotgroup(name='Center of Gravity',category="Preference Maps",

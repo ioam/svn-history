@@ -309,7 +309,7 @@ class ReverseCorrelation(FeatureResponses):
             for ii in range(rows):
                 for jj in range(cols):
                     view = SheetView((self._featureresponses[sheet][ii,jj],input_bounds),
-                                     sheet.name,sheet.precedence,topo.sim.time())
+                                     sheet.name,sheet.precedence,topo.sim.time(),sheet.row_precedence)
                     x,y = sheet.matrixidx2sheet(ii,jj)
                     key = ('RFs',sheet.name,x,y)
                     input_sheet_views[key]=view
@@ -416,11 +416,11 @@ class FeatureMaps(FeatureResponses):
                 if weighted_average:
                     preference_map = SheetView(
                         ((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
-                         bounding_box), sheet.name, sheet.precedence, topo.sim.time())
+                         bounding_box), sheet.name, sheet.precedence, topo.sim.time(),sheet.row_precedence)
                 else:
                     preference_map = SheetView(
                         ((self._featureresponses[sheet][feature].max_value_bin())/norm_factor,
-                         bounding_box), sheet.name, sheet.precedence, topo.sim.time())
+                         bounding_box), sheet.name, sheet.precedence, topo.sim.time(),sheet.row_precedence)
 
                 preference_map.cyclic = cyclic
                 preference_map.norm_factor = norm_factor
@@ -429,7 +429,7 @@ class FeatureMaps(FeatureResponses):
                 
                 selectivity_map = SheetView((self.selectivity_multiplier*
                                              self._featureresponses[sheet][feature].selectivity(),
-                                             bounding_box), sheet.name , sheet.precedence, topo.sim.time())
+                                             bounding_box), sheet.name , sheet.precedence, topo.sim.time(),sheet.row_precedence)
                 sheet.sheet_views[feature.capitalize()+'Selectivity']=selectivity_map
 
                 
@@ -477,7 +477,7 @@ class FeatureCurves(FeatureResponses):
             for i in range(rows):
                 for j in range(cols):
                     y_axis_values[i,j] = self._featureresponses[self.sheet][self.x_axis].distribution_matrix[i,j].get_value(key)
-            Response = SheetView((y_axis_values,bounding_box), self.sheet.name , self.sheet.precedence, topo.sim.time())
+            Response = SheetView((y_axis_values,bounding_box), self.sheet.name , self.sheet.precedence, topo.sim.time(),self.sheet.row_precedence)
             self.sheet.curve_dict[self.x_axis][curve_label].update({key:Response})
 
 

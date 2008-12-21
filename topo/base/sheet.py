@@ -78,6 +78,10 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
     precedence = param.Number(default = 0.1, softbounds=(0.0,1.0),doc="""
             Allows a sorting order for Sheets, e.g. in the GUI.""")
 
+    row_precedence = param.Number(default = 0.5, softbounds=(0.0,1.0),doc="""
+            Allows grouping of Sheets before sorting precedence is
+            applied, e.g. for two-dimensional plots in the GUI.""")
+
     layout_location = param.NumericTuple(default = (-1,-1),precedence=-1,doc="""
             Location for this Sheet in an arbitrary pixel-based space
             in which Sheets can be laid out for visualization.""")

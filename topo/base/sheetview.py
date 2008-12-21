@@ -62,7 +62,7 @@ class SheetView(param.Parameterized):
     ### JCALERT! term_1 and term_2 should be more explicit...
     ### the 3 cases described in the doc, are they really useful?
     ### shouldn't it be simplified?
-    def __init__(self, (term_1, term_2), src_name=None, precedence = 0.0, timestamp = -1, **params):
+    def __init__(self, (term_1, term_2), src_name=None, precedence = 0.0, timestamp = -1, row_precedence = 0.0, **params):
         """
         For ``__init__(self, input_tuple, **params)``, there are three
         types of input_tuples::
@@ -98,6 +98,7 @@ class SheetView(param.Parameterized):
 
 	self.src_name = src_name
 	self.precedence = precedence
+        self.row_precedence = row_precedence
 	self.timestamp = timestamp
         
         # Assume there's no such thing as an operator that can be mistaken
@@ -182,7 +183,7 @@ class UnitView(SheetView):
         """
         Subclass of SheetView.  Contains additional x,y member data.
         """
-        super(UnitView,self).__init__(term_tuple, projection.src.name, projection.src.precedence, timestamp = timestamp, **params)
+        super(UnitView,self).__init__(term_tuple, projection.src.name, projection.src.precedence, timestamp = timestamp, row_precedence = projection.src.row_precedence, **params)
         self.x = x
         self.y = y
         self.projection = projection
@@ -198,7 +199,7 @@ class ProjectionView(SheetView):
         """
         Subclass of SheetView. 
         """
-	super(ProjectionView,self).__init__(term_tuple, projection.src.name, projection.src.precedence, timestamp, **params)
+	super(ProjectionView,self).__init__(term_tuple, projection.src.name, projection.src.precedence, timestamp, row_precedence = projection.src.row_precedence, **params)
 	self.projection = projection
 
 

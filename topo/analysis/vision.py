@@ -184,7 +184,7 @@ def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename
     for sheet in measured_sheets:   
         complx = array(complexity(full_matrix[sheet]))
         # Should this be renamed to ModulationRatio?
-        sheet.sheet_views['ComplexSelectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
+        sheet.sheet_views['ComplexSelectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time(),sheet.row_precedence)
 
     topo.command.pylabplots.plot_modulation_ratio(full_matrix,simple_sheet_name=simple_sheet_name,complex_sheet_name=complex_sheet_name,filename=filename)
 

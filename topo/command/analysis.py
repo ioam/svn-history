@@ -206,7 +206,7 @@ def update_activity():
     for sheet in topo.sim.objects(Sheet).values():
         activity_copy = array(sheet.activity)
         new_view = SheetView((activity_copy,sheet.bounds),
-                              sheet.name,sheet.precedence,topo.sim.time())
+                              sheet.name,sheet.precedence,topo.sim.time(),sheet.row_precedence)
         sheet.sheet_views['Activity']=new_view
 
 
