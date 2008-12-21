@@ -216,6 +216,26 @@ pg = create_plotgroup(name='Activity',category='Basic',
 pg.add_plot('Activity',[('Strength','Activity')])
 
 
+def update_rgb_activities():
+    """
+    Make available Red, Green, and Blue activity matrices for all appropriate sheets.
+    """
+    for sheet in topo.sim.objects(Sheet).values():
+        for c in ['Red','Green','Blue']:
+            # should this ensure all of r,g,b are present? 
+            if hasattr(sheet,'_%sact'%c.lower()): # CB: _redact etc will be renamed
+                activity_copy = getattr(sheet,'_%sact'%c.lower()).copy()
+                new_view = SheetView((activity_copy,sheet.bounds),
+                                     sheet.name,sheet.precedence,topo.sim.time(),sheet.row_precedence)
+                sheet.sheet_views['%sActivity'%c]=new_view
+            
+
+pg = create_plotgroup(name='RGB',category='Other',
+             doc='Combine and plot the red, green, and blue activity for all appropriate Sheets.', auto_refresh=True,
+             update_command=[update_rgb_activities], plot_immediately=True)
+pg.add_plot('RGB',[('Red','RedActivity'),('Green','GreenActivity'),('Blue','BlueActivity')])
+
+
 
 class update_connectionfields(UnitMeasurementCommand):
     """A callable Parameterized command for measuring or plotting a unit from a Projection."""
