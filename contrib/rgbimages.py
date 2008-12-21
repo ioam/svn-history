@@ -124,12 +124,16 @@ class ColorImage(FileImage):
 
 
 ############################################################
+import glob
+image_filenames = glob.glob('/disk/scratch/mcgill/foilage/*.tif') # sic
+images = [ColorImage(filename=f) for f in image_filenames]
+
 from topo import sheet
 
 cone_types = ['Red','Green','Blue']
 
 topo.sim['P']=ColorImageSheet()
-topo.sim['P'].input_generator.generators=[ColorImage(filename='sc.jpg')]
+topo.sim['P'].input_generator.generators=images
 
 for c in cone_types:
     topo.sim[c]=sheet.ActivityCopy()
