@@ -206,9 +206,6 @@ pil: ${PIL}.tgz jpeg python
 ifeq ("$(shell uname -m)","x86_64")
 #       # Tell 64-bit Linux machines where to find zlib, to prevent "encoder zip not available" problems
 	cd ${PIL}; patch < ../Imaging.diff
-else ifeq ("$(shell uname -s)","Darwin")
-#       # Tell OS X machines where to find freetype
-	patch -p0 < Imaging_OSX.diff
 endif
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
