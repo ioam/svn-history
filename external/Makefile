@@ -922,6 +922,24 @@ readline-clean:
 	rm -rf ${READLINE} 
 readline-uninstall:
 	rm -rf readline $(foreach f, ${READLINE_UNINSTALL}, ${PREFIX}/${f})
+
+
+#############################################################
+# CYTHON
+CYTHON = Cython-0.9.8.1.1
+
+CYTHON_UNINSTALL += ${PYTHON_LIB}/site-packages/Cython*
+CYTHON_UNINSTALL += ${PYTHON_LIB}/site-packages/pyximport
+
+cython: ${CYTHON}.tar.gz
+	tar -xzf ${CYTHON}.tar.gz
+	cd ${CYTHON}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	touch cython
+
+cython-clean: 
+	rm -rf ${CYTHON} 
+cython-uninstall:
+	rm -rf cython $(foreach f, ${CYTHON_UNINSTALL}, ${PREFIX}/${f})
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
