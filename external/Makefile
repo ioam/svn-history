@@ -930,6 +930,7 @@ CYTHON = Cython-0.9.8.1.1
 
 CYTHON_UNINSTALL += ${PYTHON_LIB}/site-packages/Cython*
 CYTHON_UNINSTALL += ${PYTHON_LIB}/site-packages/pyximport
+CYTHON_UNINSTALL += bin/cython
 
 cython: ${CYTHON}.tar.gz
 	tar -xzf ${CYTHON}.tar.gz
@@ -940,6 +941,24 @@ cython-clean:
 	rm -rf ${CYTHON} 
 cython-uninstall:
 	rm -rf cython $(foreach f, ${CYTHON_UNINSTALL}, ${PREFIX}/${f})
+
+
+#############################################################
+# LINE_PROFILER
+LINE_PROFILER = line_profiler-582df342463a
+
+LINE_PROFILER_UNINSTALL += ${PYTHON_LIB}/site-packages/line_profiler*
+LINE_PROFILER_UNINSTALL += bin/kernprof.py
+
+line_profiler: ${LINE_PROFILER}.tar.gz cython
+	tar -xzf ${LINE_PROFILER}.tar.gz
+	cd ${LINE_PROFILER}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	touch line_profiler
+
+line_profiler-clean: 
+	rm -rf ${LINE_PROFILER} 
+line_profiler-uninstall:
+	rm -rf line_profiler $(foreach f, ${LINE_PROFILER_UNINSTALL}, ${PREFIX}/${f})
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
