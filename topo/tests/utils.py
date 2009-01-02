@@ -47,3 +47,20 @@ def new_simulation(name=None,register=True):
     sim.connect('GS2','S2',connection_type=CFProjection,delay=0.05)
     return sim
 
+
+
+class Series(object):
+    
+    def __init__(self,start=0,step=1):
+        self.value = start
+        self.step = step
+        self.generator=self._generate()
+
+    def _generate(self):
+        while True:
+            yield self.value
+            self.value+=self.step
+
+    def __call__(self):
+        return self.generator.next()
+
