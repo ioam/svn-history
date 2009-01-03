@@ -1104,14 +1104,21 @@ class Parameterized(object):
         parameters.
 
         Constant Parameters can be set during calls to this method.
-        """
-        # Deepcopy all 'instantiate=True' parameters
+        """        
+        ## Deepcopy all 'instantiate=True' parameters
+        # (build a set of names first to avoid redundantly instantiating
+        #  a later-overridden parent class's parameter)
+        params_to_instantiate = {}
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
                 # (avoid replacing name with the default of None)
                 if isinstance(v,Parameter) and v.instantiate and k!="name":
-                    self._instantiate_param(v)
-                                        
+                    params_to_instantiate[k]=v
+
+        for p in params_to_instantiate.values():
+            self._instantiate_param(p)
+
+        ## keyword arg setting
         for name,val in params.items():
             desc = self.__class__.get_param_descriptor(name)[0] # pylint: disable-msg=E1101
             if desc:
