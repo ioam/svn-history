@@ -112,12 +112,10 @@ class GeneratorSheet(Sheet):
 
         self.input_generator = new_ig
 
-        # CEBHACKALERT: should the bounds really be taken from the
-        # GeneratorSheet itself? What if someone wants to specify that
-        # a pattern should only be drawn in some smaller bounds?
-        # So this line should be removed, and examples files should
-        # set the bounds on the input_generators if they don't
-        # already, right?
+        # CEBALERT: replaces any bounds specified for the
+        # PatternGenerator with this sheet's own bounds. When
+        # PatternGenerators can draw patterns into supplied
+        # boundingboxes, should remove this.
         self.input_generator.bounds = self.bounds
         
         self.input_generator.xdensity = self.xdensity
