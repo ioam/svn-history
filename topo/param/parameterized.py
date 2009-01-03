@@ -589,6 +589,11 @@ class ParameterizedMetaclass(type):
         can set values for non-Parameter objects in Parameterized
         classes, and have the values inherited through the
         Parameterized hierarchy as usual.
+
+        Note that instantiate is handled differently: if there is a
+        parameter with the same name in one of the superclasses with
+        instantiate set to True, this parameter will inherit
+        instatiate=True.
         """
         # get all relevant slots (i.e. slots defined in all
         # superclasses of this parameter)
@@ -602,6 +607,14 @@ class ParameterizedMetaclass(type):
         if 'objtype' in slots:
             setattr(param,'objtype',mcs)            
             del slots['objtype'] 
+
+        # instantiate is handled specially
+        for superclass in classlist(mcs)[::-1]:
+            super_param = superclass.__dict__.get(param_name)
+            if super_param is not None and super_param.instantiate is True:
+                param.instantiate=True
+        del slots['instantiate']
+
 
         for slot in slots.keys():
             superclasses = iter(classlist(mcs)[::-1])

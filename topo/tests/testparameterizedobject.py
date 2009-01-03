@@ -30,6 +30,10 @@ class TestAbstractPO(param.Parameterized):
     __abstract = True
 
 
+class TestParamInstantiation(AnotherTestPO):
+    instPO = param.Parameter(default=AnotherTestPO(),instantiate=False)
+    
+
 class TestParameterized(unittest.TestCase):
 
     def test_constant_parameter(self):
@@ -98,6 +102,13 @@ class TestParameterized(unittest.TestCase):
         # might be expecting [1,2,3] here)
         self.assertEqual(anothertestpo.instPO.notinst,[1,7,3])
 
+
+    def test_instantiation_inheritance(self):
+        """Check that instantiate=True is always inherited (SF.net #2483932)."""
+        t = TestParamInstantiation()
+        assert t.params('instPO').instantiate is True
+        assert isinstance(t.instPO,AnotherTestPO)
+        
 
     def test_abstract_class(self):
         """Check that a class declared abstract actually shows up as abstract."""
