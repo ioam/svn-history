@@ -198,7 +198,7 @@ class InMemoryRecorder(DataRecorder):
         start,end = self.get_time_indices(name,tstart,tend)
         var = self._vars[name]
 
-        if start >= len(data):
+        if start >= len(var.data):
             # if the start index is out of bounds
             if fill_range:
                 time = times
