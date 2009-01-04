@@ -852,6 +852,19 @@ class Parameterized(object):
         self.initialized=True
 
 
+    def _add_parameter(self,param_name,param_obj):
+        """
+        Add a new Parameter object into this object's class.
+
+        Supposed to result in a Parameter equivalent to one declared
+        in the class's source code.
+        """
+        type.__setattr__(type(self),param_name,param_obj)
+        # still do inheritance, etc
+        self.__metaclass__._initialize_parameter(type(self),param_name,param_obj)
+        
+
+
     # CEBALERT: I think I've noted elsewhere the fact that we
     # sometimes have a method on Parameter that requires passing the
     # owning Parameterized instance or class, and other times we have
