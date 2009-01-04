@@ -852,17 +852,22 @@ class Parameterized(object):
         self.initialized=True
 
 
-    def _add_parameter(self,param_name,param_obj):
+    @bothmethod
+    def _add_parameter(self_or_cls,param_name,param_obj):
         """
         Add a new Parameter object into this object's class.
 
         Supposed to result in a Parameter equivalent to one declared
         in the class's source code.
         """
-        type.__setattr__(type(self),param_name,param_obj)
-        # still do inheritance, etc
-        self.__metaclass__._initialize_parameter(type(self),param_name,param_obj)
-        
+        if isinstance(self_or_cls,type):
+            cls=self_or_cls
+        else:
+            cls=type(self_or_cls)
+            
+        type.__setattr__(cls,param_name,param_obj)
+        cls.__metaclass__._initialize_parameter(cls,param_name,param_obj)
+
 
 
     # CEBALERT: I think I've noted elsewhere the fact that we
