@@ -474,7 +474,8 @@ class ParameterizedMetaclass(type):
         the class itself).
 
         Initializes all the Parameters by looking up appropriate
-        default values; see __param_inheritance().
+        default values (see __param_inheritance()) and setting
+        attrib_names (see _set_names()).
         """
         type.__init__(mcs,name,bases,dict_)
 
@@ -490,11 +491,15 @@ class ParameterizedMetaclass(type):
                       if isinstance(obj,Parameter)]
         
         for param_name,param in parameters:
-            # parameter has no way to find out the name a
-            # Parameterized class has for it
-            param._set_names(param_name) 
-            mcs.__param_inheritance(param_name,param)
+            mcs._initialize_parameter(param_name,param)
 
+
+    def _initialize_parameter(mcs,param_name,param):
+        # parameter has no way to find out the name a
+        # Parameterized class has for it
+        param._set_names(param_name) 
+        mcs.__param_inheritance(param_name,param)
+    
 
     def __is_abstract(mcs):
         """
