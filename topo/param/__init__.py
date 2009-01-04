@@ -22,7 +22,7 @@ __version__='$Revision$'
 import types
 
 from parameterized import Parameterized, Parameter, String, \
-     descendents, ParameterizedFunction
+     descendents, ParameterizedFunction, OptionalSingleton
 
 class Enumeration(Parameter):
     """
@@ -818,4 +818,32 @@ class InstanceMethodWrapper(object):
     def __call__(self,*args,**kw):
         return self.im(*args,**kw)
 
+
+# CEBALERT: set context to __main__ elsewhere
+# (e.g. topo.misc.commandline)?  If so, should rename this class and
+# the variable, probably.
+import __main__
+class MainParams(Parameterized,OptionalSingleton):
+    """A Parameterized class providing script-level parameters."""
+
+    context = __main__.__dict__
+
+    def __new__(cls,*args,**kw):
+        return OptionalSingleton.__new__(cls,True)
+
+    def add(self,**kw):
+        """
+        For each parameter_name=parameter_object specified in kw:
+        * adds the parameter_object to this object's class
+        * if there is an entry in 'context' that has the same name as the parameter,
+          sets the value of the parameter in this object to that value.
+        """        
+        for p_name,p_obj in kw.items():
+            self._add_parameter(p_name,p_obj)
+
+            if p_name in self.context:
+                #print "set %s.%s=%s"%(self.name,p_name,self.context[p_name])
+                setattr(self,p_name,self.context[p_name])
+            
+mainparams = MainParams()
 
