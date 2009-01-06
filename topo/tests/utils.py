@@ -50,7 +50,12 @@ def new_simulation(name=None,register=True):
 
 
 class Series(object):
-    
+    """
+    When called, return the next int from the series start,
+    start+step, start+step+step, ...
+
+    Used in tests that need predictable dynamic numbers.
+    """
     def __init__(self,start=0,step=1):
         self.value = start
         self.step = step
