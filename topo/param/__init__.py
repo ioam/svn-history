@@ -819,31 +819,70 @@ class InstanceMethodWrapper(object):
         return self.im(*args,**kw)
 
 
-# CEBALERT: set context to __main__ elsewhere
-# (e.g. topo.misc.commandline)?  If so, should rename this class and
-# the variable, probably.
-import __main__
 class MainParams(Parameterized,OptionalSingleton):
-    """A Parameterized class providing script-level parameters."""
+    """
+    A Parameterized class providing script-level parameters.
 
-    context = __main__.__dict__
+    global_context is used to search for pre-specified values of a
+    parameter as it is added to this object.
+
+    Optionally, values for parameters pre-specified using
+    exec_in_context() (rather than manually exec'ing in the
+    global_context); this causes the parameter name to be tracked (so
+    warnings can be issued if a parameter value is overwritten or
+    unused).
+    """
+    global_context = None
 
     def __new__(cls,*args,**kw):
         return OptionalSingleton.__new__(cls,True)
 
+    def __init__(self,global_context=None,**params):
+        self.global_context = global_context or {}
+        self.unused_names = set()
+        super(MainParams,self).__init__(**params)
+
+    def exec_in_context(self,arg):
+        """
+        exec arg in self.global_context, tracking new names and
+        warning of any replacements.
+        """
+        ## contains elaborate scheme to detect what is specified by
+        ## -s, and to warn about any replacement
+        current_ids = dict([(k,id(v)) for k,v in self.global_context.items()])
+
+        exec arg in self.global_context
+
+        for k,v in self.global_context.items():
+            if k in self.unused_names and id(v)!=current_ids[k]:
+                self.warning("Replacing previous value of '%s' with '%s'"%(k,v))
+
+        new_names = set(self.global_context.keys()).difference(set(current_ids.keys()))
+        for k in new_names:
+            self.unused_names.add(k)
+        
+    def check_for_unused_names(self):
+        """Warn about any unused names."""
+        for s in self.unused_names:
+            self.warning("'%s' is unused."%s)
+    
     def add(self,**kw):
         """
         For each parameter_name=parameter_object specified in kw:
         * adds the parameter_object to this object's class
-        * if there is an entry in 'context' that has the same name as the parameter,
-          sets the value of the parameter in this object to that value.
+        * if there is an entry in global_context that has the same name as the parameter,
+          sets the value of the parameter in this object to that value, and then removes
+          the name from global_context
         """        
         for p_name,p_obj in kw.items():
             self._add_parameter(p_name,p_obj)
+            if p_name in self.global_context:
+                setattr(self,p_name,self.global_context[p_name])
+                if p_name in self.unused_names:
+                    # i.e. remove from __main__ if it was a -s option (but not if -c)
+                    del self.global_context[p_name]  
+                    self.unused_names.remove(p_name)
+                
 
-            if p_name in self.context:
-                #print "set %s.%s=%s"%(self.name,p_name,self.context[p_name])
-                setattr(self,p_name,self.context[p_name])
-            
-mainparams = MainParams()
+mainparams=MainParams()
 
