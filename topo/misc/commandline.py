@@ -266,6 +266,20 @@ topo_parser.add_option("-c","--command",action = "callback",callback=c_action,ty
 		       help="string of arbitrary Python code to be executed in the main namespace.")
 
 
+from topo.param import mainparams
+mainparams.global_context=__main__.__dict__
+
+def s_action(option,opt_str,value,parser):
+    """Callback function for the -s option."""
+    mainparams.exec_in_context(value)
+    global something_executed
+    something_executed=True
+            
+topo_parser.add_option("-s","--set-parameter",action = "callback",callback=s_action,type="string",
+		       default=[],dest="commands",metavar="\"<command>\"",
+		       help="command specifying value(s) of script-level Parameter(s).")
+
+
 def auto_import_commands():
     """Import the contents of all files in the topo/command/ directory."""
     import re,os
@@ -368,6 +382,7 @@ def process_argv(argv):
         if not args:
             break
 
+    mainparams.check_for_unused_names()
 
     # If no scripts and no commands were given, pretend -i was given.
     if not something_executed: interactive()
