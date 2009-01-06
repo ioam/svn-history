@@ -540,3 +540,101 @@ The last couple of times I ran this vdot version, I was getting
 </pre>
 -->
 
+
+<H3>Considering optimizations with C++ (weave)</H3>
+
+<P> The existing profile function (which uses Python's inbuilt
+profiling) only reports time spent inside functions, but gives no
+information about how that time is spent. The new package gives
+information about how the time is spent inside one or two specific
+functions. So, for instance, if you have a function that does various
+operations on arrays, you can now see how long all those operations
+take relative to each other. That might allow you to identify a
+bottleneck in the function easily. (Note that before doing a
+line-by-line profile of a function, you should previously have
+identified that function as a bottleneck using the profiling function
+described earlier. Otherwise, optimizing the function will result in
+little performance gain overall.)
+
+
+The line-by-line profiling package is not yet built by default. If you
+want to build it, execute the following from your Topographica
+directory:
+<pre>$ make -C external line_profiler</pre>
+
+Then, the easiest way to use the new package is to:
+<ol>
+<li>put the following two lines into <code>~/ipy_user_conf.py</code> (in the <code>main()</code>
+function):
+<pre>
+import line_profiler
+ip.expose_magic('lprun',line_profiler.magic_lprun)
+</pre></li>
+<li>use <code>%lprun</code> from the Topographica prompt</li>
+</pre>
+</ol>
+
+<H4>Examples</H4>
+
+<P>
+To profile topo.base.cf.ConnectionField's
+_create_input_sheet_slice() method while starting the lissom.ty
+script:
+<pre>
+$ ./topographica
+topo_t000000.00_c1>>> from topo.base.cf import ConnectionField
+topo_t000000.00_c2>>> %lprun -f ConnectionField._create_input_sheet_slice execfile("examples/lissom.ty")
+</pre>
+
+<P>
+To profile calling of
+topo.outputfn.HomeoStaticMaxEnt while Topographica is running:
+<pre>
+$ ./topographica -i contrib/lesi.ty
+topo_t000000.00_c1>>> from topo.outputfn import HomeostaticMaxEnt
+topo_t000000.00_c2>>> %lprun -f HomeostaticMaxEnt.__call__ topo.sim.run(30)
+</pre>
+
+The output you get is something like this:
+
+<pre>
+Timer unit: 1e-06 s
+
+File: /disk/data1/workspace/v1cball/topographica/topo/outputfn/basic.py
+Function: __call__ at line 749
+Total time: 0.955004 s
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   749                                               def __call__(self,x):      
+   750       450        13003     28.9      1.4  	if self.first_call:
+   751         1            9      9.0      0.0              self.first_call = False
+   752         1           20     20.0      0.0              if self.a_init==None:
+   753         1          817    817.0      0.1                  self.a = self.random_generator.uniform(low=10, high=20,size=x.shape)
+   754                                                       else:
+   755                                                           self.a = ones(x.shape, x.dtype.char) * self.a_init
+   756         1           27     27.0      0.0              if self.b_init==None:
+   757         1          411    411.0      0.0                  self.b = self.random_generator.uniform(low=-8.0, high=-4.0,size=x.shape)
+   758                                                       else:
+   759                                                           self.b = ones(x.shape, x.dtype.char) * self.b_init
+   760         1          128    128.0      0.0  	    self.y_avg = zeros(x.shape, x.dtype.char) 
+   761                                           
+   762                                           	# Apply sigmoid function to x, resulting in what Triesch calls y
+   763       450        88485    196.6      9.3          x_orig = copy.copy(x)
+   764                                                  
+   765       450        24277     53.9      2.5          x *= 0.0
+   766       450       662809   1472.9     69.4          x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
+   767                                           		
+   768                                           
+   769       450         5979     13.3      0.6  	self.n_step += 1
+   770       450        34237     76.1      3.6  	if self.n_step == self.step:
+   771        30          253      8.4      0.0  	    self.n_step = 0
+   772        30          654     21.8      0.1  	    if self.plastic:                
+   773        30        19448    648.3      2.0  		self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
+   774                                           		
+   775                                           		# Update a and b
+   776        30        65652   2188.4      6.9  		self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
+   777        30        38795   1293.2      4.1  		self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
+
+
+</pre>
