@@ -429,7 +429,9 @@ from topo.param import Dict as DictParameter
         fake_a_package('sheets','sheet',['composer','generator',
                                          'lissom','optimized','saccade','slissom'])
         fake_a_package('eps','ep',['basic'])
-        fake_a_package('patterns','pattern',['basic','image','random','rds','teststimuli']) # missed audio
+        # CEBALERT: could support teststimuli (would need to look in history at what was in it)
+        #fake_a_package('patterns','pattern',['basic','image','random','rds','teststimuli']) # missed audio
+        fake_a_package('patterns','pattern',['basic','image','random','rds']) # missed audio
         fake_a_package('commands','command',['basic','analysis','pylabplots'])
 
         fake_a_package('projections','projection',['basic','optimized'])
@@ -513,12 +515,29 @@ from topo.misc.trace import *
         fake_a_module('traces',topo.misc,code)
 
         # rXXXX duplicate SineGratingDisk removed
-        import topo.pattern.basic
-        # JABALERT: Will this work for faking SineGratingDisk?
-        #class SineGratingDisk(topo.pattern.basicSineGrating):
-        #    """2D sine grating pattern generator with a circular mask."""
-        #    mask_shape = param.Parameter(default=Disk(smoothing=0))
-        #topo.pattern.basic.SineGratingDisk = SineGratingDisk
+        # CEBALERT: something's disappeared, right? Presumably
+        # support for wherever the duplicate was originally...
+        
+        from topo.pattern import SineGrating,Disk,Rectangle,Ring
+        # rXXXX removed these classes
+        class SineGratingDisk(SineGrating):
+            """2D sine grating pattern generator with a circular mask."""
+            mask_shape = param.Parameter(default=Disk(smoothing=0))
+        topo.pattern.basic.SineGratingDisk = SineGratingDisk
+
+        class SineGratingRectangle(SineGrating):
+           """2D sine grating pattern generator with a rectangular mask."""
+           mask_shape = param.Parameter(default=Rectangle())
+        topo.pattern.basic.SineGratingRectangle = SineGratingRectangle
+        
+        class SineGratingRing(SineGrating):
+           """2D sine grating pattern generator with a ring-shaped mask."""
+           mask_shape = param.Parameter(default=Ring(smoothing=0))
+        topo.pattern.basic.SineGratingRing = SineGratingRing
+
+
+
+
 
         # rXXXX homeostatic of moved into basic
         code = \
@@ -581,6 +600,16 @@ class mpq(object):
                 state['allow_None']=False
 
         preprocess_state(param.Parameter,param_add_allow_None)
+
+
+def teststimuli():
+
+    class SineGratingDisk(SineGrating):
+       """2D sine grating pattern generator with a circular mask."""
+       mask_shape = param.Parameter(default=Disk(smoothing=0))
+
+
+
 
 
 
