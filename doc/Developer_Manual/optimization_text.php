@@ -541,11 +541,12 @@ The last couple of times I ran this vdot version, I was getting
 -->
 
 
-<H3>Considering optimizations with C++ (weave)</H3>
+<H3>Line-by-line profiling</H3>
 
-<P> The existing profile function (which uses Python's inbuilt
+<P> The profile function described above (which uses Python's inbuilt
 profiling) only reports time spent inside functions, but gives no
-information about how that time is spent. The new package gives
+information about how that time is spent. There is also an optional
+line-by-line profiling package available that gives
 information about how the time is spent inside one or two specific
 functions. So, for instance, if you have a function that does various
 operations on arrays, you can now see how long all those operations
@@ -556,12 +557,13 @@ identified that function as a bottleneck using the profiling function
 described earlier. Otherwise, optimizing the function will result in
 little performance gain overall.)
 
-
+<P>
 The line-by-line profiling package is not yet built by default. If you
 want to build it, execute the following from your Topographica
 directory:
 <pre>$ make -C external line_profiler</pre>
 
+<P>
 Then, the easiest way to use the new package is to:
 <ol>
 <li>put the following two lines into <code>~/ipy_user_conf.py</code> (in the <code>main()</code>
@@ -635,6 +637,8 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    775                                           		# Update a and b
    776        30        65652   2188.4      6.9  		self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
    777        30        38795   1293.2      4.1  		self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
-
-
 </pre>
+
+<P>From this output, you can see that 69.4% of the time is spent in line
+766, which is thus the best place to start optimizing (e.g. by using a
+lookup table for the sigmoid function, in this case).
