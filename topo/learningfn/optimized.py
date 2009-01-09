@@ -8,7 +8,7 @@ $Id$
 """
 __version__ = "$Revision$"
 
-from numpy import zeros
+from numpy import zeros, ones
 
 from .. import param
 
