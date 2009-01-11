@@ -1170,3 +1170,15 @@ questions, on the MacPython mailing list.
   Be able to look at the effects of attention
   Add specific models for intrinsic or voltage-sensitive-dye imaging 
 -->
+
+
+
+<!-- Useful or potentially useful developer references for attribute access etc.
+http://www.cafepy.com/article/python_attributes_and_methods/python_attributes_and_methods.html
+
+http://mail.python.org/pipermail/python-dev/2003-May/035732.html
+
+http://www.cafepy.com/article/python_types_and_objects/
+
+http://www.cafepy.com/article/python_types_and_objects/python_types_and_objects.html
+-->
