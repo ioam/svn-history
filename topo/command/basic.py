@@ -408,8 +408,9 @@ class run_batch(ParameterizedFunction):
             prefix += "," + a + "=" + valstr
     
         # Set provided parameter values in main namespace
+        from topo.misc.commandline import global_params
         for a,val in p.extra_keywords.items():
-            __main__.__dict__[a] = val
+            global_params.exec_in_context("%s=%s"%(a,val))
     
         # Create output directories
         if not os.path.isdir(normalize_path(p['output_directory'])):
@@ -467,7 +468,8 @@ class run_batch(ParameterizedFunction):
         error_count = 0
         initial_warning_count = param.parameterized.warning_count
         try:
-            execfile(script_file,__main__.__dict__)
+            execfile(script_file,__main__.__dict__) #global_params.context
+            global_params.check_for_unused_names()
     
             topo.sim.name=simname
     
