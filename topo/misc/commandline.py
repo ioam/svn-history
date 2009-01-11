@@ -14,6 +14,7 @@ from optparse import OptionParser
 import sys, __main__, math, os, re
 
 import topo
+from topo.param.parameterized import Parameterized,OptionalSingleton
 
 matplotlib_imported=False
 try:
@@ -34,6 +35,74 @@ information about Topographica, help(commandname) for info on a
 specific command, or topo.about() for info on this release, including
 licensing information.
 """
+
+
+class GlobalParams(Parameterized,OptionalSingleton):
+    """
+    A Parameterized class providing script-level parameters.
+
+    global_context is used to search for pre-specified values of a
+    parameter as it is added to this object.
+
+    Optionally, values for parameters pre-specified using
+    exec_in_context() (rather than manually exec'ing in the
+    context); this causes the parameter name to be tracked (so
+    warnings can be issued if a parameter value is overwritten or
+    unused).
+    """
+    context = None
+
+    def __new__(cls,*args,**kw):
+        return OptionalSingleton.__new__(cls,True)
+
+    def __init__(self,context=None,**params):
+        self.context = context or {}
+        self.unused_names = set()
+        super(GlobalParams,self).__init__(**params)
+
+    def exec_in_context(self,arg):
+        """
+        exec arg in self.context, tracking new names and
+        warning of any replacements.
+        """
+        ## contains elaborate scheme to detect what is specified by
+        ## -s, and to warn about any replacement
+        current_ids = dict([(k,id(v)) for k,v in self.context.items()])
+
+        exec arg in self.context
+
+        for k,v in self.context.items():
+            if k in self.unused_names and id(v)!=current_ids[k]:
+                self.warning("Replacing previous value of '%s' with '%s'"%(k,v))
+
+        new_names = set(self.context.keys()).difference(set(current_ids.keys()))
+        for k in new_names:
+            self.unused_names.add(k)
+        
+    def check_for_unused_names(self):
+        """Warn about any unused names."""
+        for s in self.unused_names:
+            self.warning("'%s' is unused."%s)
+    
+    def add(self,**kw):
+        """
+        For each parameter_name=parameter_object specified in kw:
+        * adds the parameter_object to this object's class
+        * if there is an entry in context that has the same name as the parameter,
+          sets the value of the parameter in this object to that value, and then removes
+          the name from context
+        """        
+        for p_name,p_obj in kw.items():
+            self._add_parameter(p_name,p_obj)
+            if p_name in self.context:
+                setattr(self,p_name,self.context[p_name])
+                if p_name in self.unused_names:
+                    # i.e. remove from __main__ if it was a -s option (but not if -c)
+                    del self.context[p_name]  
+                    self.unused_names.remove(p_name)
+                
+
+global_params=GlobalParams(context=__main__.__dict__)
 
 
 
@@ -266,18 +335,16 @@ topo_parser.add_option("-c","--command",action = "callback",callback=c_action,ty
 		       help="string of arbitrary Python code to be executed in the main namespace.")
 
 
-from topo.param import mainparams
-mainparams.global_context=__main__.__dict__
 
 def s_action(option,opt_str,value,parser):
     """Callback function for the -s option."""
-    mainparams.exec_in_context(value)
+    global_params.exec_in_context(value)
     global something_executed
     something_executed=True
             
 topo_parser.add_option("-s","--set-parameter",action = "callback",callback=s_action,type="string",
 		       default=[],dest="commands",metavar="\"<command>\"",
-		       help="command specifying value(s) of script-level Parameter(s).")
+		       help="command specifying value(s) of script-level (global) Parameter(s).")
 
 
 def auto_import_commands():
@@ -382,7 +449,7 @@ def process_argv(argv):
         if not args:
             break
 
-    mainparams.check_for_unused_names()
+    global_params.check_for_unused_names()
 
     # If no scripts and no commands were given, pretend -i was given.
     if not something_executed: interactive()
