@@ -24,6 +24,14 @@ from topo.sheet.generator import GeneratorSheet
 from topo.outputfn.basic import DivisiveNormalizeL1
 from topo.misc.numbergenerator import UniformRandom
 
+from topo.misc.commandline import global_params
+global_params.add(
+    default_retina_density=param.Number(default=24,doc="""
+    Default nominal_density for the retina."""),
+
+    default_density=param.Number(default=5,doc="""
+    Default nominal_density for V1."""))
+
 
 # Same as topo.base.connectionfield.Hebbian; copied here as a template
 # for writing other LearningFns
@@ -66,9 +74,11 @@ gaussian_generator = topo.pattern.basic.Gaussian(
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
                                     nominal_bounds=BoundingBox(radius=0.6),
-                                    period=1.0,phase=0.05,nominal_density=locals().get('default_retina_density',24))
+                                    period=1.0,phase=0.05,
+                                    nominal_density=global_params.default_retina_density)
 
-topo.sim['V1'] = CFSheet(nominal_density=locals().get('default_density',5),nominal_bounds=BoundingBox(radius=0.5),
+topo.sim['V1'] = CFSheet(nominal_density=global_params.default_density,
+                         nominal_bounds=BoundingBox(radius=0.5),
                          output_fn=PiecewiseLinear(lower_bound=0,upper_bound=1.0))
 
 topo.sim.connect(
@@ -80,7 +90,3 @@ topo.sim.connect(
     learning_fn=CFPLF_Plugin(single_cf_fn=SampleHebbian(sample_param=0.5)),
     weights_output_fn=CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1()),
     learning_rate=200.0)
-
-
-    
-    
