@@ -1554,7 +1554,8 @@ class PicklableClassAttributes(object):
                     # attributes on the true class.
                     full_class_path = v.__module__+'.'+v.__name__
                     class_attributes[full_class_path] = {}
-                    # POs always have __dict__, never slots
+                    # Parameterized classes always have parameters in
+                    # __dict__, never in __slots__
                     for (name,obj) in v.__dict__.items():
                         if isinstance(obj,Parameter):
                             class_attributes[full_class_path][name] = obj
