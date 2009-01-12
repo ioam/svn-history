@@ -49,6 +49,8 @@ class GlobalParams(Parameterized,OptionalSingleton):
     context); this causes the parameter name to be tracked (so
     warnings can be issued if a parameter value is overwritten or
     unused).
+
+    Note that if this object is pickled, the context is not saved.
     """
     context = None
 
@@ -59,6 +61,14 @@ class GlobalParams(Parameterized,OptionalSingleton):
         self.context = context or {}
         self.unused_names = set()
         super(GlobalParams,self).__init__(**params)
+
+    def __getstate__(self):
+        # context is neither saved nor restored
+        # (in our current usage, the context of the GlobalParams
+        # instance will be set to __main__.__dict__ on startup).
+        state = super(GlobalParams,self).__getstate__()
+        del state['context']
+        return state
 
     def exec_in_context(self,arg):
         """
