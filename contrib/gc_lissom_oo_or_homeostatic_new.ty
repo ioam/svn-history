@@ -147,19 +147,19 @@ if tracking==True:
                 V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
             else:
                 Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'scaled_x_avg'], units=units)
-                HE=SimpleHomeoLinear(smoothing=V1_smoothing,
+                HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,
                                               eta=locals().get('eta',0.016), mu=mu)
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker]) 
         else:
             if lr_scaling==True:
                 Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['lr_sf'], units=units)
-                HE=SimpleHomeoLinear(smoothing=V1_smoothing,  
+                HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,  
                                               eta=locals().get('eta',0.016), mu=mu)
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
             else:
-                HE=SimpleHomeoLinear(smoothing=V1_smoothing, eta=locals().get('eta',0.016), mu=mu)
+                HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing, eta=locals().get('eta',0.016), mu=mu)
                 V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1']", attrib_names=['t','y_avg'], units=units, step=9)
                 V1_OF=PipelineOF(output_fns=[HE, V1_Tracker])
     else:
@@ -176,7 +176,7 @@ if tracking==True:
             V1_OF=PipelineOF(output_fns=[HE, AV, V1_Tracker])
 else:
     if triesch==True:
-        V1_OF=HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.016), mu=mu)
+        V1_OF=HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.016), mu=mu)
     else:
         V1_OF=HalfRectify()
 
