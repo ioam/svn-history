@@ -159,13 +159,15 @@ def save_snapshot(snapshot_name=None,xml=False):
     topoPOclassattrs = PicklableClassAttributes(topo,exclusions=('plotting','tests','tkgui'),
                                                 startup_commands=topo.sim.startup_commands)
 
+    from topo.misc.commandline import global_params
+
     topo.sim.RELEASE=topo.release
     topo.sim.VERSION=topo.version
 
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    to_save = (PickleMain(),topoPOclassattrs,topo.sim)
+    to_save = (PickleMain(),global_params,topoPOclassattrs,topo.sim)
 
     if not xml:
         try:
