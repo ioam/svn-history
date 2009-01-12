@@ -411,8 +411,7 @@ class run_batch(ParameterizedFunction):
     
         # Set provided parameter values in main namespace
         from topo.misc.commandline import global_params
-        for a,val in p.extra_keywords.items():
-            global_params.exec_in_context("%s=%s"%(a,val))
+        global_params.set_in_context(**p.extra_keywords)
     
         # Create output directories
         if not os.path.isdir(normalize_path(p['output_directory'])):
