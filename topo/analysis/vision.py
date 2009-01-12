@@ -105,13 +105,13 @@ def complexity(full_matrix):
 def phase_preference_scatter_plot(sheet_name,diameter=0.39):
     r = UniformRandom(seed=1023)
     preference_map = topo.sim[sheet_name].sheet_views['PhasePreference']
-    offset_magnitude = 0.01
+    offset_magnitude = 0.03
     datax = []
     datay = []
     (v,bb) = preference_map.view()
     for z in zeros(300):
-        x = r() - 0.5
-        y = r() - 0.5
+        x = (r() - 0.5)*2*diameter
+        y = (r() - 0.5)*2*diameter
         rand = r()
         xoff = sin(rand*2*pi)*offset_magnitude
         yoff = cos(rand*2*pi)*offset_magnitude
