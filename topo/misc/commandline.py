@@ -70,6 +70,17 @@ class GlobalParams(Parameterized,OptionalSingleton):
         del state['context']
         return state
 
+    def set_in_context(self,**params):
+        """
+        Set in self.context all name=val pairs specified in **params,
+        tracking new names and warning of any replacements.
+        """
+        for name,val in params.items():
+            if name in self.context:
+                self.warning("Replacing previous value of '%s' with '%s'"%(name,val))
+            self.context[name]=val
+            self.unused_names.add(name)
+            
     def exec_in_context(self,arg):
         """
         exec arg in self.context, tracking new names and
