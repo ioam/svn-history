@@ -291,7 +291,7 @@ class EPConnection(param.Parameterized):
 
        EventProcessors that accept only a single type of incoming
        event will typically use a src_port of None.  However, if
-       multiple types are of communication are meaningful, the
+       multiple types of communication are meaningful, the
        EventProcessor can accept other values for dest_port.  It is up
        to the dest EventProcessor to process the data appropriately
        for each port, and to define what is expected to be sent to
