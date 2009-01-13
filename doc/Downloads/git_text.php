@@ -38,13 +38,7 @@ others you can get installation packages from
 git to connect to Topographica's SVN repository. Note that you should
 try to get Git version 1.5.3 (used while writing this document) or
 later. If you are building from source, you can skip git-doc, which
-can be difficult to compile (XXXX link) since, and the documentation
-is all available online (XXXX link).
-
-<P>** The remainder of this file is draft documentation ** <BR>
-If you know Git well, you can probably already perform the operations
-described here. In that case, please help to improve the documentation
-below! Thanks.
+can be difficult to compile, and is anyway <a href="http://www.kernel.org/pub/software/scm/git/docs/">available online</a>.
 
 
 <H3>Getting the Topographica code</H3>
@@ -53,9 +47,6 @@ below! Thanks.
 git history to begin. For most work, a recent revision is fine (but make
 sure the path you want to get actually existed in that revision). Then,
 you can execute the following:
-
-<!--CB: will cut output out of examples eventually, and make commands
-more generic-->
 
 <pre>
 # location of SVN repository
@@ -93,14 +84,6 @@ and branches as well (which seems unlikely), you can use the -T and -B
 options described in the git manual.  In any case, this method is not
 usually necessary, unless you want to do some comparison across a wide
 range of historical versions of Topographica.
-
-<P>Note that if you get a message such as <code>unknown revision or
-path not in the working tree</code>, then you have probably specifed a
-path that does not exist at the specified revision. You can
-use <code>svn log</code> on an SVN copy of Topographica to get
-information about revisions, or you
-can <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/">view
-the SVN repository on the web</a>.
 
 <P>After you have the source code, you probably want to
 <A HREF="index.html#building-topographica">build Topographica</A>. You
@@ -166,7 +149,7 @@ git-reset HEAD^
 </pre>
 
 Your local changes will be kept, so you can make additional changes
-before re-committing. See the <A HREF="">XXXXgit-reset</A>
+before re-committing. See the <a href="http://www.kernel.org/pub/software/scm/git/docs/git-reset.html">git-reset</html>
 documentation for further details. <!--Note that it is safe to edit
 your history while your changes remain local, but if you have shared
 them, you should not edit your history.-->
@@ -181,9 +164,9 @@ your Git repository. These are discussed in the following sections.
 <H4>Tracking Topographica's SVN repository</H4>
 
 <P>To get updates from the Topographica SVN repository, your own copy
-should have no local changes. (If you do have local changes,
+should have no uncommitted changes. (If you do have uncommitted changes,
 the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-stash.html">git-stash</A>
-command allows you to store your own changes for later retrieval.)
+command allows you to store those changes for later retrieval.)
 
 <pre>
 # (git-stash if required)
@@ -219,11 +202,19 @@ updated and tested your code with changes from others (<code>git-svn
 rebase; make tests</code>) to ensure that your changes are compatible
 (and not just that they apply cleanly). Any actual conflict
 encountered by git-svn (e.g.  you try to commit a file which has been
-updated by someone else while you were working on it) will stop
-the <code>dcommit</code> process, and the SVN error will be reported.
+updated by someone else while you were working on it) will stop the
+<code>dcommit</code> process, and the SVN error will be reported. At
+this point, you can use the usual git commands to deal with such merge
+conflicts.
+
 
 <!-- does git-svn dcommit also then run git-svn rebase after? -->
 
+
+<P><em>** The remainder of this file is draft documentation **</em><BR>
+If you know Git well, you can probably already perform the operations
+described here. In that case, please help to improve the documentation
+below! Thanks.
 
 
 <H4>Branching your own Git repository</H4>
@@ -232,7 +223,9 @@ the <code>dcommit</code> process, and the SVN error will be reported.
 complicated new feature, for instance - you will probably find it more
 helpful to branch your git repository, and work on the
 branch. Afterwards, you can merge your branch into your master
-repository and send the changes to Topographica's SVN repository.
+repository and send the changes to Topographica's SVN repository. This
+way of working also allows you to use one git repository to work on
+multiple, independent changes to Topographica.
 
 <P>The <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-svn.html">git-svn</A>
 man page gives an overview of a possible workflow:
@@ -252,6 +245,9 @@ man page gives an overview of a possible workflow:
 # Append svn:ignore settings to the default git exclude file:
         git-svn show-ignore >> .git/info/exclude
 </pre>
+
+<!--CB: will cut output out of examples eventually, and make commands
+more generic-->
 
 To see your branches:
 <pre>
@@ -429,7 +425,21 @@ git remote add origin git@gitorious.org:/topographica/tkgui-tk85.git
 <!-- CB: there seem to be various gui tools for git, too -->
 
 
+
+<--
 <H2>References + Notes</H2>
+
+
+NOTES
+
+<P>Note that if you get a message such as <code>unknown revision or
+path not in the working tree</code>, then you have probably specifed a
+path that does not exist at the specified revision. You can
+use <code>svn log</code> on an SVN copy of Topographica to get
+information about revisions, or you
+can <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/">view
+the SVN repository on the web</a>.
+
 
 <P>something something
 
@@ -549,3 +559,4 @@ EOF
 
 
 </pre>
+-->
