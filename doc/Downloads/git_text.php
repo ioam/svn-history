@@ -149,7 +149,7 @@ git-reset HEAD^
 </pre>
 
 Your local changes will be kept, so you can make additional changes
-before re-committing. See the <a href="http://www.kernel.org/pub/software/scm/git/docs/git-reset.html">git-reset</html>
+before re-committing. See the <a href="http://www.kernel.org/pub/software/scm/git/docs/git-reset.html">git-reset</a>
 documentation for further details. <!--Note that it is safe to edit
 your history while your changes remain local, but if you have shared
 them, you should not edit your history.-->
@@ -210,12 +210,12 @@ conflicts.
 
 <!-- does git-svn dcommit also then run git-svn rebase after? -->
 
+<H3>Taking advantage of more Git features</H3>
 
 <P><em>** The remainder of this file is draft documentation **</em><BR>
 If you know Git well, you can probably already perform the operations
 described here. In that case, please help to improve the documentation
 below! Thanks.
-
 
 <H4>Branching your own Git repository</H4>
 
@@ -425,138 +425,3 @@ git remote add origin git@gitorious.org:/topographica/tkgui-tk85.git
 <!-- CB: there seem to be various gui tools for git, too -->
 
 
-
-<--
-<H2>References + Notes</H2>
-
-
-NOTES
-
-<P>Note that if you get a message such as <code>unknown revision or
-path not in the working tree</code>, then you have probably specifed a
-path that does not exist at the specified revision. You can
-use <code>svn log</code> on an SVN copy of Topographica to get
-information about revisions, or you
-can <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/">view
-the SVN repository on the web</a>.
-
-
-<P>something something
-
-<pre>
-
-http://lwn.net/Articles/210045/
-
-
-Git-svn manual
-http://www.kernel.org/pub/software/scm/git/docs/git-svn.html
-
-Howto use git and svn together
-http://www.flavio.castelli.name/howto_use_git_with_svn
-
-
-http://utsl.gen.nz/talks/git-svn/intro.html
-
-
-http://tsunanet.blogspot.com/2007/07/learning-git-svn-in-5min.html
-
-
-http://en.wikibooks.org/wiki/Source_Control_Management_With_Git/Interoperation/Subversion
-
-http://hassox.blogspot.com/2007/12/using-git-with-svn.html
-
-http://www.kernel.org/pub/software/scm/git/docs/everyday.html
-
-Multiple branches using git-svn
-http://www.dmo.ca/blog/20070608113513
-
-tips about branches
-http://wiki.laptop.org/go/Kuku/Git_Usage
-
-http://wiki.sourcemage.org/Git_Guide
-
-
-http://www.adeal.eu/
-
-Merging branches
-
-To get the difference between your master branch and the currently checked out branch: 
-git diff master..HEAD
-
-Merging a local branch is as easy as this: git checkout master; git pull . <branch>
-
-Once you merged your branch you can delete it: git branch -d <branchname>
-
-
-http://www.kernel.org/pub/software/scm/git/docs/git-merge.html
-
-
-http://michael-prokop.at/blog/2007/12/03/git-svn-in-30-minutes/
-
-http://blog.nanorails.com/tags/git
-http://blog.nanorails.com/articles/2008/1/31/getting-started-with-git
-
-
-
-My notes...
-
-ceball@san:~/dev/topographica-git$ git checkout -b tkgui-tk85 remotes/git-svn
-
-ceball@doozy:~$ mkdir git
-ceball@doozy:~$ cd git/
-ceball@doozy:~/git$ mkdir topographica
-ceball@doozy:~/git$ cd topographica
-ceball@doozy:~/git/topographica$ git --bare init
-Initialized empty Git repository in /home/ceball/git/topographica/
-
-
-ceball@san:~/dev/topographica-git$ git push ssh://ceball@doozy.inf.ed.ac.uk/home/ceball/git/topographica tkgui-tk85
-
-
-merge:
-bail is git reset 
-fix conflict is git add 
-
-
-http://sipx-wiki.calivia.com/index.php/Mirroring_sipXecs_subversion_repository_with_git
-
-man git-rev-parse
-
-
-http://utsl.gen.nz/talks/git-svn/intro.html#wtf-why
-
-
-
-list all recent actions
-git reflog
-
-
-
-pack to min disk usage
-
-git pack-refs --prune
-git reflog expire --all
-git repack -a -d -f -l
-git prune
-git rerere gc
-
-
-
-interactive rebasing
-
-git rebase -interactive
-
-
-
-
-gitk readable fonts
-
-[ -r ~/.gitk ] || cat > ~/.gitk << EOF
-set mainfont {Arial 10}
-set textfont { Courier 10}
-set uifont {Arial 10 bold}
-EOF
-
-
-</pre>
--->
