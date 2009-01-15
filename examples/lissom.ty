@@ -251,30 +251,19 @@ for e in eyes:
                 elif dataset=="Nature":
                     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
 
-                # CB: I copied 'seed+i' (where i is image no.) from
-                # dataset=="Gaussian" above. But because of the small
-                # spacing between seeds, if there are enough images,
-                # some images will have e.g. a sequence of x values
-                # that is the same as another image's sequence of y
-                # values. That doesn't matter for our current uses,
-                # but maybe we should use a system that ensures unique
-                # seeds?
-                # Actually, rather than all of this, can't we just set
-                # x, y, and orientation on input_composite? Won't that
-                # have the same result (effectively), but be simpler
-                # to set up? Or have I become confused?
+                # 5n distinct random seeds (for n images, each of which has 5 random streams)
                 inputs=[input_type(
                     filename=f, size=10.0, cache_image=False,
-                    x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i) + \
+                    x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=500+5*i) + \
                     numbergen.UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,
-                                            seed=150+i)*(-1)**(e=='Left'),
-                    y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-                    orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
+                                            seed=501+5*i)*(-1)**(e=='Left'),
+                    y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=502+5*i),
+                    orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=503+5*i),
                     scale=scalingfactor[cone_types.index(cone)]* \
                             (1.0 if 'od' not in dims else \
-                            (2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=78+i) \
+                            (2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=504+5*i) \
                              if e=='Right' else \
-                             numbergen.UniformRandom(lbound=0,ubound=2,seed=78+i))))
+                             numbergen.UniformRandom(lbound=0,ubound=2,seed=504+5*i))))
                 for f,i in zip(image_filenames,range(len(image_filenames)))]
                 input_composite=pattern.Selector(generators=inputs)
 
