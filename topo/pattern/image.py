@@ -53,17 +53,17 @@ class PatternSampler(param.Parameterized):
 
         rows,cols = pattern_array.shape
 
-        self.pattern_sheet = SheetCoordinateSystem(xdensity=1.0,ydensity=1.0,
+        self.scs = SheetCoordinateSystem(xdensity=1.0,ydensity=1.0,
             bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                        ( cols/2.0, rows/2.0))))
         
         whole_pattern_output_fn(pattern_array)
-        self.pattern_sheet.activity = pattern_array
+        self.scs.activity = pattern_array
 
         if not background_value_fn:
             self.background_value = 0.0
         else:
-            self.background_value = background_value_fn(self.pattern_sheet.activity)
+            self.background_value = background_value_fn(self.scs.activity)
         
 
     def __call__(self, x, y, sheet_xdensity, sheet_ydensity, scaling, width=1.0, height=1.0):
@@ -116,10 +116,10 @@ class PatternSampler(param.Parameterized):
         y/=height
 
         # convert the sheet (x,y) coordinates to matrixidx (r,c) ones
-        r,c = self.pattern_sheet.sheet2matrixidx(x,y)
+        r,c = self.scs.sheet2matrixidx(x,y)
 
         # now sample pattern at the (r,c) corresponding to the supplied (x,y)
-        pattern_rows,pattern_cols = self.pattern_sheet.activity.shape
+        pattern_rows,pattern_cols = self.scs.activity.shape
         if pattern_rows==0 or pattern_cols==0:
             return pattern_sample
         else:
@@ -128,8 +128,8 @@ class PatternSampler(param.Parameterized):
             for i in xrange(rows):
                 for j in xrange(cols):
                     # indexes outside the pattern are left with the background color
-                    if self.pattern_sheet.bounds.contains_exclusive(x[i,j],y[i,j]):
-                        pattern_sample[i,j] = self.pattern_sheet.activity[r[i,j],c[i,j]]
+                    if self.scs.bounds.contains_exclusive(x[i,j],y[i,j]):
+                        pattern_sample[i,j] = self.scs.activity[r[i,j],c[i,j]]
 
         return pattern_sample
 
@@ -141,7 +141,7 @@ class PatternSampler(param.Parameterized):
 
         See __call__ for a description of the various scaling options.
         """
-        pattern_rows,pattern_cols = self.pattern_sheet.activity.shape
+        pattern_rows,pattern_cols = self.scs.activity.shape
 
         # Instead of an if-test, could have a class of this type of
         # function (c.f. OutputFunctions, etc)...
