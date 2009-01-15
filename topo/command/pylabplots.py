@@ -784,18 +784,17 @@ class plot_modulation_ratio(PylabPlotCommand):
             pylab.subplot(311)
             pylab.hist(v1s,bins)
             pylab.axis([0,2.0,0,3500])
-            
+			
         if (topo.sim.objects().has_key(complex_sheet_name)):
             v1c = complexity(fullmatrix[topo.sim[complex_sheet_name]])
             pylab.subplot(312)
             pylab.hist(v1c,bins)
             pylab.axis([0,2.0,0,3500])
-            pylab.subplot(313)
             
-            if (topo.sim.objects().has_key(simple_sheet_name)):
-                # JABALERT: Jan needs to reenable this
-                #pylab.hist(numpy.concatenate(array(v1s),array(v1c)),bins)
-                pylab.axis([0,2.0,0,3500])
+        if (topo.sim.objects().has_key(simple_sheet_name) and topo.sim.objects().has_key(complex_sheet_name)):
+            pylab.subplot(313)
+            pylab.hist(numpy.concatenate(array(v1s),array(v1c)),bins)
+            pylab.axis([0,2.0,0,3500])
     
         self._generate_figure(p)
 
