@@ -94,8 +94,16 @@ def complexity(full_matrix):
                 iindex[phase_index] = i
                 res = res + abs(full_matrix.full_matrix[tuple(iindex.tolist())][x][y] - average)
                 complex_matrix[x,y] = complex_matrix[x,y] + [full_matrix.full_matrix[tuple(iindex.tolist())][x][y]]
+
             #this is taking away the DC component
-            complex_matrix[x,y] -= numpy.min(complex_matrix[x,y]) 
+            complex_matrix[x,y] -= numpy.min(complex_matrix[x,y])
+            if x==10 and y==10:
+                pylab.figure()
+                pylab.plot(complex_matrix[x,y])
+            if x==20 and y==20:
+                pylab.figure()
+                pylab.plot(complex_matrix[x,y])
+ 
             complexity[x,y] = res / (2*sum)
             fft = numpy.fft.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
             first_har = 2048/len(complex_matrix[0,0])
@@ -133,11 +141,14 @@ def phase_preference_scatter_plot(sheet_name,diameter=0.39):
         if((datax[i] > 180) & (datay[i] < (datax[i]-180))): datax[i] = datax[i] - 360; #datay[i] = datay[i] - 360
         
     f = pylab.figure()
+    ax = f.add_subplot(111, aspect='equal')
     pylab.plot(datax,datay,'ro')
     pylab.plot([0,360],[-180,180])
     pylab.plot([-180,180],[0,360])
     pylab.plot([-180,-180],[360,360])
-    pylab.axis([-180,360,-180,360])
+    ax.axis([-180,360,-180,360])
+    pylab.xticks([-180,0,180,360], [-180,0,180,360])
+    pylab.yticks([-180,0,180,360], [-180,0,180,360])
     pylab.grid()
     pylab.savefig(normalize_path(str(topo.sim.timestr()) + sheet_name + "_scatter.png"))
 
