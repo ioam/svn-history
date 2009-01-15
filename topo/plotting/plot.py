@@ -49,7 +49,7 @@ class Plot(param.Parameterized):
           self.scale_factor=1.0
           self.plot_src_name = ''
           self.precedence = 0.0
-          self.row_precedence = 0.0
+          self.row_precedence = 0.5
           # If False, this plot should be left in its native size
           # pixel-for-pixel, (e.g. for a color key or similar static
           # image), rather than being resized as necessary.
