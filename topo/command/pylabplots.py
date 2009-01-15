@@ -558,7 +558,20 @@ class tuning_curve(PylabPlotCommand):
         x_values=sorted(curve.keys())
         y_values=[curve[key].view()[0][i_value,j_value] for key in x_values]
         return x_values,y_values,x_values
-                    
+
+    def _reduce_ticks(self,ticks):
+        x = [];
+        y=  [];
+        num_ticks = 5;
+        y.append(ticks[0])
+        x.append(0)
+        for i in xrange(0,num_ticks):
+            y.append(y[-1]+numpy.pi/(num_ticks+1));
+            x.append(x[-1]+numpy.pi/(num_ticks+1));
+        y.append(ticks[-1])
+        x.append(3.14)   
+        return (x,y) 
+                            
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
@@ -579,11 +592,12 @@ class tuning_curve(PylabPlotCommand):
             self.first_curve=True
             for curve_label in sorted(sheet.curve_dict[p.x_axis].keys()):
                 x_values,y_values,ticks=self._curve_values(i_value,j_value,sheet.curve_dict[p.x_axis][curve_label])
-                #labels = [self._format_x_tick_label(x) for x in ticks]
-                #pylab.xticks(x_values, labels)
                 
+                x_tick_values,ticks = self._reduce_ticks(ticks)
+                labels = [self._format_x_tick_label(x) for x in ticks]
+                pylab.xticks(x_tick_values, labels)
+                print x_values,ticks
                 p.plot_type(x_values, y_values, label=curve_label)
-                p.axis([x_values[0],x_values[length(x_values-1)],0.0,1.0])
                 self.first_curve=False
                  
             if isint: pylab.ion()
