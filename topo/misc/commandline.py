@@ -60,6 +60,7 @@ class GlobalParams(Parameterized,OptionalSingleton):
     def __init__(self,context=None,**params):
         self.context = context or {}
         self.unused_names = set()
+        params['name']="global_params"
         super(GlobalParams,self).__init__(**params)
 
     def __getstate__(self):
