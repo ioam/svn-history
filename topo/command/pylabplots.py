@@ -579,10 +579,11 @@ class tuning_curve(PylabPlotCommand):
             self.first_curve=True
             for curve_label in sorted(sheet.curve_dict[p.x_axis].keys()):
                 x_values,y_values,ticks=self._curve_values(i_value,j_value,sheet.curve_dict[p.x_axis][curve_label])
-                labels = [self._format_x_tick_label(x) for x in ticks]
-                pylab.xticks(x_values, labels)
-
+                #labels = [self._format_x_tick_label(x) for x in ticks]
+                #pylab.xticks(x_values, labels)
+                
                 p.plot_type(x_values, y_values, label=curve_label)
+                p.axis([x_values[0],x_values[length(x_values-1)],0.0,1.0])
                 self.first_curve=False
                  
             if isint: pylab.ion()
@@ -778,22 +779,18 @@ class plot_modulation_ratio(PylabPlotCommand):
 
         from topo.analysis.vision import complexity
 
-        if (topo.sim.objects().has_key(simple_sheet_name)):
+        if (topo.sim.objects().has_key(simple_sheet_name) and topo.sim.objects().has_key(complex_sheet_name)):
             v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]])
+            v1c = complexity(fullmatrix[topo.sim[complex_sheet_name]])
             pylab.figure()
             pylab.subplot(311)
             pylab.hist(v1s,bins)
             pylab.axis([0,2.0,0,3500])
-			
-        if (topo.sim.objects().has_key(complex_sheet_name)):
-            v1c = complexity(fullmatrix[topo.sim[complex_sheet_name]])
             pylab.subplot(312)
             pylab.hist(v1c,bins)
             pylab.axis([0,2.0,0,3500])
-            
-        if (topo.sim.objects().has_key(simple_sheet_name) and topo.sim.objects().has_key(complex_sheet_name)):
             pylab.subplot(313)
-            pylab.hist(numpy.concatenate(array(v1s),array(v1c)),bins)
+            pylab.hist(numpy.concatenate((array(v1s),array(v1c)),axis=1),bins)
             pylab.axis([0,2.0,0,3500])
     
         self._generate_figure(p)
