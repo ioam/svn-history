@@ -104,6 +104,19 @@ class GlobalParams(Parameterized,OptionalSingleton):
         """Warn about any unused names."""
         for s in self.unused_names:
             self.warning("'%s' is unused."%s)
+
+# warns for param that specified with -c (but also if name gets defined in __main__,
+# e.g. by default_density=global_params.default_density in a script file
+##         for name in self.params():
+##             if name in self.context:
+##                 self.warning("'%s' still exists in global_params.context"%name)
+
+        # detect duplicate param value that wasn't used (e.g. specified with after script)
+        for name,val in self.params().items():
+            if name in self.context:
+                if self.context[name]!=self.inspect_value(name):
+                    self.warning("'%s=%s' is unused."%(name,self.context[name]))
+            
     
     def add(self,**kw):
         """
