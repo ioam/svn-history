@@ -124,6 +124,10 @@ pattern.Gaussian.aspect_ratio=4.0
 
 numpy.random.seed((500,500))
 
+# base seed for input patterns; change to get completely new random
+# input pattern parameters
+input_seed = 500
+
 
 ### Set up parameters for specified type of simulation
 
@@ -209,6 +213,7 @@ def h_to_r(h): return hsv_to_rgb(h,1.0,1.0)[0]
 def h_to_g(h): return hsv_to_rgb(h,1.0,1.0)[1]
 def h_to_b(h): return hsv_to_rgb(h,1.0,1.0)[2]
 
+
 for e in eyes:
     for n in lags:
         for cone in cone_types:
@@ -221,21 +226,22 @@ for e in eyes:
                 b=0 if 'cr' not in dims else numbergen.UnaryOperator(
                     numbergen.UniformRandom(lbound=0,ubound=1,seed=78),h_to_b)
 
+                # 6n distinct random seeds (for n inputs, each of which has 6 random streams)
                 inputs=[input_type(
-                    x=numbergen.UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12+i) + \
-                      numbergen.UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150+i)*(-1)**(e=='Left'),
-                    y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-                    orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
+                    x=numbergen.UniformRandom(lbound=-position_bound,ubound=position_bound,seed=input_seed+6*i) + \
+                      numbergen.UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=input_seed+1+6*i)*(-1)**(e=='Left'),
+                    y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=input_seed+2+6*i),
+                    orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=input_seed+3+6*i),
                     size=0.088388*(3**('or' not in dims)) * \
                       numbergen.UniformRandom(lbound=1,ubound=sf_spacing**(sf_channels-1),
-                                              seed=23+i)**('sf' in dims), 
+                                              seed=input_seed+4+6*i)**('sf' in dims), 
                     aspect_ratio=4.66667 if 'or' in dims else 1.0,
                     scale=1.0 if 'od' not in dims else \
                      (2.0-2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) - \
-                      numbergen.UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims) \
+                      numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+5+6*i)*('rg' not in dims) \
                       if e=='Right' else \
                       2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) + \
-                      numbergen.UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims)),
+                      numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed_5+6*i)*('rg' not in dims)),
                     bounds=sheet.BoundingBox(radius=0.8))
                 for i in xrange(num_inputs)]
                 input_composite=pattern.SeparatedComposite(min_separation=2.2*v1aff_radius,generators=inputs)
@@ -254,16 +260,16 @@ for e in eyes:
                 # 5n distinct random seeds (for n images, each of which has 5 random streams)
                 inputs=[input_type(
                     filename=f, size=10.0, cache_image=False,
-                    x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=500+5*i) + \
+                    x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=input_seed+5*i) + \
                     numbergen.UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,
-                                            seed=501+5*i)*(-1)**(e=='Left'),
-                    y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=502+5*i),
-                    orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=503+5*i),
+                                            seed=input_seed+1+5*i)*(-1)**(e=='Left'),
+                    y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=input_seed+2+5*i),
+                    orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=input_seed+3+5*i),
                     scale=scalingfactor[cone_types.index(cone)]* \
                             (1.0 if 'od' not in dims else \
-                            (2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=504+5*i) \
+                            (2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+4+5*i) \
                              if e=='Right' else \
-                             numbergen.UniformRandom(lbound=0,ubound=2,seed=504+5*i))))
+                             numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+4+5*i))))
                 for f,i in zip(image_filenames,range(len(image_filenames)))]
                 input_composite=pattern.Selector(generators=inputs)
 
@@ -275,7 +281,7 @@ for e in eyes:
                 input_moved=pattern.Sweeper(
                     generator=copy.deepcopy(input_composite),
                     step=int(n),speed=speed/24.0,
-                    orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56))
+                    orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=input_seed-1))
             else: input_moved=input_composite
 
             topo.sim[e+cone+'Retina'+n]=sheet.GeneratorSheet(
