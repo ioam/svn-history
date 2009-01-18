@@ -141,38 +141,30 @@ natural_image_sets = ['Nature','FoliageA','FoliageB']
 from topo.misc.commandline import global_params as p
 p.add(
 
-    dataset=param.String(
-        default="Gaussian",doc="""Set of input patterns to use."""),
+    dataset=param.String(default="Gaussian",doc="""
+        Set of input patterns to use."""),
 
-    dims=param.Parameter(
-        default=['or','od','dr','dy'],
-        doc="""Stimulus dimensions to include."""),
+    dims=param.Parameter(default=['or','od','dr','dy'],doc="""
+        Stimulus dimensions to include."""),
 
-    default_retina_density=param.Number(
-        default=24.0,
-        doc="""Default nominal_density for the retina."""),
+    default_retina_density=param.Number(default=24.0,doc="""
+        Default nominal_density for the retina."""),
 
-    default_lgn_density=param.Number(
-        default=24.0,doc="""Default nominal_density for the lgn."""),
+    default_lgn_density=param.Number(default=24.0,doc="""
+        Default nominal_density for the lgn."""),
 
-    default_density=param.Number(
-        default=48.0,doc="""Default nominal_density for V1."""),
+    default_density=param.Number(default=48.0,doc="""
+        Default nominal_density for V1."""),
 
-    max_disparity=param.Number(
-        default=4.0,doc=
-        """
+    max_disparity=param.Number(default=4.0,doc="""
         Maximum disparity between input pattern positions in left and
-        right eyes.
-        """),
+        right eyes."""),
 
-    expand_sf_test_range=param.Boolean(
-        default=False,doc=
-        """
+    expand_sf_test_range=param.Boolean(default=False,doc="""
         By default, measure_sine_pref() measures SF at the sizes of RF
         used, for speed, but if expand_sf_test_range is True, will
         also test over a larger range, including half the size of the
-        smallest and twice the size of the largest.
-        """))
+        smallest and twice the size of the largest."""))
 
 
 # Convenient shortcut:
