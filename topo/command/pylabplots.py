@@ -596,7 +596,6 @@ class tuning_curve(PylabPlotCommand):
                 x_tick_values,ticks = self._reduce_ticks(ticks)
                 labels = [self._format_x_tick_label(x) for x in ticks]
                 pylab.xticks(x_tick_values, labels)
-                print x_values,ticks
                 p.plot_type(x_values, y_values, label=curve_label)
                 self.first_curve=False
                  
