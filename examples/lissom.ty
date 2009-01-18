@@ -148,6 +148,10 @@ global_params.add(
         default=['or','od','dr','dy'],
         doc="""Stimulus dimensions to include."""),
 
+    default_retina_density=param.Number(
+        default=24.0,
+        doc="""Default nominal_density for the retina."""),
+
     default_lgn_density=param.Number(
         default=24.0,doc="""Default nominal_density for the lgn."""),
 
@@ -171,14 +175,12 @@ global_params.add(
         """))
 
 
-# CEBALERT: can't happen in call above because it depends on existence
-# of parameters defined above!
-global_params.add(
-    default_retina_density=param.Number(
-        default=48.0 if global_params.dataset in natural_image_sets or 'dy' in global_params.dims else 24.0,
-        doc="""Default nominal_density for the retina."""))
-    
-    
+# Convenient shortcut:
+if global_params.dims=='All':
+    global_params.dims=['or','od','dr','dy','cr','sf']
+   
+if global_params.dataset in natural_image_sets or 'dy' in global_params.dims:
+    global_params.params()['default_retina_density'].default=48.0
 
 
 ### Set up parameters for specified type of simulation
@@ -198,9 +200,6 @@ sf_spacing = 2.0                    # sf
 v1aff_radius=0.27083                # sf
 lgnaff_radius=0.375                 # sf
 
-# Convenient shortcut:
-if global_params.dims=='All':
-    global_params.dims=['or','od','dr','dy','cr','sf']
 
 # CEBALERT: keep to save typing? (results in a 'dims' in __main__ as
 # well as one in global_params)
