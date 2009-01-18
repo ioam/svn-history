@@ -97,7 +97,7 @@ import copy
 
 from colorsys import hsv_to_rgb
 
-from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet 
+from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet,param
 
 import topo.learningfn.optimized
 import topo.learningfn.projfn 
@@ -129,8 +129,59 @@ numpy.random.seed((500,500))
 input_seed = 500
 
 
-### Set up parameters for specified type of simulation
+# CB: not sure this is the clearest way to do it...
+# (also need to rename 'colormap').
+natural_image_sets = ['Nature','FoliageA','FoliageB']
+# Could we avoid some of the various ifs in this file by using
+# dictionaries?
+# I haven't yet used this file enough to know what's best...
 
+
+# CEBALERT: some docs need expanding...
+from topo.misc.commandline import global_params
+global_params.add(
+
+    dataset=param.String(
+        default="Gaussian",doc="""Set of input patterns to use."""),
+
+    dims=param.Parameter(
+        default=['or','od','dr','dy'],
+        doc="""Stimulus dimensions to include."""),
+
+    default_lgn_density=param.Number(
+        default=24.0,doc="""Default nominal_density for the lgn."""),
+
+    default_density=param.Number(
+        default=48.0,doc="""Default nominal_density for V1."""),
+
+    max_disparity=param.Number(
+        default=4.0,doc=
+        """
+        Maximum disparity between input pattern positions in left and
+        right eyes.
+        """),
+
+    expand_sf_test_range=param.Boolean(
+        default=False,doc=
+        """
+        By default, measure_sine_pref() measures SF at the sizes of RF
+        used, for speed, but if expand_sf_test_range is True, will
+        also test over a larger range, including half the size of the
+        smallest and twice the size of the largest.
+        """))
+
+
+# CEBALERT: can't happen in call above because it depends on existence
+# of parameters defined above!
+global_params.add(
+    default_retina_density=param.Number(
+        default=48.0 if global_params.dataset in natural_image_sets or 'dy' in global_params.dims else 24.0,
+        doc="""Default nominal_density for the retina."""))
+    
+    
+
+
+### Set up parameters for specified type of simulation
 # Defaults:                         # parameters for:
 center_polarities=['On','Off']      # oo
 rg_cone_types=['']                  # rg
@@ -147,10 +198,13 @@ sf_spacing = 2.0                    # sf
 v1aff_radius=0.27083                # sf
 lgnaff_radius=0.375                 # sf
 
-dims=locals().get('dims',['or','od','dr','dy'])
-
 # Convenient shortcut:
-if dims=='All': dims=['or','od','dr','dy','cr','sf']
+if global_params.dims=='All':
+    global_params.dims=['or','od','dr','dy','cr','sf']
+
+# CEBALERT: keep to save typing? (results in a 'dims' in __main__ as
+# well as one in global_params)
+dims = global_params.dims 
 
 topo.sim.name = "lissom_oo_" + '_'.join(dims)
 if 'od' in dims or 'dy' in dims:
@@ -161,9 +215,8 @@ if 'dr' in dims:
     speed=2.0 # Useful speeds range from 0.0 - 3.0.
 
 if 'dy' in dims: 
-    max_disparity = locals().get('max_disparity',4.0)
-    disparity_bound = max_disparity*0.041665/2.0
-    if max_disparity > 0.0: position_bound = 0.70833
+    disparity_bound = global_params.max_disparity*0.041665/2.0
+    if global_params.max_disparity > 0.0: position_bound = 0.70833
 
 if 'rg' in dims:
     rg_cone_types=['Red','Green']
@@ -189,14 +242,7 @@ sf_relative_sizes=[sf_spacing**(channel-1) for channel in sf_channel_nums]
 
 ### Input patterns and LGN sheets
 num_inputs=1
-dataset=locals().get('dataset',"Gaussian")
-
-# CB: not sure this is the clearest way to do it...
-# (also need to rename 'colormap').
-natural_image_sets = ['Nature','FoliageA','FoliageB']
-# Could we avoid some of the various ifs in this file by using
-# dictionaries?
-# I haven't yet used this file enough to know what's best...
+dataset=global_params.dataset # CEBALERT: keep to save typing?
     
 if dataset=="Gaussian":
     input_type=pattern.Gaussian
@@ -205,8 +251,6 @@ elif dataset in natural_image_sets:
     input_type=pattern.image.FileImage
     ids=4.0
         
-default_retina_density=locals().get('default_retina_density',48.0 \
-                                    if dataset in natural_image_sets or 'dy' in dims else 24.0)
 
 # helper fns for synthesizing a specified hue
 def h_to_r(h): return hsv_to_rgb(h,1.0,1.0)[0]
@@ -285,7 +329,7 @@ for e in eyes:
             else: input_moved=input_composite
 
             topo.sim[e+cone+'Retina'+n]=sheet.GeneratorSheet(
-                nominal_density=default_retina_density,
+                nominal_density=global_params.default_retina_density,
                 input_generator=input_moved,
                 period=1.0, phase=0.05,
                 nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(sf_channels-1) + \
@@ -293,19 +337,19 @@ for e in eyes:
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+'LGN'+l+n]=sheet.CFSheet(
-                    nominal_density=locals().get('default_lgn_density',24.0),
+                    nominal_density=global_params.default_lgn_density,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius),
                     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
             for channel in xrange(2,sf_channels+1):
                 topo.sim[e+'LGN'+l+n+'SF'+str(channel)]=sheet.CFSheet(
-                    nominal_density=locals().get('default_lgn_density',24.0),
+                    nominal_density=global_params.default_lgn_density,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(channel-1)),
                     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
                 
 
-topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=locals().get('default_density',48.0),
+topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=global_params.default_density,
                                      tsettle=9,nominal_bounds=sheet.BoundingBox(radius=0.5))
 
 topo.sim['V1'].output_fn.lower_bound=0.076 if dataset in natural_image_sets else 0.083
@@ -524,13 +568,8 @@ pgs = [x for y in [m for n,m in preference_maps if n in dims] for x in y] + \
 topo.command.basic.default_analysis_plotgroups=pgs
     
 
-# By default, measures SF at the sizes of RF used, for speed, but if
-# expand_sf_test_range is True, will also test over a larger range,
-# including half the size of the smallest and twice the size of the
-# largest.
-expand_sf_test_range=locals().get('expand_sf_test_range',False)
 wide_relative_sizes=[0.5*sf_relative_sizes[0]] + sf_relative_sizes + [2.0*sf_relative_sizes[-1]]
-relative_sizes=(wide_relative_sizes if expand_sf_test_range else sf_relative_sizes)
+relative_sizes=(wide_relative_sizes if global_params.expand_sf_test_range else sf_relative_sizes)
 
 
 # Set up defaults for measure_sine_pref, which is used for or, od, and sf
