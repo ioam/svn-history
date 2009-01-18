@@ -132,7 +132,7 @@ class GlobalParams(Parameterized,OptionalSingleton):
             if p_name in self.context:
                 setattr(self,p_name,self.context[p_name])
                 if p_name in self.unused_names:
-                    # i.e. remove from __main__ if it was a -s option (but not if -c)
+                    # i.e. remove from __main__ if it was a -p option (but not if -c)
                     del self.context[p_name]  
                     self.unused_names.remove(p_name)
                 
@@ -371,13 +371,13 @@ topo_parser.add_option("-c","--command",action = "callback",callback=c_action,ty
 
 
 
-def s_action(option,opt_str,value,parser):
-    """Callback function for the -s option."""
+def p_action(option,opt_str,value,parser):
+    """Callback function for the -p option."""
     global_params.exec_in_context(value)
     global something_executed
     something_executed=True
             
-topo_parser.add_option("-s","--set-parameter",action = "callback",callback=s_action,type="string",
+topo_parser.add_option("-p","--set-parameter",action = "callback",callback=p_action,type="string",
 		       default=[],dest="commands",metavar="\"<command>\"",
 		       help="command specifying value(s) of script-level (global) Parameter(s).")
 
