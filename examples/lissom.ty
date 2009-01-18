@@ -138,8 +138,8 @@ natural_image_sets = ['Nature','FoliageA','FoliageB']
 
 
 # CEBALERT: some docs need expanding...
-from topo.misc.commandline import global_params
-global_params.add(
+from topo.misc.commandline import global_params as p
+p.add(
 
     dataset=param.String(
         default="Gaussian",doc="""Set of input patterns to use."""),
@@ -176,11 +176,11 @@ global_params.add(
 
 
 # Convenient shortcut:
-if global_params.dims=='All':
-    global_params.dims=['or','od','dr','dy','cr','sf']
+if p.dims=='All':
+    p.dims=['or','od','dr','dy','cr','sf']
    
-if global_params.dataset in natural_image_sets or 'dy' in global_params.dims:
-    global_params.params()['default_retina_density'].default=48.0
+if p.dataset in natural_image_sets or 'dy' in p.dims:
+    p.params()['default_retina_density'].default=48.0
 
 
 ### Set up parameters for specified type of simulation
@@ -201,36 +201,32 @@ v1aff_radius=0.27083                # sf
 lgnaff_radius=0.375                 # sf
 
 
-# CEBALERT: keep to save typing? (results in a 'dims' in __main__ as
-# well as one in global_params)
-dims = global_params.dims 
-
-topo.sim.name = "lissom_oo_" + '_'.join(dims)
-if 'od' in dims or 'dy' in dims:
+topo.sim.name = "lissom_oo_" + '_'.join(p.dims)
+if 'od' in p.dims or 'dy' in p.dims:
     eyes=['Left','Right']
     
-if 'dr' in dims: 
+if 'dr' in p.dims: 
     lags=['0','1','2','3']
     speed=2.0 # Useful speeds range from 0.0 - 3.0.
 
-if 'dy' in dims: 
-    disparity_bound = global_params.max_disparity*0.041665/2.0
-    if global_params.max_disparity > 0.0: position_bound = 0.70833
+if 'dy' in p.dims: 
+    disparity_bound = p.max_disparity*0.041665/2.0
+    if p.max_disparity > 0.0: position_bound = 0.70833
 
-if 'rg' in dims:
+if 'rg' in p.dims:
     rg_cone_types=['Red','Green']
     cone_types=['Red','Green']
     opponent_types=['Red-Green ','Green-Red ','Luminosity ']    
     basic_opponent_types=['Red-Green ','Green-Red ']  
 
-if 'cr' in dims:
+if 'cr' in p.dims:
     rg_cone_types=['Red','Green']
     cone_types=['Red','Green','Blue']
     opponent_types=['Red-Green ','Green-Red ','Blue-RedGreen ','Luminosity ']
     basic_opponent_types=['Red-Green ','Green-Red '] 
-    dims.append('rg')
+    p.dims.append('rg')
 
-if 'sf' in dims:
+if 'sf' in p.dims:
     sf_channels=2 # Useful values are 2,3,4.
 
 # Should rewrite the code below in terms of these lists for
@@ -241,12 +237,11 @@ sf_relative_sizes=[sf_spacing**(channel-1) for channel in sf_channel_nums]
 
 ### Input patterns and LGN sheets
 num_inputs=1
-dataset=global_params.dataset # CEBALERT: keep to save typing?
     
-if dataset=="Gaussian":
+if p.dataset=="Gaussian":
     input_type=pattern.Gaussian
     ids=1.0
-elif dataset in natural_image_sets:
+elif p.dataset in natural_image_sets:
     input_type=pattern.image.FileImage
     ids=4.0
         
@@ -261,12 +256,12 @@ for e in eyes:
     for n in lags:
         for cone in cone_types:
 
-            if dataset=="Gaussian":
-                r=0 if 'rg' not in dims else numbergen.UnaryOperator(
+            if p.dataset=="Gaussian":
+                r=0 if 'rg' not in p.dims else numbergen.UnaryOperator(
                     numbergen.UniformRandom(lbound=0,ubound=1,seed=78),h_to_r)
-                g=0 if 'rg' not in dims else numbergen.UnaryOperator(
+                g=0 if 'rg' not in p.dims else numbergen.UnaryOperator(
                     numbergen.UniformRandom(lbound=0,ubound=1,seed=78),h_to_g)
-                b=0 if 'cr' not in dims else numbergen.UnaryOperator(
+                b=0 if 'cr' not in p.dims else numbergen.UnaryOperator(
                     numbergen.UniformRandom(lbound=0,ubound=1,seed=78),h_to_b)
 
                 # 6n distinct random seeds (for n inputs, each of which has 6 random streams)
@@ -275,29 +270,29 @@ for e in eyes:
                       numbergen.UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=input_seed+1+6*i)*(-1)**(e=='Left'),
                     y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=input_seed+2+6*i),
                     orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=input_seed+3+6*i),
-                    size=0.088388*(3**('or' not in dims)) * \
+                    size=0.088388*(3**('or' not in p.dims)) * \
                       numbergen.UniformRandom(lbound=1,ubound=sf_spacing**(sf_channels-1),
-                                              seed=input_seed+4+6*i)**('sf' in dims), 
-                    aspect_ratio=4.66667 if 'or' in dims else 1.0,
-                    scale=1.0 if 'od' not in dims else \
+                                              seed=input_seed+4+6*i)**('sf' in p.dims), 
+                    aspect_ratio=4.66667 if 'or' in p.dims else 1.0,
+                    scale=1.0 if 'od' not in p.dims else \
                      (2.0-2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) - \
-                      numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+5+6*i)*('rg' not in dims) \
+                      numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+5+6*i)*('rg' not in p.dims) \
                       if e=='Right' else \
                       2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) + \
-                      numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+5+6*i)*('rg' not in dims)),
+                      numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+5+6*i)*('rg' not in p.dims)),
                     bounds=sheet.BoundingBox(radius=0.8))
                 for i in xrange(num_inputs)]
                 input_composite=pattern.SeparatedComposite(min_separation=2.2*v1aff_radius,generators=inputs)
 
-            elif dataset in natural_image_sets:
-                scalingfactor=[1.4*0.9,1.4,1.4*0.97] if 'cr' in dims else [1.0,1.0,1.0]
-                if dataset=="FoliageA":
+            elif p.dataset in natural_image_sets:
+                scalingfactor=[1.4*0.9,1.4,1.4*0.97] if 'cr' in p.dims else [1.0,1.0,1.0]
+                if p.dataset=="FoliageA":
                     image_filenames=["images/mcgill/foliage_a/%02d_%d.png"%(i,cone_types.index(cone))
                                      for i in xrange(5)]
-                elif dataset=="FoliageB":
+                elif p.dataset=="FoliageB":
                     image_filenames=["images/mcgill/foliage_b/%02d_%d.png"%(i,cone_types.index(cone))
                                      for i in xrange(1,26)]
-                elif dataset=="Nature":
+                elif p.dataset=="Nature":
                     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
 
                 # 5n distinct random seeds (for n images, each of which has 5 random streams)
@@ -310,6 +305,7 @@ for e in eyes:
                     orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=input_seed+3+5*i),
                     scale=scalingfactor[cone_types.index(cone)]* \
                             (1.0 if 'od' not in dims else \
+                            (1.0 if 'od' not in p.dims else \
                             (2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+4+5*i) \
                              if e=='Right' else \
                              numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+4+5*i))))
@@ -317,7 +313,7 @@ for e in eyes:
                 input_composite=pattern.Selector(generators=inputs)
 
             else:
-                raise ValueError("Unknown dataset '%s'"%dataset)
+                raise ValueError("Unknown dataset '%s'"%p.dataset)
 
 
             if n != '':
@@ -328,7 +324,7 @@ for e in eyes:
             else: input_moved=input_composite
 
             topo.sim[e+cone+'Retina'+n]=sheet.GeneratorSheet(
-                nominal_density=global_params.default_retina_density,
+                nominal_density=p.default_retina_density,
                 input_generator=input_moved,
                 period=1.0, phase=0.05,
                 nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(sf_channels-1) + \
@@ -336,23 +332,23 @@ for e in eyes:
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+'LGN'+l+n]=sheet.CFSheet(
-                    nominal_density=global_params.default_lgn_density,
+                    nominal_density=p.default_lgn_density,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius),
                     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
             for channel in xrange(2,sf_channels+1):
                 topo.sim[e+'LGN'+l+n+'SF'+str(channel)]=sheet.CFSheet(
-                    nominal_density=global_params.default_lgn_density,
+                    nominal_density=p.default_lgn_density,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(channel-1)),
                     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
                 
 
-topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=global_params.default_density,
+topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=p.default_density,
                                      tsettle=9,nominal_bounds=sheet.BoundingBox(radius=0.5))
 
-topo.sim['V1'].output_fn.lower_bound=0.076 if dataset in natural_image_sets else 0.083
-topo.sim['V1'].output_fn.upper_bound=0.626 if dataset in natural_image_sets else 0.633
+topo.sim['V1'].output_fn.lower_bound=0.076 if p.dataset in natural_image_sets else 0.083
+topo.sim['V1'].output_fn.upper_bound=0.626 if p.dataset in natural_image_sets else 0.633
 
 # DoG weights for the LGN
 centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,
@@ -361,7 +357,7 @@ surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,
                              output_fn=outputfn.DivisiveNormalizeL1())
 
 strength=[2.33, 2.38, 2.53, 2.8] # 2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
-if dataset in natural_image_sets:
+if p.dataset in natural_image_sets:
     strength=[4.7, 4.8, 5.1, 5.8] 
 
 # Convenience variable; number of afferent connections to V1
@@ -387,7 +383,7 @@ for e in eyes:
                     nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius),
                     weights_generator=surroundg)
 
-                if 'sf' in dims and 'rg' not in dims: 
+                if 'sf' in p.dims and 'rg' not in p.dims: 
                     for channel in xrange(2,sf_channels+1):
                         topo.sim.connect(
                             e+cone+'Retina'+n, e+opponentcenter+'LGN'+l+n+'SF'+str(channel), 
@@ -409,7 +405,7 @@ for e in eyes:
                             weights_generator=pattern.Gaussian(size=0.29540*sf_spacing**(channel-1),aspect_ratio=1.0,
                                                                output_fn=outputfn.DivisiveNormalizeL1()))
 
-                if 'cr' in dims:
+                if 'cr' in p.dims:
                     topo.sim.connect(
                         e+cone+'Retina'+n, e+'Blue-RedGreen'+' LGN'+l+n, 
                         name='AfferentCenter'+cone,
@@ -418,7 +414,7 @@ for e in eyes:
                         nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius),
                         weights_generator=centerg)
 
-            if 'cr' in dims:
+            if 'cr' in p.dims:
                 topo.sim.connect(
                     e+'Blue'+'Retina'+n, e+'Blue-RedGreen'+' LGN'+l+n, 
                     name='AfferentCenter'+'Blue', 
@@ -490,24 +486,24 @@ for e in eyes:
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=projection.CFProjection,
-                 strength=1.2 if dataset in natural_image_sets else 0.9,
+                 strength=1.2 if p.dataset in natural_image_sets else 0.9,
                  weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.10417),
                  nominal_bounds_template=sheet.BoundingBox(radius=0.10417),
                  learning_rate=2.55528/ids) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=projection.CFProjection,
-                 strength=-1.75 if dataset in natural_image_sets else -0.9, 
+                 strength=-1.75 if p.dataset in natural_image_sets else -0.9, 
                  weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.22917),
                  nominal_bounds_template=sheet.BoundingBox(radius=0.22917),
-                 learning_rate=1.80873/ids/5 if dataset in natural_image_sets else 1.80873/ids)
+                 learning_rate=1.80873/ids/5 if p.dataset in natural_image_sets else 1.80873/ids)
 
 
 ### Actions scheduled to occur as the simulation proceeds.
-st=(1.0/2.0 if dataset in natural_image_sets else 1.0/num_inputs)
+st=(1.0/2.0 if p.dataset in natural_image_sets else 1.0/num_inputs)
 sheet.lissom.schedule_events("topo.sim['V1']",st=st,
                              aff_name="Afferent",ids=ids,
-                             increase_inhibition=(dataset in natural_image_sets))
+                             increase_inhibition=(p.dataset in natural_image_sets))
 
 # These simulations are slow, so we want more progress reports
 topo.sim.schedule_command(25*st,'pass')
@@ -562,25 +558,25 @@ preference_maps=[
 ('od',['Ocular Preference']),
 ('sf',['Spatial Frequency Preference']),
 ]
-pgs = [x for y in [m for n,m in preference_maps if n in dims] for x in y] + \
+pgs = [x for y in [m for n,m in preference_maps if n in p.dims] for x in y] + \
       ['Position Preference','Activity']
 topo.command.basic.default_analysis_plotgroups=pgs
     
 
 wide_relative_sizes=[0.5*sf_relative_sizes[0]] + sf_relative_sizes + [2.0*sf_relative_sizes[-1]]
-relative_sizes=(wide_relative_sizes if global_params.expand_sf_test_range else sf_relative_sizes)
+relative_sizes=(wide_relative_sizes if p.expand_sf_test_range else sf_relative_sizes)
 
 
 # Set up defaults for measure_sine_pref, which is used for or, od, and sf
 from topo.command.analysis import measure_sine_pref
-if 'sf' in dims: measure_sine_pref.frequencies = [2.4*s for s in relative_sizes]
-if 'od' in dims: measure_sine_pref.num_ocularity=2
+if 'sf' in p.dims: measure_sine_pref.frequencies = [2.4*s for s in relative_sizes]
+if 'od' in p.dims: measure_sine_pref.num_ocularity=2
 # Including the rest in measure_sine_pref is usually not computationally feasible:
-#if 'dr' in dims: measure_sine_pref.num_direction=6
-#if 'dr' in dims: measure_sine_pref.num_speeds=4
-#if 'rg' in dims: measure_sine_pref.num_hue=8
-#if 'cr' in dims: measure_sine_pref.num_hue=8
-#if 'dy' in dims: measure_sine_pref.num_disparity=6 # 12
+#if 'dr' in p.dims: measure_sine_pref.num_direction=6
+#if 'dr' in p.dims: measure_sine_pref.num_speeds=4
+#if 'rg' in p.dims: measure_sine_pref.num_hue=8
+#if 'cr' in p.dims: measure_sine_pref.num_hue=8
+#if 'dy' in p.dims: measure_sine_pref.num_disparity=6 # 12
 
 
 # Measure feature maps based on unthresholded initial response for
@@ -644,7 +640,7 @@ combined_preference_maps = {
 from topo.plotting.plotgroup import create_plotgroup
 for combined_dimensions,plotgroup_spec in combined_preference_maps.items():
     plotgroup_spec['category']="Combined Preference Maps"
-    if set(dims).issuperset(set(combined_dimensions)):
+    if set(p.dims).issuperset(set(combined_dimensions)):
         create_plotgroup(**plotgroup_spec)
 
 # CB: could this be in create_plotgroup?
