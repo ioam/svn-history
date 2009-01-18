@@ -924,7 +924,19 @@ class Parameterized(object):
             elif hasattr(g,'state_pop') and isinstance(g,Parameterized):
                 g.state_pop()
         
-        
+
+    @bothmethod
+    def set_default(self_or_cls,param_name,value):
+        """
+        Set the default value of param_name.
+
+        Equivalent to setting param_name on the class.
+        """
+        if isinstance(self_or_cls,type):
+            cls=self_or_cls
+        else:
+            cls=type(self_or_cls)
+        setattr(cls,param_name,value)
     
 
     @bothmethod
