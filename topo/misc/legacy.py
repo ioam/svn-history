@@ -426,6 +426,17 @@ from topo.param import Dict as DictParameter
         fake_a_package('coordmapperfns','coordmapper',['basic'])
         # note there's no legacy support for people using CFSOM. We could
         # add that if necessary.
+
+        ### rXXXX removed topo/sheet/generator.py
+        import topo.sheet.basic
+
+        code = \
+"""
+from topo.sheet.basic import GeneratorSheet, SequenceGeneratorSheet
+"""
+        fake_a_module('generator',topo.sheet,code,'topo.sheet')
+        ###
+
         fake_a_package('sheets','sheet',['composer','generator',
                                          'lissom','optimized','saccade','slissom'])
         fake_a_package('eps','ep',['basic'])
@@ -600,6 +611,9 @@ class mpq(object):
                 state['allow_None']=False
 
         preprocess_state(param.Parameter,param_add_allow_None)
+
+
+
 
 
 def teststimuli():

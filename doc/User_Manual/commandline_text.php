@@ -106,7 +106,7 @@ Docstring:
 
 topo_t000000.00_c12&gt;&gt;&gt; help(topo.sim['Retina'])
 
-Help on GeneratorSheet in module topo.sheet.generator object:
+Help on GeneratorSheet in module topo.sheet.basic object:
 
 class GeneratorSheet(topo.base.sheet.Sheet)
  |  Sheet for generating a series of 2D patterns.

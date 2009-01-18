@@ -70,7 +70,7 @@ from math import pi, sqrt
 import topo.pattern.basic
 
 from topo.sheet.lissom import LISSOM
-from topo.sheet.generator import GeneratorSheet
+from topo.sheet import GeneratorSheet
 from topo.projection.basic import CFProjection,SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.sheet import BoundingBox

@@ -27,7 +27,7 @@ from topo.base.functionfamily import OutputFn
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import Projection, ProjectionSheet
-from topo.sheet.generator import GeneratorSheet
+from topo.sheet import GeneratorSheet
 from topo.misc.util import MultiFile
 from topo.misc.picklemain import PickleMain
 from topo.misc.filepath import normalize_path

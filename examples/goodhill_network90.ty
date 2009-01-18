@@ -22,7 +22,7 @@ import topo.pattern.basic
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheet import Sheet
-from topo.sheet.generator import GeneratorSheet
+from topo.sheet import GeneratorSheet
 
 class point(object):
     "An object used to store x,y,z of retinas and V1"

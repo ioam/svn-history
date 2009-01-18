@@ -12,7 +12,7 @@ from topo.base.simulation import Simulation
 from topo.base.cf import CFSheet, CFProjection
 from topo.misc.filepath import resolve_path,normalize_path
 
-from topo.sheet.generator import GeneratorSheet
+from topo.sheet import GeneratorSheet
 
 from topo.plotting.plotfilesaver import PlotGroupSaver
 

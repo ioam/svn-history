@@ -30,7 +30,7 @@ from topo.base.cf import CFSheet
 from topo.base.simulation import PeriodicEventSequence,FunctionEvent
 from topo.base.boundingregion import BoundingBox,BoundingRegionParameter
 from topo.coordmapper.basic import  CoordinateMapperFn, IdentityMF
-from topo.sheet.generator import SequenceGeneratorSheet
+from topo.sheet import SequenceGeneratorSheet
 from topo.misc import util
 
 

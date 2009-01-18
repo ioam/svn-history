@@ -23,7 +23,7 @@ from numpy.oldnumeric import  sum,ones,exp, tan, sin, cos
 import numpy.oldnumeric as Numeric
 
 from topo.sheet.lissom import LISSOM
-from topo.sheet.generator import GeneratorSheet
+from topo.sheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterclasses import DynamicNumber
