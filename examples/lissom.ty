@@ -180,7 +180,7 @@ if p.dims=='All':
     p.dims=['or','od','dr','dy','cr','sf']
    
 if p.dataset in natural_image_sets or 'dy' in p.dims:
-    p.params()['default_retina_density'].default=48.0
+    p.set_default('default_retina_density',48.0)
 
 
 ### Set up parameters for specified type of simulation
