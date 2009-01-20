@@ -20,7 +20,7 @@ from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF
 from topo.outputfn.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.image import Image
-from contrib.jacommands import SimpleHomeoLinearRelative, AddGC
+from contrib.jacommands import SimpleHomeoLinearRelative, AddGC,ActivityHysteresis
 
 import contrib.jsldefs
 from contrib.jsldefs import JointScaling_lronly, JointScaling_affonly, homeostatic_analysis_function
@@ -153,39 +153,39 @@ if tracking==True:
                 HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,
                                               eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
-                V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
+                V1_OF=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),Attrib_Tracker, HE, V1_Tracker])
             else:
                 Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'scaled_x_avg'], units=units)
                 HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,
                                               eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
-                V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker]) 
+                V1_OF=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),Attrib_Tracker, HE, V1_Tracker]) 
         else:
             if lr_scaling==True:
                 Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['lr_sf'], units=units)
                 HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,  
                                               eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
                 V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=9)
-                V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
+                V1_OF=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),Attrib_Tracker, HE, V1_Tracker])
             else:
                 HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing, eta=locals().get('eta',0.016), input_output_ratio=io_ratio,noise_magnitude=locals().get('noise_magnitude',0.0),randomized_init=True)
                 V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1']", attrib_names=['t','y_avg'], units=units, step=9)
-                V1_OF=PipelineOF(output_fns=[HE, V1_Tracker])
+                V1_OF=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),HE, V1_Tracker])
     else:
         if scaling==True:
             Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf','lr_sf', 'scaled_x_avg'], units=units)
             HE=HalfRectify()
             AV=ActivityAveragingOF(smoothing=smoothing,step=1)
             V1_Tracker=AttributeTrackingOF(object=AV,coordframe="topo.sim['V1']", attrib_names=['x_avg'], units=units, step=1)
-            V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, AV, V1_Tracker])
+            V1_OF=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),Attrib_Tracker, HE, AV, V1_Tracker])
         else:
             HE=HalfRectify()
             AV=ActivityAveragingOF(smoothing=smoothing,step=1)
             V1_Tracker=AttributeTrackingOF(object=AV,coordframe="topo.sim['V1']", attrib_names=['x_avg'], units=units, step=1)
-            V1_OF=PipelineOF(output_fns=[HE, AV, V1_Tracker])
+            V1_OF=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),HE, AV, V1_Tracker])
 else:
     if triesch==True:
-        V1_OF=HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.016), input_output_ratio=io_ratio)
+        V1_OF=HE=output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.016), input_output_ratio=io_ratio)])
     else:
         V1_OF=HalfRectify()
 
@@ -318,31 +318,32 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,
                  learning_fn=CFPLF_Scaled_opt(),
-                 strength=locals().get('aff_str',1.0),name='LGNOnAfferent',
+                 strength=locals().get('aff_str',25.0),name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
-         learning_rate=locals().get('aff_lr',0.137))
+         learning_rate=locals().get('aff_lr',2.0))
                      
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
          connection_type=CFProjection,
                  learning_fn=CFPLF_Scaled_opt(),
-                 strength=locals().get('aff_str',1.0),name='LGNOffAfferent',
+                 strength=locals().get('aff_str',25.0),name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
-         learning_rate=locals().get('aff_lr',0.137))
+         learning_rate=locals().get('aff_lr',2.0))
+
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=CFProjection,
-                 strength=1.0*locals().get('exc_strength',1.0),
-                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.04),
-                 nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0.0) 
+                 strength=1.0*locals().get('exc_strength',2.5),
+                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.05),
+                 nominal_bounds_template=BoundingBox(radius=0.104),learning_rate=0.0) 
         
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  connection_type=CFProjection,
-                 strength=-1.0*locals().get('inh_strength',1.0),
+                 strength=-1.0*locals().get('inh_strength',2.5),
                  #inh_strength should be increased for more distributed datasets i.e. when the frequency parameter is higher
                  weights_generator=gauss_rand(size=2*0.22917),
-                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_lr',1.80873))
+                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_lr',0.5))
 
 
 #Output functions for tracking
