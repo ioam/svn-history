@@ -82,11 +82,11 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         size=button_image_size,
         doc="""
         Refresh the current plot (i.e. force the current plot to be regenerated
-        by executing pre_plot_hooks and plot_command).""")
+        by executing pre_plot_hooks and plot_hooks).""")
 
     Redraw = tk.Button(image_path="topo/tkgui/icons/redo-small.png",
         size=button_image_size,
-        doc="""Redraw the plot from existing data (i.e. execute plot_command only).""")
+        doc="""Redraw the plot from existing data (i.e. execute plot_hooks only).""")
     
     Enlarge = tk.Button(image_path="topo/tkgui/icons/viewmag+_2.2.png",
         size=button_image_size,
@@ -208,7 +208,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
                         on_change=self.refresh,side='right')
         self.params_in_history.append('Refresh')
 
-        self.pack_param('plot_command',parent=self.plotcommand_frame,
+        self.pack_param('plot_hooks',parent=self.plotcommand_frame,
                         expand='yes',fill='x',side='left')
         # CEBALERT: should disable unless data exists.
         self.pack_param('Redraw',parent=self.plotcommand_frame,
@@ -444,7 +444,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
     def refresh_plots(self):
         """
         Call plotgroup's make_plots with update=True (i.e. run
-        pre_plot_hooks and plot_command), then display the result.
+        pre_plot_hooks and plot_hooks), then display the result.
         """
         self.plotgroup.make_plots(update=True)
         self.update_plot_frame()        
@@ -455,7 +455,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
     def redraw_plots(self):
         """
         Call plotgroup's make_plots with update=False (i.e. run only
-        plot_command, not pre_plot_hooks), then display the result.
+        plot_hooks, not pre_plot_hooks), then display the result.
         """
         self.plotgroup.make_plots(update=False)
         self.update_plot_frame(labels=False)
@@ -464,7 +464,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
     def rescale_plots(self):
         """
         Rescale the existing plots, without calling either the
-        plot_command or the pre_plot_hooks, then display the result.
+        plot_hooks or the pre_plot_hooks, then display the result.
         """
         self.plotgroup.scale_images()
         self.update_plot_frame(labels=False,geom=True)

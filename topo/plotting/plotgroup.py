@@ -68,7 +68,7 @@ class PlotGroup(param.Parameterized):
         template for this plot, but various arguments can be passed, a
         modified version substituted, etc.""")
 
-    plot_command = param.HookList(default=[],doc="""
+    plot_hooks = param.HookList(default=[],doc="""
         Commands to execute when redrawing a plot rather than regenerating data.
 
         E.g, for a plot with data measured once but displayed one
@@ -116,8 +116,8 @@ class PlotGroup(param.Parameterized):
             f(**args)
 
 
-    def _exec_plot_command(self,**args):
-        for f in self.plot_command: 
+    def _exec_plot_hooks(self,**args):
+        for f in self.plot_hooks: 
             f(**args)
 
         
@@ -133,10 +133,10 @@ class PlotGroup(param.Parameterized):
     def make_plots(self,update=True):
 	"""
         Create and scale the plots, after first executing the PlotGroup's pre_plot_hooks
-        (if update is True) and plot_command.
+        (if update is True) and plot_hooks.
 	"""
         if update:self._exec_pre_plot_hooks()
-        self._exec_plot_command()
+        self._exec_plot_hooks()
         self._create_images(update)
         self.scale_images()
 
@@ -563,8 +563,8 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         self._check_sheet_type()
         super(ProjectionSheetPlotGroup,self)._exec_pre_plot_hooks(sheet=self.sheet,**args)
 
-    def _exec_plot_command(self,**args):
-        super(ProjectionSheetPlotGroup,self)._exec_plot_command(sheet=self.sheet,**args)
+    def _exec_plot_hooks(self,**args):
+        super(ProjectionSheetPlotGroup,self)._exec_plot_hooks(sheet=self.sheet,**args)
 
 
     # Special case: if the Strength is set to self.keyname, we
@@ -845,8 +845,8 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
     def _exec_pre_plot_hooks(self,**args):
 	super(UnitPlotGroup,self)._exec_pre_plot_hooks(coords=[(self.x,self.y)],**args)
 
-    def _exec_plot_command(self,**args):
-	super(UnitPlotGroup,self)._exec_plot_command(coords=[(self.x,self.y)],**args)
+    def _exec_plot_hooks(self,**args):
+	super(UnitPlotGroup,self)._exec_plot_hooks(coords=[(self.x,self.y)],**args)
 
 
 
@@ -896,8 +896,8 @@ class FeatureCurvePlotGroup(UnitPlotGroup):
         super(FeatureCurvePlotGroup,self)._exec_pre_plot_hooks(**args)
         self.get_curve_time()
 
-    def _exec_plot_command(self,**args):
-        super(FeatureCurvePlotGroup,self)._exec_plot_command(**args)
+    def _exec_plot_hooks(self,**args):
+        super(FeatureCurvePlotGroup,self)._exec_plot_hooks(**args)
         self.get_curve_time()
 
     def get_curve_time(self):

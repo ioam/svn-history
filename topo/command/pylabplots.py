@@ -825,7 +825,7 @@ class measure_position_pref(PositionMeasurementCommand):
 pg= create_plotgroup(name='Position Preference',category="Preference Maps",
            doc='Measure preference for the X and Y position of a Gaussian.',
            pre_plot_hooks=[measure_position_pref.instance()],
-           plot_command=[topographic_grid.instance()],
+           plot_hooks=[topographic_grid.instance()],
            normalize=True)
 
 pg.add_plot('X Preference',[('Strength','XPreference')])
@@ -910,7 +910,7 @@ class measure_cog(ParameterizedFunction):
 pg= create_plotgroup(name='Center of Gravity',category="Preference Maps",
              doc='Measure the center of gravity of each ConnectionField in a Projection.',
              pre_plot_hooks=[measure_cog.instance()],
-             plot_command=[topographic_grid.instance(xsheet_view_name="XCoG",ysheet_view_name="YCoG")],
+             plot_hooks=[topographic_grid.instance(xsheet_view_name="XCoG",ysheet_view_name="YCoG")],
              normalize=True)
 pg.add_plot('X CoG',[('Strength','XCoG')])
 pg.add_plot('Y CoG',[('Strength','YCoG')])
@@ -945,7 +945,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',
             Although the data takes a long time to collect, once it is ready the plots
             are available immediately for any unit.""",
         pre_plot_hooks=[measure_or_tuning_fullfield.instance()],
-        plot_command=[cyclic_tuning_curve.instance(x_axis="orientation")])
+        plot_hooks=[cyclic_tuning_curve.instance(x_axis="orientation")])
 
 
 
@@ -986,7 +986,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="
             Measure orientation tuning for a specific unit at different contrasts,
             using a pattern chosen to match the preferences of that unit.""",
         pre_plot_hooks=[measure_or_tuning.instance()],
-        plot_command=[cyclic_tuning_curve.instance(x_axis="orientation")],
+        plot_hooks=[cyclic_tuning_curve.instance(x_axis="orientation")],
         prerequisites=['XPreference'])
 
 
@@ -1045,7 +1045,7 @@ class measure_size_response(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
         doc='Measure the size preference for a specific unit.',
         pre_plot_hooks=[measure_size_response.instance()],
-        plot_command=[tuning_curve.instance(x_axis="size",unit="Diameter of stimulus")],
+        plot_hooks=[tuning_curve.instance(x_axis="size",unit="Diameter of stimulus")],
         prerequisites=['OrientationPreference','XPreference'])
 
 
@@ -1103,7 +1103,7 @@ class measure_contrast_response(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
         doc='Measure the contrast response function for a specific unit.',
         pre_plot_hooks=[measure_contrast_response.instance()],
-        plot_command=[tuning_curve.instance(x_axis="contrast",unit="%")],
+        plot_hooks=[tuning_curve.instance(x_axis="contrast",unit="%")],
         prerequisites=['OrientationPreference','XPreference'])
 
 
@@ -1164,7 +1164,7 @@ class measure_retinotopy(SinusoidalMeasureResponseCommand):
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
 
 
-    # JABALERT: Can't we move this to the plot_command, not the pre_plot_hooks?
+    # JABALERT: Can't we move this to the plot_hooks, not the pre_plot_hooks?
     def retinotopy_key(self,p):
         """Automatic plot of retinotopy color key."""
 
@@ -1285,7 +1285,7 @@ class measure_orientation_contrast(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
                  doc='Measure the response of one unit to a center and surround sine grating disk.',
                  pre_plot_hooks=[measure_orientation_contrast.instance()],
-                 plot_command=[tuning_curve.instance(x_axis="contrastcenter",unit="%")],
+                 plot_hooks=[tuning_curve.instance(x_axis="contrastcenter",unit="%")],
                  prerequisites=['OrientationPreference','XPreference'])        
 
 

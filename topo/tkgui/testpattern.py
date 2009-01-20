@@ -89,7 +89,7 @@ class TestPattern(SheetPanel):
         self.auto_refresh = True
 
         self.plotcommand_frame.pack_forget()
-        for name in ['pre_plot_hooks','plot_command','Fwd','Back']:
+        for name in ['pre_plot_hooks','plot_hooks','Fwd','Back']:
             self.hide_param(name)
 
         edit_sheet_param = self.get_parameter_object('edit_sheet')
