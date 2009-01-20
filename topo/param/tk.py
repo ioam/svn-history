@@ -1761,9 +1761,11 @@ class TkParameterized(TkParameterizedBase):
         param = self.get_parameter_object(name)
 
         lower_bound,upper_bound = param.get_soft_bounds()
+        
         if upper_bound is not None and lower_bound is not None:
             # TaggedSlider needs BOTH bounds (neither can be None)
-            w.set_bounds(lower_bound,upper_bound) 
+            w.set_bounds(lower_bound,upper_bound,inclusive_bounds=param.inclusive_bounds) 
+
 
         # have to do the lookup because subclass might override default
         if not lookup_by_class(self.param_immediately_apply_change,type(param)):
@@ -2805,7 +2807,7 @@ class TaggedSlider(T.Frame):
     <<TagReturn>>    - Return pressed in tag
     <<SliderSet>>    - slider is clicked/dragged
     """
-    def __init__(self,master,variable,bounds=(0,1),
+    def __init__(self,master,variable,bounds=(0,1),inclusive_bounds=(True,True),
                  slider_length=100,tag_width=10,
                  tag_extra_config={},slider_extra_config={}):
         """
@@ -2831,7 +2833,10 @@ class TaggedSlider(T.Frame):
         T.Frame.__init__(self,master)
 
         self.variable= variable
+
+        # CEBALERT: shouldn't this be calling set_slider_bounds()?
         self.bounds = bounds
+        self.inclusive_bounds = inclusive_bounds
 
         self.tag = T.Entry(self,textvariable=self.variable,
                                  width=tag_width,**tag_extra_config)
@@ -2868,12 +2873,26 @@ class TaggedSlider(T.Frame):
         self._try_to_set_slider()
 
 
-    def set_slider_bounds(self,lower,upper):
+    def set_slider_bounds(self,lower,upper,inclusive_bounds=None):
         """
         Set new lower and upper bounds for the slider.
+
+        If specified, inclusive_bounds should be a sequence of length
+        2 specifying True or False for the lower and upper bounds.
         """
         self.bounds = (lower,upper)
+
+        if inclusive_bounds is not None:
+            self.inclusive_bounds = inclusive_bounds
+
+        epsilon = max(self.slider['resolution'],0.00000000001)
+
+        if self.inclusive_bounds[0] is False:
+            lower+=epsilon
+        if self.inclusive_bounds[1] is False:
+            upper-=epsilon
         self.slider.config(from_=lower,to=upper)
+
     set_bounds = set_slider_bounds
         
  
