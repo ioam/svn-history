@@ -614,7 +614,7 @@ class mpq(object):
 
 
         def number_add_inclusive_bounds(instance,state):
-            # inclusive_bounds added to Number in rXXXX
+            # inclusive_bounds added to Number in r9789
             if 'inclusive_bounds' not in state:
                 state['inclusive_bounds']=(True,True)
 
