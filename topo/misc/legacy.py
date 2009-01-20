@@ -613,6 +613,15 @@ class mpq(object):
         preprocess_state(param.Parameter,param_add_allow_None)
 
 
+        def number_add_inclusive_bounds(instance,state):
+            # inclusive_bounds added to Number in rXXXX
+            if 'inclusive_bounds' not in state:
+                state['inclusive_bounds']=(True,True)
+
+        from .. import param
+        preprocess_state(param.Number,number_add_inclusive_bounds)
+
+
 
 
 

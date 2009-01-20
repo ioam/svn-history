@@ -248,7 +248,10 @@ class Number(Dynamic):
     (None,None), meaning there are actually no hard bounds.  One or
     both bounds can be set by specifying a value
     (e.g. bounds=(None,10) means there is no lower bound, and an upper
-    bound of 10).
+    bound of 10). Bounds are inclusive by default, but exclusivity
+    can be specified for each bound by setting inclusive_bounds
+    (e.g. inclusive_bounds=(True,False) specifies an exclusive upper
+    bound).
 
     Number is also a type of Dynamic parameter, so its value
     can be set to a callable to get a dynamically generated
@@ -277,9 +280,9 @@ class Number(Dynamic):
     Example of creating a Number::
       AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
     """
-    __slots__ = ['bounds','_softbounds','allow_None']
+    __slots__ = ['bounds','_softbounds','allow_None','inclusive_bounds']
  
-    def __init__(self,default=0.0,bounds=None,softbounds=None,allow_None=False,**params):
+    def __init__(self,default=0.0,bounds=None,softbounds=None,allow_None=False,inclusive_bounds=(True,True),**params):
         """
         Initialize this parameter object and store the bounds.
 
@@ -288,6 +291,7 @@ class Number(Dynamic):
         super(Number,self).__init__(default=default,**params)
         
         self.bounds = bounds
+        self.inclusive_bounds = inclusive_bounds
         self._softbounds = softbounds
         self.allow_None = (default is None or allow_None)
         if not callable(default): self._check_value(default)  
@@ -372,18 +376,27 @@ class Number(Dynamic):
 
         if not (is_number(val)):
             raise ValueError("Parameter '%s' only takes numeric values"%(self._attrib_name))
+
         if self.bounds!=None:
             vmin,vmax = self.bounds
-            if vmin != None and vmax != None:
-                if not (vmin <= val <= vmax):
-                    raise ValueError("Parameter '%s' must be between %s and %s (inclusive)"%(self._attrib_name,vmin,vmax))
-            elif vmin != None:
-                if not vmin <= val: 
-                    raise ValueError("Parameter '%s' must be at least %s"%(self._attrib_name,vmin))
-            elif vmax != None:
-                if not val <=vmax:
-                    raise ValueError("Parameter '%s' must be at most %s"%(self._attrib_name,vmax))
+            incmin,incmax = self.inclusive_bounds
 
+            if vmax is not None:
+                if incmax is True:
+                    if not val <= vmax:
+                        raise ValueError("Parameter '%s' must be at most %s"%(self._attrib_name,vmax))
+                else:
+                    if not val < vmax:
+                        raise ValueError("Parameter '%s' must be less than %s"%(self._attrib_name,vmax))
+
+            if vmin is not None:
+                if incmin is True:
+                    if not val >= vmin:
+                        raise ValueError("Parameter '%s' must be at least %s"%(self._attrib_name,vmin))
+                else:
+                    if not val > vmin:
+                        raise ValueError("Parameter '%s' must be greater than %s"%(self._attrib_name,vmin))
+                    
 
     def get_soft_bounds(self):
         """
