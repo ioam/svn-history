@@ -329,6 +329,8 @@ class Number(Dynamic):
         super(Number,self).__set__(obj,bounded_val)
 
 
+    # CEBALERT: in the methods below, should be testing for identity
+    # with None, rather than equality
     def crop_to_bounds(self,val):
         """
         Return the given value cropped to be within the hard bounds
@@ -377,6 +379,7 @@ class Number(Dynamic):
         if not (is_number(val)):
             raise ValueError("Parameter '%s' only takes numeric values"%(self._attrib_name))
 
+
         if self.bounds!=None:
             vmin,vmax = self.bounds
             incmin,incmax = self.inclusive_bounds
@@ -396,6 +399,21 @@ class Number(Dynamic):
                 else:
                     if not val > vmin:
                         raise ValueError("Parameter '%s' must be greater than %s"%(self._attrib_name,vmin))
+
+##         could consider simplifying the above to something like this untested code:
+
+##          too_low = False if vmin is None else
+##                    (val < vmin if incmin else val <= vmin) and
+##                    (val > vmin if incmin else val <= vmin)
+
+##          too_high = ...
+
+##          if too_low or too_high:
+##              raise ValueError("Parameter '%s' must be in the range %s" % (self._attrib_name,self.rangestr()))
+
+##         where self.rangestr() formats the range using the usual notation for
+##         indicating exclusivity, e.g. "[0,10)". 
+
                     
 
     def get_soft_bounds(self):
