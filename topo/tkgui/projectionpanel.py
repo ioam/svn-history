@@ -157,14 +157,19 @@ class UnitsPanel(ProjectionSheetPanel):
         bounds = {'x':(l,r),
                   'y':(b,t)}
 
+        inclusive_bounds = {'x':(True,False),  # GUI knows about exclusive sheet bounds
+                            'y':(False,True)}
+
         for coord in ['x','y']:
             param_obj=self.get_parameter_object(coord)                
             param_obj.bounds = bounds[coord]
+            param_obj.inclusive_bounds = inclusive_bounds[coord]
             
             # (method can be called before x,y widgets added)
             if coord in self.representations:
                 w=self.representations[coord]['widget']
-                w.set_bounds(*param_obj.bounds)
+                w.set_bounds(param_obj.bounds[0],param_obj.bounds[1],
+                             inclusive_bounds=param_obj.inclusive_bounds)
                 w.tag_set()
 
         self.initial_args = {} # reset now we've used them
