@@ -60,7 +60,7 @@ class PlotGroup(param.Parameterized):
     the plots and other special parameters.
     """
 
-    update_command = param.HookList(default=[],doc="""
+    pre_plot_hooks = param.HookList(default=[],doc="""
         Commands to execute before updating this plot, e.g. to calculate sheet views.
         
         The commands can be any callable Python objects, i.e. any x for
@@ -111,8 +111,8 @@ class PlotGroup(param.Parameterized):
     
 
     # CB: (subclasses add more commands)
-    def _exec_update_command(self,**args):
-        for f in self.update_command: 
+    def _exec_pre_plot_hooks(self,**args):
+        for f in self.pre_plot_hooks: 
             f(**args)
 
 
@@ -132,10 +132,10 @@ class PlotGroup(param.Parameterized):
 
     def make_plots(self,update=True):
 	"""
-        Create and scale the plots, after first executing the PlotGroup's update_command
+        Create and scale the plots, after first executing the PlotGroup's pre_plot_hooks
         (if update is True) and plot_command.
 	"""
-        if update:self._exec_update_command()
+        if update:self._exec_pre_plot_hooks()
         self._exec_plot_command()
         self._create_images(update)
         self.scale_images()
@@ -414,7 +414,7 @@ class TemplatePlotGroup(SheetPlotGroup):
         
       plotgroups['Activity'] =
           TemplatePlotGroup(name='Activity', category='Basic',
-              update_command=[measure_activity],
+              pre_plot_hooks=[measure_activity],
               plot_templates=[('Activity',
                   {'Strength': 'Activity', 'Hue': 'OrientationPreference', 'Confidence': None})])
     
@@ -432,7 +432,7 @@ class TemplatePlotGroup(SheetPlotGroup):
     in the same PlotGroup::
 
       TemplatePlotGroup(name='Orientation Preference', category='Basic'
-          update_command=[measure_or_pref.instance()],
+          pre_plot_hooks=[measure_or_pref.instance()],
           plot_templates=
               [('Orientation Preference',
                   {'Strength': None, 'Hue': 'OrientationPreference'}),
@@ -558,10 +558,10 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     def _sheets(self):
         return [self.sheet]
 
-    def _exec_update_command(self,**args):
+    def _exec_pre_plot_hooks(self,**args):
         self.params('sheet').compute_default()
         self._check_sheet_type()
-        super(ProjectionSheetPlotGroup,self)._exec_update_command(sheet=self.sheet,**args)
+        super(ProjectionSheetPlotGroup,self)._exec_pre_plot_hooks(sheet=self.sheet,**args)
 
     def _exec_plot_command(self,**args):
         super(ProjectionSheetPlotGroup,self)._exec_plot_command(sheet=self.sheet,**args)
@@ -719,18 +719,18 @@ class RFProjectionPlotGroup(GridPlotGroup):
     input_sheet = param.ObjectSelector(default=None,compute_default_fn=default_input_sheet,
                                        doc="The sheet on which to measure the RFs.")
 
-    def _exec_update_command(self,**args): # RFHACK
+    def _exec_pre_plot_hooks(self,**args): # RFHACK
         self.params('input_sheet').compute_default()
-        super(RFProjectionPlotGroup,self)._exec_update_command(input_sheet=self.input_sheet,**args)
+        super(RFProjectionPlotGroup,self)._exec_pre_plot_hooks(input_sheet=self.input_sheet,**args)
 
 
 class RetinotopyPlotGroup(TemplatePlotGroup):
     input_sheet = param.ObjectSelector(default=None,compute_default_fn=default_input_sheet,
                                        doc="The sheet on which to measure the RFs.")
 
-    def _exec_update_command(self,**args): # RFHACK
+    def _exec_pre_plot_hooks(self,**args): # RFHACK
         self.params('input_sheet').compute_default()
-        super(RetinotopyPlotGroup,self)._exec_update_command(
+        super(RetinotopyPlotGroup,self)._exec_pre_plot_hooks(
             input_sheet=self.input_sheet,**args)
 
 
@@ -746,9 +746,9 @@ class ProjectionPlotGroup(GridPlotGroup):
         plot_channels['Strength']=key
         return plot_channels
 
-    def _exec_update_command(self,**args):
+    def _exec_pre_plot_hooks(self,**args):
         coords=self.generate_coords()
-        super(ProjectionPlotGroup,self)._exec_update_command(coords=coords,projection=self.projection,**args)
+        super(ProjectionPlotGroup,self)._exec_pre_plot_hooks(coords=coords,projection=self.projection,**args)
 
 
 
@@ -787,9 +787,9 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
         super(CFProjectionPlotGroup,self).__init__(**params)    
         self.filesaver = CFProjectionPlotGroupSaver(self)
 
-    def _exec_update_command(self,**args): 
+    def _exec_pre_plot_hooks(self,**args): 
         self._check_projection_type()
-        super(CFProjectionPlotGroup,self)._exec_update_command(**args)
+        super(CFProjectionPlotGroup,self)._exec_pre_plot_hooks(**args)
 
     # CB: same comment for ProjectionSheetPlotGroup's _check_sheet_type.
     def _check_projection_type(self):
@@ -842,8 +842,8 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
         return plot_channels
 
         
-    def _exec_update_command(self,**args):
-	super(UnitPlotGroup,self)._exec_update_command(coords=[(self.x,self.y)],**args)
+    def _exec_pre_plot_hooks(self,**args):
+	super(UnitPlotGroup,self)._exec_pre_plot_hooks(coords=[(self.x,self.y)],**args)
 
     def _exec_plot_command(self,**args):
 	super(UnitPlotGroup,self)._exec_plot_command(coords=[(self.x,self.y)],**args)
@@ -892,8 +892,8 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
 
 class FeatureCurvePlotGroup(UnitPlotGroup):
 
-    def _exec_update_command(self,**args):
-        super(FeatureCurvePlotGroup,self)._exec_update_command(**args)
+    def _exec_pre_plot_hooks(self,**args):
+        super(FeatureCurvePlotGroup,self)._exec_pre_plot_hooks(**args)
         self.get_curve_time()
 
     def _exec_plot_command(self,**args):

@@ -942,14 +942,14 @@ class Subplotting(param.Parameterized):
 #
 #      from topo.command.analysis import Feature
 #      from math import pi
-#      update_command=[measure_or_pref.instance( \
+#      pre_plot_hooks=[measure_or_pref.instance( \
 #         frequency_feature=Feature(name="frequency",values=frange(1.0,6.0,0.2)), \
 #         phase_feature=Feature(name="phase",range=(0.0,2*pi),step=2*pi/15,cyclic=True), \
 #         orientation_feature=Feature(name="orientation",range=(0.0,pi),step=pi/4,cyclic=True)])
 #   
 #    rather than the current, much more easily controllable implementation:
 #   
-#      update_command=[measure_or_pref.instance(frequencies=frange(1.0,6.0,0.2),\
+#      pre_plot_hooks=[measure_or_pref.instance(frequencies=frange(1.0,6.0,0.2),\
 #         num_phase=15,num_orientation=4)]
 #
 #    I.e., to change anything about a Feature, one has to supply an

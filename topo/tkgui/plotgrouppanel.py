@@ -82,7 +82,7 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         size=button_image_size,
         doc="""
         Refresh the current plot (i.e. force the current plot to be regenerated
-        by executing update_command and plot_command).""")
+        by executing pre_plot_hooks and plot_command).""")
 
     Redraw = tk.Button(image_path="topo/tkgui/icons/redo-small.png",
         size=button_image_size,
@@ -201,7 +201,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         # CEBALERT: replace 
 	self.messageBar = self.parent.status 
 
-        self.pack_param('update_command',parent=self.updatecommand_frame,
+        self.pack_param('pre_plot_hooks',parent=self.updatecommand_frame,
                         expand='yes',fill='x',side='left')
 
         self.pack_param('Refresh',parent=self.updatecommand_frame,
@@ -444,7 +444,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
     def refresh_plots(self):
         """
         Call plotgroup's make_plots with update=True (i.e. run
-        update_command and plot_command), then display the result.
+        pre_plot_hooks and plot_command), then display the result.
         """
         self.plotgroup.make_plots(update=True)
         self.update_plot_frame()        
@@ -455,7 +455,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
     def redraw_plots(self):
         """
         Call plotgroup's make_plots with update=False (i.e. run only
-        plot_command, not update_command), then display the result.
+        plot_command, not pre_plot_hooks), then display the result.
         """
         self.plotgroup.make_plots(update=False)
         self.update_plot_frame(labels=False)
@@ -464,7 +464,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
     def rescale_plots(self):
         """
         Rescale the existing plots, without calling either the
-        plot_command or the update_command, then display the result.
+        plot_command or the pre_plot_hooks, then display the result.
         """
         self.plotgroup.scale_images()
         self.update_plot_frame(labels=False,geom=True)

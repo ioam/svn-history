@@ -216,7 +216,7 @@ def measure_and_analyze_complexity():
 
 pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
-             update_command=[measure_and_analyze_complexity])
+             pre_plot_hooks=[measure_and_analyze_complexity])
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])

@@ -824,7 +824,7 @@ class measure_position_pref(PositionMeasurementCommand):
 
 pg= create_plotgroup(name='Position Preference',category="Preference Maps",
            doc='Measure preference for the X and Y position of a Gaussian.',
-           update_command=[measure_position_pref.instance()],
+           pre_plot_hooks=[measure_position_pref.instance()],
            plot_command=[topographic_grid.instance()],
            normalize=True)
 
@@ -909,7 +909,7 @@ class measure_cog(ParameterizedFunction):
 
 pg= create_plotgroup(name='Center of Gravity',category="Preference Maps",
              doc='Measure the center of gravity of each ConnectionField in a Projection.',
-             update_command=[measure_cog.instance()],
+             pre_plot_hooks=[measure_cog.instance()],
              plot_command=[topographic_grid.instance(xsheet_view_name="XCoG",ysheet_view_name="YCoG")],
              normalize=True)
 pg.add_plot('X CoG',[('Strength','XCoG')])
@@ -944,7 +944,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',
             Plot orientation tuning curves for a specific unit, measured using full-field sine gratings.
             Although the data takes a long time to collect, once it is ready the plots
             are available immediately for any unit.""",
-        update_command=[measure_or_tuning_fullfield.instance()],
+        pre_plot_hooks=[measure_or_tuning_fullfield.instance()],
         plot_command=[cyclic_tuning_curve.instance(x_axis="orientation")])
 
 
@@ -985,7 +985,7 @@ class measure_or_tuning(UnitCurveCommand):
 create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="Tuning Curves",doc="""
             Measure orientation tuning for a specific unit at different contrasts,
             using a pattern chosen to match the preferences of that unit.""",
-        update_command=[measure_or_tuning.instance()],
+        pre_plot_hooks=[measure_or_tuning.instance()],
         plot_command=[cyclic_tuning_curve.instance(x_axis="orientation")],
         prerequisites=['XPreference'])
 
@@ -1044,7 +1044,7 @@ class measure_size_response(UnitCurveCommand):
 
 create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
         doc='Measure the size preference for a specific unit.',
-        update_command=[measure_size_response.instance()],
+        pre_plot_hooks=[measure_size_response.instance()],
         plot_command=[tuning_curve.instance(x_axis="size",unit="Diameter of stimulus")],
         prerequisites=['OrientationPreference','XPreference'])
 
@@ -1102,7 +1102,7 @@ class measure_contrast_response(UnitCurveCommand):
 
 create_plotgroup(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
         doc='Measure the contrast response function for a specific unit.',
-        update_command=[measure_contrast_response.instance()],
+        pre_plot_hooks=[measure_contrast_response.instance()],
         plot_command=[tuning_curve.instance(x_axis="contrast",unit="%")],
         prerequisites=['OrientationPreference','XPreference'])
 
@@ -1164,7 +1164,7 @@ class measure_retinotopy(SinusoidalMeasureResponseCommand):
                 Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True)]
 
 
-    # JABALERT: Can't we move this to the plot_command, not the update_command?
+    # JABALERT: Can't we move this to the plot_command, not the pre_plot_hooks?
     def retinotopy_key(self,p):
         """Automatic plot of retinotopy color key."""
 
@@ -1216,7 +1216,7 @@ class measure_retinotopy(SinusoidalMeasureResponseCommand):
 
 
 pg=create_plotgroup(name='Retinotopy',category="Other",
-                    doc='Measure retinotopy',update_command=[measure_retinotopy.instance()],
+                    doc='Measure retinotopy',pre_plot_hooks=[measure_retinotopy.instance()],
                     normalize=True)
 pg.add_plot('Retinotopy',[('Hue','RetinotopyPreference')])
 pg.add_plot('Retinotopy Selectivity',[('Hue','RetinotopyPreference'),('Confidence','RetinotopySelectivity')])
@@ -1284,7 +1284,7 @@ class measure_orientation_contrast(UnitCurveCommand):
 
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
                  doc='Measure the response of one unit to a center and surround sine grating disk.',
-                 update_command=[measure_orientation_contrast.instance()],
+                 pre_plot_hooks=[measure_orientation_contrast.instance()],
                  plot_command=[tuning_curve.instance(x_axis="contrastcenter",unit="%")],
                  prerequisites=['OrientationPreference','XPreference'])        
 

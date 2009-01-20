@@ -672,8 +672,8 @@ script_repr_suppress_defaults=True
 
 # CEBALERT: How about some defaults?
 # Also, do we need an option to return repr without path, if desired?
-# E.g. to get 'update_command()' instead of
-# 'topo.command.analysis.update_command()' in the gui?
+# E.g. to get 'pre_plot_hooks()' instead of
+# 'topo.command.analysis.pre_plot_hooks()' in the gui?
 def script_repr(val,imports,prefix,settings):
     """
     Variant of repr() designed for generating a runnable script.

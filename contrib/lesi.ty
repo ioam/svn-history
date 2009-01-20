@@ -373,7 +373,7 @@ topo.sim.connect('V1Inh','V1Inh', delay=0.05,
                  nominal_bounds_template = BoundingBox(radius=0.03),learning_rate=0)
 
 
-topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].update_command="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[2.4],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=True,duration=1.0)"
+topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].pre_plot_hooks="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[2.4],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=True,duration=1.0)"
 
 import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0

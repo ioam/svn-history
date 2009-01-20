@@ -88,7 +88,7 @@ def generate(plotgroup_names):
 
         _reset_views(sheet)
 
-        plotgroups[name]._exec_update_command()
+        plotgroups[name]._exec_pre_plot_hooks()
 
         sheets_views = views[sheet.name] = {}
 
@@ -113,7 +113,7 @@ def test(plotgroup_names):
 
         sheet = topo.sim['V1']
         _reset_views(sheet)
-        plotgroups[name]._exec_update_command()
+        plotgroups[name]._exec_pre_plot_hooks()
 
         f = open(resolve_path('topo/tests/%s_t%s_%s.data'%(sim_name,topo.sim.timestr(),
                                                             name.replace(' ','_'))),'r')

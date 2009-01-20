@@ -320,7 +320,7 @@ def measure_deflection_pref(num_deflection=50,
 from topo.plotting.plotgroup import create_plotgroup
 pg= create_plotgroup(name='Deflection Preference',category="Preference Maps",
                      doc='Measure preference for direction stimulus for a lagged model.',
-                     update_command=[measure_deflection_pref])
+                     pre_plot_hooks=[measure_deflection_pref])
 pg.add_plot('Deflection Preference',[('Hue','DeflectionPreference')])
 pg.add_plot('Deflection Preference&Selectivity',[('Hue','DeflectionPreference'),
 						   ('Confidence','DeflectionSelectivity')])
@@ -601,7 +601,7 @@ topo.sim.connect('V1Inh','V1Inh', delay=0.05,
                  learning_rate=0.0)
 """
 import topo.command.analysis
-topo.command.analysis.plotgroups["Orientation Preference"].update_command="measure_or_pref(pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
+topo.command.analysis.plotgroups["Orientation Preference"].pre_plot_hooks="measure_or_pref(pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
 
 import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0

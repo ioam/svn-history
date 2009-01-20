@@ -357,7 +357,7 @@ def measure_deflection_pref(num_deflection=50,
 from topo.plotting.plotgroup import create_plotgroup
 pg= create_plotgroup(name='Deflection Preference',category="Preference Maps",
                      doc='Measure preference for direction stimulus for a lagged model.',
-                     update_command=[measure_deflection_pref])
+                     pre_plot_hooks=[measure_deflection_pref])
 pg.add_plot('Deflection Preference',[('Hue','DeflectionPreference')])
 pg.add_plot('Deflection Preference&Selectivity',[('Hue','DeflectionPreference'),
 						   ('Confidence','DeflectionSelectivity')])

@@ -69,7 +69,7 @@ def _equivalent_for_plotgroup_update(p1,p2):
     (if present) match in both plotgroups.
     """
 
-    attrs_to_check = ['update_command','keyname','sheet','x','y','projection','input_sheet','density','coords']
+    attrs_to_check = ['pre_plot_hooks','keyname','sheet','x','y','projection','input_sheet','density','coords']
 
     for a in attrs_to_check:
         if hasattr(p1,a) or hasattr(p2,a):
@@ -93,13 +93,13 @@ class save_plotgroup(ParameterizedFunction):
     """
 
     equivalence_fn = param.Callable(default=_equivalent_for_plotgroup_update,doc="""
-        Function to call on plotgroups p1,p2 to determine if calling update_command
+        Function to call on plotgroups p1,p2 to determine if calling pre_plot_hooks
         on one of them is sufficient to update both plots.  Should return False
         unless the commands are exact equivalents, including all relevant parameters.""")
 
     use_cached_results = param.Boolean(default=False,doc="""
         If True, will use the equivalence_fn to determine cases where
-        the update_command for a plotgroup can safely be skipped, to
+        the pre_plot_hooks for a plotgroup can safely be skipped, to
         avoid lengthy redundant computation.  Should usually be
         False for safety, but can be enabled for e.g. batch mode
         runs using a related batch of plots.""")
@@ -148,9 +148,9 @@ class save_plotgroup(ParameterizedFunction):
         plot_description="%s%s%s" % (plotgroup.name," " if keywords else "",keywords)
         if update:
             self.previous_plotgroups.append(plotgroup)
-            self.message("%s: Running update_command" % plot_description)
+            self.message("%s: Running pre_plot_hooks" % plot_description)
         else:
-            self.message("%s: Using cached update_command results" % plot_description)
+            self.message("%s: Using cached results from pre_plot_hooks" % plot_description)
 
         plotgroup.make_plots(update=update)
         plotgroup.filesaver.save_to_disk(**(p.saver_params))
@@ -212,7 +212,7 @@ def update_activity():
 
 pg = create_plotgroup(name='Activity',category='Basic',
              doc='Plot the activity for all Sheets.', auto_refresh=True,
-             update_command=[update_activity], plot_immediately=True)
+             pre_plot_hooks=[update_activity], plot_immediately=True)
 pg.add_plot('Activity',[('Strength','Activity')])
 
 
@@ -232,7 +232,7 @@ def update_rgb_activities():
 
 pg = create_plotgroup(name='RGB',category='Other',
              doc='Combine and plot the red, green, and blue activity for all appropriate Sheets.', auto_refresh=True,
-             update_command=[update_rgb_activities], plot_immediately=True)
+             pre_plot_hooks=[update_rgb_activities], plot_immediately=True)
 pg.add_plot('RGB',[('Red','RedActivity'),('Green','GreenActivity'),('Blue','BlueActivity')])
 
 
@@ -246,7 +246,7 @@ class update_connectionfields(UnitMeasurementCommand):
 
 pg= create_plotgroup(name='Connection Fields',category="Basic",
                      doc='Plot the weight strength in each ConnectionField of a specific unit of a Sheet.',
-                     update_command=[update_connectionfields],
+                     pre_plot_hooks=[update_connectionfields],
                      plot_immediately=True, normalize=True, situate=True)
 pg.add_plot('Connection Fields',[('Strength','Weights')])
 
@@ -258,7 +258,7 @@ class update_projection(UnitMeasurementCommand):
 
 pg= create_plotgroup(name='Projection',category="Basic",
            doc='Plot the weights of an array of ConnectionFields in a Projection.',
-           update_command=[update_projection],
+           pre_plot_hooks=[update_projection],
            plot_immediately=False, normalize=True,sheet_coords=True)
 pg.add_plot('Projection',[('Strength','Weights')])
 
@@ -286,7 +286,7 @@ class update_projectionactivity(ProjectionSheetMeasurementCommand):
 
 pg =  create_plotgroup(name='Projection Activity',category="Basic",
              doc='Plot the activity in each Projection that connects to a Sheet.',
-             update_command=[update_projectionactivity.instance()],
+             pre_plot_hooks=[update_projectionactivity.instance()],
              plot_immediately=True, normalize=True,auto_refresh=True)
 pg.add_plot('Projection Activity',[('Strength','ProjectionActivity')])
 
@@ -348,7 +348,7 @@ class measure_rfs(SingleInputResponseCommand):
 
 pg= create_plotgroup(name='RF Projection',category="Other",
     doc='Measure receptive fields.',
-    update_command=[measure_rfs.instance()],
+    pre_plot_hooks=[measure_rfs.instance()],
     normalize=True)
 pg.add_plot('RFs',[('Strength','RFs')])
 
@@ -465,7 +465,7 @@ class measure_or_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Orientation Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
-             update_command=[measure_sine_pref.instance()])
+             pre_plot_hooks=[measure_sine_pref.instance()])
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',
             [('Hue','OrientationPreference'), ('Confidence','OrientationSelectivity')])
@@ -477,7 +477,7 @@ pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
 
 pg= create_plotgroup(name='Spatial Frequency Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation and frequency.',
-             update_command=[measure_sine_pref.instance()])
+             pre_plot_hooks=[measure_sine_pref.instance()])
 pg.add_plot('Spatial Frequency Preference',[('Strength','FrequencyPreference')])
 pg.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity')])
 # Just calls measure_sine_pref to plot different maps.
@@ -494,7 +494,7 @@ class measure_od_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Ocular Preference',category="Preference Maps",
              doc='Measure preference for sine gratings between two eyes.',
-             update_command=[measure_sine_pref.instance()])
+             pre_plot_hooks=[measure_sine_pref.instance()])
 pg.add_plot('Ocular Preference',[('Strength','OcularPreference')])
 pg.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
 
@@ -522,7 +522,7 @@ class measure_phasedisparity(SinusoidalMeasureResponseCommand):
 pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",doc="""
     Measure preference for sine gratings at a specific orentation differing in phase
     between two input sheets.""",
-             update_command=[measure_phasedisparity.instance()],normalize=True)
+             pre_plot_hooks=[measure_phasedisparity.instance()],normalize=True)
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
 pg.add_static_image('Color Key','topo/command/disp_key_white_vert_small.png')
@@ -561,7 +561,7 @@ class measure_dr_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Direction Preference',category="Preference Maps",
              doc='Measure preference for sine grating movement direction.',
-             update_command=[measure_dr_pref.instance()])
+             pre_plot_hooks=[measure_dr_pref.instance()])
 pg.add_plot('Direction Preference',[('Hue','DirectionPreference')])
 pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
                                                 ('Confidence','DirectionSelectivity')])
@@ -594,7 +594,7 @@ class measure_hue_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Hue Preference',category="Preference Maps",
              doc='Measure preference for colors.',
-             update_command=[measure_hue_pref.instance()],normalize=True)
+             pre_plot_hooks=[measure_hue_pref.instance()],normalize=True)
 pg.add_plot('Hue Preference',[('Hue','HuePreference')])
 pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence','HueSelectivity')])
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
@@ -637,7 +637,7 @@ class measure_corner_or_pref(PositionMeasurementCommand):
 
 pg= create_plotgroup(name='Corner OR Preference',category="Preference Maps",
              doc='Measure orientation preference for corner shape (or other complex stimuli that cannot be represented as fullfield patterns).',
-             update_command=[measure_corner_or_pref.instance()],
+             pre_plot_hooks=[measure_corner_or_pref.instance()],
              normalize=True)
 pg.add_plot('Corner Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPreference'),

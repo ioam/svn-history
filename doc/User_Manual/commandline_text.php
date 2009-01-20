@@ -499,7 +499,7 @@ so that progress will be displayed in an open Activity window:
 
 <pre>
   o.sheet_coords=False
-  for f in o.update_command:
+  for f in o.pre_plot_hooks:
      f.display=True
 </pre>
 

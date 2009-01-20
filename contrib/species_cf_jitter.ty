@@ -438,31 +438,31 @@ apply_output_fn = locals().get('apply_output_fn',True)
 
 if species=="cat":
     if apply_output_fn==True:
-        topo.plotting.plotgroup.plotgroups["Orientation Preference"].update_command="measure_or_pref(scale=0.1,frequencies=[0.48],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
-        topo.plotting.plotgroup.plotgroups["Retinotopy"].update_command="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0)"
-        topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].update_command="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=True,duration=1.0)"
-        topo.plotting.plotgroup.plotgroups["Bar X Preference"].update_command="sweeping_bar_x_pref(thickness=1.04,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=True, duration=1.0)"
-        topo.plotting.plotgroup.plotgroups["Bar Y Preference"].update_command="sweeping_bar_y_pref(thickness=1.04,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=True, duration=1.0)"
+        topo.plotting.plotgroup.plotgroups["Orientation Preference"].pre_plot_hooks="measure_or_pref(scale=0.1,frequencies=[0.48],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
+        topo.plotting.plotgroup.plotgroups["Retinotopy"].pre_plot_hooks="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0)"
+        topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].pre_plot_hooks="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=True,duration=1.0)"
+        topo.plotting.plotgroup.plotgroups["Bar X Preference"].pre_plot_hooks="sweeping_bar_x_pref(thickness=1.04,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=True, duration=1.0)"
+        topo.plotting.plotgroup.plotgroups["Bar Y Preference"].pre_plot_hooks="sweeping_bar_y_pref(thickness=1.04,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=True, duration=1.0)"
     else:
-        topo.plotting.plotgroup.plotgroups["Orientation Preference"].update_command="measure_or_pref(frequencies=[0.48],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))"
-        topo.plotting.plotgroup.plotgroups["Retinotopy"].update_command="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=False,duration=0.175)"
-        topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].update_command="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=False,duration=0.175)"
-        topo.plotting.plotgroup.plotgroups["Bar X Preference"].update_command="sweeping_bar_x_pref(thickness=1.04,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=False, duration=0.175)"
-        topo.plotting.plotgroup.plotgroups["Bar Y Preference"].update_command="sweeping_bar_y_pref(thickness=1.04,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=False, duration=0.175)"
+        topo.plotting.plotgroup.plotgroups["Orientation Preference"].pre_plot_hooks="measure_or_pref(frequencies=[0.48],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))"
+        topo.plotting.plotgroup.plotgroups["Retinotopy"].pre_plot_hooks="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=False,duration=0.175)"
+        topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].pre_plot_hooks="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=False,duration=0.175)"
+        topo.plotting.plotgroup.plotgroups["Bar X Preference"].pre_plot_hooks="sweeping_bar_x_pref(thickness=1.04,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=False, duration=0.175)"
+        topo.plotting.plotgroup.plotgroups["Bar Y Preference"].pre_plot_hooks="sweeping_bar_y_pref(thickness=1.04,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=False, duration=0.175)"
 
 
 elif species=="mouse":
     if apply_output_fn==True:
-        topo.plotting.plotgroup.plotgroups["Orientation Preference"].update_command="measure_or_pref(frequencies=[1.83],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
-        topo.plotting.plotgroup.plotgroups["Retinotopy"].update_command="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0)"
-        topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].update_command="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=True,duration=1.0)"
-        topo.plotting.plotgroup.plotgroups["Bar X Preference"].update_command="sweeping_bar_x_pref(thickness=0.27,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=True, duration=1.0)"
-        topo.plotting.plotgroup.plotgroups["Bar Y Preference"].update_command="sweeping_bar_y_pref(thickness=0.27,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=True, duration=1.0)"
+        topo.plotting.plotgroup.plotgroups["Orientation Preference"].pre_plot_hooks="measure_or_pref(frequencies=[1.83],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
+        topo.plotting.plotgroup.plotgroups["Retinotopy"].pre_plot_hooks="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0)"
+        topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].pre_plot_hooks="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=True,duration=1.0)"
+        topo.plotting.plotgroup.plotgroups["Bar X Preference"].pre_plot_hooks="sweeping_bar_x_pref(thickness=0.27,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=True, duration=1.0)"
+        topo.plotting.plotgroup.plotgroups["Bar Y Preference"].pre_plot_hooks="sweeping_bar_y_pref(thickness=0.27,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=True, duration=1.0)"
     else:  
-        topo.plotting.plotgroup.plotgroups["Orientation Preference"].update_command="measure_or_pref(frequencies=[1.83],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))"
-        topo.plotting.plotgroup.plotgroups["Retinotopy"].update_command="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=False,duration=0.175)"
-        topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].update_command="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=False,duration=0.175)"
-        topo.plotting.plotgroup.plotgroups["Bar X Preference"].update_command="sweeping_bar_x_pref(thickness=0.27,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=False, duration=0.175)"
-        topo.plotting.plotgroup.plotgroups["Bar Y Preference"].update_command="sweeping_bar_y_pref(thickness=0.27,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=False, duration=0.175)"
+        topo.plotting.plotgroup.plotgroups["Orientation Preference"].pre_plot_hooks="measure_or_pref(frequencies=[1.83],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))"
+        topo.plotting.plotgroup.plotgroups["Retinotopy"].pre_plot_hooks="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=False,duration=0.175)"
+        topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].pre_plot_hooks="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=False,duration=0.175)"
+        topo.plotting.plotgroup.plotgroups["Bar X Preference"].pre_plot_hooks="sweeping_bar_x_pref(thickness=0.27,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=False, duration=0.175)"
+        topo.plotting.plotgroup.plotgroups["Bar Y Preference"].pre_plot_hooks="sweeping_bar_y_pref(thickness=0.27,scale=0.3,offset=0.0,weighted_average=True, display=False, output_fn=False, duration=0.175)"
 
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0

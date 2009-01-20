@@ -1122,7 +1122,7 @@ def rfs_analysis_function(sheet="V1", sheets_to_measure=["V1"]):
     from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
 
-    #topo.plotting.plotgroup.plotgroups["RF Projection"].update_command="measure_rfs(scale=10.0,display=False,use_full=True,l=-1.0,b=-1.0,r=1.0,t=1.0)"
+    #topo.plotting.plotgroup.plotgroups["RF Projection"].pre_plot_hooks="measure_rfs(scale=10.0,display=False,use_full=True,l=-1.0,b=-1.0,r=1.0,t=1.0)"
     #present a pattern without plasticity to ensure that values are initialized at t=0
     pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
                     plastic=False,apply_output_fn=True,overwrite_previous=False)
