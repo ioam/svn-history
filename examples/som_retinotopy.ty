@@ -8,7 +8,7 @@ Constructed to match the retinotopic simulation from page 53-59 of
 Miikkulainen, Bednar, Choe, and Sirosh (2005), Computational Maps in
 the Visual Cortex, Springer.  Known differences include:
 
- - The default_density and default_retina_density are smaller for
+ - The cortex_density and retina_density are smaller for
    speed (compared to 40 and 24 in the book).
  - The original simulation used a radius_0 of 13.3/40, which does work
    for some random seeds, but a much larger radius is used here so that
@@ -21,43 +21,63 @@ __version__='$Revision$'
 
 from math import exp, sqrt
 
-from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet
+from topo import learningfn,numbergen,outputfn,param,pattern,projection,responsefn,sheet
 
 import topo.learningfn.projfn 
 import topo.pattern.random
 import topo.responsefn.optimized 
 
 
+from topo.misc.commandline import global_params as p
+p.add(
+
+    retina_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the retina."""),
+
+    cortex_density=param.Number(default=48.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for V1."""),
+
+    input_seed=param.Number(default=0,bounds=(0,None),doc="""
+        Seed for the pseudorandom number generator controlling the
+        input patterns."""),
+
+    weight_seed=param.Number(default=0,bounds=(0,None),doc="""
+        Seed for the pseudorandom number generator controlling the
+        initial weight values."""),
+
+    radius_0=param.Number(default=1.0,bounds=(0,None),doc="""
+        Starting radius for the neighborhood function."""),
+
+    alpha_0=param.Number(default=0.42,bounds=(0,None),doc="""
+        Starting value for the learning rate."""))
+
+
 # input pattern
 sheet.GeneratorSheet.period = 1.0
 sheet.GeneratorSheet.phase = 0.05
-# The locals().get calls allow the parameter to be overriden on the command line
-sheet.GeneratorSheet.nominal_density = locals().get('default_retina_density',10.0)
-
-# Local variable to allow inputs to be controlled easily
-input_seed=locals().get('input_seed',0)
+sheet.GeneratorSheet.nominal_density = p.retina_density
 
 input_pattern = pattern.Gaussian(scale=1.0,size=2*sqrt(2.0*0.1*24.0)/24.0,
     aspect_ratio=1.0,orientation=0,
-    x=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+12),
-    y=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+56))
+    x=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=p.input_seed+12),
+    y=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=p.input_seed+56))
 
 
 # Local variable to allow weights to be controlled easily
-weight_seed=locals().get('weight_seed',0)
-pattern.random.seed((weight_seed+67,weight_seed+89))
+pattern.random.seed((p.weight_seed+67,p.weight_seed+89))
 
 topo.sim['Retina'] = sheet.GeneratorSheet(input_generator=input_pattern)
 
-default_density=locals().get('default_density',10.0)
 topo.sim['V1'] = sheet.CFSheet(
-    nominal_density = default_density,
+    nominal_density = p.cortex_density,
     # Original CMVC simulation used an initial radius of 13.3/40.0 (~0.33)
-    output_fn = outputfn.KernelMax(density=default_density,
+    output_fn = outputfn.KernelMax(density=p.cortex_density,
         kernel_radius=numbergen.BoundedNumber(
             bounds=(0.5/40,None),
             generator=numbergen.ExponentialDecay(
-                starting_value=locals().get('radius_0',1.0),
+                starting_value=p.radius_0,
                 time_constant=40000/5.0))))
 
 topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,
@@ -65,7 +85,7 @@ topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,
     weights_generator = pattern.random.UniformRandom(),
     nominal_bounds_template=sheet.BoundingBox(radius=1.0), # fully connected network.
     learning_rate=numbergen.ExponentialDecay(
-        starting_value = locals().get('alpha_0',0.42),
+        starting_value = p.alpha_0,
         time_constant=40000/6.0),
     response_fn = responsefn.optimized.CFPRF_EuclideanDistance_opt(),
     learning_fn = learningfn.projfn.CFPLF_EuclideanHebbian())
