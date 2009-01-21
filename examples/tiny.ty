@@ -24,13 +24,13 @@ from topo.sheet import GeneratorSheet
 from topo.outputfn.basic import DivisiveNormalizeL1
 from topo.misc.numbergenerator import UniformRandom
 
-from topo.misc.commandline import global_params
-global_params.add(
-    default_retina_density=param.Number(default=24,doc="""
-    Default nominal_density for the retina."""),
+from topo.misc.commandline import global_params as p
+p.add(
+    retina_density=param.Number(default=24,doc="""
+    The nominal_density to use for the retina."""),
 
-    default_density=param.Number(default=5,doc="""
-    Default nominal_density for V1."""))
+    cortex_density=param.Number(default=5,doc="""
+    The nominal_density to use for V1."""))
 
 
 # Same as topo.base.connectionfield.Hebbian; copied here as a template
@@ -75,9 +75,9 @@ gaussian_generator = topo.pattern.basic.Gaussian(
 topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
                                     nominal_bounds=BoundingBox(radius=0.6),
                                     period=1.0,phase=0.05,
-                                    nominal_density=global_params.default_retina_density)
+                                    nominal_density=p.retina_density)
 
-topo.sim['V1'] = CFSheet(nominal_density=global_params.default_density,
+topo.sim['V1'] = CFSheet(nominal_density=p.cortex_density,
                          nominal_bounds=BoundingBox(radius=0.5),
                          output_fn=PiecewiseLinear(lower_bound=0,upper_bound=1.0))
 
