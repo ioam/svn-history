@@ -1,32 +1,21 @@
 """
-Example of a LISSOM-based position, orientation, direction, speed,
-ocular dominance, disparity, spatial frequency, and color preference
-map.
+Example of a LISSOM-based position, orientation, phase, direction,
+speed, ocular dominance, disparity, spatial frequency, and color
+preference map.
 
 Orientation, direction, ocular dominance, disparity, spatial frequency
-and color dimensions can be turned on and off.  All maps have position
-information, and speed is always present when direction is included.
+and color dimensions can be turned on and off; see the dims parameter
+below.  All maps inherently include position information, speed is
+always present when direction is included, and phase is always present
+when orientation is included.  The training dataset (e.g. natural
+images or artificial inputs) can be selected using the dataset
+parameter below.
 
-Here are examples of the commands that you could use to get the specified combinations of maps:
+For example, 
 
-  OR:               ./topographica -c "dims=['or']"                     examples/lissom.ty
-  OR/DR:            ./topographica -c "dims=['or','dr']"                examples/lissom.ty
-  OR/OD:            ./topographica -c "dims=['or','od']"                examples/lissom.ty
-  OR/RG:            ./topographica -c "dims=['or','rg']"                examples/lissom.ty
-  OR/OD/DR:         ./topographica -c "dims=['or','od','dr']"           examples/lissom.ty
-  OR/OD/DR/DY:      ./topographica -c "dims=['or','od','dr','dy']"      examples/lissom.ty
-  OR/OD/DR/DY/SF:   ./topographica -c "dims=['or','od','dr','dy','sf']" examples/lissom.ty
-  OR/OD/DR/DY/RG:   ./topographica -c "dims=['or','od','dr','dy','rg']" examples/lissom.ty
-  OR/OD/DR/DY/CR:   ./topographica -c "dims=['or','od','dr','dy','cr']" examples/lissom.ty
-  OR/OD/DR/DY/CR/SF:./topographica -c "dims=['or','od','dr','dy','cr','sf']" examples/lissom.ty
+  ./topographica -c "dims=['or','od']" -c "dataset='Gaussian'" examples/lissom.ty
 
-OR/OD/DR/DY is the default.
-
-You can also select different training datasets:
- Gaussians:      ./topographica -c "dataset='Gaussian'" examples/lissom.ty
- Natural images: ./topographica -c "dataset='Nature'"   examples/lissom.ty  
- Color images:   ./topographica -c "dataset='FoliageB'" examples/lissom.ty  
-Gaussian is the default.
+selects a Gaussian OR/OD simulation.  Gaussian OR/OD/DR/DY is the default.
 
 These simulations are intended to be close (but approximate) matches
 to the various map simulations in chapter 5 of Miikkulainen, Bednar,
@@ -137,26 +126,46 @@ natural_image_sets = ['Nature','FoliageA','FoliageB']
 # I haven't yet used this file enough to know what's best...
 
 
-# CEBALERT: some docs need expanding...
 from topo.misc.commandline import global_params as p
 p.add(
 
-    dataset=param.String(default="Gaussian",doc="""
-        Set of input patterns to use."""),
+    dataset=param.Enumeration(default='Gaussian',available=
+        ['Gaussian','Nature','FoliageA','FoliageB'],doc="""
+        Set of input patterns to use::
 
-    dims=param.Parameter(default=['or','od','dr','dy'],doc="""
-        Stimulus dimensions to include."""),
+          :'Gaussian': Two-dimensional Gaussians
+          :'Nature':   Shouval's 1999 monochrome 256x256 images
+          :'FoliageA': McGill calibrated LMS foliage/ image subset (5)
+          :'FoliageB': McGill calibrated LMS foliage/ image subset (25)"""),
 
-    retina_density=param.Number(default=24.0,doc="""
+    dims=param.List(default=['or','od','dr','dy'],class_=str,doc="""
+        Stimulus dimensions to include, out of the possible list::
+        
+          :'or': Orientation
+          :'od': Ocular dominance
+          :'dr': Direction of motion
+          :'dy': Disparity
+          :'rg': Red/Green color (not to be combined with cr)
+          :'cr': RGB/LMS Color (not to be combined with rg)
+          :'sf': Spatial frequency
+
+        Each additional dimension increases the realism, but adds
+        significant complexity, computation time, and memory
+        requirements."""),
+
+    retina_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
         Default nominal_density for the retina."""),
 
-    lgn_density=param.Number(default=24.0,doc="""
+    lgn_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
         Default nominal_density for the lgn."""),
 
-    cortex_density=param.Number(default=48.0,doc="""
+    cortex_density=param.Number(default=48.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
         Default nominal_density for V1."""),
 
-    max_disparity=param.Number(default=4.0,doc="""
+    max_disparity=param.Number(default=4.0,bounds=(0,None),doc="""
         Maximum disparity between input pattern positions in left and
         right eyes."""),
 
