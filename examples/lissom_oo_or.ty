@@ -33,7 +33,7 @@ __version__='$Revision$'
 from math import pi, sqrt
 import numpy
 
-from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet 
+from topo import learningfn,numbergen,outputfn,param,pattern,projection,responsefn,sheet
 
 import topo.learningfn.optimized
 import topo.learningfn.projfn 
@@ -101,7 +101,7 @@ topo.sim['LGNOn']=sheet.CFSheet(nominal_density=p.lgn_density,
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
-topo.sim['LGNOff']=sheet.CFSheet(p.lgn_density,
+topo.sim['LGNOff']=sheet.CFSheet(nominal_density=p.lgn_density,
     nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
