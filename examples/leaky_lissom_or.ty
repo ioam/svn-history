@@ -28,13 +28,25 @@ from topo.learningfn.projfn import CFPLF_OutstarHebbian
 from topo.misc.numbergenerator import UniformRandom
 
 
+from topo.misc.commandline import global_params as p
+p.add(
+
+    retina_density=param.Number(default=36.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the retina."""),
+
+    cortex_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for V1."""))
+
+
 # CEBHACKALERT: should be changed over to use circular connection fields.
 # (This requires that the learning rates be adjusted.)
 
 
 ### Setup input
 #
-GeneratorSheet.nominal_density = 36.0 
+GeneratorSheet.nominal_density = p.retina_density
 GeneratorSheet.period = 1
 GeneratorSheet.phase = 0.05
 GeneratorSheet.nominal_bounds = BoundingBox(radius=0.72)
@@ -53,7 +65,7 @@ input_pattern = topo.pattern.basic.TwoRectangles(scale=1.0)
 
 ### LISSOM parameters
 #
-SLISSOM.nominal_density = locals().get('default_density',24.0)
+SLISSOM.nominal_density = p.cortex_density
 
 
 ### Specify weight initialization, response function, and learning function

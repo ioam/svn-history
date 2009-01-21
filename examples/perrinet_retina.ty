@@ -86,7 +86,16 @@ class PyNNRetina(EventProcessor):
             spikes,self.N,self.simtime/self.dt,self.dt)
         self.send_output(src_port=port,data=spike_out)
 
-N=locals().get('default_density',32)
+
+from topo.misc.commandline import global_params as p
+p.add(
+
+    cortex_density=param.Number(default=32.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for V1."""))
+
+
+N=p.cortex_density
 topo.sim["PyNNR"]=PyNNRetina(N=N)
 
 topo.sim["Photoreceptors"]=sheet.GeneratorSheet(

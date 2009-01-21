@@ -39,6 +39,20 @@ from topo.param import Parameterized
 import topo.pattern.basic
 import topo.pattern.random
 
+
+from topo.misc.commandline import global_params as p
+p.add(
+
+    retina_density=param.Number(default=30.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the retina."""),
+
+    # original network had a density of 256, but that is too large for normal use
+    cortex_density=param.Number(default=25.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for V1."""))
+
+
 # ALERT: Consider moving these to the main topo/ directory, perhaps
 # after generalizing them.
 
@@ -77,7 +91,7 @@ class PiecewiseLinearDecay(param.Parameterized):
 # input patterns
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.05
-GeneratorSheet.nominal_density = 30
+GeneratorSheet.nominal_density = p.retina_density
 
 gaussian_width = 0.23/sqrt(2)
 gaussian_height = 0.09/sqrt(2)
@@ -92,14 +106,13 @@ input_pattern = topo.pattern.basic.Gaussian(
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 
-# cortical sheet (original network had a density of 256, but that is too large for normal use)
-default_density=locals().get('default_density',25) #256
+default_density=p.cortex_density
 
 KernelMax.kernel_radius=PiecewiseLinearDecay()
 
 topo.sim['V1'] = CFSheet(
-    nominal_density = default_density,
-    output_fn = KernelMax(density=default_density))
+    nominal_density = p.cortex_density,
+    output_fn = KernelMax(density=p.cortex_density))
 
 from topo.misc.numbergenerator import ExponentialDecay
 CFProjection.learning_rate=LinearDecay()

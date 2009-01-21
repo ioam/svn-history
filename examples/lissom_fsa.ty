@@ -15,7 +15,7 @@ __version__='$Revision$'
 from math import pi, sqrt
 import numpy
 
-from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet 
+from topo import learningfn,numbergen,outputfn,param,pattern,projection,responsefn,sheet 
 
 import topo.learningfn.optimized
 import topo.learningfn.projfn 
@@ -25,6 +25,22 @@ import topo.responsefn.optimized
 import topo.sheet.lissom
 import topo.sheet.optimized
 
+from topo.misc.commandline import global_params as p
+p.add(
+
+    retina_density=param.Number(default=48.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the retina."""),
+
+    lgn_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the LGN."""),
+
+    cortex_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for V1."""))
+
+
 ### Specify weight initialization, response function, and learning function
 projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
@@ -32,7 +48,6 @@ projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
 projection.CFProjection.weights_output_fn=outputfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
-sheet.GeneratorSheet.nominal_density = 48.0
 
 
 ### Input patterns
@@ -57,22 +72,22 @@ combined_inputs = pattern.SeparatedComposite(min_separation=1.722972972972973,ge
 
 ### Sheets
 topo.sim['Retina']=sheet.GeneratorSheet(
-    nominal_density=locals().get('default_retina_density',48.0),
+    nominal_density=p.retina_density,
     nominal_bounds=sheet.BoundingBox(radius=1.77),
     input_generator=combined_inputs,period=1.0,phase=0.05)
 
 topo.sim['LGNOn']=sheet.CFSheet(
-    nominal_density=locals().get('default_lgn_density',24.0),    
+    nominal_density=p.lgn_density,    
     nominal_bounds=sheet.BoundingBox(radius=1.542),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 
 topo.sim['LGNOff']=sheet.CFSheet(
-    nominal_density=locals().get('default_lgn_density',24.0),    
+    nominal_density=p.lgn_density,    
     nominal_bounds=sheet.BoundingBox(radius=1.542),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 
 topo.sim['FSA'] = sheet.lissom.LISSOM(
-    nominal_density=locals().get('default_density',24.0),tsettle=9,
+    nominal_density=p.cortex_density,tsettle=9,
     nominal_bounds=sheet.BoundingBox(radius=0.5),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
 
