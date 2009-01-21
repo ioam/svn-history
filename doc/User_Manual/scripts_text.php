@@ -17,8 +17,8 @@ HREF="batch.html">separately</A>.
 systems (including Linux, Unix, and Mac) just open a terminal window,
 go to your <code>topographica/</code> directory, and type e.g.:
 
-<pre title="Win: topographica -g examples\cfsom_or.ty">
-  ./topographica -g examples/cfsom_or.ty
+<pre title="Win: topographica -g examples\tiny.ty">
+  ./topographica -g examples/tiny.ty
 </pre>
 
 or

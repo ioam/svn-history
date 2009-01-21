@@ -185,7 +185,7 @@ SVN.  We should consider how we want people to keep track of their
 code; should it be in the main SVN repository?  A separate "contrib"
 or "inprogress" branch?  We have to consider at least three types of
 examples, which may need three different locations: trivial
-(tiny.ty, cfsom_or.ty, hierarchical.ty), published
+(tiny.ty, hierarchical.ty), published
 (at least lissom_oo_or.ty, lissom_oo_dr.ty, lissom_or.ty,
 lissom_photo_or.ty, lissom_whisker_barrels.ty, obermayer_pnas90.ty,
 goodhill_network90.ty, som_retinotopy.ty), and ongoing research (by

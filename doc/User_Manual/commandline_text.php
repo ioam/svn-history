@@ -16,7 +16,7 @@ a Sheet named V1, you can display and change V1's parameters using
 Python commands:
 
 <pre>
-[cloud]v1cball: ./topographica -i examples/cfsom_or.ty 
+[cloud]v1cball: ./topographica -i examples/tiny.ty 
 
 Welcome to Topographica!
 
@@ -28,25 +28,25 @@ licensing information.
 
 
 topo_t000000.00_c1&gt;&gt;&gt; topo.sim['V1'].density
-               Out[1]:50.0
+               Out[1]:5.0
 
 topo_t000000.00_c2&gt;&gt;&gt; topo.sim['V1'].output_fn
-               Out[2]:KernelMax(crop_radius_multiplier=...)
+               Out[2]:PiecewiseLinear(lower_bound=...)
 
 topo_t000000.00_c3&gt;&gt;&gt; from topo.outputfn import *
 
-topo_t000000.00_c4&gt;&gt;&gt; topo.sim['V1'].output_fn=PiecewiseLinear(lower_bound=0.1,
-                 ...:                                          upper_bound=0.8)
+topo_t000000.00_c4&gt;&gt;&gt; topo.sim['V1'].output_fn=IdentityOF()
 
 topo_t000000.00_c5&gt;&gt;&gt; topo.sim['V1'].output_fn
-               Out[5]:PiecewiseLinear(lower_bound=...)
+               Out[5]:IdentityOF(name=...)
 
 topo_t000000.00_c6&gt;&gt;&gt; topo.sim['V1'].activity
                Out[6]:
-array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+array([[ 0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.]])
 ...
 </pre>
 
@@ -178,7 +178,7 @@ equivalent to entering its commands manually.
 program:</A>
 
 <pre>
-$ ./topographica -g examples/cfsom_or.ty
+$ ./topographica -g examples/tiny.ty
 Topographica&gt; topo.sim.run(1)
 Topographica&gt; from topo.command.pylabplots import *
 Topographica&gt; V1 = topo.sim['V1']

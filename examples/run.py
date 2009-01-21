@@ -128,7 +128,6 @@ group_targets = dict( all_quick=["hierarchical","cfsom_or","som_retinotopy","lis
 
 
 targets = {
-    "cfsom_or":       run("cfsom_or.ty",density=4),
     "hierarchical":   run("hierarchical.ty",density=4),
     "lissom_or":      run("lissom_or.ty",density=4),
     "lissom_oo_or":   run("lissom_oo_or.ty",density=4),
