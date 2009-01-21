@@ -6,7 +6,7 @@ simulation from figure 5.9 of Miikkulainen, Bednar, Choe, and Sirosh
 (2005), Computational Maps in the Visual Cortex, Springer.  Known
 differences include:
 
- - The default_density is smaller for practicality (142 in the book).
+ - The cortex_density is smaller for practicality (142 in the book).
  - The matching is not yet perfect at different densities
  - The lateral inhibitory radius is up to 0.5 matrix units greater
    than in the book, because Topographica enforces good
@@ -44,6 +44,26 @@ import topo.sheet.lissom
 import topo.sheet.optimized
 
 
+from topo.misc.commandline import global_params as p
+p.add(
+
+    area=param.Number(default=1.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        Default cortical area to simulate; 1.0 gives a 1.0x1.0 Sheet area in V1."""),
+
+    retina_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the retina."""),
+
+    lgn_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the LGN."""),
+
+    cortex_density=param.Number(default=48.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for V1."""))
+
+
 ### Specify weight initialization, response function, and learning function
 projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
@@ -70,30 +90,24 @@ inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)
 
 combined_inputs = pattern.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
-### Area scaling -- V1 is 1.0x1.0 by default
-default_area = locals().get('default_area',1.0)
 
 ### Sheets
-topo.sim['Retina']=sheet.GeneratorSheet(
-    nominal_density=locals().get('default_retina_density',24.0),
+topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=p.retina_density,
     input_generator=combined_inputs, period=1.0, phase=0.05,
-    nominal_bounds=sheet.BoundingBox(radius=default_area/2.0+0.25+0.375))
+    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25+0.375))
 
-topo.sim['LGNOn']=sheet.CFSheet(
-    nominal_density=locals().get('default_lgn_density',24.0),
-    nominal_bounds=sheet.BoundingBox(radius=default_area/2.0+0.25),
+topo.sim['LGNOn']=sheet.CFSheet(nominal_density=p.lgn_density,
+    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
-topo.sim['LGNOff']=sheet.CFSheet(
-    nominal_density=locals().get('default_lgn_density',24.0),
-    nominal_bounds=sheet.BoundingBox(radius=default_area/2.0+0.25),
+topo.sim['LGNOff']=sheet.CFSheet(p.lgn_density,
+    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
-topo.sim['V1'] = sheet.lissom.LISSOM(
-    nominal_density=locals().get('default_density',48.0),
-    nominal_bounds=sheet.BoundingBox(radius=default_area/2.0),tsettle=9,
+topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=p.cortex_density,
+    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0),tsettle=9,
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633),
     joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt)
 

@@ -155,15 +155,15 @@ p.add(
 
     retina_density=param.Number(default=24.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
-        Default nominal_density for the retina."""),
+        The nominal_density to use for the retina."""),
 
     lgn_density=param.Number(default=24.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
-        Default nominal_density for the lgn."""),
+        The nominal_density to use for the LGN."""),
 
     cortex_density=param.Number(default=48.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
-        Default nominal_density for V1."""),
+        The nominal_density to use for V1."""),
 
     max_disparity=param.Number(default=4.0,bounds=(0,None),doc="""
         Maximum disparity between input pattern positions in left and
