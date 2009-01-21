@@ -42,7 +42,7 @@ Springer.  Specifically:
 
 Known differences include:
 
- - The default_density is smaller for practicality (142 in the book).
+ - The cortex_density is smaller for practicality (142 in the book).
  - The matching is not yet perfect at different densities
  - The lateral inhibitory radius is up to 0.5 matrix units greater
    than in the book, because Topographica enforces good
@@ -147,13 +147,13 @@ p.add(
     dims=param.Parameter(default=['or','od','dr','dy'],doc="""
         Stimulus dimensions to include."""),
 
-    default_retina_density=param.Number(default=24.0,doc="""
+    retina_density=param.Number(default=24.0,doc="""
         Default nominal_density for the retina."""),
 
-    default_lgn_density=param.Number(default=24.0,doc="""
+    lgn_density=param.Number(default=24.0,doc="""
         Default nominal_density for the lgn."""),
 
-    default_density=param.Number(default=48.0,doc="""
+    cortex_density=param.Number(default=48.0,doc="""
         Default nominal_density for V1."""),
 
     max_disparity=param.Number(default=4.0,doc="""
@@ -172,7 +172,7 @@ if p.dims=='All':
     p.dims=['or','od','dr','dy','cr','sf']
    
 if p.dataset in natural_image_sets or 'dy' in p.dims:
-    p.set_default('default_retina_density',48.0)
+    p.set_default('retina_density',48.0)
 
 
 ### Set up parameters for specified type of simulation
@@ -316,7 +316,7 @@ for e in eyes:
             else: input_moved=input_composite
 
             topo.sim[e+cone+'Retina'+n]=sheet.GeneratorSheet(
-                nominal_density=p.default_retina_density,
+                nominal_density=p.retina_density,
                 input_generator=input_moved,
                 period=1.0, phase=0.05,
                 nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(sf_channels-1) + \
@@ -324,19 +324,19 @@ for e in eyes:
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+'LGN'+l+n]=sheet.CFSheet(
-                    nominal_density=p.default_lgn_density,
+                    nominal_density=p.lgn_density,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius),
                     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
             for channel in xrange(2,sf_channels+1):
                 topo.sim[e+'LGN'+l+n+'SF'+str(channel)]=sheet.CFSheet(
-                    nominal_density=p.default_lgn_density,
+                    nominal_density=p.lgn_density,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(channel-1)),
                     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
                 
 
-topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=p.default_density,
+topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=p.cortex_density,
                                      tsettle=9,nominal_bounds=sheet.BoundingBox(radius=0.5))
 
 topo.sim['V1'].output_fn.lower_bound=0.076 if p.dataset in natural_image_sets else 0.083
