@@ -11,15 +11,22 @@ __version__='$Revision$'
 
 from math import pi
 
-from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet
+from topo import learningfn,numbergen,outputfn,param,pattern,projection,responsefn,sheet
 
 import topo.learningfn.optimized 
 import topo.pattern.random
 import topo.responsefn.optimized 
 
 
+from topo.misc.commandline import global_params as p
+p.add(
+    retina_density=param.Number(default=20.0,doc="""
+    The nominal_density to use for the retina."""),
+
+    cortex_density=param.Number(default=10.0,doc="""
+    The nominal_density to use for cortical sheets."""))
+
 # Increase verbosity of message printing
-#from topo import param
 #param.parameterized.min_print_level = param.parameterized.MESSAGE
 
 
@@ -27,7 +34,7 @@ import topo.responsefn.optimized
 
 sheet.GeneratorSheet.period = 1.0
 sheet.GeneratorSheet.phase = 0.25
-sheet.GeneratorSheet.nominal_density = 20
+sheet.GeneratorSheet.nominal_density = p.retina_density
 
 left_input_pattern = pattern.Line(
     thickness=0.02,
@@ -52,7 +59,7 @@ projection.CFProjection.response_fn = responsefn.optimized.CFPRF_DotProduct_opt(
 
 
 ### Specify cortical sheets' density and output function
-sheet.CFSheet.nominal_density = locals().get('default_density',10.0)
+sheet.CFSheet.nominal_density = p.cortex_density
 # sheet activation saturates at 1
 sheet.CFSheet.output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 
