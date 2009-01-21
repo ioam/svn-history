@@ -75,6 +75,8 @@ updates are currently available in the latest SVN version:
   <div class="i2">- <?php classref('topo.command.analysis','measure_sine_pref')?>:
   general purpose measurement for any preference that can be tested
   with a sine grating</div>
+  <div class="i2">- Added support for script-level parameters (<?php
+  classref('topo.misc.commandline','GlobalParams)?>; see examples/lissom.ty</div>
 </dd>
 <dt>Example scripts:</dt>
 <dd>
