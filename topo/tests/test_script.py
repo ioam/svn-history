@@ -27,7 +27,7 @@ def generate_data(script="examples/lissom_oo_or.ty",data_filename=None,
     specified in run_for.
 
     args are set in __main__ before the script is executed (allowing
-    one to specify e.g.  default_density).
+    one to specify e.g. cortex_density).
     
     For the default data_filename of None, saves the resulting data to
     the pickle script_DATA.
@@ -84,9 +84,9 @@ def test_script(script="examples/lissom_oo_or.ty",data_filename=None,decimal=Non
     look_at = data['look_at']
 
     ## support old data files which contain only 'density'
-    ## (i.e. default_density)
+    ## (i.e. cortex_density)
     if 'args' not in data:
-        data['args']={'default_density' : data['density']}
+        data['args']={'cortex_density' : data['density']}
 
     args = data['args']
 
@@ -258,7 +258,7 @@ def compare_with_and_without_snapshot_NoSnapshot(script="examples/lissom_oo_or.t
     data_filename=script+"_PICKLETEST"
     
     # we must execute in main because e.g. scheduled events are run in __main__
-    __main__.__dict__['default_density']=density
+    __main__.__dict__['cortex_density']=density
     execfile(script,__main__.__dict__)
     
 
@@ -291,7 +291,7 @@ def compare_with_and_without_snapshot_CreateSnapshot(script="examples/lissom_oo_
     look_at=data['look_at']
     density=data['density']
     
-    __main__.__dict__['default_density']=density
+    __main__.__dict__['cortex_density']=density
     execfile(script,__main__.__dict__)        
 
     # check we have the same before any pickling
