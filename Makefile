@@ -178,9 +178,9 @@ oo_or_comparisons:
 
 
 # Test that the specified scripts haven't changed in results or speed.
-#SCRIPTS=^cfsom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty
+#SCRIPTS=^lissom_oo_or.ty ^som_retinotopy.ty
 # ^lissom_or_noshrinking.ty  - only matches to 4 dp with IMPORT_WEAVE=0 
-SCRIPTS= ^cfsom_or.ty ^hierarchical.ty ^lissom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^lissom.ty ^lissom_fsa.ty #^lissom_whisker_barrels.ty
+SCRIPTS= ^hierarchical.ty ^lissom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^lissom.ty ^lissom_fsa.ty #^lissom_whisker_barrels.ty
 # CEB: tests on these scripts temporarily suspended (SF.net #2053538)
 # ^lissom_oo_or_homeostatic.ty ^lissom_oo_or_homeostatic_tracked.ty
 
@@ -356,7 +356,7 @@ sf-web-site: reference-manual doc
 	rsync -v -arHz --rsh=ssh doc/. web.sf.net:/home/groups/t/to/topographica/htdocs/.
 
 
-SCRIPTS_TO_KEEP_IN_DIST= ^cfsom_or.ty ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_or.ty ^lissom_fsa.ty ^lissom_oo_or.ty ^lissom_or_movie.ty ^lissom_or.ty ^lissom.ty ^lissom_whisker_barrels.ty ^obermayer_pnas90.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^tiny.ty
+SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_or.ty ^lissom_fsa.ty ^lissom_oo_or.ty ^lissom_or_movie.ty ^lissom_or.ty ^lissom.ty ^lissom_whisker_barrels.ty ^obermayer_pnas90.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^tiny.ty
 
 
 # Clear out everything not intended for the public distribution
