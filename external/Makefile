@@ -6,7 +6,7 @@ CC = gcc
 # own Python, e.g. on Windows.)
 PYSETUP_OPT = --prefix=${PREFIX}
 
-default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip readline
+default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
 
 # uses touch -a to avoid changing modification dates
 platform-skip:
@@ -30,9 +30,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tilewrapper-uninstall psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean scrodget-clean tooltip-clean snit-clean svn2cl-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tilewrapper-uninstall psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean scrodget-clean tooltip-clean snit-clean svn2cl-clean readline-clean termcap-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tilewrapper-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall scrodget-uninstall tooltip-uninstall snit-uninstall svn2cl-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tilewrapper-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall scrodget-uninstall tooltip-uninstall snit-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall
 
 
 
@@ -74,7 +74,7 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 
 # LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
 # CB: rpath is ignored on OS X (so where are the library files taken from?). 
-python: ${PYTHON}.tgz tk blt
+python: ${PYTHON}.tgz tk blt readline
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
 # 32-bit/64-bit snapshot patch: topo SF.net #2119256
@@ -92,7 +92,7 @@ endif
 else
 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
 endif
-	cd ${PYTHON}; env PREFIX=${PREFIX} make 
+	cd ${PYTHON}; env PREFIX=${PREFIX} make EXTRA_CFLAGS=-I${PREFIX}/include
 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
 	touch python
 
@@ -911,7 +911,7 @@ READLINE = readline-5.2
 READLINE_UNINSTALL += lib/libreadline.* 
 READLINE_UNINSTALL += include/readline.h
 
-readline: ${READLINE}.tar.gz
+readline: ${READLINE}.tar.gz termcap
 	tar -xzf ${READLINE}.tar.gz
 	cd ${READLINE}; ./configure --prefix=${PREFIX} 
 	make -C ${READLINE}
@@ -922,6 +922,28 @@ readline-clean:
 	rm -rf ${READLINE} 
 readline-uninstall:
 	rm -rf readline $(foreach f, ${READLINE_UNINSTALL}, ${PREFIX}/${f})
+
+
+#############################################################
+# GNU TERMCAP
+TERMCAP = termcap-1.3.1
+
+TERMCAP_UNINSTALL += lib/libtermcap.* 
+TERMCAP_UNINSTALL += include/termcap.h
+
+termcap: ${TERMCAP}.tar.gz
+	tar -xzf ${TERMCAP}.tar.gz
+	cd ${TERMCAP}; ./configure --prefix=${PREFIX} 
+	make -C ${TERMCAP}
+	make -C ${TERMCAP} install
+	touch termcap
+
+termcap-clean: 
+	rm -rf ${TERMCAP} 
+termcap-uninstall:
+	rm -rf termcap $(foreach f, ${TERMCAP_UNINSTALL}, ${PREFIX}/${f})
+
+
 
 
 #############################################################
