@@ -70,7 +70,7 @@ LGN_off_output_fn=HalfRectify()
 # The ratio between the input and ouptut of the V1 neurons
 io_ratio=locals().get('io_ratio',3.6) 
 
-V1_OF=HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.1)
+V1_OF=HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.15)
 
 # Specify weight initialization, response function, and learning function
 CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
@@ -128,10 +128,15 @@ topo.sim['LGNOff']=LISSOM(nominal_density=default_retinal_density,
 
 # Add the lateral connectivity to LGN
 AddGC()
- 
+
+
+AH = ActivityHysteresis(time_constant=0.5) 
 topo.sim['V1'] = JointScaling(nominal_density=default_density,tsettle=16,plastic=True,apply_scaling=False,
                                 nominal_bounds=BoundingBox(radius=0.5),smoothing=smoothing,
-                                output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),V1_OF]))
+                                output_fn=PipelineOF(output_fns=[AH,V1_OF]))
+
+#make sure that activity is reset at the beginning of iteration
+topo.sim['V1'].beginning_of_iteration.append(AH.reset)
 
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
                  connection_type=SharedWeightCFProjection,strength=locals().get('ret_strength',2.33),
@@ -148,7 +153,7 @@ topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','J
                  learning_fn=CFPLF_Scaled_opt(),
                  strength=locals().get('aff_str',20.0),name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
-                 nominal_bounds_template=BoundingBox(radius=0.27083),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
          learning_rate=locals().get('aff_lr',1.5))
                      
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
@@ -156,7 +161,7 @@ topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','
                  learning_fn=CFPLF_Scaled_opt(),
                  strength=locals().get('aff_str',20.0),name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
-                 nominal_bounds_template=BoundingBox(radius=0.27083),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
          learning_rate=locals().get('aff_lr',1.5))
 
 # BACHAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -175,9 +180,9 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
         
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  connection_type=CFProjection,
-                 strength=-1.0*locals().get('inh_strength',3.3),
+                 strength=-1.0*locals().get('inh_strength',2.0),
                  #inh_strength should be increased for more distributed datasets i.e. when the frequency parameter is higher
-                 weights_generator=gauss_rand(size=0.25), #!!! put 2* back
+                 weights_generator=gauss_rand(size=0.15), #!!! put 2* back
                  nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_inh_lr',1.80873))
 
 
