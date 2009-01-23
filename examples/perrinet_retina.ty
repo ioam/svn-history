@@ -11,6 +11,7 @@
   2. Download nest-1 and Pynest1 from:
   
        http://www.nest-initiative.uni-freiburg.de/index.php/Software:Download
+       http://www.nest-initiative.org/index.php/Image:Pynest1.tgz
 
      and PyNN 0.3 from:
      
@@ -46,6 +47,11 @@
       ./topographica -g examples/perrinet_retina.ty
 
   You can then present any input pattern you like and see the results.
+
+  For comparison, you can also run the underlying code directly
+  (without Topographica):
+
+      bin/python examples/perrinet_retina_pynest.py
 """
 
 import numpy
@@ -69,11 +75,11 @@ class PyNNRetina(EventProcessor):
     def __init__(self,**params):
         super(PyNNRetina,self).__init__(**params)
         self.ps=pynr.retina_default()
-        self.ps.update({"simtime":self.simtime})
         self.ps.update({"N":self.N})
         self.dt=self.ps["dt"]
 
     def input_event(self,conn,data):
+        self.ps.update({"simtime":self.simtime})
         self.ps.update({"amplitude":.10*data})
         on_list,off_list=pynr.run_retina(self.ps)
         self.process_spikelist(on_list,"ONActivity")
@@ -86,16 +92,14 @@ class PyNNRetina(EventProcessor):
             spikes,self.N,self.simtime/self.dt,self.dt)
         self.send_output(src_port=port,data=spike_out)
 
-
+# Command-line controllable parameters
 from topo.misc.commandline import global_params as p
-p.add(
-
-    cortex_density=param.Number(default=32.0,bounds=(0,None),
-        inclusive_bounds=(False,True),doc="""
-        The nominal_density to use for V1."""))
+p.add(retina_density=param.Integer(default=32,bounds=(0,None),
+          inclusive_bounds=(False,True),doc="""
+          The nominal_density to use for the retina."""))
 
 
-N=p.cortex_density
+N=p.retina_density
 topo.sim["PyNNR"]=PyNNRetina(N=N)
 
 topo.sim["Photoreceptors"]=sheet.GeneratorSheet(
