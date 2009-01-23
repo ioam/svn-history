@@ -340,7 +340,7 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
             
         """
 
-        inline(code, ['input_activity','learning_rate_scaling_factor', 'output_activity','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], compiler='gcc',local_dict=locals())
+        inline(code, ['input_activity','learning_rate_scaling_factor', 'output_activity','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
 
 
 class CFPLF_Scaled(CFPLF_PluginScaled):
