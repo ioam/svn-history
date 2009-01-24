@@ -678,7 +678,7 @@ class ActivityHysteresis(OutputFnWithState):
         import topo.sheet.lissom
         import topo.base.functionfamily
         #topo.sheet.lissom.LISSOM.beginning_of_iteration.append(self.reset)
-        topo.base.functionfamily.PatternDrivenAnalysis.before_pattern_presentation.append(self.reset)
+        topo.base.functionfamily.PatternDrivenAnalysis.pre_presentation_hooks.append(self.reset)
         
     def __call__(self,x):
         if (self.first_call == True):

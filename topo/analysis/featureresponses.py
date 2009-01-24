@@ -182,8 +182,8 @@ class FeatureResponses(PatternDrivenAnalysis):
         super(FeatureResponses,self).__init__(**params)
         self.initialize_featureresponses(features)
         self.before_analysis_session.append(save_input_generators)
-        self.before_pattern_presentation.append(wipe_out_activity)
-        self.before_pattern_presentation.append(clear_event_queue)
+        self.pre_presentation_hooks.append(wipe_out_activity)
+        self.pre_presentation_hooks.append(clear_event_queue)
         self.after_analysis_session.append(restore_input_generators)
         
     def initialize_featureresponses(self,features):
@@ -255,7 +255,7 @@ class FeatureResponses(PatternDrivenAnalysis):
         # Could use complete_settings here, to avoid some
         # PatternPresenter special cases, but that might cause
         # conflicts with the existing PatternPresenter code.
-        for f in self.before_pattern_presentation: f()
+        for f in self.pre_presentation_hooks: f()
         #valstring = " ".join(["%s=%s" % (n,v) for n,v in complete_settings])
         #self.message("Presenting pattern %s" % valstring)
         self.pattern_presenter(dict(permuted_settings),self.param_dict)
