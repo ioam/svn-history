@@ -259,7 +259,7 @@ class FeatureResponses(PatternDrivenAnalysis):
         #valstring = " ".join(["%s=%s" % (n,v) for n,v in complete_settings])
         #self.message("Presenting pattern %s" % valstring)
         self.pattern_presenter(dict(permuted_settings),self.param_dict)
-        for f in self.after_pattern_presentation: f()
+        for f in self.post_presentation_hooks: f()
 
         if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
 

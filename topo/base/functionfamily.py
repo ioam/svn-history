@@ -264,7 +264,7 @@ class PatternDrivenAnalysis(param.Parameterized):
     pre_presentation_hooks = param.HookList(default=[],instantiate=False,doc="""
         List of callable objects to be run before each pattern is presented.""")
     
-    after_pattern_presentation = param.HookList(default=[],instantiate=False,doc="""
+    post_presentation_hooks = param.HookList(default=[],instantiate=False,doc="""
         List of callable objects to be run after each pattern is presented.""")
     
     after_analysis_session = param.HookList(default=[],instantiate=False,doc="""
