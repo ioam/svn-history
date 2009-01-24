@@ -156,6 +156,40 @@ class SnapshotSupport(object):
         # Haven't yet thought about whether or not it's actually possible
         # to get the version number before unpickling...
 
+        # removed this class in rXXXX
+        class InstanceMethodWrapper(object):
+            """
+            Wrapper for pickling instance methods.
+
+            The constructor takes an instance method (e.g. for an object
+            'sim', method sim.time) as its only argument.  The wrapper
+            instance is callable, picklable, etc.
+            """
+            def __repr__(self):
+                return repr(self.im.im_func)
+
+            # Hope __name__ doesn't get set...
+            def _fname(self):
+                return self.im.im_func.func_name
+            __name__ = property(_fname)
+
+            def __init__(self,im):
+                self.im = im
+
+            def __getstate__(self):
+                return (self.im.im_self,
+                        self.im.im_func.func_name)
+
+            def __setstate__(self,state):
+                obj,func_name = state
+                self.im = getattr(obj,func_name)
+
+            def __call__(self,*args,**kw):
+                return self.im(*args,**kw)
+
+        import topo.param
+        topo.param.InstanceMethodWrapper = InstanceMethodWrapper
+
         def param_remove_hidden(instance,state):
             # Hidden attribute removed from Parameter in r7861
             if 'hidden' in state:

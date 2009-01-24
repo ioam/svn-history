@@ -489,7 +489,7 @@ class FunctionEvent(Event):
     """
     def __init__(self,time,fn,*args,**kw):
         super(FunctionEvent,self).__init__(time)
-        self.fn = param.wrap_callable(fn)
+        self.fn = fn
         self.args = args
         self.kw = kw
 
@@ -957,8 +957,8 @@ class Simulation(param.Parameterized,OptionalSingleton):
         # we set step to 2 so that by default timing doesn't slow simulation too much. but
         # e.g. leaving it as None would result in info at 2% increments of requested run duration,
         # no matter what duration (0.005 or 5, etc).
-        self.timer = SomeTimer(func=param.wrap_callable(self.run),
-                               simulation_time_fn=param.wrap_callable(self.time))
+        self.timer = SomeTimer(func=self.run,
+                               simulation_time_fn=self.time)
 
 
     def __getitem__(self,item_name):

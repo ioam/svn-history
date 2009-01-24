@@ -55,6 +55,18 @@ release = ''
 version = ''
 
 
+
+# CEBALERT: can we move these pickle support functions elsewhere?
+# In fact, can we just gather all the non-legacy pickle garbage into one
+# place? I'd even like to get stuff out of classes, but I guess that
+# wouldn't always be desirable.
+# (What prompted this note is that, apart from the clutter the pickle
+# methods add to classes, I cannot remember all the ways one can
+# support pickling; the answer to any new pickle problem is often
+# spread throughout all the pickle methods I've ever added...)
+
+
+# (note that these _pickle_support functions also work for deep copying)
 def _numpy_ufunc_pickle_support():
     """
     Allow instances of numpy.ufunc to pickle.
@@ -80,6 +92,22 @@ def _mpq_pickle_support():
     mpq_type = type(mpq(1,10)) # CEBALERT: any idea how to get this properly?
     import copy_reg
     copy_reg.pickle(mpq_type,lambda q: (mpq,(q.digits(),)))
+
+
+
+def _instance_method_pickle_support():
+    """Allow instance methods to pickle."""
+    # CB: well, it seems to work - maybe there are cases where this
+    # wouldn't work?
+    def _pickle_instance_method(mthd):
+        mthd_name = mthd.im_func.__name__
+        obj = mthd.im_self
+        return getattr, (obj,mthd_name)
+
+    import copy_reg, types
+    copy_reg.pickle(types.MethodType, _pickle_instance_method)
+
+_instance_method_pickle_support()
 
 
 # Set the default value of Simulation.time_type to gmpy.mpq

@@ -533,26 +533,11 @@ class Callable(Parameter):
     regular standalone functions cannot be deepcopied as of Python
     2.4, so instantiate must be False for those values.
     """
-    def __init__(self,default=None,**params):
-        Parameter.__init__(self,default=wrap_callable(default),**params)
-
     def __set__(self,obj,val):
         if not callable(val):
             raise ValueError("Callable '%s' only takes a callable object."%self._attrib_name)
-        super(Callable,self).__set__(obj,wrap_callable(val))
+        super(Callable,self).__set__(obj,val)
 
-
-def wrap_callable(c):
-    """
-    Wrap a callable object in an InstanceMethodWrapper, if necessary.
-
-    If c is an instancemethod, then wrap it and return the wrapper,
-    otherwise return c.
-    """
-    if isinstance(c,types.MethodType):
-        return InstanceMethodWrapper(c)
-    else:
-        return c
         
 
 # CEBALERT: this should be a method of ClassSelector.
@@ -816,38 +801,6 @@ class Dict(ClassSelector):
 
 
 
-class InstanceMethodWrapper(object):
-    """
-    Wrapper for pickling instance methods.
-
-    The constructor takes an instance method (e.g. for an object
-    'sim', method sim.time) as its only argument.  The wrapper
-    instance is callable, picklable, etc.
-    """
-    # CEBALERT: Both repr and name disguise that this is an
-    # InstanceMethodWrapper.
-
-    def __repr__(self):
-        return repr(self.im.im_func)
-
-    # Hope __name__ doesn't get set...
-    def _fname(self):
-        return self.im.im_func.func_name
-    __name__ = property(_fname)
-    
-    def __init__(self,im):
-        self.im = im
-
-    def __getstate__(self):
-        return (self.im.im_self,
-                self.im.im_func.func_name)
-
-    def __setstate__(self,state):
-        obj,func_name = state
-        self.im = getattr(obj,func_name)
-
-    def __call__(self,*args,**kw):
-        return self.im(*args,**kw)
 
 
 
