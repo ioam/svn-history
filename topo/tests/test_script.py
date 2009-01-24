@@ -57,6 +57,19 @@ def generate_data(script="examples/lissom_oo_or.ty",data_filename=None,
 GenerateData=generate_data
 
 
+def _support_old_args(args):
+    # support old data files which contain 'default_density', etc
+    if 'default_density' in args:
+        args['cortex_density']=args['default_density']
+        #del args['default_density']
+    if 'default_retina_density' in args:
+        args['retina_density']=args['default_retina_density']
+        #del args['default_retina_density']
+    if 'default_lgn_density' in args:
+        args['lgn_density']=args['default_lgn_density']
+        #del args['default_lgn_density']
+    # (left the dels commented out for now in case scripts still use old names)
+
 def test_script(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None):
     """
     Run script with the parameters specified when its DATA file was
@@ -83,24 +96,12 @@ def test_script(script="examples/lissom_oo_or.ty",data_filename=None,decimal=Non
     run_for=data['run_for']
     look_at = data['look_at']
 
-    ## support old data files which contain 'density',
-    ## 'default_density', etc
+    # support very old data files that contain 'density' instead of args['cortex_density']
     if 'args' not in data:
         data['args']={'cortex_density' : data['density']}
 
     args = data['args']
-    if 'default_density' in args:
-        args['cortex_density']=args['default_density']
-        del args['default_density']
-    if 'default_retina_density' in args:
-        args['retina_density']=args['default_retina_density']
-        del args['default_retina_density']
-    if 'default_lgn_density' in args:
-        args['lgn_density']=args['default_lgn_density']
-        del args['default_lgn_density']
-    ##
-
-    
+    _support_old_args(args)
 
     for arg,val in args.items():
         __main__.__dict__[arg]=val
@@ -192,11 +193,14 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
         
     old_time = speed_data['how_long']
     iterations = speed_data['iterations']
-    args = speed_data['args']
+    args = speed_data['args']    
+
+    _support_old_args(args)
 
     for arg,val in args.items():
         __main__.__dict__[arg]=val
-    
+
+    print "Running '%s' with the following arguments: %s"%(script,args)
     new_time = time_sim_run(script,iterations)
 
     percent_change = 100.0*(new_time-old_time)/old_time
