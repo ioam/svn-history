@@ -237,7 +237,7 @@ slow-tests: print-info train-tests all-speed-tests map-tests
 
 # General rules for generating test data and running the tests
 %_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",run_for=[1,99,150],look_at="V1",default_density=8,default_retina_density=24,default_lgn_density=24)'
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",run_for=[1,99,150],look_at="V1",cortex_density=8,retina_density=24,lgn_density=24)'
 
 %_TEST: %_DATA
 	${TIMER}./topographica -c 'import_weave=${IMPORT_WEAVE}' -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",decimal=${TESTDP})'
@@ -269,13 +269,13 @@ v_lissom:
 
 # Special versions for specific scripts:
 topo/tests/lissom.ty_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_DATA",run_for=[1,99,150],look_at="V1",default_density=8,default_retina_density=6,default_lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_DATA",run_for=[1,99,150],look_at="V1",cortex_density=8,retina_density=6,lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
 
 topo/tests/lissom.ty_SPEEDDATA:
-	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_SPEEDDATA",iterations=250,default_density=8,default_retina_density=6,default_lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
+	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_SPEEDDATA",iterations=250,cortex_density=8,retina_density=6,lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
 
 topo/tests/lissom_fsa.ty_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_fsa.ty",data_filename="topo/tests/lissom_fsa.ty_DATA",run_for=[1,99,150],look_at="FSA",default_density=8,default_retina_density=24,default_lgn_density=24)'
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_fsa.ty",data_filename="topo/tests/lissom_fsa.ty_DATA",run_for=[1,99,150],look_at="FSA",cortex_density=8,retina_density=24,lgn_density=24)'
 
 topo/tests/lissom_whisker_barrels.ty_DATA:
 	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_whisker_barrels.ty",data_filename="topo/tests/lissom_whisker_barrels.ty_DATA",run_for=[1,99,150],look_at="S1")'
@@ -284,10 +284,10 @@ topo/tests/lissom_whisker_barrels.ty_DATA:
 
 # pass a list of plotgroup names to test() instead of plotgroups_to_test to restrict the tests
 map-tests:
-	./topographica -c "default_density=8" examples/lissom_oo_or.ty -c "topo.sim.run(100);from topo.tests.test_map_measurement import *; test(plotgroups_to_test)" 
+	./topographica -c "cortex_density=8" examples/lissom_oo_or.ty -c "topo.sim.run(100);from topo.tests.test_map_measurement import *; test(plotgroups_to_test)" 
 
 generate-map-tests-data:
-	./topographica -c "default_density=8" examples/lissom_oo_or.ty -c "topo.sim.run(100);from topo.tests.test_map_measurement import *; generate(plotgroups_to_test)" 
+	./topographica -c "cortex_density=8" examples/lissom_oo_or.ty -c "topo.sim.run(100);from topo.tests.test_map_measurement import *; generate(plotgroups_to_test)" 
 
 script-repr-tests:
 	./topographica examples/hierarchical.ty -a -c "save_script_repr('topo/tests/script_repr_test.ty')"
