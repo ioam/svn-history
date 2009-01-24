@@ -83,12 +83,24 @@ def test_script(script="examples/lissom_oo_or.ty",data_filename=None,decimal=Non
     run_for=data['run_for']
     look_at = data['look_at']
 
-    ## support old data files which contain only 'density'
-    ## (i.e. cortex_density)
+    ## support old data files which contain 'density',
+    ## 'default_density', etc
     if 'args' not in data:
         data['args']={'cortex_density' : data['density']}
 
     args = data['args']
+    if 'default_density' in args:
+        args['cortex_density']=args['default_density']
+        del args['default_density']
+    if 'default_retina_density' in args:
+        args['retina_density']=args['default_retina_density']
+        del args['default_retina_density']
+    if 'default_lgn_density' in args:
+        args['lgn_density']=args['default_lgn_density']
+        del args['default_lgn_density']
+    ##
+
+    
 
     for arg,val in args.items():
         __main__.__dict__[arg]=val
