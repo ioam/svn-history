@@ -258,7 +258,7 @@ class PatternDrivenAnalysis(param.Parameterized):
     
     __abstract = True
 
-    before_analysis_session = param.HookList(default=[],instantiate=False,doc="""
+    pre_analysis_session_hooks = param.HookList(default=[],instantiate=False,doc="""
         List of callable objects to be run before an analysis session begins.""")
     
     pre_presentation_hooks = param.HookList(default=[],instantiate=False,doc="""

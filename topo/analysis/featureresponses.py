@@ -181,7 +181,7 @@ class FeatureResponses(PatternDrivenAnalysis):
     def __init__(self,features,**params):
         super(FeatureResponses,self).__init__(**params)
         self.initialize_featureresponses(features)
-        self.before_analysis_session.append(save_input_generators)
+        self.pre_analysis_session_hooks.append(save_input_generators)
         self.pre_presentation_hooks.append(wipe_out_activity)
         self.pre_presentation_hooks.append(clear_event_queue)
         self.after_analysis_session.append(restore_input_generators)
@@ -205,7 +205,7 @@ class FeatureResponses(PatternDrivenAnalysis):
         """Present the given input patterns and collate the responses."""
         
         # Run hooks before the analysis session
-        for f in self.before_analysis_session: f()
+        for f in self.pre_analysis_session_hooks: f()
 
         self.param_dict=param_dict
         self.pattern_presenter = pattern_presenter
