@@ -31,7 +31,7 @@ import topo.responsefn.optimized
 from topo.misc.commandline import global_params as p
 p.add(
 
-    retina_density=param.Number(default=24.0,bounds=(0,None),
+    retina_density=param.Number(default=10.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
         The nominal_density to use for the retina."""),
 
