@@ -99,6 +99,9 @@ def _instance_method_pickle_support():
     """Allow instance methods to pickle."""
     # CB: well, it seems to work - maybe there are cases where this
     # wouldn't work?
+    # Alternative technique (totally different approach), but would
+    # only work with pickle (not cPickle):
+    # http://code.activestate.com/recipes/572213/
     def _pickle_instance_method(mthd):
         mthd_name = mthd.im_func.__name__
         obj = mthd.im_self

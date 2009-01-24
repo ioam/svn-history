@@ -1685,19 +1685,6 @@ class ParameterizedFunction(Parameterized):
         return (Parameterized.__new__,(self.__class__,),state)
         
 
-## CB: would allow all instance methods to pickle, but we use cPickle
-## rather than pickle (for speed), so we can't use this.
-##
-## # from http://code.activestate.com/recipes/572213/
-## import pickle,new
-## def save_instancemethod(self, obj):
-##     """ Save an instancemethod object """
-##     # Instancemethods are re-created each time they are accessed so this will not be memoized
-##     args = (obj.im_func, obj.im_self, obj.im_class)
-##     self.save_reduce(new.instancemethod, args)
-## pickle.Pickler.dispatch[new.instancemethod] = save_instancemethod
-
-
 
 # CEBALERT: This singleton-producing mechanism is pretty complicated,
 # and it would be great if someone could simplify it. Getting all of
@@ -1710,7 +1697,7 @@ class ParameterizedFunction(Parameterized):
 #     behave the same as any normal Python object.
 #
 # For how to use, see topo.base.simulation.Simulation or
-# topo.param.__init__.MainParams.
+# topo.misc.commandland.GlobalParams.
 class OptionalSingleton(object):
 
     _inst = None
