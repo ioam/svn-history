@@ -184,7 +184,7 @@ class FeatureResponses(PatternDrivenAnalysis):
         self.pre_analysis_session_hooks.append(save_input_generators)
         self.pre_presentation_hooks.append(wipe_out_activity)
         self.pre_presentation_hooks.append(clear_event_queue)
-        self.after_analysis_session.append(restore_input_generators)
+        self.post_analysis_session_hooks.append(restore_input_generators)
         
     def initialize_featureresponses(self,features):
         """Create an empty DistributionMatrix for each feature and each sheet."""
@@ -240,7 +240,7 @@ class FeatureResponses(PatternDrivenAnalysis):
         timer.call_fixed_num_times(self.permutations)
         
         # Run hooks after the analysis session
-        for f in self.after_analysis_session: f()
+        for f in self.post_analysis_session_hooks: f()
 
     def present_permutation(self,permutation):
         """Present a pattern with the specified set of feature values."""
