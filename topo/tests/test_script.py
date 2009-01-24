@@ -92,7 +92,8 @@ def test_script(script="examples/lissom_oo_or.ty",data_filename=None,decimal=Non
 
     for arg,val in args.items():
         __main__.__dict__[arg]=val
-        
+
+    print "Running '%s' with the following arguments: %s"%(script,args)
     execfile(script,__main__.__dict__)        
 
     for time in run_for:
