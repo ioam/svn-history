@@ -1,0 +1,67 @@
+#!bin/python
+
+__version__ = '$Revision: 9030 $'
+
+import os
+import sys
+
+raise NotImplementedError("script under construction")
+
+def usage():
+    print """
+Usage: etc/update_095_to_096 [file] 
+
+Example: etc/update_095_to_096 my_script.ty
+"""
+
+# Parse arguments
+if len(sys.argv)!=2:
+    usage()
+    sys.exit(-1)
+
+
+info = """
+$Id$
+
+
+This utility converts a script written for Topographica 0.9.5 into one
+that will work with Topographica 0.9.6.
+
+Your original script will not be altered; a new version will be saved
+with the filename suffix '_0.9.6'.
+
+If you find that the new version of your script will not run in
+Topographica 0.9.6, you have two options:
+
+(1) Submit your script to the Topographica developers, and we will
+    improve this updating script to handle the problem
+
+(2) Try to run the new script in Topographica with legacy support
+    enabled by passing '-l' at startup
+    (e.g. ./topographica -l -g your_script.ty
+
+
+"""
+
+print info
+
+# should be ordered most to least specific
+replacements = [
+    ('topo.outputfn'                 , 'topo.transferfn'),
+    ('OutputFn'                      , 'TransferFn')
+    ]
+     
+
+filename = sys.argv[1] 
+
+str = open(filename,'r').read()
+
+print "* Replacing names."
+for old,new in replacements:
+    str = new.join(str.split(old))
+
+
+new_filename = filename+'_0.9.6'
+open(new_filename,'w').write(str)
+
+print "\n\nUpdating finished; output written to %s"%new_filename
