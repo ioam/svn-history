@@ -27,9 +27,9 @@ from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, HomeostaticMaxEnt
-from topo.outputfn.basic import GeneralizedLogistic, Sigmoid
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, HomeostaticMaxEnt
+from topo.transferfn.basic import GeneralizedLogistic, Sigmoid
 from topo.pattern.basic import Gaussian, Composite, SeparatedComposite
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 

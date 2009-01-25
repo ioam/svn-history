@@ -24,8 +24,8 @@ from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import HalfRectify,PiecewiseLinear,DivisiveNormalizeL1, PipelineOF, HomeostaticMaxEnt,AttributeTrackingOF,Sigmoid
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.basic import HalfRectify,PiecewiseLinear,DivisiveNormalizeL1, PipelineTF, HomeostaticMaxEnt,AttributeTrackingTF,Sigmoid
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, Choice
 from topo.pattern.basic import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
@@ -149,12 +149,12 @@ topo.sim['LGNOff']=LISSOM(nominal_density=48.0,
 
 topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Simple_OF]))
+                        output_fn=PipelineTF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Simple_OF]))
 
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Complex_OF]))
+                        output_fn=PipelineTF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Complex_OF]))
 
 # DoG weights for the LGN
 #centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())

@@ -86,11 +86,11 @@ import copy
 
 from colorsys import hsv_to_rgb
 
-from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet,param
+from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet,param
 
 import topo.learningfn.optimized
 import topo.learningfn.projfn 
-import topo.outputfn.optimized 
+import topo.transferfn.optimized 
 import topo.pattern.random
 import topo.pattern.image
 import topo.responsefn.optimized 
@@ -103,7 +103,7 @@ projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
 projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
-projection.CFProjection.weights_output_fn=outputfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
+projection.CFProjection.weights_output_fn=transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 
 ### Default for tutorial
@@ -335,13 +335,13 @@ for e in eyes:
                 topo.sim[e+opponent+'LGN'+l+n]=sheet.CFSheet(
                     nominal_density=p.lgn_density,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius),
-                    output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                    output_fn=transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
             for channel in xrange(2,sf_channels+1):
                 topo.sim[e+'LGN'+l+n+'SF'+str(channel)]=sheet.CFSheet(
                     nominal_density=p.lgn_density,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(channel-1)),
-                    output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                    output_fn=transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
                 
 
@@ -353,9 +353,9 @@ topo.sim['V1'].output_fn.upper_bound=0.626 if p.dataset in natural_image_sets el
 
 # DoG weights for the LGN
 centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,
-                             output_fn=outputfn.DivisiveNormalizeL1())
+                             output_fn=transferfn.DivisiveNormalizeL1())
 surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,
-                             output_fn=outputfn.DivisiveNormalizeL1())
+                             output_fn=transferfn.DivisiveNormalizeL1())
 
 strength=[2.33, 2.38, 2.53, 2.8] # 2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
 if p.dataset in natural_image_sets:
@@ -394,7 +394,7 @@ for e in eyes:
                             nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                             
                             weights_generator=pattern.Gaussian(size=0.07385*sf_spacing**(channel-1),aspect_ratio=1.0,
-                                                               output_fn=outputfn.DivisiveNormalizeL1()))
+                                                               output_fn=transferfn.DivisiveNormalizeL1()))
 
                         topo.sim.connect(
                             e+cone+'Retina'+n, e+opponentsurround+'LGN'+l+n+'SF'+str(channel), 
@@ -404,7 +404,7 @@ for e in eyes:
                             nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                             
                             weights_generator=pattern.Gaussian(size=0.29540*sf_spacing**(channel-1),aspect_ratio=1.0,
-                                                               output_fn=outputfn.DivisiveNormalizeL1()))
+                                                               output_fn=transferfn.DivisiveNormalizeL1()))
 
                 if 'cr' in p.dims:
                     topo.sim.connect(
@@ -451,7 +451,7 @@ for e in eyes:
                             nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                             
                             weights_generator=pattern.Gaussian(size=0.07385*sf_spacing**(channel-1),aspect_ratio=1.0,
-                                                               output_fn=outputfn.DivisiveNormalizeL1()))
+                                                               output_fn=transferfn.DivisiveNormalizeL1()))
 
                         topo.sim.connect(
                             e+cone+'Retina'+n, e+'LGN'+l+n+'SF'+str(channel), 
@@ -461,7 +461,7 @@ for e in eyes:
                             nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                             
                             weights_generator=pattern.Gaussian(size=0.29540*sf_spacing**(channel-1),aspect_ratio=1.0,
-                                                               output_fn=outputfn.DivisiveNormalizeL1()))
+                                                               output_fn=transferfn.DivisiveNormalizeL1()))
 
 
             for opponent in opponent_types:

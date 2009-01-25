@@ -14,7 +14,7 @@ from .. import param
 from ..param.parameterized import ParamOverrides
 
 from boundingregion import BoundingBox, BoundingRegionParameter
-from functionfamily import OutputFn, IdentityOF
+from functionfamily import TransferFn, IdentityTF
 from sheetcoords import SheetCoordinateSystem
 
 
@@ -109,7 +109,7 @@ class PatternGenerator(param.Parameterized):
         Optional PatternGenerator used to construct a mask to be applied to
         the pattern.""")
     
-    output_fn = param.ClassSelector(OutputFn,default=IdentityOF(),precedence=0.08,doc="""
+    output_fn = param.ClassSelector(TransferFn,default=IdentityTF(),precedence=0.08,doc="""
         Optional function to apply to the pattern array after it has been created.
         This function can be used for normalization, thresholding, etc.""")
 
@@ -137,7 +137,7 @@ class PatternGenerator(param.Parameterized):
         # Optimization (not clear that is helps; does make small (-0.5s out of 75s)
         # difference to startup time of lissom_oo_or)
         output_fn = p.output_fn
-        if not isinstance(output_fn,IdentityOF): 
+        if not isinstance(output_fn,IdentityTF): 
             output_fn(result)
                                
         return result
@@ -230,7 +230,7 @@ class Constant(PatternGenerator):
         self._apply_mask(params,result)
 
         output_fn = params['output_fn']
-        if output_fn is not IdentityOF: # Optimization (but may not actually help)
+        if output_fn is not IdentityTF: # Optimization (but may not actually help)
             output_fn(result)
 
         return result

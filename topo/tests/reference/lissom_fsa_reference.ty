@@ -30,8 +30,8 @@ from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import DivisiveNormalizeL1, PiecewiseLinear
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.basic import DivisiveNormalizeL1, PiecewiseLinear
 #from topo.responsefn.optimized import CFPRF_SharedWeightDotProduct_opt
 from topo.base.patterngenerator import PatternGenerator
 from topo.misc.numbergenerator import UniformRandom, NormalRandom, Choice

@@ -13,7 +13,7 @@ from ..param.parameterized import ParamOverrides
 from topo.base.patterngenerator import PatternGenerator
 from topo.pattern import Composite, Gaussian
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.outputfn.basic import IdentityOF
+from topo.transferfn.basic import IdentityTF
 
 
 def seed(seed=None):
@@ -61,7 +61,7 @@ class RandomGenerator(PatternGenerator):
         self._apply_mask(params,result)
 
         output_fn = params['output_fn']
-        if output_fn is not IdentityOF: # Optimization (but may not actually help)
+        if output_fn is not IdentityTF: # Optimization (but may not actually help)
             output_fn(result)
         
         return result

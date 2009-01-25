@@ -13,7 +13,7 @@ from ..param.parameterized import ParamOverrides
 
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.base.functionfamily import IdentityOF
+from topo.base.functionfamily import IdentityTF
 
 
 ### JABHACKALERT: This code seems to work fine when the input regions
@@ -114,7 +114,7 @@ class RandomDotStereogram(PatternGenerator):
         result = offset + scale*bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity ,
                                           (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
 
-        if output_fn is not IdentityOF:
+        if output_fn is not IdentityTF:
             output_fn(result)
 
         return result

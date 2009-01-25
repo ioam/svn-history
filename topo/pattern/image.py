@@ -15,7 +15,7 @@ from .. import param
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.outputfn.basic import DivisiveNormalizeLinf,IdentityOF,OutputFn
+from topo.transferfn.basic import DivisiveNormalizeLinf,IdentityTF,TransferFn
 from topo.misc.filepath import Filename
 
 
@@ -30,7 +30,7 @@ class PatternSampler(param.Parameterized):
     background value.
     """
 
-    def __init__(self, pattern_array=None, image=None, whole_pattern_output_fn=IdentityOF(), background_value_fn=None):
+    def __init__(self, pattern_array=None, image=None, whole_pattern_output_fn=IdentityTF(), background_value_fn=None):
         """
         Create a SheetCoordinateSystem whose activity is pattern_array
         (where pattern_array is a NumPy array), modified in place by
@@ -200,7 +200,7 @@ class FastPatternSampler(param.Parameterized):
        Defaults to Image.NEAREST.""")
 
        
-    def __init__(self, pattern=None, image=None, whole_pattern_output_fn=IdentityOF(), background_value_fn=None):
+    def __init__(self, pattern=None, image=None, whole_pattern_output_fn=IdentityTF(), background_value_fn=None):
         super(FastPatternSampler,self).__init__()
 
         if pattern and image:
@@ -250,7 +250,7 @@ class GenericImage(PatternGenerator):
 
     __abstract = True
     
-    output_fn = param.ClassSelector(OutputFn,default=IdentityOF())
+    output_fn = param.ClassSelector(TransferFn,default=IdentityTF())
     
     aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),
         softbounds=(0.0,2.0),precedence=0.31,doc="""
@@ -265,7 +265,7 @@ class GenericImage(PatternGenerator):
         How to scale the initial image size relative to the default area of 1.0.""")
 
     whole_image_output_fn = param.ClassSelector(
-        OutputFn,default=DivisiveNormalizeLinf(),precedence=0.96,doc="""
+        TransferFn,default=DivisiveNormalizeLinf(),precedence=0.96,doc="""
         Function applied to the whole, original image array (before any cropping).""")
 
     # CB: I guess it's a type rather than an instance because of the

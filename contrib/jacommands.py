@@ -16,7 +16,7 @@ from topo.projection.basic import CFProjection
 from topo.base.boundingregion import BoundingBox
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.basic import Gaussian,Selector,Null
-from topo.outputfn.basic import HomeostaticMaxEnt,OutputFnWithState
+from topo.transferfn.basic import HomeostaticMaxEnt,TransferFnWithState
 from topo.base.arrayutil import clip_lower
 from topo.sheet.lissom import LISSOM
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
@@ -28,7 +28,7 @@ from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
 from topo.base.patterngenerator import PatternGenerator,Constant 
-from topo.outputfn.basic import  Sigmoid
+from topo.transferfn.basic import  Sigmoid
 
 
 
@@ -290,7 +290,7 @@ def divide_with_constant(x,y):
     
 
 def AddGC():
-    from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
+    from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
     from topo.projection.basic import CFProjection, SharedWeightCFProjection
     from topo.base.boundingregion import BoundingBox
     lgn_surroundg = Gaussian(size=__main__.__dict__.get('LGNLatSurroundSize',0.5),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
@@ -336,7 +336,7 @@ def homeostatic_analysis_function():
   
     
 
-class SimpleHomeoSigmoid(OutputFnWithState):
+class SimpleHomeoSigmoid(TransferFnWithState):
     mu = param.Number(default=0.01,doc="Target average activity.")
     a_init = param.Number(default=13,doc="Multiplicative parameter controlling the exponential.")
     b_init = param.Number(default=-4,doc="Additive parameter controlling the exponential.")
@@ -370,7 +370,7 @@ class SimpleHomeoSigmoid(OutputFnWithState):
             self.b -= self.eta * (self.y_avg - self.mu)
 
 
-class SimpleHomeoLinear(OutputFnWithState):
+class SimpleHomeoLinear(TransferFnWithState):
     mu = param.Number(default=0.01,doc="Target average activity.")
     t_init = param.Number(default=0.0,doc="Threshold parameter")
     eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
@@ -401,7 +401,7 @@ class SimpleHomeoLinear(OutputFnWithState):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
             self.t += self.eta * (self.y_avg - self.mu)
 
-class SimpleHomeoLinearRelative(OutputFnWithState):
+class SimpleHomeoLinearRelative(TransferFnWithState):
     input_output_ratio = param.Number(default=3.6,doc="The ratio between the average input and output activity")
     t_init = param.Number(default=-0.0,doc="Threshold parameter")
     eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
@@ -580,7 +580,7 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple",prob=0.1):
 
             
             
-class CascadeHomeostatic(OutputFnWithState):
+class CascadeHomeostatic(TransferFnWithState):
     """
     """
 
@@ -662,7 +662,7 @@ class CascadeHomeostatic(OutputFnWithState):
                 
 
   
-class ActivityHysteresis(OutputFnWithState):
+class ActivityHysteresis(TransferFnWithState):
     """ 
     This output function allows the activity to be smoothly interpolated between 
     individual time step of the simulation. The time_constant paremater controls the 
@@ -694,7 +694,7 @@ class ActivityHysteresis(OutputFnWithState):
     def reset(self):
         self.old_a *= 0
 
-class Habituation(OutputFnWithState):
+class Habituation(TransferFnWithState):
     """ 
     This output function allows the activity to be smoothly interpolated between 
     individual time step of the simulation. The time_constant paremater controls the 
@@ -941,7 +941,7 @@ def plot_linearized_rfs(sheet_name="V1Simple", lgn_on_projection_name="LGNOnAffe
                     for ly in xrange(0,lgny):                            
                            RF +=  on_cfs.weights[lx,ly] * topo.sim["LGNOn"].projections["Afferent"].cfs[0,0].weights 
     
-#class CascadeHomeostatic(OutputFnWithState):
+#class CascadeHomeostatic(TransferFnWithState):
 #    """
 #    """
 #

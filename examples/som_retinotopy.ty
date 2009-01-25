@@ -21,7 +21,7 @@ __version__='$Revision$'
 
 from math import exp, sqrt
 
-from topo import learningfn,numbergen,outputfn,param,pattern,projection,responsefn,sheet
+from topo import learningfn,numbergen,transferfn,param,pattern,projection,responsefn,sheet
 
 import topo.learningfn.projfn 
 import topo.pattern.random
@@ -73,7 +73,7 @@ topo.sim['Retina'] = sheet.GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1'] = sheet.CFSheet(
     nominal_density = p.cortex_density,
     # Original CMVC simulation used an initial radius of 13.3/40.0 (~0.33)
-    output_fn = outputfn.KernelMax(density=p.cortex_density,
+    output_fn = transferfn.KernelMax(density=p.cortex_density,
         kernel_radius=numbergen.BoundedNumber(
             bounds=(0.5/40,None),
             generator=numbergen.ExponentialDecay(

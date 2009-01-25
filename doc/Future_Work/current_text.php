@@ -64,7 +64,7 @@ Priorities:
 
 
 * functionfamily.py
-(8) OutputFn: rename norm_value (CEB)
+(8) TransferFn: rename norm_value (CEB)
 (8) LearningFn should have learning_rate param 
     (see same alert in cf.py) (CEB)
 
@@ -602,10 +602,10 @@ alterdot() changes all dot functions to use blas.
 _________________________________________________________
 
 
-|            if output_fn is not IdentityOF: # Optimization (but may not actually help)
+|            if output_fn is not IdentityTF: # Optimization (but may not actually help)
 |  !             output_fn(result)           # CEBHACKALERT: particularly since everything but
-|  !                                         # the IdentityOF *class* will pass this if-test!
-|  !         return result                   # Should be: "if not instance(output_fn,IdentityOF):".
+|  !                                         # the IdentityTF *class* will pass this if-test!
+|  !         return result                   # Should be: "if not instance(output_fn,IdentityTF):".
 |  !                                         # I guess this needs fixing in several places.
 
 I think the "optimization" should just be removed

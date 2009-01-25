@@ -33,8 +33,8 @@ from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import PiecewiseLinear,DivisiveNormalizeL1,AttributeTrackingOF, ActivityAveragingOF, HomeostaticMaxEnt
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.basic import PiecewiseLinear,DivisiveNormalizeL1,AttributeTrackingTF, ActivityAveragingTF, HomeostaticMaxEnt
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.basic import Gaussian
 
@@ -74,7 +74,7 @@ elif output_fn_type == "Homeostatic_debug":
            (0.0,0.25), (0.25,0.0), (0.0,-0.25), (-0.25,0.0)]
     topo.sim.name = "lissom_oo_or_noshrinking_debug"
     HE=HomeostaticMaxEnt(eta=0.0002, **shared_params )
-    TF=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']", attrib_names=['a','b', 'y_avg'], units=units, step=1)
+    TF=AttributeTrackingTF(object=HE, coordframe="topo.sim['V1']", attrib_names=['a','b', 'y_avg'], units=units, step=1)
     output_fn=HE+TF
 
 

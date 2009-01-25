@@ -76,10 +76,10 @@ from topo.base.boundingregion import BoundingBox
 from topo.sheet.lissom import LISSOM
 from topo.sheet import GeneratorSheet
 from topo.projection.basic import CFProjection
-from topo.outputfn.basic import PiecewiseLinear
+from topo.transferfn.basic import PiecewiseLinear
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 import topo.pattern.basic
 
 

@@ -37,11 +37,11 @@ __version__='$Revision: 8562 $'
 from math import pi, sqrt
 import numpy
 
-from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet 
+from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet 
 
 import topo.learningfn.optimized
 import topo.learningfn.projfn 
-import topo.outputfn.optimized 
+import topo.transferfn.optimized 
 import topo.pattern.random
 import topo.pattern.image
 import topo.responsefn.optimized 
@@ -54,7 +54,7 @@ projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
 projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
-projection.CFProjection.weights_output_fn=outputfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
+projection.CFProjection.weights_output_fn=transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 
 ### Default for tutorial
@@ -106,7 +106,7 @@ for e in eyes:
                 topo.sim[e+opponent+' LGN'+l+n]=sheet.CFSheet(
                     nominal_density=24.0,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+0.27083),
-                    output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                    output_fn=transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                     measure_maps=False)
 
 
@@ -116,8 +116,8 @@ topo.sim['V1'].output_fn.lower_bound=0.076
 topo.sim['V1'].output_fn.upper_bound=0.626
 
 # DoG weights for the LGN
-centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=outputfn.DivisiveNormalizeL1())
-surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=outputfn.DivisiveNormalizeL1())
+centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=transferfn.DivisiveNormalizeL1())
+surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=transferfn.DivisiveNormalizeL1())
 
 for e in eyes:
     for n in lags:

@@ -718,9 +718,9 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
 # JABALERT: Untested as of Mon Nov 10 12:59:54 GMT 2008
 class plot_tracked_attributes(PylabPlotCommand):
     """
-    Plots parameter values associated with an AttributeTrackingOF.
+    Plots parameter values associated with an AttributeTrackingTF.
     Example call:
-    VT=AttributeTrackingOF(function=HE, debug_params=['a', 'b',], units=[(0,0),(1,1)], step=1)
+    VT=AttributeTrackingTF(function=HE, debug_params=['a', 'b',], units=[(0,0),(1,1)], step=1)
     plot_tracked_attributes(VT,0,10000,attrib_names=['a'],units=[(0,0)], filename='V1')
     """
 

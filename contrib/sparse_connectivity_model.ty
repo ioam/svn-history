@@ -18,10 +18,10 @@ from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt,CFPLF_BCMFixed_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import PiecewiseLinear,HalfRectifyAndPower,HalfRectify,DivisiveNormalizeL1
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.basic import PiecewiseLinear,HalfRectifyAndPower,HalfRectify,DivisiveNormalizeL1
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, Choice
-from topo.outputfn.basic import HomeostaticMaxEnt,PipelineOF
+from topo.transferfn.basic import HomeostaticMaxEnt,PipelineTF
 from topo.pattern.basic import Gaussian,Composite,SeparatedComposite
 from contrib.jacommands import ActivityHysteresis, Translator,Habituation, Jitterer, AddGC, SimpleHomeo
 from topo.base.functionfamily import CoordinateMapperFn
@@ -133,7 +133,7 @@ topo.sim['LGNOff']=LISSOM(nominal_density=locals().get('default_retinal_density'
 
 topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=cs),tsettle=50, 
-                        output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.3),V1_OF]))
+                        output_fn=PipelineTF(output_fns=[ActivityHysteresis(time_constant=0.3),V1_OF]))
 
 topo.sim['V1Complex'] = LISSOM(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=cs),tsettle=0, 

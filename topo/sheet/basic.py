@@ -18,7 +18,7 @@ import topo
 from topo import param
 
 from topo.base.cf import CFSheet, CFPOutputFn
-from topo.base.functionfamily import OutputFn,IdentityOF
+from topo.base.functionfamily import TransferFn,IdentityTF
 from topo.base.patterngenerator import PatternGenerator, Constant
 from topo.base.projection import Projection
 from topo.base.sheet import activity_type, BoundingBox
@@ -27,7 +27,7 @@ from topo.base.simulation import FunctionEvent, PeriodicEventSequence
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
 from topo.misc.util import NxN
-from topo.outputfn.basic import PiecewiseLinear
+from topo.transferfn.basic import PiecewiseLinear
 
 
 
@@ -83,7 +83,7 @@ class GeneratorSheet(Sheet):
     input_generator = param.ClassSelector(PatternGenerator,default=Constant(),
         doc="""Specifies a particular PatternGenerator type to use when creating patterns.""")
 
-    output_fn = param.ClassSelector(OutputFn,default=IdentityOF(),doc="""
+    output_fn = param.ClassSelector(TransferFn,default=IdentityTF(),doc="""
         Output function to apply (if apply_output_fn is true) to this Sheet's activity.""")
     
     apply_output_fn=param.Boolean(default=True,doc="""
@@ -239,7 +239,7 @@ class JointNormalizingCFSheet(CFSheet):
     (see _port_match), plus a learn() function that computes the joint
     sums.  Joint normalization also requires having ConnectionField
     store and return a norm_total for each neuron, and having an
-    OutputFn that will respect this norm_total rather than the strict
+    TransferFn that will respect this norm_total rather than the strict
     total of the ConnectionField's weights.  At present,
     CFPOF_DivisiveNormalizeL1 and CFPOF_DivisiveNormalizeL1_opt do use
     norm_total; others can be extended to do something similar if
@@ -252,7 +252,7 @@ class JointNormalizingCFSheet(CFSheet):
     dest_port=('Activity','JointNormalize', 'AfferentGroup1'),
 
     Then all those that have this dest_port will be normalized
-    together, as long as an appropriate OutputFn is being used.
+    together, as long as an appropriate TransferFn is being used.
     """
 
     joint_norm_fn = param.Callable(default=compute_joint_norm_totals,doc="""

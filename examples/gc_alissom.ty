@@ -15,9 +15,9 @@ from topo.base.cf import CFSheet, CFPOF_Plugin
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.projfn import CFPLF_PluginScaled
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Scaled_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF 
-from topo.outputfn.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineTF, IdentityTF, ActivityAveragingTF, AttributeTrackingTF 
+from topo.transferfn.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.image import Image
 from contrib.jacommands import SimpleHomeoLinearRelative, AddGC, ActivityHysteresis
@@ -101,7 +101,7 @@ def gauss_rand(size):
 norm=locals().get('norm',True)
 
 if norm==False:
-    pi=topo.base.cf.CFPOF_Plugin(single_cf_fn=topo.outputfn.basic.IdentityOF())
+    pi=topo.base.cf.CFPOF_Plugin(single_cf_fn=topo.transferfn.basic.IdentityTF())
 else:
     pi = None
 
@@ -133,7 +133,7 @@ AddGC()
 AH = ActivityHysteresis(time_constant=0.5) 
 topo.sim['V1'] = JointScaling(nominal_density=default_density,tsettle=16,plastic=True,apply_scaling=False,
                                 nominal_bounds=BoundingBox(radius=0.5),smoothing=smoothing,
-                                output_fn=PipelineOF(output_fns=[AH,V1_OF]))
+                                output_fn=PipelineTF(output_fns=[AH,V1_OF]))
 
 #make sure that activity is reset at the beginning of iteration
 topo.sim['V1'].beginning_of_iteration.append(AH.reset)

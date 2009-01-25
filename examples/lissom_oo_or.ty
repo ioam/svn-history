@@ -33,11 +33,11 @@ __version__='$Revision$'
 from math import pi, sqrt
 import numpy
 
-from topo import learningfn,numbergen,outputfn,param,pattern,projection,responsefn,sheet
+from topo import learningfn,numbergen,transferfn,param,pattern,projection,responsefn,sheet
 
 import topo.learningfn.optimized
 import topo.learningfn.projfn 
-import topo.outputfn.optimized 
+import topo.transferfn.optimized 
 import topo.pattern.random
 import topo.responsefn.optimized 
 import topo.sheet.lissom
@@ -69,7 +69,7 @@ projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
 projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
-projection.CFProjection.weights_output_fn=outputfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
+projection.CFProjection.weights_output_fn=transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 
 ### Default for tutorial
@@ -98,17 +98,17 @@ topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=p.retina_density,
 
 topo.sim['LGNOn']=sheet.CFSheet(nominal_density=p.lgn_density,
     nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25),
-    output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+    output_fn=transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
 topo.sim['LGNOff']=sheet.CFSheet(nominal_density=p.lgn_density,
     nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25),
-    output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+    output_fn=transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
 topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=p.cortex_density,
     nominal_bounds=sheet.BoundingBox(radius=p.area/2.0),tsettle=9,
-    output_fn=outputfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633),
+    output_fn=transferfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633),
     joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt)
 
 
@@ -117,9 +117,9 @@ topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=p.cortex_density,
 
 # DoG weights for the LGN
 centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,
-                             output_fn=outputfn.DivisiveNormalizeL1())
+                             output_fn=transferfn.DivisiveNormalizeL1())
 surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,
-                             output_fn=outputfn.DivisiveNormalizeL1())
+                             output_fn=transferfn.DivisiveNormalizeL1())
 
 on_weights = pattern.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)

@@ -63,7 +63,7 @@ classes:
 <DD>Projection classes: connections between Sheets</DD>
 <P><DT><A href="topo.ep-module.html"><strong>ep</strong></A></DT>
 <DD>EventProcessor classes: other simulation objects</DD>
-<P><DT><A href="topo.outputfn-module.html"><strong>outputfn</strong></A></DT>
+<P><DT><A href="topo.transferfn-module.html"><strong>transferfn</strong></A></DT>
 <DD>Output functions: apply to matrices to do e.g. normalization or squashing</DD>
 <P><DT><A href="topo.responsefn-module.html"><strong>responsefn</strong></A></DT>
 <DD>Calculate the response of a unit or a Projection</DD>

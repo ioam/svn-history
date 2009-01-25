@@ -202,14 +202,14 @@ producing 2D patterns is provided, as described on
 <H3>Output functions</H3>
 
 <ul>
-<li><?php classref('topo.base.functionfamily','OutputFn')?>
+<li><?php classref('topo.base.functionfamily','TransferFn')?>
     <ul>
-    <li><?php classref('topo.outputfn.basic','DivisiveNormalizeL1')?>
-    <li><?php classref('topo.outputfn.basic','DivisiveNormalizeL2')?>
-    <li><?php classref('topo.outputfn.basic','PiecewiseLinear')?>
-    <li><?php classref('topo.outputfn.basic','Pipeline')?>
-    <li><?php classref('topo.outputfn.basic','PatternCombine')?>
-    <li><?php classref('topo.base.functionfamily','IdentityOF')?>
+    <li><?php classref('topo.transferfn.basic','DivisiveNormalizeL1')?>
+    <li><?php classref('topo.transferfn.basic','DivisiveNormalizeL2')?>
+    <li><?php classref('topo.transferfn.basic','PiecewiseLinear')?>
+    <li><?php classref('topo.transferfn.basic','Pipeline')?>
+    <li><?php classref('topo.transferfn.basic','PatternCombine')?>
+    <li><?php classref('topo.base.functionfamily','IdentityTF')?>
     </ul>
 </ul>
 
@@ -217,18 +217,18 @@ producing 2D patterns is provided, as described on
 <li><?php classref('topo.base.cf','CFPOutputFn')?>
     <ul>
     <li><?php classref('topo.base.cf','CFPOF_Plugin')?>
-    <li><?php classref('topo.outputfn.optimized','CFPOF_DivisiveNormalizeL1')?>
+    <li><?php classref('topo.transferfn.optimized','CFPOF_DivisiveNormalizeL1')?>
     </ul>
 </ul>
 
-<P>An OutputFn is a function object that will accept a matrix argument
+<P>A TransferFn is a function object that will accept a matrix argument
 and (typically) modify it in some way.  This is a very simple concept,
 but it is used many times throughout the Topographica code, and
 provides a lot of flexibility.  Any function that can normalize a set
-of weights or an input pattern is an OutputFn, as is any Sheet's
+of weights or an input pattern is a TransferFn, as is any Sheet's
 activity transfer function.
 
-<P>OutputFns are controlled by a set of parameters that are each
+<P>TransferFns are controlled by a set of parameters that are each
 typically called output_fn.  Each such parameter is associated with a
 particular processing step of a Sheet or a Projection.  For instance,
 CFProjections have an output_fn applied after they calculate their
@@ -239,14 +239,14 @@ the pattern is calculated.
 
 <P>The output_fn parameters allow the user to control calculations in
 a flexible way, without having to write or maintain new code.  For
-instance, the PatternCombine OutputFn can be used to add a
+instance, the PatternCombine TransferFn can be used to add a
 user-specified type of random noise to any of the major processing
 steps.  Alternatively, it can be used to mask out a specific region
 at the end of the calculation, to implement a user-specified lesion or
 a non-rectangular neural region.
 
-<P>Multiple OutputFns can be applied in series using the Pipeline
-OutputFn, e.g. to add random noise, normalize the results, and then
+<P>Multiple TransferFns can be applied in series using the Pipeline
+TransferFn, e.g. to add random noise, normalize the results, and then
 mask out lesioned units.
 
 <P>For the common and very expensive case of normalizing

@@ -28,9 +28,9 @@ from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, HomeostaticMaxEnt, ActivityAveragingOF, AttributeTrackingOF, PipelineOF
-from topo.outputfn.basic import GeneralizedLogistic, Sigmoid, HalfRectify
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, HomeostaticMaxEnt, ActivityAveragingTF, AttributeTrackingTF, PipelineTF
+from topo.transferfn.basic import GeneralizedLogistic, Sigmoid, HalfRectify
 from topo.pattern.basic import Gaussian, Composite, SeparatedComposite
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, VonMisesRandom
 from topo.analysis.featureresponses import Feature, FeatureMaps
@@ -429,44 +429,44 @@ afferent_target = locals().get('afferent_target',mu*balance)
 #Debugging
 
 #LGNOnAfferent
-LGNOn_Avg=ActivityAveragingOF(smoothing=smoothing,step=1)
-LGNOn_Tracker=AttributeTrackingOF(object=LGNOn_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
-LGNOn_OF = PipelineOF(output_fns=[LGNOn_Avg, LGNOn_Tracker])
+LGNOn_Avg=ActivityAveragingTF(smoothing=smoothing,step=1)
+LGNOn_Tracker=AttributeTrackingTF(object=LGNOn_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
+LGNOn_OF = PipelineTF(output_fns=[LGNOn_Avg, LGNOn_Tracker])
 
 #LGNOffAfferent
-LGNOff_Avg=ActivityAveragingOF(smoothing=smoothing,step=1)
-LGNOff_Tracker=AttributeTrackingOF(object=LGNOff_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
-LGNOff_OF = PipelineOF(output_fns=[LGNOff_Avg, LGNOff_Tracker])
+LGNOff_Avg=ActivityAveragingTF(smoothing=smoothing,step=1)
+LGNOff_Tracker=AttributeTrackingTF(object=LGNOff_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
+LGNOff_OF = PipelineTF(output_fns=[LGNOff_Avg, LGNOff_Tracker])
 
 #Latex_local
-LatExloc_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=1)
-LatExloc_Tracker=AttributeTrackingOF(object=LatExloc_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
-LatExloc_OF = PipelineOF(output_fns=[LatExloc_Avg, LatExloc_Tracker])
+LatExloc_Avg=ActivityAveragingTF(initial_average=0.0,smoothing=smoothing,step=1)
+LatExloc_Tracker=AttributeTrackingTF(object=LatExloc_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
+LatExloc_OF = PipelineTF(output_fns=[LatExloc_Avg, LatExloc_Tracker])
 
 #Latex
-LatEx_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=1)
-LatEx_Tracker=AttributeTrackingOF(object=LatEx_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
-LatEx_OF = PipelineOF(output_fns=[LatEx_Avg, LatEx_Tracker])
+LatEx_Avg=ActivityAveragingTF(initial_average=0.0,smoothing=smoothing,step=1)
+LatEx_Tracker=AttributeTrackingTF(object=LatEx_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
+LatEx_OF = PipelineTF(output_fns=[LatEx_Avg, LatEx_Tracker])
 
 #Ex_to_In_local
-ExtoInloc_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=1)
-ExtoInloc_Tracker=AttributeTrackingOF(object=ExtoInloc_Avg,coordframe="topo.sim['V1Inh']", attrib_names=['x_avg'], units=units, step=1)
-ExtoInloc_OF = PipelineOF(output_fns=[ExtoInloc_Avg, ExtoInloc_Tracker])
+ExtoInloc_Avg=ActivityAveragingTF(initial_average=0.0,smoothing=smoothing,step=1)
+ExtoInloc_Tracker=AttributeTrackingTF(object=ExtoInloc_Avg,coordframe="topo.sim['V1Inh']", attrib_names=['x_avg'], units=units, step=1)
+ExtoInloc_OF = PipelineTF(output_fns=[ExtoInloc_Avg, ExtoInloc_Tracker])
 
 #Ex_to_in
-ExtoIn_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=1)
-ExtoIn_Tracker=AttributeTrackingOF(object=ExtoIn_Avg,coordframe="topo.sim['V1Inh']", attrib_names=['x_avg'], units=units, step=1)
-ExtoIn_OF = PipelineOF(output_fns=[ExtoIn_Avg, ExtoIn_Tracker])
+ExtoIn_Avg=ActivityAveragingTF(initial_average=0.0,smoothing=smoothing,step=1)
+ExtoIn_Tracker=AttributeTrackingTF(object=ExtoIn_Avg,coordframe="topo.sim['V1Inh']", attrib_names=['x_avg'], units=units, step=1)
+ExtoIn_OF = PipelineTF(output_fns=[ExtoIn_Avg, ExtoIn_Tracker])
 
 #In_to_Ex
-IntoEx_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=1)
-IntoEx_Tracker=AttributeTrackingOF(object=IntoEx_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
-IntoEx_OF = PipelineOF(output_fns=[IntoEx_Avg, IntoEx_Tracker])
+IntoEx_Avg=ActivityAveragingTF(initial_average=0.0,smoothing=smoothing,step=1)
+IntoEx_Tracker=AttributeTrackingTF(object=IntoEx_Avg,coordframe="topo.sim['V1Exc']", attrib_names=['x_avg'], units=units, step=1)
+IntoEx_OF = PipelineTF(output_fns=[IntoEx_Avg, IntoEx_Tracker])
 
 #In_to_In
-IntoIn_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=1)
-IntoIn_Tracker=AttributeTrackingOF(object=IntoIn_Avg,coordframe="topo.sim['V1Inh']", attrib_names=['x_avg'], units=units, step=1)
-IntoIn_OF = PipelineOF(output_fns=[IntoIn_Avg, IntoIn_Tracker])
+IntoIn_Avg=ActivityAveragingTF(initial_average=0.0,smoothing=smoothing,step=1)
+IntoIn_Tracker=AttributeTrackingTF(object=IntoIn_Avg,coordframe="topo.sim['V1Inh']", attrib_names=['x_avg'], units=units, step=1)
+IntoIn_OF = PipelineTF(output_fns=[IntoIn_Avg, IntoIn_Tracker])
 
 #Function for generating Gaussian random initial weights
 def gauss_rand(size):
@@ -499,14 +499,14 @@ afferent_target = locals().get('afferent_target',mu*balance)
 #Sheet coordinates of units to track for debugging
 units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
 
-Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1Exc']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
+Attrib_Tracker=AttributeTrackingTF(object="topo.sim['V1Exc']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
 HE=HomeostaticMaxEnt(smoothing=0.999, eta=locals().get('eta',0.0002*15), mu=mu, step=15)
-V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1Exc']", attrib_names=['a', 'b','y_avg'], units=units, step=15)
-V1_OF_exc=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
+V1_Tracker=AttributeTrackingTF(object=HE,coordframe="topo.sim['V1Exc']", attrib_names=['a', 'b','y_avg'], units=units, step=15)
+V1_OF_exc=PipelineTF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
 
 S=HomeostaticMaxEnt(smoothing=0.999,  eta=locals().get('eta',0.0002*14), mu=2*mu, step=14)
-V1_Tracker_inh=AttributeTrackingOF(object=S,coordframe="topo.sim['V1Inh']", attrib_names=['a', 'b','y_avg'], units=units, step=14)
-V1_OF_inh=PipelineOF(output_fns=[S, V1_Tracker_inh])
+V1_Tracker_inh=AttributeTrackingTF(object=S,coordframe="topo.sim['V1Inh']", attrib_names=['a', 'b','y_avg'], units=units, step=14)
+V1_OF_inh=PipelineTF(output_fns=[S, V1_Tracker_inh])
 """
 
 ###########################################

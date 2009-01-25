@@ -61,7 +61,7 @@ from topoconsole import TopoConsole,ControllableMenu
 from topo.coordmapper import *
 from topo.ep import *
 from topo.learningfn import *
-from topo.outputfn import *
+from topo.transferfn import *
 from topo.pattern import *
 from topo.projection import *
 from topo.responsefn import *

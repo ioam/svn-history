@@ -23,7 +23,7 @@ from topo.base.cf import CFProjection,ConnectionField,MaskedCFIter,\
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.functionfamily import CoordinateMapperFn,IdentityMF
 from topo.misc.util import rowcol2idx
-from topo.outputfn.basic import OutputFn,IdentityOF
+from topo.transferfn.basic import TransferFn,IdentityTF
 from topo.learningfn.basic import LearningFn,IdentityLF
 
 
@@ -33,11 +33,11 @@ class CFPOF_SharedWeight(CFPOutputFn):
 
     Applies the single_cf_fn to the single shared CF's weights.
     """
-    single_cf_fn = param.ClassSelector(OutputFn,default=IdentityOF())
+    single_cf_fn = param.ClassSelector(TransferFn,default=IdentityTF())
     
     def __call__(self, cfs, output_activity, norm_values=None, **params):
         """Apply the specified single_cf_fn to every CF."""
-        if type(self.single_cf_fn) is not IdentityOF:
+        if type(self.single_cf_fn) is not IdentityTF:
             cf = cfs[0][0]
             self.single_cf_fn(cf.weights)
 
@@ -75,7 +75,7 @@ class SharedWeightCF(ConnectionField):
 
         self.weights = self.weights_slice.submatrix(cf.weights)
         
-	# JAHACKALERT the OutputFn cannot be applied in SharedWeightCF
+	# JAHACKALERT the TransferFn cannot be applied in SharedWeightCF
 	# - another inconsistency in the class tree design - there
 	# should be nothing in the parent class that is ignored in its
 	# children.  Probably need to extract some functionality of
@@ -99,7 +99,7 @@ class SharedWeightCFProjection(CFProjection):
     ### actually work yet, but we could certainly extend it to support
     ### learning if desired, e.g. to learn position-independent responses.
     learning_fn = param.ClassSelector(CFPLearningFn,CFPLF_Identity(),constant=True)
-    output_fn  = param.ClassSelector(OutputFn,default=IdentityOF())
+    output_fn  = param.ClassSelector(TransferFn,default=IdentityTF())
     weights_output_fn = param.ClassSelector(
         CFPOutputFn,default=CFPOF_SharedWeight())
 
@@ -312,7 +312,7 @@ class OneToOneProjection(Projection):
         default=Constant(),constant=True,
         doc="""Generate initial weight values for each unit of the destination sheet.""")
 
-    output_fn  = param.ClassSelector(OutputFn,default=IdentityOF(),
+    output_fn  = param.ClassSelector(TransferFn,default=IdentityTF(),
         doc='Function applied to the Projection activity after it is computed.')
 
     learning_fn = param.ClassSelector(LearningFn,default=IdentityLF(),

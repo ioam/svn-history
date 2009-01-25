@@ -19,7 +19,7 @@ that can be used with the above functions and classes::
   projection     - Projection classes: connections between Sheets
   pattern        - PatternGenerator classes: 2D input or weight patterns 
   ep             - EventProcessor classes: other simulation objects
-  outputfn       - Output functions, for e.g. normalization or squashing
+  transferfn     - Transfer functions, for e.g. normalization or squashing
   responsefn     - Calculate the response of a Projection
   learningfn     - Adjust weights for a Projection
   coordmapper    - CoordinateMapperFn classes: map coords between Sheets
@@ -42,7 +42,7 @@ __all__ = ['analysis',
            'ep',
            'learningfn',
            'misc',
-           'outputfn',
+           'transferfn',
            'param',
            'pattern',
            'plotting',

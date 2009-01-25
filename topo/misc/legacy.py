@@ -156,6 +156,28 @@ class SnapshotSupport(object):
         # Haven't yet thought about whether or not it's actually possible
         # to get the version number before unpickling...
 
+
+
+        ### rXXXX moved topo.outputfn to topo.transferfn 
+        fake_a_package('outputfn','transferfn',['basic','optimized','projfn'])
+
+        ### rXXXX renamed OutputFn to TransferFn + xxxOF->xxxTF
+        import topo.base.functionfamily
+        import topo.transferfn.basic
+        def _rename(mod):        
+            for name,obj in mod.__dict__.items():
+                if isinstance(obj,type) and issubclass(obj,mod.TransferFn):
+                    if name.endswith('TF'):
+                        exec name[0:-2]+'OF='+name in mod.__dict__
+                    elif 'TransferFn' in name:
+                        exec name.replace('Transfer','Output')+'='+name in mod.__dict__
+
+        _rename(topo.base.functionfamily)
+        _rename(topo.transferfn.basic)
+        ###
+        
+                
+
         # removed this class in rXXXX
         class InstanceMethodWrapper(object):
             """
@@ -280,6 +302,7 @@ class SnapshotSupport(object):
 
         from topo.base.sheet import Sheet
         select_setstate(Sheet,sheet_set_shape) 
+
 
 
         ##########

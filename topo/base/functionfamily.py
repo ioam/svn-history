@@ -1,7 +1,7 @@
 """
 Basic function objects.
 
-OutputFns: accept and modify a 2d array
+TransferFns: accept and modify a 2d array
 ResponseFns: accept two 2d arrays and return a scalar
 LearningFns: accept two 2d arrays and a scalar, return one of the arrays modified
 
@@ -16,7 +16,7 @@ import numpy
 from .. import param
 
 
-class OutputFn(param.Parameterized):
+class TransferFn(param.Parameterized):
     """
     Function object to modify a matrix in place, e.g. for normalization.
 
@@ -37,16 +37,16 @@ class OutputFn(param.Parameterized):
         raise NotImplementedError
 
     def __add__(self,of):
-        assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
-        return PipelineOF(output_fns=[self,of])
+        assert isinstance(of,TransferFn), "TransferFns can only be added to other TransferFns"
+        return PipelineTF(output_fns=[self,of])
 
 
 
 
-# Trivial example of an OutputFn, provided for when a default
+# Trivial example of a TransferFn, provided for when a default
 # is needed.  The other concrete OutputFunction classes are stored
-# in outputfn/, to be imported as needed.
-class IdentityOF(OutputFn):
+# in transferfn/, to be imported as needed.
+class IdentityTF(TransferFn):
     """
     Identity function, returning its argument as-is.
 
@@ -61,13 +61,13 @@ class IdentityOF(OutputFn):
 
 
 
-class PipelineOF(OutputFn):
+class PipelineTF(TransferFn):
     """
-    Applies a list of other OutputFns in order, to combine their effects.
+    Applies a list of other TransferFns in order, to combine their effects.
     """
     
-    output_fns = param.List(default=[],class_=OutputFn,doc="""
-        List of OutputFns to apply, in order.  The default is an empty list, 
+    output_fns = param.List(default=[],class_=TransferFn,doc="""
+        List of TransferFns to apply, in order.  The default is an empty list, 
         which should be overridden for any useful work.""")
 
     def __call__(self,x):
@@ -75,13 +75,13 @@ class PipelineOF(OutputFn):
             of(x)
 
     def __iadd__(self,of):
-        assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
+        assert isinstance(of,TransferFn), "TransferFns can only be added to other TransferFns"
         self.output_fns.append(of)
 
     def __add__(self,of):
         # Returns a single new Pipeline rather than a nested Pipeline
-        assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
-        return PipelineOF(output_fns=self.output_fns+[of])
+        assert isinstance(of,TransferFn), "TransferFns can only be added to other TransferFns"
+        return PipelineTF(output_fns=self.output_fns+[of])
 
     def override_plasticity_state(self, new_plasticity_state):
         """
@@ -109,7 +109,7 @@ class PipelineOF(OutputFn):
         for of in self.output_fns:
             if hasattr(of,"state_push"):
                 of.state_push()
-        super(PipelineOF,self).state_push()
+        super(PipelineTF,self).state_push()
 
     def state_pop(self):
         """
@@ -119,13 +119,13 @@ class PipelineOF(OutputFn):
         for of in self.output_fns:
             if hasattr(of,"state_pop"):
                 of.state_pop()
-        super(PipelineOF,self).state_pop()
+        super(PipelineTF,self).state_pop()
 
 
 
     # We don't use norm_value ourselves, so if someone asks for it,
     # return an underlying value from self.output_fns.  Only in the
-    # case where a single underlying OF defines norm_value is that
+    # case where a single underlying TF defines norm_value is that
     # meaningful to do, so we ensure that we only return something in
     # that specific case.
     def __get_norm_value(self):
@@ -133,7 +133,7 @@ class PipelineOF(OutputFn):
         for of in self.output_fns:
             if of.norm_value is not None:
                 if found==True:
-                    raise ValueError("At most one OF in a PipelineOF may define norm_value")
+                    raise ValueError("At most one TF in a PipelineTF may define norm_value")
                 val=of.norm_value
                 found=True
         if found: return val

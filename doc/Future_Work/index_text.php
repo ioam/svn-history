@@ -178,7 +178,7 @@ can be used to display or save any element of the model.
 
 <P><DT>Lesion support</DT><DD>
 It is now possible to temporarily lesion any part of a Topographica
-Sheet or Projection using a PatternCombine OutputFn.  This capability
+Sheet or Projection using a PatternCombine TransferFn.  This capability
 will eventually be extended so that it is easier to use, to make it
 simpler to test which components are required for a certain behavior,
 and to replicate animal lesion experiments.

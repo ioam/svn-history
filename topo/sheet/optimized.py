@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 from .. import param
 
-from topo.base.functionfamily import OutputFn, IdentityOF
+from topo.base.functionfamily import TransferFn, IdentityTF
 from topo.base.projection import Projection, NeighborhoodMask
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 from topo.sheet.lissom import LISSOM

@@ -29,8 +29,8 @@ from topo.base.sheet import BoundingBox
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import DivisiveNormalizeL1,PiecewiseLinear
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.basic import DivisiveNormalizeL1,PiecewiseLinear
 
 
 ### Name of the basis simulation (set this)

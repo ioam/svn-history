@@ -22,7 +22,7 @@ from topo.base.sheet import Sheet
 
 import topo.pattern.basic
 from topo.pattern.basic import Gaussian        
-from topo.outputfn.basic import PiecewiseLinear
+from topo.transferfn.basic import PiecewiseLinear
 
 
 # CEBALERT: will be removed eventually when param.tk
@@ -397,12 +397,12 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         self.assertEqual(self.f.pa,'test') # didn't get set to wrong value
 
         # Check that we can create an object from a class in __main__
-        exec "from topo.outputfn.basic import IdentityOF" in __main__.__dict__
+        exec "from topo.transferfn.basic import IdentityTF" in __main__.__dict__
         w.delete(0,"end")
-        w.insert(0,"IdentityOF()")
+        w.insert(0,"IdentityTF()")
         self.f._update_param_from_tkvar('pa',force=True)
-        import topo.outputfn.basic
-        self.assertEqual(type(self.f.pa),topo.outputfn.basic.IdentityOF)
+        import topo.transferfn.basic
+        self.assertEqual(type(self.f.pa),topo.transferfn.basic.IdentityTF)
 
 
 

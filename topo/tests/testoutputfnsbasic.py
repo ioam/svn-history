@@ -16,9 +16,9 @@ __version__='$Revision$'
 import unittest
 import copy
 
-from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1
-from topo.outputfn.basic import DivisiveNormalizeL2, DivisiveNormalizeLinf
-from topo.outputfn.basic import DivisiveNormalizeLp, HomeostaticMaxEnt
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1
+from topo.transferfn.basic import DivisiveNormalizeL2, DivisiveNormalizeLinf
+from topo.transferfn.basic import DivisiveNormalizeLp, HomeostaticMaxEnt
 
 from numpy.oldnumeric import array
 from numpy.testing import assert_array_equal
@@ -235,7 +235,7 @@ class TestDivisiveLpNormalize(unittest.TestCase):
 
         ### JCALERT! As already said above; this method does not work as a procedure
         ### because of a problem when using x *= factor instead of x = x * factor
-        ### it is not understood why because it does work fine in all others outputfn?
+        ### it is not understood why because it does work fine in all others transferfn?
         ### Therefore it is only tested as a function
 
         # Test as a function
@@ -340,7 +340,7 @@ class TestDivisiveLpNormalize(unittest.TestCase):
 
 
 
-class TestOutputFnWithRandomState(unittest.TestCase):
+class TestTransferFnWithRandomState(unittest.TestCase):
     """Currently just tests whether random generator state is handled
     by state_push() and state_pop()."""
 
@@ -390,7 +390,7 @@ cases = [TestPiecewiseLinear,
          TestDivisiveLengthNormalize,
          TestDivisiveMaxNormalize,
          TestDivisiveLpNormalize,
-         TestOutputFnWithRandomState]
+         TestTransferFnWithRandomState]
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.makeSuite(case) for case in cases)

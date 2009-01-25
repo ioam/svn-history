@@ -33,12 +33,12 @@ topo_t000000.00_c1&gt;&gt;&gt; topo.sim['V1'].density
 topo_t000000.00_c2&gt;&gt;&gt; topo.sim['V1'].output_fn
                Out[2]:PiecewiseLinear(lower_bound=...)
 
-topo_t000000.00_c3&gt;&gt;&gt; from topo.outputfn import *
+topo_t000000.00_c3&gt;&gt;&gt; from topo.transferfn import *
 
-topo_t000000.00_c4&gt;&gt;&gt; topo.sim['V1'].output_fn=IdentityOF()
+topo_t000000.00_c4&gt;&gt;&gt; topo.sim['V1'].output_fn=IdentityTF()
 
 topo_t000000.00_c5&gt;&gt;&gt; topo.sim['V1'].output_fn
-               Out[5]:IdentityOF(name=...)
+               Out[5]:IdentityTF(name=...)
 
 topo_t000000.00_c6&gt;&gt;&gt; topo.sim['V1'].activity
                Out[6]:
@@ -84,7 +84,7 @@ function for more detailed information:
 topo_t000000.00_c11>>>  PiecewiseLinear?
 ...
 Docstring:
-    Piecewise-linear OutputFn with lower and upper thresholds.
+    Piecewise-linear TransferFn with lower and upper thresholds.
     
     Values below the lower_threshold are set to zero, those above
     the upper threshold are set to 1.0, and those in between are

@@ -13,14 +13,14 @@ import copy
 from .. import param
 
 import topo
-from topo.base.functionfamily import OutputFn
+from topo.base.functionfamily import TransferFn
 from topo.base.cf import CFSheet, CFPOutputFn
 from topo.base.projection import Projection
 from topo.base.sheet import activity_type
 from topo.base.simulation import EPConnectionEvent
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
-from topo.outputfn.basic import PiecewiseLinear
+from topo.transferfn.basic import PiecewiseLinear
 from topo.sheet import JointNormalizingCFSheet, JointNormalizingCFSheet_Continuous
 
 
@@ -59,7 +59,7 @@ class LISSOM(JointNormalizingCFSheet):
         Whether to modify the weights after every settling step.
         If false, waits until settling is completed before doing learning.""")
 
-    output_fn = param.ClassSelector(OutputFn,default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+    output_fn = param.ClassSelector(TransferFn,default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     
     precedence = param.Number(0.6)
     

@@ -99,7 +99,7 @@ import numpy
 
 from topo import learningfn
 from topo import numbergen
-from topo import outputfn
+from topo import transferfn
 from topo import pattern
 from topo import projection
 from topo import responsefn

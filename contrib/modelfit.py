@@ -3,7 +3,7 @@ import numpy
 import pylab
 from numpy import array, size, mat, shape
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.base.functionfamily import IdentityOF
+from topo.base.functionfamily import IdentityTF
 import topo
 from topo.base.boundingregion import BoundingBox
 from topo.pattern.image import Image
@@ -211,7 +211,7 @@ def runModelFit():
     
     inputs = []
     activities = []
-    topo.sim["V1"].output_fn=IdentityOF()    
+    topo.sim["V1"].output_fn=IdentityTF()    
     for i in xrange(0,99):
         topo.sim.run(0.15)
         inputs.append(topo.sim["Retina"].activity.copy())

@@ -590,10 +590,10 @@ topo_t000000.00_c2>>> %lprun -f ConnectionField._create_input_sheet_slice execfi
 
 <P>
 To profile calling of
-topo.outputfn.HomeoStaticMaxEnt while Topographica is running:
+topo.transferfn.HomeoStaticMaxEnt while Topographica is running:
 <pre>
 $ ./topographica -i contrib/lesi.ty
-topo_t000000.00_c1>>> from topo.outputfn import HomeostaticMaxEnt
+topo_t000000.00_c1>>> from topo.transferfn import HomeostaticMaxEnt
 topo_t000000.00_c2>>> %lprun -f HomeostaticMaxEnt.__call__ topo.sim.run(30)
 </pre>
 
@@ -602,7 +602,7 @@ The output you get is something like this:
 <pre>
 Timer unit: 1e-06 s
 
-File: /disk/data1/workspace/v1cball/topographica/topo/outputfn/basic.py
+File: /disk/data1/workspace/v1cball/topographica/topo/transferfn/basic.py
 Function: __call__ at line 749
 Total time: 0.955004 s
 

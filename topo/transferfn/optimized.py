@@ -10,7 +10,7 @@ from numpy.oldnumeric import sum
 from .. import param
 
 from topo.base.cf import CFPOutputFn,CFPOF_Plugin
-from topo.base.functionfamily import OutputFn, IdentityOF
+from topo.base.functionfamily import TransferFn, IdentityTF
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 from basic import DivisiveNormalizeL1
@@ -27,7 +27,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     CFPOF_DivisiveNormalizeL1.
     """
     single_cf_fn = param.ClassSelector(
-        OutputFn,DivisiveNormalizeL1(norm_value=1.0),readonly=True)
+        TransferFn,DivisiveNormalizeL1(norm_value=1.0),readonly=True)
     
     def __call__(self, iterator, mask, **params):
         rows,cols = mask.shape
@@ -110,7 +110,7 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
     """
 
     single_cf_fn = param.ClassSelector(
-        OutputFn,default=DivisiveNormalizeL1(norm_value=1.0),constant=True)
+        TransferFn,default=DivisiveNormalizeL1(norm_value=1.0),constant=True)
 
     def __call__(self, iterator, mask, **params):
         """
@@ -119,7 +119,7 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
         normalization.  After use, cf.norm_total is deleted because
         the value it would have has been changed.
         """
-        if type(self.single_cf_fn) is not IdentityOF:
+        if type(self.single_cf_fn) is not IdentityTF:
             rows,cols = mask.shape
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
@@ -136,5 +136,5 @@ provide_unoptimized_equivalent("CFPOF_DivisiveNormalizeL1_opt","CFPOF_DivisiveNo
 
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and
-                    (issubclass(v,OutputFn) or issubclass(v,CFPOutputFn))]))
+                    (issubclass(v,TransferFn) or issubclass(v,CFPOutputFn))]))
 

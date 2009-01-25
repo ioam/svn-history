@@ -26,22 +26,22 @@ import topo
 from topo.base.sheet import activity_type
 from topo.base.arrayutil import clip_lower
 from topo.base.arrayutil import L2norm, norm, array_argmax
-from topo.base.functionfamily import OutputFn
+from topo.base.functionfamily import TransferFn
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetcoords import SheetCoordinateSystem
-# Imported here so that all OutputFns will be in the same package
-from topo.base.functionfamily import IdentityOF,PipelineOF
+# Imported here so that all TransferFns will be in the same package
+from topo.base.functionfamily import IdentityTF,PipelineTF
 from topo.pattern.basic import Gaussian
 
-Pipeline = PipelineOF
+Pipeline = PipelineTF
 
 # CEBHACKALERT: these need to respect the mask - which will be passed in.
 
 
-class PiecewiseLinear(OutputFn):
+class PiecewiseLinear(TransferFn):
     """ 
-    Piecewise-linear OutputFn with lower and upper thresholds.
+    Piecewise-linear TransferFn with lower and upper thresholds.
     
     Values below the lower_threshold are set to zero, those above
     the upper threshold are set to 1.0, and those in between are
@@ -58,7 +58,7 @@ class PiecewiseLinear(OutputFn):
 
 
 
-class Sigmoid(OutputFn):
+class Sigmoid(TransferFn):
     """ 
     Sigmoidal (logistic) output function: 1/(1+exp-(r*x+k)).
 
@@ -83,7 +83,7 @@ class Sigmoid(OutputFn):
 
 
                   
-class NakaRushton(OutputFn):
+class NakaRushton(TransferFn):
     #JABALERT: Please write the equation into words in the docstring, as in Sigmoid.
     """
     Naka-Rushton curve.
@@ -95,10 +95,10 @@ class NakaRushton(OutputFn):
     of constrast gain control in cortical neurons.  The input of the
     curve is usually contrast, but under the assumption that the
     firing rate of a model neuron is directly proportional to the
-    contrast, it can be used as an OutputFn for a Sheet.
+    contrast, it can be used as a TransferFn for a Sheet.
     
     The parameter c50 corresponds to the contrast at which the half of
-    the maximal output is reached.  For a Sheet OutputFn this translates
+    the maximal output is reached.  For a Sheet TransferFn this translates
     to the input for which a neuron will respond with activity 0.5.
     """
     
@@ -117,7 +117,7 @@ class NakaRushton(OutputFn):
 
 
 
-class GeneralizedLogistic(OutputFn):
+class GeneralizedLogistic(TransferFn):
     """ 
     The generalized logistic curve (Richards' curve): y = l + (u /(1 + b * exp(-r*(x-2*m))^(1/b))).
 
@@ -154,9 +154,9 @@ class GeneralizedLogistic(OutputFn):
 
 
 
-class DivisiveNormalizeL1(OutputFn):
+class DivisiveNormalizeL1(TransferFn):
     """
-    OutputFn that divides an array by its L1 norm.
+    TransferFn that divides an array by its L1 norm.
 
     This operation ensures that the sum of the absolute values of the
     array is equal to the specified norm_value, rescaling each value
@@ -176,9 +176,9 @@ class DivisiveNormalizeL1(OutputFn):
 
 
 
-class DivisiveNormalizeL2(OutputFn):
+class DivisiveNormalizeL2(TransferFn):
     """
-    OutputFn to divide an array by its Euclidean length (aka its L2 norm).
+    TransferFn to divide an array by its Euclidean length (aka its L2 norm).
 
     For a given array interpreted as a flattened vector, keeps the
     Euclidean length of the vector at a specified norm_value.
@@ -193,9 +193,9 @@ class DivisiveNormalizeL2(OutputFn):
 
 
 
-class DivisiveNormalizeLinf(OutputFn):
+class DivisiveNormalizeLinf(TransferFn):
     """
-    OutputFn to divide an array by its L-infinity norm
+    TransferFn to divide an array by its L-infinity norm
     (i.e. the maximum absolute value of its elements).
 
     For a given array interpreted as a flattened vector, scales the
@@ -215,9 +215,9 @@ class DivisiveNormalizeLinf(OutputFn):
 
 
     
-class DivisiveNormalizeLp(OutputFn):
+class DivisiveNormalizeLp(TransferFn):
     """
-    OutputFn to divide an array by its Lp-Norm, where p is specified.
+    TransferFn to divide an array by its Lp-Norm, where p is specified.
 
     For a parameter p and a given array interpreted as a flattened
     vector, keeps the Lp-norm of the vector at a specified norm_value.
@@ -236,7 +236,7 @@ class DivisiveNormalizeLp(OutputFn):
 
 
 
-class HalfRectifyAndSquare(OutputFn):
+class HalfRectifyAndSquare(TransferFn):
     """
     Output function that applies a half-wave rectification (clips at zero)
     and then squares the values.
@@ -248,7 +248,7 @@ class HalfRectifyAndSquare(OutputFn):
         x *= x
 
 
-class HalfRectifyAndPower(OutputFn):
+class HalfRectifyAndPower(TransferFn):
     """
     Output function that applies a half-wave rectification (i.e.,
     clips at zero), and then raises the result to the e-th power
@@ -271,7 +271,7 @@ class HalfRectifyAndPower(OutputFn):
 
 
 
-class HalfRectify(OutputFn):
+class HalfRectify(TransferFn):
     """
     Output function that applies a half-wave rectification (clips at zero)
     
@@ -283,7 +283,7 @@ class HalfRectify(OutputFn):
 
 
 
-class Square(OutputFn):
+class Square(TransferFn):
     """Output function that applies a squaring nonlinearity."""
 
     def __call__(self,x):
@@ -291,7 +291,7 @@ class Square(OutputFn):
         
 
 
-class BinaryThreshold(OutputFn):
+class BinaryThreshold(TransferFn):
     """
     Forces all values below a threshold to zero, and above it to 1.0.
     """
@@ -306,8 +306,8 @@ class BinaryThreshold(OutputFn):
 
 ### JABALERT: Is this the right location for this class?  It brings in
 ### dependencies on PatternGenerator, which is not something that many
-### OutputFns will need.
-class PatternCombine(OutputFn):
+### TransferFns will need.
+class PatternCombine(TransferFn):
     """
     Combine the supplied pattern with one generated using a
     PatternGenerator.
@@ -343,8 +343,8 @@ class PatternCombine(OutputFn):
 
 ### JABALERT: Need to move this class out of this file, as it brings in
 ### dependencies on PatternGeneratorParameter and Gaussian, which are
-### not things that many OutputFns will need.  Perhaps move to som.py?
-class KernelMax(OutputFn):
+### not things that many TransferFns will need.  Perhaps move to som.py?
+class KernelMax(TransferFn):
     """
     Replaces the given matrix with a kernel function centered around the maximum value.
 
@@ -405,11 +405,11 @@ class KernelMax(OutputFn):
 
 
 
-class OutputFnWithState(OutputFn):
+class TransferFnWithState(TransferFn):
     """
-    Abstract base class for OutputFns that need to maintain a self.plastic parameter.
+    Abstract base class for TransferFns that need to maintain a self.plastic parameter.
 
-    These OutputFns typically maintain some form of internal history
+    These TransferFns typically maintain some form of internal history
     or other state from previous calls, which can be disabled by
     override_plasticity_state().
     """
@@ -421,7 +421,7 @@ class OutputFnWithState(OutputFn):
     __abstract = True
     
     def __init__(self,**params):
-        super(OutputFnWithState,self).__init__(**params)
+        super(TransferFnWithState,self).__init__(**params)
         self._plasticity_setting_stack = []
 
 
@@ -460,11 +460,11 @@ class OutputFnWithState(OutputFn):
         self.plastic = self._plasticity_setting_stack.pop()                        
 
 
-# CB: it's not ideal that all OutputFnWithRandomState fns have
-# the plastic stuff (from OutputFnWithState).
-class OutputFnWithRandomState(OutputFnWithState):
+# CB: it's not ideal that all TransferFnWithRandomState fns have
+# the plastic stuff (from TransferFnWithState).
+class TransferFnWithRandomState(TransferFnWithState):
     """
-    Abstract base class for OutputFns that use a random number generator.
+    Abstract base class for TransferFns that use a random number generator.
     """
 
     random_generator = param.Parameter(
@@ -474,16 +474,16 @@ class OutputFnWithRandomState(OutputFnWithState):
         numbers (see RandomState's help for more information).
 
         Note that all instances of subclasses of
-        OutputFnWithRandomState will share this RandomState object,
+        TransferFnWithRandomState will share this RandomState object,
         and hence its state. To create an instance of an
-        OutputFnWithRandomState subclass that has its own state, set
+        TransferFnWithRandomState subclass that has its own state, set
         this parameter on the instance to a new RandomState instance.
         """)
         
     __abstract = True
     
     def __init__(self,**params):
-        super(OutputFnWithRandomState,self).__init__(**params)
+        super(TransferFnWithRandomState,self).__init__(**params)
         self.__random_generators_stack = []
 
     def state_push(self):
@@ -493,18 +493,18 @@ class OutputFnWithRandomState(OutputFnWithState):
         """
         self.__random_generators_stack.append(self.random_generator)
         self.random_generator=copy.copy(self.random_generator)
-        super(OutputFnWithRandomState,self).state_push()
+        super(TransferFnWithRandomState,self).state_push()
 
     def state_pop(self):
         """
         Retrieve the previous random number generator from the stack.
         """
         self.random_generator = self.__random_generators_stack.pop()
-        super(OutputFnWithRandomState,self).state_push()
+        super(TransferFnWithRandomState,self).state_push()
         
 
 
-class PoissonSample(OutputFnWithRandomState):
+class PoissonSample(TransferFnWithRandomState):
     """
     Simulate Poisson-distributed activity with specified mean values.
     
@@ -545,7 +545,7 @@ class PoissonSample(OutputFnWithRandomState):
 
 
 
-class AttributeTrackingOF(OutputFnWithState):
+class AttributeTrackingTF(TransferFnWithState):
     """
     Keeps track of attributes of a specified Parameterized over time, for analysis or plotting.
 
@@ -606,7 +606,7 @@ class AttributeTrackingOF(OutputFnWithState):
         script_repr()).""")
 
     def __init__(self,**params):
-        super(AttributeTrackingOF,self).__init__(**params)
+        super(AttributeTrackingTF,self).__init__(**params)
         self.values={}
         self.n_step = 0
         self._object=None
@@ -655,7 +655,7 @@ class AttributeTrackingOF(OutputFnWithState):
           
 
 
-class ActivityAveragingOF(OutputFnWithState):
+class ActivityAveragingTF(TransferFnWithState):
     """
     Calculates the average of the input activity.
 
@@ -681,7 +681,7 @@ class ActivityAveragingOF(OutputFnWithState):
 
     
     def __init__(self,**params):
-        super(ActivityAveragingOF,self).__init__(**params)
+        super(ActivityAveragingTF,self).__init__(**params)
         self.n_step = 0
         self.x_avg=None
 
@@ -699,7 +699,7 @@ class ActivityAveragingOF(OutputFnWithState):
 		self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
 
 
-class HomeostaticMaxEnt(OutputFnWithRandomState):
+class HomeostaticMaxEnt(TransferFnWithRandomState):
     """
     Implementation of homeostatic intrinsic plasticity from Jochen Triesch,
     ICANN 2005, LNCS 3696 pp.65-70.
@@ -708,7 +708,7 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
     desired average firing rate and approximately exponential
     distribution of firing rates (for the maximum possible entropy).
     
-    Note that this OutputFn has state, so the history of calls to it
+    Note that this TransferFn has state, so the history of calls to it
     will affect future behavior.  The plastic parameter can be used
     to disable changes to the state.
     
@@ -797,7 +797,7 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
         super(HomeostaticMaxEnt,self).state_pop()
         
 
-class ScalingOF(OutputFnWithState):
+class ScalingOF(TransferFnWithState):
     """
     Scales input activity based on the current average activity (x_avg).
 
@@ -850,4 +850,4 @@ class ScalingOF(OutputFnWithState):
 
 
 
-__all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,OutputFn)]))
+__all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,TransferFn)]))

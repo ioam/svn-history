@@ -23,7 +23,7 @@ simply applies the output functions sequentially.  For instance,
 LISSOM V1 Sheets typically use a PiecewiseLinear() output_fn, and
 noise can be added to this by setting the output_fn to
 PiecewiseLinear(...)+X(), where X() is an output function that adds
-noise.  Others that have IdentityOF() by default can simply use the
+noise.  Others that have IdentityTF() by default can simply use the
 new output function instead of the old identity function. Suitable
 output functions for noise include variants of:
 
@@ -38,7 +38,7 @@ range of the variation, respectively, the operator determines whether
 the noise is multiplicative, divisive, or some other type of
 combination, and the noise itself can either be Uniform or Gaussian
 (i.e., normal), or even some some user-defined distribution.  There
-are also some other noise-related OutputFns available, such as
+are also some other noise-related TransferFns available, such as
 ProportionalGaussian (variance proportional to the mean).
 
 <P>Hints: For additive noise, if you are modelling non-zero background
@@ -57,20 +57,20 @@ the additive noise.
 into the LateralExcitatory Projection, just change e.g.
 
 <pre>
-  output_fn=IdentityOF()
+  output_fn=IdentityTF()
 </pre>
 
 (if an output_fn is specified) to e.g.:
 
 <pre>
-  output_fn=IdentityOF()+PatternCombine(generator=topo.pattern.random.\
+  output_fn=IdentityTF()+PatternCombine(generator=topo.pattern.random.\
       UniformRandom(scale=0.1,offset=-0.05),operator=numpy.add)
 </pre>
 
 
-(where in this case you could actually omit the "IdentityOF()+"
+(where in this case you could actually omit the "IdentityTF()+"
 because it doesn't do anything).  Some networks may not state
-"output_fn=IdentityOF()" explicitly, in which case just add the
+"output_fn=IdentityTF()" explicitly, in which case just add the
 entire string above to the definition of that projection in the .ty
 file.  To see the results immediately, just run the network for one
 step, then visualize the Projection Activity and the final Activity.

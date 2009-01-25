@@ -50,9 +50,9 @@ from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.projfn import CFPLF_PluginScaled
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Scaled_opt
-from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF
-from topo.outputfn.basic import AttributeTrackingOF, Sigmoid, HalfRectify, HomeostaticMaxEnt
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineTF, IdentityTF, ActivityAveragingTF
+from topo.transferfn.basic import AttributeTrackingTF, Sigmoid, HalfRectify, HomeostaticMaxEnt
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.image import Image
 

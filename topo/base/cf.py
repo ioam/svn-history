@@ -30,7 +30,7 @@ from .. import param
 
 import patterngenerator
 from patterngenerator import PatternGenerator
-from functionfamily import OutputFn,IdentityOF
+from functionfamily import TransferFn,IdentityTF
 from functionfamily import LearningFn,Hebbian,IdentityLF
 from functionfamily import ResponseFn,DotProduct
 from functionfamily import CoordinateMapperFn,IdentityMF
@@ -152,7 +152,7 @@ class ConnectionField(param.Parameterized):
     # CEBALERT: do something for mask_template=None
     def __init__(self,input_sheet,template=BoundingBox(radius=0.1),
                  weights_generator=patterngenerator.Constant(),mask=None,
-                 output_fn=IdentityOF(),**params):
+                 output_fn=IdentityTF(),**params):
         """
         Create weights at the specified (x,y) location on the
         specified input_sheet.
@@ -262,7 +262,7 @@ class ConnectionField(param.Parameterized):
         return self.input_sheet_slice.submatrix(activity)
 
 
-    def change_bounds(self,template,mask,output_fn=IdentityOF()):
+    def change_bounds(self,template,mask,output_fn=IdentityTF()):
         """
         Change the bounding box for this ConnectionField.
 
@@ -432,14 +432,14 @@ class CFPOF_Plugin(CFPOutputFn):
     Applies the specified single_cf_fn to each CF in the CFProjection
     for which the mask is nonzero.
     """
-    single_cf_fn = param.ClassSelector(OutputFn,default=IdentityOF(),
-        doc="Accepts an OutputFn that will be applied to each CF individually.")
+    single_cf_fn = param.ClassSelector(TransferFn,default=IdentityTF(),
+        doc="Accepts a TransferFn that will be applied to each CF individually.")
     
     def __call__(self, iterator, mask, **params):
         """
         Apply the single_cf_fn to each CF for which the mask is nonzero.
         """
-        if type(self.single_cf_fn) is not IdentityOF:
+        if type(self.single_cf_fn) is not IdentityTF:
             single_cf_fn = self.single_cf_fn
 
             for cf,r,c in iterator():
@@ -455,7 +455,7 @@ class CFPOF_Identity(CFPOutputFn):
     Must never be changed or subclassed, because it might never
     be called. (I.e., it could simply be tested for and skipped.)
     """
-    single_cf_fn = param.ClassSelector(OutputFn,default=IdentityOF(),constant=True)
+    single_cf_fn = param.ClassSelector(TransferFn,default=IdentityTF(),constant=True)
     
     def __call__(self, iterator, mask, **params):
         pass
@@ -469,7 +469,7 @@ class CFProjection(Projection):
 
     CFProjection computes its activity using a response_fn of type
     CFPResponseFn (typically a CF-aware version of mdot) and output_fn 
-    (which is typically IdentityOF).  The initial contents of the 
+    (which is typically IdentityTF).  The initial contents of the 
     ConnectionFields mapping from the input Sheet into the target
     ProjectionSheet are controlled by the weights_generator, cf_shape,
     and weights_output_fn parameters, while the location of the
@@ -600,7 +600,7 @@ class CFProjection(Projection):
                         if self.apply_output_fn_init:
                             of = self.weights_output_fn.single_cf_fn
                         else:
-                            of = IdentityOF()
+                            of = IdentityTF()
                             
                         if not self.same_cf_shape_for_all_cfs:
                             mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
