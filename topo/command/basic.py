@@ -135,6 +135,24 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
         restore_input_generators()
 
 
+
+class _VersionPrinter(object):
+    """When unpickled, prints version & release information about snapshot."""
+    def __init__(self,release,version):
+        self.release = release
+        self.version = version
+    def __getstate__(self):
+        return {'release':self.release,
+                'version':self.version}
+    def __setstate__(self,state):
+        release = state['release']
+        version = state['version']
+        self.release=release
+        self.version=version
+        # CB: Should probably clean up. And could be a debug statement, instead.
+        print "Snapshot is from release '%s' (version '%s')."%(release,version)
+        
+
 def save_snapshot(snapshot_name=None,xml=False):
     """
     Save a snapshot of the network's current state.
@@ -167,7 +185,7 @@ def save_snapshot(snapshot_name=None,xml=False):
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    to_save = (PickleMain(),global_params,topoPOclassattrs,topo.sim)
+    to_save = (_VersionPrinter(topo.release,topo.version),PickleMain(),global_params,topoPOclassattrs,topo.sim)
 
     if not xml:
         try:
