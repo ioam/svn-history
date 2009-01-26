@@ -182,7 +182,7 @@ from parameterized import Parameterized,ParameterizedMetaclass,\
      classlist
      
 from . import Boolean,String,Number,Selector,ClassSelector,\
-     ObjectSelector,Callable,Dynamic,Parameter
+     ObjectSelector,Callable,Dynamic,Parameter,List,HookList
 
 
 # CEBALERT: copied from topo.misc.filepath, to make it clear what we
@@ -567,7 +567,7 @@ class TkParameterizedBase(Parameterized):
         # This is because we use Number to control the type, so we
         # don't need restrictions from DoubleVar.)
         self._param_to_tkvar = {Boolean:T.BooleanVar,
-                                 Parameter:T.StringVar}
+                                Parameter:T.StringVar}
 
         # CEBALERT: Parameter is the base parameter class, but ... 
         # at least need a test that will fail when a new param type added
@@ -578,7 +578,9 @@ class TkParameterizedBase(Parameterized):
                     ClassSelector:CSPTranslator,
                     Number:Eval_ReprTranslator,
                     Boolean:BoolTranslator,
-                    String:DoNothingTranslator}
+                    String:DoNothingTranslator,
+                    List:ListTranslator,
+                    HookList:ListTranslator} # CBALERT: sort out inherit.
         
         self.change_PO(extraPO)
         super(TkParameterizedBase,self).__init__(**params)
@@ -1140,7 +1142,10 @@ class TkParameterized(TkParameterizedBase):
             Number:self._create_number_widget,
             Button:self._create_button_widget,
             String:self._create_string_widget,
-            Selector:self._create_selector_widget}
+            Selector:self._create_selector_widget,
+            List:self._create_list_widget,
+            HookList:self._create_list_widget
+            }
         
         self.representations = {}  
         
@@ -1749,6 +1754,56 @@ class TkParameterized(TkParameterizedBase):
         help_text = getdoc(self._string2object(name,tkvar._original_get()))
         self.balloon.bind(w,help_text)
         return w
+
+    def _list_edit(self,param_name):
+        val = self.get_parameter_value(param_name)
+        parameterized_instance = list_to_parameterized(val)
+
+        parameter_window = AppWindow(self)
+        #parameter_window.title(PO_to_edit.name+' parameters')
+
+        parameter_frame = ParametersFrameWithApply(parameter_window,parameterized_object=parameterized_instance,show_labels=False)
+        #msg_handler=self.msg_handler,on_change=self.on_change,on_modify=self.on_modify)
+
+        # CEBALERT: more dynamic class changes to make it impossible
+        # to follow what is happening...ParametersFrame needs some
+        # reorganization...
+        def _forgotten_why(itself):
+            parameterized_instance.update()#_original(parameterized_instance)
+            
+            ### refresh()
+            po_val = self.get_parameter_value(param_name)
+            po_stringrep = self._object2string(param_name,po_val)
+            self._tkvars[param_name]._original_set(po_stringrep)
+            ###
+#            self._refresh_value(param_name)#handle_gui_set(param_name,force=True)
+
+        parameter_frame._hack_hook = _forgotten_why#parameterized_instance._update_original
+
+        parameter_frame.pack()
+
+                                                   
+
+
+        
+
+
+    def _create_list_widget(self,frame,name,widget_options):
+        #param = self.get_parameter_object(name)
+        #value = self.get_parameter_value(name)
+        tkvar = self._tkvars[name]
+
+        X = lambda event=None,x=name: self._list_edit(x)
+
+        w = ListWidget(frame,variable=self._tkvars[name],
+                       cmd=X,**widget_options)
+        #w = ListWidget(frame,variable=tkvar,**widget_options)
+        
+                    
+        #help_text = getdoc(self._string2object(name,tkvar._original_get()))
+        #self.balloon.bind(w,help_text)
+        return w
+
     
 
     def _create_number_widget(self,frame,name,widget_options):
@@ -1909,9 +1964,20 @@ class BoolTranslator(DoNothingTranslator):
 
 
 # Error messages: need to change how they're reported
-
-
 from parameterized import script_repr
+class ListTranslator(Translator):
+
+    def __init__(self,param,initial_value=None):
+        super(ListTranslator,self).__init__(param)
+        self.list_=initial_value
+
+    def string2object(self,string_):
+        return self.list_
+    
+    def object2string(self,object_):
+        self.list_=object_
+        return script_repr(self.list_,[],"",[])
+
 
 class Eval_ReprTranslator(Translator):
     """
@@ -1962,7 +2028,8 @@ class Eval_ReprTranslator(Translator):
         n.last_string = self.last_string
         n.last_object = self.last_object
         return n
-        
+
+
 
 class String_ObjectTranslator(Translator):
 
@@ -2022,7 +2089,6 @@ class CSPTranslator(String_ObjectTranslator):
         n = Translator.__copy__(self)
         n.cache = copy.copy(self.cache)
         return n
-
 
 
 def param_is_dynamically_generated(param,po):
@@ -2550,6 +2616,8 @@ class ParametersFrameWithApply(ParametersFrame):
     def _apply_button(self):
         self.update_parameters()
         self._refresh_button(overwrite_error=False)
+        if hasattr(self,'_hack_hook'):
+            self._hack_hook(self)
 
     def _refresh_value(self,param_name):
         po_val = self.get_parameter_value(param_name)
@@ -3176,3 +3244,101 @@ class AppWindow(ScrolledWindow):
         
 
 
+class ListWidget(T.Frame):
+    def __init__(self, master, variable,cmd,**widget_options):
+        T.Frame.__init__(self, master)
+        w=T.Entry(self,textvariable=variable) #CEBALERT:should be state='disabled' but without dimming
+        w.pack(fill='both',expand=1)
+        w.bind("<Button-1>",cmd)
+        
+        #b=T.Button(self,text="...",command=cmd)
+        #b.pack(side='right')
+
+import new
+import odict
+
+def dict_to_parameterized(class_name,parameter_values):
+    # each item is just a Parameter (i.e. not specific)
+    parameter_objs = dict([(name,Parameter(default=value))
+                           for name,value in parameter_values.items()])
+
+    # got to be a new class to get independent sets of parameters
+    new_class = new.classobj(class_name,(Representer,),parameter_objs)
+    return  new_class(parameter_values)
+
+
+def list_to_parameterized(list_):
+
+    parameter_values = odict.OrderedDict([('a'*i,item) for item,i in zip(list_,range(1,len(list_)+1))])
+
+    parameter_objs = dict([(name,Parameter(default=value))
+                           for name,value in parameter_values.items()])
+
+    new_class = new.classobj('List',(ListRepresenter,),parameter_objs)
+    #new_class.params('name').hidden=True
+    
+    inst = new_class(dict(parameter_values))
+    inst.list_ = list_ # that's a hack; need to get classes right
+    return inst
+
+
+
+
+
+############################################################    
+
+def standard_parameterized_params():
+    return Parameterized.params().keys()
+
+
+class Representer(Parameterized):
+
+    name = Parameter(precedence=-1) # CEBALERT
+    # represented is a mapping
+    
+    def __init__(self,represented):
+        ## CEBALERT: if we come to represent dicts in the GUI,
+        ## will have to deal with name clashes (e.g. for name parameter)
+        for name in standard_parameterized_params():
+            assert name not in represented
+        ##
+        self.represented = represented
+        super(Representer,self).__init__(**represented)
+        self.initialized=False # allow all modifications
+        
+
+    def update(self):
+        param_names = self.params().keys()
+
+        # remove any of the standard params (e.g. name) that haven't
+        # been added to represented
+        for name in standard_parameterized_params():
+            if name not in self.represented:
+                param_names.pop(param_names.index(name))
+                
+        for name in param_names:
+            self.represented[name]=getattr(self,name)
+
+
+
+
+class ListRepresenter(Representer):
+
+
+    def update(self):
+        super(ListRepresenter,self).update()
+
+        ## grow or shrink original list if necessary
+        l = len(self.list_)-len(self.represented)
+        if l>0:
+            for i in range(l):
+                self.list_.pop()
+        elif l<0:
+            for i in range(-l):
+                self.list_.append(None)
+
+        for val,i in zip(self.represented.values(),range(len(self.list_))):
+            self.list_[i]=val
+
+        
+            
