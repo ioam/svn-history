@@ -731,7 +731,7 @@ def function_script_repr(fn,imports,prefix,settings):
     return module+'.'+name
 
 def type_script_repr(type_,imports,prefix,settings):
-    module = type.__module__
+    module = type_.__module__
     if module!='__builtin__':
         imports.append('import %s'%module)
     return module+'.'+type_.__name__
