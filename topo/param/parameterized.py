@@ -867,6 +867,11 @@ class Parameterized(object):
             
         type.__setattr__(cls,param_name,param_obj)
         cls.__metaclass__._initialize_parameter(cls,param_name,param_obj)
+        # delete cached params()
+        try:
+            delattr(cls,'_%s__params'%cls.__name__) 
+        except AttributeError:
+            pass
 
 
 
@@ -1320,8 +1325,8 @@ class Parameterized(object):
         Includes Parameters from this class and its
         superclasses.
         """
-        # CB: we cache the parameters because this method is called
-        # often, and new parameters cannot be added (or deleted)
+        # CB: we cache the parameters because this method is called often,
+        # and parameters are rarely added (and cannot be deleted)
         try:
             pdict=getattr(cls,'_%s__params'%cls.__name__)
         except AttributeError:
