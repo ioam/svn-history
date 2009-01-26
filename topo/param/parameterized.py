@@ -1688,6 +1688,15 @@ class ParameterizedFunction(Parameterized):
         # ensure that ParameterizedFunction.__new__ is skipped
         state = ParameterizedFunction.__getstate__(self)
         return (Parameterized.__new__,(self.__class__,),state)
+
+    def script_repr(self,imports=[],prefix="    "):
+        """
+        Same as Parameterized.script_repr, except that X.classname(Y
+        is replaced with X.classname.instance(Y
+        """
+        r = Parameterized.script_repr(self,imports,prefix)
+        classname=self.__class__.__name__
+        return r.replace(".%s("%classname,".%s.instance("%classname)    
         
 
 
