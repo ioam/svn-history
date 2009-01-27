@@ -104,7 +104,7 @@ from topo.%s import *
 """%new
     fake_a_module('%s'%old,topo,code,'topo')
 
-    mod = __import__("topo.%s"%old)
+    mod = __import__("topo.%s"%old,fromlist=[old])
     #mod = eval('topo.%s'%old)
 
     for x in add_what:
