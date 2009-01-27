@@ -1711,7 +1711,7 @@ class ParameterizedFunction(Parameterized):
 #     behave the same as any normal Python object.
 #
 # For how to use, see topo.base.simulation.Simulation or
-# topo.misc.commandland.GlobalParams.
+# topo.misc.commandline.GlobalParams.
 class OptionalSingleton(object):
 
     _inst = None
