@@ -30,6 +30,7 @@ updates are currently available in the latest SVN version:
 <dd>
   <div class="i2">- model editor supports non-Sheet EventProcessors
   and non-CFProjection EPConnections</div>
+  <div class="i2">- right-click option for plotting tuning curves</div>
 </dd>
 <dt>Component library:</dt>
 <dd>

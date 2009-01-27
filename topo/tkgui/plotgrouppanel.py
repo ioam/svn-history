@@ -849,6 +849,10 @@ class SheetPanel(PlotGroupPanel):
                                     indexname='receptive_field',
                                     command=self._receptive_field_window)
 
+        self._unit_menu.add_command(label='Orientation Tuning Curves',
+                                    indexname='or tuning curve',
+                                    command=self._or_tuning_curve_window)
+
 ###### part of disable items hack #####
         self._unit_menu_updaters['connection_fields'] = self.check_for_cfs
         self._unit_menu_updaters['receptive_field'] = self.check_for_rfs        
@@ -866,7 +870,7 @@ class SheetPanel(PlotGroupPanel):
             sheet = topo.sim[plot.plot_src_name]
 
             # RFHACK: if any one generator has RF views for this sheet, then enable the menu option
-            # At the moemnt, njust a hack to prevent menu option for generator sheets.
+            # At the moment, just a hack to prevent menu option for generator sheets.
             if not isinstance(sheet,GeneratorSheet):
                 show_rfs = True
             else:
@@ -932,6 +936,24 @@ class SheetPanel(PlotGroupPanel):
                 except KeyError:
                     # maybe lose this warning
                     topo.sim.warning("No RF measurements are available yet for input_sheet %s; run the Receptive Field plot for that input_sheet to see the RF."%g.name)
+
+
+    def _or_tuning_curve_window(self):
+        """
+        Open a Tuning Curve plot for the unit currently
+        identified by a right click.
+        """
+        if 'plot' in self._right_click_info:
+            plot = self._right_click_info['plot']
+            sheet = topo.sim[plot.plot_src_name]
+            center_x,center_y=self._right_click_info['coords'][1]
+            r,c = self._right_click_info['coords'][0]
+
+            try:
+                from topo.command.pylabplots import cyclic_tuning_curve
+                cyclic_tuning_curve(x_axis="orientation",coords=[(center_x,center_y)],sheet=sheet)
+            except AttributeError:
+                topo.sim.warning("No orientation tuning curve measurements are available yet for sheet %s; run the Orientation Tuning (Fullfield) command and try again."%sheet.name)
 
 
     def conditional_refresh(self):
