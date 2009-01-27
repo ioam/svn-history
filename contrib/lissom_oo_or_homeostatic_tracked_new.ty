@@ -318,7 +318,7 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,
                  learning_fn=CFPLF_Scaled_opt(),
-                 strength=locals().get('aff_str',25.0),name='LGNOnAfferent',
+                 strength=locals().get('aff_str',15.0),name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
          learning_rate=locals().get('aff_lr',2.0))
@@ -326,7 +326,7 @@ topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','J
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
          connection_type=CFProjection,
                  learning_fn=CFPLF_Scaled_opt(),
-                 strength=locals().get('aff_str',25.0),name='LGNOffAfferent',
+                 strength=locals().get('aff_str',15.0),name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
          learning_rate=locals().get('aff_lr',2.0))
@@ -343,7 +343,7 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  strength=-1.0*locals().get('inh_strength',2.5),
                  #inh_strength should be increased for more distributed datasets i.e. when the frequency parameter is higher
                  weights_generator=gauss_rand(size=0.15),
-                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_lr',0.5))
+                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_inh_lr',0.5))
 
 
 #Output functions for tracking
