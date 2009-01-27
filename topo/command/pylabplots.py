@@ -585,7 +585,7 @@ class tuning_curve(PylabPlotCommand):
     
             pylab.ylabel('Response')
             pylab.xlabel('%s (%s)' % (p.x_axis.capitalize(),p.unit))
-            pylab.title('Sheet %s, coordinate(x,y)=(%d,%d) at time %s' % 
+            pylab.title('Sheet %s, coordinate(x,y)=(%0.3f,%0.3f) at time %s' % 
                         (sheet.name,coordinate[0],coordinate[1],topo.sim.timestr()))
             title='%s: %s Tuning Curve' % (topo.sim.name,p.x_axis.capitalize())
         
