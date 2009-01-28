@@ -32,7 +32,7 @@ dist: bluesphere
 
 clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tilewrapper-uninstall psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean scrodget-clean tooltip-clean snit-clean svn2cl-clean readline-clean termcap-clean odict-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tilewrapper-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall scrodget-uninstall tooltip-uninstall snit-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall odict-clean
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tilewrapper-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall scrodget-uninstall tooltip-uninstall snit-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall odict-uninstall
 
 
 
@@ -866,6 +866,8 @@ odict: python
 	cp odict.py ${PREFIX}/lib/python2.5/site-packages/
 	touch odict
 
+odict-clean:
+	rm -rf ${ODICT}
 odict-uninstall:
 	rm -rf odict ${foreach f,${ODICT_UNINSTALL}, ${PREFIX}/${f}}
 
