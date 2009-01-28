@@ -15,10 +15,10 @@ import sys
 # Maybe we could do that by trying to use cpickle initially, then
 # falling back to pickle when we do a 'legacy load' of the snapshot.
 
-
-
 # CEBALERT: should have ONE list for the update script and for this,
 # rather than having (effectively) a list in each.
+
+
 
 def preprocess_state(class_,state_mod_fn): 
     """
@@ -91,12 +91,6 @@ class %s(object):
     setattr(module,old_name,fake_old_class)
 
 
-
-# CB: should use a factory to produce functions or should use
-# decorations.  Would avoid code duplication and make it simpler to
-# see what's happening
-
-
 def _import(x,y):
     """return module y from: 'from x import y'"""
     return __import__(x+'.'+y,fromlist=[y])
@@ -148,6 +142,14 @@ def fake_a_module(name,parent=None,source_code=None,parent_path=None):
         sys.modules[name]=module
 
 
+class DuplicateCheckingList(list):
+    def append(self,item):
+        assert item not in self, "%s already added"%item
+        list.append(self,item)
+
+
+
+
 class SnapshotSupport(object):
 
     @staticmethod
@@ -158,485 +160,12 @@ class SnapshotSupport(object):
         # suitable way e.g. dictionary.
         # Haven't yet thought about whether or not it's actually possible
         # to get the version number before unpickling...
-
-
-        ### rXXXX moved topo.outputfn to topo.transferfn
-        import topo,topo.transferfn
-        package_redirect('outputfn',topo,topo.transferfn)
-
-        ### rXXXX renamed OutputFn to TransferFn + xxxOF->xxxTF
-        import topo.base.functionfamily
-        import topo.transferfn.basic
-        def _rename(mod):        
-            for name,obj in mod.__dict__.items():
-                if isinstance(obj,type) and issubclass(obj,mod.TransferFn):
-                    if name.endswith('TF'):
-                        exec name[0:-2]+'OF='+name in mod.__dict__
-                    elif 'TransferFn' in name:
-                        exec name.replace('Transfer','Output')+'='+name in mod.__dict__
-
-        _rename(topo.base.functionfamily)
-        _rename(topo.transferfn.basic)
-        ###
-
-
-        # removed this class in rXXXX
-        class InstanceMethodWrapper(object):
-            """
-            Wrapper for pickling instance methods.
-
-            The constructor takes an instance method (e.g. for an object
-            'sim', method sim.time) as its only argument.  The wrapper
-            instance is callable, picklable, etc.
-            """
-            def __repr__(self):
-                return repr(self.im.im_func)
-
-            # Hope __name__ doesn't get set...
-            def _fname(self):
-                return self.im.im_func.func_name
-            __name__ = property(_fname)
-
-            def __init__(self,im):
-                self.im = im
-
-            def __getstate__(self):
-                return (self.im.im_self,
-                        self.im.im_func.func_name)
-
-            def __setstate__(self,state):
-                obj,func_name = state
-                self.im = getattr(obj,func_name)
-
-            def __call__(self,*args,**kw):
-                return self.im(*args,**kw)
-
-        import topo.param
-        topo.param.InstanceMethodWrapper = InstanceMethodWrapper
-
-        def param_remove_hidden(instance,state):
-            # Hidden attribute removed from Parameter in r7861
-            if 'hidden' in state:
-                if state['hidden'] is True:
-                    state['precedence']=-1
-                del state['hidden']
-
-        def param_add_readonly(instance,state):
-            # Hidden attribute added to Parameter in r7975
-            if 'readonly' not in state:
-                state['readonly']=False
-
-        from .. import param
-        preprocess_state(param.Parameter,param_remove_hidden)
-        preprocess_state(param.Parameter,param_add_readonly)
-
-
-        def class_selector_remove_suffixtolose(instance,state):
-            # suffix_to_lose removed from ClassSelectorParameter in r8031
-            if 'suffix_to_lose' in state:
-                del state['suffix_to_lose']
-
-        preprocess_state(param.ClassSelector,class_selector_remove_suffixtolose)
-
-
-
-        def cf_rename_slice_array(instance,state):
-            ## slice_array was renamed to input_sheet_slice in r7548
-            if 'slice_array' in state:
-                input_sheet_slice = state['slice_array']
-                state['input_sheet_slice'] = input_sheet_slice
-                del state['slice_array'] # probably doesn't work
-
-        from topo.base.cf import ConnectionField
-        preprocess_state(ConnectionField,cf_rename_slice_array)
-
-
-        def sim_remove_time_type_attr(instance,state):
-            # _time_type attribute added to simulation in r7581
-            # and replaced by time_type param in r8215
-            if '_time_type' in state:
-                # CB: untested code (unless someone has such a snapshot;
-                # if nobody has such a snapshot, can remove this code).
-                state['_time_type_param_value']=state['_time_type']
-                del state['_time_type']
-            
-        from topo.base.simulation import Simulation
-        preprocess_state(Simulation,sim_remove_time_type_attr)
-
-
-        def slice_setstate_selector(state):
-            # Allow loading of pickles created before Pickle support was added to Slice.
-            #
-            # In snapshots created between 7547 (Slice becomes array) and 7762
-            # (inclusive; Slice got pickle support in 7763), Slice instances
-            # will be missing some information.
-            #
-            # CB: info could be recovered if required.
-            if isinstance(state,dict):
-                return None
-            else:
-                return ndarray.__setstate__
-
-        from topo.base.sheetcoords import Slice                
-        select_setstate(Slice,slice_setstate_selector,post_super=False)
-
-        # CB: this is to work round change in SCS, but __setstate__ is never
-        # called on that (method resolution order means __setstate__ comes
-        # from EventProcessor instead)
-        def sheet_set_shape(state):
-            # since 7958, SCS has stored shape on creation
-            def setstate(instance,state):
-                if '_SheetCoordinateSystem__shape' not in state:
-                    m = '_SheetCoordinateSystem__'
-                    # all these are necessary for the calculation now,
-                    # but would not otherwise be restored until later
-                    setattr(instance,'bounds',state['bounds'])
-                    setattr(instance,'lbrt',state['lbrt'])
-                    setattr(instance,m+'xdensity',state[m+'xdensity'])
-                    setattr(instance,m+'xstep',state[m+'xstep'])
-                    setattr(instance,m+'ydensity',state[m+'ydensity'])
-                    setattr(instance,m+'ystep',state[m+'ystep'])
-
-                    shape = Slice(instance.bounds,instance).shape_on_sheet()
-                    setattr(instance,m+'shape',shape)
-
-            return setstate
-
-        from topo.base.sheet import Sheet
-        select_setstate(Sheet,sheet_set_shape) 
-
-
-        ##########
-        # r8001 Removed OutputFnParameter and CFPOutputFnParameter
-        # r8014 Removed LearningFnParameter and ResponseFnParameter (+CFP equivalents)
-        # r8028 Removed CoordinateMapperFnParameter
-        # r8029 Removed PatternGeneratorParameter
-        from topo.base.functionfamily import OutputFn,ResponseFn,LearningFn,\
-             CoordinateMapperFn
-        d = {"OutputFnParameter":OutputFn,
-             "ResponseFnParameter":ResponseFn,
-             "LearningFnParameter":LearningFn,
-             "CoordinateMapperFnParameter":CoordinateMapperFn}        
-
-        import topo.base.functionfamily
-        for name,arg in d.items():
-            fake_a_class(topo.base.functionfamily,name,
-                         param.ClassSelector,(arg,))
-
-        from topo.base.cf import CFPOutputFn,CFPResponseFn,CFPLearningFn
-        d = {"CFPOutputFnParameter":CFPOutputFn,
-             "CFPResponseFnParameter":CFPResponseFn,
-             "CFPLearningFnParameter":CFPLearningFn}         
-
-        import topo.base.cf
-        for name,arg in d.items():
-            fake_a_class(topo.base.cf,name,
-                         param.ClassSelector,(arg,))
-
-        import topo.base.patterngenerator
-        from topo.base.patterngenerator import PatternGenerator
-        fake_a_class(topo.base.patterngenerator,"PatternGeneratorParameter",
-                     param.ClassSelector,(PatternGenerator,))
-        ##########
-            
-
-        # for snapshots saved before r7901
-        class SimSingleton(object):
-            """Support for old snapshots."""
-            def __setstate__(self,state):
-                sim = state['actual_sim']
-                param.Dynamic.time_fn = sim.time
-
-        import topo.base.simulation
-        topo.base.simulation.SimSingleton=SimSingleton
-
-
-        # CEBALERT: we really need to start detecting the version so
-        # hacks aren't unnecessary installed. Or at least provide an
-        # option to request legacy support otherwise it's turned
-        # off. Or something like that.
-
-        # rXXXX
-        # support topo.base.parameterized
-        import topo.base
-        module_redirect('parameterized',topo.base,topo.param.parameterized)
-        
-        # rXXXX
-        # support topo.base.parameterizedobject
-        import topo.param
-        module_redirect('parameterizedobject',topo.base,topo.param.parameterized)
-        topo.base.parameterizedobject.ParameterizedObject=topo.param.parameterized.Parameterized
-
-
-        ##############################################################
-        # rXXXX
-        # support topo.base.parameterclasses
-        module_redirect('parameterclasses',topo.base,topo.param)
-
-        new_names = ['Boolean','String','Callable','Composite','Selector',
-                     'ObjectSelector','ClassSelector','List','Dict']
-
-        for name in new_names:
-            setattr(topo.base.parameterclasses,name+'Parameter',
-                    getattr(topo.base.parameterclasses,name))
-        ##############################################################
-
-            
-        ##############################################################
-        # DynamicNumber was removed in rXXXX
-        class DynamicNumber(object):
-            """
-            Provide support for existing code that uses DynamicNumber:
-            see __new__().
-            """
-            warnedA = False  # suppress warnings for the moment.
-            warnedB = False
-
-            def __new__(cls,default=None,**params):
-                """
-                If bounds or softbounds or any params are supplied, assume
-                we're dealing with DynamicNumber declared as a parameter
-                of a ParameterizedObject class.  In this case, return a
-                new *Number* parameter instead.
-
-                Otherwise, assume we're dealing with DynamicNumber
-                supplied as the value of a Number Parameter. In this case,
-                return a DynamicNumber (but one which is not a Parameter,
-                just a simple wrapper).
-
-                * Of course, this is not 100% reliable: if someone defines
-                * a class with a DynamicNumber but doesn't pass any doc or
-                * bounds or whatever. But in such cases, they'll get the
-                * ParameterizedObject warning about being unable to set a
-                * class attribute.
-
-                Most of the code is to generate warning messages.
-
-                """
-                if len(params)>0:
-                    ####################
-                    m = "\n------------------------------------------------------------\nPlease update your code - instead of using the 'DynamicNumber' Parameter in the code for your class, please use the 'Number' Parameter; the Number Parameter now supports dynamic values automatically.\n\nE.g. change\n\nclass X(Parameterized):\n    y=DynamicNumber(NumberGenerator())\n\nto\n\n\nclass X(Parameterized):\n    y=Number(NumberGenerator())\n------------------------------------------------------------\n"
-                    if not cls.warnedA:
-                        param.Parameterized().warning(m)
-                        cls.warnedA=True
-                    ####################
-
-                    n = Number(default,**params)
-                    return n
-                else:
-                    ####################
-                    m = "\n------------------------------------------------------------\nPlease update your code - instead of using DynamicNumber to contain a number generator, pass the number generator straight to the Number parameter:\n\nE.g. in code using the class below...\n\nclass X(Parameterized):\n    y=Number(0.0)\n\n\nchange\n\nx = X(y=DynamicNumber(NumberGenerator()))\n\nto\n\nx = X(y=NumberGenerator())\n------------------------------------------------------------\n"
-                    if not cls.warnedB:
-                        param.Parameterized().warning(m)
-                        cls.warnedB=True
-                    ####################
-                    return object.__new__(cls,default)
-
-
-            def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
-                self.val = default
-            def __call__(self):
-                return self.val()
-
-        import topo.base.parameterclasses
-        topo.base.parameterclasses.DynamicNumber = DynamicNumber
-        import topo.param
-        topo.param.DynamicNumber = DynamicNumber
-
-        ##############################################################
-
-
-        from topo.base.cf import CFProjection
-        from numpy import array
-        def cfproj_add_cfs(instance,state):
-            # cfs attribute added in r8227
-            if 'cfs' not in state:
-                cflist = state['_cfs']
-                state['cfs'] = array(cflist)
-        preprocess_state(CFProjection,cfproj_add_cfs)
-
-
-        # rXXXX renaming of component libraries
-        import topo.outputfn,topo.responsefn,\
-               topo.learningfn,topo.coordmapper
-        package_redirect('outputfns',topo,topo.outputfn)
-        package_redirect('responsefns',topo,topo.responsefn)
-        package_redirect('learningfns',topo,topo.learningfn)
-        package_redirect('coordmapperfns',topo,topo.coordmapper)
-        
-        # note there's no legacy support for people using CFSOM. We could
-        # add that if necessary.
-
-
-        ### rXXXX removed topo/sheet/generator.py
-        import topo.sheet
-        module_redirect('generator',topo.sheet,topo.sheet)
-        ###
-
-        package_redirect('sheets',topo,topo.sheet)
-
-
-        import topo.ep
-        package_redirect('eps',topo,topo.ep)
-
-        # CEBALERT: add teststimuli (in email)
-
-        import topo.pattern
-        package_redirect('patterns',topo,topo.pattern)
-        import topo.command
-        package_redirect('commands',topo,topo.command)
-        import topo.projection
-        package_redirect('projections',topo,topo.projection)
-
-        # CEBALERT: check this is necessary
-        # the isn't-in-__all__ shimmy
-        import sys
-        import topo.projections.basic as ps,topo.projection.basic as p
-        ps.CFPOF_SharedWeight = p.CFPOF_SharedWeight
-        ps.SharedWeightCF = p.SharedWeightCF
-
-
-        # rXXXX renamed generatorsheet
-        # CEBALERT: below gives errors with snapshot-compatiblity-tests
-        #module_redirect('generatorsheet',topo.sheets,topo.sheet.generator)
-        code = \
-"""
-from topo.sheet.generator import *
-"""
-        fake_a_module('generatorsheet',topo.sheets,code,'topo.sheets')
-
-
-        # rXXXX renamed functionfamilies
-        module_redirect('functionfamilies',topo.base,topo.base.functionfamily)
-
-        # rXXXX renamed topo.x.projfns
-        import topo.outputfn.projfn,topo.responsefn.projfn,topo.learningfn.projfn
-        for mod in ['outputfn','responsefn','learningfn']:
-            existing_mod = _import('topo.%s'%mod,'projfn')
-            module_redirect('projfns',_import('topo',mod),existing_mod)
-            module_redirect('projfns',_import('topo',mod+'s'),existing_mod)
-
-
-        # rXXXX renamed topo.misc.numbergenerators
-        import topo.misc.numbergenerator
-        module_redirect('numbergenerators',topo.misc,topo.misc.numbergenerator)
-
-        # rXXXX renamed topo.misc.patternfns
-        import topo.misc.patternfn
-        module_redirect('patternfns',topo.misc,topo.misc.patternfn)
-
-
-        # r9617 removed ExtraPickler
-        class ExtraPicklerSkipper(object):
-            def __setstate__(self,state):
-                # print warning of what's being skipped?
-                pass
-        topo.misc.util.ExtraPickler=ExtraPicklerSkipper
-
-
-        # rXXXX renamed topo.misc.utils
-        import topo.misc.util
-        module_redirect('utils',topo.misc,topo.misc.util)
-        
-
-        # rXXXX renamed topo.misc.traces
-        import topo.misc.trace
-        module_redirect('traces',topo.misc,topo.misc.trace)
-
-        # rXXXX duplicate SineGratingDisk removed
-        # CEBALERT: something's disappeared, right? Presumably
-        # support for wherever the duplicate was originally...
-        
-        from topo.pattern import SineGrating,Disk,Rectangle,Ring
-        # rXXXX removed these classes
-        class SineGratingDisk(SineGrating):
-            """2D sine grating pattern generator with a circular mask."""
-            mask_shape = param.Parameter(default=Disk(smoothing=0))
-        topo.pattern.basic.SineGratingDisk = SineGratingDisk
-
-        class SineGratingRectangle(SineGrating):
-           """2D sine grating pattern generator with a rectangular mask."""
-           mask_shape = param.Parameter(default=Rectangle())
-        topo.pattern.basic.SineGratingRectangle = SineGratingRectangle
-        
-        class SineGratingRing(SineGrating):
-           """2D sine grating pattern generator with a ring-shaped mask."""
-           mask_shape = param.Parameter(default=Ring(smoothing=0))
-        topo.pattern.basic.SineGratingRing = SineGratingRing
-
-
-        # rXXXX homeostatic of moved into basic
-        module_redirect('homeostatic',topo.outputfns,topo.outputfns)
-
-        # rXXXX renamed CFProjection.weights_shape to CFProjection.cf_shape
-        param.parameterized._param_name_changes['topo.base.cf.CFProjection']={'weights_shape':'cf_shape'}
-
-        # rXXXX CF's bounds made into read-only attribute (since the value
-        # actually comes from the slice).
-        # (Problem exposed when Parameterized's __setstate__ changed to
-        # set all state attributes, rather than just those in __dict__?)        
-        def cf_bounds_property(instance,state):
-            try:
-                del state['bounds']
-            except KeyError:
-                pass
-
-        from topo.base.cf import ConnectionField
-        preprocess_state(ConnectionField,cf_bounds_property)
-
-        ## If gmpy.mpq not available, use fixedpoint.FixedPoint. 
-        ## 
-        ## Note that this won't replace gmpy.mpq in the snapshot
-        ## itself, because Simulation.time_type will remain gmpy.mpq.
-        ## This has the advantage of not affecting the snapshot
-        ## itself, but has the disadvantage of showing mpq as the
-        ## time_type when it's actually FixedPoint on this run. We
-        ## could easily replace time_type, too. I'm not sure which is
-        ## better.
-        ##
-        ## (only implements creation of mpq)
-        ##
-        ## CEBALERT: not sure what precision should be used for
-        ## FixedPoint to replace rational. Should we set the precision
-        ## really high?
-        code = \
-"""
-import fixedpoint
-class mpq(object):
-    def __new__(self,*args,**kw):
-        return fixedpoint.FixedPoint(args[0],precision=4)
-"""
-        # only replace gmpy if necessary
-        try:
-            import gmpy
-        except ImportError:
-            param.Parameterized().warning("gmpy.mpq not available: using fixedpoint.FixedPoint as a replacement.")
-            fake_a_module('gmpy',source_code=code)
-
-        # allow_None added in r9380
         from topo import param
-        def param_add_allow_None(instance,state):
-            if 'allow_None' not in state and hasattr(instance.__class__,'allow_None'):
-                # have to add to state or else slot won't exist on instance, but will
-                # exist on class (consequence of using __slots__)
-                state['allow_None']=False
-
-        preprocess_state(param.Parameter,param_add_allow_None)
-
-        def number_add_inclusive_bounds(instance,state):
-            # inclusive_bounds added to Number in r9789
-            if 'inclusive_bounds' not in state:
-                state['inclusive_bounds']=(True,True)
-
-        from .. import param
-        preprocess_state(param.Number,number_add_inclusive_bounds)
-
-
-def teststimuli():
-
-    class SineGratingDisk(SineGrating):
-       """2D sine grating pattern generator with a circular mask."""
-       mask_shape = param.Parameter(default=Disk(smoothing=0))
+        #param.parameterized.min_print_level=param.parameterized.DEBUG
+        global supporters
+        for f in supporters:
+            param.Parameterized(name='SnapshotSupport').debug("calling %s"%f.__name__)
+            f()
 
 
 # CEBALERT: rename SnapshotSupport and integrate LegacySupport so that
@@ -656,3 +185,587 @@ def LegacySupport():
 def install_legacy_support():
     SnapshotSupport.install()
     LegacySupport()
+
+
+
+######################################################################
+######################################################################
+
+# note there's no legacy support for people using CFSOM. We could
+# add that if necessary.
+
+
+S=supporters=DuplicateCheckingList()
+
+def rename_output_fn_to_transfer_fn():
+    ### rXXXX moved topo.outputfn to topo.transferfn
+    import topo,topo.transferfn
+    package_redirect('outputfn',topo,topo.transferfn)
+
+    ### rXXXX renamed OutputFn to TransferFn + xxxOF->xxxTF
+    import topo.base.functionfamily
+    import topo.transferfn.basic
+    def _rename(mod):        
+        for name,obj in mod.__dict__.items():
+            if isinstance(obj,type) and issubclass(obj,mod.TransferFn):
+                if name.endswith('TF'):
+                    exec name[0:-2]+'OF='+name in mod.__dict__
+                elif 'TransferFn' in name:
+                    exec name.replace('Transfer','Output')+'='+name in mod.__dict__
+
+    _rename(topo.base.functionfamily)
+    _rename(topo.transferfn.basic)
+
+S.append(rename_output_fn_to_transfer_fn)
+
+
+def removed_InstanceMethodWrapper():
+    # removed this class in rXXXX
+    class InstanceMethodWrapper(object):
+        """
+        Wrapper for pickling instance methods.
+
+        The constructor takes an instance method (e.g. for an object
+        'sim', method sim.time) as its only argument.  The wrapper
+        instance is callable, picklable, etc.
+        """
+        def __repr__(self):
+            return repr(self.im.im_func)
+
+        # Hope __name__ doesn't get set...
+        def _fname(self):
+            return self.im.im_func.func_name
+        __name__ = property(_fname)
+
+        def __init__(self,im):
+            self.im = im
+
+        def __getstate__(self):
+            return (self.im.im_self,
+                    self.im.im_func.func_name)
+
+        def __setstate__(self,state):
+            obj,func_name = state
+            self.im = getattr(obj,func_name)
+
+        def __call__(self,*args,**kw):
+            return self.im(*args,**kw)
+
+    import topo.param
+    topo.param.InstanceMethodWrapper = InstanceMethodWrapper
+
+S.append(removed_InstanceMethodWrapper)
+
+
+def param_remove_hidden():
+    # Hidden attribute removed from Parameter in r7861
+    from topo import param
+    def _param_remove_hidden(instance,state):
+        if 'hidden' in state:
+            if state['hidden'] is True:
+                state['precedence']=-1
+            del state['hidden']
+    preprocess_state(param.Parameter,_param_remove_hidden)
+
+S.append(param_remove_hidden)
+
+def param_add_readonly():
+    # Hidden attribute added to Parameter in r7975
+    from topo import param
+    def _param_add_readonly(instance,state):
+        if 'readonly' not in state:
+            state['readonly']=False
+    preprocess_state(param.Parameter,_param_add_readonly)
+
+S.append(param_add_readonly)
+
+
+def class_selector_remove_suffixtolose():
+    # suffix_to_lose removed from ClassSelectorParameter in r8031
+    from topo import param
+    def _class_selector_remove_suffixtolose(instance,state):
+        if 'suffix_to_lose' in state:
+            del state['suffix_to_lose']
+    preprocess_state(param.ClassSelector,_class_selector_remove_suffixtolose)
+    
+S.append(class_selector_remove_suffixtolose)
+
+
+def cf_rename_slice_array():
+    ## slice_array was renamed to input_sheet_slice in r7548    
+    def _cf_rename_slice_array(instance,state):
+        if 'slice_array' in state:
+            input_sheet_slice = state['slice_array']
+            state['input_sheet_slice'] = input_sheet_slice
+            del state['slice_array'] # probably doesn't work
+
+    from topo.base.cf import ConnectionField
+    preprocess_state(ConnectionField,_cf_rename_slice_array)
+
+S.append(cf_rename_slice_array)
+
+def sim_remove_time_type_attr():
+    # _time_type attribute added to simulation in r7581
+    # and replaced by time_type param in r8215
+    def _sim_remove_time_type_attr(instance,state):
+        if '_time_type' in state:
+            # CB: untested code (unless someone has such a snapshot;
+            # if nobody has such a snapshot, can remove this code).
+            state['_time_type_param_value']=state['_time_type']
+            del state['_time_type']
+
+    from topo.base.simulation import Simulation
+    preprocess_state(Simulation,_sim_remove_time_type_attr)
+S.append(sim_remove_time_type_attr)
+
+
+
+def slice_setstate_selector():
+    # Allow loading of pickles created before Pickle support was added to Slice.
+    #
+    # In snapshots created between 7547 (Slice becomes array) and 7762
+    # (inclusive; Slice got pickle support in 7763), Slice instances
+    # will be missing some information.
+    #
+    # CB: info could be recovered if required.
+    def _slice_setstate_selector(state):
+        if isinstance(state,dict):
+            return None
+        else:
+            return ndarray.__setstate__
+
+    from topo.base.sheetcoords import Slice                
+    select_setstate(Slice,_slice_setstate_selector,post_super=False)
+
+S.append(slice_setstate_selector)
+
+
+def sheet_set_shape():
+    # CB: this is to work round change in SCS, but __setstate__ is never
+    # called on that (method resolution order means __setstate__ comes
+    # from EventProcessor instead)
+    from topo.base.sheetcoords import Slice
+    def _sheet_set_shape(state):
+        # since 7958, SCS has stored shape on creation
+        def setstate(instance,state):
+            if '_SheetCoordinateSystem__shape' not in state:
+                m = '_SheetCoordinateSystem__'
+                # all these are necessary for the calculation now,
+                # but would not otherwise be restored until later
+                setattr(instance,'bounds',state['bounds'])
+                setattr(instance,'lbrt',state['lbrt'])
+                setattr(instance,m+'xdensity',state[m+'xdensity'])
+                setattr(instance,m+'xstep',state[m+'xstep'])
+                setattr(instance,m+'ydensity',state[m+'ydensity'])
+                setattr(instance,m+'ystep',state[m+'ystep'])
+
+                shape = Slice(instance.bounds,instance).shape_on_sheet()
+                setattr(instance,m+'shape',shape)
+
+        return setstate
+
+    from topo.base.sheet import Sheet
+    select_setstate(Sheet,_sheet_set_shape) 
+S.append(sheet_set_shape)
+
+
+def removed_function_family_parameters():
+    # r8001 Removed OutputFnParameter and CFPOutputFnParameter
+    # r8014 Removed LearningFnParameter and ResponseFnParameter (+CFP equivalents)
+    # r8028 Removed CoordinateMapperFnParameter
+    # r8029 Removed PatternGeneratorParameter
+    from topo import param
+    from topo.base.functionfamily import OutputFn,ResponseFn,LearningFn,\
+         CoordinateMapperFn
+    d = {"OutputFnParameter":OutputFn,
+         "ResponseFnParameter":ResponseFn,
+         "LearningFnParameter":LearningFn,
+         "CoordinateMapperFnParameter":CoordinateMapperFn}        
+
+    import topo.base.functionfamily
+    for name,arg in d.items():
+        fake_a_class(topo.base.functionfamily,name,
+                     param.ClassSelector,(arg,))
+
+    from topo.base.cf import CFPOutputFn,CFPResponseFn,CFPLearningFn
+    d = {"CFPOutputFnParameter":CFPOutputFn,
+         "CFPResponseFnParameter":CFPResponseFn,
+         "CFPLearningFnParameter":CFPLearningFn}         
+
+    import topo.base.cf
+    for name,arg in d.items():
+        fake_a_class(topo.base.cf,name,
+                     param.ClassSelector,(arg,))
+
+    import topo.base.patterngenerator
+    from topo.base.patterngenerator import PatternGenerator
+    fake_a_class(topo.base.patterngenerator,"PatternGeneratorParameter",
+                 param.ClassSelector,(PatternGenerator,))
+
+S.append(removed_function_family_parameters)
+
+
+
+def added_dynamic_time_fn():
+    # for snapshots saved before r7901
+    from topo import param
+    class SimSingleton(object):
+        """Support for old snapshots."""
+        def __setstate__(self,state):
+            sim = state['actual_sim']
+            param.Dynamic.time_fn = sim.time
+
+    import topo.base.simulation
+    topo.base.simulation.SimSingleton=SimSingleton
+
+S.append(added_dynamic_time_fn)
+
+def moved_parameterized():
+    # rXXXX
+    # support topo.base.parameterized
+    import topo.base
+    module_redirect('parameterized',topo.base,topo.param.parameterized)
+
+S.append(moved_parameterized)
+
+def renamed_parameterizedobject():
+    # rXXXX
+    # support topo.base.parameterizedobject
+    import topo.param
+    module_redirect('parameterizedobject',topo.base,topo.param.parameterized)
+    topo.base.parameterizedobject.ParameterizedObject=topo.param.parameterized.Parameterized
+S.append(renamed_parameterizedobject)
+
+def removed_parameterclasses():
+    # rXXXX
+    # support topo.base.parameterclasses
+    import topo.param
+    module_redirect('parameterclasses',topo.base,topo.param)
+
+    new_names = ['Boolean','String','Callable','Composite','Selector',
+                 'ObjectSelector','ClassSelector','List','Dict']
+
+    for name in new_names:
+        setattr(topo.base.parameterclasses,name+'Parameter',
+                getattr(topo.base.parameterclasses,name))
+S.append(removed_parameterclasses)
+
+def removed_DynamicNumber():
+    # DynamicNumber was removed in rXXXX
+    class DynamicNumber(object):
+        """
+        Provide support for existing code that uses DynamicNumber:
+        see __new__().
+        """
+        warnedA = False  # suppress warnings for the moment.
+        warnedB = False
+
+        def __new__(cls,default=None,**params):
+            """
+            If bounds or softbounds or any params are supplied, assume
+            we're dealing with DynamicNumber declared as a parameter
+            of a ParameterizedObject class.  In this case, return a
+            new *Number* parameter instead.
+
+            Otherwise, assume we're dealing with DynamicNumber
+            supplied as the value of a Number Parameter. In this case,
+            return a DynamicNumber (but one which is not a Parameter,
+            just a simple wrapper).
+
+            * Of course, this is not 100% reliable: if someone defines
+            * a class with a DynamicNumber but doesn't pass any doc or
+            * bounds or whatever. But in such cases, they'll get the
+            * ParameterizedObject warning about being unable to set a
+            * class attribute.
+
+            Most of the code is to generate warning messages.
+
+            """
+            if len(params)>0:
+                ####################
+                m = "\n------------------------------------------------------------\nPlease update your code - instead of using the 'DynamicNumber' Parameter in the code for your class, please use the 'Number' Parameter; the Number Parameter now supports dynamic values automatically.\n\nE.g. change\n\nclass X(Parameterized):\n    y=DynamicNumber(NumberGenerator())\n\nto\n\n\nclass X(Parameterized):\n    y=Number(NumberGenerator())\n------------------------------------------------------------\n"
+                if not cls.warnedA:
+                    param.Parameterized().warning(m)
+                    cls.warnedA=True
+                ####################
+
+                n = Number(default,**params)
+                return n
+            else:
+                ####################
+                m = "\n------------------------------------------------------------\nPlease update your code - instead of using DynamicNumber to contain a number generator, pass the number generator straight to the Number parameter:\n\nE.g. in code using the class below...\n\nclass X(Parameterized):\n    y=Number(0.0)\n\n\nchange\n\nx = X(y=DynamicNumber(NumberGenerator()))\n\nto\n\nx = X(y=NumberGenerator())\n------------------------------------------------------------\n"
+                if not cls.warnedB:
+                    param.Parameterized().warning(m)
+                    cls.warnedB=True
+                ####################
+                return object.__new__(cls,default)
+
+
+        def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
+            self.val = default
+        def __call__(self):
+            return self.val()
+
+    import topo.base.parameterclasses
+    topo.base.parameterclasses.DynamicNumber = DynamicNumber
+    import topo.param
+    topo.param.DynamicNumber = DynamicNumber
+
+S.append(removed_DynamicNumber)
+
+
+def cfproj_add_cfs():
+    # cfs attribute added in r8227
+    from topo.base.cf import CFProjection
+    from numpy import array
+    def _cfproj_add_cfs(instance,state):
+        if 'cfs' not in state:
+            cflist = state['_cfs']
+            state['cfs'] = array(cflist)
+    preprocess_state(CFProjection,_cfproj_add_cfs)
+
+S.append(cfproj_add_cfs)
+
+def renamed_component_libraries():
+    # rXXXX renaming of component libraries
+    import topo.outputfn,topo.responsefn,\
+           topo.learningfn,topo.coordmapper
+    package_redirect('outputfns',topo,topo.outputfn)
+    package_redirect('responsefns',topo,topo.responsefn)
+    package_redirect('learningfns',topo,topo.learningfn)
+    package_redirect('coordmapperfns',topo,topo.coordmapper)
+
+S.append(renamed_component_libraries)
+
+def removed_generator():
+    ### rXXXX removed topo/sheet/generator.py
+    import topo.sheet
+    module_redirect('generator',topo.sheet,topo.sheet)
+
+S.append(removed_generator)
+
+def renamed_sheets():
+    import topo,topo.sheet
+    package_redirect('sheets',topo,topo.sheet)
+
+S.append(renamed_sheets)
+
+def renamed_eps():
+    import topo,topo.ep
+    package_redirect('eps',topo,topo.ep)
+
+S.append(renamed_eps)
+
+
+def renamed_patterns():
+    import topo.pattern
+    package_redirect('patterns',topo,topo.pattern)
+
+S.append(renamed_patterns)
+
+def renamed_commands():
+    import topo.command
+    package_redirect('commands',topo,topo.command)
+
+S.append(renamed_commands)
+
+def renamed_projections():
+    import topo.projection
+    package_redirect('projections',topo,topo.projection)
+
+    # CEBALERT: check this is necessary
+    # the isn't-in-__all__ shimmy
+    import sys
+    import topo.projections.basic as ps,topo.projection.basic as p
+    ps.CFPOF_SharedWeight = p.CFPOF_SharedWeight
+    ps.SharedWeightCF = p.SharedWeightCF
+
+S.append(renamed_projections)
+
+
+def renamed_generatorsheet():
+    # rXXXX renamed generatorsheet
+    # CEBALERT: below gives errors with snapshot-compatiblity-tests
+    #module_redirect('generatorsheet',topo.sheets,topo.sheet.generator)
+    import topo.sheets
+    code = \
+"""
+from topo.sheet.generator import *
+"""
+    fake_a_module('generatorsheet',topo.sheets,code,'topo.sheets')
+S.append(renamed_generatorsheet)
+
+def renamed_functionfamilies():
+    # rXXXX renamed functionfamilies
+    import topo.base,topo.base.functionfamily
+    module_redirect('functionfamilies',topo.base,topo.base.functionfamily)
+
+S.append(renamed_functionfamilies)
+
+def renamed_projfns():
+    # rXXXX renamed topo.x.projfns
+    import topo.outputfn.projfn,topo.responsefn.projfn,topo.learningfn.projfn
+    for mod in ['outputfn','responsefn','learningfn']:
+        existing_mod = _import('topo.%s'%mod,'projfn')
+        module_redirect('projfns',_import('topo',mod),existing_mod)
+        module_redirect('projfns',_import('topo',mod+'s'),existing_mod)
+
+S.append(renamed_projfns)
+
+def renamed_numbergenerators():
+    # rXXXX renamed topo.misc.numbergenerators
+    import topo.misc.numbergenerator
+    module_redirect('numbergenerators',topo.misc,topo.misc.numbergenerator)
+
+S.append(renamed_numbergenerators)
+
+def renamed_patternfns():
+    # rXXXX renamed topo.misc.patternfns
+    import topo.misc.patternfn
+    module_redirect('patternfns',topo.misc,topo.misc.patternfn)
+
+S.append(renamed_patternfns)
+
+def removed_ExtraPickler():
+    import topo.misc.util
+    # r9617 removed ExtraPickler
+    class ExtraPicklerSkipper(object):
+        def __setstate__(self,state):
+            # print warning of what's being skipped?
+            pass
+    topo.misc.util.ExtraPickler=ExtraPicklerSkipper
+
+S.append(removed_ExtraPickler)
+
+def renamed_utils():
+    # rXXXX renamed topo.misc.utils
+    import topo.misc.util
+    module_redirect('utils',topo.misc,topo.misc.util)
+
+S.append(renamed_utils)
+
+def renamed_traces():
+    # rXXXX renamed topo.misc.traces
+    import topo.misc.trace
+    module_redirect('traces',topo.misc,topo.misc.trace)
+
+S.append(renamed_traces)
+
+##### CLEAN UP
+# CEBALERT: add teststimuli (in email)
+def CEBALERT():
+    # rXXXX duplicate SineGratingDisk removed
+    # CEBALERT: something's disappeared, right? Presumably
+    # support for wherever the duplicate was originally...
+    import topo.pattern.basic
+    from topo.pattern import SineGrating,Disk,Rectangle,Ring
+    # rXXXX removed these classes
+    from topo import param
+    class SineGratingDisk(SineGrating):
+        """2D sine grating pattern generator with a circular mask."""
+        mask_shape = param.Parameter(default=Disk(smoothing=0))
+    topo.pattern.basic.SineGratingDisk = SineGratingDisk
+
+    class SineGratingRectangle(SineGrating):
+       """2D sine grating pattern generator with a rectangular mask."""
+       mask_shape = param.Parameter(default=Rectangle())
+    topo.pattern.basic.SineGratingRectangle = SineGratingRectangle
+
+    class SineGratingRing(SineGrating):
+       """2D sine grating pattern generator with a ring-shaped mask."""
+       mask_shape = param.Parameter(default=Ring(smoothing=0))
+    topo.pattern.basic.SineGratingRing = SineGratingRing
+
+def teststimuli():
+    class SineGratingDisk(SineGrating):
+       """2D sine grating pattern generator with a circular mask."""
+       mask_shape = param.Parameter(default=Disk(smoothing=0))
+
+S.append(CEBALERT)
+#####
+
+def moved_homeostatic():
+    # rXXXX homeostatic of moved into basic
+    import topo.outputfns
+    module_redirect('homeostatic',topo.outputfns,topo.outputfns)
+
+S.append(moved_homeostatic)
+
+def renamed_cfproj_weights_shape():
+    # rXXXX renamed CFProjection.weights_shape to CFProjection.cf_shape
+    from topo import param
+    param.parameterized._param_name_changes['topo.base.cf.CFProjection']={'weights_shape':'cf_shape'}
+
+S.append(renamed_cfproj_weights_shape)
+
+def cf_bounds_readonly():
+    # rXXXX CF's bounds made into read-only attribute (since the value
+    # actually comes from the slice).
+    # (Problem exposed when Parameterized's __setstate__ changed to
+    # set all state attributes, rather than just those in __dict__?)        
+    def cf_bounds_property(instance,state):
+        try:
+            del state['bounds']
+        except KeyError:
+            pass
+
+    from topo.base.cf import ConnectionField
+    preprocess_state(ConnectionField,cf_bounds_property)
+
+S.append(cf_bounds_readonly)
+
+
+def provide_gmpy_equivalent():
+    ## If gmpy.mpq not available, use fixedpoint.FixedPoint. 
+    ## 
+    ## Note that this won't replace gmpy.mpq in the snapshot
+    ## itself, because Simulation.time_type will remain gmpy.mpq.
+    ## This has the advantage of not affecting the snapshot
+    ## itself, but has the disadvantage of showing mpq as the
+    ## time_type when it's actually FixedPoint on this run. We
+    ## could easily replace time_type, too. I'm not sure which is
+    ## better.
+    ##
+    ## (only implements creation of mpq)
+    ##
+    ## CEBALERT: not sure what precision should be used for
+    ## FixedPoint to replace rational. Should we set the precision
+    ## really high?
+    code = \
+"""
+import fixedpoint
+class mpq(object):
+    def __new__(self,*args,**kw):
+        return fixedpoint.FixedPoint(args[0],precision=4)
+"""
+    # only replace gmpy if necessary
+    try:
+        import gmpy
+    except ImportError:
+        param.Parameterized().warning("gmpy.mpq not available: using fixedpoint.FixedPoint as a replacement.")
+        fake_a_module('gmpy',source_code=code)
+
+S.append(provide_gmpy_equivalent)
+
+
+def param_add_allow_None():
+    # allow_None added in r9380
+    from topo import param
+    def _param_add_allow_None(instance,state):
+        if 'allow_None' not in state and hasattr(instance.__class__,'allow_None'):
+            # have to add to state or else slot won't exist on instance, but will
+            # exist on class (consequence of using __slots__)
+            state['allow_None']=False
+    preprocess_state(param.Parameter,_param_add_allow_None)
+
+S.append(param_add_allow_None)
+
+def number_add_inclusive_bounds():
+    # inclusive_bounds added to Number in r9789    
+    from topo import param
+    def _number_add_inclusive_bounds(instance,state):
+        if 'inclusive_bounds' not in state:
+            state['inclusive_bounds']=(True,True)
+    preprocess_state(param.Number,_number_add_inclusive_bounds)
+
+S.append(number_add_inclusive_bounds)
