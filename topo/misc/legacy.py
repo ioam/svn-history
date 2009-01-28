@@ -94,38 +94,37 @@ class %s(object):
     setattr(module,old_name,fake_old_class)
 
 
-def fake_a_package(old,new,add_what):
-
-    import topo
-    
-    code = \
-"""
-from topo.%s import *
-"""%new
-    fake_a_module('%s'%old,topo,code,'topo')
-
-    mod = __import__("topo.%s"%old,fromlist=[old])
-    #mod = eval('topo.%s'%old)
-
-    for x in add_what:
-    
-        code = \
-"""
-from topo.%s.%s import *
-"""%(new,x)
-
-        # gotta supply the path because mod is fake...
-        fake_a_module(x,mod,code,'topo.%s'%old)
 
 # CB: should use a factory to produce functions or should use
 # decorations.  Would avoid code duplication and make it simpler to
 # see what's happening
 
 
-# e.g. topo,'commands',topo.command
+def _import(x,y):
+    """return module y from: 'from x import y'"""
+    return __import__(x+'.'+y,fromlist=[y])
+
 def module_redirect(name,parent,actual_module):
+    """For use when module parent.name is now actual_module."""
     sys.modules[parent.__name__+'.'+name]=actual_module
     setattr(parent,name,actual_module)
+    return getattr(parent,name)
+
+def package_redirect(name,parent,actual_package):
+    """
+    For use when package parent.name is now actual_package.
+
+    All .py files found in actual_package's path are added to newly
+    created parent.name package.
+    """
+    new_package = module_redirect(name,parent,actual_package)
+    
+    import os,fnmatch
+    mod_names = [f.split('.py')[0] for f in os.listdir(actual_package.__path__[0]) if fnmatch.fnmatch(f,'[!._]*.py')]
+
+    for name in mod_names:
+        m=_import(actual_package.__name__,name)
+        module_redirect(name,new_package,m)
     
     
 # CB: not fully tested (don't know if it's enough to support all user
@@ -164,8 +163,9 @@ class SnapshotSupport(object):
         # to get the version number before unpickling...
 
 
-        ### rXXXX moved topo.outputfn to topo.transferfn 
-        fake_a_package('outputfn','transferfn',['basic','optimized','projfn'])
+        ### rXXXX moved topo.outputfn to topo.transferfn
+        import topo,topo.transferfn
+        package_redirect('outputfn',topo,topo.transferfn)
 
         ### rXXXX renamed OutputFn to TransferFn + xxxOF->xxxTF
         import topo.base.functionfamily
@@ -309,13 +309,11 @@ class SnapshotSupport(object):
         select_setstate(Sheet,sheet_set_shape) 
 
 
-
         ##########
         # r8001 Removed OutputFnParameter and CFPOutputFnParameter
         # r8014 Removed LearningFnParameter and ResponseFnParameter (+CFP equivalents)
         # r8028 Removed CoordinateMapperFnParameter
         # r8029 Removed PatternGeneratorParameter
-
         from topo.base.functionfamily import OutputFn,ResponseFn,LearningFn,\
              CoordinateMapperFn
         d = {"OutputFnParameter":OutputFn,
@@ -462,12 +460,13 @@ class SnapshotSupport(object):
 
 
         # rXXXX renaming of component libraries
-
-        # should read the list basic/optimized/etc from somewhere
-        fake_a_package('outputfns','outputfn',['basic','optimized','projfn'])
-        fake_a_package('responsefns','responsefn',['basic','optimized','projfn'])
-        fake_a_package('learningfns','learningfn',['basic','optimized','projfn'])
-        fake_a_package('coordmapperfns','coordmapper',['basic'])
+        import topo.outputfn,topo.responsefn,\
+               topo.learningfn,topo.coordmapper
+        package_redirect('outputfns',topo,topo.outputfn)
+        package_redirect('responsefns',topo,topo.responsefn)
+        package_redirect('learningfns',topo,topo.learningfn)
+        package_redirect('coordmapperfns',topo,topo.coordmapper)
+        
         # note there's no legacy support for people using CFSOM. We could
         # add that if necessary.
 
@@ -477,40 +476,49 @@ class SnapshotSupport(object):
         module_redirect('generator',topo.sheet,topo.sheet)
         ###
 
+        package_redirect('sheets',topo,topo.sheet)
 
-        fake_a_package('sheets','sheet',['composer','generator',
-                                         'lissom','optimized','saccade','slissom'])
-        fake_a_package('eps','ep',['basic'])
-        # CEBALERT: could support teststimuli (would need to look in history at what was in it)
-        #fake_a_package('patterns','pattern',['basic','image','random','rds','teststimuli']) # missed audio
-        fake_a_package('patterns','pattern',['basic','image','random','rds']) # missed audio
-        fake_a_package('commands','command',['basic','analysis','pylabplots'])
 
-        fake_a_package('projections','projection',['basic','optimized'])
+        import topo.ep
+        package_redirect('eps',topo,topo.ep)
+
+        # CEBALERT: add teststimuli (in email)
+
+        import topo.pattern
+        package_redirect('patterns',topo,topo.pattern)
+        import topo.command
+        package_redirect('commands',topo,topo.command)
+        import topo.projection
+        package_redirect('projections',topo,topo.projection)
+
+        # CEBALERT: check this is necessary
         # the isn't-in-__all__ shimmy
         import sys
-        sys.modules['topo.projections.basic'].CFPOF_SharedWeight = topo.projection.basic.CFPOF_SharedWeight
-        sys.modules['topo.projections.basic'].SharedWeightCF = topo.projection.basic.SharedWeightCF
+        import topo.projections.basic as ps,topo.projection.basic as p
+        ps.CFPOF_SharedWeight = p.CFPOF_SharedWeight
+        ps.SharedWeightCF = p.SharedWeightCF
 
 
         # rXXXX renamed generatorsheet
+        # CEBALERT: below gives errors with snapshot-compatiblity-tests
+        #module_redirect('generatorsheet',topo.sheets,topo.sheet.generator)
         code = \
 """
 from topo.sheet.generator import *
 """
         fake_a_module('generatorsheet',topo.sheets,code,'topo.sheets')
-# CEBALERT: below gives errors with snapshot-compatiblity-tests
-#        module_redirect('genatorsheet',topo.sheets,topo.sheet)
 
 
         # rXXXX renamed functionfamilies
         module_redirect('functionfamilies',topo.base,topo.base.functionfamily)
 
         # rXXXX renamed topo.x.projfns
-        from topo import outputfn,responsefn,learningfn
+        import topo.outputfn.projfn,topo.responsefn.projfn,topo.learningfn.projfn
         for mod in ['outputfn','responsefn','learningfn']:
-            module_redirect('projfns',eval('topo.%ss'%mod),eval('topo.%s.projfn'%mod))
-            module_redirect('projfns',eval('topo.%s'%mod),eval('topo.%s.projfn'%mod))
+            existing_mod = _import('topo.%s'%mod,'projfn')
+            module_redirect('projfns',_import('topo',mod),existing_mod)
+            module_redirect('projfns',_import('topo',mod+'s'),existing_mod)
+
 
         # rXXXX renamed topo.misc.numbergenerators
         import topo.misc.numbergenerator
@@ -619,7 +627,6 @@ class mpq(object):
 
         preprocess_state(param.Parameter,param_add_allow_None)
 
-
         def number_add_inclusive_bounds(instance,state):
             # inclusive_bounds added to Number in r9789
             if 'inclusive_bounds' not in state:
@@ -629,18 +636,11 @@ class mpq(object):
         preprocess_state(param.Number,number_add_inclusive_bounds)
 
 
-
-
-
 def teststimuli():
 
     class SineGratingDisk(SineGrating):
        """2D sine grating pattern generator with a circular mask."""
        mask_shape = param.Parameter(default=Disk(smoothing=0))
-
-
-
-
 
 
 # CEBALERT: rename SnapshotSupport and integrate LegacySupport so that
@@ -656,8 +656,6 @@ def LegacySupport():
     cfp = topo.base.cf.CFProjection
     type.__setattr__(cfp,'weights_shape',cfp.__dict__['cf_shape'])
 
-
-        
 
 def install_legacy_support():
     SnapshotSupport.install()
