@@ -121,6 +121,13 @@ from topo.%s.%s import *
 # decorations.  Would avoid code duplication and make it simpler to
 # see what's happening
 
+
+# e.g. topo,'commands',topo.command
+def module_redirect(name,parent,actual_module):
+    sys.modules[parent.__name__+'.'+name]=actual_module
+    setattr(parent,name,actual_module)
+    
+    
 # CB: not fully tested (don't know if it's enough to support all user
 # code).
 def fake_a_module(name,parent=None,source_code=None,parent_path=None):
@@ -157,7 +164,6 @@ class SnapshotSupport(object):
         # to get the version number before unpickling...
 
 
-
         ### rXXXX moved topo.outputfn to topo.transferfn 
         fake_a_package('outputfn','transferfn',['basic','optimized','projfn'])
 
@@ -175,8 +181,7 @@ class SnapshotSupport(object):
         _rename(topo.base.functionfamily)
         _rename(topo.transferfn.basic)
         ###
-        
-                
+
 
         # removed this class in rXXXX
         class InstanceMethodWrapper(object):
@@ -359,41 +364,30 @@ class SnapshotSupport(object):
         # rXXXX
         # support topo.base.parameterized
         import topo.base
-        code = \
-"""
-from topo.param.parameterized import *
-"""
-        fake_a_module('parameterized',topo.base,code)
+        module_redirect('parameterized',topo.base,topo.param.parameterized)
         
         # rXXXX
         # support topo.base.parameterizedobject
-        code = \
-"""
-from topo.param.parameterized import *
-ParameterizedObject=Parameterized
-"""
-        fake_a_module('parameterizedobject',topo.base,code)
+        import topo.param
+        module_redirect('parameterizedobject',topo.base,topo.param.parameterized)
+        topo.base.parameterizedobject.ParameterizedObject=topo.param.parameterized.Parameterized
 
 
+        ##############################################################
         # rXXXX
         # support topo.base.parameterclasses
-        code = \
-"""
-from topo.param import *
+        module_redirect('parameterclasses',topo.base,topo.param)
 
-from topo.param import Boolean as BooleanParameter
-from topo.param import String as StringParameter
-from topo.param import Callable as CallableParameter
-from topo.param import Composite as CompositeParameter
-from topo.param import Selector as SelectorParameter
-from topo.param import ObjectSelector as ObjectSelectorParameter
-from topo.param import ClassSelector as ClassSelectorParameter
-from topo.param import List as ListParameter
-from topo.param import Dict as DictParameter
-"""
-        fake_a_module('parameterclasses',topo.base,code)
+        new_names = ['Boolean','String','Callable','Composite','Selector',
+                     'ObjectSelector','ClassSelector','List','Dict']
 
+        for name in new_names:
+            setattr(topo.base.parameterclasses,name+'Parameter',
+                    getattr(topo.base.parameterclasses,name))
+        ##############################################################
 
+            
+        ##############################################################
         # DynamicNumber was removed in rXXXX
         class DynamicNumber(object):
             """
@@ -449,16 +443,13 @@ from topo.param import Dict as DictParameter
             def __call__(self):
                 return self.val()
 
-
-
-
-
-            
-
         import topo.base.parameterclasses
         topo.base.parameterclasses.DynamicNumber = DynamicNumber
         import topo.param
         topo.param.DynamicNumber = DynamicNumber
+
+        ##############################################################
+
 
         from topo.base.cf import CFProjection
         from numpy import array
@@ -471,10 +462,6 @@ from topo.param import Dict as DictParameter
 
 
         # rXXXX renaming of component libraries
-    
-        # i don't understand why I can't get the following idea to work:
-        # e.g. simply have sys.modules['topo.outputfns']=topo.outputfn (and for basic etc)
-        # it doesn't work: importing topo.outputfns just gives topo
 
         # should read the list basic/optimized/etc from somewhere
         fake_a_package('outputfns','outputfn',['basic','optimized','projfn'])
@@ -484,15 +471,12 @@ from topo.param import Dict as DictParameter
         # note there's no legacy support for people using CFSOM. We could
         # add that if necessary.
 
-        ### rXXXX removed topo/sheet/generator.py
-        import topo.sheet.basic
 
-        code = \
-"""
-from topo.sheet.basic import GeneratorSheet, SequenceGeneratorSheet
-"""
-        fake_a_module('generator',topo.sheet,code,'topo.sheet')
+        ### rXXXX removed topo/sheet/generator.py
+        import topo.sheet
+        module_redirect('generator',topo.sheet,topo.sheet)
         ###
+
 
         fake_a_package('sheets','sheet',['composer','generator',
                                          'lissom','optimized','saccade','slissom'])
@@ -514,47 +498,28 @@ from topo.sheet.basic import GeneratorSheet, SequenceGeneratorSheet
 """
 from topo.sheet.generator import *
 """
-        
         fake_a_module('generatorsheet',topo.sheets,code,'topo.sheets')
+# CEBALERT: below gives errors with snapshot-compatiblity-tests
+#        module_redirect('genatorsheet',topo.sheets,topo.sheet)
 
 
         # rXXXX renamed functionfamilies
-        code = \
-"""
-from topo.base.functionfamily import *
-"""
-        fake_a_module('functionfamilies',topo.base,code)
-
-        # CB: maybe a simple link from sys.modules would work for these?
-        # (didn't try - see earlier ALERT)
+        module_redirect('functionfamilies',topo.base,topo.base.functionfamily)
 
         # rXXXX renamed topo.x.projfns
         from topo import outputfn,responsefn,learningfn
-        for x in ['outputfn','responsefn','learningfn']:
-            code = \
-"""
-from topo.%s.projfn import *
-"""%x
-            # fake topo.x.projfns and topo.xs.projfns since both have existed...
-            fake_a_module('projfns',eval('topo.%ss'%x),code,'topo.%ss'%x)
-            fake_a_module('projfns',eval('topo.%s'%x),code,'topo.%s'%x)
+        for mod in ['outputfn','responsefn','learningfn']:
+            module_redirect('projfns',eval('topo.%ss'%mod),eval('topo.%s.projfn'%mod))
+            module_redirect('projfns',eval('topo.%s'%mod),eval('topo.%s.projfn'%mod))
 
         # rXXXX renamed topo.misc.numbergenerators
         import topo.misc.numbergenerator
-        code = \
-"""
-from topo.misc.numbergenerator import *
-"""
-        fake_a_module('numbergenerators',topo.misc,code)
+        module_redirect('numbergenerators',topo.misc,topo.misc.numbergenerator)
 
         # rXXXX renamed topo.misc.patternfns
         import topo.misc.patternfn
-        code = \
-"""
-from topo.misc.patternfn import *
-"""
-        fake_a_module('patternfns',topo.misc,code)
-        
+        module_redirect('patternfns',topo.misc,topo.misc.patternfn)
+
 
         # r9617 removed ExtraPickler
         class ExtraPicklerSkipper(object):
@@ -567,20 +532,12 @@ from topo.misc.patternfn import *
 
         # rXXXX renamed topo.misc.utils
         import topo.misc.util
-        code = \
-"""
-from topo.misc.util import *
-"""
-        fake_a_module('utils',topo.misc,code)
+        module_redirect('utils',topo.misc,topo.misc.util)
         
 
         # rXXXX renamed topo.misc.traces
         import topo.misc.trace
-        code = \
-"""
-from topo.misc.trace import *
-"""
-        fake_a_module('traces',topo.misc,code)
+        module_redirect('traces',topo.misc,topo.misc.trace)
 
         # rXXXX duplicate SineGratingDisk removed
         # CEBALERT: something's disappeared, right? Presumably
@@ -604,15 +561,8 @@ from topo.misc.trace import *
         topo.pattern.basic.SineGratingRing = SineGratingRing
 
 
-
-
-
         # rXXXX homeostatic of moved into basic
-        code = \
-"""
-from topo.outputfn import HomeostaticMaxEnt # and what else?
-"""
-        fake_a_module('homeostatic',topo.outputfns,code,'topo.outputfns')
+        module_redirect('homeostatic',topo.outputfns,topo.outputfns)
 
         # rXXXX renamed CFProjection.weights_shape to CFProjection.cf_shape
         param.parameterized._param_name_changes['topo.base.cf.CFProjection']={'weights_shape':'cf_shape'}
