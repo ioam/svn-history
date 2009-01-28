@@ -16,11 +16,6 @@ import sys
 # falling back to pickle when we do a 'legacy load' of the snapshot.
 
 
-# CB: Could probably simplify some things in here where I've
-# accidentally used the more complex code like fake_a_class for simply
-# linking one class to another after renaming the class (fake_a_class()
-# is to create a class in a module where the class doesn't exist at
-# all any more). But things are working at the moment...
 
 # CEBALERT: should have ONE list for the update script and for this,
 # rather than having (effectively) a list in each.
@@ -82,6 +77,8 @@ def fake_a_class(module,old_name,new_class,new_class_args=()):
 
     new_class_args allow any arguments to be supplied to new_class
     before other arguments are passed at creation time.
+
+    For use when module.old_name=new_class is not possible.
     """
     class_code = """
 class %s(object):
@@ -534,8 +531,7 @@ from topo.sheet.generator import *
             def __setstate__(self,state):
                 # print warning of what's being skipped?
                 pass
-        fake_a_class(topo.misc.util,"ExtraPickler",
-                     ExtraPicklerSkipper)
+        topo.misc.util.ExtraPickler=ExtraPicklerSkipper
 
 
         # rXXXX renamed topo.misc.utils
