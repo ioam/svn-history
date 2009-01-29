@@ -20,7 +20,6 @@ except ImportError:
 from .. import param
 
 import topo
-import topo.command.pylabplots
 from topo.base.cf import CFSheet
 from topo.base.sheetview import SheetView
 from topo.misc.filepath import normalize_path
@@ -238,7 +237,7 @@ def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename
         complx = array(complexity(full_matrix[sheet]))
         # Should this be renamed to ModulationRatio?
         sheet.sheet_views['ComplexSelectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time(),sheet.row_precedence)
-
+    import topo.command.pylabplots
     topo.command.pylabplots.plot_modulation_ratio(full_matrix,simple_sheet_name=simple_sheet_name,complex_sheet_name=complex_sheet_name,filename=filename)
 
     # Avoid error if no simple sheet exists
