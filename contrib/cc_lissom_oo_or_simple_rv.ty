@@ -18,7 +18,7 @@ import __main__
 
 from topo.sheet.lissom import LISSOM, JointNormalizingCFSheet_Continuous
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
-from topo.sheet.generator import GeneratorSheet
+from topo.sheet.basic import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection,OneToOneProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
@@ -221,7 +221,7 @@ if simpleLateral:
 	                 weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
 	                     generators=[Gaussian(aspect_ratio=1.0, size=locals().get('SxLatInhSize',0.22917)),
 	                                topo.pattern.random.UniformRandom()]),
-	                 nominal_bounds_template=BoundingBox(radius=0.22917/2),
+	                 nominal_bounds_template=BoundingBox(radius=0.22917),
 	                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
                                ExponentialDecay(starting_value = locals().get('LatInh_lr',0.3),
                                                 time_constant=locals().get('LatInh_tc',16000)))))
@@ -232,7 +232,7 @@ if simpleLateral:
 topo.sim.connect('V1Simple','V1Complex',delay=0.05,
                  connection_type=CFProjection,strength=locals().get('StoCStr',4),name='V1SimpleAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.05)),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('StoCBB',0.15)/2),learning_rate=locals().get('FF_lr',0.3))
+                 nominal_bounds_template=BoundingBox(radius=locals().get('StoCBB',0.15)/2),learning_rate=locals().get('FF_lr',0.0))
                 
 topo.sim.connect('V1Complex','V1Simple',delay=0.05,
                  connection_type=CFProjection,strength=locals().get('FStrExc',0.1),name='V1SimpleFeedbackExc1',
