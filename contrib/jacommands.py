@@ -403,7 +403,7 @@ class SimpleHomeoLinear(TransferFnWithState):
 
 class SimpleHomeoLinearRelative(TransferFnWithState):
     input_output_ratio = param.Number(default=3.6,doc="The ratio between the average input and output activity")
-    t_init = param.Number(default=-0.0,doc="Threshold parameter")
+    t_init = param.Number(default=0.0,doc="Threshold parameter")
     eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
     smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
     randomized_init = param.Boolean(False, doc="Whether to randomize the initial t parameter")
