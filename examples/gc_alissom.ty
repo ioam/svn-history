@@ -56,8 +56,8 @@ elif dataset=="Natural":
 
 #Sheet coordinates of units to track for debugging
 units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
-default_density = locals().get('default_density',48)
-default_retinal_density = locals().get('default_retinal_density',default_density/2)
+default_density = locals().get('cortex_density',48)
+default_retinal_density = locals().get('retina_density',default_density/2)
   
 #Smoothing value for exponential averaging
 smoothing=locals().get('smoothing',0.999)
