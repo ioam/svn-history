@@ -794,7 +794,9 @@ class plot_modulation_ratio(PylabPlotCommand):
 
         if (topo.sim.objects().has_key(simple_sheet_name) and topo.sim.objects().has_key(complex_sheet_name)):
             v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]])
-            v1c = complexity(fullmatrix[topo.sim[complex_sheet_name]])
+            v1ct = complexity(fullmatrix[topo.sim[complex_sheet_name]])
+            # double the number of complex cells to reflect large width of layer 2/3
+            v1c = numpy.concatenate((array(v1ct),array(v1ct)),axis=1)
             pylab.figure()
             pylab.subplot(311)
             pylab.hist(v1s,bins)
