@@ -158,20 +158,8 @@ lint-base:
 
 
 # Compare topographica and C++ lissom output
-# (needs cleanup+doc)
-COMPARE_BASERN=24
-COMPARE_BASEN=24
-compare_or: 
-	make -C topo/tests/reference/
-	./topographica -c "BaseRN=${COMPARE_BASERN}; BaseN=${COMPARE_BASEN}; comparisons=True" topo/tests/reference/lissom_or_reference.ty 
-
 or_comparisons:
 	./topographica -c "from topo.tests.test_script import run_multiple_density_comparisons;nerr=run_multiple_density_comparisons('lissom_or_reference.ty'); import sys;sys.exit(nerr)"
-
-# will change to use new script (+BaseRN,BaseN ignored right now)
-compare_oo_or: 
-	make -C topo/tests/reference/fixed_params/
-	./topographica -c "BaseRN=${COMPARE_BASERN}; BaseN=${COMPARE_BASEN}; comparisons=True" topo/tests/reference/fixed_params/lissom_oo_or_reference_fixed.ty 
 
 oo_or_comparisons:
 	./topographica -c "from topo.tests.test_script import run_multiple_density_comparisons;nerr=run_multiple_density_comparisons('lissom_oo_or_reference.ty'); import sys;sys.exit(nerr)"
