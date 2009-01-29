@@ -60,7 +60,6 @@ def complexity(full_matrix):
     complex_matrix = zeros(full_matrix.matrix_shape,object_)
     fftmeasure = zeros(full_matrix.matrix_shape,Float)
     i = 0
-    
     for f in full_matrix.features:
         if f.name == "phase":
             
@@ -96,19 +95,62 @@ def complexity(full_matrix):
                 complex_matrix[x,y] = complex_matrix[x,y] + [full_matrix.full_matrix[tuple(iindex.tolist())][x][y]]
 
             #this is taking away the DC component
-            complex_matrix[x,y] -= numpy.min(complex_matrix[x,y])
-            if x==10 and y==10:
+            #complex_matrix[x,y] -= numpy.min(complex_matrix[x,y])
+            if x==15 and y==15:
                 pylab.figure()
                 pylab.plot(complex_matrix[x,y])
-            if x==20 and y==20:
+            if x==26 and y==26:
                 pylab.figure()
                 pylab.plot(complex_matrix[x,y])
  
             complexity[x,y] = res / (2*sum)
             fft = numpy.fft.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
             first_har = 2048/len(complex_matrix[0,0])
-            fftmeasure[x,y] = (2 *abs(fft[first_har]) * abs(fft[first_har]) )/(abs(fft[0]) * abs(fft[0]))
+            
+            fftmeasure[x,y] = 2 *abs(fft[first_har]) /abs(fft[0])
     return fftmeasure
+
+
+def compute_ACDC_orientation_tuning_curves(full_matrix,curve_label,sheet):
+    
+    """ This function allows and alternative computation of orientation tuning curve where
+    for each given orientation the response is computed as a maximum of AC or DC component 
+    across the phases instead of the maximum used as a standard in Topographica"""
+    # this method assumes that only single frequency has been used
+    i = 0
+    for f in full_matrix.features:
+        if f.name == "phase":
+            phase_index = i
+        if f.name == "orientation":
+            orientation_index = i
+        if f.name == "frequency":
+            frequency_index = i
+        i=i+1   
+    print sheet.curve_dict
+    if not sheet.curve_dict.has_key("orientationACDC"):
+        sheet.curve_dict["orientationACDC"]={}
+    sheet.curve_dict["orientationACDC"][curve_label]={}
+    
+    rows,cols = full_matrix.matrix_shape
+    for o in xrange(size(full_matrix.features[orientation_index].values)):
+        s_w = zeros(full_matrix.matrix_shape)
+        for x in range(rows):
+            for y in range(cols):
+                or_response=[] 
+                for p in xrange(size(full_matrix.features[phase_index].values)):
+                    index = [0,0,0]
+                    index[phase_index] = p
+                    index[orientation_index] = o
+                    index[frequency_index] = 0
+                    or_response.append(full_matrix.full_matrix[tuple(index)][x][y])
+                 
+                fft = numpy.fft.fft(or_response+or_response+or_response+or_response,2048)   
+                first_har = 2048/len(or_response)   
+                s_w[x][y] = numpy.maximum(2 *abs(fft[first_har]),abs(fft[0]))
+        s = SheetView((s_w,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time(),sheet.row_precedence)
+        sheet.curve_dict["orientationACDC"][curve_label].update({full_matrix.features[orientation_index].values[o]:s}) 
+    
+
 
 def phase_preference_scatter_plot(sheet_name,diameter=0.39):
     r = UniformRandom(seed=1023)
