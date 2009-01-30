@@ -31,27 +31,93 @@ import topo.responsefn.optimized
 import topo.sheet.lissom
 import topo.sheet.optimized
 
-# ALERT: Need to eliminate these imports
+# ALERT: Need to eliminate these imports by moving them into topo/
 from contrib.jacommands import SimpleHomeoLinearRelative, AddGC, ActivityHysteresis
-from contrib.jsldefs import JointScaling_lronly, JointScaling_affonly, homeostatic_analysis_function
 
-###############################################################
-####Different input types which can be used for development###
-dataset=locals().get('dataset',"Gaussian") #set the input type by choosing the dataset parameter 
 
-if dataset=="Gaussian":
+# Parameters that can be passed on the command line using -p
+from topo.misc.commandline import global_params as p
+p.add(
+
+    dataset=param.Enumeration(default='Gaussian',available=
+        ['Gaussian','Nature'],doc="""
+        Set of input patterns to use::
+
+          :'Gaussian': Two-dimensional Gaussians
+          :'Nature':   Shouval's 1999 monochrome 256x256 images"""),
+
+    num_inputs=param.Integer(default=2,bounds=(1,None),doc="""
+        How many input patterns to present at each iteration, when using discrete 
+        patterns (e.g. Gaussians)."""),
+
+    # ALERT: Not yet respected
+    area=param.Number(default=1.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        Default cortical area to simulate; 1.0 gives a 1.0x1.0 Sheet area in V1."""),
+
+    retina_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the retina."""),
+
+    lgn_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the LGN."""),
+
+    cortex_density=param.Number(default=48.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for V1."""),
+
+    scale=param.Number(default=1.0,inclusive_bounds=(False,True),doc="""
+        Brightness of the input patterns"""),
+
+    smoothing=param.Number(default=0.999,bounds=(0.0,1.0),doc="""
+        Weighting of previous activity vs. current activity when calculating the
+        average for homeostatic plasticity."""),
+    
+    V1_smoothing=param.Number(default=0.999,bounds=(0.0,1.0),doc="""
+        Same as smoothing but specifically for V1."""),
+
+    io_ratio=param.Number(default=3.6,bounds=(0.0,None),doc="""
+        The ratio between the average input and output activity."""),
+
+    eta=param.Number(default=0.001,bounds=(0.0,None),doc="""
+        Learning rate for homeostatic plasticity."""),
+
+
+    aff_strength=param.Number(default=25.0,bounds=(0.0,None),doc="""
+        Overall strength of the afferent projection to V1."""),
+
+    exc_strength=param.Number(default=2.5,bounds=(0.0,None),doc="""
+        Overall strength of the lateral excitatory projection to V1."""),
+
+    inh_strength=param.Number(default=2.5,bounds=(0.0,None),doc="""
+        Overall strength of the lateral inhibitory projection to V1."""),
+
+
+    aff_lr=param.Number(default=2.0,bounds=(0.0,None),doc="""
+        Learning rate for the afferent projection to V1."""),
+
+    exc_lr=param.Number(default=0.0,bounds=(0.0,None),doc="""
+        Learning rate for the lateral excitatory projection to V1."""),
+
+    inh_lr=param.Number(default=0.5,bounds=(0.0,None),doc="""
+        Learning rate for the lateral inhibitory projection to V1."""))
+
+
+
+### Input patterns
+
+if p.dataset=="Gaussian":
     input_type=pattern.Gaussian
-    num_inputs=locals().get('num_inputs',2) #in the case where dataset=pattern.Gaussian, must also set the number of pattern.Gaussians per iteration, default is 2
     inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
                        y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=35+i),
                        orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
-                       size=0.088388, aspect_ratio=4.66667, scale= locals().get('scale', 1.0), bounds=sheet.BoundingBox(radius=1.125))
-            #Set the contrast of the gaussian patterns by setting the scale parameter.
-            for i in xrange(num_inputs)]
+                       size=0.088388, aspect_ratio=4.66667, scale=p.scale, bounds=sheet.BoundingBox(radius=1.125))
+            for i in xrange(p.num_inputs)]
     
     combined_inputs = pattern.SeparatedComposite(min_separation=0,generators=inputs)
     
-elif dataset=="Natural":
+elif p.dataset=="Natural":
     
     input_type=pattern.image.FileImage
     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
@@ -64,23 +130,13 @@ elif dataset=="Natural":
 
     combined_inputs =pattern.Selector(generators=inputs)
 
-#Sheet coordinates of units to track for debugging
-units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
-default_density = locals().get('cortex_density',48)
-default_retinal_density = locals().get('retina_density',default_density/2)
-  
-#Smoothing value for exponential averaging
-smoothing=locals().get('smoothing',0.999)
-V1_smoothing=locals().get('V1_smoothing',0.999) # Allows different smoothing for averaging  V1 activity and averaging afferent activity.
 
 #Output functions: Sheets
 LGN_on_output_fn=transferfn.HalfRectify()
 LGN_off_output_fn=transferfn.HalfRectify()
 
-# The ratio between the input and ouptut of the V1 neurons
-io_ratio=locals().get('io_ratio',3.6) 
-
-V1_OF=HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.15)
+V1_OF=SimpleHomeoLinearRelative(smoothing=p.V1_smoothing,eta=p.eta,
+                                input_output_ratio=p.io_ratio,t_init=0.15)
 
 # Specify weight initialization, response function, and learning function
 projection.CFProjection.cf_shape = pattern.Disk(smoothing=0.0)
@@ -104,24 +160,19 @@ def gauss_rand(size):
                              generators=[pattern.Gaussian(aspect_ratio=1.0, size=size),
                                          pattern.random.UniformRandom()])
 
-#Whether or not to use divisive weights normalization
-norm=locals().get('norm',True)
-pi=None if norm==True else \
-    transferfn.optimized.CFPOF_Plugin(single_cf_fn=transferfn.IdentityTF())
-
 
 ###########################################
 # build simulation
 
-topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=default_retinal_density,
+topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=p.retina_density,
     input_generator=combined_inputs, period=1.0, phase=0.05,
     nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.375+0.5))
 
-topo.sim['LGNOn']=sheet.lissom.LISSOM(nominal_density=default_retinal_density,
+topo.sim['LGNOn']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
     nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.5),
     output_fn=LGN_on_output_fn, tsettle=0, measure_maps=False)
 
-topo.sim['LGNOff']=sheet.lissom.LISSOM(nominal_density=default_retinal_density,
+topo.sim['LGNOff']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
     nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.5),
     output_fn=LGN_off_output_fn, tsettle=0, measure_maps=False)
 
@@ -129,8 +180,8 @@ topo.sim['LGNOff']=sheet.lissom.LISSOM(nominal_density=default_retinal_density,
 AddGC()
 
 AH = ActivityHysteresis(time_constant=0.5) 
-topo.sim['V1'] = sheet.lissom.JointScaling(nominal_density=default_density,
-    tsettle=16, plastic=True, apply_scaling=False, smoothing=smoothing,
+topo.sim['V1'] = sheet.lissom.JointScaling(nominal_density=p.cortex_density,
+    tsettle=16, plastic=True, apply_scaling=False, smoothing=p.smoothing,
     nominal_bounds=sheet.BoundingBox(radius=0.5),
     output_fn=transferfn.PipelineTF(output_fns=[AH,V1_OF]))
 
@@ -138,42 +189,42 @@ topo.sim['V1'] = sheet.lissom.JointScaling(nominal_density=default_density,
 topo.sim['V1'].beginning_of_iteration.append(AH.reset)
 
 topo.sim.connect('Retina','LGNOn',delay=0.05,
-    connection_type=projection.SharedWeightCFProjection,strength=locals().get('ret_strength',2.33),
+    connection_type=projection.SharedWeightCFProjection,strength=2.33,
     nominal_bounds_template=sheet.BoundingBox(radius=0.375),name='Afferent',
     weights_generator=on_weights)
 
 topo.sim.connect('Retina','LGNOff',delay = 0.05,
-    connection_type=projection.SharedWeightCFProjection,strength=locals().get('ret_strength',2.33),
+    connection_type=projection.SharedWeightCFProjection,strength=2.33,
     nominal_bounds_template=sheet.BoundingBox(radius=0.375),name='Afferent',
     weights_generator=off_weights)
 
 topo.sim.connect('LGNOn','V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
     connection_type=projection.CFProjection,
     learning_fn=learningfn.optimized.CFPLF_Scaled_opt(),
-    strength=locals().get('aff_str',25.0),name='LGNOnAfferent',
+    strength=p.aff_strength,name='LGNOnAfferent',
     weights_generator=gauss_rand(size=2*0.27083),
-    nominal_bounds_template=sheet.BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
-    learning_rate=locals().get('aff_lr',2))
+    nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
+    learning_rate=p.aff_lr)
                      
 topo.sim.connect('LGNOff','V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
     connection_type=projection.CFProjection,
     learning_fn=learningfn.optimized.CFPLF_Scaled_opt(),
-    strength=locals().get('aff_str',25.0),name='LGNOffAfferent',
+    strength=p.aff_strength,name='LGNOffAfferent',
     weights_generator=gauss_rand(size=2*0.27083),
-    nominal_bounds_template=sheet.BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
-    learning_rate=locals().get('aff_lr',2))
+    nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
+    learning_rate=p.aff_lr)
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
     connection_type=projection.CFProjection,
-    strength=1.0*locals().get('exc_strength',2.5),
+    strength=p.exc_strength,
     weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.05),
-    nominal_bounds_template=sheet.BoundingBox(radius=0.104),learning_rate=locals().get('lat_exc_lr',0.0)) 
+    nominal_bounds_template=sheet.BoundingBox(radius=0.104),learning_rate=p.exc_lr)
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
     connection_type=projection.CFProjection,
-    strength=-1.0*locals().get('inh_strength',2.5),
+    strength=-1.0*p.inh_strength,
     weights_generator=gauss_rand(size=0.15),
-    nominal_bounds_template=sheet.BoundingBox(radius=0.22917),learning_rate=locals().get('lat_inh_lr',0.5))
+    nominal_bounds_template=sheet.BoundingBox(radius=0.22917),learning_rate=p.inh_lr)
 
 
 # default locations for model editor
