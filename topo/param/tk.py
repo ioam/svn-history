@@ -3248,7 +3248,7 @@ class ListWidget(T.Frame):
 
     def __init__(self, master, variable,cmd,**widget_options):
         T.Frame.__init__(self, master)
-        w=T.Entry(self,textvariable=variable) #CEBALERT:should be state='disabled' but without dimming
+        w=T.Entry(self,textvariable=variable,state='disabled',disabledforeground='black') #CEBALERT: presumably disabledforeground won't work work with styles...
         w.pack(fill='both',expand=1)
 
         ### Right-click menu for widgets
