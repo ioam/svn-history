@@ -1166,7 +1166,7 @@ class FeatureCurveCommand(SinusoidalMeasureResponseCommand):
             curve_label="; ".join([('%s = '+val_format+'%s') % (n.capitalize(),v,p.units) for n,v in curve.items()])
             # JABALERT: Why is the feature list duplicated here?
             x.collect_feature_responses(self._feature_list(p),p.pattern_presenter,static_params,curve_label,p.display)
-            compute_ACDC_orientation_tuning_curves(x._fullmatrix[sheet],curve_label,sheet)
+            #compute_ACDC_orientation_tuning_curves(x._fullmatrix[sheet],curve_label,sheet)
 
 
     def _feature_list(self,p):
