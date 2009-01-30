@@ -3245,14 +3245,31 @@ class AppWindow(ScrolledWindow):
 
 
 class ListWidget(T.Frame):
+
     def __init__(self, master, variable,cmd,**widget_options):
         T.Frame.__init__(self, master)
         w=T.Entry(self,textvariable=variable) #CEBALERT:should be state='disabled' but without dimming
         w.pack(fill='both',expand=1)
-        w.bind("<Button-1>",cmd)
+
+        ### Right-click menu for widgets
+        # CEBALERT: I can't work out how to make the right-click event
+        # bound to the widget already (by the ParametersFrame) ever
+        # activate!  It must be overwritten or something by tk. So I
+        # have to duplicate the right-click menu code here.
+        w.bind("<<right-click>>",self._right_click)
+        master.option_add("*Menu.tearOff", "0") 
+        self.menu = Menu(master)
+        self.menu.insert_command('end',label='Properties',
+            command=cmd)
+
+    def _right_click(self, event):
+        """
+        Popup the right-click menu.
+        """
+        self.menu.tk_popup(event.x_root, event.y_root)
+
+
         
-        #b=T.Button(self,text="...",command=cmd)
-        #b.pack(side='right')
 
 import new
 import odict
