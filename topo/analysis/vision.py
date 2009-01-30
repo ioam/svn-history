@@ -230,6 +230,7 @@ def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename
     If there is a sheet named as specified in simple_sheet_name,
     also plots its phase preference as a scatter plot.
     """
+    import topo
     measured_sheets = [s for s in topo.sim.objects(CFSheet).values()
                        if hasattr(s,'measure_maps') and s.measure_maps]
 
