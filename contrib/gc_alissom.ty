@@ -53,6 +53,58 @@ elif dataset=="Natural":
         for f in image_filenames]
 
     combined_inputs =topo.pattern.basic.Selector(generators=inputs)
+elif dataset=="NoisyDisks":
+    disk_scale=locals().get('diskscale',0.35)
+    #Set the contrast of the disk pattern by setting the disk_scale parameter, map development also depends on the contrast of the disk edges.
+    input_type=topo.pattern.basic.Composite
+    inputs=[input_type(operator=numpy.add,
+                       generators=[topo.pattern.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
+                                                            y=UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
+                                                            size=2.0, aspect_ratio=1.0, scale=disk_scale,
+                                                            offset=0.5,
+                                                            bounds=BoundingBox(radius=1.125), smoothing=0.1),
+                                   topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',-0.5), scale=locals().get('rand_scale',1.0))])]
+    #Set the scale of the noise by setting the rand_offset and rand_scale parameters, note that the disk/noise signal ratio also depends on the retinal density      
+    combined_inputs =topo.pattern.basic.Selector(generators=inputs)
+
+elif dataset=="Disks":
+    disk_scale=locals().get('diskscale',0.5)
+    input_type=topo.pattern.basic.Disk
+    inputs=[input_type(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
+                       y=UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
+                       size=2.0, aspect_ratio=1.0, scale=disk_scale,
+                       offset=0.5,
+                       bounds=BoundingBox(radius=1.125), smoothing=0.1)]
+            
+    combined_inputs =topo.pattern.basic.Selector(generators=inputs)
+
+elif dataset=="NoisyDiskstoNatural":
+    #This dataset mimics pre and post eye-opening development - scheduled changes must also be set to ensure the input pattern changes at simulated eye opening
+    disk_scale=locals().get('diskscale',0.35)
+    disks_input_type=topo.pattern.basic.Composite
+    disks_inputs=[disks_input_type(operator=numpy.add,
+                       generators=[topo.pattern.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
+                                                            y=UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
+                                                            size=2.0, aspect_ratio=1.0, scale=disk_scale,
+                                                            offset=0.5,
+                                                            bounds=BoundingBox(radius=1.125), smoothing=0.1),
+                                   topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',-0.5), scale=locals().get('rand_scale',1.0))])]
+
+    combined_inputs =topo.pattern.basic.Selector(generators=disks_inputs)      
+   
+    
+    natural_input_type=topo.pattern.image.Image
+    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+    natural_inputs=[natural_input_type(filename=f,
+                       size=10.0,  #size_normalization='original',(size=10.0)
+                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+        for f in image_filenames]
+
+    natural_combined_inputs =topo.pattern.basic.Selector(generators=natural_inputs)
+
+###############################################################################    
 
 #Sheet coordinates of units to track for debugging
 units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
@@ -198,6 +250,28 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
 topo.sim.grid_layout([[None,    'V1',     None],
                       ['LGNOn', None,     'LGNOff'],
                       [None,    'Retina', None]], xstart=150)
+                      
+                      
+### Input pattern changes
+changetime = locals().get('changetime',6000)# Time at which patterns or strengths are set to change
+
+changetargets = locals().get('changetargets',True) #If false, targets for afferent scaling and output function adjustment are not changed.
+if dataset=="NoisyDiskstoNatural":
+    if changetargets==True:
+        new_frequency = locals().get('new_frequency',5)
+        new_balance = locals().get('new_balance',4)
+        new_mu=0.0045*new_frequency
+        new_afferent_target = new_mu*new_balance
+        topo.sim.schedule_command(changetime,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
+        topo.sim.schedule_command(changetime,'topo.sim["V1"].target=new_afferent_target')
+        if tracking==True:
+            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fn.output_fns[1].mu=new_mu')
+        else:
+            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fn.mu=new_mu')
+    else:
+        topo.sim.schedule_command(changetime,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
+                      
+                      
 import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureCurveCommand.selectivity_multiplier=1.0
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
