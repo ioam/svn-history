@@ -112,7 +112,7 @@ if p.dataset=="Gaussian":
     inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
                        y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=35+i),
                        orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
-                       size=0.088388, aspect_ratio=4.66667, scale=p.scale, bounds=sheet.BoundingBox(radius=1.125))
+                       size=0.088388, aspect_ratio=4.66667, scale=p.scale)
             for i in xrange(p.num_inputs)]
     
     combined_inputs = pattern.SeparatedComposite(min_separation=0,generators=inputs)
