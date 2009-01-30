@@ -37,7 +37,6 @@ from topo.misc.util import cross_product, frange
 from topo.pattern.basic import SineGrating, Gaussian, Rectangle, Disk, OrientationContrast
 from topo.plotting.plotgroup import plotgroups,default_input_sheet,default_measureable_sheet
 from topo.sheet import GeneratorSheet
-from topo.analysis.vision import compute_ACDC_orientation_tuning_curves
 
 
 # CB: having a class called DistributionMatrix with an attribute
@@ -454,6 +453,9 @@ class FeatureCurves(FeatureResponses):
     features.  The results can be accessed in the curve_dict,
     indexed by the curve_label and feature value.
     """
+    post_collect_responses_hook = param.HookList(default=[],instantiate=False,doc="""
+        List of callable objects to be run at the end of collect_feature_responses function.
+        The functions should accept three parameters: FullMatrix, curve label, sheet""")
 
     def __init__(self,features,sheet,x_axis):
 	super(FeatureCurves, self).__init__(features)
@@ -479,9 +481,7 @@ class FeatureCurves(FeatureResponses):
                     y_axis_values[i,j] = self._featureresponses[self.sheet][self.x_axis].distribution_matrix[i,j].get_value(key)
             Response = SheetView((y_axis_values,bounding_box), self.sheet.name , self.sheet.precedence, topo.sim.time(),self.sheet.row_precedence)
             self.sheet.curve_dict[self.x_axis][curve_label].update({key:Response})
-
-
-
+        for f in self.post_collect_responses_hook: f(self._fullmatrix[self.sheet],curve_label,self.sheet)
 
 ###############################################################################
 ###############################################################################
@@ -1143,7 +1143,7 @@ class FeatureCurveCommand(SinusoidalMeasureResponseCommand):
     # the crossproduct of them?
     curve_parameters=param.Parameter([{"contrast":30},{"contrast":60},{"contrast":80},{"contrast":90}],doc="""
         List of parameter values for which to measure a curve.""")
-
+    
     __abstract = True
 
     def __call__(self,**params):
@@ -1166,7 +1166,7 @@ class FeatureCurveCommand(SinusoidalMeasureResponseCommand):
             curve_label="; ".join([('%s = '+val_format+'%s') % (n.capitalize(),v,p.units) for n,v in curve.items()])
             # JABALERT: Why is the feature list duplicated here?
             x.collect_feature_responses(self._feature_list(p),p.pattern_presenter,static_params,curve_label,p.display)
-            #compute_ACDC_orientation_tuning_curves(x._fullmatrix[sheet],curve_label,sheet)
+
 
 
     def _feature_list(self,p):
