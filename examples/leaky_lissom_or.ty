@@ -28,6 +28,7 @@ from topo.learningfn.projfn import CFPLF_OutstarHebbian
 from topo.misc.numbergenerator import UniformRandom
 
 
+# Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
 p.add(
 

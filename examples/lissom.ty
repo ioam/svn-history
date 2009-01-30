@@ -126,6 +126,7 @@ natural_image_sets = ['Nature','FoliageA','FoliageB']
 # I haven't yet used this file enough to know what's best...
 
 
+# Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
 p.add(
 

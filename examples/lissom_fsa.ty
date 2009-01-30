@@ -25,6 +25,8 @@ import topo.responsefn.optimized
 import topo.sheet.lissom
 import topo.sheet.optimized
 
+
+# Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
 p.add(
 

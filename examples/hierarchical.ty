@@ -18,6 +18,7 @@ import topo.pattern.random
 import topo.responsefn.optimized 
 
 
+# Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
 p.add(
     retina_density=param.Number(default=20.0,doc="""

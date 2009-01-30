@@ -25,6 +25,7 @@ import topo.pattern.random
 import topo.responsefn.optimized 
 
 
+# Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
 p.add(
 

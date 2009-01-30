@@ -40,6 +40,7 @@ import topo.pattern.basic
 import topo.pattern.random
 
 
+# Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
 p.add(
 

@@ -92,7 +92,8 @@ class PyNNRetina(EventProcessor):
             spikes,self.N,self.simtime/self.dt,self.dt)
         self.send_output(src_port=port,data=spike_out)
 
-# Command-line controllable parameters
+
+# Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
 p.add(retina_density=param.Integer(default=32,bounds=(0,None),
           inclusive_bounds=(False,True),doc="""
