@@ -312,7 +312,12 @@ def is_button(widget):
     Simple detection of Button-like widgets that are not Checkbuttons
     (i.e. widgets that do not require a separate label).
     """
-    return 'command' in widget.config() and not hasattr(widget,'toggle')
+    # CEBALERT: document why try/except is needed
+    try:
+        button = 'command' in widget.config() and not hasattr(widget,'toggle')
+    except T.TclError:
+        button = False
+    return button
 
 
 # CEB: workaround for tkinter lagging behind tk (tk must have changed
@@ -1859,7 +1864,7 @@ class TkParameterized(TkParameterizedBase):
             states = {'error'   : 'red',
                       'changed' : 'blue',
                       None      : 'black'}
-
+            
             if is_button(widget):
                 # can't change state of button
                 return
