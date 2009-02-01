@@ -654,7 +654,8 @@ class TkParameterizedBase(Parameterized):
         """
         * The callback to use for all GUI variable traces/binds *
         """
-        if self._live_update: self._update_param_from_tkvar(p_name)
+        if self._live_update:
+            self._update_param_from_tkvar(p_name)
 
 
     def _tkvar_set(self,param_name,val):
@@ -1307,10 +1308,6 @@ class TkParameterized(TkParameterizedBase):
                 pass
 
 
-
-
-    ### Use in callbacks
-
     def _handle_gui_set(self,p_name,force=False):
         """Override the superclass's method to X and allow status indications."""
         #logging.info("%s._handle_gui_set(%s,force=%s)"%(self,p_name,force))
@@ -1321,8 +1318,7 @@ class TkParameterized(TkParameterizedBase):
 
 
 
-    ### Simulate GUI actions
-
+    #### Simulate GUI actions
     def gui_set_param(self,param_name,val):
         """Simulate setting the parameter in the GUI."""
         self._tkvar_set(param_name,val)  # ERROR: presumably calls trace stuff twice
@@ -1331,7 +1327,7 @@ class TkParameterized(TkParameterizedBase):
     def gui_get_param(self,param_name):
         """Simulate getting the parameter in the GUI."""
         return self._tkvars[param_name].get()
-
+    ####
 
 
 ################################################################################
@@ -1735,14 +1731,9 @@ class TkParameterized(TkParameterizedBase):
         def f(event,name=name):
             v = self._tkvars[name].get()
             self._tkvar_set(name,v)
-            # CEBSUPERHACKALERT: variable traces vanish so need this
             self._handle_gui_set(name)
             
         w.bind("<<ComboboxSelected>>",f)
-
-        # CEBALERT: hack to 
-        w._readonly_=True
-        
 
         help_text = getdoc(self._string2object(name,tkvar._original_get()))
         self.balloon.bind(w,help_text)
@@ -1863,22 +1854,19 @@ class TkParameterized(TkParameterizedBase):
     def _set_widget_status(self,param_name,status):
 
         if param_name in self.representations:
-
             widget = self.representations[param_name]['widget']
+            states = {'error'   : 'red',
+                      'changed' : 'blue',
+                      None      : 'black'}
 
-            states = {'error':'red','changed':'blue',None:'black'}
+            if is_button(widget):
+                # can't change state of button
+                return
 
             try:
-                if is_button(widget):
-                    return
-                else:
-                    widget.config(foreground=states[status])
+                widget.config(foreground=states[status])
             except T.TclError:  #CEBALERT uh-oh
                 pass
-
-                            
-
-
 
     def _pretty_print(self,s):
         """
@@ -2120,7 +2108,7 @@ class ParametersFrame(TkParameterized,T.Frame):
     show_labels = Boolean(default=True)
 
     def __init__(self,master,parameterized_object=None,on_set=None,
-                 on_modify=None,msg_handler=None,**params):
+                 on_modify=None,msg_handler=None,on_close=None,**params):
         """
         Create a ParametersFrame with the specifed master, and
         representing the Parameters of parameterized_object.
@@ -2142,6 +2130,7 @@ class ParametersFrame(TkParameterized,T.Frame):
 
         self.on_set = on_set
         self.on_modify = on_modify
+        self.on_close = on_close
 
         ## Frame for the Parameters
         self._params_frame = T.Frame(self)
@@ -2239,13 +2228,21 @@ class ParametersFrame(TkParameterized,T.Frame):
             if not self.hidden_param(param_name):
                 self.gui_set_param(param_name,val)#_tkvars[param_name].set(val)
 
-        if self.on_modify: self.on_modify()
-        if self.on_set: self.on_set()
+        # CEBALERT: why doesn't this first check that something has actually changed?
+        if self.on_modify:
+            self.on_modify()
+            
+        if self.on_set:
+            self.on_set()
+
         self.update_idletasks()
         
         
     def _close_button(self):
         """See Close parameter."""
+        if self.on_close:
+            self.on_close()
+            
         T.Frame.destroy(self) # hmm
         self.master.destroy()
 
@@ -2548,20 +2545,19 @@ class ParametersFrameWithApply(ParametersFrame):
                 if hasattr(w,'tag_set'):w.tag_set()
 
 
+##     def _defaults_button(self):
+##         """See Defaults parameter."""
+##         assert isinstance(self._extraPO,Parameterized)
 
-    def _defaults_button(self):
-        """See Defaults parameter."""
-        assert isinstance(self._extraPO,Parameterized)
+##         defaults = self._extraPO.defaults()
 
-        defaults = self._extraPO.defaults()
+##         for param_name,val in defaults.items():
+##             if not self.hidden_param(param_name):
+##                 self._tkvars[param_name].set(val)
 
-        for param_name,val in defaults.items():
-            if not self.hidden_param(param_name):
-                self._tkvars[param_name].set(val)
-
-        if self.on_modify: self.on_modify()
-        if self.on_set: self.on_set()
-        self.update_idletasks()
+##         if self.on_modify: self.on_modify()
+##         if self.on_set: self.on_set()
+##         self.update_idletasks()
 
 
 # CB: can override tracefn so that Apply/Refresh buttons are enabled/disabled as appropriate
