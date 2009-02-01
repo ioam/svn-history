@@ -734,7 +734,7 @@ class TkParameterizedBase(Parameterized):
         parameter,sourcePO=self.get_parameter_object(param_name,with_location=True)
 
         ### can only edit constant parameters for class objects
-        if parameter.constant==True and not isinstance(sourcePO,ParameterizedMetaclass):
+        if parameter.constant==True and not isinstance(sourcePO,type):
             return  ### HIDDEN
 
         tkvar = self._tkvars[param_name]
@@ -2267,7 +2267,6 @@ class ParametersFrame(TkParameterized,T.Frame):
             # can only set window title on a window (model editor puts frame in another frame)
             pass
 
-        # CB: need a method for this!
         self.__dict__['_name_param_value'] = title
         
         
@@ -2280,7 +2279,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         self.pack_params_to_display()
 
         # hide Defaults button for classes
-        if isinstance(parameterized_object,ParameterizedMetaclass):
+        if isinstance(parameterized_object,type):
             self.hide_param('Defaults')
         else:
             self.unhide_param('Defaults')    
@@ -2347,8 +2346,6 @@ class ParametersFrame(TkParameterized,T.Frame):
 
         
 
-    # CEBALERT: name doesn't make sense! change params_to_display to
-    # something else e.g. params_to_display
     def pack_params_to_display(self):
 
         self._wipe_currently_displayed_params()
@@ -2371,22 +2368,6 @@ class ParametersFrame(TkParameterized,T.Frame):
         self.currently_displayed_params = dict([(param_name,self.representations[param_name])
                                           for param_name in self.params_to_display])
         #self.event_generate("<<SizeRight>>")
-
-
-#    def _create_widget(self,name,master,widget_options={},on_set=None,on_modify=None):
-#        w,l = TkParameterized._create_widget(self,name,master,widget_options,on_set,on_modify)
-#        
-#        w.bind('<<right-click>>',lambda event: self._right_click(event, w))
-#        return w,l
-           
-        
-    def _create_selector_widget(self,frame,name,widget_options):
-        """As for the superclass, but binds <<right-click>> event for opening menu."""
-        w = TkParameterized._create_selector_widget(self,frame,name,widget_options)
-        #w.bind('<<right-click>>',lambda event: self._right_click(event, w))
-        return w
-
-
 
 
     # CEBALERT: rename
@@ -2418,24 +2399,13 @@ class ParametersFrame(TkParameterized,T.Frame):
         parameter_frame.pack()
 
 
-##     def unpack_param(self,param_name):
-##         if param_name in self.currently_displayed_params:
-##             raise NotImplementedError("yet")
-##         super(ParametersFrame,self).unpack_param(param_name)
+        # CEBALERT: need to sort out all this stuff in the tkpo/pf
+        # hierarchy
         
+##     def unpack_param(self,param_name):
 ##     def hide_param(self,param_name):
-##         if param_name in self.currently_displayed_params:
-##             raise NotImplementedError("yet")
-##         super(ParametersFrame,self).hide_param(param_name)
-
 ##     def unhide_param(self,param_name):
-##         if param_name in self.currently_displayed_params:
-##             raise NotImplementedError("yet")
-##         super(ParametersFrame,self).unhide_param(param_name)    
 
-
-    # ERROR need to sort out all this stuff in the tkpo/pf hierarchy
-    
     def repack_param(self,param_name):
 
         self._refresh_value(param_name)
@@ -2451,35 +2421,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         
         self._create_translator(param_name,param)
         self._make_representation(param_name)
-        self._grid_param(param_name,row)
-
-            
-
-##     def _indicate_tkvar_status(self,param_name):
-##         """
-##         Calls the superclass's method, then additionally indicates if a parameter
-##         differs from the class default (by giving label green background).
-##         """
-##         TkParameterized._indicate_tkvar_status(self,param_name)
-
-##         b = 'white'
-        
-##         param,sourcePO = self.get_parameter_object(param_name,with_location=True)
-
-##         if sourcePO is not self and self.get_parameter_value(param_name) is not self.get_parameter_object(param_name).default:
-##             b = "green"
-
-
-##         if hasattr(self,'representations') and param_name in self.representations:
-##             try:
-##                 label = self.representations[param_name]['label']
-##                 if label is None:  # HACK about the label being none
-##                     return
-##                 label['background']=b
-##             except T.TclError:
-##                 pass
-
-
+        self._grid_param(param_name,row)            
 
     def _refresh_value(self,param_name):
         pass
@@ -2517,14 +2459,14 @@ class ParametersFrameWithApply(ParametersFrame):
         self.pack_param('Apply',parent=self._buttons_frame_right,
                         on_set=self._apply_button,side='left')
 
-        assert self.has_unapplied_change() is False, "ParametersFrame altered a value on opening. If possible, please email ceball at users.sf.net describing what you were doing when you received this error."
+        assert self.has_unapplied_change() is False, "ParametersFrame altered a value on opening. If possible, please file a bug report on the website describing what you were doing when you received this error."
 
         # CEBALERT: should use existing code
         self.representations['Apply']['widget']['state']='disabled'
 
 
     def _create_string_widget(self,frame,name,widget_options):
-        # CEBALERT: why do I unbind those events?
+        # don't want immediate updates, so unbind update events
         w= super(ParametersFrameWithApply,self)._create_string_widget(frame,name,widget_options)
         w.unbind('<Return>')
         w.unbind('<FocusOut>')
@@ -2532,7 +2474,6 @@ class ParametersFrameWithApply(ParametersFrame):
 
 
     def set_PO(self,parameterized_object):
-
         super(ParametersFrameWithApply,self).set_PO(parameterized_object)
                                           
         # (don't want to update parameters immediately)
@@ -2549,10 +2490,7 @@ class ParametersFrameWithApply(ParametersFrame):
                 return True
         return False
 
-
-
     def _indicate_tkvar_status(self,param_name,status=None):
-
         if self._tkvar_changed(param_name):
             status = 'changed'
 
@@ -2571,12 +2509,10 @@ class ParametersFrameWithApply(ParametersFrame):
 
             w.config(state=state)
             
-
-
-
     def _close_button(self):
-        # CEBALERT: dialog box should include a cancel button
-        # Also, changes are *not* applied if one of the boxes is in error.
+        # CEBERRORALERT: dialog box should include a cancel button
+        # Also, changes are *not* applied if one of the boxes is in
+        # error.
         if self.has_unapplied_change() \
                and askyesno("Close","Apply changes before closing?"):
             self.update_parameters()
@@ -2584,7 +2520,7 @@ class ParametersFrameWithApply(ParametersFrame):
 
 
     def update_parameters(self):
-        if isinstance(self._extraPO,ParameterizedMetaclass):
+        if isinstance(self._extraPO,type):
             for name in self.params_to_display.keys():
                 #if self._tkvar_changed(name):
                 self._update_param_from_tkvar(name)
