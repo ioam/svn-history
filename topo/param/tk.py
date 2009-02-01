@@ -1112,6 +1112,8 @@ class TkParameterized(TkParameterizedBase):
         self.master = master
         self.msg_handler = msg_handler
 
+        self.representations = {}
+
         # CEBALER: doc
         self.allow_dynamic = []
 
@@ -1128,6 +1130,7 @@ class TkParameterized(TkParameterizedBase):
                                      **params)
 
         self.balloon = Balloon(master)
+
 
 
         # CEBALERT: what about subclasses of Number (e.g. Integer,
@@ -1865,7 +1868,7 @@ class TkParameterized(TkParameterizedBase):
     # (tile having the right idea about how to do this kind of thing!)
     def _set_widget_status(self,param_name,status):
 
-        if hasattr(self,'representations') and param_name in self.representations:
+        if param_name in self.representations:
 
             widget = self.representations[param_name]['widget']
 
@@ -2150,6 +2153,9 @@ class ParametersFrame(TkParameterized,T.Frame):
         self._params_frame = T.Frame(self)
         self._params_frame.pack(side='top',expand='yes',fill='both')
 
+        self.params_to_display = {}
+        self.currently_displayed_params = {}
+
         if parameterized_object:
             self.set_PO(parameterized_object)
 
@@ -2225,7 +2231,7 @@ class ParametersFrame(TkParameterized,T.Frame):
 
     def _refresh_button(self):
         """See Refresh parameter."""
-        for name in self.displayed_params.keys():
+        for name in self.params_to_display.keys():
             self._tkvars[name].get()
 
 
@@ -2266,12 +2272,12 @@ class ParametersFrame(TkParameterized,T.Frame):
         
         
         ### Pack all of the non-hidden Parameters
-        self.displayed_params = {}
+        self.params_to_display = {}
         for n,p in parameterized_object.params().items():
             if not self.hidden_param(n):
-                self.displayed_params[n]=p
+                self.params_to_display[n]=p
                     
-        self.pack_displayed_params()
+        self.pack_params_to_display()
 
         # hide Defaults button for classes
         if isinstance(parameterized_object,ParameterizedMetaclass):
@@ -2280,16 +2286,15 @@ class ParametersFrame(TkParameterized,T.Frame):
             self.unhide_param('Defaults')    
 
 
-    def _wipe_currently_displaying(self):
+    def _wipe_currently_displayed_params(self):
         """Wipe old labels and widgets from screen."""
-        if hasattr(self,'currently_displaying'):
-            for rep in self.currently_displaying.values():
-                try:
-                    rep['label'].destroy()
-                except AttributeError:
-                    # e.g. buttons have None for label ('notNonelabel')
-                    pass
-                rep['widget'].destroy()
+        for rep in self.currently_displayed_params.values():
+            try:
+                rep['label'].destroy()
+            except AttributeError:
+                # e.g. buttons have None for label ('notNonelabel')
+                pass
+            rep['widget'].destroy()
         
 
     def _grid_param(self,parameter_name,row):
@@ -2342,20 +2347,20 @@ class ParametersFrame(TkParameterized,T.Frame):
 
         
 
-    # CEBALERT: name doesn't make sense! change displayed_params to
+    # CEBALERT: name doesn't make sense! change params_to_display to
     # something else e.g. params_to_display
-    def pack_displayed_params(self):
+    def pack_params_to_display(self):
 
-        self._wipe_currently_displaying()
+        self._wipe_currently_displayed_params()
 
         ### sort Parameters by reverse precedence
         parameter_precedences = {}
-        for name,parameter in self.displayed_params.items():
+        for name,parameter in self.params_to_display.items():
             parameter_precedences[name]=parameter.precedence
         sorted_parameter_names = keys_sorted_by_value(parameter_precedences)
             
         ### create the labels & widgets
-        for name in self.displayed_params:
+        for name in self.params_to_display:
             self._make_representation(name)
             
         ### add widgets & labels to screen in a grid
@@ -2363,8 +2368,8 @@ class ParametersFrame(TkParameterized,T.Frame):
         for row,parameter_name in zip(rows,sorted_parameter_names): 
             self._grid_param(parameter_name,row)
 
-        self.currently_displaying = dict([(param_name,self.representations[param_name])
-                                          for param_name in self.displayed_params])
+        self.currently_displayed_params = dict([(param_name,self.representations[param_name])
+                                          for param_name in self.params_to_display])
         #self.event_generate("<<SizeRight>>")
 
 
@@ -2414,17 +2419,17 @@ class ParametersFrame(TkParameterized,T.Frame):
 
 
 ##     def unpack_param(self,param_name):
-##         if param_name in self.currently_displaying:
+##         if param_name in self.currently_displayed_params:
 ##             raise NotImplementedError("yet")
 ##         super(ParametersFrame,self).unpack_param(param_name)
         
 ##     def hide_param(self,param_name):
-##         if param_name in self.currently_displaying:
+##         if param_name in self.currently_displayed_params:
 ##             raise NotImplementedError("yet")
 ##         super(ParametersFrame,self).hide_param(param_name)
 
 ##     def unhide_param(self,param_name):
-##         if param_name in self.currently_displaying:
+##         if param_name in self.currently_displayed_params:
 ##             raise NotImplementedError("yet")
 ##         super(ParametersFrame,self).unhide_param(param_name)    
 
@@ -2512,15 +2517,10 @@ class ParametersFrameWithApply(ParametersFrame):
         self.pack_param('Apply',parent=self._buttons_frame_right,
                         on_set=self._apply_button,side='left')
 
-        # this check for displayed_params, like elsewhere it exists,
-        # is to get round the fact that parametersframes can be opened
-        # without any associated object. Need to clean this
-        # up. (displayed_params should probably start as an empty
-        # dict.)
-        if hasattr(self,'displayed_params'):
-            assert self.has_unapplied_change() is False, "ParametersFrame altered a value on opening. If possible, please email ceball at users.sf.net describing what you were doing when you received this error."
-            # should use existing code
-            self.representations['Apply']['widget']['state']='disabled'
+        assert self.has_unapplied_change() is False, "ParametersFrame altered a value on opening. If possible, please email ceball at users.sf.net describing what you were doing when you received this error."
+
+        # CEBALERT: should use existing code
+        self.representations['Apply']['widget']['state']='disabled'
 
 
     def _create_string_widget(self,frame,name,widget_options):
@@ -2544,7 +2544,7 @@ class ParametersFrameWithApply(ParametersFrame):
     def has_unapplied_change(self):
         """Return True if any one of the packed parameters' displayed values is different from
         that on the object."""
-        for name in self.displayed_params.keys():
+        for name in self.params_to_display.keys():
             if self._tkvar_changed(name):
                 return True
         return False
@@ -2562,7 +2562,7 @@ class ParametersFrameWithApply(ParametersFrame):
     def _handle_gui_set(self,p_name,force=False):
         TkParameterized._handle_gui_set(self,p_name,force)
 
-        if hasattr(self,'representations') and 'Apply' in self.representations:
+        if 'Apply' in self.representations:
             w=self.representations['Apply']['widget']
             if self.has_unapplied_change():
                 state='normal'
@@ -2585,11 +2585,11 @@ class ParametersFrameWithApply(ParametersFrame):
 
     def update_parameters(self):
         if isinstance(self._extraPO,ParameterizedMetaclass):
-            for name in self.displayed_params.keys():
+            for name in self.params_to_display.keys():
                 #if self._tkvar_changed(name):
                 self._update_param_from_tkvar(name)
         else:
-            for name,param in self.displayed_params.items():
+            for name,param in self.params_to_display.items():
                 if not param.constant:  #and self._tkvar_changed(name):
                     self._update_param_from_tkvar(name)
 
@@ -2607,7 +2607,7 @@ class ParametersFrameWithApply(ParametersFrame):
 
         
     def _refresh_button(self,overwrite_error=True):
-        for name in self.displayed_params.keys():
+        for name in self.params_to_display.keys():
             if self.translators[name].last_string2object_failed and not overwrite_error:
                 pass
             else:
