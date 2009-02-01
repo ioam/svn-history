@@ -2151,8 +2151,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         self._params_frame.pack(side='top',expand='yes',fill='both')
 
         if parameterized_object:
-            self.set_PO(parameterized_object,on_set=on_set,
-                        on_modify=on_modify)
+            self.set_PO(parameterized_object)
 
         self._create_button_panel()
 
@@ -2251,14 +2250,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         self.master.destroy()
 
 
-
-    # CEBALERT: all these 'on_set=None's mean someone could lose
-    # their initial setting: cleanup
-    def set_PO(self,parameterized_object,on_set=None,on_modify=None):
-        """
-
-        """
-
+    def set_PO(self,parameterized_object):
         self.change_PO(parameterized_object)
 
         title = "Parameters of "+ (parameterized_object.name or str(parameterized_object)) # (name for class is None)
@@ -2279,7 +2271,7 @@ class ParametersFrame(TkParameterized,T.Frame):
             if not self.hidden_param(n):
                 self.displayed_params[n]=p
                     
-        self.pack_displayed_params(on_set=on_set,on_modify=on_modify)
+        self.pack_displayed_params()
 
         # hide Defaults button for classes
         if isinstance(parameterized_object,ParameterizedMetaclass):
@@ -2299,10 +2291,6 @@ class ParametersFrame(TkParameterized,T.Frame):
                     pass
                 rep['widget'].destroy()
         
-
-##     def pack_param(self):
-##         raise TypeError("ParametersFrame arranges all parameters together in a grid.")
-
 
     def _grid_param(self,parameter_name,row):
         widget = self.representations[parameter_name]['widget']
@@ -2343,10 +2331,10 @@ class ParametersFrame(TkParameterized,T.Frame):
 
 
 
-    def _make_representation(self,name,on_set=None,on_modify=None):
+    def _make_representation(self,name):
         widget,label = self._create_widget(name,self._params_frame,
-                                           on_set=on_set or self.on_set,
-                                           on_modify=on_modify or self.on_modify)
+                                           on_set=self.on_set,
+                                           on_modify=self.on_modify)
 
         label.bind("<Double-Button-1>",lambda event=None,x=name: self.switch_dynamic(x))
         self.representations[name]={'widget':widget,'label':label}
@@ -2356,7 +2344,7 @@ class ParametersFrame(TkParameterized,T.Frame):
 
     # CEBALERT: name doesn't make sense! change displayed_params to
     # something else e.g. params_to_display
-    def pack_displayed_params(self,on_set=None,on_modify=None):
+    def pack_displayed_params(self):
 
         self._wipe_currently_displaying()
 
@@ -2368,7 +2356,7 @@ class ParametersFrame(TkParameterized,T.Frame):
             
         ### create the labels & widgets
         for name in self.displayed_params:
-            self._make_representation(name,on_set,on_modify)
+            self._make_representation(name)
             
         ### add widgets & labels to screen in a grid
         rows = range(len(sorted_parameter_names))
@@ -2543,12 +2531,10 @@ class ParametersFrameWithApply(ParametersFrame):
         return w
 
 
-    def set_PO(self,parameterized_object,on_set=None,on_modify=None):
+    def set_PO(self,parameterized_object):
 
-        super(ParametersFrameWithApply,self).set_PO(parameterized_object,
-                                                    on_set=on_set,
-                                                    on_modify=on_modify)
-
+        super(ParametersFrameWithApply,self).set_PO(parameterized_object)
+                                          
         # (don't want to update parameters immediately)
         for v in self._tkvars.values():
             v._checking_get = v.get
