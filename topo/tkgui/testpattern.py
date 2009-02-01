@@ -120,7 +120,7 @@ class TestPattern(SheetPanel):
         self.pack_param('plastic',side='bottom',parent=present_frame)
         self.params_frame.pack(side='bottom',expand='yes',fill='x')
         self.pack_param('duration',parent=present_frame,side='left')
-        self.pack_param('Present',parent=present_frame,on_change=self.present_pattern,side="right")
+        self.pack_param('Present',parent=present_frame,on_set=self.present_pattern,side="right")
 
 
     def setup_plotgroup(self):

@@ -205,39 +205,39 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
                         expand='yes',fill='x',side='left')
 
         self.pack_param('Refresh',parent=self.updatecommand_frame,
-                        on_change=self.refresh,side='right')
+                        on_set=self.refresh,side='right')
         self.params_in_history.append('Refresh')
 
         self.pack_param('plot_hooks',parent=self.plotcommand_frame,
                         expand='yes',fill='x',side='left')
         # CEBALERT: should disable unless data exists.
         self.pack_param('Redraw',parent=self.plotcommand_frame,
-                        on_change=self.redraw_plots,side='right')
+                        on_set=self.redraw_plots,side='right')
         
             
         self.pack_param('Enlarge',parent=self.control_frame_1,
-                        on_change=self.enlarge_plots,side=LEFT)
+                        on_set=self.enlarge_plots,side=LEFT)
         self.params_in_history.append('Enlarge') # CEBNOTE: while it's a GUI op
 
         self.pack_param('Reduce',parent=self.control_frame_1,
-                        on_change=self.reduce_plots,side=LEFT)
+                        on_set=self.reduce_plots,side=LEFT)
         self.params_in_history.append('Reduce')
 
 
         if topo.tkgui.TK_SUPPORTS_DOCK:
             self.pack_param("dock",parent=self.control_frame_1,
-                            on_change=self.set_dock,side=LEFT)
+                            on_set=self.set_dock,side=LEFT)
 
 
         # Don't need to add these two to params_in_history because their
         # availability is controlled separately (determined by what's
         # in the history)
         self.pack_param('Back',parent=self.control_frame_2,
-                        on_change=lambda x=-1: self.navigate_pg_history(x),
+                        on_set=lambda x=-1: self.navigate_pg_history(x),
                         side=LEFT)
 
         self.pack_param('Fwd',parent=self.control_frame_2,
-                        on_change=lambda x=+1: self.navigate_pg_history(x),
+                        on_set=lambda x=+1: self.navigate_pg_history(x),
                         side=LEFT)
 
 
@@ -822,7 +822,7 @@ class SheetPanel(PlotGroupPanel):
         super(SheetPanel,self).__init__(master,plotgroup,**params)
 
         self.pack_param('auto_refresh',parent=self.control_frame_1,
-                        on_change=self.set_auto_refresh,
+                        on_set=self.set_auto_refresh,
                         side=RIGHT)
         self.params_in_history.append('auto_refresh')
 
@@ -831,11 +831,11 @@ class SheetPanel(PlotGroupPanel):
 
 
         self.pack_param('normalize',parent=self.control_frame_1,
-                        on_change=self.redraw_plots,side="right")
+                        on_set=self.redraw_plots,side="right")
         self.pack_param('integer_scaling',parent=self.control_frame_2,
-                        on_change=self.rescale_plots,side='right')
+                        on_set=self.rescale_plots,side='right')
         self.pack_param('sheet_coords',parent=self.control_frame_2,
-                        on_change=self.rescale_plots,side='right')
+                        on_set=self.rescale_plots,side='right')
 
         self.params_in_history.append('sheet_coords')
         self.params_in_history.append('integer_scaling')

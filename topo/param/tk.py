@@ -122,7 +122,7 @@ representing those of an external parameterized instance or class).
       dock = param.Boolean(False,doc='Whether to attach this Panel')
       
       def __init__(self,master,x):
-          self.pack_param('dock',side='top',on_change=self.handle_dock)
+          self.pack_param('dock',side='top',on_set=self.handle_dock)
           self.pack_param('one',side='left')
           self.pack_param('two',side='right')
 
@@ -718,9 +718,6 @@ class TkParameterizedBase(Parameterized):
         return changed
 
 
-    # CEBALERT: now I've added on_modify, need to go through and rename
-    # on_change and decide whether each use should be for alteration of 
-    # value or just gui set. Probably can remove on_change.    
     def _update_param_from_tkvar(self,param_name):
         """
         Attempt to set the parameter represented by param_name to the
@@ -763,7 +760,7 @@ class TkParameterizedBase(Parameterized):
             if hasattr(tkvar,'_on_modify'): tkvar._on_modify()
 
         ### call any function associated with GUI set()
-        if hasattr(tkvar,'_on_change'): tkvar._on_change()
+        if hasattr(tkvar,'_on_set'): tkvar._on_set()
 
 
 ################################################################################
@@ -1221,7 +1218,7 @@ class TkParameterized(TkParameterizedBase):
 
         else:
             p_type = type(self)
-            parameter_frame = p_type(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler,on_change=self.on_change,on_modify=self.on_modify)
+            parameter_frame = p_type(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler,on_set=self.on_set,on_modify=self.on_modify)
 
         parameter_frame.pack()
 
@@ -1362,9 +1359,8 @@ class TkParameterized(TkParameterizedBase):
                    self._param_right_click(event,param_name))
 
 
-    # CEBALERT: rename on_change and on_modify
     def pack_param(self,name,parent=None,widget_options={},
-                   on_change=None,on_modify=None,**pack_options):
+                   on_set=None,on_modify=None,**pack_options):
         """
         Create a widget for the Parameter name, configured according
         to widget_options, and pack()ed according to the pack_options.
@@ -1383,11 +1379,11 @@ class TkParameterized(TkParameterizedBase):
         is specified, defaults to the originally supplied master
         (i.e. that set during __init__).
 
-        * on_change is an optional function to call whenever the
+        * on_set is an optional function to call whenever the
         Parameter's corresponding Tkinter Variable's trace_variable
         indicates that it has been set (this does not necessarily mean
         that the widget's value has changed). When the widget is created,
-        the on_change method will be called (because the creation of the
+        the on_set method will be called (because the creation of the
         widget triggers a set in Tkinter).
 
         * on_modify is an optional function to call whenever the
@@ -1403,12 +1399,12 @@ class TkParameterized(TkParameterizedBase):
         Examples of use:
         pack_param(name)
         pack_param(name,side='left')
-        pack_param(name,parent=frame3,on_change=some_func)
+        pack_param(name,parent=frame3,on_set=some_func)
         pack_param(name,widget_options={'width':50},side='top',expand='yes',fill='y')
         """
         frame = T.Frame(parent or self.master)
 
-        widget,label = self._create_widget(name,frame,widget_options,on_change,on_modify)
+        widget,label = self._create_widget(name,frame,widget_options,on_set,on_modify)
 
         # checkbuttons are 'widget label' rather than 'label widget'
         if widget.__class__ is T.Checkbutton:  # type(widget) doesn't seem to work
@@ -1421,7 +1417,7 @@ class TkParameterized(TkParameterizedBase):
 
         representation = {"frame":frame,"widget":widget,
                           "label":label,"pack_options":pack_options,
-                          "on_change":on_change,"on_modify":on_modify,
+                          "on_set":on_set,"on_modify":on_modify,
                           "widget_options":widget_options}                       
         self.representations[name] = representation
 
@@ -1499,7 +1495,7 @@ class TkParameterized(TkParameterizedBase):
         w = self.representations[name]['widget']
         l = self.representations[name]['label']
         o = self.representations[name]['pack_options']
-        on_change = self.representations[name]['on_change']
+        on_set = self.representations[name]['on_set']
         on_modify = self.representations[name]['on_modify']
         
         w.destroy(); l.destroy()        
@@ -1507,7 +1503,7 @@ class TkParameterized(TkParameterizedBase):
         param_obj,PO = self.get_parameter_object(name,with_location=True)
         self._create_tkvar(PO,name,param_obj)
         
-        self.pack_param(name,f,on_change=on_change,on_modify=on_modify,**o)
+        self.pack_param(name,f,on_set=on_set,on_modify=on_modify,**o)
 
 
     def _switch_dynamic(self,name=None,dynamic=False):
@@ -1540,7 +1536,7 @@ class TkParameterized(TkParameterizedBase):
 # WIDGET CREATION
 ################################################################################
 
-    def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
+    def _create_widget(self,name,master,widget_options={},on_set=None,on_modify=None):
         """
         Return widget,label for parameter 'name', each having the master supplied
 
@@ -1564,8 +1560,8 @@ class TkParameterized(TkParameterizedBase):
             self.allow_dynamic.append(name)
                     
             
-        if on_change is not None:
-            self._tkvars[name]._on_change=on_change
+        if on_set is not None:
+            self._tkvars[name]._on_set=on_set
 
         if on_modify is not None:
             self._tkvars[name]._on_modify=on_modify
@@ -1594,7 +1590,7 @@ class TkParameterized(TkParameterizedBase):
         Return a FocusTakingButton to represent Parameter 'name'.
 
         Buttons require a command, which should have been specified as the
-        'on_change' function passed to pack_param().
+        'on_set' function passed to pack_param().
 
         After creating a button for a Parameter param, self.param() also
         executes the button's command.
@@ -1604,11 +1600,11 @@ class TkParameterized(TkParameterizedBase):
         the (possibly pretty_print()ed) name of the Parameter.        
         """
         try:
-            command = self._tkvars[name]._on_change
+            command = self._tkvars[name]._on_set
         except AttributeError:
             raise TypeError("No command given for '%s' button."%name)
 
-        del self._tkvars[name]._on_change # because we use Button's command instead
+        del self._tkvars[name]._on_set # because we use Button's command instead
 
         # Calling the parameter (e.g. self.Apply()) is like pressing the button:
         self.__dict__["_%s_param_value"%name]=command
@@ -1763,7 +1759,7 @@ class TkParameterized(TkParameterizedBase):
         #parameter_window.title(PO_to_edit.name+' parameters')
 
         parameter_frame = ParametersFrameWithApply(parameter_window,parameterized_object=parameterized_instance,show_labels=False)
-        #msg_handler=self.msg_handler,on_change=self.on_change,on_modify=self.on_modify)
+        #msg_handler=self.msg_handler,on_set=self.on_set,on_modify=self.on_modify)
 
         # CEBALERT: more dynamic class changes to make it impossible
         # to follow what is happening...ParametersFrame needs some
@@ -2126,13 +2122,13 @@ class ParametersFrame(TkParameterized,T.Frame):
 
     show_labels = Boolean(default=True)
 
-    def __init__(self,master,parameterized_object=None,on_change=None,
+    def __init__(self,master,parameterized_object=None,on_set=None,
                  on_modify=None,msg_handler=None,**params):
         """
         Create a ParametersFrame with the specifed master, and
         representing the Parameters of parameterized_object.
 
-        on_change is an optional function to call whenever any of the
+        on_set is an optional function to call whenever any of the
         GUI variables representing Parameter values is set() by the
         GUI (i.e. by the user). Since a variable's value is not
         necessarily changed by such a set(), on_modify is another
@@ -2147,7 +2143,7 @@ class ParametersFrame(TkParameterized,T.Frame):
                                  msg_handler=msg_handler,
                                  **params)
 
-        self.on_change = on_change
+        self.on_set = on_set
         self.on_modify = on_modify
 
         ## Frame for the Parameters
@@ -2155,7 +2151,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         self._params_frame.pack(side='top',expand='yes',fill='both')
 
         if parameterized_object:
-            self.set_PO(parameterized_object,on_change=on_change,
+            self.set_PO(parameterized_object,on_set=on_set,
                         on_modify=on_modify)
 
         self._create_button_panel()
@@ -2221,11 +2217,11 @@ class ParametersFrame(TkParameterized,T.Frame):
         self._buttons_frame_right.pack(side='right',expand='yes',fill='x')
 
         self.pack_param('Defaults',parent=self._buttons_frame_left,
-                        on_change=self._defaults_button,side='left')
+                        on_set=self._defaults_button,side='left')
         self.pack_param('Refresh',parent=self._buttons_frame_left,
-                        on_change=self._refresh_button,side='left')
+                        on_set=self._refresh_button,side='left')
         self.pack_param('Close',parent=self._buttons_frame_right,
-                        on_change=self._close_button,side='right')
+                        on_set=self._close_button,side='right')
 
 
     def _refresh_button(self):
@@ -2245,7 +2241,7 @@ class ParametersFrame(TkParameterized,T.Frame):
                 self.gui_set_param(param_name,val)#_tkvars[param_name].set(val)
 
         if self.on_modify: self.on_modify()
-        if self.on_change: self.on_change()
+        if self.on_set: self.on_set()
         self.update_idletasks()
         
         
@@ -2256,9 +2252,9 @@ class ParametersFrame(TkParameterized,T.Frame):
 
 
 
-    # CEBALERT: all these 'on_change=None's mean someone could lose
+    # CEBALERT: all these 'on_set=None's mean someone could lose
     # their initial setting: cleanup
-    def set_PO(self,parameterized_object,on_change=None,on_modify=None):
+    def set_PO(self,parameterized_object,on_set=None,on_modify=None):
         """
 
         """
@@ -2283,7 +2279,7 @@ class ParametersFrame(TkParameterized,T.Frame):
             if not self.hidden_param(n):
                 self.displayed_params[n]=p
                     
-        self.pack_displayed_params(on_change=on_change,on_modify=on_modify)
+        self.pack_displayed_params(on_set=on_set,on_modify=on_modify)
 
         # hide Defaults button for classes
         if isinstance(parameterized_object,ParameterizedMetaclass):
@@ -2349,9 +2345,9 @@ class ParametersFrame(TkParameterized,T.Frame):
 
 
 
-    def _make_representation(self,name,on_change=None,on_modify=None):
+    def _make_representation(self,name,on_set=None,on_modify=None):
         widget,label = self._create_widget(name,self._params_frame,
-                                           on_change=on_change or self.on_change,
+                                           on_set=on_set or self.on_set,
                                            on_modify=on_modify or self.on_modify)
 
         label.bind("<Double-Button-1>",lambda event=None,x=name: self.switch_dynamic(x))
@@ -2362,7 +2358,7 @@ class ParametersFrame(TkParameterized,T.Frame):
 
     # CEBALERT: name doesn't make sense! change displayed_params to
     # something else e.g. params_to_display
-    def pack_displayed_params(self,on_change=None,on_modify=None):
+    def pack_displayed_params(self,on_set=None,on_modify=None):
 
         self._wipe_currently_displaying()
 
@@ -2374,7 +2370,7 @@ class ParametersFrame(TkParameterized,T.Frame):
             
         ### create the labels & widgets
         for name in self.displayed_params:
-            self._make_representation(name,on_change,on_modify)
+            self._make_representation(name,on_set,on_modify)
             
         ### add widgets & labels to screen in a grid
         rows = range(len(sorted_parameter_names))
@@ -2386,8 +2382,8 @@ class ParametersFrame(TkParameterized,T.Frame):
         #self.event_generate("<<SizeRight>>")
 
 
-#    def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
-#        w,l = TkParameterized._create_widget(self,name,master,widget_options,on_change,on_modify)
+#    def _create_widget(self,name,master,widget_options={},on_set=None,on_modify=None):
+#        w,l = TkParameterized._create_widget(self,name,master,widget_options,on_set,on_modify)
 #        
 #        w.bind('<<right-click>>',lambda event: self._right_click(event, w))
 #        return w,l
@@ -2427,7 +2423,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         self.balloon.bind(title,getdoc(self.get_parameter_object(param_name,self._extraPO)))
         ############################
 
-        parameter_frame = type(self)(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler,on_change=self.on_change,on_modify=self.on_modify)
+        parameter_frame = type(self)(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler,on_set=self.on_set,on_modify=self.on_modify)
         parameter_frame.pack()
 
 
@@ -2514,10 +2510,10 @@ class ParametersFrameWithApply(ParametersFrame):
                           (i.e. acts on the class object).""")
     
     def __init__(self,master,parameterized_object=None,
-                 on_change=None,on_modify=None,**params):        
+                 on_set=None,on_modify=None,**params):        
         super(ParametersFrameWithApply,self).__init__(master,
                                                       parameterized_object,
-                                                      on_change,on_modify,
+                                                      on_set,on_modify,
                                                       **params)
         self._live_update = False
 
@@ -2527,7 +2523,7 @@ class ParametersFrameWithApply(ParametersFrame):
             
         
         self.pack_param('Apply',parent=self._buttons_frame_right,
-                        on_change=self._apply_button,side='left')
+                        on_set=self._apply_button,side='left')
 
         # this check for displayed_params, like elsewhere it exists,
         # is to get round the fact that parametersframes can be opened
@@ -2548,10 +2544,10 @@ class ParametersFrameWithApply(ParametersFrame):
         return w
 
 
-    def set_PO(self,parameterized_object,on_change=None,on_modify=None):
+    def set_PO(self,parameterized_object,on_set=None,on_modify=None):
 
         super(ParametersFrameWithApply,self).set_PO(parameterized_object,
-                                                    on_change=on_change,
+                                                    on_set=on_set,
                                                     on_modify=on_modify)
 
         # (don't want to update parameters immediately)
@@ -2649,7 +2645,7 @@ class ParametersFrameWithApply(ParametersFrame):
                 self._tkvars[param_name].set(val)
 
         if self.on_modify: self.on_modify()
-        if self.on_change: self.on_change()
+        if self.on_set: self.on_set()
         self.update_idletasks()
 
 

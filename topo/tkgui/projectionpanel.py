@@ -123,8 +123,8 @@ class UnitsPanel(ProjectionSheetPanel):
                                  # sheet_change if any of them were specified. Isn't there a cleaner
                                  # way?
         super(UnitsPanel,self).__init__(master,plotgroup,**params)
-        self.pack_param('x',parent=self.control_frame_4,on_change=self.refresh_plots)
-        self.pack_param('y',parent=self.control_frame_4,on_change=self.refresh_plots)
+        self.pack_param('x',parent=self.control_frame_4,on_set=self.refresh_plots)
+        self.pack_param('y',parent=self.control_frame_4,on_set=self.refresh_plots)
         self.sheet_change()
 
 
@@ -183,7 +183,7 @@ class ConnectionFieldsPanel(UnitsPanel):
 
     def __init__(self,master,plotgroup,**params):
         super(ConnectionFieldsPanel,self).__init__(master,plotgroup,**params)
-        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change,side='left',expand=1)
+        self.pack_param('situate',parent=self.control_frame_3,on_set=self.situate_change,side='left',expand=1)
         
     def situate_change(self):
         self.redraw_plots()
@@ -351,7 +351,7 @@ class CFProjectionPanel(ProjectionPanel):
 
     def __init__(self,master,plotgroup,**params):
         super(CFProjectionPanel,self).__init__(master,plotgroup,**params)
-        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change,side='left',expand=1)
+        self.pack_param('situate',parent=self.control_frame_3,on_set=self.situate_change,side='left',expand=1)
 
     def situate_change(self):
         self.redraw_plots()

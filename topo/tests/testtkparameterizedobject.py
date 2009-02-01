@@ -72,18 +72,18 @@ class TestTkParameterized(unittest.TestCase):
 
         f.pack_param('const')
         
-        f.pack_param('boo',on_change=f.upboocount)
+        f.pack_param('boo',on_set=f.upboocount)
 
         self.assertEqual(f.boo,True); self.assertEqual(f.boocount,0)
 
         f.boo = False
-        self.assertEqual(f.boocount,1) # check that on_change was called
+        self.assertEqual(f.boocount,1) # check that on_set was called
         self.assertEqual(f.boo,False)  # check that f.boo was set
         self.assertEqual(f._tkvars['boo'].get(),False) # simulate GUI get & check result
 
 
         f._tkvars['boo'].set(True) # simulate GUI set
-        self.assertEqual(f.boocount,2) # check that on_change was called
+        self.assertEqual(f.boocount,2) # check that on_set was called
         self.assertEqual(f.boo,True) # check that f.boo was actually set
         self.assertEqual(f._tkvars['boo'].get(),True) # simulate GUI get
 
@@ -138,12 +138,12 @@ class TestTkParameterized(unittest.TestCase):
 
 
 
-    def test_on_change(self):
+    def test_on_set(self):
 
         f = SomeFrame(Toplevel())
 
         self.z = 0
-        f.pack_param('boo',on_change=self.upzcount)
+        f.pack_param('boo',on_set=self.upzcount)
         f.boo=True
         self.assertEqual(self.z,1)
         

@@ -39,7 +39,7 @@ class FeatureCurvePanel(PlotGroupPanel):
 	PlotGroupPanel.__init__(self,master,plotgroup,**params)
 
         self.pack_param("sheet",parent=self.control_frame_3,
-            on_change=self.sheet_change,side='left',expand=1,
+            on_modify=self.sheet_change,side='left',expand=1,
             widget_options={'new_default':True,
                             'sort_fn_args':{'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
 
