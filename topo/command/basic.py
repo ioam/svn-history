@@ -238,12 +238,16 @@ def load_snapshot(snapshot_name):
             _load_pickle(snapshot)
             p.message("snapshot loaded successfully with legacy support")
         except: # what?
-            m = "snapshot could not be loaded. If you make a copy " + \
-                "of the snapshot available to Topographica's developers, support " + \
-                "can probably be added to Topographica; please email " + \
-                "developers[at]topographica.org, or file a bug report at " + \
-                "www.sf.net/projects/topographica.\n" + \
-                "Error:"
+            
+            m = """
+            Snapshot could not be loaded.
+
+            If you make a copy of the snapshot available to
+            Topographica's developers, support for it can be added to
+            Topographica; please file a bug report via the website.
+
+            Error:
+            """
             p.warning(m)
             raise 
 

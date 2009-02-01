@@ -31,16 +31,20 @@ Your original script will not be altered; a new version will be saved
 with the filename suffix '_0.9.6'.
 
 If you find that the new version of your script will not run in
-Topographica 0.9.6, you have two options:
+Topographica 0.9.6, you have three options:
 
-(1) Submit your script to the Topographica developers, and we will
-    improve this updating script to handle the problem
+(1) Submit your script to the Topographica developers via a support
+    request on the web site, and we will try to improve this updating
+    script to handle the problem
 
 (2) Try to run the new script in Topographica with legacy support
     enabled by passing '-l' at startup
-    (e.g. ./topographica -l -g your_script.ty
+    (e.g. ./topographica -l -g your_script.ty)
 
-
+(3) Update your script manually to match the new features of
+    Topographica, e.g. by searching the ChangeLog.txt file to see what
+    changes have been made since the previous release.
+   
 """
 
 print info
