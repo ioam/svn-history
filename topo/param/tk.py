@@ -2338,8 +2338,6 @@ class ParametersFrame(TkParameterized,T.Frame):
         # widgets expand to fill frame
         widget.master.grid_columnconfigure(1,weight=2)
 
-        self.representations[parameter_name]['row']=row
-
         self._post_add_param(parameter_name)
 
 
@@ -2450,7 +2448,8 @@ class ParametersFrame(TkParameterized,T.Frame):
         self._refresh_value(param_name)
         
         r = self.representations[param_name]
-        widget,label,row = r['widget'],r['label'],r['row']
+        widget,label = r['widget'],r['label']
+        row = widget.grid_info()['row']
 
         widget.destroy()
         label.destroy()
