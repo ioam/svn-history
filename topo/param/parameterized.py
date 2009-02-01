@@ -9,6 +9,7 @@ __version__='$Revision$'
 import sys
 import copy
 import re
+import __main__
 
 from operator import itemgetter,attrgetter
 from types import FunctionType
@@ -1451,7 +1452,6 @@ _param_name_changes = {}
 # (not yet finished - do we need to add information about version numbers?)
 
 # CEBALERT: Can't this stuff move to the ParameterizedMetaclass?
-import __main__
 class PicklableClassAttributes(object):
     """
     Supports pickling of Parameterized class attributes for a given module.
@@ -1497,28 +1497,35 @@ class PicklableClassAttributes(object):
         for cmd in self.startup_commands:
             exec cmd in __main__.__dict__
             
-        for class_name,state in state['class_attributes'].items():
+        for class_path,state in state['class_attributes'].items():
             # from e.g. "topo.base.parameter.Parameter", we want "topo.base.parameter"
-            module_path = class_name[0:class_name.rindex('.')]
 
-            ### ? globals()[module.split('.')[0]] = __import__(module)
-            # exec 'import '+module_path in __main__.__dict__
+            module_path = class_path[0:class_path.rindex('.')]
+            class_name = class_path[class_path.rindex('.')+1::]
 
-            exec 'import '+module_path in __main__.__dict__
+            module = sys.modules[module_path]
 
+            # CEBALERT: This try/except+warning shouldn't be
+            # necessary, and it hides problems (1. don't see real
+            # error message, and 2. everyone - including buildbot -
+            # ignores the warnings so a. we never hear about them and
+            # b. people probably get subtle bugs).
+            # I propose to change this (and the try/except below) to produce
+            # errors (and therefore to get the same note about filing a support
+            # request to have legacy support updated).
             try:
-                class_ = eval(class_name,__main__.__dict__)
+                class_=getattr(module,class_name)
             except:
-                Parameterized().warning("Could not find class %s to restore its parameter values (class might have been removed or renamed)."%class_name)
+                Parameterized().warning("Could not find class %s to restore its parameter values (class might have been removed or renamed)."%class_path)
                 break
 
             # now restore class Parameter values
             for p_name,p in state.items():
 
-                if class_name in _param_name_changes:
-                    if p_name in _param_name_changes[class_name]:
-                        new_p_name = _param_name_changes[class_name][p_name]
-                        Parameterized().message("%s's %s parameter has been renamed to %s."%(class_name,p_name,new_p_name))
+                if class_path in _param_name_changes:
+                    if p_name in _param_name_changes[class_path]:
+                        new_p_name = _param_name_changes[class_path][p_name]
+                        Parameterized().message("%s's %s parameter has been renamed to %s."%(class_path,p_name,new_p_name))
                         p_name = new_p_name
 
                 # CEBALERT: This try/except+warning shouldn't be
@@ -1531,7 +1538,7 @@ class PicklableClassAttributes(object):
                 try:
                     setattr(class_,p_name,p)
                 except:
-                    Parameterized().warning('Problem restoring "%s" parameter for class %s (e.g. the default value of %s.%s might not now be the same as when the snapshot was saved). This affects instances of %s if they are using the class default value for %s.' % (p_name,class_name,class_name,p_name,class_name,p_name)) # Indicates that parameter object representing p_name may have changed since the snapshot was created: support could be added in topo.misc.legacy
+                    Parameterized().warning('Problem restoring "%s" parameter for class %s (e.g. the default value of %s.%s might not now be the same as when the snapshot was saved). This affects instances of %s if they are using the class default value for %s.' % (p_name,class_path,class_path,p_name,class_path,p_name)) # Indicates that parameter object representing p_name may have changed since the snapshot was created: support could be added in topo.misc.legacy
                 
 
 
