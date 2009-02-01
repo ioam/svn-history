@@ -70,6 +70,10 @@ def select_setstate(class_,selector,pre_super=False,post_super=True):
     class_.__setstate__ = new_setstate
 
 
+# fake_X() vs redirect_X(): redirect simply makes the name point to
+# another thing, whereas fake actually creates a new thing (e.g. new
+# module)
+
 def fake_a_class(module,old_name,new_class,new_class_args=()):
     """
     Install a class named 'old_name' in 'module'; when created,
@@ -129,28 +133,23 @@ def package_redirect(name,parent,actual_package):
 
     
     
-# CB: not fully tested (don't know if it's enough to support all user
-# code).
-def fake_a_module(name,parent=None,source_code=None,parent_path=None):
-    """Create the module parent.name using source_code."""
-    # CB: parent path is necessary (even though it should be available
-    # from parent) when faking a package
+# CB: not yet tested with parent!=None
+def fake_a_module(name,source_code,parent=None,parent_name=None):
+    """
+    Create the module parent.name using source_code.
 
-    assert source_code is not None # hack til I reorder the args!
-
+    Installs to sys.modules[name] unless parent is not None,
+    in which case see module_redirect().
+    """
     # create the module
     module = imp.new_module(name)
     exec source_code in module.__dict__
 
-    if parent is not None:
-        # install the module
-        if parent_path is None:
-            parent_path = parent.__name__
-
-        sys.modules[parent_path+'.'+name]=module
-        setattr(parent,name,module)
-    else:
+    if parent is None:
         sys.modules[name]=module
+    else:
+        module_redirect(name,parent,module,parent_name)
+        
 
 
 class DuplicateCheckingList(list):
@@ -599,15 +598,10 @@ S.append(renamed_projections)
 
 
 def renamed_generatorsheet():
-    # rXXXX renamed generatorsheet
     # CEBALERT: below gives errors with snapshot-compatiblity-tests
-    #module_redirect('generatorsheet',topo.sheets,topo.sheet.generator)
     import topo.sheets
-    code = \
-"""
-from topo.sheet.generator import *
-"""
-    fake_a_module('generatorsheet',topo.sheets,code,'topo.sheets')
+    module_redirect('generatorsheet',topo.sheets,topo.sheet.generator,parent_name='topo.sheets')
+
 S.append(renamed_generatorsheet)
 
 def renamed_functionfamilies():
@@ -758,7 +752,7 @@ class mpq(object):
         import gmpy
     except ImportError:
         param.Parameterized().warning("gmpy.mpq not available: using fixedpoint.FixedPoint as a replacement.")
-        fake_a_module('gmpy',source_code=code)
+        fake_a_module('gmpy',code)
 
 S.append(provide_gmpy_equivalent)
 
