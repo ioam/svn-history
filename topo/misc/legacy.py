@@ -95,11 +95,21 @@ def _import(x,y):
     """return module y from: 'from x import y'"""
     return __import__(x+'.'+y,fromlist=[y])
 
-def module_redirect(name,parent,actual_module):
-    """For use when module parent.name is now actual_module."""
-    sys.modules[parent.__name__+'.'+name]=actual_module
-    setattr(parent,name,actual_module)
+def module_redirect(name,parent,actual_module,parent_name=None):
+    """
+    For use when module parent.name is now actual_module.
+
+    Use parent_name to override parent.name if necessary (e.g. when
+    parent is already redirected).
+    """
+    if parent_name is None:
+        parent_name=parent.__name__
+        
+    sys.modules[parent_name+'.'+name]=actual_module
+    setattr(sys.modules[parent_name],name,actual_module)
+
     return getattr(parent,name)
+
 
 def package_redirect(name,parent,actual_package):
     """
@@ -113,9 +123,10 @@ def package_redirect(name,parent,actual_package):
     import os,fnmatch
     mod_names = [f.split('.py')[0] for f in os.listdir(actual_package.__path__[0]) if fnmatch.fnmatch(f,'[!._]*.py')]
 
-    for name in mod_names:
-        m=_import(actual_package.__name__,name)
-        module_redirect(name,new_package,m)
+    for mod_name in mod_names:
+        m=_import(actual_package.__name__,mod_name)
+        module_redirect(mod_name,new_package,m,parent_name=parent.__name__+'.'+name)
+
     
     
 # CB: not fully tested (don't know if it's enough to support all user
@@ -161,7 +172,7 @@ class SnapshotSupport(object):
         # Haven't yet thought about whether or not it's actually possible
         # to get the version number before unpickling...
         from topo import param
-        #param.parameterized.min_print_level=param.parameterized.DEBUG
+#        param.parameterized.min_print_level=param.parameterized.DEBUG
         global supporters
         for f in supporters:
             param.Parameterized(name='SnapshotSupport').debug("calling %s"%f.__name__)
@@ -205,13 +216,17 @@ def rename_output_fn_to_transfer_fn():
     ### rXXXX renamed OutputFn to TransferFn + xxxOF->xxxTF
     import topo.base.functionfamily
     import topo.transferfn.basic
+
     def _rename(mod):        
         for name,obj in mod.__dict__.items():
             if isinstance(obj,type) and issubclass(obj,mod.TransferFn):
                 if name.endswith('TF'):
-                    exec name[0:-2]+'OF='+name in mod.__dict__
+                    old_name = name[0:-2]+'OF'
+                    new_class = obj
+                    setattr(mod,old_name,obj)
                 elif 'TransferFn' in name:
-                    exec name.replace('Transfer','Output')+'='+name in mod.__dict__
+                    old_name=name.replace('Transfer','Output')
+                    setattr(mod,old_name,obj)
 
     _rename(topo.base.functionfamily)
     _rename(topo.transferfn.basic)
@@ -607,8 +622,8 @@ def renamed_projfns():
     import topo.outputfn.projfn,topo.responsefn.projfn,topo.learningfn.projfn
     for mod in ['outputfn','responsefn','learningfn']:
         existing_mod = _import('topo.%s'%mod,'projfn')
-        module_redirect('projfns',_import('topo',mod),existing_mod)
-        module_redirect('projfns',_import('topo',mod+'s'),existing_mod)
+        module_redirect('projfns',_import('topo',mod),existing_mod,parent_name='topo.%s'%mod)
+        module_redirect('projfns',_import('topo',mod+'s'),existing_mod,parent_name='topo.%ss'%mod)
 
 S.append(renamed_projfns)
 
@@ -769,3 +784,11 @@ def number_add_inclusive_bounds():
     preprocess_state(param.Number,_number_add_inclusive_bounds)
 
 S.append(number_add_inclusive_bounds)
+
+
+def onedpowerspectrum_was_in_basic():
+    # rXXXX-rXXXX OneDPowerSpectrum moved back to pattern/audio 
+    import topo.pattern.audio
+    import topo.pattern.basic
+    topo.pattern.basic.OneDPowerSpectrum=topo.pattern.audio.OneDPowerSpectrum
+S.append(onedpowerspectrum_was_in_basic)
