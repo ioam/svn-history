@@ -1117,9 +1117,6 @@ class TkParameterized(TkParameterizedBase):
         # CEBALER: doc
         self.allow_dynamic = []
 
-
-
-        
         self.param_immediately_apply_change = {Boolean:True,
                                                Selector:True,
                                                Number:False,
@@ -1130,8 +1127,6 @@ class TkParameterized(TkParameterizedBase):
                                      **params)
 
         self.balloon = Balloon(master)
-
-
 
         # CEBALERT: what about subclasses of Number (e.g. Integer,
         # which should get a slider that jumps between integers...
@@ -1307,9 +1302,8 @@ class TkParameterized(TkParameterizedBase):
                     pass
                 ######################################################
 
-            except (AttributeError,KeyError):
-                # could be called before self.representations exists,
-                # or before param in _tkvars dict
+            except KeyError:
+                # could be called before param in _tkvars dict
                 pass
 
 
