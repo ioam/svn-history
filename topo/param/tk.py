@@ -1303,8 +1303,9 @@ class TkParameterized(TkParameterizedBase):
                     pass
                 ######################################################
 
-            except KeyError:
+            except (KeyError,AttributeError):
                 # could be called before param in _tkvars dict
+                # or before _original_set added to tk var
                 pass
 
 
