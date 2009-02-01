@@ -607,10 +607,9 @@ class TkParameterizedBase(Parameterized):
             self._create_tkvar(PO,name,param)
             
 
-    # rename param to param_obj
-    def _create_tkvar(self,PO,name,param):
+    def _create_tkvar(self,PO,name,param_obj):
         """
-        Add _tkvars[name] to represent param.
+        Add _tkvars[name] to represent the parameter object with the specified name.
         
         The appropriate Variable is used for each Parameter type.
 
@@ -619,9 +618,9 @@ class TkParameterizedBase(Parameterized):
         string representations to the objects themselves.
         """
         # CEBALERT: should probably delete any existing tkvar for name
-        self._create_translator(name,param)
+        self._create_translator(name,param_obj)
 
-        tkvar = lookup_by_class(self._param_to_tkvar,type(param))()
+        tkvar = lookup_by_class(self._param_to_tkvar,type(param_obj))()
         self._tkvars[name] = tkvar
 
         # overwrite Variable's set() with one that will handle
@@ -731,10 +730,10 @@ class TkParameterizedBase(Parameterized):
         """
         self.debug("TkPOb._update_param_from_tkvar(%s)"%param_name)
         
-        parameter,sourcePO=self.get_parameter_object(param_name,with_location=True)
+        parameter,sourcePO=self.get_parameter_object(param_name,with_source=True)
 
         ### can only edit constant parameters for class objects
-        if parameter.constant==True and not isinstance(sourcePO,type):
+        if parameter.constant is True and not isinstance(sourcePO,type):
             return  ### HIDDEN
 
         tkvar = self._tkvars[param_name]
@@ -757,10 +756,12 @@ class TkParameterizedBase(Parameterized):
 
             self.debug("set %s to %s"%(param_name,val))
                 
-            if hasattr(tkvar,'_on_modify'): tkvar._on_modify()
+            if hasattr(tkvar,'_on_modify'):
+                tkvar._on_modify()
 
         ### call any function associated with GUI set()
-        if hasattr(tkvar,'_on_set'): tkvar._on_set()
+        if hasattr(tkvar,'_on_set'):
+            tkvar._on_set()
 
 
 ################################################################################
@@ -801,19 +802,18 @@ class TkParameterizedBase(Parameterized):
         raise AttributeError(self._attr_err_msg(name,sources))
 
         
-    # CB: change with_location to with_source
-    def get_parameter_object(self,name,parameterized_object=None,with_location=False):
+    def get_parameter_object(self,name,parameterized_object=None,with_source=False):
         """
         Return the Parameter *object* (not value) specified by name,
         from the source_POs in this object (or the
         specified parameterized_object).
 
-        If with_location=True, returns also the source parameterizedobject.
+        If with_source=True, returns also the source parameterizedobject.
         """
         source = parameterized_object or self.get_source_po(name)
         parameter_object = source.params()[name]
 
-        if not with_location:
+        if not with_source:
             return parameter_object
         else:
             return parameter_object,source
@@ -988,7 +988,7 @@ class TkParameterizedBase(Parameterized):
         # (no warnings/errors, so e.g. a string in a
         # tagged slider just goes to the default value)
         # CEBALERT: set_in_bounds not valid for POMetaclass?
-        parameter,sourcePO=self.get_parameter_object(param_name,with_location=True)
+        parameter,sourcePO=self.get_parameter_object(param_name,with_source=True)
 
         # CEBHACKALERT: GeneratorSheet.input_generator should be a
         # property? But it's a Parameter...
@@ -1229,7 +1229,7 @@ class TkParameterized(TkParameterizedBase):
 
     def _update_dynamic_menu_entry(self,param_name):
         """Keep track of status of dynamic entry."""
-        param,po = self.get_parameter_object(param_name,with_location=True)
+        param,po = self.get_parameter_object(param_name,with_source=True)
         currently_dynamic = param_is_dynamically_generated(param,po)
         if hasattr(param,'_value_is_dynamic') and not currently_dynamic:
             self._right_click_param = param_name
@@ -1503,7 +1503,7 @@ class TkParameterized(TkParameterizedBase):
         
         w.destroy(); l.destroy()        
 
-        param_obj,PO = self.get_parameter_object(name,with_location=True)
+        param_obj,PO = self.get_parameter_object(name,with_source=True)
         self._create_tkvar(PO,name,param_obj)
         
         self.pack_param(name,f,on_set=on_set,on_modify=on_modify,**o)
@@ -1512,7 +1512,7 @@ class TkParameterized(TkParameterizedBase):
     def _switch_dynamic(self,name=None,dynamic=False):
 
         param_name = name or self._right_click_param
-        param,po = self.get_parameter_object(param_name,with_location=True)
+        param,po = self.get_parameter_object(param_name,with_source=True)
         if not hasattr(param,'_value_is_dynamic'):
             return
         
@@ -1551,7 +1551,7 @@ class TkParameterized(TkParameterizedBase):
         # default is self._create_string_widget... 
         widget_creation_fn = self._create_string_widget
 
-        param_obj,source_po = self.get_parameter_object(name,with_location=True)
+        param_obj,source_po = self.get_parameter_object(name,with_source=True)
 
         if not (param_is_dynamically_generated(param_obj,source_po) or name in self.allow_dynamic):
             # ...but overwrite that with a more specific one, if possible
