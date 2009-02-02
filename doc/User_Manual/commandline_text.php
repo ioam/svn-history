@@ -30,14 +30,14 @@ licensing information.
 topo_t000000.00_c1&gt;&gt;&gt; topo.sim['V1'].density
                Out[1]:5.0
 
-topo_t000000.00_c2&gt;&gt;&gt; topo.sim['V1'].output_fn
+topo_t000000.00_c2&gt;&gt;&gt; topo.sim['V1'].output_fns[0]
                Out[2]:PiecewiseLinear(lower_bound=...)
 
 topo_t000000.00_c3&gt;&gt;&gt; from topo.transferfn import *
 
-topo_t000000.00_c4&gt;&gt;&gt; topo.sim['V1'].output_fn=IdentityTF()
+topo_t000000.00_c4&gt;&gt;&gt; topo.sim['V1'].output_fns=[IdentityTF()]
 
-topo_t000000.00_c5&gt;&gt;&gt; topo.sim['V1'].output_fn
+topo_t000000.00_c5&gt;&gt;&gt; topo.sim['V1'].output_fns[0]
                Out[5]:IdentityTF(name=...)
 
 topo_t000000.00_c6&gt;&gt;&gt; topo.sim['V1'].activity
@@ -127,7 +127,7 @@ class GeneratorSheet(topo.base.sheet.Sheet)
  |  Data descriptors defined here:
  |  
  |  apply_output_fns
- |      Whether to apply the output_fn after computing an Activity matrix.
+ |      Whether to apply the output_fns after computing an Activity matrix.
  |  
  |  input_generator
  |      Specifies a particular PatternGenerator type to use when creating patterns.

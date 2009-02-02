@@ -203,30 +203,30 @@ Parameter(default=10,instantiate=True)</code>.  As mentioned above,
 this is useful when the Parameter will hold a mutable object, when
 sharing between instances would lead to confusion.
 
-<P>For instance, consider a Parameter whose value is the output 
-function <code>PiecewiseLinear</code>, which itself has the Parameters
-<code>upper_bound</code> and <code>lower_bound</code>. A user might
-want to declare that all <code>CFSheet</code>s should have output
-functions that are <code>PiecewiseLinear</code>, by
-setting <code>CFSheet.output_fn=PiecewiseLinear()</code>.  Without
+<P>For instance, consider a Parameter whose value is the learning 
+function <code>Oja</code>, which itself has the Parameter
+<code>alpha</code>. A user might
+want to declare that all <code>CFSheet</code>s should have 
+a single output function, <code>Oja</code>, by
+setting <code>CFSheet.learning_fn=Oja()</code>.  Without
 <code>instantiate=True</code>, instances of the class
-<code>CFSheet</code> would share a single <code>PiecewiseLinear</code>
+<code>CFSheet</code> would share a single <code>Oja</code>
 object. A user with a number of <code>CFSheet</code>s might be
-surprised to find that setting the <code>lower_bound</code> on one
-particular <code>CFSheet</code> would change it on them all.
+surprised to find that setting <code>alpha</code> on one
+particular <code>CFSheet</code>'s learning_fn would change it on them all.
 
 <P>To avoid this confusion, the author of <code>CFSheet</code> can
-declare that the output_fn Parameter always be instantiated:
+declare that the learning_fn Parameter always be instantiated:
 
 <pre>
-output_fn = Parameter(default=PiecewiseLinear(),instantiate=True)
+learning_fn = Parameter(default=Oja(),instantiate=True)
 </pre>
 
 In this case, each instance of CFSheet will have its own instance of
-PiecewiseLinear, independent of other <code>CFSheet</code>s'
-<code>PiecewiseLinear()</code> instances.  In fact, output_fn
-parameters (like others taking mutable objects) are typically declared
-not as Parameter but as <?php classref('topo.param','ClassSelector')?>, which sets
+Oja, independent of other <code>CFSheet</code>s' <code>Oja()</code>
+instances.  In fact, learning_fn parameters (like others taking
+mutable objects) are typically declared not as Parameter but as <?php
+classref('topo.param','ClassSelector')?>, which sets
 <code>instantiate=True</code> automatically.  Thus in most cases users
 can use Parameters without worrying about the details of inheritance
 and instantiation, but the details have been included here because the

@@ -7,25 +7,23 @@ adding noise, a few of which are outlined below.
 
 <H2>Additive and multiplicative noise in output_fns</H2>
 
-One easy way to add noise in Topographica is by using an
-<i>output_fn</i>.  An output_fn is simply a function that maps an
+One easy way to add noise in Topographica is by using a
+<i>TransferFn</i>.  A TransferFn is simply a function that maps an
 array into another array of the same size and shape.  At many
-locations in the Topographica code, a parameter named output_fn is
-provided to allow the user to put in any desired function of this
-type.  For instance, the output_fn of a Sheet (e.g. the Retina or V1)
-is its activation or transfer function.  The output_fn of a Projection
-(e.g. Afferent or LateralExcitatory) is applied to the activity in
-that Projection after it has been computed, and is thus also a type of
-transfer function.
+locations in the Topographica code, a parameter named output_fns is
+provided to allow the user to put in any desired functions of this
+type.  For instance, the output_fns of a Sheet (e.g. the Retina or V1)
+constitute its activation or transfer function.  The output_fns of a Projection
+(e.g. Afferent or LateralExcitatory) are applied to the activity in
+that Projection after it has been computed, and thus are also transfer functions.
 
-<p>Topographica output_fns are composable using the + operator, which
-simply applies the output functions sequentially.  For instance,
-LISSOM V1 Sheets typically use a PiecewiseLinear() output_fn, and
-noise can be added to this by setting the output_fn to
-PiecewiseLinear(...)+X(), where X() is an output function that adds
-noise.  Others that have IdentityTF() by default can simply use the
-new output function instead of the old identity function. Suitable
-output functions for noise include variants of:
+<p>Multiple TransferFns can be placed in Topographica output_fns, and will
+be applied sequentially. For instance,
+LISSOM V1 Sheets typically have one PiecewiseLinear() TransferFn in its list
+of output_fns; noise can be added to this by appending to output_fns a TransferFn that adds
+noise.  Others that have an empty list of output_fns  by default can again just append
+the new output_function to the list. Suitable
+transfer functions for noise include variants of:
 
 <blockquote><small>
   PatternCombine(generator=topo.pattern.random.UniformRandom(scale=1.0,offset=1.0),operator=numpy.multiply)<br>
@@ -54,28 +52,26 @@ will typically want to do the multiplicative noise first, to avoid scaling
 the additive noise.
 
 <P>As an example, to inject zero-mean additive uniform random noise
-into the LateralExcitatory Projection, just change e.g.
+into the LateralExcitatory Projection of a LISSOM-based model, just change e.g.
 
 <pre>
-  output_fn=IdentityTF()
+  output_fns=[]
 </pre>
 
-(if an output_fn is specified) to e.g.:
+(if output_fns are specified) to e.g.:
 
 <pre>
-  output_fn=IdentityTF()+PatternCombine(generator=topo.pattern.random.\
-      UniformRandom(scale=0.1,offset=-0.05),operator=numpy.add)
+  output_fns=[PatternCombine(generator=topo.pattern.random.\
+      UniformRandom(scale=0.1,offset=-0.05),operator=numpy.add)]
 </pre>
 
 
-(where in this case you could actually omit the "IdentityTF()+"
-because it doesn't do anything).  Some networks may not state
-"output_fn=IdentityTF()" explicitly, in which case just add the
-entire string above to the definition of that projection in the .ty
-file.  To see the results immediately, just run the network for one
-step, then visualize the Projection Activity and the final Activity.
-The long-term effects of this noise can then be evaluated by running
-for longer periods.
+Some networks may not state "output_fns=[]" explicitly, in which case
+just add the entire string above to the definition of that projection
+in the .ty file.  To see the results immediately, just run the network
+for one step, then visualize the Projection Activity and the final
+Activity.  The long-term effects of this noise can then be evaluated
+by running for longer periods.
 
 <H2>Projection mapping jitter</H2>
 
@@ -138,9 +134,9 @@ CFPOF_DivisiveNormalizeL1_opt or CFPOF_DivisiveNormalizeL1 could be
 changed to:
 
 <pre>
-  CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1(single_cf_fn=(\
+  CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1(single_cf_fn=(\
      PatternCombine(generator=topo.pattern.random.UniformRandom(scale=0.1,offset=-0.05),operator=numpy.add)+\
-     DivisiveNormalizeL1(norm_value=1.0)))
+     DivisiveNormalizeL1(norm_value=1.0)))]
 </pre>
 
 (or those parameters could be set on a specific projection).  To model
@@ -148,12 +144,12 @@ noise arising in the normalization step itself, just exchange
 DivisiveNormalizeL1 and PatternCombine, or add another PatternCombine
 after DivisiveNormalizeL1.
 
-<P>Note that the weights_output_fn is used when setting up the initial
+<P>Note that weights_output_fns are used when setting up the initial
 weights, so if you mean for it to apply only to learning, you may want
 to add the noise only after the network has been initialized.  For
 LISSOM networks this can be achieved by setting
-LISSOM.post_initialization_weights_output_fn instead of
-CFProjection.weights_output_fn. 
+LISSOM.post_initialization_weights_output_fns instead of
+CFProjection.weights_output_fns. 
 
 
 <H2>Spatially correlated noise</H2>
@@ -164,7 +160,7 @@ Connection Field is chosen independently of all others of that type.
 Many kinds of "noise" in biological systems will have spatial
 correlations, e.g. due to some underlying source that has a spatial
 extent (such as the vasculature, some diffusible chemical, etc.).  To
-include such effects for the output_fn noise sources described above,
+include such effects for the noise sources described above (output_fns),
 you could add new classes in topo.pattern.random that generate
 spatially correlated noise rather than noise that is independent per
 pixel.  E.g., the noise matrix could be convolved with a small
@@ -177,8 +173,8 @@ noise (pink noise) that is common in physical systems.
 
 <P>One could also consider the effects of measurement noise, e.g. on
 computing preference maps, which could be done by temporarily
-modifying the output_fn of each sheet so that what is measured is no
+modifying the output_fns of each sheet so that what is measured is no
 longer the actual activity value, but a transformation of it.  A
-better approach would probably be to add an output_fn parameter to the
-commands for measuring maps, so that such a function could be supplied
+better approach would probably be to add an output_fns parameter to the
+commands for measuring maps, so that such functions could be supplied
 for any measurement.

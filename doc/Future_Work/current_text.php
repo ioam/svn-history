@@ -599,19 +599,6 @@ numpy.alterdot(...)
 alterdot() changes all dot functions to use blas.
 (but note that dot() is, for some reason, not a dot product.)
 
-_________________________________________________________
-
-
-|            if output_fn is not IdentityTF: # Optimization (but may not actually help)
-|  !             output_fn(result)           # CEBHACKALERT: particularly since everything but
-|  !                                         # the IdentityTF *class* will pass this if-test!
-|  !         return result                   # Should be: "if not instance(output_fn,IdentityTF):".
-|  !                                         # I guess this needs fixing in several places.
-
-I think the "optimization" should just be removed
-everywhere.  It would be good to test the speed first, but if that's
-too much trouble, just removing it is fine.
-
 
 _________________________________________________________
 

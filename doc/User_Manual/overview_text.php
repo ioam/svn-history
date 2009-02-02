@@ -199,7 +199,7 @@ producing 2D patterns is provided, as described on
 <A HREF="patterns.html">a separate page</A>.
 
 
-<H3>Output functions</H3>
+<H3>Transfer functions</H3>
 
 <ul>
 <li><?php classref('topo.base.functionfamily','TransferFn')?>
@@ -229,15 +229,15 @@ of weights or an input pattern is a TransferFn, as is any Sheet's
 activity transfer function.
 
 <P>TransferFns are controlled by a set of parameters that are each
-typically called output_fn.  Each such parameter is associated with a
+typically called output_fns.  Each such parameter is associated with a
 particular processing step of a Sheet or a Projection.  For instance,
-CFProjections have an output_fn applied after they calculate their
-activity, and a weights_output_fn applied after a set of weights is
-modified.  Sheets have an output_fn applied after they calculate their
-activity, and PatternGenerators have an output_fn applied after
+CFProjections have output_fns applied after they calculate their
+activity, and weights_output_fns applied after a set of weights is
+modified.  Sheets have output_fns applied after they calculate their
+activity, and PatternGenerators have output_fns applied after
 the pattern is calculated.
 
-<P>The output_fn parameters allow the user to control calculations in
+<P>The output_fns parameters allow the user to control calculations in
 a flexible way, without having to write or maintain new code.  For
 instance, the PatternCombine TransferFn can be used to add a
 user-specified type of random noise to any of the major processing
@@ -245,12 +245,11 @@ steps.  Alternatively, it can be used to mask out a specific region
 at the end of the calculation, to implement a user-specified lesion or
 a non-rectangular neural region.
 
-<P>Multiple TransferFns can be applied in series using the Pipeline
-TransferFn, e.g. to add random noise, normalize the results, and then
-mask out lesioned units.
+<P>Multiple TransferFns can be applied in series, e.g. to add random
+noise, normalize the results, and then mask out lesioned units.
 
 <P>For the common and very expensive case of normalizing
-ConnectionField weights, a family of output functions that works on an
+ConnectionField weights, a family of transfer functions that works on an
 entire CFProjection at once is also available (CFPOutputFn).  These
 functions can be optimized heavily, and can do such things as
 normalizing across an entire Projection.
