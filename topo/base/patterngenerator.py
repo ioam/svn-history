@@ -14,7 +14,6 @@ from .. import param
 from ..param.parameterized import ParamOverrides
 
 from boundingregion import BoundingBox, BoundingRegionParameter
-from functionfamily import TransferFn, IdentityTF
 from sheetcoords import SheetCoordinateSystem
 
 
@@ -101,7 +100,7 @@ class PatternGenerator(param.Parameterized):
 
     mask = param.Parameter(default=None,precedence=-1,doc="""
         Optional object (expected to be an array) with which to multiply the
-        pattern array after it has been created, before any output_fn is
+        pattern array after it has been created, before any output_fns are
         applied. This can be used to shape the pattern.""")
 
     # Note that the class type is overridden to PatternGenerator below
@@ -109,9 +108,9 @@ class PatternGenerator(param.Parameterized):
         Optional PatternGenerator used to construct a mask to be applied to
         the pattern.""")
     
-    output_fn = param.ClassSelector(TransferFn,default=IdentityTF(),precedence=0.08,doc="""
-        Optional function to apply to the pattern array after it has been created.
-        This function can be used for normalization, thresholding, etc.""")
+    output_fns = param.HookList(default=[],precedence=0.08,doc="""
+        Optional function(s) to apply to the pattern array after it has been created.
+        Can be used for normalization, thresholding, etc.""")
 
     def __call__(self,**params):
         """
@@ -134,11 +133,8 @@ class PatternGenerator(param.Parameterized):
         self._apply_mask(p,fn_result)
         result = p.scale*fn_result+p.offset
             
-        # Optimization (not clear that is helps; does make small (-0.5s out of 75s)
-        # difference to startup time of lissom_oo_or)
-        output_fn = p.output_fn
-        if not isinstance(output_fn,IdentityTF): 
-            output_fn(result)
+        for of in p['output_fns']:
+            of(result)
                                
         return result
                                
@@ -229,8 +225,7 @@ class Constant(PatternGenerator):
         result = params['scale']*ones(shape, Float)+params['offset']
         self._apply_mask(params,result)
 
-        output_fn = params['output_fn']
-        if output_fn is not IdentityTF: # Optimization (but may not actually help)
+        for of in params['output_fns']:
             output_fn(result)
 
         return result

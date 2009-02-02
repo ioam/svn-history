@@ -99,10 +99,8 @@ class SharedWeightCFProjection(CFProjection):
     ### actually work yet, but we could certainly extend it to support
     ### learning if desired, e.g. to learn position-independent responses.
     learning_fn = param.ClassSelector(CFPLearningFn,CFPLF_Identity(),constant=True)
-    output_fn  = param.ClassSelector(TransferFn,default=IdentityTF())
-    weights_output_fn = param.ClassSelector(
-        CFPOutputFn,default=CFPOF_SharedWeight())
-
+    output_fns  = param.HookList(default=[])
+    weights_output_fns = param.HookList(default=[CFPOF_SharedWeight()])
     precedence = param.Number(default=0.5)
 
     def __init__(self,**params):
@@ -133,7 +131,7 @@ class SharedWeightCFProjection(CFProjection):
                                      template=slice_template,
                                      weights_generator=self.weights_generator,
                                      mask=self.mask_template,
-                                     output_fn=self.weights_output_fn.single_cf_fn)
+                                     output_fns=[wof.single_cf_fn for wof in self.weights_output_fns])
 
         cflist = []
         scf = self.__sharedcf
@@ -178,7 +176,7 @@ class SharedWeightCFProjection(CFProjection):
         pass
     
     
-    def apply_learn_output_fn(self,mask):
+    def apply_learn_output_fns(self,mask):
         """
         Because of how output functions are applied, it is not currently
         possible to use learning functions and learning output functions for
@@ -289,7 +287,8 @@ class ScaledCFProjection(CFProjection):
             self.lr_sf=ones(self.dest.shape, activity_type)
         
         self.response_fn(MaskedCFIter(self), input_activity, self.activity, self.strength)
-        self.output_fn(self.activity)
+        for of in self.output_fns:
+            of(self.activity)
         self.calculate_sf()
         self.do_scaling()
 
@@ -312,7 +311,7 @@ class OneToOneProjection(Projection):
         default=Constant(),constant=True,
         doc="""Generate initial weight values for each unit of the destination sheet.""")
 
-    output_fn  = param.ClassSelector(TransferFn,default=IdentityTF(),
+    output_fns  = param.HookList(default=[],
         doc='Function applied to the Projection activity after it is computed.')
 
     learning_fn = param.ClassSelector(LearningFn,default=IdentityLF(),
@@ -369,7 +368,8 @@ class OneToOneProjection(Projection):
         self.input_buffer = input
         result = self.weights.take(self.dest_idxs) * input.take(self.src_idxs) * self.strength
         self.activity.put(self.dest_idxs,result)
-        self.output_fn(self.activity)
+        for of in self.output_fns:
+            of(self.activity)
 
     def learn(self):
         if self.input_buffer is not None:

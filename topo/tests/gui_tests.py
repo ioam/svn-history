@@ -105,8 +105,8 @@ def test_test_pattern():
     # first change several more parameters
     initial_preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
     
-    new_param_values = [('output_fn','Sigmoid'),
-                        ('orientation','pi/4')]
+    new_param_values = [#('output_fns','Sigmoid'),
+                        ('scale','2')]
 
     for name,value in new_param_values:
         tp.params_frame.gui_set_param(name,value)

@@ -109,7 +109,7 @@ projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
 projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
-projection.CFProjection.weights_output_fn=transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
+projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()]
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 
 
@@ -145,11 +145,11 @@ topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=p.retina_density,
 
 topo.sim['LGNOn']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
     nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.5),
-    output_fn=transferfn.HalfRectify(), measure_maps=False)
+    output_fns=[transferfn.HalfRectify()], measure_maps=False)
 
 topo.sim['LGNOff']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
     nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.5),
-    output_fn=transferfn.HalfRectify(), tsettle=0, measure_maps=False)
+    output_fns=[transferfn.HalfRectify()], tsettle=0, measure_maps=False)
 
 # Add the lateral connectivity to LGN
 AddGC()
@@ -162,7 +162,7 @@ V1_OF=SimpleHomeoLinearRelative(smoothing=p.V1_smoothing,eta=p.eta,
 topo.sim['V1'] = sheet.lissom.JointScaling(nominal_density=p.cortex_density,
     tsettle=16, plastic=True, apply_scaling=False, smoothing=p.smoothing,
     nominal_bounds=sheet.BoundingBox(radius=0.5),
-    output_fn=transferfn.PipelineTF(output_fns=[AH,V1_OF]))
+    output_fns=[AH,V1_OF])
 
 #make sure that activity is reset at the beginning of iteration
 topo.sim['V1'].beginning_of_iteration.append(AH.reset)
@@ -173,9 +173,9 @@ topo.sim['V1'].beginning_of_iteration.append(AH.reset)
 
 # DoG weights for the LGN
 centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,
-                             output_fn=transferfn.DivisiveNormalizeL1())
+                             output_fns=[transferfn.DivisiveNormalizeL1()])
 surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,
-                             output_fn=transferfn.DivisiveNormalizeL1())
+                             output_fns=[transferfn.DivisiveNormalizeL1()])
     
 on_weights = pattern.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
@@ -237,5 +237,5 @@ import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureCurveCommand.selectivity_multiplier=1.0
 topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=64
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
-topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fn=True
+topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
 topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":5},{"contrast":10},{"contrast":20},{"contrast":40},{"contrast":80},{"contrast":100}]

@@ -186,8 +186,8 @@ class Projection(EPConnection):
     
     dest_port = param.Parameter(default='Activity')
 
-    output_fn = param.ClassSelector(TransferFn,default=IdentityTF(),doc="""
-    Function applied to the Projection activity after it is computed.""")
+    output_fns = param.HookList(default=[],doc="""
+    Function(s) applied to the Projection activity after it is computed.""")
 
     plastic = param.Boolean(default=True, doc="""
         Whether or not to update the internal state on each call.
@@ -234,7 +234,7 @@ class Projection(EPConnection):
         pass
 
 
-    def apply_learn_output_fn(self,mask):
+    def apply_learn_output_fns(self,mask):
         """
         Sub-classes can implement this function if they wish to
         perform an operation after learning has completed, such as
@@ -282,8 +282,10 @@ class Projection(EPConnection):
         """
         self._plasticity_setting_stack.append(self.plastic)
         self.plastic=new_plasticity_state
-        if hasattr(self.output_fn,'override_plasticity_state'):
-            self.output_fn.override_plasticity_state(new_plasticity_state)
+
+        for of in self.output_fns:
+            if hasattr(of,'override_plasticity_state'):
+                of.override_plasticity_state(new_plasticity_state)
       
 
     def restore_plasticity_state(self):
@@ -296,8 +298,10 @@ class Projection(EPConnection):
         e.g. to reenable plasticity of any type that was disabled.
         """
         self.plastic = self._plasticity_setting_stack.pop()
-        if hasattr(self.output_fn,'restore_plasticity_state'):
-            self.output_fn.restore_plasticity_state()
+
+        for of in self.output_fns:
+            if hasattr(of,'restore_plasticity_state'):
+                of.restore_plasticity_state()
 
 
     def get_projection_view(self, timestamp):
@@ -322,31 +326,32 @@ class ProjectionSheet(Sheet):
     After all events have been processed for a given time, the
     ProjectionSheet computes its own activity matrix using its
     activate() method, which by default sums all its Projections'
-    activity matrices and passes the result through a user-specified
-    output_fn() before sending it out on the default output port.
+    activity matrices and passes the result through user-specified
+    output_fns() before sending it out on the default output port.
     The activate() method can be overridden to sum some of the
     projections, multiply that by the sum of other projections, etc.,
     to model modulatory or other more complicated types of connections.
 
-    The output_fn is a function s(A) that takes an activity matrix
-    A and produces an identically shaped output matrix. The default
-    is the identity function.
+    output_fns are functions that take an activity matrix and produce
+    an identically shaped output matrix. The default is having no
+    output_fns.
     """
 
     dest_ports=['Activity']
     
     src_ports=['Activity']
     
-    output_fn = param.ClassSelector(TransferFn,default=IdentityTF(),
-        doc="Output function to apply (if apply_output_fn is true) to this Sheet's activity.")
+    output_fns = param.HookList(default=[],
+        doc="Output function(s) to apply (if apply_output_fns is true) to this Sheet's activity.")
     
     multiplicative_constant = param.Number(default = 0.0,doc="""
         Constant value added to projection activity before combining multiplicatively.""")   
        
     divisive_constant = param.Number(default = 1.0,doc="""
         Constant value added to projection activity before combining divisively.""")  
-    
-    apply_output_fn=param.Boolean(default=True,
+
+    # CEBALERT: rename to fns
+    apply_output_fns=param.Boolean(default=True,
         doc="Whether to apply the output_fn after computing an Activity matrix.")
         
     # Should be a MaskParameter for safety
@@ -469,8 +474,9 @@ class ProjectionSheet(Sheet):
                 tmp_activity += proj.activity
             self.activity=tmp_dict[priority][0].activity_group[1](self.activity,tmp_activity)
         
-        if self.apply_output_fn:
-            self.output_fn(self.activity)
+        if self.apply_output_fns:
+            for of in self.output_fns:
+                of(self.activity)
     
         self.send_output(src_port='Activity',data=self.activity)
     
@@ -491,7 +497,7 @@ class ProjectionSheet(Sheet):
 
     def learn(self):
         """
-        By default, call the learn() and apply_learn_output_fn()
+        By default, call the learn() and apply_learn_output_fns()
         methods on every Projection to this Sheet.
         
         Any other type of learning can be implemented by overriding this method.
@@ -503,7 +509,7 @@ class ProjectionSheet(Sheet):
                 self.debug("Skipping non-Projection "+proj.name)
             else:
                 proj.learn()
-                proj.apply_learn_output_fn(self.activity)
+                proj.apply_learn_output_fns(self.activity)
 
 
     def present_input(self,input_activity,conn):
@@ -553,16 +559,18 @@ class ProjectionSheet(Sheet):
         be affected by this call.
 
         By default, calls override_plasticity_state() on the
-        ProjectionSheet's output_fn and all of its incoming
+        ProjectionSheet's output_fns and all of its incoming
         Projections, and also enables the 'plastic' parameter for this
         ProjectionSheet.  The old value of the plastic parameter is
         saved to an internal stack to be restored by
         restore_plasticity_state().
         """
-        
         super(ProjectionSheet,self).override_plasticity_state(new_plasticity_state)
-        if hasattr(self.output_fn,'override_plasticity_state'):
-            self.output_fn.override_plasticity_state(new_plasticity_state)
+
+        for of in self.output_fns:
+            if hasattr(of,'override_plasticity_state'):
+                of.override_plasticity_state(new_plasticity_state)
+                
         for proj in self.in_connections:
             # Could instead check for a override_plasticity_state method
             if isinstance(proj,Projection):
@@ -571,8 +579,11 @@ class ProjectionSheet(Sheet):
 
     def restore_plasticity_state(self):
         super(ProjectionSheet,self).restore_plasticity_state()
-        if hasattr(self.output_fn,'restore_plasticity_state'):
-            self.output_fn.restore_plasticity_state()
+
+        for of in self.output_fns:
+            if hasattr(of,'restore_plasticity_state'):
+                of.restore_plasticity_state()
+
         for proj in self.in_connections:
             if isinstance(proj,Projection):
                 proj.restore_plasticity_state()

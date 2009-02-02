@@ -31,10 +31,9 @@ from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetcoords import SheetCoordinateSystem
 # Imported here so that all TransferFns will be in the same package
-from topo.base.functionfamily import IdentityTF,PipelineTF
+from topo.base.functionfamily import IdentityTF
 from topo.pattern.basic import Gaussian
 
-Pipeline = PipelineTF
 
 # CEBHACKALERT: these need to respect the mask - which will be passed in.
 
@@ -797,7 +796,7 @@ class HomeostaticMaxEnt(TransferFnWithRandomState):
         super(HomeostaticMaxEnt,self).state_pop()
         
 
-class ScalingOF(TransferFnWithState):
+class ScalingTF(TransferFnWithState):
     """
     Scales input activity based on the current average activity (x_avg).
 
@@ -823,7 +822,7 @@ class ScalingOF(TransferFnWithState):
 
     
     def __init__(self,**params):
-        super(ScalingOF,self).__init__(**params)
+        super(ScalingTF,self).__init__(**params)
         self.n_step = 0
         self.x_avg=None
         self.sf=None

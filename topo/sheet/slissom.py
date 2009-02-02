@@ -97,8 +97,9 @@ class SLISSOM(LISSOM):
         for proj in self.in_connections:
             self.activity += proj.activity
 
-        if self.apply_output_fn:
-            self.output_fn(self.activity)
+        if self.apply_output_fns:
+            for of in self.output_fns:
+                of(self.activity)
 
 	# Add noise, based on the noise_rate.
 	if self.noise_rate > 0.0:

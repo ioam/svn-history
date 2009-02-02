@@ -62,7 +62,7 @@ projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
 projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
-projection.CFProjection.weights_output_fn=transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
+projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()]
 
 ### Default for tutorial
 pattern.Line.scale=0.7
@@ -93,7 +93,7 @@ topo.sim['Retina']=sheet.GeneratorSheet(
 topo.sim['V1'] = sheet.lissom.LISSOM(
     nominal_density=p.cortex_density,
     nominal_bounds=sheet.BoundingBox(radius=0.5),tsettle=9,
-    output_fn=transferfn.PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+    output_fns=[transferfn.PiecewiseLinear(lower_bound=0.1,upper_bound=0.65)])
 #   joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt) # Need to enable
 
 
@@ -130,4 +130,4 @@ sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/num_inputs,aff_name="Affere
 # speed and reliability
 from topo.analysis.featureresponses import MeasureResponseCommand
 MeasureResponseCommand.duration=0.175
-MeasureResponseCommand.apply_output_fn=False
+MeasureResponseCommand.apply_output_fns=False

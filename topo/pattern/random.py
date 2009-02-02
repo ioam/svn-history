@@ -60,10 +60,9 @@ class RandomGenerator(PatternGenerator):
         result = self._distrib(shape,params)
         self._apply_mask(params,result)
 
-        output_fn = params['output_fn']
-        if output_fn is not IdentityTF: # Optimization (but may not actually help)
-            output_fn(result)
-        
+        for of in params['output_fns']:
+            of(result)
+                
         return result
 
 

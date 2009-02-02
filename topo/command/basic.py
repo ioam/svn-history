@@ -58,7 +58,7 @@ def clear_event_queue():
     topo.sim.event_clear()
 
 
-def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=False,apply_output_fn=True):
+def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=False,apply_output_fns=True):
     """
     Present the specified test patterns for the specified duration.
 
@@ -96,11 +96,11 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
         for sheet in topo.sim.objects(Sheet).values():
              sheet.override_plasticity_state(new_plasticity_state=False)
 
-    if not apply_output_fn:
+    if not apply_output_fns:
         for each in topo.sim.objects(Sheet).values():
             if hasattr(each,'measure_maps'):
                if each.measure_maps: 
-                   each.apply_output_fn = False
+                   each.apply_output_fns = False
 
     # Register the inputs on each input sheet
     generatorsheets = topo.sim.objects(GeneratorSheet)
@@ -126,9 +126,9 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
         for sheet in topo.sim.objects(Sheet).values():
             sheet.restore_plasticity_state()
           
-    if not apply_output_fn:
+    if not apply_output_fns:
         for each in topo.sim.objects(Sheet).values():
-            each.apply_output_fn = True
+            each.apply_output_fns = True
  
         
     if not overwrite_previous:

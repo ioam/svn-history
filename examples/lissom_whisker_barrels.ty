@@ -332,7 +332,7 @@ def color_MEAs():
 def measure_deflection_pref(num_deflection=50,
 			    scale=0.3,offset=0.0,display=False,weighted_average=False,
 			    pattern_presenter=PatternPresenter(pattern_generator=TestWhiskerArray(),
-							       apply_output_fn=False,duration=0.175)):
+							       apply_output_fns=False,duration=0.175)):
     """  
     Measure deflection maps, by collating the responses to a set of
     whisker deflections in different directions.
@@ -369,7 +369,7 @@ pg.add_static_image('Color Key','topo/command/dfl_key_white_vert.png')
 
 def measure_sweep_pref(num_deflection=50,
                     scale=0.3,offset=0.0,display=False,weighted_average=False,
-                    pattern_presenter=PatternPresenter(pattern_generator=WhiskerArray(w_x=w_x,w_y=w_y,tilt=1.0),apply_output_fn=False,duration=1.0)):
+                    pattern_presenter=PatternPresenter(pattern_generator=WhiskerArray(w_x=w_x,w_y=w_y,tilt=1.0),apply_output_fns=False,duration=1.0)):
     
     """  
     Measure deflection maps, by collating the responses to a set of
@@ -453,7 +453,7 @@ CFProjection.cf_shape = topo.pattern.basic.Constant()
 CFProjection.weights_generator = topo.pattern.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
-CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
 
 
 
@@ -518,7 +518,7 @@ Subplotting.set_subplots("Deflection",force=False)
 # speed and reliability
 from topo.analysis.featureresponses import MeasureResponseCommand
 MeasureResponseCommand.duration=0.175
-MeasureResponseCommand.apply_output_fn=False
+MeasureResponseCommand.apply_output_fns=False
 
 
 

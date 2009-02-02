@@ -786,3 +786,18 @@ def onedpowerspectrum_was_in_basic():
     import topo.pattern.basic
     topo.pattern.basic.OneDPowerSpectrum=topo.pattern.audio.OneDPowerSpectrum
 S.append(onedpowerspectrum_was_in_basic)
+
+
+## # Legacy support
+## class PipelineTF(TransferFn):
+
+##     def __new__(self,*args,**kw):
+##         param.Parameterized().warning("PipelineTF is deprecated; returning output_fns list.")
+
+##         if 'output_fns' in kw:
+##             return kw['output_fns']
+##         else:
+##             return []
+
+#topo.transferfn.basic had
+#Pipeline = PipelineTF

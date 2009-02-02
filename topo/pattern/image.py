@@ -30,7 +30,7 @@ class PatternSampler(param.Parameterized):
     background value.
     """
 
-    def __init__(self, pattern_array=None, image=None, whole_pattern_output_fn=IdentityTF(), background_value_fn=None):
+    def __init__(self, pattern_array=None, image=None, whole_pattern_output_fns=None, background_value_fn=None):
         """
         Create a SheetCoordinateSystem whose activity is pattern_array
         (where pattern_array is a NumPy array), modified in place by
@@ -38,7 +38,9 @@ class PatternSampler(param.Parameterized):
 
         If supplied, background_value_fn must accept an array and return a scalar.
         """
-        
+        if whole_pattern_output_fns is None:
+            whole_pattern_output_fns = []
+            
         super(PatternSampler,self).__init__()
 
         if pattern_array is not None and image is not None:
@@ -56,8 +58,10 @@ class PatternSampler(param.Parameterized):
         self.scs = SheetCoordinateSystem(xdensity=1.0,ydensity=1.0,
             bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                        ( cols/2.0, rows/2.0))))
-        
-        whole_pattern_output_fn(pattern_array)
+
+        for wpof in whole_pattern_output_fns:
+            wpof(pattern_array)
+            
         self.scs.activity = pattern_array
 
         if not background_value_fn:
@@ -200,7 +204,7 @@ class FastPatternSampler(param.Parameterized):
        Defaults to Image.NEAREST.""")
 
        
-    def __init__(self, pattern=None, image=None, whole_pattern_output_fn=IdentityTF(), background_value_fn=None):
+    def __init__(self, pattern=None, image=None, whole_pattern_output_fns=None, background_value_fn=None):
         super(FastPatternSampler,self).__init__()
 
         if pattern and image:
@@ -250,7 +254,7 @@ class GenericImage(PatternGenerator):
 
     __abstract = True
     
-    output_fn = param.ClassSelector(TransferFn,default=IdentityTF())
+    output_fns = param.HookList(default=[])
     
     aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),
         softbounds=(0.0,2.0),precedence=0.31,doc="""
@@ -264,9 +268,9 @@ class GenericImage(PatternGenerator):
         precedence=0.95,doc="""
         How to scale the initial image size relative to the default area of 1.0.""")
 
-    whole_image_output_fn = param.ClassSelector(
-        TransferFn,default=DivisiveNormalizeLinf(),precedence=0.96,doc="""
-        Function applied to the whole, original image array (before any cropping).""")
+    whole_image_output_fns = param.HookList(
+        default=[DivisiveNormalizeLinf()],precedence=0.96,doc="""
+        Function(s) applied to the whole, original image array (before any cropping).""")
 
     # CB: I guess it's a type rather than an instance because of the
     # way PatternSampler is written (requiring values of many
@@ -290,13 +294,13 @@ class GenericImage(PatternGenerator):
         height = params['size']
         width = params['aspect_ratio']*height
 
-        whole_image_output_fn = params['whole_image_output_fn']
+        whole_image_output_fns = params['whole_image_output_fns']
 
-        if self._get_image(params) or whole_image_output_fn != self.last_wiof:
-            self.last_wiof = whole_image_output_fn
+        if self._get_image(params) or whole_image_output_fns != self.last_wiofs:
+            self.last_wiofs = whole_image_output_fns
 
             self.ps=self.pattern_sampler_type(image=self._image,
-                                              whole_pattern_output_fn=self.last_wiof,
+                                              whole_pattern_output_fns=whole_image_output_fns,
                                               background_value_fn=edge_average)
             
         result = self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
@@ -382,7 +386,7 @@ class FileImage(GenericImage):
         """
         super(FileImage,self).__init__(**params)
         self.last_filename = None
-        self.last_wiof = None
+        self.last_wiofs = None
 
 
     def _get_image(self,params):

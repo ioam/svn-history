@@ -68,7 +68,7 @@ topo_t000000.00_c10&gt;&gt;&gt; dir(topo.sim['V1'])
 ...
  'activity',
  'activity_len',
- 'apply_output_fn',
+ 'apply_output_fns',
  'bounds',
 ...]
 </pre>
@@ -126,7 +126,7 @@ class GeneratorSheet(topo.base.sheet.Sheet)
  |  ----------------------------------------------------------------------
  |  Data descriptors defined here:
  |  
- |  apply_output_fn
+ |  apply_output_fns
  |      Whether to apply the output_fn after computing an Activity matrix.
  |  
  |  input_generator

@@ -74,12 +74,12 @@ topo.sim['Retina'] = sheet.GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1'] = sheet.CFSheet(
     nominal_density = p.cortex_density,
     # Original CMVC simulation used an initial radius of 13.3/40.0 (~0.33)
-    output_fn = transferfn.KernelMax(density=p.cortex_density,
+    output_fns=[transferfn.KernelMax(density=p.cortex_density,
         kernel_radius=numbergen.BoundedNumber(
             bounds=(0.5/40,None),
             generator=numbergen.ExponentialDecay(
                 starting_value=p.radius_0,
-                time_constant=40000/5.0))))
+                time_constant=40000/5.0)))])
 
 topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,
     connection_type=projection.CFProjection,

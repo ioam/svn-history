@@ -152,7 +152,7 @@ class ConnectionField(param.Parameterized):
     # CEBALERT: do something for mask_template=None
     def __init__(self,input_sheet,template=BoundingBox(radius=0.1),
                  weights_generator=patterngenerator.Constant(),mask=None,
-                 output_fn=IdentityTF(),**params):
+                 output_fns=None,**params):
         """
         Create weights at the specified (x,y) location on the
         specified input_sheet.
@@ -180,6 +180,9 @@ class ConnectionField(param.Parameterized):
         over the edge of the input sheet then the weights will
         actually be half-moon (or similar) rather than circular.
         """
+        if output_fns is None:
+            output_fns = []
+            
         super(ConnectionField,self).__init__(**params)
         self.input_sheet = input_sheet
 
@@ -218,7 +221,8 @@ class ConnectionField(param.Parameterized):
         # apply the mask.  The same applies anywhere the mask is used,
         # including in learningfn/. We should investigate masked
         # arrays (from numpy).
-        output_fn(self.weights)        
+        for of in output_fns:
+            of(self.weights)        
 
 
     # CB: can this be renamed to something better?
@@ -262,7 +266,7 @@ class ConnectionField(param.Parameterized):
         return self.input_sheet_slice.submatrix(activity)
 
 
-    def change_bounds(self,template,mask,output_fn=IdentityTF()):
+    def change_bounds(self,template,mask,output_fns=None):
         """
         Change the bounding box for this ConnectionField.
 
@@ -275,6 +279,9 @@ class ConnectionField(param.Parameterized):
         Note that the supplied template will be modified, so if you're
         also using them elsewhere you should pass copies.
         """
+        if output_fns is None:
+            output_fns = []
+            
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.input_sheet_slice
 
@@ -295,7 +302,8 @@ class ConnectionField(param.Parameterized):
             self.mask = array(self.mask,copy=1) # CB: why's this necessary?
                                                 # (see ALERT in __init__)
             self.weights *= self.mask
-            output_fn(self.weights)
+            for of in output_fns:
+                of(self.weights)
             del self.norm_total
 
 
@@ -468,8 +476,8 @@ class CFProjection(Projection):
     A projection composed of ConnectionFields from a Sheet into a ProjectionSheet.
 
     CFProjection computes its activity using a response_fn of type
-    CFPResponseFn (typically a CF-aware version of mdot) and output_fn 
-    (which is typically IdentityTF).  The initial contents of the 
+    CFPResponseFn (typically a CF-aware version of mdot) and output_fns 
+    (typically none).  The initial contents of the 
     ConnectionFields mapping from the input Sheet into the target
     ProjectionSheet are controlled by the weights_generator, cf_shape,
     and weights_output_fn parameters, while the location of the
@@ -522,9 +530,8 @@ class CFProjection(Projection):
         Amount of learning at each step for this projection, specified
         in units that are independent of the density of each Sheet.""")
 
-    weights_output_fn = param.ClassSelector(CFPOutputFn,
-        default=CFPOF_Plugin(),
-        doc='Function applied to each CF after learning.')
+    weights_output_fns = param.HookList(default=[CFPOF_Plugin()],
+        doc='Functions applied to each CF after learning.')
 
     strength = param.Number(default=1.0,doc="""
         Global multiplicative scaling applied to the Activity of this Sheet.""")
@@ -542,8 +549,8 @@ class CFProjection(Projection):
         size, unless this parameter is False - in which case the user-specified size of
         the cf_shape is used. In normal usage of Topographica, this parameter should
         remain True.""")
-    
-    apply_output_fn_init=param.Boolean(default=True,doc="""
+
+    apply_output_fns_init=param.Boolean(default=True,doc="""
         Whether to apply the output function to connection fields (e.g. for 
         normalization) when the CFs are first created.""")
 
@@ -597,10 +604,10 @@ class CFProjection(Projection):
                     x_cf,y_cf = self.coord_mapper(x,y)
                     self.debug("Creating CF(%d,%d) from src (%.3f,%.3f) to  dest (%.3f,%.3f)"%(r,c,x_cf,y_cf,x,y))
                     try:
-                        if self.apply_output_fn_init:
-                            of = self.weights_output_fn.single_cf_fn
+                        if self.apply_output_fns_init:
+                            ofs = [wof.single_cf_fn for wof in self.weights_output_fns]
                         else:
-                            of = IdentityTF()
+                            ofs = []
                             
                         if not self.same_cf_shape_for_all_cfs:
                             mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
@@ -609,7 +616,7 @@ class CFProjection(Projection):
                                                 template=slice_template,
                                                 weights_generator=self.weights_generator,
                                                 mask=mask_template, 
-                                                output_fn=of))
+                                                output_fns=ofs))
                     except NullCFError:
                         if self.allow_null_cfs:
                             row.append(None)
@@ -705,7 +712,8 @@ class CFProjection(Projection):
         self.input_buffer = input_activity
         self.activity *=0.0
         self.response_fn(MaskedCFIter(self), input_activity, self.activity, self.strength)
-        self.output_fn(self.activity)
+        for of in self.output_fns:
+            of(self.activity)
 
     
     def learn(self):
@@ -718,8 +726,9 @@ class CFProjection(Projection):
             self.learning_fn(MaskedCFIter(self),self.input_buffer,self.dest.activity,self.learning_rate)
        
 
-    def apply_learn_output_fn(self,mask):
-        self.weights_output_fn(MaskedCFIter(self),mask)
+    def apply_learn_output_fns(self,mask):
+        for of in self.weights_output_fns:
+            of(MaskedCFIter(self),mask)
 
 
     ### This could be changed into a special __set__ method for
@@ -757,14 +766,14 @@ class CFProjection(Projection):
 
         cfs = self.cfs
         rows,cols = cfs.shape
-        output_fn = self.weights_output_fn.single_cf_fn
+        output_fns = [wof.single_cf_fn for wof in self.weights_output_fns]
 
         for r in xrange(rows):
             for c in xrange(cols):
                 # CB: listhack - loop is candidate for replacement by numpy fn
                 cfs[r,c].change_bounds(template=slice_template,
                                         mask=mask_template,
-                                        output_fn=output_fn)
+                                        output_fns=output_fns)
 
 
     def change_density(self, new_wt_density):

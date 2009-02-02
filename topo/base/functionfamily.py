@@ -36,11 +36,6 @@ class TransferFn(param.Parameterized):
     def __call__(self,x):
         raise NotImplementedError
 
-    def __add__(self,of):
-        assert isinstance(of,TransferFn), "TransferFns can only be added to other TransferFns"
-        return PipelineTF(output_fns=[self,of])
-
-
 
 
 # Trivial example of a TransferFn, provided for when a default
@@ -59,90 +54,6 @@ class IdentityTF(TransferFn):
     def __call__(self,x,sum=None):
         pass
 
-
-
-class PipelineTF(TransferFn):
-    """
-    Applies a list of other TransferFns in order, to combine their effects.
-    """
-    
-    output_fns = param.List(default=[],class_=TransferFn,doc="""
-        List of TransferFns to apply, in order.  The default is an empty list, 
-        which should be overridden for any useful work.""")
-
-    def __call__(self,x):
-        for of in self.output_fns:
-            of(x)
-
-    def __iadd__(self,of):
-        assert isinstance(of,TransferFn), "TransferFns can only be added to other TransferFns"
-        self.output_fns.append(of)
-
-    def __add__(self,of):
-        # Returns a single new Pipeline rather than a nested Pipeline
-        assert isinstance(of,TransferFn), "TransferFns can only be added to other TransferFns"
-        return PipelineTF(output_fns=self.output_fns+[of])
-
-    def override_plasticity_state(self, new_plasticity_state):
-        """
-        Calls override_plasticity_state on every output_fn
-        in the list that defines that method.
-        """
-        for of in self.output_fns:
-            if hasattr(of,"override_plasticity_state"):
-                of.override_plasticity_state(new_plasticity_state)
-
-    def restore_plasticity_state(self):
-        """
-        Calls restore_plasticity_state on every output_fn
-        in the list that defines that method.
-        """
-        for of in self.output_fns:
-            if hasattr(of,"restore_plasticity_state"):
-                of.restore_plasticity_state()
-
-    def state_push(self):
-        """
-        Calls state_push on every output_fn
-        in the list that defines that method.
-        """
-        for of in self.output_fns:
-            if hasattr(of,"state_push"):
-                of.state_push()
-        super(PipelineTF,self).state_push()
-
-    def state_pop(self):
-        """
-        Calls state_pop every output_fn
-        in the list that defines that method.
-        """
-        for of in self.output_fns:
-            if hasattr(of,"state_pop"):
-                of.state_pop()
-        super(PipelineTF,self).state_pop()
-
-
-
-    # We don't use norm_value ourselves, so if someone asks for it,
-    # return an underlying value from self.output_fns.  Only in the
-    # case where a single underlying TF defines norm_value is that
-    # meaningful to do, so we ensure that we only return something in
-    # that specific case.
-    def __get_norm_value(self):
-        found=False
-        for of in self.output_fns:
-            if of.norm_value is not None:
-                if found==True:
-                    raise ValueError("At most one TF in a PipelineTF may define norm_value")
-                val=of.norm_value
-                found=True
-        if found: return val
-        return None
-
-    def __set_norm_value(self,norm_value):
-        raise ValueError("Set the norm_value on one of the individual output_fns instead.")
-
-    norm_value = property(__get_norm_value,__set_norm_value)
 
 
 

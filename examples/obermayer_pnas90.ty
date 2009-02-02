@@ -113,7 +113,7 @@ KernelMax.kernel_radius=PiecewiseLinearDecay()
 
 topo.sim['V1'] = CFSheet(
     nominal_density = p.cortex_density,
-    output_fn = KernelMax(density=p.cortex_density))
+    output_fns = [KernelMax(density=p.cortex_density)])
 
 from topo.misc.numbergenerator import ExponentialDecay
 CFProjection.learning_rate=LinearDecay()

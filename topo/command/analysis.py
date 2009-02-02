@@ -326,8 +326,8 @@ class measure_rfs(SingleInputResponseCommand):
         static_params = dict([(s,p[s]) for s in p.static_parameters])
         if p.duration is not None:
             p.pattern_presenter.duration=p.duration
-        if p.apply_output_fn is not None:
-            p.pattern_presenter.apply_output_fn=p.apply_output_fn
+        if p.apply_output_fns is not None:
+            p.pattern_presenter.apply_output_fns=p.apply_output_fns
         x.collect_feature_responses(p.pattern_presenter,static_params,p.display,self._feature_list(p))
 
 
@@ -615,7 +615,7 @@ class measure_corner_or_pref(PositionMeasurementCommand):
 
     divisions=param.Integer(default=10)
 
-    pattern_presenter = param.Callable(PatternPresenter(gaussian_corner,apply_output_fn=False,duration=0.175))
+    pattern_presenter = param.Callable(PatternPresenter(gaussian_corner,apply_output_fns=False,duration=0.175))
 
     x_range=param.NumericTuple((-1.2,1.2))
 

@@ -59,13 +59,13 @@ class LISSOM(JointNormalizingCFSheet):
         Whether to modify the weights after every settling step.
         If false, waits until settling is completed before doing learning.""")
 
-    output_fn = param.ClassSelector(TransferFn,default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+    output_fns = param.HookList(default=[PiecewiseLinear(lower_bound=0.1,upper_bound=0.65)])
     
     precedence = param.Number(0.6)
-    
-    post_initialization_weights_output_fn = param.ClassSelector(
-        CFPOutputFn,default=None,doc="""
-        Weights output_fn that can be set after an initial normalization step.""")
+
+    post_initialization_weights_output_fns = param.HookList([],doc="""
+        If not empty, weights output_fns that will replace the
+        existing ones after an initial normalization step.""")
 
     beginning_of_iteration = param.HookList(default=[],instantiate=False,doc="""
         List of callables to be executed at the beginning of each iteration.""")
@@ -83,12 +83,12 @@ class LISSOM(JointNormalizingCFSheet):
 
     def start(self):
         self._normalize_weights()
-        if self.post_initialization_weights_output_fn is not None:
+        if len(self.post_initialization_weights_output_fns)>0:
             for proj in self.in_connections:
                 if not isinstance(proj,Projection):
                     self.debug("Skipping non-Projection ")
                 else:
-                    proj.weights_output_fn=self.post_initialization_weights_output_fn 
+                    proj.weights_output_fns=self.post_initialization_weights_output_fns
 
 
     def input_event(self,conn,data):
@@ -111,7 +111,7 @@ class LISSOM(JointNormalizingCFSheet):
     ### flagged).
     def process_current_time(self):
         """
-        Pass the accumulated stimulation through self.output_fn and
+        Pass the accumulated stimulation through self.output_fns and
         send it out on the default output port.
         """
         if self.new_input:
@@ -298,8 +298,9 @@ class JointScaling(LISSOM):
         for proj in self.in_connections:
             self.activity += proj.activity
         
-        if self.apply_output_fn:
-            self.output_fn(self.activity)
+        if self.apply_output_fns:
+            for of in self.output_fns:
+                of(self.activity)
           
         self.send_output(src_port='Activity',data=self.activity)
 
@@ -322,7 +323,12 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",
     Convenience function for scheduling a default set of events
     typically used with a LISSOM sheet.  The parameters used
     are the defaults from Miikkulainen, Bednar, Choe, and Sirosh
-    (2005), Computational Maps in the Visual Cortex, Springer.     
+    (2005), Computational Maps in the Visual Cortex, Springer.
+
+    Note that Miikulainen 2005 specifies only one output_fn for the
+    LISSOM sheet; where these scheduled actions operate on an
+    output_fn, they do so only on the first output_fn in the sheet's
+    list of output_fns.
 
     Installs afferent learning rate changes for any projection whose
     name contains the keyword specified by aff_name (typically
@@ -339,7 +345,7 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",
 
     If increase_inhibition is true, gradually increases the strength
     of the inhibitory connection, typically used for natural image
-    simulations.    
+    simulations.
     """
 
     # Allow sheet.BoundingBox calls (below) after reloading a snapshot
@@ -402,10 +408,10 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",
         topo.sim.schedule_command(20000*st,ps%('0.2055'))
     
     # Activation function threshold changes
-    bstr = sheet_str+'.output_fn.lower_bound=%5.3f;'+\
-           sheet_str+'.output_fn.upper_bound=%5.3f'
-    lbi=sheet_.output_fn.lower_bound
-    ubi=sheet_.output_fn.upper_bound
+    bstr = sheet_str+'.output_fns[0].lower_bound=%5.3f;'+\
+           sheet_str+'.output_fns[0].upper_bound=%5.3f'
+    lbi=sheet_.output_fns[0].lower_bound
+    ubi=sheet_.output_fns[0].upper_bound
     
     topo.sim.schedule_command(  200*st,bstr%(lbi+0.01,ubi+0.01))
     topo.sim.schedule_command(  500*st,bstr%(lbi+0.02,ubi+0.02))

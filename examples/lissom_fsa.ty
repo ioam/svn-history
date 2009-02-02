@@ -48,7 +48,7 @@ projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
 projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
-projection.CFProjection.weights_output_fn=transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
+projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()]
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 
 
@@ -81,25 +81,27 @@ topo.sim['Retina']=sheet.GeneratorSheet(
 topo.sim['LGNOn']=sheet.CFSheet(
     nominal_density=p.lgn_density,    
     nominal_bounds=sheet.BoundingBox(radius=1.542),
-    output_fn=transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+    output_fns=[transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)])
 
 topo.sim['LGNOff']=sheet.CFSheet(
     nominal_density=p.lgn_density,    
     nominal_bounds=sheet.BoundingBox(radius=1.542),
-    output_fn=transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+    output_fns=[transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)])
 
 topo.sim['FSA'] = sheet.lissom.LISSOM(
     nominal_density=p.cortex_density,tsettle=9,
     nominal_bounds=sheet.BoundingBox(radius=0.5),
-    output_fn=transferfn.PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+    output_fns=[transferfn.PiecewiseLinear(lower_bound=0.1,upper_bound=0.65)])
 
 
 
 ### Connections
 
 # DoG weights for the LGN
-centerg   = pattern.Gaussian(size=0.11079,aspect_ratio=1.0,output_fn=transferfn.DivisiveNormalizeL1(norm_value=2.33))
-surroundg = pattern.Gaussian(size=0.17725,aspect_ratio=1.0,output_fn=transferfn.DivisiveNormalizeL1(norm_value=2.33))
+centerg   = pattern.Gaussian(size=0.11079,aspect_ratio=1.0,
+                             output_fns=[transferfn.DivisiveNormalizeL1(norm_value=2.33)])
+surroundg = pattern.Gaussian(size=0.17725,aspect_ratio=1.0,
+                             output_fns=[transferfn.DivisiveNormalizeL1(norm_value=2.33)])
 
 on_weights = pattern.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
@@ -155,4 +157,4 @@ topo.sim['Retina'].layout_location=(279,500)
 # speed and reliability
 from topo.analysis.featureresponses import MeasureResponseCommand
 MeasureResponseCommand.duration=0.175
-MeasureResponseCommand.apply_output_fn=False
+MeasureResponseCommand.apply_output_fns=False

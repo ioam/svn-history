@@ -72,7 +72,6 @@ class RandomDotStereogram(PatternGenerator):
         ydensity    = params['ydensity']
         scale       = params['scale']
         offset      = params['offset']
-        output_fn   = params['output_fn']
         dotdensity  = params['dotdensity']
         random_seed = params['random_seed']
 
@@ -114,7 +113,7 @@ class RandomDotStereogram(PatternGenerator):
         result = offset + scale*bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity ,
                                           (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
 
-        if output_fn is not IdentityTF:
-            output_fn(result)
+        for of in params['output_fns']:
+            of(result)
 
         return result

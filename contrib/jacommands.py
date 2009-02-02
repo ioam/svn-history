@@ -293,7 +293,7 @@ def AddGC():
     from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
     from topo.projection.basic import CFProjection, SharedWeightCFProjection
     from topo.base.boundingregion import BoundingBox
-    lgn_surroundg = Gaussian(size=__main__.__dict__.get('LGNLatSurroundSize',0.5),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+    lgn_surroundg = Gaussian(size=__main__.__dict__.get('LGNLatSurroundSize',0.5),aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
 
 
     topo.sim.connect('LGNOn','LGNOn',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),

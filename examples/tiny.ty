@@ -83,7 +83,7 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
 
 topo.sim['V1'] = CFSheet(nominal_density=p.cortex_density,
                          nominal_bounds=BoundingBox(radius=0.5),
-                         output_fn=PiecewiseLinear(lower_bound=0,upper_bound=1.0))
+                         output_fns=[PiecewiseLinear(lower_bound=0,upper_bound=1.0)])
 
 topo.sim.connect(
     'Retina','V1',name='Afferent',delay=0.05,
@@ -92,5 +92,5 @@ topo.sim.connect(
     nominal_bounds_template=BoundingBox(radius=0.2),
     response_fn=CFPRF_DotProduct_opt(),
     learning_fn=CFPLF_Plugin(single_cf_fn=SampleHebbian(sample_param=0.5)),
-    weights_output_fn=CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1()),
+    weights_output_fns=[CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1())],
     learning_rate=200.0)

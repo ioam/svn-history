@@ -544,7 +544,7 @@ class PatternPresenter(param.Parameterized):
     # JABALERT: Needs documenting; apparently only for retinotopy?
     divisions = param.Parameter()
 
-    apply_output_fn = param.Boolean(default=True, doc="""
+    apply_output_fns = param.Boolean(default=True, doc="""
         When presenting a pattern, whether to apply each sheet's
         output function.  If False, for many networks the response
         will be linear, which requires fewer test patterns to measure
@@ -797,7 +797,7 @@ class PatternPresenter(param.Parameterized):
                     g.scale=g.contrast
             
         pattern_present(inputs, self.duration, plastic=False,
-                     apply_output_fn=self.apply_output_fn)
+                     apply_output_fns=self.apply_output_fns)
 
 
 
@@ -984,7 +984,7 @@ class MeasureResponseCommand(ParameterizedFunction):
     pattern_presenter = param.Callable(default=None,doc="""
         Callable object that will present a parameter-controlled pattern to a
         set of Sheets.  Needs to be supplied by a subclass or in the call.
-        The attributes duration and apply_output_fn (if non-None) will
+        The attributes duration and apply_output_fns (if non-None) will
         be set on this object, and it should respect those if possible.""")
     
     static_parameters = param.List(class_=str,default=["scale","offset"],doc="""
@@ -994,8 +994,8 @@ class MeasureResponseCommand(ParameterizedFunction):
 
     subplot = param.String("",doc="""Name of map to register as a subplot, if any.""")
 
-    apply_output_fn = param.Boolean(default=None, doc="""
-        If non-None, pattern_presenter.apply_output_fn will be
+    apply_output_fns = param.Boolean(default=None, doc="""
+        If non-None, pattern_presenter.apply_output_fns will be
         set to this value.  Provides a simple way to set
         this commonly changed option of PatternPresenter.""")
 
@@ -1015,8 +1015,8 @@ class MeasureResponseCommand(ParameterizedFunction):
         static_params = dict([(s,p[s]) for s in p.static_parameters])
         if p.duration is not None:
             p.pattern_presenter.duration=p.duration
-        if p.apply_output_fn is not None:
-            p.pattern_presenter.apply_output_fn=p.apply_output_fn
+        if p.apply_output_fns is not None:
+            p.pattern_presenter.apply_output_fns=p.apply_output_fns
         x.collect_feature_responses(p.pattern_presenter,static_params,
                                     p.display,p.weighted_average)
 

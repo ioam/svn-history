@@ -237,7 +237,7 @@ function by default:
   plotgroups["Orientation Preference"].command=
       "measure_or_pref(scale=0.75,offset=0.5,display=False,
        pattern_presenter=PatternPresenter(
-           pattern_generator=SineGrating(),apply_output_fn=True,
+           pattern_generator=SineGrating(),apply_output_fns=True,
            duration=1.0))"
 </pre>
 
@@ -285,7 +285,7 @@ Preference plots:
 7. def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                        scale=0.3,offset=0.0,display=False,weighted_average=True,
 8.                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                           apply_output_fn=False,duration=0.175)):
+                           apply_output_fns=False,duration=0.175)):
        step_phase=2*pi/num_phase
        step_orientation=pi/num_orientation
    

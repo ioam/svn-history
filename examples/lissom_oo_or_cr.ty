@@ -54,7 +54,7 @@ projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
 projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
-projection.CFProjection.weights_output_fn=transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
+projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()]
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 
 ### Default for tutorial
@@ -106,18 +106,18 @@ for e in eyes:
                 topo.sim[e+opponent+' LGN'+l+n]=sheet.CFSheet(
                     nominal_density=24.0,
                     nominal_bounds=sheet.BoundingBox(radius=0.5+0.27083),
-                    output_fn=transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                    output_fns=[transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)],
                     measure_maps=False)
 
 
 topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,nominal_bounds=sheet.BoundingBox(radius=0.5))
 
-topo.sim['V1'].output_fn.lower_bound=0.076
-topo.sim['V1'].output_fn.upper_bound=0.626
+topo.sim['V1'].output_fns[0].lower_bound=0.076
+topo.sim['V1'].output_fns[0].upper_bound=0.626
 
 # DoG weights for the LGN
-centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=transferfn.DivisiveNormalizeL1())
-surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=transferfn.DivisiveNormalizeL1())
+centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,output_fns=[transferfn.DivisiveNormalizeL1()])
+surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,output_fns=[transferfn.DivisiveNormalizeL1()])
 
 for e in eyes:
     for n in lags:
@@ -213,4 +213,4 @@ topo.sim.grid_layout([vs,ls,es], xstep=70/len(eyes), ystep=200, item_scale=0.75/
 # speed and reliability
 from topo.analysis.featureresponses import MeasureResponseCommand
 MeasureResponseCommand.duration=0.175
-MeasureResponseCommand.apply_output_fn=False
+MeasureResponseCommand.apply_output_fns=False

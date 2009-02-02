@@ -59,8 +59,8 @@ class TestImage(unittest.TestCase):
                       xdensity=8,
                       ydensity=8,
                       bounds=BoundingBox(radius=0.5),
-                      output_fn=IdentityTF(),
-                      whole_image_output_fn=IdentityTF(),
+                      output_fns=[],
+                      whole_image_output_fns=[],
                       size_normalization='original')
 
         assert_array_almost_equal(image_array,image())
@@ -187,8 +187,8 @@ class TestImage(unittest.TestCase):
                       xdensity=8,
                       ydensity=8,
                       size=2.0,
-                      output_fn=IdentityTF(),
-                      whole_image_output_fn=IdentityTF(),
+                      output_fns=[],
+                      whole_image_output_fns=[],
                       size_normalization='fit_longest',
                       bounds=BoundingBox(radius=1.0))
 
@@ -272,8 +272,8 @@ class TestImage(unittest.TestCase):
         image = FileImage(filename = 'topo/tests/testimage.pgm',
                       xdensity=8,
                       ydensity=8,
-                      output_fn=IdentityTF(),
-                      whole_image_output_fn=IdentityTF(),
+                      output_fns=[],
+                      whole_image_output_fns=[],
                       size_normalization='stretch_to_fit',
                       bounds=BoundingBox(radius=1.0))
 
@@ -323,8 +323,8 @@ class TestImage(unittest.TestCase):
         image = FileImage(filename = 'topo/tests/testimage.pgm',
                       xdensity=15,
                       ydensity=15,
-                      output_fn=IdentityTF(),
-                      whole_image_output_fn=IdentityTF(),
+                      output_fns=[],
+                      whole_image_output_fns=[],
                       size_normalization='fit_shortest',
                       bounds=BoundingBox(radius=0.5))
 
