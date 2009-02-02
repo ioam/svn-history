@@ -15,6 +15,7 @@ from ..param.parameterized import ParamOverrides
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 from sheetcoords import SheetCoordinateSystem
+from functionfamily import TransferFn
 
 
 # CEBALERT: PatternGenerator has become a bit of a monster abstract
@@ -108,7 +109,7 @@ class PatternGenerator(param.Parameterized):
         Optional PatternGenerator used to construct a mask to be applied to
         the pattern.""")
     
-    output_fns = param.HookList(default=[],precedence=0.08,doc="""
+    output_fns = param.HookList(default=[],class_=TransferFn,precedence=0.08,doc="""
         Optional function(s) to apply to the pattern array after it has been created.
         Can be used for normalization, thresholding, etc.""")
 

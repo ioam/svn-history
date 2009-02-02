@@ -18,7 +18,7 @@ import topo
 from topo import param
 
 from topo.base.cf import CFSheet, CFPOutputFn
-from topo.base.functionfamily import TransferFn,IdentityTF
+from topo.base.functionfamily import TransferFn
 from topo.base.patterngenerator import PatternGenerator, Constant
 from topo.base.projection import Projection
 from topo.base.sheet import activity_type, BoundingBox
@@ -83,7 +83,7 @@ class GeneratorSheet(Sheet):
     input_generator = param.ClassSelector(PatternGenerator,default=Constant(),
         doc="""Specifies a particular PatternGenerator type to use when creating patterns.""")
 
-    output_fns = param.HookList(default=[],doc="""
+    output_fns = param.HookList(default=[],class_=TransferFn,doc="""
         Output function to apply (if apply_output_fns is true) to this Sheet's activity.""")
     
     apply_output_fns=param.Boolean(default=True,doc="""

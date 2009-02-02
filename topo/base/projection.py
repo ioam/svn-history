@@ -14,7 +14,7 @@ from topo.misc.keyedlist import KeyedList # CEBALERT: not in base
 
 from sheet import Sheet
 from simulation import EPConnection
-from functionfamily import TransferFn,IdentityTF
+from functionfamily import TransferFn
 from sheetview import ProjectionView
 
 class SheetMask(param.Parameterized):
@@ -186,7 +186,7 @@ class Projection(EPConnection):
     
     dest_port = param.Parameter(default='Activity')
 
-    output_fns = param.HookList(default=[],doc="""
+    output_fns = param.HookList(default=[],class_=TransferFn,doc="""
     Function(s) applied to the Projection activity after it is computed.""")
 
     plastic = param.Boolean(default=True, doc="""
@@ -341,7 +341,7 @@ class ProjectionSheet(Sheet):
     
     src_ports=['Activity']
     
-    output_fns = param.HookList(default=[],
+    output_fns = param.HookList(default=[],class_=TransferFn,
         doc="Output function(s) to apply (if apply_output_fns is true) to this Sheet's activity.")
     
     multiplicative_constant = param.Number(default = 0.0,doc="""

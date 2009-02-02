@@ -531,6 +531,7 @@ class CFProjection(Projection):
         in units that are independent of the density of each Sheet.""")
 
     weights_output_fns = param.HookList(default=[CFPOF_Plugin()],
+        class_=CFPOutputFn,
         doc='Functions applied to each CF after learning.')
 
     strength = param.Number(default=1.0,doc="""

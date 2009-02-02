@@ -15,7 +15,7 @@ from .. import param
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.transferfn.basic import DivisiveNormalizeLinf,IdentityTF,TransferFn
+from topo.transferfn.basic import DivisiveNormalizeLinf,TransferFn
 from topo.misc.filepath import Filename
 
 
@@ -254,8 +254,6 @@ class GenericImage(PatternGenerator):
 
     __abstract = True
     
-    output_fns = param.HookList(default=[])
-    
     aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),
         softbounds=(0.0,2.0),precedence=0.31,doc="""
         Ratio of width to height; size*aspect_ratio gives the width.""")
@@ -268,8 +266,8 @@ class GenericImage(PatternGenerator):
         precedence=0.95,doc="""
         How to scale the initial image size relative to the default area of 1.0.""")
 
-    whole_image_output_fns = param.HookList(
-        default=[DivisiveNormalizeLinf()],precedence=0.96,doc="""
+    whole_image_output_fns = param.HookList(default=[DivisiveNormalizeLinf()],
+        class_=TransferFn,precedence=0.96,doc="""
         Function(s) applied to the whole, original image array (before any cropping).""")
 
     # CB: I guess it's a type rather than an instance because of the

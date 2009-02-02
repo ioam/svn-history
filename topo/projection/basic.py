@@ -99,7 +99,6 @@ class SharedWeightCFProjection(CFProjection):
     ### actually work yet, but we could certainly extend it to support
     ### learning if desired, e.g. to learn position-independent responses.
     learning_fn = param.ClassSelector(CFPLearningFn,CFPLF_Identity(),constant=True)
-    output_fns  = param.HookList(default=[])
     weights_output_fns = param.HookList(default=[CFPOF_SharedWeight()])
     precedence = param.Number(default=0.5)
 
@@ -310,9 +309,6 @@ class OneToOneProjection(Projection):
     weights_generator = param.ClassSelector(PatternGenerator,
         default=Constant(),constant=True,
         doc="""Generate initial weight values for each unit of the destination sheet.""")
-
-    output_fns  = param.HookList(default=[],
-        doc='Function applied to the Projection activity after it is computed.')
 
     learning_fn = param.ClassSelector(LearningFn,default=IdentityLF(),
         doc="""Learning function applied to weights.""")
