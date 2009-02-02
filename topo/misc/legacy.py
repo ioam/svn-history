@@ -206,6 +206,29 @@ def install_legacy_support():
 
 
 S=supporters=DuplicateCheckingList()
+# in general, newest changes should go at the start of the list.
+
+def removed_pipeline():
+    import topo.transferfn.basic,topo.base.functionfamily
+    class PipelineTF(topo.base.functionfamily.TransferFn):
+        def __new__(self,*args,**kw):
+            param.Parameterized().warning("PipelineTF is deprecated; returning output_fns list.")
+            
+            if 'output_fns' in kw:
+                return kw['output_fns']
+            else:
+                return []
+
+    topo.base.functionfamily.PipelineOF = PipelineTF
+    topo.base.functionfamily.PipelineTF = PipelineTF
+    
+    topo.transferfn.basic.PipelineTF = PipelineTF
+    topo.transferfn.basic.Pipeline = PipelineTF
+    topo.transferfn.basic.PipelineOF = PipelineTF
+
+S.append(removed_pipeline)
+
+
 
 def rename_output_fn_to_transfer_fn():
     ### rXXXX moved topo.outputfn to topo.transferfn
@@ -788,16 +811,3 @@ def onedpowerspectrum_was_in_basic():
 S.append(onedpowerspectrum_was_in_basic)
 
 
-## # Legacy support
-## class PipelineTF(TransferFn):
-
-##     def __new__(self,*args,**kw):
-##         param.Parameterized().warning("PipelineTF is deprecated; returning output_fns list.")
-
-##         if 'output_fns' in kw:
-##             return kw['output_fns']
-##         else:
-##             return []
-
-#topo.transferfn.basic had
-#Pipeline = PipelineTF
