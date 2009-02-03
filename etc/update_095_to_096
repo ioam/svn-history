@@ -52,9 +52,29 @@ print info
 # should be ordered most to least specific
 replacements = [
     ('topo.outputfn'                 , 'topo.transferfn'),
-    ('OutputFn'                      , 'TransferFn')
+    ('OutputFn'                      , 'TransferFn'),
+    ('update_command'                , 'pre_plot_hooks'),
+    ('plot_command'                  , 'plot_hooks'),
+    ('before_pattern_presentation'   , 'pre_presentation_hooks'),
+    ('after_pattern_presentation'    , 'post_presentation_hooks'),
+    ('before_analysis_session'       , 'pre_analysis_session_hooks'),
+    ('after_analysis_session'        , 'post_analysis_session_hooks')
     ]
-     
+
+
+
+# TO DO:
+#
+# Removal of Pipeline/PipelineOF/PipelineTF (replace with list)
+# e.g. output_fn=PipelineTF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Simple_OF])
+# should become just output_fn=[ActivityHysteresis(...),V1Simple_OF]
+#
+# MeasureResponseCommand, etc?
+#
+# *OF -> *TF
+#
+# output_fn=X -> output_fns=[X]
+
 
 filename = sys.argv[1] 
 
