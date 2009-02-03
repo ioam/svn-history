@@ -1752,30 +1752,23 @@ class TkParameterized(TkParameterizedBase):
         parameter_window = AppWindow(self)
         #parameter_window.title(PO_to_edit.name+' parameters')
 
-        parameter_frame = ParametersFrameWithApply(parameter_window,parameterized_object=parameterized_instance,show_labels=False)
-        #msg_handler=self.msg_handler,on_set=self.on_set,on_modify=self.on_modify)
+        parameter_frame = EditingParametersFrameWithApply(parameter_window,parameterized_object=parameterized_instance,show_labels=False,on_close=lambda:self._handle_gui_set(param_name))
 
         # CEBALERT: more dynamic class changes to make it impossible
         # to follow what is happening...ParametersFrame needs some
         # reorganization...
         def _forgotten_why(itself):
-            parameterized_instance.update()#_original(parameterized_instance)
-            
             ### refresh()
             po_val = self.get_parameter_value(param_name)
             po_stringrep = self._object2string(param_name,po_val)
             self._tkvars[param_name]._original_set(po_stringrep)
             ###
-#            self._refresh_value(param_name)#handle_gui_set(param_name,force=True)
 
-        parameter_frame._hack_hook = _forgotten_why#parameterized_instance._update_original
+        if _forgotten_why not in parameter_frame._apply_hooks:
+            parameter_frame._apply_hooks.append(_forgotten_why)
+
 
         parameter_frame.pack()
-
-                                                   
-
-
-        
 
 
     def _create_list_widget(self,frame,name,widget_options):
@@ -2128,6 +2121,9 @@ class ParametersFrame(TkParameterized,T.Frame):
         """
         T.Frame.__init__(self,master,borderwidth=1,relief='raised')
 
+        self.on_set = on_set
+        self.on_modify = on_modify
+
         TkParameterized.__init__(self,master,
                                  extraPO=parameterized_object,
                                  self_first=False,
@@ -2202,6 +2198,7 @@ class ParametersFrame(TkParameterized,T.Frame):
             pass
 
         buttons_frame = T.Frame(self,borderwidth=1,relief='sunken')
+        self.buttons_frame = buttons_frame
         buttons_frame.pack(side="bottom",expand="no")
         
         self._buttons_frame_left = T.Frame(buttons_frame)
@@ -2282,16 +2279,15 @@ class ParametersFrame(TkParameterized,T.Frame):
             self.unhide_param('Defaults')    
 
 
-    def _wipe_currently_displayed_params(self):
-        """Wipe old labels and widgets from screen."""
-        for rep in self.currently_displayed_params.values():
-            try:
-                rep['label'].destroy()
-            except AttributeError:
-                # e.g. buttons have None for label ('notNonelabel')
-                pass
-            rep['widget'].destroy()
-        
+##     def _wipe_currently_displayed_params(self):
+##         """Wipe old labels and widgets from screen."""
+##         for rep in self.currently_displayed_params.values():
+##             for w in rep:
+##                 try:
+##                     rep[w].destroy()
+##                 except: # e.g. buttons have None for label ('notNonelabel')
+##                     pass
+                
 
     def _grid_param(self,parameter_name,row):
         widget = self.representations[parameter_name]['widget']
@@ -2333,6 +2329,13 @@ class ParametersFrame(TkParameterized,T.Frame):
 
 
     def _make_representation(self,name):
+        if name in self.representations:
+            for w in self.representations[name].values():
+                try:
+                    w.destroy()
+                except: #e.g. buttons have None for label ('notNonelabel')
+                    pass
+        
         widget,label = self._create_widget(name,self._params_frame,
                                            on_set=self.on_set,
                                            on_modify=self.on_modify)
@@ -2344,8 +2347,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         
 
     def pack_params_to_display(self):
-
-        self._wipe_currently_displayed_params()
+#        self._wipe_currently_displayed_params()
 
         ### sort Parameters by reverse precedence
         parameter_precedences = {}
@@ -2392,8 +2394,17 @@ class ParametersFrame(TkParameterized,T.Frame):
         self.balloon.bind(title,getdoc(self.get_parameter_object(param_name,self._extraPO)))
         ############################
 
-        parameter_frame = type(self)(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler,on_set=self.on_set,on_modify=self.on_modify)
+        # CEBALERT: don't want EditingParametersFrameWithApply
+        t = type(self)
+        if t.__name__=='EditingParametersFrameWithApply':
+            t = ParametersFrameWithApply
+            
+        parameter_frame = t(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler,on_set=self.on_set,on_modify=self.on_modify)
         parameter_frame.pack()
+
+        # CEBALERT: need to get the list item to update in parent if editing via a right click
+        # properties frame. need to get a new representation into translator.
+        #parameter_frame._apply_hooks.append(lambda *args:self._refresh_value(param_name))
 
 
         # CEBALERT: need to sort out all this stuff in the tkpo/pf
@@ -2409,7 +2420,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         
         r = self.representations[param_name]
         widget,label = r['widget'],r['label']
-        row = widget.grid_info()['row']
+        row = int(widget.grid_info()['row'])
 
         widget.destroy()
         label.destroy()
@@ -2441,7 +2452,8 @@ class ParametersFrameWithApply(ParametersFrame):
                           (i.e. acts on the class object).""")
     
     def __init__(self,master,parameterized_object=None,
-                 on_set=None,on_modify=None,**params):        
+                 on_set=None,on_modify=None,**params):
+        self._apply_hooks=[]
         super(ParametersFrameWithApply,self).__init__(master,
                                                       parameterized_object,
                                                       on_set,on_modify,
@@ -2512,7 +2524,7 @@ class ParametersFrameWithApply(ParametersFrame):
         # error.
         if self.has_unapplied_change() \
                and askyesno("Close","Apply changes before closing?"):
-            self.update_parameters()
+            self._apply_button()
         super(ParametersFrameWithApply,self)._close_button()
 
 
@@ -2530,8 +2542,13 @@ class ParametersFrameWithApply(ParametersFrame):
     def _apply_button(self):
         self.update_parameters()
         self._refresh_button(overwrite_error=False)
-        if hasattr(self,'_hack_hook'):
-            self._hack_hook(self)
+        # CEBALERT: because overriding a method that\s already been
+        # installed as a callback does nothing
+        for h in self._apply_hooks:
+            h(self)
+
+        # CEBALERT: how does apply button's status change now? Doesn't
+        # work properly for list editing; stays grey until clicked twice.
 
     def _refresh_value(self,param_name):
         po_val = self.get_parameter_value(param_name)
@@ -3182,8 +3199,6 @@ class ListWidget(T.Frame):
         self.menu.tk_popup(event.x_root, event.y_root)
 
 
-        
-
 import new
 import odict
 
@@ -3207,7 +3222,7 @@ def list_to_parameterized(list_):
     new_class = new.classobj('List',(ListRepresenter,),parameter_objs)
     #new_class.params('name').hidden=True
     
-    inst = new_class(dict(parameter_values))
+    inst = new_class(parameter_values)
     inst.list_ = list_ # that's a hack; need to get classes right
     return inst
 
@@ -3224,10 +3239,9 @@ def standard_parameterized_params():
 class Representer(Parameterized):
 
     name = Parameter(precedence=-1) # CEBALERT
-    # represented is a mapping
     
     def __init__(self,represented):
-        ## CEBALERT: if we come to represent dicts in the GUI,
+        ## CEBALERT: when we come to represent dicts in the GUI,
         ## will have to deal with name clashes (e.g. for name parameter)
         for name in standard_parameterized_params():
             assert name not in represented
@@ -3235,9 +3249,9 @@ class Representer(Parameterized):
         self.represented = represented
         super(Representer,self).__init__(**represented)
         self.initialized=False # allow all modifications
-        
 
-    def update(self):
+
+    def my_params(self):
         param_names = self.params().keys()
 
         # remove any of the standard params (e.g. name) that haven't
@@ -3245,21 +3259,42 @@ class Representer(Parameterized):
         for name in standard_parameterized_params():
             if name not in self.represented:
                 param_names.pop(param_names.index(name))
-                
-        for name in param_names:
+
+        return param_names
+        
+
+    def update(self):
+        for name in self.my_params():
             self.represented[name]=getattr(self,name)
 
+    def add(self,name):
+        p = Parameter(default=None)
+        self._add_parameter(name,p)
+        self.represented[name]=p.default
+        return name
+        
+    def remove(self,name):
+        # CB: don't move any of this method up to parameterized
+        # without considering the consequences!
 
-
+        del self.represented[name]
+        
+        cls=type(self)
+        delattr(cls,name)
+        try:
+            delattr(cls,'_%s__params'%cls.__name__) 
+        except AttributeError:
+            pass
+        
 
 class ListRepresenter(Representer):
-
 
     def update(self):
         super(ListRepresenter,self).update()
 
         ## grow or shrink original list if necessary
         l = len(self.list_)-len(self.represented)
+
         if l>0:
             for i in range(l):
                 self.list_.pop()
@@ -3267,8 +3302,304 @@ class ListRepresenter(Representer):
             for i in range(-l):
                 self.list_.append(None)
 
+        if len(self.represented)==0:
+            self.list_[:]=[]
+            return
+
         for val,i in zip(self.represented.values(),range(len(self.list_))):
             self.list_[i]=val
 
+    def add(self,name=None):
+        try:
+            longest = max([len(n) for n in self.my_params()])
+        except ValueError:
+            longest = 0
         
+        if name is None:
+            name = 'a'*(longest+1)
+            #name = 'a'*(len(self.my_params())+1)
+        assert name not in self.my_params()
+        return super(ListRepresenter,self).add(name)
+
+
+# Problems:
+# * + button gets hidden as more rows added (unless window made
+#   bigger)
+#
+# * window doesn't open at right width to display contents
+#   list item contents
+#
+# * I suspect there's a bug where you can get to a situation in
+#   which editing one box will result in changes to another,
+#   thanks to the ridiculously and unnecessarily complex code
+#   for tracking items. But I can't currently demonstrate such a
+#   a bug...
+class EditingParametersFrameWithApply(ParametersFrameWithApply):
+
+    def __init__(self,master,parameterized_object=None,
+                 on_set=None,on_modify=None,**params):
+        super(EditingParametersFrameWithApply,self).__init__(
+            master,parameterized_object,on_set,on_modify,**params)
+        import __main__;__main__.__dict__['x']=self
+
+        self.hide_param('Defaults')
+
+        ## hack to find last row
+        last_row = -1
+        for n,d in self.currently_displayed_params.items():
+            row = int(d['widget'].grid_info()['row'])
+            last_row=max(row,last_row)
+
+        ad=T.Button(self,text="+",command=self._add_param)
+        ad.pack(side='right')
+
+        ### CB: should use button parameter and pack_param
+        self._hack=[]
+        image=ImageTk.PhotoImage(ImageOps.fit(
+            Image.open(resolve_path('topo/tkgui/icons/edit_add.png')),(20,20)))
+        ad['image']=image
+        self._hack.append(image)
+        ###
+
+        self._apply_hooks.append(lambda *args: self.xupdate())
+        self._apply_hooks.append(lambda *args: self._update_apply_status())
+
+
+# CEBALERT: name this, and there's duplication with represented etc.
+    def xupdate(self):
+        cls = type(self._extraPO)
+        
+        old = {}
+        for name in self.params_to_display:
+            old[name]=(self._tkvars[name],
+                       self.representations[name],
+                       self.params_to_display[name],
+                       self.currently_displayed_params[name],
+                       self._extraPO.params(name))
+
+        new_pos = {} 
+        for name in self.params_to_display.keys():
+            new_pos[int(self.representations[name]['widget'].grid_info()['row'])]=name
+
+        self._extraPO.represented = odict.OrderedDict()
+        
+        for name,pos in zip(sorted(self.params_to_display),range(len(self.params_to_display))):
+            self._tkvars[name]=old[new_pos[pos]][0]
+
+            # getting ridiculous. make sure old widgets are wiped from
+            # the earth. who knows how many other times I should have
+            # been doing this in the gui?
+            for w in self.representations[name].values():
+                try:
+                    w.grid_remove()
+                    w.destroy()
+                except:
+                    pass
+                    
+            self.representations[name]=old[new_pos[pos]][1]
+            self.params_to_display[name]=old[new_pos[pos]][2]
+            self.currently_displayed_params[name]=old[new_pos[pos]][3]
+            type.__setattr__(cls,name,old[new_pos[pos]][4])
+
+            # (see alert at start of method)
+            self._extraPO.represented[name]=getattr(self._extraPO,name)
+
+        ## delete cached params()
+        try:
+            delattr(cls,'_%s__params'%cls.__name__) 
+        except AttributeError:
+            pass
+
+        self._extraPO.update()
+        self.set_PO(self._extraPO) # HACK! At least extract relevant parts
+        
+
+    def _grid_param(self,parameter_name,row):
+        super(EditingParametersFrameWithApply,self)._grid_param(
+            parameter_name,row)
+        lc = self.representations[parameter_name]['list_ctrl']
+        lc.grid(column=3,row=row)
+
+
+    def _make_representation(self,name):
+        super(EditingParametersFrameWithApply,self)._make_representation(name)
+
+        param_obj = self.get_parameter_object(name)
+
+        self.representations[name]['list_ctrl']=ListItemCtrlWidget(
+            self._params_frame,
+            lambda:self._up_param(name),
+            lambda:self._down_param(name),
+            lambda:self._del_param(name))
+
+    def _add_param(self):
+        # should refactor pack_params to get out adding of single param
+        po = self._extraPO
+        name = po.add()
+
+        self._create_tkvar(po,name,po.params(name))
+
+        self._make_representation(name)
+        row = len(self.params_to_display)
+        self._grid_param(name,row)
+
+        self.params_to_display[name]=po.params(name)
+        self.currently_displayed_params[name]=self.representations[name]
+
+        self._update_apply_status()
+        
+
+    def _del_param(self,name):
+        current_pos = int(self.representations[name]['widget'].grid_info()['row'])
+        po = self._extraPO
+        for w in self.representations[name]:
+            try:
+                self.representations[name][w].grid_forget()
+                self.representations[name][w].destroy()
+            except:
+                pass
             
+        del self._tkvars[name]
+        del self.representations[name]
+        del self.params_to_display[name]
+        del self.currently_displayed_params[name]
+        del self.translators[name]
+        
+        po.remove(name)
+
+        # move ones below up one
+        for n in self.params_to_display:
+            for n2,w in self.representations[n].items():
+                if hasattr(w,'grid_info'):
+                    w_gi = w.grid_info()
+                    if 'row' in w_gi:
+                        r1 = int(w_gi['row'])
+                        if r1>current_pos:
+                            w_gi['row']='%s'%(r1-1)
+                            w.grid(**w_gi)
+                        
+        self._update_apply_status()
+
+
+        
+    def _down_param(self,name):
+        current_pos = int(self.representations[name]['widget'].grid_info()['row'])
+
+        if current_pos==len(self.params_to_display)-1:
+            return
+
+        new_pos = current_pos+1
+        current_name = name
+
+        self.y(current_name,current_pos,new_pos)
+
+
+    def y(self,current_name,current_pos,new_pos):
+        #### HACK TO FIND NEW NAME BY MATCHING ROW
+        new_name=None
+        for n in self.representations:
+            row = int(self.representations[n]['widget'].grid_info()['row'])
+            if row==new_pos:
+                new_name=n
+                break
+        assert new_name is not None
+        ####
+
+        for n,w in self.representations[current_name].items():
+            if hasattr(w,'grid_info'):
+                g = w.grid_info()
+                if 'row' in g:
+                    #print "regrid",current_name,current_pos
+                    g['row']='%s'%new_pos
+                    w.grid(**g)
+
+        for n,w in self.representations[new_name].items():
+            if hasattr(w,'grid_info'):
+                g = w.grid_info()
+                if 'row' in g:
+                    #print "regrid",new_name,new_pos
+                    g['row']='%s'%current_pos 
+                    w.grid(**g)
+
+        self._update_apply_status()
+
+
+    def _up_param(self,name):
+        current_pos = int(self.representations[name]['widget'].grid_info()['row'])
+
+        if current_pos==0:
+            return
+
+        new_pos = current_pos-1
+        current_name = name
+
+        self.y(current_name,current_pos,new_pos)
+
+    # CEBALERT: why not in super?
+    def _update_apply_status(self):
+        w=self.representations['Apply']['widget']
+        if self.has_unapplied_change():
+            w.config(state='normal')
+        else:
+            w.config(state='disabled')
+            
+    def set_PO(self,parameterized_object):
+        super(EditingParametersFrameWithApply,self).set_PO(parameterized_object)
+        self.hide_param('Defaults') # CEBALERT: should just have been unpacked earlier
+
+    def has_unapplied_change(self):
+        # detect length change
+        if len(self._extraPO.list_)!=len(self.params_to_display):
+            return True
+
+        # detect order change 
+        names = sorted(self.params_to_display.keys())
+        for i,name in zip(range(len(names)),names):
+            if int(self.representations[name]['widget'].grid_info()['row'])!=i:
+                return True
+            
+        return super(EditingParametersFrameWithApply,self).has_unapplied_change()
+        
+
+    def _refresh_button(self,overwrite_error=True):
+        self.set_PO(self._extraPO)
+        self._update_apply_status()
+
+    # CEBALERT: because 
+    def _apply_button(self):
+        self.update_parameters()
+        for h in self._apply_hooks:
+            h(self)
+
+
+class ListItemCtrlWidget(T.Frame):
+    def __init__(self,master,up_cmd,down_cmd,remove_cmd):
+        T.Frame.__init__(self, master)
+
+        up = T.Button(self,text="u",command=up_cmd)
+        up.pack(side='left')
+
+        down = T.Button(self,text="d",command=down_cmd)
+        down.pack(side='left')
+
+        remove = T.Button(self,text='-',command=remove_cmd)
+        remove.pack(side='left')
+
+
+##         ### CEBALERT: should use button parameter & pack_param
+##         self._hack = []
+##         image=ImageTk.PhotoImage(ImageOps.fit(
+##             Image.open(resolve_path('topo/tkgui/icons/arrow-up.png')),(20,20)))
+##         up['image']=image
+##         self._hack.append(image)
+
+##         image=ImageTk.PhotoImage(ImageOps.fit(
+##             Image.open(resolve_path('topo/tkgui/icons/arrow-down-2.0.png')),(20,20)))
+##         down['image']=image
+##         self._hack.append(image)
+
+##         image=ImageTk.PhotoImage(ImageOps.fit(
+##             Image.open(resolve_path('topo/tkgui/icons/edit_remove.png')),(20,20)))
+##         remove['image']=image
+##         self._hack.append(image)
+##         ###
