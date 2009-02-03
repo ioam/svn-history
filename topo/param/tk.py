@@ -3586,20 +3586,20 @@ class ListItemCtrlWidget(T.Frame):
         remove.pack(side='left')
 
 
-##         ### CEBALERT: should use button parameter & pack_param
-##         self._hack = []
-##         image=ImageTk.PhotoImage(ImageOps.fit(
-##             Image.open(resolve_path('topo/tkgui/icons/arrow-up.png')),(20,20)))
-##         up['image']=image
-##         self._hack.append(image)
+        ### CEBALERT: should use button parameter & pack_param
+        self._hack = []
+        image=ImageTk.PhotoImage(ImageOps.fit(
+            Image.open(resolve_path('topo/tkgui/icons/arrow-up.png')),(20,20)))
+        up['image']=image
+        self._hack.append(image)
 
-##         image=ImageTk.PhotoImage(ImageOps.fit(
-##             Image.open(resolve_path('topo/tkgui/icons/arrow-down-2.0.png')),(20,20)))
-##         down['image']=image
-##         self._hack.append(image)
+        image=ImageTk.PhotoImage(ImageOps.fit(
+            Image.open(resolve_path('topo/tkgui/icons/arrow-down-2.0.png')),(20,20)))
+        down['image']=image
+        self._hack.append(image)
 
-##         image=ImageTk.PhotoImage(ImageOps.fit(
-##             Image.open(resolve_path('topo/tkgui/icons/edit_remove.png')),(20,20)))
-##         remove['image']=image
-##         self._hack.append(image)
-##         ###
+        image=ImageTk.PhotoImage(ImageOps.fit(
+            Image.open(resolve_path('topo/tkgui/icons/edit_remove.png')),(20,20)))
+        remove['image']=image
+        self._hack.append(image)
+        ###
