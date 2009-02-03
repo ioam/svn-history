@@ -1443,8 +1443,10 @@ def print_all_param_defaults():
 
 
 
-
 # Support for changing parameter names
+# CEBALERT: doesn't support things like changing output_fn to output_fns,
+# where we also need to do output_fn=x -> output_fns=[x].
+# Should implement fuller support in legacy, and remove this from here.
 _param_name_changes = {}
 # e.g. you change topo.pattern.basic.Gaussian.aspect_ratio to aspect_ration
 # _param_name_changes['topo.pattern.basic.Gaussian']={'aspect_ratio':'aspect_ration'}

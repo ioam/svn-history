@@ -19,7 +19,7 @@ import sys
 # rather than having (effectively) a list in each.
 
 
-
+from topo.sheet.lissom import LISSOM
 def preprocess_state(class_,state_mod_fn): 
     """
     Allow processing of state with state_mod_fn before
@@ -37,6 +37,8 @@ def preprocess_state(class_,state_mod_fn):
     class_.__setstate__ = new_setstate
 
 
+# CB: this is complicated, and I'd like to remove it. Only
+# being used once at the moment.
 def select_setstate(class_,selector,pre_super=False,post_super=True):
     """
     Select appropriate function to call as a replacement
@@ -170,16 +172,24 @@ class SnapshotSupport(object):
         # Haven't yet thought about whether or not it's actually possible
         # to get the version number before unpickling...
         from topo import param
-#        param.parameterized.min_print_level=param.parameterized.DEBUG
         global supporters
         for f in supporters:
             param.Parameterized(name='SnapshotSupport').debug("calling %s"%f.__name__)
             f()
 
 
-# CEBALERT: rename SnapshotSupport and integrate LegacySupport so that
-# the difference is clear.
 
+####
+# CEB: this is only to show how we could support running old scripts
+# without modifying them. Currently we haven't implemented enough for
+# it to be useful.
+# E.g. we changed output_fn to output_fns for several classes. To
+# support that in a snapshot requires intercepting the saved data and
+# detecting 'output_fn=x' and replacing it with 'output_fns=[x]',
+# etc. To support it in a script requires installing something in the
+# class that will take .output_fn=x and actually do .output_fns=[x]. A
+# concrete example is given below: CFProjection's weights_shape was
+# changed to cf_shape.
 def LegacySupport():
     """
     Support for running old scripts. Use in conjunction with
@@ -189,7 +199,8 @@ def LegacySupport():
     import topo.base.cf
     cfp = topo.base.cf.CFProjection
     type.__setattr__(cfp,'weights_shape',cfp.__dict__['cf_shape'])
-
+####
+    
 
 def install_legacy_support():
     SnapshotSupport.install()
@@ -207,8 +218,46 @@ def install_legacy_support():
 S=supporters=DuplicateCheckingList()
 # in general, newest changes should go at the start of the list.
 
+def renamed_output_fn_to_output_fns():
+    ## rXXXX output_fn=X changed to output_fns=[x] in multiple classes
+    
+    def _changed_output_fn(instance,state):
+        for x in 'output_fn','weights_output_fn':
+            if x in state:
+                fn = state[x]
+                state['%ss'%x] = [fn]
+                # CEBALERT: ideally, would also delete old 'output_fn' parameter,
+                # but we don't currently support parameter deletion.
+                del state[x] # probably does nothing
+
+            if 'apply_%s'%x in state:
+                state['apply_%ss'%x]=state['apply_%s'%x]
+                del state['apply_%s'%x]
+
+            if 'apply_%s_init'%x in state:
+                state['apply_%ss_init'%x]=state['apply_%s_init'%x]
+                del state['apply_%s_init'%x]
+ 
+    # because I can't be bothered narrowing it down; does this
+    # slow down legacy support installation?
+    from topo.param.parameterized import Parameterized
+    preprocess_state(Parameterized,_changed_output_fn)
+
+   
+    def _post_initialization_weights_output_fn(instance,state):
+        if 'post_initialization_weights_output_fn' in state:
+            state['post_initialization_weights_output_fns']=[state['post_initialization_weights_output_fn']]
+            del state['post_initialization_weights_output_fn']
+    from topo.sheet.lissom import LISSOM
+    # CEBALERT: problem with multiple preprocess_state functions? 
+    #preprocess_state(LISSOM,_post_initialization_weights_output_fn)
+
+S.append(renamed_output_fn_to_output_fns)
+
+
 def removed_pipeline():
     import topo.transferfn.basic,topo.base.functionfamily
+    from topo import param
     class PipelineTF(topo.base.functionfamily.TransferFn):
         def __new__(self,*args,**kw):
             param.Parameterized().warning("PipelineTF is deprecated; returning output_fns list.")
@@ -229,7 +278,7 @@ S.append(removed_pipeline)
 
 
 
-def rename_output_fn_to_transfer_fn():
+def rename_outputfn_to_transferfn():
     ### rXXXX moved topo.outputfn to topo.transferfn
     import topo,topo.transferfn
     package_redirect('outputfn',topo,topo.transferfn)
@@ -252,7 +301,7 @@ def rename_output_fn_to_transfer_fn():
     _rename(topo.base.functionfamily)
     _rename(topo.transferfn.basic)
 
-S.append(rename_output_fn_to_transfer_fn)
+S.append(rename_outputfn_to_transferfn)
 
 
 def removed_InstanceMethodWrapper():
@@ -381,27 +430,24 @@ def sheet_set_shape():
     # called on that (method resolution order means __setstate__ comes
     # from EventProcessor instead)
     from topo.base.sheetcoords import Slice
-    def _sheet_set_shape(state):
+    def _sheet_set_shape(instance,state):
         # since 7958, SCS has stored shape on creation
-        def setstate(instance,state):
-            if '_SheetCoordinateSystem__shape' not in state:
-                m = '_SheetCoordinateSystem__'
-                # all these are necessary for the calculation now,
-                # but would not otherwise be restored until later
-                setattr(instance,'bounds',state['bounds'])
-                setattr(instance,'lbrt',state['lbrt'])
-                setattr(instance,m+'xdensity',state[m+'xdensity'])
-                setattr(instance,m+'xstep',state[m+'xstep'])
-                setattr(instance,m+'ydensity',state[m+'ydensity'])
-                setattr(instance,m+'ystep',state[m+'ystep'])
-
-                shape = Slice(instance.bounds,instance).shape_on_sheet()
-                setattr(instance,m+'shape',shape)
-
-        return setstate
+        if '_SheetCoordinateSystem__shape' not in state:
+            m = '_SheetCoordinateSystem__'
+            # all these are necessary for the calculation now,
+            # but would not otherwise be restored until later
+            setattr(instance,'bounds',state['bounds'])
+            setattr(instance,'lbrt',state['lbrt'])
+            setattr(instance,m+'xdensity',state[m+'xdensity'])
+            setattr(instance,m+'xstep',state[m+'xstep'])
+            setattr(instance,m+'ydensity',state[m+'ydensity'])
+            setattr(instance,m+'ystep',state[m+'ystep'])
+            shape = Slice(instance.bounds,instance).shape_on_sheet()
+            setattr(instance,m+'shape',shape)
+            state[m+'shape']=shape
 
     from topo.base.sheet import Sheet
-    select_setstate(Sheet,_sheet_set_shape) 
+    preprocess_state(Sheet,_sheet_set_shape) 
 S.append(sheet_set_shape)
 
 
