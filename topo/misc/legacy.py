@@ -697,6 +697,7 @@ S.append(duplicate_SineGratingDisk)
 
 
 # CEB: possibly this should be higher up (above topo.patterns?)
+# And were there other classes e.g. OrientationContrastPattern?
 def teststimuli_removed():
     # rXXXX
     import topo.pattern
