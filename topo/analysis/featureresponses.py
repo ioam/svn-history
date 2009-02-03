@@ -176,6 +176,8 @@ class FeatureResponses(PatternDrivenAnalysis):
     # CEB: we might want to measure the map on a sheet due
     # to a specific projection, rather than measure the map due
     # to all projections.
+    
+    _fullmatrix = {}
 
     def __init__(self,features,**params):
         super(FeatureResponses,self).__init__(**params)
@@ -188,12 +190,12 @@ class FeatureResponses(PatternDrivenAnalysis):
     def initialize_featureresponses(self,features):
         """Create an empty DistributionMatrix for each feature and each sheet."""
         self._featureresponses = {}
-        self._fullmatrix = {}
+        self.__class__._fullmatrix = {}
         for sheet in self.sheets_to_measure():
             self._featureresponses[sheet] = {}
             for f in features:
                 self._featureresponses[sheet][f.name]=DistributionMatrix(sheet.shape,axis_range=f.range,cyclic=f.cyclic)
-            self._fullmatrix[sheet] = FullMatrix(sheet.shape,features)
+            self.__class__._fullmatrix[sheet] = FullMatrix(sheet.shape,features)
 
     def sheets_to_measure(self):
         """Return a list of the Sheets in the current simulation for which to collect responses."""
@@ -270,7 +272,7 @@ class FeatureResponses(PatternDrivenAnalysis):
         for sheet in self.sheets_to_measure():
             for feature,value in current_values:
                 self._featureresponses[sheet][feature].update(sheet.activity, value)
-            self._fullmatrix[sheet].update(sheet.activity,current_values)
+            self.__class__._fullmatrix[sheet].update(sheet.activity,current_values)
 
 
 
