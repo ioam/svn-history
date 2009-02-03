@@ -4,8 +4,7 @@ __version__ = '$Revision: 9030 $'
 
 import os
 import sys
-
-raise NotImplementedError("script under construction")
+import re
 
 def usage():
     print """
@@ -50,7 +49,17 @@ Topographica 0.9.6, you have three options:
 print info
 
 # should be ordered most to least specific
+substitutions = [
+    # CEBALERT: still need to remove any imports of PipelineTF, etc
+    ("output_fn\s*=\s*PipelineTF\(",""), # CEBALERT: these leave a trailing )
+    ("output_fn\s*=\s*PipelineOF\(",""), #
+    ("output_fn\s*=\s*Pipeline\(",""),   #
+    ]
+
 replacements = [
+    ('AttributeTrackingOF'           , 'AttributeTrackingTF'),
+    ('ActivityAveragingOF'           , 'ActivityAveragingTF'),
+    ('ScalingOF'                     , 'ScalingTF'),
     ('topo.outputfn'                 , 'topo.transferfn'),
     ('OutputFn'                      , 'TransferFn'),
     ('update_command'                , 'pre_plot_hooks'),
@@ -58,34 +67,34 @@ replacements = [
     ('before_pattern_presentation'   , 'pre_presentation_hooks'),
     ('after_pattern_presentation'    , 'post_presentation_hooks'),
     ('before_analysis_session'       , 'pre_analysis_session_hooks'),
-    ('after_analysis_session'        , 'post_analysis_session_hooks')
+    ('after_analysis_session'        , 'post_analysis_session_hooks'),
+    ('apply_output_fn'               , 'apply_output_fns'),
+    ('apply_output_fn_init'          , 'apply_output_fns_init')
     ]
 
 
 
 # TO DO:
 #
-# Removal of Pipeline/PipelineOF/PipelineTF (replace with list)
-# e.g. output_fn=PipelineTF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Simple_OF])
-# should become just output_fn=[ActivityHysteresis(...),V1Simple_OF]
-#
 # MeasureResponseCommand, etc?
 #
-# *OF -> *TF
-#
-# output_fn=X -> output_fns=[X]
+# *output_fn=X -> *output_fns=[X]
+# .output_fn -> .output_fns[0]  or some kind of warning or leave it!
+# apply_output_fn -> apply_output_fns
+
 
 
 filename = sys.argv[1] 
 
-str = open(filename,'r').read()
+s = open(filename,'r').read()
 
-print "* Replacing names."
+for old,new in substitutions:
+    s = re.sub(old,new,s)
+
 for old,new in replacements:
-    str = new.join(str.split(old))
-
+    s = new.join(s.split(old))
 
 new_filename = filename+'_0.9.6'
-open(new_filename,'w').write(str)
+open(new_filename,'w').write(s)
 
 print "\n\nUpdating finished; output written to %s"%new_filename
