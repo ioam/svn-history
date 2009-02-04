@@ -190,12 +190,12 @@ class FeatureResponses(PatternDrivenAnalysis):
     def initialize_featureresponses(self,features):
         """Create an empty DistributionMatrix for each feature and each sheet."""
         self._featureresponses = {}
-        self.__class__._fullmatrix = {}
+        FeatureResponses._fullmatrix = {}
         for sheet in self.sheets_to_measure():
             self._featureresponses[sheet] = {}
             for f in features:
                 self._featureresponses[sheet][f.name]=DistributionMatrix(sheet.shape,axis_range=f.range,cyclic=f.cyclic)
-            self.__class__._fullmatrix[sheet] = FullMatrix(sheet.shape,features)
+            FeatureResponses._fullmatrix[sheet] = FullMatrix(sheet.shape,features)
 
     def sheets_to_measure(self):
         """Return a list of the Sheets in the current simulation for which to collect responses."""
@@ -272,7 +272,7 @@ class FeatureResponses(PatternDrivenAnalysis):
         for sheet in self.sheets_to_measure():
             for feature,value in current_values:
                 self._featureresponses[sheet][feature].update(sheet.activity, value)
-            self.__class__._fullmatrix[sheet].update(sheet.activity,current_values)
+            FeatureResponses._fullmatrix[sheet].update(sheet.activity,current_values)
 
 
 
