@@ -148,7 +148,7 @@ class save_plotgroup(ParameterizedFunction):
         plot_description="%s%s%s" % (plotgroup.name," " if keywords else "",keywords)
         if update:
             self.previous_plotgroups.append(plotgroup)
-            self.message("%s: Running pre_plot_hooks" % plot_description)
+            self.debug("%s: Running pre_plot_hooks" % plot_description)
         else:
             self.message("%s: Using cached results from pre_plot_hooks" % plot_description)
 
