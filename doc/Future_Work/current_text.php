@@ -179,19 +179,6 @@ parameters don't match - need to adjust c++ lissom.
 no guarantee that code in/related to connectionfield is valid at all
 densities (tied to c++ comparisons task).
 
-<H4>2008/01/25 (JB): Organization of examples/</H4>
-The examples directory is getting quite big and confusing, at least in
-SVN.  We should consider how we want people to keep track of their
-code; should it be in the main SVN repository?  A separate "contrib"
-or "inprogress" branch?  We have to consider at least three types of
-examples, which may need three different locations: trivial
-(tiny.ty, hierarchical.ty), published
-(at least lissom_oo_or.ty, lissom_oo_dr.ty, lissom_or.ty,
-lissom_photo_or.ty, lissom_whisker_barrels.ty, obermayer_pnas90.ty,
-goodhill_network90.ty, som_retinotopy.ty), and ongoing research (by
-us, but also by people unaffiliated with Topographica but want their
-changes to track with SVN or be tied to a specific SVN version?)
-
 <H4>2008/08/15 (JB): Cleanup of examples, especially for afferent radii</H4>
 
 Once Kateryna's project completes, should systematically examine the
@@ -210,8 +197,6 @@ the edge would be cut off slightly using the current values.
 add an option to clean up external/ once topographica has been
 built, to free up some space for users while still leaving it
 updatable
-
-<H4>Base class of Number that allows a value of None</H4>
 
 <H4>Move test data files into subdirectories of topo/tests</H4>
 
