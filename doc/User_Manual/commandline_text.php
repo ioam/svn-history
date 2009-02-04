@@ -81,7 +81,7 @@ You can also get information about most objects by typing
 function for more detailed information:
 
 <pre>
-topo_t000000.00_c11>>>  PiecewiseLinear?
+topo_t000000.00_c11>>> PiecewiseLinear?
 ...
 Docstring:
     Piecewise-linear TransferFn with lower and upper thresholds.
@@ -242,7 +242,7 @@ href="http://matplotlib.sourceforge.net/">MatPlotLib documentation</A>
 for how to make new plots and change their axes, labels, titles, line
 styles, etc.
 
-<H2><A NAME="saving-bitmaps">Saving Topographica bitmaps</A></H2>
+<H2><A NAME="saving-bitmaps">Saving or accessing Topographica bitmaps</A></H2>
 
 A command save_plotgroup is provided to allow you to automate the
 process of generating and saving the various bitmap images visible in
@@ -274,7 +274,17 @@ save_plotgroup("Projection",projection=topo.sim['V1'].projections('Afferent'))
 optional parameters.  Using these commands makes it possible to run
 simulations without any GUI, for batch or remote processing.
 
+<P>It is also possible to access these bitmaps from the command line,
+if you want to analyze them rather than save them.  For example to see
+the matrix of values for the OrientationPreference, plus the bounding
+box in Sheet coordinates, do:
 
+<pre>
+measure_or_pref()
+(mat,bbox)=topo.sim['V1'].sheet_views['OrientationPreference'].view()
+print mat
+print bbox.lbrt()
+</pre>
 
 <H2><a name="importing">Imports</a></H2>
 
