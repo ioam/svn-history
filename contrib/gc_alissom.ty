@@ -116,8 +116,8 @@ smoothing=locals().get('smoothing',0.999)
 V1_smoothing=locals().get('V1_smoothing',0.999) # Allows different smoothing for averaging  V1 activity and averaging afferent activity.
 
 #Output functions: Sheets
-LGN_on_output_fn=HalfRectify()
-LGN_off_output_fn=HalfRectify()
+LGN_on_output_fns=[HalfRectify()]
+LGN_off_output_fns=[HalfRectify()]
 
 # The ratio between the input and ouptut of the V1 neurons
 io_ratio=locals().get('io_ratio',3.6) 
@@ -139,13 +139,13 @@ CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.pattern.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
-CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
-SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
+CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
+SharedWeightCFProjection.response_fns=[CFPRF_DotProduct_opt()]
 
 
 # DoG weights for the LGN
-centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
-surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
+surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
     
 on_weights = topo.pattern.basic.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
@@ -178,14 +178,14 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=default_retinal_density,
 
 topo.sim['LGNOn']=LISSOM(nominal_density=default_retinal_density,
                           nominal_bounds=BoundingBox(radius=0.5+0.25+0.5),
-                          output_fn=LGN_on_output_fn,tsettle=0,
+                          output_fns=LGN_on_output_fns,tsettle=0,
                           measure_maps=False)
 
 
 
 topo.sim['LGNOff']=LISSOM(nominal_density=default_retinal_density,
                            nominal_bounds=BoundingBox(radius=0.5+0.25+0.5),
-                           output_fn=LGN_off_output_fn,tsettle=0,
+                           output_fns=LGN_off_output_fns,tsettle=0,
                            measure_maps=False)
 
 # Add the lateral connectivity to LGN
@@ -193,7 +193,7 @@ AddGC()
 
 topo.sim['V1'] = JointScaling(nominal_density=default_density,tsettle=16,plastic=True,apply_scaling=False,
                                 nominal_bounds=BoundingBox(radius=0.5),smoothing=smoothing,
-                                output_fn=V1_OF)
+                                output_fns=V1_OF)
 
 #make sure that activity is reset at the beginning of iteration
 topo.sim['V1'].beginning_of_iteration.append(AH.reset)
@@ -265,9 +265,9 @@ if dataset=="NoisyDiskstoNatural":
         topo.sim.schedule_command(changetime,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
         topo.sim.schedule_command(changetime,'topo.sim["V1"].target=new_afferent_target')
         if tracking==True:
-            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fn.output_fns[1].mu=new_mu')
+            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fns[1].mu=new_mu')
         else:
-            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fn.mu=new_mu')
+            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fns[0].mu=new_mu')
     else:
         topo.sim.schedule_command(changetime,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
                       
@@ -275,7 +275,7 @@ if dataset=="NoisyDiskstoNatural":
 import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureCurveCommand.selectivity_multiplier=1.0
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
-topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fn=True
+topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
 if tracking:
     topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=5
     topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=64
