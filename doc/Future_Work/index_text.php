@@ -29,7 +29,9 @@ saving using XML, which is designed to be an archival, readable
 format.  In the meantime, users should be aware that saved snapshot
 files will not necessarily be readable by future versions of
 Topographica, and should be considered temporary.
-<!-- Also consider CDF, HDF, or something like it for binary files -->
+<!-- Also consider HDF5 or possibly netCDF4 for binary files, -->
+<!-- e.g. through PyTables, http://www.pytables.org/docs/manual/ch04.html#id2553542 -->
+  
 <!-- From: fwh@inf.ed.ac.uk ; Oct  5 08:41:59 2005 +0100:
 
   Consider http://www.neurogems.org/nmlparser/index.html ; see
@@ -100,6 +102,11 @@ related computationally tractable spiking unit models.  More detailed
 compartmental models can be simulated in NEST, Neuron or Genesis instead,
 and packaged up using the Sheet interface so that they can be used
 in Topographica.
+
+<!-- Consider implementing:
+  Neural Computation Volume 21, Number 3, 2009, "A Canonical Model for
+  Event-Driven Neural Simulators", Stefan Mihalas and Ernst Niebur
+-->
 
 </DL>
 
