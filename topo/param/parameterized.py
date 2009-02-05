@@ -1505,7 +1505,7 @@ class PicklableClassAttributes(object):
             module_path = class_path[0:class_path.rindex('.')]
             class_name = class_path[class_path.rindex('.')+1::]
 
-            module = sys.modules[module_path]
+            module = __import__(module_path,fromlist=[module_path])
 
             # CEBALERT: This try/except+warning shouldn't be
             # necessary, and it hides problems (1. don't see real
