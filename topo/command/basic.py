@@ -25,7 +25,6 @@ from ..param.parameterized import ParamOverrides
 import topo
 from topo.base.functionfamily import TransferFn
 from topo.base.sheet import Sheet
-from topo.base.cf import CFSheet
 from topo.base.projection import Projection, ProjectionSheet
 from topo.sheet import GeneratorSheet
 from topo.misc.util import MultiFile
