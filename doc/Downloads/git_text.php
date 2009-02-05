@@ -197,15 +197,21 @@ repository, preserving their log messages, so that to an SVN user it
 appears you made each of those changes one after the other in a
 batch. 
 
-<P>As with SVN, before committing you should first check that you have
-updated and tested your code with changes from others (<code>git-svn
-rebase; make tests</code>) to ensure that your changes are compatible
-(and not just that they apply cleanly). Any actual conflict
-encountered by git-svn (e.g.  you try to commit a file which has been
-updated by someone else while you were working on it) will stop the
-<code>dcommit</code> process, and the SVN error will be reported. At
-this point, you can use the usual git commands to deal with such merge
-conflicts.
+<P>If you want to see exactly what is going to happen without making
+any actual changes, you might wish to try a 'dry run' first:
+<pre>
+git svn dcommit -n
+</pre>
+
+<P>As with SVN, before committing to the central repository you should
+first check that you have updated and tested your code with changes
+from others (<code>git-svn rebase; make tests</code>) to ensure that
+your changes are compatible (and not just that they apply
+cleanly). Any actual conflict encountered by git-svn (e.g.  you try to
+commit a file which has been updated by someone else while you were
+working on it) will stop the <code>dcommit</code> process, and the SVN
+error will be reported. At this point, you can use the usual git
+commands to deal with such merge conflicts.
 
 
 <!-- does git-svn dcommit also then run git-svn rebase after? -->
@@ -216,6 +222,14 @@ conflicts.
 If you know Git well, you can probably already perform the operations
 described here. In that case, please help to improve the documentation
 below! Thanks.
+
+<H4>Editing your history</H4>
+
+You can use <code>git rebase --interactive</code> to reorder, remove,
+or combine commits. For instance, to inspect your last 3 commits, use
+<code>git rebase -i HEAD~3</code>. In the resulting editor window, you
+can rearrange, combine, or remove commits.
+
 
 <H4>Branching your own Git repository</H4>
 
@@ -319,6 +333,15 @@ XXXX
 
 <P>Delete branch when done. XXXX
 
+
+<!--
+   1. Commit everything to the topic branch
+   2. git checkout master
+   3. git svn rebase
+   4. git merge topic_branch
+   5. resolve any merge conflicts
+   6. git svn dcommit
+-->
 
 <H4>Sharing your repository</H4>
 
