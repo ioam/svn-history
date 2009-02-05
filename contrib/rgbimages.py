@@ -37,11 +37,12 @@ class ColorImageSheet(GeneratorSheet):
         self._greenact[:] = g._green
         self._blueact[:] = g._blue
         
-        if self.apply_output_fn:
-            self.output_fn(self.activity)
-            self.output_fn(self._redact)
-            self.output_fn(self._greenact)
-            self.output_fn(self._blueact)
+        if self.apply_output_fns:
+            for output_fn in self.output_fns:
+                output_fn(self.activity)
+                output_fn(self._redact)
+                output_fn(self._greenact)
+                output_fn(self._blueact)
 
         self.send_output(src_port='Activity',data=self.activity)
         self.send_output(src_port='RedActivity',data=self._redact)
@@ -134,10 +135,10 @@ class ColorImage(FileImage):
         height = params['size']
         width = params['aspect_ratio']*height
 
-        whole_image_output_fn = params['whole_image_output_fn']
+        whole_image_output_fns = params['whole_image_output_fns']
 
-        if self._get_image(params) or whole_image_output_fn != self.last_wiof:
-            self.last_wiof = whole_image_output_fn
+        if self._get_image(params) or whole_image_output_fns != self.last_wiofs:
+            self.last_wiofs = whole_image_output_fns
 
             R,G,B = self._image.split()
             # with PIL 1.1.6 will be just red_pattern.array = numpy.array(R)
@@ -154,15 +155,15 @@ class ColorImage(FileImage):
             # 3 pattern samplers for now because of whole image output
             # fn and background value fn; need to sort those out
             self.ps=self.pattern_sampler_type(pattern_array=red_pattern_array, 
-                                              whole_pattern_output_fn=self.last_wiof,
+                                              whole_pattern_output_fns=self.last_wiofs,
                                               background_value_fn=edge_average)
             
             self._gps = self.pattern_sampler_type(pattern_array=green_pattern_array, 
-                                              whole_pattern_output_fn=self.last_wiof,
+                                              whole_pattern_output_fns=self.last_wiofs,
                                               background_value_fn=edge_average)
 
             self._bps = self.pattern_sampler_type(pattern_array=blue_pattern_array, 
-                                              whole_pattern_output_fn=self.last_wiof,
+                                              whole_pattern_output_fns=self.last_wiofs,
                                               background_value_fn=edge_average)
             
 
