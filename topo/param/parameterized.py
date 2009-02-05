@@ -865,7 +865,15 @@ class Parameterized(object):
             cls=self_or_cls
         else:
             cls=type(self_or_cls)
-            
+
+        # CEBALERT: can't we just do
+        # setattr(cls,param_name,param_obj)?  The metaclass's
+        # __setattr__ is actually written to handle that.  (Would also
+        # need to do something about the params() cache.  That cache
+        # is a pain, but it definitely improved the startup time; it
+        # would be worthwhile making sure no method except for one
+        # "add_param()" method has to deal with it (plus any future
+        # remove_param() method.)
         type.__setattr__(cls,param_name,param_obj)
         cls.__metaclass__._initialize_parameter(cls,param_name,param_obj)
         # delete cached params()
@@ -873,6 +881,7 @@ class Parameterized(object):
             delattr(cls,'_%s__params'%cls.__name__) 
         except AttributeError:
             pass
+
 
 
 
@@ -1489,7 +1498,6 @@ class PicklableClassAttributes(object):
         return {'class_attributes':class_attributes,
                 'startup_commands':self.startup_commands}
 
-
     def __setstate__(self,state):
         """
         Execute the startup commands and set class attributes.
@@ -1522,7 +1530,7 @@ class PicklableClassAttributes(object):
                 break
 
             # now restore class Parameter values
-            for p_name,p in state.items():
+            for p_name,p_obj in state.items():
 
                 if class_path in _param_name_changes:
                     if p_name in _param_name_changes[class_path]:
@@ -1530,18 +1538,21 @@ class PicklableClassAttributes(object):
                         Parameterized().message("%s's %s parameter has been renamed to %s."%(class_path,p_name,new_p_name))
                         p_name = new_p_name
 
-                # CEBALERT: This try/except+warning shouldn't be
-                # necessary, because we can always add legacy
-                # support. In fact, because of this warning (rather
-                # than error), buildbot did not catch a problem and it
-                # went unnoticed (at least by me) for at least 100
-                # revisions. Maybe buildbot should be checking for
-                # warnings...
-                try:
-                    setattr(class_,p_name,p)
-                except:
-                    Parameterized().warning('Problem restoring "%s" parameter for class %s (e.g. the default value of %s.%s might not now be the same as when the snapshot was saved). This affects instances of %s if they are using the class default value for %s.' % (p_name,class_path,class_path,p_name,class_path,p_name)) # Indicates that parameter object representing p_name may have changed since the snapshot was created: support could be added in topo.misc.legacy
-                
+                if p_name not in class_.params():
+                    # CEBALERT: GlobalParams's source code never has
+                    # parameters. If we move Parameter saving and
+                    # restoring to Parameterized, could allow
+                    # individual classes to customize Parameter
+                    # restoration.
+                    if class_.__name__!='GlobalParams':
+                        Parameterized(name='load_snapshot').warning("Restored %s.%s from the snapshot, but '%s' is no longer defined as a Parameter by the current version of %s. Please file a support request via the website to have legacy support added." % (class_.__name__, p_name,p_name,class_.__name__))
+                else:
+                    try:
+                        setattr(class_,p_name,p_obj)
+                    except:
+                        # CEBALERT: how would this happen?
+                        Parameterized(name='load_snapshot').warning('Problem restoring Parameter "%s.%s". Please file a support request via the website to have legacy support added.'% (class_.__name__,p_name)) 
+                                        
 
 
     # CB: I guess this could be simplified
