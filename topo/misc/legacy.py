@@ -252,6 +252,14 @@ def renamed_output_fn_to_output_fns():
     # CEBALERT: problem with multiple preprocess_state functions? 
     #preprocess_state(LISSOM,_post_initialization_weights_output_fn)
 
+
+    # CEBALERT: need to handle the class parameters
+    # (see ALERT in topo.param.parameterized saying that it's
+    # currently not possible)
+
+
+
+
 S.append(renamed_output_fn_to_output_fns)
 
 
