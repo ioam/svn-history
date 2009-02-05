@@ -1515,18 +1515,10 @@ class PicklableClassAttributes(object):
 
             module = __import__(module_path,fromlist=[module_path])
 
-            # CEBALERT: This try/except+warning shouldn't be
-            # necessary, and it hides problems (1. don't see real
-            # error message, and 2. everyone - including buildbot -
-            # ignores the warnings so a. we never hear about them and
-            # b. people probably get subtle bugs).
-            # I propose to change this (and the try/except below) to produce
-            # errors (and therefore to get the same note about filing a support
-            # request to have legacy support updated).
             try:
                 class_=getattr(module,class_name)
             except:
-                Parameterized().warning("Could not find class %s to restore its parameter values (class might have been removed or renamed)."%class_path)
+                Parameterized().warning("Could not find class '%s' to restore its parameter values (class might have been removed or renamed; please file a support request via the website)."%class_path)
                 break
 
             # now restore class Parameter values
@@ -1545,7 +1537,7 @@ class PicklableClassAttributes(object):
                     # individual classes to customize Parameter
                     # restoration.
                     if class_.__name__!='GlobalParams':
-                        Parameterized(name='load_snapshot').warning("Restored %s.%s from the snapshot, but '%s' is no longer defined as a Parameter by the current version of %s. Please file a support request via the website to have legacy support added." % (class_.__name__, p_name,p_name,class_.__name__))
+                        Parameterized(name='load_snapshot').warning("Restored %s.%s from the snapshot, but '%s' is no longer defined as a Parameter by the current version of %s. Please file a support request via the website." % (class_.__name__, p_name,p_name,class_.__name__))
                 else:
                     try:
                         setattr(class_,p_name,p_obj)
