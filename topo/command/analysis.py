@@ -451,7 +451,7 @@ class measure_sine_pref(SinusoidalMeasureResponseCommand):
         return features
 
 
-
+# Here as the simplest possible example; could be moved elsewhere.
 class measure_or_pref(SinusoidalMeasureResponseCommand):
     """Measure an orientation preference map by collating the response to patterns."""
 

@@ -250,12 +250,8 @@ which sine gratings are presented to 1.0, and turn on the response
 function by default:
 
 <pre>
-  from topo.plotting.plotgroup import plotgroups
-  plotgroups["Orientation Preference"].command=
-      "measure_or_pref(scale=0.75,offset=0.5,display=False,
-       pattern_presenter=PatternPresenter(
-           pattern_generator=SineGrating(),apply_output_fns=True,
-           duration=1.0))"
+from topo.analysis.featureresponses import MeasureResponseCommand
+MeasureResponseCommand.duration=1.0
 </pre>
 
 <P>
@@ -367,13 +363,17 @@ you can adjust the FeatureMaps.selectivity_multiplier parameter:
   FeatureMaps.selectivity_multiplier=1.0
 </pre>
 
-<P>Also note that the data for plotting can also be calculated in any other way
-(ignoring FeatureMaps and PatternPresenter altogether), as long as it
-results in a SheetView added to the appropriate sheet_views dictionary and
-specified in the template.  For instance, the
-<A HREF="../Reference_Manual/topo.command.analysis-module.html#measure_cog">
+<P>Also note that the Orientation Preference plot code above shows
+just one possible way of implementing such a plot; in Topographica
+itself, a hierarchy of classes is used to simplify the definition of
+multiple types of plots. 
+
+<P>Additionally, the data for plotting can also be calculated in any
+other way (ignoring FeatureMaps and PatternPresenter altogether), as
+long as it results in a SheetView added to the appropriate sheet_views
+dictionary and specified in the template.  For instance, the <A
+HREF="../Reference_Manual/topo.command.analysis-module.html#measure_cog">
 measure_cog</A> command used in Center of Gravity plots simply looks
 at each ConnectionField individually, computes its center of gravity,
 and builds a SheetView out of that (rather than presenting any input
 patterns).
-
