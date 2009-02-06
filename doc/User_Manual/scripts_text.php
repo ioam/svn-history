@@ -185,7 +185,7 @@ commands can be specified at the commandline by using the
 
 <pre>
 ./topographica -c 'from topo.command.analysis import measure_sine_pref'\
--c 'measure_sine_pref.num_directions=12' examples/lissom.ty
+-c 'measure_sine_pref.num_directions=12' examples/tiny.ty
 </pre>
 
 would import <code>measure_sine_pref</code> and set its
