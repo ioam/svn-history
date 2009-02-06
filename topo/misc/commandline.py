@@ -53,8 +53,8 @@ class GlobalParams(Parameterized,OptionalSingleton):
     from topo.misc.commandline import global_params as p
     p.add(
         retina_density=param.Number(default=24.0,bounds=(0,None),
-        inclusive_bounds=(False,True),doc="""
-        The nominal_density to use for the retina."""))
+        inclusive_bounds=(False,True),doc=\"""
+        The nominal_density to use for the retina.\"""))
     ...
     topo.sim['Retina']=sheet.GeneratorSheet(
         nominal_density=p.retina_density)
