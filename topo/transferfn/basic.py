@@ -240,10 +240,12 @@ class HalfRectifyAndSquare(TransferFn):
     Output function that applies a half-wave rectification (clips at zero)
     and then squares the values.
     """
-    lower_bound = param.Number(default=0.0,softbounds=(0.0,1.0))
+    t = param.Number(default=0.0,doc="""
+        The threshold at which output becomes non-zero.""")
     
     def __call__(self,x):
-        clip_lower(x,self.lower_bound)
+        x -= self.t
+        clip_lower(x,0)
         x *= x
 
 
@@ -253,8 +255,6 @@ class HalfRectifyAndPower(TransferFn):
     clips at zero), and then raises the result to the e-th power
     (where the exponent e can be selected arbitrarily).
     """
-    lower_bound = param.Number(default=0.0,softbounds=(0.0,1.0))
-    
     e = param.Number(default=2.0,doc="""
         The exponent to which the thresholded value is raised.""")
     
@@ -263,7 +263,7 @@ class HalfRectifyAndPower(TransferFn):
     
     def __call__(self,x):
         x -= self.t
-        clip_lower(x,self.lower_bound)
+        clip_lower(x,0)
         a = power(x,self.e)
         x*=0
         x+=a
@@ -273,12 +273,13 @@ class HalfRectifyAndPower(TransferFn):
 class HalfRectify(TransferFn):
     """
     Output function that applies a half-wave rectification (clips at zero)
-    
     """
-    lower_bound = param.Number(default=0.0,softbounds=(0.0,1.0))
+    t = param.Number(default=0.0,doc="""
+        The threshold at which output becomes non-zero.""")
     
     def __call__(self,x):
-        clip_lower(x,self.lower_bound)
+        x -= self.t
+        clip_lower(x,0)
 
 
 
