@@ -27,12 +27,12 @@ of the options accepted by tiny.ty, you can do that when you call
 run_batch:
 
 <pre>
-  ./topographica -a -c "run_batch('examples/tiny.ty',default_density=3)"
+  ./topographica -a -c "run_batch('examples/tiny.ty',cortex_density=3)"
 </pre>
 
 <p>To help you keep the options straight, they will be encoded into
 the directory name (as
-<code>200710112056_tiny,default_density=3</code> in this case).
+<code>200710112056_tiny,cortex_density=3</code> in this case).
 
 <p>run_batch also accepts a parameter <code>analysis_fn</code>, which
 can be any callable Python object (e.g. the name of a function).  The
@@ -58,7 +58,7 @@ after the run_batch call, as usual.  These will be processed before or
 after the batch run, respectively:
 
 <pre>
-  ./topographica -a -c "save_script_repr()" -c default_density=3\
+  ./topographica -a -c "save_script_repr()" -p cortex_density=3\
   -c "run_batch('examples/tiny.ty')" \
   -c "save_snapshot()"
 </pre>
@@ -67,7 +67,7 @@ Note that the output directory is not created or changed until the
 run_batch command is executed, so the output from the
 save_script_repr() command will go into the default output directory.
 Also note that when a parameter is set before run_batch (as
-default_density is in this example), it will not be encoded into the
+cortex_density is in this example), it will not be encoded into the
 directory filename, because run_batch will not be aware that it has
 changed.  Similarly, any errors in the commands provided before or
 after run_batch will not show up in the .out file stored in the

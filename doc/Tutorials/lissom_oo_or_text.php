@@ -22,7 +22,7 @@ orientation map network (a .typ file), which can be done by running
 <P>Depending on the speed of your machine, you may want to go get a
 snack at this point; on a 3GHz 512MB machine this training process
 currently takes from 7-15 minutes (depending on the amount of level
-2 cache).<!--lodestar: 15:46 ; cortex: 7:31 -->
+2 cache).<!--lodestar: 15:46 ; cortex: 7:31; fiver: 8:07 -->
 </p>
 
 
@@ -576,7 +576,7 @@ iterations at a time instead before looking at an
 of units to something closer to real primate cortex, by quitting
 and then restarting with a higher density in V1:
 <blockquote><code class='to_type'>
-  ./topographica -c default_density=142 examples/lissom_oo_or.ty -g
+  ./topographica -p cortex_density=142 examples/lissom_oo_or.ty -g
   </code></blockquote>
 <p></p>
   

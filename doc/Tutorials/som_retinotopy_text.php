@@ -39,7 +39,7 @@ develops a mapping of the dimensions of variance in the input space.
   Topographica GUI, you could run:
 <pre>
   /home/jbednar/public/topographica/topographica \
-  -c default_retina_density=24 -c default_density=40 som_retinotopy.ty -g
+  -p retina_density=24 -p cortex_density=40 som_retinotopy.ty -g
 </pre>
   (all on one line, with no backslash).  These changes can also be
   made in the .ty file itself, if you do not want to type them each
@@ -325,22 +325,22 @@ parameters that check <code>locals()</code> for their defaults).  For
 instance, the starting value of the neighborhood radius (from which
 all future values are calculated according to exponential decay) is
 1.0.  You can change this value as you see fit, e.g. to 0.1, by
-passing <code>-c radius_0=0.1</code> on the command line
+passing <code>-p radius_0=0.1</code> on the command line
 <emph>before</emph> the .ty file.  With such a small learning radius,
 global ordering is unlikely to happen, and one can expect the
 topographic grid not to flatten out (despite local order in patches).
 <br>
 
 <P>Similarly, consider changing the initial learning rate from
-<code>0.42</code> to e.g. <code>1.0</code> (e.g. by passing <code>-c
+<code>0.42</code> to e.g. <code>1.0</code> (e.g. by passing <code>-p
 alpha_0=1.0</code> on the command line).  The retina and V1 densities
 cannot be changed after the simulation has started, but again, they
 can be changed by providing their values on the command line as above
 (or by editing the <code>som_retinotopy.ty</code> file) and starting
 Topographica again.
 
-<P>You can also try changing the input_seed ("-c input_seed=XX"), to
-get a different stream of inputs, or weight_seed ("-c
+<P>You can also try changing the input_seed ("-p input_seed=XX"), to
+get a different stream of inputs, or weight_seed ("-p
 weight_seed=XX"), to get a different set of initial weights.
 With some of these values, you may encounter cases where the SOM
 fails to converge even though it seems to be working properly

@@ -97,13 +97,8 @@ similar to the following:
 from math import exp, sqrt
 import numpy
 
-from topo import learningfn
-from topo import numbergen
-from topo import transferfn
-from topo import pattern
-from topo import projection
-from topo import responsefn
-from topo import sheet
+from topo import learningfn,numbergen,transferfn,param,pattern,\
+                 projection,responsefn,sheet
 </pre>
 
 <P>As described in the <A
@@ -162,12 +157,12 @@ explicitly import everything they need.
 
 <P>In addition to startup options for the Topographica program,
 scripts themselves can also be controlled by options passed at
-startup. For instance, many of our examples read variables that can
+startup. For instance, many of our examples read parameters that can
 optionally be set at startup, such as
-<code>default_retina_density</code>, <code>default_lgn_density</code>,
-and <code>default_density</code>, e.g.:
+<code>retina_density</code>, <code>lgn_density</code>,
+and <code>cortex_density</code>, e.g.:
 
-<pre>./topographica -i -c default_retina_density=12 -c default_density=12 \
+<pre>./topographica -i -p retina_density=12 -p cortex_density=12 \
 examples/lissom_oo_or.ty 
 </pre>
 
@@ -178,10 +173,28 @@ initial testing or exploration of a model; higher densities can be
 used to produce results for publication. <!--CEBALERT: link to
 book/scaling paper?-->
 
-<P>Your own scripts can read any startup variables you require (see
-our examples for how to read any such variable). Note that startup
-variables must be set before the script is executed, i.e.  they should
-be passed on the commandline before the script.
+<P>Your own scripts can read any startup parameters you require (see
+<?php classref('topo.misc.commandline','GlobalParams') ?> and our
+example scripts for how to read any such parameter). Note that startup
+parameters must be set before the script is executed, i.e.  they
+should be passed on the commandline before the script.
+
+<P>In addition to setting startup parameters, arbitrary Python
+commands can be specified at the commandline by using the
+<code>-c</code> option. For instance:
+
+<pre>
+./topographica -c 'from topo.command.analysis import measure_sine_pref'\
+-c 'measure_sine_pref.num_directions=12' examples/lissom.ty
+</pre>
+
+would import <code>measure_sine_pref</code> and set its
+<code>num_directions</code> attribute to <code>12</code>, and then
+execute the <code>tiny.ty</code> example script. As with ordinary
+Python commands, you can use a semicolon <code>;</code> to separate
+statements within one command.
+
+
 
 
 

@@ -40,17 +40,39 @@ licensing information.
 class GlobalParams(Parameterized,OptionalSingleton):
     """
     A Parameterized class providing script-level parameters.
+    
+    Script-level parameters can be set from the commandline by passing
+    via -p, e.g. ./topographica -p retina_density=10
 
-    global_context is used to search for pre-specified values of a
-    parameter as it is added to this object.
+    Within scripts, parameters can be declared by using the add()
+    method.
 
-    Optionally, values for parameters pre-specified using
-    exec_in_context() (rather than manually exec'ing in the
-    context); this causes the parameter name to be tracked (so
-    warnings can be issued if a parameter value is overwritten or
-    unused).
 
-    Note that if this object is pickled, the context is not saved.
+    Example usage in a script:
+
+    from topo.misc.commandline import global_params as p
+    p.add(
+        retina_density=param.Number(default=24.0,bounds=(0,None),
+        inclusive_bounds=(False,True),doc="""
+        The nominal_density to use for the retina."""))
+    ...
+    topo.sim['Retina']=sheet.GeneratorSheet(
+        nominal_density=p.retina_density)
+
+
+    Further information:
+
+    'context' is usually set to __main__.__dict__ and is used to find
+    the value of a parameter as it is add()ed to this object
+    (i.e. add() has access to values set via the commandline or in
+    scripts).
+
+    Values set via set_in_context() or exec_in_context() (used by -p)
+    are tracked: warnings are issued for overwritten values, and
+    unused values can be warned about via check_for_unused_names().
+
+    The context is not saved in snapshots, but parameter values are
+    saved.
     """
     context = None
 
