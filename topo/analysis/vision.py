@@ -158,7 +158,7 @@ def phase_preference_scatter_plot(sheet_name,diameter=0.39):
     datax = []
     datay = []
     (v,bb) = preference_map.view()
-    for z in zeros(300):
+    for z in zeros(66):
         x = (r() - 0.5)*2*diameter
         y = (r() - 0.5)*2*diameter
         rand = r()
