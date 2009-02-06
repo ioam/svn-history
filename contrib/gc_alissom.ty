@@ -273,11 +273,11 @@ if dataset=="NoisyDiskstoNatural":
                       
                       
 import topo.analysis.featureresponses
-topo.analysis.featureresponses.FeatureCurveCommand.selectivity_multiplier=1.0
+
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
 topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
 if tracking:
-    topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=5
+    topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
     topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=64
     topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":10},{"contrast":30},{"contrast":50},{"contrast":100}]
 else:
