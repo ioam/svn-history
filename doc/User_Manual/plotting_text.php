@@ -196,28 +196,45 @@ different way.
 
 <P>The available plots are all specified in a general way that allows
 users to change the details of how the data is visualized.  Each plot
-is part of a PlotGroup that specifies a command to run to generate
-the data, and then how to visualize the results for all the Sheets in
-the simulation at once.
+is part of a PlotGroup that specifies a list of commands ('hooks') to
+run to generate the data, and then how to visualize the results for
+all the Sheets in the simulation at once.
 
-<P>The command used is shown in the plot window as "update command",
-where users can add or change parameters or command names as needed.
-For instance, if you want to reduce the number of sine grating phases
-used when measuring orientation maps, say, from 18 to 8, you can
-change the string in the Orientation Preference window from
-<code>measure_or_pref()</code> to
-<code>measure_or_pref(num_phase=8)</code>.  The next time the plot is
-refreshed, the new value will be used instead.  To see what options
-are available for each command, see
-<A HREF="../Reference_Manual/topo.command.analysis-module.html">
-topo/command/analysis.py</A>.
+<P>The list of hooks used is shown in the plot window as "Pre plot hooks",
+where users can change the parameters of existing hooks, and add or remove
+hooks. For instance, if you want to reduce the number of sine grating phases
+used when measuring orientation maps, say, from 18 to 8, you can right click 
+on the list of hooks, choose Properties, 
+and then, in the new window displaying the list entries, right click on the <code>measure_sine_pref.instance()</code> entry:
 
-<P>Some plots also use a "plot command", called after the "update
-command" to actually visualize the results.  For instance,
-some commands generate data for all units in a Sheet, but the
-PlotGroup displays results from only a single sheet; in this case
-the "plot command" (usually much quicker than the "update command") is
-called whenever a new unit is selected.
+<center>
+<img src="images/edit_list.png" WIDTH="455" HEIGHT="136">
+</center>
+
+<P>This will give you a properties window for that hook:
+
+<center>
+<img src="images/list_item_properties.png" WIDTH="441" HEIGHT="569">
+</center>
+
+<P>Here you can reduce the number of phases by dragging the
+appropriate slider. The next time the plot is refreshed, the new value
+will be used instead.  
+
+<P>The properties window for a list entry shows what parameters are
+available; hovering the mouse over a parameter name gives a brief
+description. More detail about various commands is available in <A
+HREF="../Reference_Manual/topo.command.analysis-module.html">
+topo/command/analysis.py</A> and <A
+HREF="../Reference_Manual/topo.command.pylabplots-module.html">
+topo/command/pylabplots.py</A>.
+
+<P>Some plots also use "Plot hooks", called after the "Pre plot
+hooks", to actually visualize the results.  For instance, some
+commands generate data for all units in a Sheet, but the PlotGroup
+displays results from only a single sheet; in this case the plot hooks
+(usually much quicker to run than the pre-plot hooks) are called
+whenever a new unit is selected.
 
 <P> If you often need to change the parameters for map or curve
 measurement, then you can do that easily without modifying your copy
