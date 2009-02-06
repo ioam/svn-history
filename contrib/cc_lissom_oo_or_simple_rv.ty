@@ -283,8 +283,7 @@ def secondStage():
     topo.sim['FakeRetina2'].set_input_generator(zeroInput)
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
-    #topo.sim['V1Complex'].in_connections[2].strength=__main__.__dict__.get('SSLI_Strength',-0.7)
-    randomize_V1Simple_relative_LGN_strength()
+    randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.1))
     
 from topo.analysis.featureresponses import MeasureResponseCommand
 MeasureResponseCommand.scale=3    
