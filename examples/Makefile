@@ -6,7 +6,7 @@
 # easily under Windows as well.
 
 all_quick: hierarchical cfsom_or som_retinotopy lissom_oo_or
-all_long: lissom_oo_or_10000.typ gc_alissom_10000.typ som_retinotopy_40000.typ lissom_or_10000.typ lissom_fsa_10000.typ
+all_long: lissom_oo_or_10000.typ gca_lissom_10000.typ som_retinotopy_40000.typ lissom_or_10000.typ lissom_fsa_10000.typ
 saved-examples: lissom_oo_or_10000.typ
 
 # Allow extra arguments to be passed to the Topographica command line
@@ -55,8 +55,8 @@ lissom_oo_or_10000.typ: lissom_oo_or.ty ../topo/*/*.py
 	../topographica ${TOPOCMD} lissom_oo_or.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
 
 
-gc_alissom_10000.typ: gc_alissom.ty ../topo/*/*.py
-	../topographica ${TOPOCMD} gc_alissom.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
+gca_lissom_10000.typ: gca_lissom.ty ../topo/*/*.py
+	../topographica ${TOPOCMD} gca_lissom.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
 
 
 lissom_or_10000.typ: lissom_or.ty ../topo/*/*.py

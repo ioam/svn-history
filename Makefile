@@ -167,7 +167,7 @@ oo_or_comparisons:
 
 # Test that the specified scripts haven't changed in results or speed.
 #SCRIPTS=^lissom_oo_or.ty ^som_retinotopy.ty
-SCRIPTS= ^hierarchical.ty ^lissom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^lissom.ty ^lissom_fsa.ty ^gc_alissom.ty #^lissom_whisker_barrels.ty
+SCRIPTS= ^hierarchical.ty ^lissom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^lissom.ty ^lissom_fsa.ty ^gca_lissom.ty #^lissom_whisker_barrels.ty
 # CEB: tests on these scripts temporarily suspended (SF.net #2053538)
 # ^lissom_oo_or_homeostatic.ty ^lissom_oo_or_homeostatic_tracked.ty
 # ^lissom_or_noshrinking.ty  - only matches to 4 dp with IMPORT_WEAVE=0 
