@@ -35,7 +35,7 @@ from topo.command.basic import wipe_out_activity, clear_event_queue
 from topo.misc.distribution import Distribution
 from topo.misc.util import cross_product, frange
 from topo.pattern.basic import SineGrating, Gaussian, Rectangle, Disk, OrientationContrast
-from topo.plotting.plotgroup import plotgroups,default_input_sheet,default_measureable_sheet
+from topo.plotting.plotgroup import plotgroups
 from topo.sheet import GeneratorSheet
 
 
