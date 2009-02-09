@@ -13,9 +13,9 @@ differences include:
  - Using a fixed lateral excitatory radius rather than shrinking it
    (now that homeostatic plasticity allows all neurons to develop robustly) 
 
-$Id: lissom_oo_or.ty 9831 2009-01-25 16:34:35Z ceball $
+$Id$
 """
-__version__='$Revision: 9831 $'
+__version__='$Revision$'
 
 
 from math import pi, sqrt
