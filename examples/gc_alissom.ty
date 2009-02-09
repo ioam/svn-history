@@ -113,6 +113,12 @@ projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveN
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 
 
+### Default for tutorial
+pattern.Line.scale=0.9
+pattern.Gaussian.size=0.08333
+pattern.Gaussian.aspect_ratio=4.0
+
+
 ### Input patterns
 if p.dataset=="Gaussian":
     input_type=pattern.Gaussian
@@ -238,4 +244,4 @@ topo.analysis.featureresponses.FeatureCurveCommand.selectivity_multiplier=1.0
 topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=64
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
 topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
-topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":5},{"contrast":10},{"contrast":20},{"contrast":40},{"contrast":80},{"contrast":100}]
+topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":10},{"contrast":30},{"contrast":50},{"contrast":100}]
