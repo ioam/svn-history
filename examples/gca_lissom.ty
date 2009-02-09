@@ -158,7 +158,8 @@ topo.sim['LGNOff']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
     output_fns=[transferfn.HalfRectify()], tsettle=0, measure_maps=False)
 
 # Add the lateral connectivity to LGN
-AddGC()
+AddGC('LGNOn')
+AddGC('LGNOff')
 
 AH = transferfn.ActivityHysteresis(time_constant=0.5) 
 

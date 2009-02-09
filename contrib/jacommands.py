@@ -289,27 +289,26 @@ def divide_with_constant(x,y):
     return numpy.divide(x,y+1.0)
     
 
-def AddGC():
+def AddGC(sheet_name,surround_gaussian_size=0.5,strength=135):
+    """
+    Add divisive normalization to topo.sim[sheet_name], providing
+    contrast gain control and contrast-invariant tuning.
+    """
     from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
     from topo.projection.basic import CFProjection, SharedWeightCFProjection
     from topo.base.boundingregion import BoundingBox
-    lgn_surroundg = Gaussian(size=__main__.__dict__.get('LGNLatSurroundSize',0.5),aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
+    lgn_surroundg = Gaussian(size=surround_gaussian_size,
+                             aspect_ratio=1.0,
+                             output_fns=[DivisiveNormalizeL1()])
 
-
-    topo.sim.connect('LGNOn','LGNOn',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
-                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',135),
-                    nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOn',
-                    weights_generator=lgn_surroundg)
-    
-    topo.sim.connect('LGNOff','LGNOff',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
-                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',135),
-                    nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOff',
-                    weights_generator=lgn_surroundg)
-    
-    topo.sim["LGNOn"].tsettle = 2
-    topo.sim["LGNOff"].tsettle = 2
-    topo.sim["LGNOn"].strict_tsettle=1
-    topo.sim["LGNOff"].strict_tsettle=1
+    topo.sim.connect(sheet_name,sheet_name,delay=0.05,name='LateralGC',
+                     dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
+                     connection_type=SharedWeightCFProjection,
+                     strength=strength,weights_generator=lgn_surroundg,
+                     nominal_bounds_template=BoundingBox(radius=0.5))
+                         
+    topo.sim[sheet_name].tsettle = 2
+    topo.sim[sheet_name].strict_tsettle=1
     
 
 #global parameter holding the activities
