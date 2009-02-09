@@ -636,7 +636,8 @@ class ActivityHysteresis(TransferFnWithState):
     time scale of this interpolation. 
     """
 
-    time_constant  = param.Number(default = 0.3,doc="""Time constant of the continouse projection input calculation.""")
+    time_constant  = param.Number(default=0.3,doc="""
+    Time constant of the continouse projection input calculation.""")
     
     def __init__(self,**params):
         super(ActivityHysteresis,self).__init__(**params)
@@ -644,11 +645,10 @@ class ActivityHysteresis(TransferFnWithState):
         self.old_a = 0 
         import topo.sheet.lissom
         import topo.base.functionfamily
-        #topo.sheet.lissom.LISSOM.beginning_of_iteration.append(self.reset)
         topo.base.functionfamily.PatternDrivenAnalysis.pre_presentation_hooks.append(self.reset)
         
     def __call__(self,x):
-        if (self.first_call == True):
+        if self.first_call is True:
            self.old_a = x.copy() * 0.0
            self.first_call = False
            
@@ -660,6 +660,7 @@ class ActivityHysteresis(TransferFnWithState):
         
     def reset(self):
         self.old_a *= 0
+
 
 class Habituation(TransferFnWithState):
     """ 
