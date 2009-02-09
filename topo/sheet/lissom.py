@@ -13,6 +13,7 @@ import copy
 from .. import param
 
 import topo
+from topo.base.boundingregion import BoundingBox
 from topo.base.functionfamily import TransferFn
 from topo.base.cf import CFSheet, CFPOutputFn
 from topo.base.projection import Projection
@@ -20,8 +21,10 @@ from topo.base.sheet import activity_type
 from topo.base.simulation import EPConnectionEvent
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
-from topo.transferfn.basic import PiecewiseLinear
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.sheet import JointNormalizingCFSheet, JointNormalizingCFSheet_Continuous
+from topo.projection.basic import SharedWeightCFProjection
+from topo.pattern.basic import Gaussian
 
 
 class LISSOM(JointNormalizingCFSheet):
@@ -314,6 +317,30 @@ class JointScaling(LISSOM):
     def state_pop(self,**args):
         super(JointScaling,self).state_pop(**args)
         self.x_avg,self.scaled_x_avg, self.sf, self.lr_sf=self.__current_state_stack.pop()
+
+
+
+def _divide_with_constant(x,y):
+    return numpy.divide(x,y+1.0)
+
+
+def add_gc(sheet_name,surround_gaussian_size=0.5,strength=135):
+    """
+    Add divisive normalization to topo.sim[sheet_name], providing
+    contrast gain control and contrast-invariant tuning.
+    """
+    lgn_surroundg = Gaussian(size=surround_gaussian_size,
+                             aspect_ratio=1.0,
+                             output_fns=[DivisiveNormalizeL1()])
+
+    topo.sim.connect(sheet_name,sheet_name,delay=0.05,name='LateralGC',
+                     dest_port=('Activity'),activity_group=(0.6,_divide_with_constant),
+                     connection_type=SharedWeightCFProjection,
+                     strength=strength,weights_generator=lgn_surroundg,
+                     nominal_bounds_template=BoundingBox(radius=0.5))
+                         
+    topo.sim[sheet_name].tsettle = 2
+    topo.sim[sheet_name].strict_tsettle=1
 
 
 

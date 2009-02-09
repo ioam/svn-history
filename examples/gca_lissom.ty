@@ -31,9 +31,6 @@ import topo.responsefn.optimized
 import topo.sheet.lissom
 import topo.sheet.optimized
 
-# ALERT: Need to eliminate these imports by moving them into topo/
-from contrib.jacommands import AddGC
-
 
 # Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
@@ -158,8 +155,8 @@ topo.sim['LGNOff']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
     output_fns=[transferfn.HalfRectify()], tsettle=0, measure_maps=False)
 
 # Add the lateral connectivity to LGN
-AddGC('LGNOn')
-AddGC('LGNOff')
+topo.sheet.lissom.add_gc('LGNOn')
+topo.sheet.lissom.add_gc('LGNOff')
 
 AH = transferfn.ActivityHysteresis(time_constant=0.5) 
 

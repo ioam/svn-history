@@ -282,33 +282,7 @@ def AddV2():
     topo.sim.schedule_command( 26500,LE+'.change_bounds(BoundingBox(radius=0.00484))')
     topo.sim.schedule_command( 28000,LE+'.change_bounds(BoundingBox(radius=0.00290))')
     topo.sim.schedule_command(40000,LE+'.change_bounds(BoundingBox(radius=0.00174))')
-    
-    
-
-def divide_with_constant(x,y):
-    return numpy.divide(x,y+1.0)
-    
-
-def AddGC(sheet_name,surround_gaussian_size=0.5,strength=135):
-    """
-    Add divisive normalization to topo.sim[sheet_name], providing
-    contrast gain control and contrast-invariant tuning.
-    """
-    from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
-    from topo.projection.basic import CFProjection, SharedWeightCFProjection
-    from topo.base.boundingregion import BoundingBox
-    lgn_surroundg = Gaussian(size=surround_gaussian_size,
-                             aspect_ratio=1.0,
-                             output_fns=[DivisiveNormalizeL1()])
-
-    topo.sim.connect(sheet_name,sheet_name,delay=0.05,name='LateralGC',
-                     dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
-                     connection_type=SharedWeightCFProjection,
-                     strength=strength,weights_generator=lgn_surroundg,
-                     nominal_bounds_template=BoundingBox(radius=0.5))
-                         
-    topo.sim[sheet_name].tsettle = 2
-    topo.sim[sheet_name].strict_tsettle=1
+        
     
 
 #global parameter holding the activities
