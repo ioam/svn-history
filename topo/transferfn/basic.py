@@ -37,6 +37,7 @@ from topo.pattern.basic import Gaussian
 
 # CEBHACKALERT: these need to respect the mask - which will be passed in.
 
+# CEBALERT: copy.copy(x) where x is a numpy array should probably be x.copy()
 
 class PiecewiseLinear(TransferFn):
     """ 
@@ -847,6 +848,57 @@ class ScalingTF(TransferFnWithState):
         
         x *= self.sf
               
+
+class HomeostaticResponse(TransferFnWithState):
+    """
+  Using homeostatic adaptation (A) rather than manual threshold adjustment,
+   to avoid the need for most parameter adjustment and to be more robust
+
+    """
+
+    input_output_ratio = param.Number(default=3.6,doc="""
+    The ratio between the average input and output activity.""")
+    
+    t_init = param.Number(default=0.0,doc="""
+    Threshold parameter.""")
+    
+    eta = param.Number(default=0.0002,doc="""
+    Learning rate for homeostatic plasticity.""")
+    
+    smoothing = param.Number(default=0.9997,doc="""
+    Weighting of previous activity vs. current activity when
+    calculating the average.""")
+    
+    randomized_init = param.Boolean(False,doc="""
+    Whether to randomize the initial t parameter.""")
+    
+    noise_magnitude =  param.Number(default=0.1,doc="""
+    The magnitude of the additive noise to apply to the B parameter at
+    initialization.""")
+        
+    def __init__(self,**params):
+        super(HomeostaticResponse,self).__init__(**params)
+        self.first_call = True
+        self.mu = 0
+
+    def __call__(self,x):
+        if self.first_call:
+            self.first_call = False
+            if self.randomized_init:
+                self.t = ones(x.shape, x.dtype.char) * self.t_init + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitude*2
+            else:
+                self.t = ones(x.shape, x.dtype.char) * self.t_init
+            
+            self.y_avg = zeros(x.shape, x.dtype.char) * self.mu
+
+        x_orig = copy.copy(x)
+        x -= self.t
+        clip_lower(x,0)
+        self.mu = topo.sim["V1"].x_avg/self.input_output_ratio
+        if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
+            self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
+            self.t += self.eta * (self.y_avg - self.mu)
+        # recalculate the mu based on the input/ output ratio
 
 
 
