@@ -189,13 +189,20 @@ class EventProcessor(param.Parameterized):
 
     ### JABALERT: Should change send_output to accept a list of src_ports, not a single src_port.
     def send_output(self,src_port=None,data=None):
-        """Send some data out to all connections on the given src_port."""
+        """
+        Send some data out to all connections on the given src_port.
+        The data is deepcopied before it is sent out, to ensure that
+        future changes to the data are not reflected in events from
+        the past.
+        """
+        
         out_conns_on_src_port = [conn for conn in self.out_connections
                                  if self._port_match(conn.src_port,[src_port])]
 
+        data=deepcopy(data)
         for conn in out_conns_on_src_port:
             #self.verbose("Sending output on src_port %s via connection %s to %s" % (str(src_port), conn.name, conn.dest.name))
-            e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
+            e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data,deep_copy=False)
             self.simulation.enqueue_event(e)
             
 
@@ -409,14 +416,20 @@ class EPConnectionEvent(Event):
     the src wants to provide, and a link to the connection over which
     it has arrived, so that the dest can determine what to do with the
     data.
+
+    By default, the data is deepcopied before being added to this
+    instance for safety (e.g. so that future changes to data
+    structures do not affect messages arriving from the past).
+    However, if you can ensure that the copying is not
+    necessary (e.g. if you deepcoy before sending a set of
+    identical messages), then you can pass deep_copy=False
+    to avoid the copy.
     """
-    def __init__(self,time,conn,data=None):
+    
+    def __init__(self,time,conn,data=None,deep_copy=True):
         super(EPConnectionEvent,self).__init__(time)
         assert isinstance(conn,EPConnection)
-        ### JABALERT: Do we always want to deepcopy here?
-        ### E.g. the same data sent to a dozen ports should probably have
-        ### only one copy.
-        self.data = deepcopy(data)
+        self.data = deepcopy(data) if deep_copy else data
         self.conn = conn
 
     def __call__(self,sim):
