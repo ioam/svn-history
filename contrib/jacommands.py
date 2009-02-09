@@ -601,7 +601,15 @@ class CascadeHomeostatic(TransferFnWithState):
                 print "\n"
                 
 
-  
+import topo.transferfn.basic
+ActivityHysteresis = topo.transferfn.basic.Hysteresis
+SimpleHomeoLinearRelative = topo.transferfn.basic.HomeostaticResponse
+
+import topo.sheet.lissom
+def AddGC():
+    topo.sheet.lissom.add_gc('LGNOn')
+    topo.sheet.lissom.add_gc('LGNOff')
+
 
 
 class Habituation(TransferFnWithState):
