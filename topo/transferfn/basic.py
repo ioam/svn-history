@@ -852,30 +852,29 @@ class ScalingTF(TransferFnWithState):
 
 class HomeostaticResponse(TransferFnWithState):
     """
-    Using homeostatic adaptation (A) rather than manual threshold
-    adjustment, to avoid the need for most parameter adjustment and to
-    be more robust
+    Adapts the parameters of a linear threshold function to maintain a
+    constant desired ratio between input and output.
     """
 
     input_output_ratio = param.Number(default=3.6,doc="""
-    The ratio between the average input and output activity.""")
+        The desired ratio between the average input and output activity.""")
     
     t_init = param.Number(default=0.0,doc="""
-    Threshold parameter.""")
+        Initial value of the threshold.""")
     
     eta = param.Number(default=0.0002,doc="""
-    Learning rate for homeostatic plasticity.""")
+        Learning rate for homeostatic plasticity.""")
     
     smoothing = param.Number(default=0.9997,doc="""
-    Weighting of previous activity vs. current activity when
-    calculating the average.""")
+        Weighting of previous activity vs. current activity when
+        calculating the average.""")
     
     randomized_init = param.Boolean(False,doc="""
-    Whether to randomize the initial t parameter.""")
+        Whether to randomize the initial t parameter.""")
     
     noise_magnitude =  param.Number(default=0.1,doc="""
-    The magnitude of the additive noise to apply to the B parameter at
-    initialization.""")
+        The magnitude of the additive noise to apply to the t_init
+        parameter at initialization.""")
         
     def __init__(self,**params):
         super(HomeostaticResponse,self).__init__(**params)
@@ -904,11 +903,12 @@ class HomeostaticResponse(TransferFnWithState):
 
 class Hysteresis(TransferFnWithState):
     """
-    Smoothly interpolates a matrix between simulation time steps.
+    Smoothly interpolates a matrix between simulation time steps, with
+    exponential falloff.
     """
 
     time_constant  = param.Number(default=0.3,doc="""
-    Controls the time scale of the iterpolation.""")
+        Controls the time scale of the iterpolation.""")
     
     def __init__(self,**params):
         super(Hysteresis,self).__init__(**params)
