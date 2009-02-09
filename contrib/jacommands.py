@@ -401,16 +401,30 @@ class SimpleHomeoLinear(TransferFnWithState):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
             self.t += self.eta * (self.y_avg - self.mu)
 
-class SimpleHomeoLinearRelative(TransferFnWithState):
-    input_output_ratio = param.Number(default=3.6,doc="The ratio between the average input and output activity")
-    t_init = param.Number(default=0.0,doc="Threshold parameter")
-    eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
-    smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
-    randomized_init = param.Boolean(False, doc="Whether to randomize the initial t parameter")
-    noise_magnitude =  param.Number(default=0.1, doc="The magnitude of the additive noise to apply to the B parameter at initialization")
+class HomeostaticResponse(TransferFnWithState):
+
+    input_output_ratio = param.Number(default=3.6,doc="""
+    The ratio between the average input and output activity.""")
+    
+    t_init = param.Number(default=0.0,doc="""
+    Threshold parameter.""")
+    
+    eta = param.Number(default=0.0002,doc="""
+    Learning rate for homeostatic plasticity.""")
+    
+    smoothing = param.Number(default=0.9997,doc="""
+    Weighting of previous activity vs. current activity when
+    calculating the average.""")
+    
+    randomized_init = param.Boolean(False,doc="""
+    Whether to randomize the initial t parameter.""")
+    
+    noise_magnitude =  param.Number(default=0.1,doc="""
+    The magnitude of the additive noise to apply to the B parameter at
+    initialization.""")
         
     def __init__(self,**params):
-        super(SimpleHomeoLinearRelative,self).__init__(**params)
+        super(HomeostaticResponse,self).__init__(**params)
         self.first_call = True
         self.mu = 0
 

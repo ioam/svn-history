@@ -32,7 +32,7 @@ import topo.sheet.lissom
 import topo.sheet.optimized
 
 # ALERT: Need to eliminate these imports by moving them into topo/
-from contrib.jacommands import SimpleHomeoLinearRelative, AddGC, ActivityHysteresis
+from contrib.jacommands import HomeostaticResponse, AddGC, ActivityHysteresis
 
 
 # Parameters that can be passed on the command line using -p
@@ -162,7 +162,7 @@ AddGC()
 
 AH = ActivityHysteresis(time_constant=0.5) 
 
-V1_OF=SimpleHomeoLinearRelative(smoothing=p.V1_smoothing,eta=p.eta,
+V1_OF=HomeostaticResponse(smoothing=p.V1_smoothing,eta=p.eta,
                                 input_output_ratio=p.io_ratio,t_init=0.15)
 
 topo.sim['V1'] = sheet.lissom.JointScaling(nominal_density=p.cortex_density,
