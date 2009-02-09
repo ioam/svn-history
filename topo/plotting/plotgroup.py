@@ -516,10 +516,12 @@ class TemplatePlotGroup(SheetPlotGroup):
 
 
 def default_measureable_sheet():
-    """Returns the first sheet for which measure_maps is True, for use as a default value."""
+    """Returns the first sheet for which measure_maps is True (if any), or else the first sheet, for use as a default value."""
 
     sheets = [s for s in topo.sim.objects(Sheet).values()
               if hasattr(s,'measure_maps') and s.measure_maps]
+    if len(sheets)<1:
+        sheets = [s for s in topo.sim.objects(Sheet).values()]
     if len(sheets)<1:
         raise ValueError("Unable to find a suitable measureable sheet.")
     sht=sheets[0]
