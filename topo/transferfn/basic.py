@@ -908,7 +908,7 @@ class Hysteresis(TransferFnWithState):
     """
 
     time_constant  = param.Number(default=0.3,doc="""
-        Controls the time scale of the iterpolation.""")
+        Controls the time scale of the interpolation.""")
     
     def __init__(self,**params):
         super(Hysteresis,self).__init__(**params)
