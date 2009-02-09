@@ -23,6 +23,7 @@ from numpy import exp,zeros,ones,power
 from numpy.oldnumeric import dot
 
 import topo
+import topo.base.functionfamily
 from topo.base.sheet import activity_type
 from topo.base.arrayutil import clip_lower
 from topo.base.arrayutil import L2norm, norm, array_argmax
@@ -901,22 +902,18 @@ class HomeostaticResponse(TransferFnWithState):
         # recalculate the mu based on the input/ output ratio
 
 
-class ActivityHysteresis(TransferFnWithState):
-    """ 
-    This output function allows the activity to be smoothly interpolated between 
-    individual time step of the simulation. The time_constant paremater controls the 
-    time scale of this interpolation. 
+class Hysteresis(TransferFnWithState):
+    """
+    Smoothly interpolates a matrix between simulation time steps.
     """
 
     time_constant  = param.Number(default=0.3,doc="""
-    Time constant of the continouse projection input calculation.""")
+    Controls the time scale of the iterpolation.""")
     
     def __init__(self,**params):
-        super(ActivityHysteresis,self).__init__(**params)
+        super(Hysteresis,self).__init__(**params)
         self.first_call = True
         self.old_a = 0 
-        import topo.sheet.lissom
-        import topo.base.functionfamily
         topo.base.functionfamily.PatternDrivenAnalysis.pre_presentation_hooks.append(self.reset)
         
     def __call__(self,x):

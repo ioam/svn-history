@@ -158,7 +158,7 @@ topo.sim['LGNOff']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
 topo.sheet.lissom.add_gc('LGNOn')
 topo.sheet.lissom.add_gc('LGNOff')
 
-AH = transferfn.ActivityHysteresis(time_constant=0.5) 
+AH = transferfn.Hysteresis(time_constant=0.5) 
 
 V1_OF=transferfn.HomeostaticResponse(smoothing=p.V1_smoothing,eta=p.eta,
                                      input_output_ratio=p.io_ratio,t_init=0.15)
