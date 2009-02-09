@@ -327,8 +327,11 @@ def _divide_with_constant(x,y):
 def add_gc(sheet_name,surround_gaussian_size=0.5,strength=135):
     """
     Add divisive normalization to topo.sim[sheet_name], providing
-    contrast gain control and contrast-invariant tuning.
+    contrast gain control and contrast-invariant tuning.  Should
+    be used with an LGN sheet of type LISSOM, so that it will
+    respect the tsettle and strict_tsettle parameters.
     """
+    
     lgn_surroundg = Gaussian(size=surround_gaussian_size,
                              aspect_ratio=1.0,
                              output_fns=[DivisiveNormalizeL1()])
