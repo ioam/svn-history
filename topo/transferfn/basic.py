@@ -851,9 +851,9 @@ class ScalingTF(TransferFnWithState):
 
 class HomeostaticResponse(TransferFnWithState):
     """
-  Using homeostatic adaptation (A) rather than manual threshold adjustment,
-   to avoid the need for most parameter adjustment and to be more robust
-
+    Using homeostatic adaptation (A) rather than manual threshold
+    adjustment, to avoid the need for most parameter adjustment and to
+    be more robust
     """
 
     input_output_ratio = param.Number(default=3.6,doc="""
@@ -901,5 +901,39 @@ class HomeostaticResponse(TransferFnWithState):
         # recalculate the mu based on the input/ output ratio
 
 
+class ActivityHysteresis(TransferFnWithState):
+    """ 
+    This output function allows the activity to be smoothly interpolated between 
+    individual time step of the simulation. The time_constant paremater controls the 
+    time scale of this interpolation. 
+    """
+
+    time_constant  = param.Number(default=0.3,doc="""
+    Time constant of the continouse projection input calculation.""")
+    
+    def __init__(self,**params):
+        super(ActivityHysteresis,self).__init__(**params)
+        self.first_call = True
+        self.old_a = 0 
+        import topo.sheet.lissom
+        import topo.base.functionfamily
+        topo.base.functionfamily.PatternDrivenAnalysis.pre_presentation_hooks.append(self.reset)
+        
+    def __call__(self,x):
+        if self.first_call is True:
+           self.old_a = x.copy() * 0.0
+           self.first_call = False
+           
+        #if (float(topo.sim.time()) %1.0) <= 0.15: self.old_a =  self.old_a* 0 
+        new_a = x.copy()
+        self.old_a = self.old_a + (new_a - self.old_a)*self.time_constant
+        x*=0
+        x += self.old_a
+        
+    def reset(self):
+        self.old_a *= 0
+
+
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,TransferFn)]))
+

@@ -32,7 +32,7 @@ import topo.sheet.lissom
 import topo.sheet.optimized
 
 # ALERT: Need to eliminate these imports by moving them into topo/
-from contrib.jacommands import AddGC, ActivityHysteresis
+from contrib.jacommands import AddGC
 
 
 # Parameters that can be passed on the command line using -p
@@ -160,7 +160,7 @@ topo.sim['LGNOff']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
 # Add the lateral connectivity to LGN
 AddGC()
 
-AH = ActivityHysteresis(time_constant=0.5) 
+AH = transferfn.ActivityHysteresis(time_constant=0.5) 
 
 V1_OF=transferfn.HomeostaticResponse(smoothing=p.V1_smoothing,eta=p.eta,
                                      input_output_ratio=p.io_ratio,t_init=0.15)
