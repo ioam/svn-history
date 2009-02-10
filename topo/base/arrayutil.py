@@ -8,7 +8,7 @@ __version__ = "$Revision$"
 import re
 
 from numpy import sqrt,dot,arctan2,array2string,logical_not,fmod,floor,\
-     array,concatenate,set_printoptions
+     array,concatenate,set_printoptions,divide
 from numpy import abs # pylint: disable-msg=W0622
 from numpy import ufunc
 
@@ -175,4 +175,9 @@ def array_argmax(mat):
     return r,c
 
 
-
+def divide_with_constant(x,y):
+    """
+    Divide two scalars or arrays with a constant (1.0) offset on the
+    denominator to avoid divide-by-zero issues.
+    """ 
+    return divide(x,y+1.0)
