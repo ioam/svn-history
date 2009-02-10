@@ -22,7 +22,7 @@ orientation map network (a .typ file), which can be done by running
 <P>Depending on the speed of your machine, you may want to go get a
 snack at this point; on a 3GHz 512MB machine this training process
 currently takes from 7-15 minutes (depending on the amount of level
-2 cache).<!--lodestar: 15:46 ; cortex: 7:31; fiver: 8:07 -->
+2 cache).<!--lodestar: 15:46 ; cortex: 7:31; fiver: 8:07; jupiter1: 9:00 -->
 </p>
 
 
@@ -87,7 +87,7 @@ class='t_item'>Simulation</span> menu to get the
 
 <p class='center'>
 <img src="images/test_pattern_oo.png" alt="Test Pattern window"
-align="middle" WIDTH="332" HEIGHT="774">
+align="middle" WIDTH="315" HEIGHT="720">
 </p>
 
 <p>
@@ -104,7 +104,7 @@ network.
 window should then show the result:
 <p class='center'>
 <img src="images/activity_line_oo.png" alt="Response to a line"
-align="middle" WIDTH="490" HEIGHT="342">
+align="middle" WIDTH="668" HEIGHT="360">
 </p>
 
 <P>This window shows the response for each neural area.  For now, please
@@ -152,7 +152,7 @@ neuron in the center of the cortex (by default):
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo.png" alt="Weights of one neuron"
-align="middle" WIDTH="490" HEIGHT="421">
+align="middle" WIDTH="668" HEIGHT="421">
 </p>
 
 <P>Again, please make sure for now that <span class='t_item'>Strength
@@ -164,7 +164,7 @@ excitatory and lateral inhibitory weights to that neuron from nearby
 neurons in V1. The afferent weights represent the retinal pattern that
 would most excite the neuron.  For the particular neuron shown above,
 the optimal retinal stimulus would be a short, bright line oriented at
-about 160 degrees (from 10 o'clock to 4 o'clock) in the center of the
+about 0 degrees (from 9 o'clock to 3 o'clock) in the center of the
 retina. (Note that the particular neuron you are viewing may have a
 different preferred orientation.)
 </p><p></p></li>
@@ -177,12 +177,12 @@ inputs). To see what the other neurons look like, select
 from the <span class='t_item'>Plots</span> menu, then select <span
 class='t_item'>LGNOnAfferent</span> from the drop-down <span
 class='t_item'>Projection</span> list, followed by the refresh
-arrow next to 'Update command':
+arrow next to 'Pre plot hooks':
   
 
 <p class="center">
 <img src="images/projection_oo.png" alt="Afferent weights of many neurons"
-align="middle" WIDTH="396" HEIGHT="475">
+align="middle" WIDTH="496" HEIGHT="415">
 </p>
 
 This plot shows the afferent weights from the LGN ON sheet for every fifth neuron in each
@@ -204,7 +204,7 @@ neuron.  The results of a similar procedure can be viewed by selecting
 
 <p class="center">
 <img src="images/oo_or_map.png" alt="Orientation map"
-align="middle" WIDTH="583" HEIGHT="428">
+align="middle" WIDTH="597" HEIGHT="414">
 </p><br>
 
 <P>
@@ -227,6 +227,10 @@ orientation, and the stronger the selectivity, the brighter the color.
 In this case, because the neurons are strongly selective, the
 Preference&Selectivity plot is nearly identical to the Preference plot.
 
+<P>Phase preference and selectivity are also displayed in the
+window, but these are not analysed here (and are not shown above).
+
+
 </p><p>
 </p></li>
 
@@ -238,7 +242,7 @@ class='t_item'>Strength only</span> is now turned <i>off</i> in the
 
 <p class="center">
 <img src="images/activity_line_oo_or.png" alt="Color-coded response to a line"
-align="middle" WIDTH="490" HEIGHT="342"><br />
+align="middle" WIDTH="668" HEIGHT="360"><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -266,14 +270,13 @@ located in a patch of neurons with similar orientation preferences:
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of one neuron"
-align="middle" WIDTH="490" HEIGHT="421"><br />
+align="middle" WIDTH="668" HEIGHT="421"><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
 <P> Look at the <span class='t_item'>LateralExcitatory</span> weights,
 which show that the neurons near the above neuron are nearly all
-purple, to match its preferred orientation.
-<!-- somewhere might want to say this one almost falls on a boundary--> 
+red, to match its preferred orientation.
 
 <P>
 Returning to the <span class='w_title'>Test pattern</span> window,
@@ -284,7 +287,7 @@ on one of the cyan-colored patches of activity. This will bring up a menu:
 
 <p class="center">
 <img src="images/lissom_oo_or_activity_rightclick.png" alt="Right-click menu"
-align="middle" WIDTH="424" HEIGHT="109" >
+align="middle" WIDTH="444" HEIGHT="125" >
 </p><br>
 
 <!--CB: should probably be a list-->
@@ -300,7 +303,7 @@ so we choose <span class='t_item'>Connection Fields</span> from the
 
 <p class="center">
 <img src="images/unit_weights_41_24_oo_or.png" alt="Colorized weights of one neuron"
-align="middle" WIDTH="490" HEIGHT="421"><br />
+align="middle" WIDTH="668" HEIGHT="421"><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -330,7 +333,7 @@ is true of the map generated by LISSOM:
 
 <p class="center">
 <img src="images/lissom_oo_or_orpref_ft.png" alt="FT of orientation preference map"
-align="middle" WIDTH="310" HEIGHT="329">
+align="middle" WIDTH="420" HEIGHT="473">
 </p><br>
 
 </li>
@@ -399,7 +402,7 @@ orientation-specific responses to large contours in the image:
 
 <p class="center">
 <img src="images/natural_image_oo_or.png" alt="Ellen Arthur"
-align="middle" WIDTH="379" HEIGHT="346"><br />
+align="middle" WIDTH="484" HEIGHT="360"><br />
 </p>
 
 <P>Here we have enabled <span class='t_item'>Sheet coords</span>
@@ -547,7 +550,7 @@ change <span class='t_item'>Run for</span> to 20 and press return) you
 can plot (or refresh) an <span class='w_title'>Orientation
 Preference</span> map to see what sort of orientation map has
 developed.  (Press the 'Refresh' button next to the <span
-class='t_item'>Update command</span> item if no plot is visible when
+class='t_item'>Pre plot hooks</span> if no plot is visible when
 first opening the window.  Measuring a new map will usually take about
 15 seconds to complete.)  If you've changed the learning rate to a
 high value, or haven't presented many inputs, the map will not
