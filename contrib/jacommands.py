@@ -605,10 +605,35 @@ import topo.transferfn.basic
 ActivityHysteresis = topo.transferfn.basic.Hysteresis
 SimpleHomeoLinearRelative = topo.transferfn.basic.HomeostaticResponse
 
-import topo.sheet.lissom
+def _divide_with_constant(x,y):
+    return numpy.divide(x,y+1.0)
+
+
+def add_gc(sheet_name,surround_gaussian_size=0.5,strength=135):
+    """
+    Add divisive normalization to topo.sim[sheet_name], providing
+    contrast gain control and contrast-invariant tuning.  Should
+    be used with an LGN sheet of type LISSOM, so that it will
+    respect the tsettle and strict_tsettle parameters.
+    """
+    
+    lgn_surroundg = Gaussian(size=surround_gaussian_size,
+                             aspect_ratio=1.0,
+                             output_fns=[DivisiveNormalizeL1()])
+
+    topo.sim.connect(sheet_name,sheet_name,delay=0.05,name='LateralGC',
+                     dest_port=('Activity'),activity_group=(0.6,_divide_with_constant),
+                     connection_type=SharedWeightCFProjection,
+                     strength=strength,weights_generator=lgn_surroundg,
+                     nominal_bounds_template=BoundingBox(radius=0.5))
+                         
+    topo.sim[sheet_name].tsettle = 2
+    topo.sim[sheet_name].strict_tsettle=1
+
+
 def AddGC():
-    topo.sheet.lissom.add_gc('LGNOn')
-    topo.sheet.lissom.add_gc('LGNOff')
+    add_gc('LGNOn')
+    add_gc('LGNOff')
 
 
 
