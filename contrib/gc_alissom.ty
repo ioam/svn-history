@@ -109,7 +109,7 @@ elif dataset=="NoisyDiskstoNatural":
 #Sheet coordinates of units to track for debugging
 units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
 default_density = locals().get('default_density',48)
-default_retinal_density = locals().get('default_retinal_density',default_density/2)
+default_retinal_density = locals().get('default_retinal_density',default_density/4)
   
 #Smoothing value for exponential averaging
 smoothing=locals().get('smoothing',0.999)
@@ -120,7 +120,7 @@ LGN_on_output_fns=[HalfRectify()]
 LGN_off_output_fns=[HalfRectify()]
 
 # The ratio between the input and ouptut of the V1 neurons
-io_ratio=locals().get('io_ratio',3.6) 
+io_ratio=locals().get('io_ratio',4.2) 
 
 tracking=locals().get('tracking', False) # Turn tracking on or off
 
@@ -211,7 +211,7 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,
                  learning_fn=CFPLF_Scaled_opt(),
-                 strength=locals().get('aff_str',25.0),name='LGNOnAfferent',
+                 strength=locals().get('aff_str',15.0),name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
          learning_rate=locals().get('aff_lr',2))
@@ -219,7 +219,7 @@ topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','J
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
          connection_type=CFProjection,
                  learning_fn=CFPLF_Scaled_opt(),
-                 strength=locals().get('aff_str',25.0),name='LGNOffAfferent',
+                 strength=locals().get('aff_str',15.0),name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
          learning_rate=locals().get('aff_lr',2))
@@ -257,18 +257,6 @@ changetime = locals().get('changetime',6000)# Time at which patterns or strength
 
 changetargets = locals().get('changetargets',True) #If false, targets for afferent scaling and output function adjustment are not changed.
 if dataset=="NoisyDiskstoNatural":
-    if changetargets==True:
-        new_frequency = locals().get('new_frequency',5)
-        new_balance = locals().get('new_balance',4)
-        new_mu=0.0045*new_frequency
-        new_afferent_target = new_mu*new_balance
-        topo.sim.schedule_command(changetime,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
-        topo.sim.schedule_command(changetime,'topo.sim["V1"].target=new_afferent_target')
-        if tracking==True:
-            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fns[1].mu=new_mu')
-        else:
-            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fns[0].mu=new_mu')
-    else:
         topo.sim.schedule_command(changetime,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
                       
                       
@@ -276,9 +264,9 @@ import topo.analysis.featureresponses
 
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
 topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
-if tracking:
+if tracking=True:
     topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
-    topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=64
+    topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=32
     topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":10},{"contrast":30},{"contrast":50},{"contrast":100}]
 else:
     topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=16
