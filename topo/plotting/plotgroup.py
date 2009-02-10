@@ -453,10 +453,10 @@ class TemplatePlotGroup(SheetPlotGroup):
         Documentation string describing this type of plot.""")
 
     plot_immediately=param.Boolean(False,doc="""
-        Whether to call the plot command at once or only when the user asks for a refresh.
+        Whether to call the pre-plot hooks at once or only when the user asks for a refresh.
  
         Should be set to true for quick plots, but false for those that take a long time
-        to calculate, so that the user can change the update command if necessary.""")
+        to calculate, so that the user can change the hooks if necessary.""")
     
     prerequisites=param.List([],doc="""
         List of preference maps that must exist before this plot can be calculated.""")

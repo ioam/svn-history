@@ -175,9 +175,9 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         # units. Surely tk has a function to convert between
         # text and screen units?
         no_plot_note_text = """      
-Press Refresh on the update command to generate the plot, after modifying the commands below if necessary. Note that Refreshing may take some time.
+Press Refresh on the pre-plot hooks to generate the plot, after modifying the hooks below if necessary. Note that Refreshing may take some time.
 
-Many commands accept 'display=True' so that the progress can be viewed in an open Activity window, e.g. for debugging.
+Many hooks accept 'display=True' so that the progress can be viewed in an open Activity window, e.g. for debugging.
 """
 
         self.no_plot_note=Label(self.plot_container,text=no_plot_note_text,

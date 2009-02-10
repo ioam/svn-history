@@ -211,7 +211,7 @@ and then, in the new window displaying the list entries, right click on the <cod
 <img src="images/edit_list.png" WIDTH="455" HEIGHT="136">
 </center>
 
-<P>This will give you a properties window for that hook:
+<P>This will give you a properties window for that item:
 
 <center>
 <img src="images/list_item_properties.png" WIDTH="441" HEIGHT="569">

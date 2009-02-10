@@ -503,9 +503,10 @@ button:
   o.Refresh() # measure the map: equivalent to pressing the Refresh button
 </pre>
   
-<P>Parameters of the plots can also be set. Continuing from the previous example,
-we can switch the plots to be in sheet coordinates, and alter the update command
-so that progress will be displayed in an open Activity window:
+<P>Parameters of the plots can also be set. Continuing from the
+previous example, we can switch the plots to be in sheet coordinates,
+and alter the pre-plot hooks so that progress will be displayed in an
+open Activity window:
 
 <pre>
   o.sheet_coords=False
