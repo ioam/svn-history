@@ -49,7 +49,7 @@ Topographica is installed in <code>/home/jbednar/public/topographica/</code>.
   
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
-align="middle" WIDTH="426" HEIGHT="149">
+align="middle" WIDTH="409" HEIGHT="127">
 </p>
 <p>
 The window and button style will differ on different platforms, but
