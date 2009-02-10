@@ -378,21 +378,17 @@ class EditorCanvas(Canvas):
         return i
 
     def toggle_object_density(self):
-        if EditorNode.show_density:
-            EditorNode.show_density = False
+        if EditorSheet.show_density:
+            EditorSheet.show_density = False
         else:
-            EditorNode.show_density = True
+            EditorSheet.show_density = True
         self.refresh() 
 
     def toggle_object_activity(self):
-        if EditorNode.show_activity:
-            EditorNode.show_activity = False
-            view = 'normal'
+        if EditorSheet.view == 'activity':
+            EditorSheet.view = 'normal'
         else:
-            EditorNode.show_activity = True
-            view = 'activity'
-        for obj in self.object_list:
-            obj.select_view(view)
+            EditorSheet.view = 'activity'
         self.refresh()
 
     def get_object_xy(self, x, y) : 
@@ -486,7 +482,7 @@ class EditorCanvas(Canvas):
             for i in self.object_indices:
                 self.item_menu.entryconfig(i,foreground = 'Gray', activeforeground = 'Gray')
         if (focus != None):
-            for (label, function) in focus.get_viewing_choices():
+            for (label, function) in focus.viewing_choices:
                 self.view.add_command(label = label, command = function)
             # give the connection or object the focus
             focus.set_focus(True)
@@ -1148,10 +1144,6 @@ class EditorEP(EditorNode):
     """
     Represents any topo EventProcessor as a small, fixed-size oval by default.
     """
-    normalize = param.Boolean(default=False)
-    show_density = param.Boolean(default=False)
-    view = param.Enumeration(default='activity',
-                       available=['normal','activity'])
     
     def __init__(self, canvas, simobj, pos, name):
         EditorNode.__init__(self, canvas, simobj, pos, name)
@@ -1163,14 +1155,9 @@ class EditorEP(EditorNode):
         self.init_draw(col, False) # create a new parallelogram
         self.currentCol = col
         self.gradient = 1
-        self.viewing_choices = [('Normal', lambda: self.select_view('normal')),
-                                ('Activity', lambda: self.select_view('activity'))]
 
 
     #   Draw methods
-
-    def get_viewing_choices(self):
-        return self.viewing_choices
 
     def set_focus(self, focus):
         for id in self.id:
@@ -1357,11 +1344,6 @@ class EditorSheet(EditorEP):
         self.init_draw(col, focus) # create new one with correct colour
         self.currentCol = col
         self.draw()
-
-    def select_view(self, view_choice):
-        self.view = view_choice
-        self.set_focus(False)
-        self.canvas.redraw_objects()
 
     def init_draw(self, colour, focus):
         self.id = []
@@ -1568,9 +1550,6 @@ class EditorEPConnection(EditorConnection):
 
     #   Draw methods
     
-    def get_viewing_choices(self):
-        return self.viewing_choices
-
     def select_view(self, view_choice):
         self.view = view_choice
         self.move()
