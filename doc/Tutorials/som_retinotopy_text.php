@@ -59,7 +59,7 @@ develops a mapping of the dimensions of variance in the input space.
 You should now see a window for the GUI:
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
-align="middle" width="426" height="149">
+align="middle" width="409" height="127">
 </p>
   
 <p>
@@ -87,14 +87,14 @@ align="middle" WIDTH="272" HEIGHT="265" border=2>
 <li>To see the initial state of this network, select <span
 class='t_item'>Projection</span> from the <span
 class='t_item'>Plots</span> menu to get the <span
-class='w_title'>Projection</span> window, and press the Update
-command's refresh arrow as the window suggests.  This plot shows the
+class='w_title'>Projection</span> window, and press the Pre plot hooks'
+refresh arrow as the window suggests.  This plot shows the
 initial set of weights from a 10x10 subset of the V1 neurons:
 <!-- (i.e., all neurons for this small network): -->
 
 <p class='center'>
 <img src="images/som_projection_000000.png" alt="Projection window at 0"
-align="middle" WIDTH="379" HEIGHT="545">
+align="middle" WIDTH="496" HEIGHT="505">
 </p>
 
 <p> Each neuron is fully connected to the input units, and thus has a
@@ -112,7 +112,7 @@ cortical space using a Center of Gravity plot.  To get one, open the
 class='w_title'>Topographica Console</span>, select <span
 class='t_item'>Preference Maps</span> and then <span
 class='t_item'>Center of Gravity</span>, and press the Refresh button
-by the Update Command to get several plots.  These plots show the
+by the Pre-plot hooks to get several plots.  These plots show the
 results of computing the <i>center of gravity</i>
 (a.k.a. <i>centroid</i> or <i>center of mass</i>) of the set of input
 weights for each neuron.
@@ -139,7 +139,7 @@ Gravity</span> plot window, although it is more difficult to interpret
 at this stage:
 
 <p class='center'>
-<IMG WIDTH="511" HEIGHT="388" SRC="images/som_cog_000000.png"  align="middle" alt="CoG bitmap plots">
+<IMG WIDTH="505" HEIGHT="360" SRC="images/som_cog_000000.png"  align="middle" alt="CoG bitmap plots">
 </p>
 
 where the V1 X CoG plot shows the X location preferred by each neuron,
@@ -168,7 +168,7 @@ cortical response to the given input pattern.  Select
 the <span class='t_item'>Plots</span> menu to get the following plot:
 
 <p class='center'>
-<IMG WIDTH="379" HEIGHT="388" SRC="images/som_activity_000000.png" align="middle" alt="Activity at 0">
+<IMG WIDTH="402" HEIGHT="360" SRC="images/som_activity_000000.png" align="middle" alt="Activity at 0">
 </p>
 
 <p>This window shows the response for each Sheet in the model, which
@@ -183,7 +183,7 @@ Console</span> window, make sure it says 1, and hit Go.  The
 show something like:
 
 <p class='center'>
-<IMG WIDTH="379" HEIGHT="388" SRC="images/som_activity_000001.png" align="middle" alt="Activity at 0">
+<IMG WIDTH="402" HEIGHT="360" SRC="images/som_activity_000001.png" align="middle" alt="Activity at 1">
 </p>
 
 <p>In the <span class='t_item'>Retina</span> plot, each photoreceptor
@@ -202,7 +202,7 @@ a Gaussian shape, you can look at the Projection Activity plot</a>,
 which shows the feedforward activity in V1:
 
 <p class='center'>
-<IMG WIDTH="379" HEIGHT="418" SRC="images/som_projection_activity_000001.png" align="middle" alt="Projection Activity at 0">
+<IMG WIDTH="402" HEIGHT="380" SRC="images/som_projection_activity_000001.png" align="middle" alt="Projection Activity at 1">
 </p>
 
 <P>Here these responses are best thought of as Euclidean proximity,
@@ -214,13 +214,13 @@ activity appears random because the Euclidean distance from the input
 vector to the initial random weight vector is random.
 
 <P><li> If you now hit the <span class='t_item'>Refresh</span> arrow
-on the Update command in the <span class='w_title'>Projection</span>
+for the pre-plot hooks in the <span class='w_title'>Projection</span>
 window, you'll see that most of the neurons have learned new weight
 patterns based on this input.
 
 <p class='center'>
 <img src="images/som_projection_000001.png" alt="Projection window at 1"
-align="middle" WIDTH="379" HEIGHT="545">
+align="middle" WIDTH="496" HEIGHT="505">
 </p>
 
 (You should probably turn on the <span
@@ -244,7 +244,7 @@ patterns, though not very cleanly yet:
 
 <p class='center'>
 <img src="images/som_projection_000005.png" alt="Projection window at 5"
-align="middle" WIDTH="379" HEIGHT="545">
+align="middle" WIDTH="496" HEIGHT="505">
 </p>
 
 If you look at the Projection Activity window, you will see that the
@@ -262,7 +262,7 @@ After 5000 iterations, updating the <span class='w_title'>Center of
 Gravity</span> should result in something like:
 
 <p class='center'>
-<IMG WIDTH="511" HEIGHT="388" SRC="images/som_cog_005000.png"  align="middle" alt="CoG bitmap plots">
+<IMG WIDTH="505" HEIGHT="360" SRC="images/som_cog_005000.png"  align="middle" alt="CoG bitmap plots">
 </p>
 
 The X and Y CoG plots are now smooth, but not yet the axis-aligned gradients
@@ -288,7 +288,7 @@ selective for typical input patterns:
 
 <P class='center'>
 <img src="images/som_projection_010000.png" alt="Projection window at 10000"
-align="middle" WIDTH="379" HEIGHT="545">
+align="middle" WIDTH="496" HEIGHT="505">
 </p>
 
 
@@ -305,7 +305,7 @@ matching a prototypical input at one location:
 
 <p class='center'>
 <img src="images/som_projection_040000.png" alt="Projection window at 40000"
-align="middle" WIDTH="379" HEIGHT="545">
+align="middle" WIDTH="496" HEIGHT="505">
 </p>
 
 For this particular example, the topographic mapping for the x
