@@ -31,6 +31,8 @@ import topo.responsefn.optimized
 import topo.sheet.lissom
 import topo.sheet.optimized
 
+from topo.base.arrayutil import divide_with_constant
+
 
 # Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
@@ -146,17 +148,23 @@ topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=p.retina_density,
     input_generator=combined_inputs, period=1.0, phase=0.05,
     nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.375+0.5))
 
-topo.sim['LGNOn']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
-    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.5),
-    output_fns=[transferfn.HalfRectify()], measure_maps=False)
 
-topo.sim['LGNOff']=sheet.lissom.LISSOM(nominal_density=p.retina_density,
-    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.5),
-    output_fns=[transferfn.HalfRectify()], tsettle=0, measure_maps=False)
+# LGN has lateral connections for divisive normalization
+for s in ['LGNOn','LGNOff']:
+    topo.sim[s]=sheet.lissom.LISSOM(nominal_density=p.retina_density,
+        nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.5),
+        output_fns=[transferfn.HalfRectify()],
+        tsettle=2,strict_tsettle=1,measure_maps=False)
 
-# Add the lateral connectivity to LGN
-topo.sheet.lissom.add_gc('LGNOn')
-topo.sheet.lissom.add_gc('LGNOff')
+    lgn_surroundg = pattern.Gaussian(size=0.5,aspect_ratio=1.0,
+        output_fns=[transferfn.DivisiveNormalizeL1()])
+
+    topo.sim.connect(s,s,delay=0.05,name='LateralGC',
+                     dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
+                     connection_type=projection.SharedWeightCFProjection,
+                     strength=135,weights_generator=lgn_surroundg,
+                     nominal_bounds_template=sheet.BoundingBox(radius=0.5))
+
 
 AH = transferfn.Hysteresis(time_constant=0.5) 
 
@@ -238,7 +246,7 @@ topo.sim.grid_layout([[None,    'V1',     None],
 ### Set up appropriate defaults for analysis
 
 import topo.analysis.featureresponses
-topo.analysis.featureresponses.FeatureCurveCommand.selectivity_multiplier=1.0
+topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
 topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=64
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
 topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
