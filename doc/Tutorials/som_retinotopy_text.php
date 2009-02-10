@@ -58,7 +58,7 @@ develops a mapping of the dimensions of variance in the input space.
 <p>
 You should now see a window for the GUI:
 <p class='center'>
-<img src="images/topographica_console.png" alt="Console Window"
+<img src="images/som_topographica_console.png" alt="Console Window"
 align="middle" width="409" height="127">
 </p>
   
