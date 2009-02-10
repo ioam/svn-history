@@ -9,7 +9,7 @@ This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> software to explore a
 simple orientation map simulation using weight plots and test pattern
 images.  This particular example uses a <a
-href="http://nn.cs.utexas.edu/lookup?rflissom">LISSOM model</a>
+href="http://nn.cs.utexas.edu/keyword?rflissom">LISSOM model</a>
 cortex, although Topographica supports other models and is easily
 extensible for models not yet supported.
 </p>
