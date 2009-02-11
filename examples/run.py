@@ -162,7 +162,11 @@ targets = {
     "som_retinotopy_40000.typ":run("som_retinotopy.ty",
                                    commands=["topo.sim.run(40000)",
                                              retinotopy_analysis(),
-                                             snapshot("som_retinotopy_40000.typ")])
+                                             snapshot("som_retinotopy_40000.typ")]),
+    "gca_lissom_10000.typ":run("gca_lissom.ty",
+                               commands=["topo.sim.run(10000)",
+                                         or_analysis(),
+                                         snapshot("gca_lissom_10000.typ")])
                               
     }
 
