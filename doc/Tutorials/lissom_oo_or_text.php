@@ -534,7 +534,7 @@ class='w_title'>Projection</span> window.
 changes in the weights of a few neurons in the <span
 class='t_item'>LGNOnAfferent</span> array (by peering closely).  If
 the changes are too subtle for your taste, you can make each input
-have a obvious effect by speeding up learning to a highly implausible
+have an obvious effect by speeding up learning to a highly implausible
 level.  To do this, open the <span class='w_title'>Model Editor</span>
 window, right click on the LGNOnAfferent projection (the cone-shaped
 lines from LGNOn to V1), select Properties, and change Learning Rate
