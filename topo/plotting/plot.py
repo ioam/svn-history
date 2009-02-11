@@ -146,7 +146,11 @@ class TemplatePlot(Plot):
     """
     A bitmap-based plot as specified by a plot template (or plot channels).
     """
-    
+
+    # Not sure why, but this has to be a Parameter to avoid spurious complaints
+    warn_time=param.Number(-2,precedence=-1,doc="Time last warned about stale plots")
+
+
     def __init__(self,channels,sheet_views,density,
                  plot_bounding_box,normalize,**params):
 	"""
@@ -205,7 +209,6 @@ class TemplatePlot(Plot):
 	# def annotated_bitmap(self):  
         # enable other construction....
 
-        self.warn_time=-2
 
     def _get_matrix(self,key):
         """
@@ -229,13 +232,10 @@ class TemplatePlot(Plot):
                 if self.timestamp < 0:
                     self.timestamp = timestamp
                 elif abs(timestamp - self.timestamp) > self.staleness_warning:
-                    # JABALERT: This is supposed to warn only once for each old matrix used, 
-                    # but it's currently warning every time...
-                    if self.warn_time != min(timestamp, self.timestamp):
+                    if TemplatePlot.warn_time != min(timestamp, self.timestamp):
                         self.warning("Combining SheetViews from different times (%s,%s) for plot %s; see staleness_warning" %
                                      (timestamp, self.timestamp,self.name))
-                        self.warn_time = min(timestamp, self.timestamp)
-            
+                        TemplatePlot.warn_time = min(timestamp, self.timestamp)
         return matrix
 
 
