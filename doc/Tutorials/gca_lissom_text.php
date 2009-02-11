@@ -71,8 +71,8 @@ selecting <span class='t_item'>Load snapshot</span> from the
 <code>gca_lissom_10000.typ</code> in the examples/ directory. 
 <!--CEBALERT: update when sure what size we'll use-->
 This small orientation map simulation should load in a few seconds,
-with a 54x54 retina, a 36x36 LGN (composed of one 36x36 OFF channel
-sheet, and one 36x36 ON channel sheet), and a 48x48 V1 with about two
+with a 78x78 retina, a 60x60 LGN (composed of one 60x60 OFF channel
+sheet, and one 60x60 ON channel sheet), and a 48x48 V1 with about two
 million synaptic weights. The architecture can be viewed in
 the <span class='w_title'>Model Editor</span> window (which can be
 selected from the <span class='t_item'>Simulation</span> menu), but is
@@ -80,7 +80,7 @@ also shown below:
 <!--CEBALERT: image needs to be created properly!-->
 <p class='center'>
 <img src="images/gca_lissom_network_diagram.png" alt="LISSOM network"
-align="middle" WIDTH="521" HEIGHT="446">
+align="middle" WIDTH="554" HEIGHT="385">
 </p>
 
 <p></p>
@@ -121,6 +121,7 @@ align="middle" WIDTH="668" HEIGHT="360">
 <span class='t_item'>Normalize</span>
 and <span class='t_item'>Strength only</span> (both are usually off by
 default).
+<!--Considering whether to make initial lgn response visible in the model-->
 
 <P>As you move your mouse over the plots, information about the
 location of the mouse cursor is displayed in the status bar at the
@@ -379,11 +380,10 @@ controls the ratio between width and height; will be scaled by the
 </dt><dd> controls the amount of Gaussian falloff around the edges of patterns such as rings and lines
 </dd><dt><span class='t_item'>scale</span>
 </dt><dd> controls the brightness (try 1.0 for a sine grating).  Note
-that this relatively simple model is very sensitive to the scale, and
-scales higher than about 1.2 will result in a broad,
-orientation-unselective response, while low scales will give no
-response.  More complex models (and actual brains!)
-are less sensitive to the scale or contrast.
+how this model is insensitive to the scale; the response remains orientation
+selective even as the scale is varied substantially. (If you try the <a href="lissom_oo_or.html">lissom_oo_or
+tutorial</a>, you can see the effect of contrast gain control operating in this 
+model.)
 </dd><dt><span class='t_item'>offset</span></dt><dd> is added to every pixel
 </dd><dt><span class='t_item'>frequency</span>
 </dt><dd> controls frequency of a sine grating or Gabor 
@@ -398,16 +398,14 @@ parameters of the mask_shape pattern can be edited by right-clicking on it.
 
 <p> 
 To present photographs, select a <span class='t_item'>Pattern generator</span> of type
-<span class='t_item'>FileImage</span>. (You can type the path to an image file of your
-own (in e.g. PNG, JPG, TIFF, or PGM format) in the <span
-class='t_item'>filename</span> box.) For most photographs you will 
-need to change the <span class='t_item'>scale</span> to something like
-2.0 to see a reasonable
-response from this model V1, and you may want to enlarge the image
-size to look at details.  A much larger, more complicated, and slower map would
-be required to see interesting patterns in the response to most images,
-but even with this network you may be able to see some
-orientation-specific responses to large contours in the image:
+<span class='t_item'>FileImage</span>. (You can type the path to an
+image file of your own (in e.g. PNG, JPG, TIFF, or PGM format) in
+the <span class='t_item'>filename</span> box.) For most photographs,
+you will probably want to enlarge the image size to look at details.
+A much larger, more complicated, and slower map would be required to
+see interesting patterns in the response to most images, but even with
+this network you may be able to see some orientation-specific
+responses to large contours in the image:
 </p>
 
 <p class="center">
@@ -634,7 +632,23 @@ through the simulation as above.  The final result after 10000
 iterations (requiring several hours on a 3GHz machine) should be a much
 smoother map and neurons that are more orientation selective.  Even
 so, the overall organization and function should be similar.
-</li></ol>
+</li>
+
+<!--CEB: not sure if this is worth mentioning yet...
+because the history buttons don't quite work perfectly with
+or pref windows and because it's current work-->
+<!--
+<p></p>
+
+<li>
+Finally, you might also be interested in observing in more detail how
+the orientation map develops over time. c.f. lissom_oo_or, which
+starts with big patches that shrink (exc rad shrink vs
+homeost);lissom_oo_or map dev less stable
+</li>
+-->
+
+</ol>
 
 
 <h2>Exploring further</h2>
