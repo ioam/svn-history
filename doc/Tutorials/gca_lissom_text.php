@@ -2,10 +2,10 @@
 
 <p>
 This tutorial shows how to use the
-<a href="http://topographica.org/">Topographica</a> software package to explore a
-simple orientation map simulation using test patterns and weight
-plots.  This particular example uses a <a
-href="http://nn.cs.utexas.edu/keyword?rflissom">LISSOM model</a>
+<a href="http://topographica.org/">Topographica</a> software package
+to explore a simple orientation map simulation using test patterns and
+weight plots.  This particular example uses
+a <a href="http://nn.cs.utexas.edu/lookup?rflissom">LISSOM model</a>
 cortex, although Topographica supports many other models and is easily
 extensible for models not yet supported.
 </p>
@@ -14,15 +14,15 @@ extensible for models not yet supported.
 instructions for <a href="../Downloads/index.html">obtaining and
 installing</a> Topographica.  Also, you will need to generate a saved
 orientation map network (a .typ file), which can be done by running
-<blockquote><code class='to_type'>./topographica -c "targets=['lissom_oo_or_10000.typ']" examples/run.py</code></blockquote>
+<blockquote><code class='to_type'>./topographica -c "targets=['gca_lissom_10000.typ']" examples/run.py</code></blockquote>
 
 (on Unix or Mac systems; on Windows, the syntax is slightly different&mdash;see the note about
 <A HREF="../Downloads/win32notes.html#unix-commands-on-win">translating Unix shell commands</A>).
 
 <P>Depending on the speed of your machine, you may want to go get a
-snack at this point; on a 3GHz 512MB machine this training process
-currently takes from 7-15 minutes (depending on the amount of level
-2 cache).<!--lodestar: 15:46 ; cortex: 7:31; fiver: 8:07; jupiter1: 9:00 -->
+snack at this point; on a 2.66GHz machine this training process
+currently takes about 17 minutes.
+<!--fiver: 17:13 -->
 </p>
 
 
@@ -31,13 +31,16 @@ currently takes from 7-15 minutes (depending on the amount of level
 
 In this example, we will load a saved network and test its behavior by
 presenting different visual input patterns.  We will assume that
-Topographica is installed in <code>/home/jbednar/public/topographica/</code>.
+Topographica is installed
+in <code>/home/jbednar/public/topographica/</code>.
 
 <ol> 
 <p></p>
 <li>First, change to your topographica directory, e.g.:
 
-<blockquote><code class='to_type'>cd /home/jbednar/public/topographica/</code></blockquote>
+<blockquote>
+<code class='to_type'>cd /home/jbednar/public/topographica/</code>
+</blockquote>
 <p></p>
 </li>
 
@@ -60,7 +63,7 @@ similar buttons should be provided.
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting
-<code>lissom_oo_or_10000.typ</code> in the examples/ directory. This small orientation
+<code>gca_lissom_10000.typ</code> in the examples/ directory. This small orientation
 map simulation should load in a few seconds, with a 54x54
 retina, a 36x36 LGN (composed of one 36x36 OFF channel sheet, and one
 36x36 ON channel sheet), and a 48x48 V1 with about two million 
@@ -68,10 +71,10 @@ synaptic weights. The architecture can be viewed in the <span
 class='w_title'>Model Editor</span> window (which can be selected from
 the <span class='t_item'>Simulation</span> menu), but is also shown
 below:
-<!--CEBALERT: image needs updating-->
+<!--CEBALERT: image needs to be created properly!-->
 <p class='center'>
-<img src="images/lissom_network_diagram_oo.png" alt="LISSOM network"
-align="middle" WIDTH="569" HEIGHT="413">
+<img src="images/gca_lissom_network_diagram.png" alt="LISSOM network"
+align="middle" WIDTH="521" HEIGHT="446">
 </p>
 
 <p></p>
@@ -87,7 +90,7 @@ class='t_item'>Simulation</span> menu to get the
 <span class='w_title'>Test Pattern</span> window:
 
 <p class='center'>
-<img src="images/test_pattern_oo.png" alt="Test Pattern window"
+<img src="images/gca_lissom_test_pattern.png" alt="Test Pattern window"
 align="middle" WIDTH="315" HEIGHT="720">
 </p>
 
@@ -104,13 +107,14 @@ network.
 <li>The <a name="Activity-plot"><span class='w_title'>Activity</span></a> 
 window should then show the result:
 <p class='center'>
-<img src="images/activity_line_oo.png" alt="Response to a line"
+<img src="images/gca_lissom_activity_010000.png" alt="Response to a line"
 align="middle" WIDTH="668" HEIGHT="360">
 </p>
 
-<P>This window shows the response for each neural area.  For now, please
-make sure that <span class='t_item'>Strength only</span> is turned on;
-it is usually off by default.
+<P>This window shows the response for each neural area. Please turn on
+<span class='t_item'>Normalize</span>
+and <span class='t_item'>Strength only</span> (both are usually off by
+default).
 
 <P>As you move your mouse over the plots, information about the
 location of the mouse cursor is displayed in the status bar at the
@@ -152,7 +156,7 @@ menu. This will plot the synaptic strengths of connections to the
 neuron in the center of the cortex (by default):
 
 <p class="center">
-<img src="images/unit_weights_0_0_oo.png" alt="Weights of one neuron"
+<img src="images/gca_lissom_cf_center_010000.png" alt="CF of center neuron"
 align="middle" WIDTH="668" HEIGHT="421">
 </p>
 
@@ -165,7 +169,7 @@ excitatory and lateral inhibitory weights to that neuron from nearby
 neurons in V1. The afferent weights represent the retinal pattern that
 would most excite the neuron.  For the particular neuron shown above,
 the optimal retinal stimulus would be a short, bright line oriented at
-about 0 degrees (from 9 o'clock to 3 o'clock) in the center of the
+about 30 degrees (from 8 o'clock to 2 o'clock) in the center of the
 retina. (Note that the particular neuron you are viewing may have a
 different preferred orientation.)
 </p><p></p></li>
@@ -182,7 +186,7 @@ arrow next to 'Pre plot hooks':
   
 
 <p class="center">
-<img src="images/projection_oo.png" alt="Afferent weights of many neurons"
+<img src="images/gca_lissom_projection_010000.png" alt="Afferent weights of many neurons"
 align="middle" WIDTH="496" HEIGHT="415">
 </p>
 
@@ -204,8 +208,8 @@ neuron.  The results of a similar procedure can be viewed by selecting
 <a name="OrientationPreference-plot"><span class='t_item'>Orientation Preference</span></a>:
 
 <p class="center">
-<img src="images/oo_or_map.png" alt="Orientation map"
-align="middle" WIDTH="597" HEIGHT="414">
+<img src="images/gca_lissom_or_pref_010000.png" alt="Orientation map"
+align="middle" WIDTH="596" HEIGHT="414">
 </p><br>
 
 <P>
@@ -242,7 +246,7 @@ class='t_item'>Strength only</span> is now turned <i>off</i> in the
 <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line"
+<img src="images/gca_lissom_activity_010000_or.png" alt="Color-coded response to a line"
 align="middle" WIDTH="668" HEIGHT="360"><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
@@ -270,14 +274,14 @@ window, you can see that the neuron whose weights we plotted is
 located in a patch of neurons with similar orientation preferences: 
 
 <p class="center">
-<img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of one neuron"
+<img src="images/gca_lissom_cf_center_010000_or.png" alt="Colorized weights of one neuron"
 align="middle" WIDTH="668" HEIGHT="421"><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
 <P> Look at the <span class='t_item'>LateralExcitatory</span> weights,
 which show that the neurons near the above neuron are nearly all
-red, to match its preferred orientation.
+orange, to match its preferred orientation.
 
 <P>
 Returning to the <span class='w_title'>Test pattern</span> window,
@@ -303,7 +307,7 @@ so we choose <span class='t_item'>Connection Fields</span> from the
 <span class='t_item'>Single unit</span> submenu to get a new plot:
 
 <p class="center">
-<img src="images/unit_weights_41_24_oo_or.png" alt="Colorized weights of one neuron"
+<img src="images/gca_lissom_cf_vertical_010000_or.png" alt="Colorized weights of one neuron"
 align="middle" WIDTH="668" HEIGHT="421"><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
@@ -333,7 +337,7 @@ is true of the map generated by LISSOM:
 
 
 <p class="center">
-<img src="images/lissom_oo_or_orpref_ft.png" alt="FT of orientation preference map"
+<img src="images/gca_lissom_ormap_ft.png" alt="FT of orientation preference map"
 align="middle" WIDTH="420" HEIGHT="473">
 </p><br>
 
