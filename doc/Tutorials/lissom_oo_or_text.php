@@ -621,7 +621,7 @@ and then restarting with a higher density in V1:
   
 You'll need about a gigabyte of memory and a lot of time, but you can then step
 through the simulation as above.  The final result after 10000
-iterations (requiring about half a day on a 3GHz machine) should be a much
+iterations (requiring a few hours on a 3GHz machine) should be a much
 smoother map and neurons that are more orientation selective.  Even
 so, the overall organization and function should be similar.
 </li></ol>

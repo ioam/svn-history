@@ -631,7 +631,7 @@ and then restarting with a higher density in V1:
   
 You'll need about a gigabyte of memory and a lot of time, but you can then step
 through the simulation as above.  The final result after 10000
-iterations (requiring about half a day on a 3GHz machine) should be a much
+iterations (requiring several hours on a 3GHz machine) should be a much
 smoother map and neurons that are more orientation selective.  Even
 so, the overall organization and function should be similar.
 </li></ol>
@@ -639,12 +639,13 @@ so, the overall organization and function should be similar.
 
 <h2>Exploring further</h2>
 
-<p> Topographica comes with additional examples, and more are
-always being added.  In particular, the above examples work
-in nearly the same way with the simpler <code>lissom_or.ty</code>
-model.  Any valid Python code can
-be used to control and extend Topographica; documentation for Python and existing Topographica commands
-can be accessed from the <span class='t_item'>Help</span> menu of the
+<p> Topographica comes with additional examples, and more are always
+being added.  In particular, the above examples work in nearly the
+same way with the simpler <code>lissom_or.ty</code>
+and <code>lissom_oo_or.ty</code> models.  Any valid Python code can be
+used to control and extend Topographica; documentation for Python and
+existing Topographica commands can be accessed from
+the <span class='t_item'>Help</span> menu of the
 <span class='w_title'>Topographica Console</span> window.
 <p>
  Please contact 
