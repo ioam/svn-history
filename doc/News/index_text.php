@@ -29,6 +29,38 @@
   <A target="_top" href="http://www.cython.org">Cython</A> package for writing fast components</div>
 </dd>
 <br>
+<dt>Command-line and batch:</dt>
+<dd>
+  <div class="i2">- -v and -d options to print verbose and debugging messages</div>
+  <div class="i2">- new options to  
+  <?php classref('topo.command.basic','run_batch')?> and better progress messages</div>
+  <div class="i2">- replaced most commands with
+  <?php classref('topo.param.parameterized','ParameterizedFunction')?>s,
+  which have documented, type and bound-checked arguments and allow
+  inheritance of shared functionality</div>
+  <div class="i2">- replaced map measurement commands in
+  <A target="_top" HREF="../Reference_Manual/topo.command-module.html">topo.command</A>
+  with simpler, general-purpose, easily .ty-file controllable versions (see
+  lissom_oo_or.ty and lissom.ty for examples)</div>
+  <div class="i2">- <?php classref('topo.command.analysis','save_plotgroup')?>: 
+  more useful default values; results can be cached to avoid recomputation</div>
+  <div class="i2">- <?php classref('topo.command.analysis','measure_sine_pref')?>:
+  general purpose measurement for any preference that can be tested
+  with a sine grating</div>
+  <div class="i2">- Changed locals to script-level parameters using
+  <?php classref('topo.misc.commandline','GlobalParams')?>;
+  see examples/lissom.ty</div>
+  <div class="i2">- Made 
+  <?php classref('topo.command.pylabplots','gradientplot')?> and
+  <?php classref('topo.command.pylabplots','fftplot')?> available in
+  batch mode.</div>
+</dd>
+</font>
+</dl>
+</td>
+<td width="50%">
+<dl COMPACT>
+<font size="-1">
 <dt>GUI:</dt>
 <dd>
   <div class="i2">- model editor supports non-Sheet EventProcessors
@@ -37,6 +69,19 @@
   <div class="i2">- plot windows can be arranged in 2D, not just a row
   (see <?php classref('topo.base.sheet','Sheet')?>.row_precedence)</div>
   </div>
+</dd>
+<br>
+<dt>Example scripts:</dt>
+<dd>
+  <div class="i2">- example file for
+  <a href="../User_Manual/interfacing.html">interfacing to external simulators</a>
+  (examples/perrinet_retina.ty)</div>
+  <div class="i2">- removed outdated or in-progress examples</div>
+  <div class="i2">- greatly simplified remaining example scripts</div>
+  <div class="i2">- now use <?php classref('topo.misc.commandline','GlobalParams')?>
+  to support consistent option setting using -p</div>
+  <div class="i2">- allowed saving of local functions and instance
+  method calls in snapshots</div>
 </dd>
 <br>
 <dt>Component library:</dt>
@@ -66,51 +111,6 @@
   code).</div>
   <div class="i2">- Parameters: bounds can now be exclusive, optional support for None in most 
   types</div>
-</dd>
-</font>
-</dl>
-</td>
-<td width="50%">
-<dl COMPACT>
-<font size="-1">
-<dt>Command-line and batch:</dt>
-<dd>
-  <div class="i2">- -v and -d options to print verbose and debugging messages</div>
-  <div class="i2">- new options to  
-  <?php classref('topo.command.basic','run_batch')?> and better progress messages</div>
-  <div class="i2">- replaced most commands with
-  <?php classref('topo.param.parameterized','ParameterizedFunction')?>s,
-  which have documented, type and bound-checked arguments and allow
-  inheritance of shared functionality</div>
-  <div class="i2">- replaced map measurement commands in
-  <A target="_top" HREF="../Reference_Manual/topo.command-module.html">topo.command</A>
-  with simpler, general-purpose, easily .ty-file controllable versions (see
-  lissom_oo_or.ty and lissom.ty for examples)</div>
-  <div class="i2">- <?php classref('topo.command.analysis','save_plotgroup')?>: 
-  more useful default values; results can be cached to avoid recomputation</div>
-  <div class="i2">- <?php classref('topo.command.analysis','measure_sine_pref')?>:
-  general purpose measurement for any preference that can be tested
-  with a sine grating</div>
-  <div class="i2">- Changed locals to script-level parameters using
-  <?php classref('topo.misc.commandline','GlobalParams')?>;
-  see examples/lissom.ty</div>
-  <div class="i2">- Made 
-  <?php classref('topo.command.pylabplots','gradientplot')?> and
-  <?php classref('topo.command.pylabplots','fftplot')?> available in
-  batch mode.</div>
-</dd>
-<br>
-<dt>Example scripts:</dt>
-<dd>
-  <div class="i2">- example file for
-  <a href="../User_Manual/interfacing.html">interfacing to external simulators</a>
-  (examples/perrinet_retina.ty)</div>
-  <div class="i2">- removed outdated or in-progress examples</div>
-  <div class="i2">- greatly simplified remaining example scripts</div>
-  <div class="i2">- now use <?php classref('topo.misc.commandline','GlobalParams')?>
-  to support consistent option setting using -p</div>
-  <div class="i2">- allowed saving of local functions and instance
-  method calls in snapshots</div>
 </dd>
 </font>
 </dl>
