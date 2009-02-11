@@ -1747,7 +1747,13 @@ class TkParameterized(TkParameterizedBase):
 
     def _list_edit(self,param_name):
         val = self.get_parameter_value(param_name)
-        parameterized_instance = list_to_parameterized(val)
+
+        param_obj = self.get_parameter_object(param_name)
+        class_=None
+        if hasattr(param_obj,'class_') and isinstance(param_obj.class_,type):
+            class_ = param_obj.class_
+
+        parameterized_instance = list_to_parameterized(val,class_)
 
         parameter_window = AppWindow(self)
         #parameter_window.title(PO_to_edit.name+' parameters')
@@ -3202,6 +3208,9 @@ class ListWidget(T.Frame):
 import new
 import odict
 
+
+# CEBALERT: dict stuff is just half implemented! does enough
+# to support list subclasses
 def dict_to_parameterized(class_name,parameter_values):
     # each item is just a Parameter (i.e. not specific)
     parameter_objs = dict([(name,Parameter(default=value))
@@ -3212,17 +3221,22 @@ def dict_to_parameterized(class_name,parameter_values):
     return  new_class(parameter_values)
 
 
-def list_to_parameterized(list_):
+def list_to_parameterized(list_,class_=None):
 
     parameter_values = odict.OrderedDict([('a'*i,item) for item,i in zip(list_,range(1,len(list_)+1))])
 
-    parameter_objs = dict([(name,Parameter(default=value))
-                           for name,value in parameter_values.items()])
+    if class_ is None:
+        parameter_objs = dict([(name,Parameter(default=value))
+                               for name,value in parameter_values.items()])
+    else:
+        parameter_objs = dict([(name,ClassSelector(class_=class_,default=value))
+                               for name,value in parameter_values.items()])
+        
 
     new_class = new.classobj('List',(ListRepresenter,),parameter_objs)
     #new_class.params('name').hidden=True
     
-    inst = new_class(parameter_values)
+    inst = new_class(parameter_values,class_=class_)
     inst.list_ = list_ # that's a hack; need to get classes right
     return inst
 
@@ -3240,12 +3254,13 @@ class Representer(Parameterized):
 
     name = Parameter(precedence=-1) # CEBALERT
     
-    def __init__(self,represented):
+    def __init__(self,represented,class_):
         ## CEBALERT: when we come to represent dicts in the GUI,
         ## will have to deal with name clashes (e.g. for name parameter)
         for name in standard_parameterized_params():
             assert name not in represented
         ##
+        self.class_ = class_
         self.represented = represented
         super(Representer,self).__init__(**represented)
         self.initialized=False # allow all modifications
@@ -3268,7 +3283,11 @@ class Representer(Parameterized):
             self.represented[name]=getattr(self,name)
 
     def add(self,name):
-        p = Parameter(default=None)
+        if self.class_ is None:
+            p = Parameter(default=None)
+        else:
+            p = ClassSelector(class_=self.class_,default=None)
+            
         self._add_parameter(name,p)
         self.represented[name]=p.default
         return name
