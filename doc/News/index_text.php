@@ -1,7 +1,6 @@
-<p><b>25 November 2008:</b> Version 0.9.6 is in preparation;
-updates are currently available in the latest SVN version:
+<p><b>12 February 2009:</b> Version 0.9.6 released, including:
 
-<!-- So far updated only to r9630 -->
+<!-- Updated to r9984 -->
 <center>
 <table width="100%" cellpadding="5">
 <tr>
@@ -17,29 +16,39 @@ updates are currently available in the latest SVN version:
 <!--  mouse model (examples/lissom_oo_or_species.ty)<BR> -->
 <dt>General improvements:</dt>
 <dd>
-<!--CB: surely these divs should be some kind of li?-->
-  <div class="i2">- significant performance improvements (nearly 2X)</div>
-  <div class="i2">- significant startup time improvements for large networks</div>
+  <div class="i2">- significant performance improvements in
+  simulations (nearly 2X overall), plotting (2X), and startup time </div>
   <div class="i2">- minor bugfixes</div>
 <!--  <div class="i2">- updated Windows packages</div> -->
   <div class="i2">- more options for 
   <A target="_top" href="../User_Manual/noise.html">adding noise</A>
   to ConnectionField shapes</div>
+  <div class="i2">- optional 
+  <A target="_top" href="../Developer_Manual/optimization.html#line-by-line">line-by-line profiling</A></div>
+  <div class="i2">- optional
+  <A target="_top" href="http://www.cython.org">Cython</A> package for writing fast components</div>
 </dd>
+<br>
 <dt>GUI:</dt>
 <dd>
   <div class="i2">- model editor supports non-Sheet EventProcessors
   and non-CFProjection EPConnections</div>
   <div class="i2">- right-click option for plotting tuning curves</div>
+  <div class="i2">- plot windows can be arranged in 2D, not just a row
+  (see <?php classref('topo.base.sheet','Sheet')?>.row_precedence)</div>
+  </div>
 </dd>
+<br>
 <dt>Component library:</dt>
 <dd>
   <div class="i2">- PatternGenerators: 
   <?php classref('topo.pattern.basic','Translator')?>; 
     mask_shape parameter also now makes it easy to specify a mask
     for any pattern, e.g. in the GUI</div>
-  <div class="i2">- OutputFns: 
-  <?php classref('topo.outputfn.basic','HalfRectifyAndPower')?></div>
+  <div class="i2">- TransferFns (formerly called OutputFns):
+  <?php classref('topo.transferfn.basic','HalfRectifyAndPower')?>,
+  <?php classref('topo.transferfn.basic','Hysteresis')?>, and
+  <?php classref('topo.transferfn.basic','HomeostaticResponse')?></div>
   <div class="i2">- Sheets: 
   <?php classref('topo.sheet.basic','ActivityCopy')?></div>
   <div class="i2">- LearningFns: 
@@ -50,6 +59,13 @@ updates are currently available in the latest SVN version:
   <?php classref('topo.analysis.featureresponses','FeatureResponses')?> and
   <?php classref('topo.sheet.lissom','LISSOM')?> to make it easier to
   add user-defined functionality.</div>
+  <div class="i2">- Changed names and definitions of various similar
+  concepts (OutputFn, before_presentation, update_command,
+  plot_command, etc.)  to reflect shared concept of Hooks and
+  HookLists (lists of callables to run at specific spots in the
+  code).</div>
+  <div class="i2">- Parameters: bounds can now be exclusive, optional support for None in most 
+  types</div>
 </dd>
 </font>
 </dl>
@@ -59,9 +75,8 @@ updates are currently available in the latest SVN version:
 <font size="-1">
 <dt>Command-line and batch:</dt>
 <dd>
-  <div class="i2">- -v option to print verbose messages</div>
-  <div class="i2">- -d option to print debugging messages</div>
-  <div class="i2">- new options to
+  <div class="i2">- -v and -d options to print verbose and debugging messages</div>
+  <div class="i2">- new options to  
   <?php classref('topo.command.basic','run_batch')?> and better progress messages</div>
   <div class="i2">- replaced most commands with
   <?php classref('topo.param.parameterized','ParameterizedFunction')?>s,
@@ -76,10 +91,15 @@ updates are currently available in the latest SVN version:
   <div class="i2">- <?php classref('topo.command.analysis','measure_sine_pref')?>:
   general purpose measurement for any preference that can be tested
   with a sine grating</div>
-  <div class="i2">- Added support for script-level parameters 
-  (<?php classref('topo.misc.commandline','GlobalParams')?>;
+  <div class="i2">- Changed locals to script-level parameters using
+  <?php classref('topo.misc.commandline','GlobalParams')?>;
   see examples/lissom.ty</div>
+  <div class="i2">- Made 
+  <?php classref('topo.command.pylabplots','gradientplot')?> and
+  <?php classref('topo.command.pylabplots','fftplot')?> available in
+  batch mode.</div>
 </dd>
+<br>
 <dt>Example scripts:</dt>
 <dd>
   <div class="i2">- example file for
@@ -87,11 +107,18 @@ updates are currently available in the latest SVN version:
   (examples/perrinet_retina.ty)</div>
   <div class="i2">- removed outdated or in-progress examples</div>
   <div class="i2">- greatly simplified remaining example scripts</div>
+  <div class="i2">- now use <?php classref('topo.misc.commandline','GlobalParams')?>
+  to support consistent option setting using -p</div>
+  <div class="i2">- allowed saving of local functions and instance
+  method calls in snapshots</div>
 </dd>
 </font>
 </dl>
 </td>
 </tr>
+<tr><td colspan='2'><small>We also provide a utility to simplify the
+  process of <A HREF="../Downloads/update_script.html">updating scripts</A>
+that were written for version 0.9.5.</small> </td></tr>
 </table>
 </center>
 
