@@ -1547,14 +1547,14 @@
 	  minor changes
 
 	* [r9694] contrib/jacommands.py:
-	  "changed to use x_avg instead of lr_x_avg in
-	  SimpleHomeoLinearRelative"
+	  Changed to use x_avg instead of lr_x_avg in
+	  SimpleHomeoLinearRelative
 
 	* [r9693] contrib/jsldefs.py:
-	  "commented out some things and also change lr_x_avg to x_avg"
+	  Commented out some things and also change lr_x_avg to x_avg
 
 	* [r9692] topo/sheet/lissom.py:
-	  "made it possible to switch off scaling with parameter"
+	  Made it possible to switch off scaling with parameter
 
 2008-12-15  ceball
 
@@ -1652,7 +1652,7 @@
 2008-12-08  antolikjan
 
 	* [r9671] contrib/cc_lissom_oo_or_simple_rv.ty:
-	  "Made some consolidation/simplification of the code"
+	  Made some consolidation/simplification of the code
 
 2008-12-08  jbednar
 
@@ -3509,7 +3509,7 @@
 2008-10-02  antolikjan
 
 	* [r9355] contrib/jacommands.py:
-	  "Minor parameter adjustment"
+	  Minor parameter adjustment
 
 	* [r9354] contrib/jacommands.py:
 	  moved CascadeHomeostatic here
@@ -3520,7 +3520,7 @@
 	* [r9352] contrib/cc_lissom_oo_or_simple_rv.ty,
 	  contrib/gc_lissom_oo_or_homeostatic_new.ty,
 	  contrib/lgn_lateral.ty:
-	  "moved the still active example files from examples to contrib"
+	  Moved the still active example files from examples to contrib
 
 	* [r9351] topo/tkgui/testpattern.py:
 	  event_clear has now default parameter EPConnection so I removed
@@ -4135,11 +4135,11 @@
 
 	* [r9218]
 	  examples/cc_lissom_oo_or_simple_rv.ty:
-	  "repaired bug in image presentation"
+	  Repaired bug in image presentation
 
 	* [r9217]
 	  examples/cc_lissom_oo_or_simple_rv.ty:
-	  "repaired bug in image presentation"
+	  Repaired bug in image presentation
 
 2008-09-17  ceball
 
@@ -4170,11 +4170,11 @@
 
 	* [r9210]
 	  examples/gc_lissom_oo_or_homeostatic_new.ty:
-	  "moved to the new images set"
+	  Moved to the new images set
 
 	* [r9209]
 	  examples/cc_lissom_oo_or_simple_rv.ty:
-	  "changed to new image set"
+	  Changed to new image set
 
 2008-09-15  ceball
 
@@ -4207,7 +4207,7 @@
 2008-09-15  antolikjan
 
 	* [r9202] contrib/jacommands.py:
-	  "renamed import pathes related to the new renaming scheme"
+	  Renamed import pathes related to the new renaming scheme
 
 2008-09-15  ceball
 
@@ -4557,17 +4557,17 @@
 
 	* [r9132]
 	  examples/gc_lissom_oo_or_homeostatic_new.ty:
-	  "minor parameter changes"
+	  Minor parameter changes
 
 	* [r9131]
 	  examples/cc_lissom_oo_or_simple_rv.ty:
 	  parameter changes
 
 	* [r9130] contrib/modelfit.py:
-	  "minor input changes"
+	  Minor input changes
 
 	* [r9129] contrib/jacommands.py:
-	  "few minor changes"
+	  Few minor changes
 
 	* [r9128] topo/tkgui/testpattern.py:
 	  corrected some indentition problems
