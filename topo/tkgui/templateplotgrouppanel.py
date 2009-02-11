@@ -60,30 +60,26 @@ class TemplatePlotGroupPanel(SheetPanel):
 disabling all color coding for Strength/Hue/Confidence plots.""")
 
     ####################################################################
-    # CEBALERT: Ugly hack!  Basic idea for method copied from previous
-    # tkgui.  Instead, we probably want a mechanism for doing this
-    # from the command line, probably a global 'monochrome' parameter
-    # that all plots respect, and then people can modify the plot
-    # templates directly if they need more control than that.
-    def strength_only_fn(self):
+    # CEBALERT: Ugly hack!  Basic idea for method (deleting conf & hue
+    # from plot_templates) copied from previous tkgui.  Instead, we
+    # probably want a mechanism for doing this from the command line,
+    # probably a global 'monochrome' parameter that all plots respect,
+    # and then people can modify the plot templates directly if they
+    # need more control than that.
+    def redraw_plots(self):
+        # same as superclass, except that if strength only is true
+        # it temporarily removes hue&conf from plot_templates
+        original_templates = self.plotgroup.plot_templates
+        self.plotgroup.plot_templates = copy.deepcopy(self.plotgroup.plot_templates)        
         if self.strength_only:
             for name,template in self.plotgroup.plot_templates:
                 for c in ['Confidence','Hue']:
                     if c in template:
-                        self.__non_so_templates[name][c]=template[c]
                         del template[c]
-        else:
-            for name,template in self.plotgroup.plot_templates:
-                for c in ['Confidence','Hue']:
-                    if c in self.__non_so_templates[name]:
-                        template[c]=self.__non_so_templates[name][c]
-        
+
         super(TemplatePlotGroupPanel,self).redraw_plots()
-    def __init_strength_only_hack(self):
-        self.__non_so_templates = copy.deepcopy(self.plotgroup.plot_templates)
-    ####################################################################
-
-
+        self.plotgroup.plot_templates = original_templates
+            
 
     ## CB: update init args now we have no pgts.
     def __init__(self,master,plotgroup,**params):
@@ -91,8 +87,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         super(TemplatePlotGroupPanel,self).__init__(master,plotgroup,**params)
 
         self.pack_param('strength_only',parent=self.control_frame_1,
-                        on_set=self.strength_only_fn,side='right')
-        self.__init_strength_only_hack()
+                        on_set=self.redraw_plots,side='right')
         
         # Display any plots that can be done with existing data, but
         # don't regenerate the SheetViews unless requested
