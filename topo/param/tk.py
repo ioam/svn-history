@@ -1962,7 +1962,7 @@ class ListTranslator(Translator):
     
     def object2string(self,object_):
         self.list_=object_
-        return script_repr(self.list_,[],"",[]).replace("\n"," ")
+        return script_repr(self.list_,[],"",[]).replace("\n","")
 
 
 class Eval_ReprTranslator(Translator):
