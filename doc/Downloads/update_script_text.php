@@ -46,7 +46,7 @@ but these should be relatively simple to correct in the .ty file.
 
 <P>If you find the script still will not run, please <A
 HREF="../Forums/problems.html">file a bug report</A> so that we can
-fix the problem. (To work with your originally script immediately, you
+fix the problem. (To work with your original script immediately, you
 can instead try running Topographica with legacy support enabled, as
 described earlier.)
 
