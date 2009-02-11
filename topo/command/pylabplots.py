@@ -442,7 +442,7 @@ class topographic_grid(PylabPlotCommand):
                 # what the actual possible range is for this simulation (which would presumably
                 # be the maximum size of any GeneratorSheet?).
                 pylab.axis(p.axis)
-                title='Topographic mapping to '+sheet.name+' at time '+topo.sim.timestr()
+                p.title='Topographic mapping to '+sheet.name+' at time '+topo.sim.timestr()
     
                 if isint: pylab.ion()
                 p.filename_suffix="_"+sheet.name
@@ -506,7 +506,7 @@ class overlaid_plots(PylabPlotCommand):
                                     s_sc[i][j]=s[scale*i][scale*j]
                             pylab.quiver(scale*X,scale*X,-cos(2*pi*v_sc)*s_sc,-sin(2*pi*v_sc)*s_sc,color=c,edgecolors=c,minshaft=3,linewidths=1) 						
     							
-                    title='%s overlaid with %s at time %s' %(plot.name,pref,topo.sim.timestr())
+                    p.title='%s overlaid with %s at time %s' %(plot.name,pref,topo.sim.timestr())
                     if isint: pylab.ion()
                     p.filename_suffix="_"+sheet.name                    
                     self._generate_figure(p)
@@ -587,7 +587,7 @@ class tuning_curve(PylabPlotCommand):
             pylab.xlabel('%s (%s)' % (p.x_axis.capitalize(),p.unit))
             pylab.title('Sheet %s, coordinate(x,y)=(%0.3f,%0.3f) at time %s' % 
                         (sheet.name,coordinate[0],coordinate[1],topo.sim.timestr()))
-            title='%s: %s Tuning Curve' % (topo.sim.name,p.x_axis.capitalize())
+            p.title='%s: %s Tuning Curve' % (topo.sim.name,p.x_axis.capitalize())
         
             self.first_curve=True
             for curve_label in sorted(sheet.curve_dict[p.x_axis].keys()):
