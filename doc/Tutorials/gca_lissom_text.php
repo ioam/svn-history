@@ -1,12 +1,17 @@
-<H1>LISSOM Orientation Map</H1>
+<H1>GCA-LISSOM Orientation Map</H1>
 
 <p>
 This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> software package
 to explore a simple orientation map simulation using test patterns and
-weight plots.  This particular example uses
-a <a href="http://nn.cs.utexas.edu/lookup?rflissom">LISSOM model</a>
-cortex, although Topographica supports many other models and is easily
+weight plots. 
+
+<P>We will use the <!--CEBALERT: link to
+publication-->GCA-LISSOM model, which is based on the 
+<a href="http://nn.cs.utexas.edu/keyword?rflissom">LISSOM model</a>
+but also includes contrast gain control (GC) in the LGN and
+homeostatic adaptation (A) in V1. Although we focus on one model here,
+Topographica already supports many other models and is easily
 extensible for models not yet supported.
 </p>
 
@@ -63,14 +68,15 @@ similar buttons should be provided.
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting
-<code>gca_lissom_10000.typ</code> in the examples/ directory. This small orientation
-map simulation should load in a few seconds, with a 54x54
-retina, a 36x36 LGN (composed of one 36x36 OFF channel sheet, and one
-36x36 ON channel sheet), and a 48x48 V1 with about two million 
-synaptic weights. The architecture can be viewed in the <span
-class='w_title'>Model Editor</span> window (which can be selected from
-the <span class='t_item'>Simulation</span> menu), but is also shown
-below:
+<code>gca_lissom_10000.typ</code> in the examples/ directory. 
+<!--CEBALERT: update when sure what size we'll use-->
+This small orientation map simulation should load in a few seconds,
+with a 54x54 retina, a 36x36 LGN (composed of one 36x36 OFF channel
+sheet, and one 36x36 ON channel sheet), and a 48x48 V1 with about two
+million synaptic weights. The architecture can be viewed in
+the <span class='w_title'>Model Editor</span> window (which can be
+selected from the <span class='t_item'>Simulation</span> menu), but is
+also shown below:
 <!--CEBALERT: image needs to be created properly!-->
 <p class='center'>
 <img src="images/gca_lissom_network_diagram.png" alt="LISSOM network"
