@@ -12,11 +12,11 @@ import topo.pattern.basic
 import topo.command.analysis
 from math import pi, sqrt, exp, pow
 from numpy.oldnumeric import zeros, Float, sum
-from topo.projection.basic import CFProjection
-from topo.base.boundingregion import BoundingBox, SharedWeightCFProjection
+from topo.projection.basic import CFProjection, SharedWeightCFProjection
+from topo.base.boundingregion import BoundingBox 
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.basic import Gaussian,Selector,Null
-from topo.transferfn.basic import HomeostaticMaxEnt,TransferFnWithState, Sigmoid, PiecewiseLinear
+from topo.transferfn.basic import DivisiveNormalizeL1,HomeostaticMaxEnt,TransferFnWithState, Sigmoid, PiecewiseLinear
 from topo.base.arrayutil import clip_lower
 from topo.sheet.lissom import LISSOM
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
