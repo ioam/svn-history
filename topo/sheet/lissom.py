@@ -214,6 +214,8 @@ class JointScaling(LISSOM):
     
     apply_scaling = param.Boolean(default=True, doc="""Whether to apply the scaling factors.""")
 
+    precedence = param.Number(0.65)
+
 
     def __init__(self,**params):
         super(JointScaling,self).__init__(**params)
