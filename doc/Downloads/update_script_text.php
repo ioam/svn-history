@@ -74,5 +74,5 @@ version 0.9.5 of Topographica.
 <P>Currently, we do not explicitly support code written for versions
 of Topographica prior to 0.9.4. Depending on the age of the code,
 though, such support is possible in theory. Please let us know if you
-an old script (or snapshot) that you need to use in a modern version
+have an old script (or snapshot) that you need to use in a modern version
 of Topographica.
