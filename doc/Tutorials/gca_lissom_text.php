@@ -645,6 +645,7 @@ Finally, you might also be interested in observing in more detail how
 the orientation map develops over time. c.f. lissom_oo_or, which
 starts with big patches that shrink (exc rad shrink vs
 homeost);lissom_oo_or map dev less stable
+? could include tuning curve width scale invariance
 </li>
 -->
 

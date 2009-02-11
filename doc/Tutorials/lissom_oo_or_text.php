@@ -68,10 +68,9 @@ synaptic weights. The architecture can be viewed in the <span
 class='w_title'>Model Editor</span> window (which can be selected from
 the <span class='t_item'>Simulation</span> menu), but is also shown
 below:
-<!--CEBALERT: image needs updating-->
 <p class='center'>
 <img src="images/lissom_network_diagram_oo.png" alt="LISSOM network"
-align="middle" WIDTH="569" HEIGHT="413">
+align="middle" WIDTH="541" HEIGHT="399">
 </p>
 
 <p></p>
