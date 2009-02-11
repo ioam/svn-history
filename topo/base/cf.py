@@ -512,7 +512,7 @@ class CFProjection(Projection):
 
     cf_shape = param.ClassSelector(PatternGenerator,
         default=patterngenerator.Constant(),constant=True,
-        doc="Define the shape of the connection fields.")
+        doc="Mask pattern to define the shape of the connection fields.")
 
     same_cf_shape_for_all_cfs = param.Boolean(default=True,doc="""
         Whether or not to share a single cf_shape mask for all CFs.
@@ -550,6 +550,10 @@ class CFProjection(Projection):
         size, unless this parameter is False - in which case the user-specified size of
         the cf_shape is used. In normal usage of Topographica, this parameter should
         remain True.""")
+
+    mask_threshold = param.Number(default=0.5,constant=True,doc="""
+        If a unit is above this value in the cf_shape mask, it is
+        included; otherwise it is excluded from the mask.""")
 
     apply_output_fns_init=param.Boolean(default=True,doc="""
         Whether to apply the output function to connection fields (e.g. for 
@@ -661,8 +665,8 @@ class CFProjection(Projection):
                      bounds=bounds_template,
                      xdensity=sheet.xdensity,
                      ydensity=sheet.ydensity)
-        # CBENHANCEMENT: threshold should be settable by user
-        mask = where(mask>=0.5,mask,0.0)
+
+        mask = where(mask>=self.mask_threshold,mask,0.0)
 
         # CB: unnecessary copy (same as for weights)
         return mask.astype(weight_type)
