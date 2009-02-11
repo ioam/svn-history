@@ -2285,14 +2285,14 @@ class ParametersFrame(TkParameterized,T.Frame):
             self.unhide_param('Defaults')    
 
 
-##     def _wipe_currently_displayed_params(self):
-##         """Wipe old labels and widgets from screen."""
-##         for rep in self.currently_displayed_params.values():
-##             for w in rep:
-##                 try:
-##                     rep[w].destroy()
-##                 except: # e.g. buttons have None for label ('notNonelabel')
-##                     pass
+    def _wipe_currently_displayed_params(self):
+        """Wipe old labels and widgets from screen."""
+        for rep in self.currently_displayed_params.values():
+            for w in rep:
+                try:
+                    rep[w].destroy()
+                except: # e.g. buttons have None for label ('notNonelabel')
+                    pass
                 
 
     def _grid_param(self,parameter_name,row):
@@ -2353,7 +2353,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         
 
     def pack_params_to_display(self):
-#        self._wipe_currently_displayed_params()
+        self._wipe_currently_displayed_params()
 
         ### sort Parameters by reverse precedence
         parameter_precedences = {}
