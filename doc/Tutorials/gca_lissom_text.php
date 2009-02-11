@@ -548,7 +548,7 @@ have an obvious effect by speeding up learning to a highly implausible
 level.  To do this, open the <span class='w_title'>Model Editor</span>
 window, right click on the LGNOnAfferent projection (the cone-shaped
 lines from LGNOn to V1), select Properties, and change Learning Rate
-from the default 0.48 to 100, press Apply, and then do the same for
+from the default 2.0 to 100, press Apply, and then do the same for
 the LGNOffAfferent projection.
 <!--
 You can also do the same from the
@@ -583,9 +583,8 @@ parameters. For instance, to have a random orientation for each
 presentation, right click on <span class='t_item'>Orientation</span> and select <span class='t_item'>Enter dynamic
 value</span>.  The slider will disappear from the entry box, and you can
 type in an expression such as
-<code>UniformRandom(lbound=-pi,ubound=pi)</code>.  <!--CEBALERT: and
-hope nobody's imported pattern.random.UniformRandom into
-__main__...--> When you have finished configuring your pattern, press
+<code>numbergen.UniformRandom(lbound=-pi,ubound=pi)</code>.
+When you have finished configuring your pattern, press
 <span class='b_press'>Apply</span> or <span class='b_press'>Close</span> on the <span class='w_title'>Parameters of Gaussian</span> window. Having now set up the
 input generator on the <span class='w_title'>Parameters of Retina</span> window, click <span class='b_press'>Apply</span> or
 <span class='b_press'>Close</span> on this too. Now when you press <span class='b_press'>Go</span> on the console window

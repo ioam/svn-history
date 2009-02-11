@@ -573,9 +573,8 @@ parameters. For instance, to have a random orientation for each
 presentation, right click on <span class='t_item'>Orientation</span> and select <span class='t_item'>Enter dynamic
 value</span>.  The slider will disappear from the entry box, and you can
 type in an expression such as
-<code>UniformRandom(lbound=-pi,ubound=pi)</code>.  <!--CEBALERT: and
-hope nobody's imported pattern.random.UniformRandom into
-__main__...--> When you have finished configuring your pattern, press
+<code>numbergen.UniformRandom(lbound=-pi,ubound=pi)</code>.
+When you have finished configuring your pattern, press
 <span class='b_press'>Apply</span> or <span class='b_press'>Close</span> on the <span class='w_title'>Parameters of Gaussian</span> window. Having now set up the
 input generator on the <span class='w_title'>Parameters of Retina</span> window, click <span class='b_press'>Apply</span> or
 <span class='b_press'>Close</span> on this too. Now when you press <span class='b_press'>Go</span> on the console window
