@@ -390,9 +390,12 @@ distdir: FORCE
 dist: doc distdir reference-manual FORCE
 	${CD} ${DIST_DIR}; ${MAKE} distarc
 
+# Note that the output needs to be appended to a copy of the old file,
+# to keep old fixes to formatting. The 9000:HEAD can be omitted to get
+# the full list, but this is faster.
 ChangeLog.txt: FORCE
 	make -C external svn2cl
-	external/svn2cl --include-rev --group-by-day --separate-daylogs --break-before-msg --stdout https://topographica.svn.sourceforge.net/svnroot/topographica/ | sed -e 's|/trunk/topographica/||g' > ChangeLog.txt
+	external/svn2cl -r 9000:HEAD --include-rev --group-by-day --separate-daylogs --break-before-msg --stdout https://topographica.svn.sourceforge.net/svnroot/topographica/ | sed -e 's|/trunk/topographica/||g' > ChangeLog.txt
 
 
 
