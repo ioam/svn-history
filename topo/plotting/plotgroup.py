@@ -125,7 +125,7 @@ class PlotGroup(param.Parameterized):
 	"""
         Return the list of plots.
 
-	Re-implemented by TemplatePlotGroup to construct a list of plots as specified by the template.
+        Can be re-implemented in subclasses to *contruct* the list.
 	"""
 	return self.plot_list
 
@@ -145,7 +145,8 @@ class PlotGroup(param.Parameterized):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
         """
-        self.plots = [plot for plot in self._plot_list() if plot != None]
+        plot_list = self._plot_list()
+        self.plots = [plot for plot in plot_list if plot != None]
 
         # Suppress plots in the special case of plots not being updated 
         # and having no resizable images, to suppress plotgroups that
@@ -155,7 +156,7 @@ class PlotGroup(param.Parameterized):
             self.plots=[]
 
         # Take the timestamps from the underlying Plots
-	timestamps = [plot.timestamp for plot in self._plot_list()
+	timestamps = [plot.timestamp for plot in plot_list
                       if plot != None and plot.timestamp >= 0]
         if timestamps != []:
             self.time = max(timestamps)
@@ -502,6 +503,16 @@ class TemplatePlotGroup(SheetPlotGroup):
 
 	
     def _plot_list(self):
+        """Construct a list of plots as specified by the template."""
+        # CEBALERT: I don't understand what this is doing. Appending?
+        # Replacing?  Must be replacing self.plot_list with a new
+        # list, and returns that same list. Anyway, this method
+        # together with self.plot_list is confusing. Certainly callers
+        # must avoid using _plot_list() as a way of just getting
+        # self.plot_list. Wouldn't it be clearer to call this method
+        # create_plot_list() and store result in self.plot_list? Or
+        # else make self.plot_list a property that creates the list if
+        # necessary.
 	plot_list = self.plot_list
         for sheet in self._sheets():
 	    for (pt_name,pt) in self.plot_templates:
