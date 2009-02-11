@@ -440,7 +440,7 @@ this process is controlled by the network structure and the delays
 between nodes.  For simplicity, let's consider time starting at zero.
 The first scheduled event is that the Retina will be asked to draw an
 input pattern at time 0.05 (the phase of the
-<?php classref('topo.sheets.generatorsheet','GeneratorSheet') ?>).  Thus
+<?php classref('topo.sheet.basic','GeneratorSheet') ?>).  Thus
 the first visible activity occurs in the Retina, at 0.05.  The
 Retina is connected to the LGN with a delay of 0.05, and so the LGN
 responds at 0.10.  The delay from the LGN to V1 is also 0.05, so V1
