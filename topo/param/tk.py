@@ -1962,7 +1962,7 @@ class ListTranslator(Translator):
     
     def object2string(self,object_):
         self.list_=object_
-        return script_repr(self.list_,[],"",[])
+        return script_repr(self.list_,[],"",[]).replace("\n"," ")
 
 
 class Eval_ReprTranslator(Translator):
@@ -2004,7 +2004,7 @@ class Eval_ReprTranslator(Translator):
         if object_==self.last_object:
             return self.last_string
         else:
-            string_=script_repr(object_,[],"",[])
+            string_=script_repr(object_,[],"",[]).replace("\n","")
             self.last_object = object_
             self.last_string = string_
             return string_
