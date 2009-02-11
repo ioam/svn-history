@@ -63,7 +63,7 @@ elif dataset=="NoisyDisks":
                                                             size=2.0, aspect_ratio=1.0, scale=disk_scale,
                                                             offset=0.5,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.1),
-                                   topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',-0.5), scale=locals().get('rand_scale',1.0))])]
+                                   topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',-0.5), scale=locals().get('rand_scale',0.3))])]
     #Set the scale of the noise by setting the rand_offset and rand_scale parameters, note that the disk/noise signal ratio also depends on the retinal density      
     combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 
@@ -126,7 +126,7 @@ tracking=locals().get('tracking', False) # Turn tracking on or off
 
 AH = ActivityHysteresis(time_constant=0.5)
 Attrib_Tracker=AttributeTrackingTF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
-HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.3)
+HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.15)
 V1_Tracker=AttributeTrackingTF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=18)
 
 if tracking:
@@ -264,8 +264,8 @@ import topo.analysis.featureresponses
 
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
 topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
+topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
 if tracking:
-    topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
     topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=32
     topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":10},{"contrast":30},{"contrast":50},{"contrast":100}]
 else:
