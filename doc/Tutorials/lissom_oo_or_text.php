@@ -229,7 +229,7 @@ In this case, because the neurons are strongly selective, the
 Preference&Selectivity plot is nearly identical to the Preference plot.
 
 <P>Phase preference and selectivity are also displayed in the
-window, but these are not analysed here (and are not shown above).
+window, but these are not analyzed here (and are not shown above).
 
 
 </p><p>
