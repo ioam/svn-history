@@ -443,15 +443,18 @@ the input and the final response after the cortex has settled due to
 the lateral connections.  If you want to understand the settling
 process itself, you can also visualize how the activity propagates
 from the retina to the LGN, from the LGN to V1, and then within V1.
-To do this, first make sure that there is an <span
-class='t_item'>Activity</span> window open, with Auto-refresh enabled.
-Then go to the console window and hit "Step" repeatedly. You will see
-the activity arrive first in the LGN, then in V1, and then gradually
-change within V1.  The Step button moves to the next scheduled event
-in the simulation, which are at even multiples of 0.05 for this
-particular simulation.  You can also type in the specific duration
-(e.g. 0.05) to move forward into the "Run for:" box, and hit "Go"
-instead.
+To do this, first make sure that there is
+an <span class='t_item'>Activity</span> window open, with Auto-refresh
+enabled.  Then go to the console window and hit "Step"
+repeatedly. After an input is presented, you will see the activity
+arrive first in the LGN, then change in the LGN, then appear in V1,
+and then gradually change within V1. (You might want to turn on
+Normalize to see some features more easily, although this can make
+others more difficult to see.)  The Step button moves to the next
+scheduled event in the simulation, which are at even multiples of 0.05
+for this particular simulation.  You can also type in the specific
+duration (e.g. 0.05) to move forward into the "Run for:" box, and hit
+"Go" instead.
 
 <P>As explained in the
 <A HREF="../User_Manual/time.html">User Manual</A>,
@@ -462,8 +465,9 @@ input pattern at time 0.05 (the phase of the
 <?php classref('topo.sheet.basic','GeneratorSheet') ?>).  Thus
 the first visible activity occurs in the Retina, at 0.05.  The
 Retina is connected to the LGN with a delay of 0.05, and so the LGN
-responds at 0.10.  The delay from the LGN to V1 is also 0.05, so V1
-is first activated at time 0.15.  V1 also has self-connections with a
+responds at 0.10. The LGN has self-connections with a delay of 0.05,
+so the next event is the LGN settling at 0.15 (the gain control step).
+After this step, V1 is initially activated at 0.20. V1 also has self-connections with a
 delay of 0.05, and so V1 is then repeatedly activated every 0.05 timesteps.
 Eventually, the number of V1 activations reaches a fixed limit for LISSOM
 (usually about 10 timesteps), and no further events are generated or consumed
@@ -493,7 +497,7 @@ studied using the LISSOM model in Topographica as follows.
 <p></p><li>First, quit from any existing simulation, and start with a fresh copy:
 
 <blockquote><code class='to_type'>
-  ./topographica examples/lissom_oo_or.ty -g
+  ./topographica examples/gca_lissom.ty -g
   </code></blockquote>
 <p></p>
 
@@ -598,7 +602,7 @@ iterations at a time instead before looking at an
 of units to something closer to real primate cortex, by quitting
 and then restarting with a higher density in V1:
 <blockquote><code class='to_type'>
-  ./topographica -p cortex_density=142 examples/lissom_oo_or.ty -g
+  ./topographica -p cortex_density=142 examples/gca_lissom.ty -g
   </code></blockquote>
 <p></p>
   
