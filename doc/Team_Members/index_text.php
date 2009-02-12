@@ -21,7 +21,7 @@ the United Kingdom and the United States.  The principal developers are:
       September 2005 - </dt>
   <dd>Chris has worked on nearly every part of Topographica.  Since
       September 2008 he has been a PhD student in Edinburgh, working on
-      modeling the development of auditory cortex.
+      modeling the development of color and motion preference maps.
 
   <p><dt>Judith Law, September 2005 - </dt>
   <dd>Judith is working on her PhD thesis about V1 surround modulation
@@ -56,13 +56,13 @@ Other significant contributors include:
       significantly to the web site and other graphical design.
 
   <p><dt>Julien Ciroux, October 2005 - April 2006</dt>
-  <dd>Julien recently received an MSc from the University of Edinburgh
+  <dd>Julien received an MSc from the University of Edinburgh
       (topic: modeling the McCollough effect in LISSOM).  He implemented the
-      new plotting subsystem in 0.8.2 and other GUI-related functions.
+      plotting subsystem in 0.8.2 and other GUI-related functions.
 
   <p><dt>Foivos Demertzis, September 2006 - May 2007</dt>
-  <dd>Foivos is working on his undergraduate degree at the
-      University of Edinburgh, with a project of developing
+  <dd>Foivos completed his undergraduate degree at the
+      University of Edinburgh, including a project of developing
       more sample models for Topographica.
 
   <p><dt>Kateryna Gerasymova, May 2008 - September 2008</dt>
@@ -72,7 +72,7 @@ Other significant contributors include:
       color.
 
   <p><dt><a target="_top" href="http://porter.csres.utexas.edu/judah/">Judah De Paula</a>, 2004 - 2006</dt>
-  <dd>Judah has now completed his PhD at the University of Texas (topic:
+  <dd>Judah completed his PhD at the University of Texas (topic:
       modeling the development of color maps in LISSOM).  He was
       responsible for the initial Windows support, and implemented the
       first complete plotting and related GUI code.
@@ -87,13 +87,10 @@ Other significant contributors include:
   <dd>Louise finished her undergraduate degree at the
       University of Edinburgh in summer 2006.  She implemented sample
       models of visual cortex maps published by other research groups.
-      This effort will help ensure that Topographica has
-      general-purpose support for maps, and will build a library of
-      starting points for future studies (e.g. comparison studies).
 
   <p><dt>Ruaidhri Primrose, September 2006 - May 2007</dt>
-  <dd>Ruaidrhi is working on his undergraduate degree at the
-      University of Edinburgh, with a project of developing
+  <dd>Ruaidrhi completed his undergraduate degree at the
+      University of Edinburgh, including a project of developing
       more sample models for Topographica.
 
   <p><dt><a target="_top" href="http://www.cs.utexas.edu/~jp/">Jefferson
