@@ -287,6 +287,20 @@ creation of python objects in other processes that communicate through
 proxies. 
 </DD>
 
+<P><DT><A HREF="http://cython.org">Cython</A></DT>
+<DD>
+Cython is a language that is very similar to Python, but supports
+calling C functions and declaring C types, and will produce and
+compile C code. Therefore, the performance benefit of C is available
+from a much simpler language. Because Cython can compile almost any
+Python code to C, one can start with a component written entirely in
+Python and then optimize it step by step (by adding types, for
+example). See the Cython documentation for more information.  To
+install Cython for Topographica, just enter <code>make -C external
+cython</code> from your Topographica directory.
+</DD>
+
+
 </DL>
 
 
