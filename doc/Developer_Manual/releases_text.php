@@ -14,6 +14,7 @@ such a release, the steps we generally follow are:
 
 <li><P>Make sure you have checked out topographica-win. If not:
 <pre>
+cd topographica/
 svn co $TOPOROOT/trunk/topographica-win topographica-win
 </pre>  
 
