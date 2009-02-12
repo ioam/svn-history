@@ -148,8 +148,7 @@ class _VersionPrinter(object):
         version = state['version']
         self.release=release
         self.version=version
-        # CB: Should probably clean up. And could be a debug statement, instead.
-        print "Snapshot is from release '%s' (version '%s')."%(release,version)
+        param.Parameterized(name="load_snapshot").debug("Snapshot is from release '%s' (version '%s')."%(release,version))
         
 
 def save_snapshot(snapshot_name=None,xml=False):
