@@ -3367,7 +3367,6 @@ class EditingParametersFrameWithApply(ParametersFrameWithApply):
                  on_set=None,on_modify=None,**params):
         super(EditingParametersFrameWithApply,self).__init__(
             master,parameterized_object,on_set,on_modify,**params)
-        import __main__;__main__.__dict__['x']=self
 
         self.hide_param('Defaults')
 
