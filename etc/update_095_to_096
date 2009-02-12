@@ -49,12 +49,15 @@ Topographica 0.9.6, you have three options:
 print info
 
 # should be ordered most to least specific
+# CEBALERT: no need for separate list; can just use substitutions
 substitutions = [
     # CEBALERT: still need to remove any imports of PipelineTF, etc
     ("output_fn\s*=\s*PipelineTF\(",""), # CEBALERT: these leave a trailing )
     ("output_fn\s*=\s*PipelineOF\(",""), #
     ("output_fn\s*=\s*Pipeline\(",""),   #
+    ("output_fn\s*=\s*","output_fns=["), # CEBALERT: missing trailing ] 
     ]
+
 
 replacements = [
     ('AttributeTrackingOF'           , 'AttributeTrackingTF'),
@@ -73,16 +76,8 @@ replacements = [
     ]
 
 
-
 # TO DO:
-#
-# MeasureResponseCommand, etc?
-#
-# *output_fn=X -> *output_fns=[X]
 # .output_fn -> .output_fns[0]  or some kind of warning or leave it!
-# apply_output_fn -> apply_output_fns
-
-
 
 filename = sys.argv[1] 
 
