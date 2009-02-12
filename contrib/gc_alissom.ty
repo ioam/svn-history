@@ -264,6 +264,7 @@ import topo.analysis.featureresponses
 
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
 topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
+topo.analysis.featureresponses.FeatureMaps.num_orientation=32
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
 if tracking:
     topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=32
