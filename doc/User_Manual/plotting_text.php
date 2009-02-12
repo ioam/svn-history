@@ -192,7 +192,7 @@ plots are (and using the same code), but they are visualized in a
 different way.
 
 
-<H2>Changing existing plots</H2>
+<H2><A NAME='changing-existing-plots'>Changing existing plots</A></H2>
 
 <P>The available plots are all specified in a general way that allows
 users to change the details of how the data is visualized.  Each plot

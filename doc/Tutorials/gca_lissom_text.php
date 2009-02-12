@@ -225,6 +225,8 @@ is the orientation map for V1 in this model.
 Each neuron in the plot is color coded by its preferred orientation,
 according to the key shown to the left of the plot.
 (If viewing a monochrome printout, see web page for the colors).
+Note that phase preference and selectivity are also displayed in
+the window, but these are not analyzed here (and are not shown above).
 </p>
 
 <p> You can see that nearby neurons have similar orientation
@@ -239,9 +241,19 @@ orientation, and the stronger the selectivity, the brighter the color.
 In this case, because the neurons are strongly selective, the
 Preference&Selectivity plot is nearly identical to the Preference plot.
 
-<P>Note that phase preference and selectivity are also displayed in
-the window, but these are not analyzed here (and are not shown above).
-
+<P>
+<!--CB: I think 'hook' is worse than 'command' in this context--> If
+you want to see what happens during map measurement, you can watch the
+procedure as it takes place by enabling visualization. Edit the 'Pre
+plot hooks' (as described in
+the <A HREF="../User_Manual/plotting.html#changing-existing-plots">User
+Manual</A>) so that the
+<?php classref('topo.command.analysis','measure_sine_pref') ?>
+ command's <code>display</code> parameter is turned on. Open an
+Activity window and ensure it has Auto-Refresh turned on, then press
+Refresh by the Orientation Preference window's 'Pre plot hooks'. You
+will see a series of sine gratings presented to the network, and can
+observe the response each time in the LGN and V1 sheets.
 </p><p>
 </p></li>
 
@@ -464,43 +476,6 @@ so that the network will be in a well-defined state.  (To do this,
 just type the fractional part into the "Run for:" box, i.e. 0.95 if
 the time is currently 10002.05, and then press "Go".)
 </li>
-
-<li>
-
-<!--CB: I think 'hook' is worse than 'command' in this context-->
-Earlier we introduced an orientation preference map, stating that it
-was the result of a procedure similar to that used in optical imaging
-experiments. In fact, you can watch the procedure as it takes
-place. To do this, we will re-measure the map, but with visualization
-enabled.
-
-<P>Returning to the Orientation Preference window, the commands used
-to generate the data for the existing plots are shown in
-the <span class="t_item">Pre plot hooks</span>. In Topographica, 'hook
-lists' are general-purpose locations for executable commands. Users
-can add their own commands at such locations, as well as editing the
-properties of existing ones. To access the commands for measuring the
-orientation map, right click on the list and select Properties. You
-will see that in this case there is one command,
-<?php classref('topo.command.analysis','measure_sine_pref') ?>. As
-described in the documentation, this is a command to measure
-preferences for sine gratings in various combinations. We can access
-its properties by right clicking on the measure_sine_pref command and
-again choosing Properties. As usual, a description of each property is
-available by hovering the mouse over its name. In this case, we are
-interested in 'Display', which controls whether or not the GUI should
-be updated as the command proceeds. Change its value to True, choose
-Apply, and return to the Orientation Preference window. At this point,
-ensure that you have an <span class="w_title">Activity</span> window
-open with <span class="t_item">Normalize</span> and
-<span class="t_item">Auto refresh</span> turned on, and 
-<span class="t_item">Strength only</span> turned off. Now press
-Refresh by the Orientation Preference window's Pre plot hooks; you
-will see a series of sine gratings presented to the network, and you
-can observe the response each time in the LGN and V1 sheets.
-</li>
-
-
 </ol>
 
 
