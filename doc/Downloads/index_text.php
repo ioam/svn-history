@@ -182,8 +182,8 @@ instructions</A>. Otherwise, download either the <code>.zip</code>
 or <code>.tar.gz</code> archive package from our
 <A HREF="http://sourceforge.net/project/showfiles.php?group_id=53602">downloads</A>
 page, and then unpack it. You will need to do this in a writable
-directory with approximately 500 megabytes of spaces available (as of
-09/2008).
+directory with approximately 800 megabytes of spaces available (as of
+2/2009).
 
 <H4><A NAME="building-topographica">Building Topographica</A></H4>
 

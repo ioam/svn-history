@@ -3,7 +3,7 @@ below, a large number of changes and new features are scheduled over
 the next few months, as well as over the next few years.  Our current
 <a href="current.html">lower-level list of tasks</a> is kept separately.
 
-<H2>Most urgent (Winter 2008-2009):</H2>
+<H2>Most urgent (Spring 2009):</H2>
 <DL COMPACT>
 <P><DT>Stable APIs</DT><DD>
 The Topographica API (determined by the classes in base/) is gradually
@@ -21,7 +21,7 @@ available for them).
 
 Model state saving is currently implemented using Python "pickling"
 (persistent storage).  As the Topographica classes change, these files
-quickly become out of date, and cannot be loaded into more recent
+quickly become out of date, and often cannot be loaded into more recent
 versions.  By the 1.0 release we plan to provide an upgrade path, so
 that old saved files can be used with new versions.  To make this
 simpler, we are working on an alternative implementation of state
@@ -147,7 +147,9 @@ Each event processor (e.g. a Sheet) can run on a different physical
 processor, exchanging information with other event processors using
 either shared memory or message passing protocols such as MPI.
 Implementing this type of parallelization is not likely to require
-significant changes to the simulator.
+significant changes to the simulator.  We are also working on a
+GPU-based implementation, to use the processors available on modern
+graphics cards.
 <!-- 
   Should be able to do this without significant
   changes to the code, by adding a parallel Simulator class and proxies
@@ -235,7 +237,7 @@ these domains will be particularly helpful.
 
 <P><DT>More library components</DT><DD>
 Topographica currently includes examples of each type of library
-component, such as Sheets, Projections, ResponseFunctions,
+component, such as Sheets, Projections, TransferFns, ResponseFunctions,
 LearningFunctions, and PatternGenerators.  However, many other types
 are used in the literature, and as these are implemented in
 Topographica they will be added to the library.  Again, user

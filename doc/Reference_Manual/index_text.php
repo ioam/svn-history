@@ -57,6 +57,8 @@ classes:
 <P><DL COMPACT>
 <P><DT><A href="topo.pattern-module.html"><strong>pattern</strong></A></DT>
 <DD>PatternGenerator classes: 2D input or weight patterns</DD>
+<P><DT><A href="topo.numbergen-module.html"><strong>numbergen</strong></A></DT>
+<DD>NumberGenerator classes: scalars drawn from some distribution</DD>
 <P><DT><A href="topo.sheet-module.html"><strong>sheet</strong></A></DT>
 <DD>Sheet classes: 2D arrays of processing units</DD>
 <P><DT><A href="topo.projection-module.html"><strong>projection</strong></A></DT>

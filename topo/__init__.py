@@ -142,13 +142,12 @@ def about(display=True):
 Pre-release version %s (%s) of Topographica; an updated
 version may be available from topographica.org.
 
-Copyright 2005-2008 James A. Bednar, Jan Antolik, Christopher Ball,
-Yoonsuck Choe, Julien Ciroux, Judah B. De Paula, Foivos Demertzis,
-Kateryna Gerasymova, Veldri Kurniawan, Judith Law, Alan Lindsay,
-Louise Mathews, Lewis Ng, Christopher Palmer, Ruaidhri Primrose,
-Jefferson Provost, Tikesh Ramtohul, Yiu Fai Sit, Stuart Wilson, and
-Roger Zhao.
-
+Copyright 2005-2009 James A. Bednar, James Adwick, Jan Antolik,
+Christopher Ball, Andy Cameron, Yoonsuck Choe, Julien Ciroux, Judah
+B. De Paula, Foivos Demertzis, Kateryna Gerasymova, John Jacob, Chris
+Jeffery, Veldri Kurniawan, Judith Law, Alan Lindsay, Louise Mathews,
+Lewis Ng, Christopher Palmer, Ruaidhri Primrose, Jefferson Provost,
+Tikesh Ramtohul, Yiu Fai Sit, Stuart Wilson, and Roger Zhao.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as

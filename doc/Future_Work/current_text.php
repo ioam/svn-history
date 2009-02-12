@@ -3,9 +3,9 @@ with earlier ones being higher priority than later ones.  Tasks
 within each section are also ordered approximately by priority.
 
 <DL COMPACT>
-<P>We are slowly changing over to use
+<P>Most of our current tasks have been moved to
 sourceforge's <a href="http://sourceforge.net/tracker/?group_id=53602">trackers</a>;
-those are becoming our primary record of outstanding tasks, so please
+those are our primary record of outstanding tasks, so please
 check there first. In particular, <em>new tasks should be submitted to
 a tracker rather than added to this list</em>.
 
@@ -133,7 +133,6 @@ anyway?) (CEB)
 
 <H4>2008/09/30 (CB): coordinates in GUI</H4>
 
-
 <H4>2007/10/03 (CB): Urgent param/tk cleanup</H4>
 Cleanup + doc of param/tk.py. Includes fixing 'from param import tk'.
 
@@ -164,12 +163,10 @@ easier.
 -->
 
 
-
 <H4>2007/10/26: Update tutorial</H4>
-Update the lissom_oo_or tutorial page to include fresh figures; some
-are a bit out of date.  Add a section about plotting 'Orientation
-tuning fullfield' tuning curves.  CB: would the tutorial benefit from
-being split up a little more?  Maybe it's getting daunting?
+Add a section about plotting 'Orientation tuning fullfield' tuning
+curves.  CB: would the tutorial benefit from being split up a little
+more?  Maybe it's getting daunting?
 
 <H4>CB: c++ comparisons</H4>
 or/oo_or: Some BaseRN/BaseN combinations don't match. oo_dr: input
@@ -526,9 +523,7 @@ Optional packages (e.g. mlabwrap, pyaudio) on Windows and OS X.
 
 
 <H4>2006/02/23 (all): Making more things be Parameters</H4>
-And writing doc strings at the same time. E.g. the x and y widgets in
-the Unit Weights window can be Numbers with bounds, etc.
-
+And writing doc strings at the same time. 
 
 <H4>2006/02/23 (all): ensuring classes are declared abstract if they
 are abstract</H4>
