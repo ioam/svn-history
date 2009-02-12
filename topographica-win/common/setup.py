@@ -51,7 +51,7 @@ f.write("environ['PATH']="+repr(os.path.join(path,compiler_path))+"\n")
 f.write("\n")
 f.write('import topo'+'\n')
 # CEBHACKALERT: This is hard-coded twice: should be read from somewhere.
-f.write("topo.release='0.9.5'\n")
+f.write("topo.release='0.9.6'\n")
 f.write("\n")
 f.write("# Process the command-line arguments\n")
 f.write('from sys import argv\n')
