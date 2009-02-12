@@ -3523,10 +3523,11 @@ class EditingParametersFrameWithApply(ParametersFrameWithApply):
         #### HACK TO FIND NEW NAME BY MATCHING ROW
         new_name=None
         for n in self.representations:
-            row = int(self.representations[n]['widget'].grid_info()['row'])
-            if row==new_pos:
-                new_name=n
-                break
+            if 'row' in self.representations[n]['widget'].grid_info():
+                row = int(self.representations[n]['widget'].grid_info()['row'])
+                if row==new_pos:
+                    new_name=n
+                    break
         assert new_name is not None
         ####
 
