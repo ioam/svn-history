@@ -1557,8 +1557,7 @@ class TkParameterized(TkParameterizedBase):
                     break
         elif name not in self.allow_dynamic:
             self.allow_dynamic.append(name)
-                    
-            
+
         if on_set is not None:
             self._tkvars[name]._on_set=on_set
 
@@ -1657,7 +1656,6 @@ class TkParameterized(TkParameterizedBase):
         # CEBALERT: need to document how & why people should use 'sort_fn_args'
         # and 'new_default' when calling pack_param(). Also, simplify it if
         # possible.
-        
         self.translators[name].update()
         
         new_range = self.translators[name].cache.keys()
@@ -1686,7 +1684,6 @@ class TkParameterized(TkParameterizedBase):
                 current_value = new_range[0] # whatever was there is out of date now
 
         tkvar.set(current_value)
-
         return new_range,widget_options
         
 
@@ -1718,9 +1715,7 @@ class TkParameterized(TkParameterizedBase):
         # (a) supports changing its option list (subject of a previous ALERT)
         # (b) supports sorting of its option list
         # (c) supports selecting a new default
-
         new_range,widget_options = self._X(name,widget_options)
-
         tkvar = self._tkvars[name]
 
         # Combobox looks bad with standard theme on my ubuntu
@@ -1738,7 +1733,7 @@ class TkParameterized(TkParameterizedBase):
             v = self._tkvars[name].get()
             self._tkvar_set(name,v)
             self._handle_gui_set(name)
-            
+
         w.bind("<<ComboboxSelected>>",f)
 
         help_text = getdoc(self._string2object(name,tkvar._original_get()))
@@ -1859,19 +1854,20 @@ class TkParameterized(TkParameterizedBase):
     def _set_widget_status(self,param_name,status):
 
         if param_name in self.representations:
-            widget = self.representations[param_name]['widget']
-            states = {'error'   : 'red',
-                      'changed' : 'blue',
-                      None      : 'black'}
-            
-            if is_button(widget):
-                # can't change state of button
-                return
+            if 'widget' in self.representations:
+                widget = self.representations[param_name]['widget']
+                states = {'error'   : 'red',
+                          'changed' : 'blue',
+                          None      : 'black'}
 
-            try:
-                widget.config(foreground=states[status])
-            except T.TclError:  #CEBALERT uh-oh
-                pass
+                if is_button(widget):
+                    # can't change state of button
+                    return
+
+                try:
+                    widget.config(foreground=states[status])
+                except T.TclError:  #CEBALERT uh-oh
+                    pass
 
     def _pretty_print(self,s):
         """
@@ -2344,17 +2340,19 @@ class ParametersFrame(TkParameterized,T.Frame):
 
     def _make_representation(self,name):
         if name in self.representations:
-            for w in self.representations[name].values():
+            for n,w in self.representations[name].items():
                 try:
                     w.destroy()
                 except: #e.g. buttons have None for label ('notNonelabel')
                     pass
+                del self.representations[name][n]
         
         widget,label = self._create_widget(name,self._params_frame,
                                            on_set=self.on_set,
                                            on_modify=self.on_modify)
 
         label.bind("<Double-Button-1>",lambda event=None,x=name: self.switch_dynamic(x))
+
         self.representations[name]={'widget':widget,'label':label}
         self._indicate_tkvar_status(name)
 
@@ -3460,6 +3458,7 @@ class EditingParametersFrameWithApply(ParametersFrameWithApply):
 
     def _add_param(self):
         # should refactor pack_params to get out adding of single param
+
         po = self._extraPO
         name = po.add()
 
@@ -3581,7 +3580,7 @@ class EditingParametersFrameWithApply(ParametersFrameWithApply):
         # detect order change 
         names = sorted(self.params_to_display.keys())
         for i,name in zip(range(len(names)),names):
-            if int(self.representations[name]['widget'].grid_info()['row'])!=i:
+            if 'widget' not in self.representations[name] or int(self.representations[name]['widget'].grid_info()['row'])!=i:
                 return True
             
         return super(EditingParametersFrameWithApply,self).has_unapplied_change()
@@ -3594,6 +3593,7 @@ class EditingParametersFrameWithApply(ParametersFrameWithApply):
     # CEBALERT: because 
     def _apply_button(self):
         self.update_parameters()
+        
         for h in self._apply_hooks:
             h(self)
 
