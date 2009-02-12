@@ -1,4 +1,202 @@
+2009-02-12  antolikjan
+
+	* [r10028] contrib/gc_alissom.ty:
+	  made default map measurment with higher number of orientations
+
+2009-02-12  ceball
+
+	* [r10027] topo/param/tk.py:
+	  Fixed SF #2572627 (assumed all widgets were managed by grid, but
+	  some are managed by pack).
+
+	* [r10026] topo/param/tk.py:
+	  Fixed bug in GUI where a new list item could not be added
+	  sometimes (caused by a parameter's representation was not being
+	  removed).
+
+	* [r10025] doc/Tutorials:
+	  More to ignore.
+
+2009-02-12  jbednar
+
+	* [r10024] README.txt,
+	  doc/Downloads/index_text.php,
+	  doc/Future_Work/current_text.php,
+	  doc/Future_Work/index_text.php,
+	  doc/Reference_Manual/index_text.php,
+	  topo/__init__.py:
+	  Updated for new release
+
+	* [r10023]
+	  doc/Developer_Manual/releases_text.php:
+	  Minor clarification
+
+2009-02-12  ceball
+
+	* [r10022] topo/param/tk.py:
+	  Removed debugging aid left in by mistake.
+
+2009-02-12  jbednar
+
+	* [r10021] /trunk/topographica-win/common/setup.py,
+	  /trunk/topographica-win/create_installer/topographica.iss:
+	  Updated to declare version 0.9.6
+
+	* [r10020] examples/gca_lissom.ty:
+	  Added item_scale to make Model Editor look better
+
+2009-02-12  ceball
+
+	* [r10019] topo/param/tk.py:
+	  Fixed bug where TaggedSliders' sliders were not being refreshed
+	  when the Defaults button was pressed.
+
+	* [r10018]
+	  doc/Tutorials/som_retinotopy_text.php:
+	  Updated locals() -> global_params.
+
+	* [r10017] doc/Tutorials/gca_lissom_text.php:
+	  More changes to convert from lissom_oo_or to gca_lissom.
+
+	* [r10016] topo/command/basic.py:
+	  Changed snapshot info print statement to debug statement.
+
+	* [r10015] doc/Tutorials/gca_lissom_text.php,
+	  doc/Tutorials/lissom_oo_or_text.php,
+	  doc/User_Manual/plotting_text.php:
+	  Reduced section about display=True during map measurement.
+
+2009-02-12  jbednar
+
+	* [r10014] Makefile:
+	  Updated stated release; still needs 'make new-version'
+
 2009-02-11  jbednar
+
+	* [r10013] topo/command/pylabplots.py:
+	  Fixed pylabplots titles; missing since r9557
+
+2009-02-11  ceball
+
+	* [r10012] doc/Tutorials/gca_lissom_text.php,
+	  doc/Tutorials/images/lissom_network_diagram_oo.png,
+	  doc/Tutorials/lissom_oo_or_text.php:
+	  Minor updates (including lissom_oo_or network diagram.
+
+	* [r10011] doc/Tutorials/gca_lissom_text.php,
+	  doc/Tutorials/images/gca_lissom_network_diagram.png:
+	  More updates: network size, network diagram.
+
+	* [r10010] doc/Tutorials/gca_lissom_text.php,
+	  doc/Tutorials/lissom_oo_or_text.php:
+	  Minor updates.
+
+	* [r10009] doc/Tutorials/gca_lissom_text.php,
+	  doc/Tutorials/lissom_oo_or_text.php:
+	  Updated command.
+
+	* [r10008] doc/Tutorials/gca_lissom_text.php,
+	  doc/Tutorials/lissom_oo_or_text.php:
+	  Fixed minor typo.
+
+	* [r10007] topo/param/tk.py:
+	  Fixed typo.
+
+	* [r10006] topo/param/tk.py:
+	  Remove newline characters from script_reprs in the GUI. Partially
+	  addresses SF bug #2590268.
+
+2009-02-11  antolikjan
+
+	* [r10005] contrib/jacommands.py:
+	  repaired some more problems with imports
+
+2009-02-11  ceball
+
+	* [r10004] topo/param/tk.py:
+	  Fixed SF #2585687 by restoring code to wipe all displayed widgets
+	  (should not have been removed).
+
+	* [r10003]
+	  doc/Downloads/update_script_text.php:
+	  Fixed minor typo.
+
+2009-02-11  antolikjan
+
+	* [r10002] contrib/jacommands.py:
+	  added some missing imports
+
+	* [r10001] contrib/gc_alissom.ty:
+	  change to some parameters
+
+2009-02-11  ceball
+
+	* [r10000]
+	  topo/tkgui/templateplotgrouppanel.py:
+	  Made strength-only hack safe between instances of
+	  TemplatePlotGroupPanels. Fixes SF #2585560.
+
+	* [r9999] doc/Downloads/update_script_text.php:
+	  Minor typo.
+
+	* [r9998] topo/param/tk.py:
+	  Implemented ClassSelector support for List parameters that have a
+	  valid class_. SF feature #2581878.
+
+2009-02-11  jbednar
+
+	* [r9997] doc/News/index_text.php:
+	  Reorganized order; no new items
+
+	* [r9996] doc/Home/news_text.php,
+	  doc/News/index_text.php:
+	  Updated with recent news and to announce version 0.9.6
+
+	* [r9995] doc/Downloads/update_script_text.php:
+	  Updated for 0.9.6
+
+	* [r9994]
+	  doc/Developer_Manual/optimization_text.php:
+	  Added line-by-line target. Reduced line length to work in
+	  browser.
+
+2009-02-11  ceball
+
+	* [r9993] topo/sheet/lissom.py:
+	  Increased JointScaling's precedence above that of LISSOM's.
+
+	* [r9992] topo/plotting/plotgroup.py:
+	  Fixed bug in PlotGroup's _create_images() where plots were being
+	  constructed twice for TemplatePlotGroups.
+
+2009-02-11  jbednar
+
+	* [r9991] examples/tiny.ty:
+	  Made import style match other examples
+
+	* [r9990] doc/Tutorials/gca_lissom_text.php,
+	  doc/Tutorials/lissom_oo_or_text.php:
+	  Made spelling consistent
+
+	* [r9989] Makefile:
+	  Sped up ChangeLog generation
+
+	* [r9988] ChangeLog.txt:
+	  Fixed some bogus checkin messages
+
+	* [r9987] ChangeLog.txt,
+	  doc/News/index_text.php:
+	  Updated with recent changes
+
+2009-02-11  ceball
+
+	* [r9986] doc/Tutorials/gca_lissom_text.php:
+	  Updated introduction to GCA-LISSOM tutorial.
+
+2009-02-11  jbednar
+
+	* [r9985] doc/News/index_text.php:
+	  Updated with recent changes
 
 	* [r9984] topo/base/cf.py:
 	  Added mask_threshold value (fixes ALERT)
