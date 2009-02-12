@@ -2237,6 +2237,11 @@ class ParametersFrame(TkParameterized,T.Frame):
             if not self.hidden_param(param_name):
                 self.gui_set_param(param_name,val)#_tkvars[param_name].set(val)
 
+                # CEBALERT: taggedsliders need to have tag_set() called to update slider
+                w = self.representations[param_name]['widget']
+                if hasattr(w,'tag_set'):w.tag_set()
+
+
         # CEBALERT: why doesn't this first check that something has actually changed?
         if self.on_modify:
             self.on_modify()
@@ -2244,7 +2249,10 @@ class ParametersFrame(TkParameterized,T.Frame):
         if self.on_set:
             self.on_set()
 
+
+        
         self.update_idletasks()
+
         
         
     def _close_button(self):
