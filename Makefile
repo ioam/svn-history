@@ -344,7 +344,7 @@ sf-web-site: reference-manual doc
 	rsync -v -arHz --rsh=ssh doc/. web.sf.net:/home/groups/t/to/topographica/htdocs/.
 
 
-SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_or.ty ^lissom_fsa.ty ^lissom_oo_or.ty ^lissom_or_movie.ty ^lissom_or.ty ^lissom.ty ^lissom_whisker_barrels.ty ^obermayer_pnas90.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^tiny.ty
+SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_or.ty ^lissom_fsa.ty ^lissom_oo_or.ty ^lissom_or_movie.ty ^lissom_or.ty ^lissom.ty ^lissom_whisker_barrels.ty ^obermayer_pnas90.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^tiny.ty ^gca_lissom.ty
 
 
 # Clear out everything not intended for the public distribution
@@ -366,10 +366,10 @@ SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_o
 #@@	   ${CD} topo/tests/reference ; make clean
 #@@	   ${RM} -r doc/buildbot/
 #@@	   find examples/*.ty -maxdepth 1 ${subst ^,! -name ,${SCRIPTS_TO_KEEP_IN_DIST}} -exec rm {} \;
-#@@	   ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
-#@@	   else
+#@@ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
+#@@else
 #@@	   	${RM} -r topographica-win 
-#@@	   endif
+#@@endif
 
 # Make public distribution archive
 distarc: FORCE distclean 
@@ -395,7 +395,7 @@ dist: doc distdir reference-manual FORCE
 # the full list, but this is faster.
 ChangeLog.txt: FORCE
 	make -C external svn2cl
-	external/svn2cl -r 9000:HEAD --include-rev --group-by-day --separate-daylogs --break-before-msg --stdout https://topographica.svn.sourceforge.net/svnroot/topographica/ | sed -e 's|/trunk/topographica/||g' > ChangeLog.txt
+	external/svn2cl -r HEAD:9000 --include-rev --group-by-day --separate-daylogs --break-before-msg --stdout https://topographica.svn.sourceforge.net/svnroot/topographica/ | sed -e 's|/trunk/topographica/||g' > ChangeLog.txt
 
 
 

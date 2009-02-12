@@ -2,7 +2,6 @@ This directory contains example Topographica simulation scripts,
 including the following simple ones:
 
   tiny.ty              - Short, simple, fast example
-  cfsom_or.ty          - SOM network with ConnectionFields  
   hierarchical.ty      - Example of connecting multiple maps
   lissom_oo_or.ty      - LISSOM orientation map with ON/OFF channels
   som_retinotopy.ty    - SOM retinotopy map
@@ -11,6 +10,9 @@ including the following simple ones:
 Additionally, several other examples are also included:
 
   goodhill_network90.ty        - 2D ocular dominance elastic net model 
+
+  gca_lissom.ty                - LISSOM orientation map with gain 
+                                 control and homesotatic plasticity
 
   leaky_lissom_or.ty           - LISSOM with spiking neurons
 
