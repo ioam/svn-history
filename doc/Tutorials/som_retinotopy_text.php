@@ -321,7 +321,7 @@ equivalent results.
 Topographica.  This time, change one of the parameter values, either
 by editing the <code>som_retinotopy.ty</code> file before starting, or
 by providing it on the command line before the script name (for those
-parameters that check <code>locals()</code> for their defaults).  For
+parameters set via global_params.  For
 instance, the starting value of the neighborhood radius (from which
 all future values are calculated according to exponential decay) is
 1.0.  You can change this value as you see fit, e.g. to 0.1, by
