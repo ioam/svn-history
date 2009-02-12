@@ -240,8 +240,7 @@ topo.sim.connect(
 ### Default locations for model editor
 topo.sim.grid_layout([[None,    'V1',     None],
                       ['LGNOn', None,     'LGNOff'],
-                      [None,    'Retina', None]], xstart=150)
-
+                      [None,    'Retina', None]], xstart=150,item_scale=0.8)
 
 ### Set up appropriate defaults for analysis
 
