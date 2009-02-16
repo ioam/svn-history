@@ -223,7 +223,6 @@ def get_activity(**data):
     """Helper function: return 'Activity' from data."""
     return data['Activity']
 
-from topo.misc import rgbhsv
 def hue_from_rgb(**data):
     """
     Helper function: given arrays of RedActivity, GreenActivity, and
@@ -231,7 +230,7 @@ def hue_from_rgb(**data):
     corresponding hues.
     """
     red,green,blue = data['RedActivity'],data['GreenActivity'],data['BlueActivity']
-    H,S,V = rgbhsv.rgb_to_hsv_array(
+    H,S,V = rgb_to_hsv_array(
         numpy.array(255*red,dtype=numpy.int32),
         numpy.array(255*green,dtype=numpy.int32),
         numpy.array(255*blue,dtype=numpy.int32))
