@@ -306,7 +306,7 @@ for e in eyes:
                     y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=input_seed+2+5*i),
                     orientation=0 if n != '' else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=input_seed+3+5*i),
                     scale=scalingfactor[cone_types.index(cone)]* \
-                            (1.0 if 'od' not in dims else \
+                            (1.0 if 'od' not in p.dims else \
                             (1.0 if 'od' not in p.dims else \
                             (2.0-numbergen.UniformRandom(lbound=0,ubound=2,seed=input_seed+4+5*i) \
                              if e=='Right' else \
