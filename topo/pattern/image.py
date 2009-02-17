@@ -225,7 +225,7 @@ class FastPatternSampler(param.Parameterized):
         # redesigned?  The interface to this function is pretty inscrutable.)
 
         im = ImageOps.fit(self.image,x.shape,self.sampling_method)
-        return array(im)
+        return array(im,dtype=Float)
 
         
 # Would be best called Image, but that causes confusion with PIL's Image
