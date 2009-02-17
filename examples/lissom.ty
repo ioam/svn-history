@@ -13,7 +13,7 @@ parameter below.
 
 For example, 
 
-  ./topographica -c "dims=['or','od']" -c "dataset='Gaussian'" examples/lissom.ty
+  ./topographica -p "dims=['or','od']" -p "dataset='Gaussian'" examples/lissom.ty
 
 selects a Gaussian OR/OD simulation.  Gaussian OR/OD/DR/DY is the default.
 
