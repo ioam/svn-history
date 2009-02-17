@@ -141,16 +141,9 @@ class ColorImage(FileImage):
             self.last_wiofs = whole_image_output_fns
 
             R,G,B = self._image.split()
-            # with PIL 1.1.6 will be just red_pattern.array = numpy.array(R)
-            red_pattern_array = numpy.array(R.getdata(),numpy.float32)
-            red_pattern_array.shape = (self._image.size[::-1]) 
-
-            green_pattern_array = numpy.array(G.getdata(),numpy.float32)
-            green_pattern_array.shape = (self._image.size[::-1])
-            
-            blue_pattern_array = numpy.array(B.getdata(),numpy.float32)
-            blue_pattern_array.shape = (self._image.size[::-1]) 
-            ####
+            red_pattern_array = numpy.array(R,dtype=numpy.float32) 
+            green_pattern_array = numpy.array(G,dtype=numpy.float32)
+            blue_pattern_array = numpy.array(B,dtype=numpy.float32)
 
             # 3 pattern samplers for now because of whole image output
             # fn and background value fn; need to sort those out
@@ -331,7 +324,7 @@ if __name__=="__main__" or __name__=="__mynamespace__":
 
     from topo import sheet
     import glob
-    image_filenames = glob.glob('/disk/scratch/mcgill/foilage/*.tif') # sic
+    image_filenames = glob.glob('/disk/scratch/fast/v1cball/mcgill/foilage/*.tif') # sic
     images0 = [ColorImage(filename=f) for f in image_filenames]
     images1 = [TColorImage(filename=f) for f in image_filenames]
     
