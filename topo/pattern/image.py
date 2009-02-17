@@ -48,8 +48,7 @@ class PatternSampler(param.Parameterized):
         elif pattern_array is not None:
             pass
         elif image is not None:
-            pattern_array = array(image.getdata(),Float)
-            pattern_array.shape = (image.size[::-1]) # getdata() returns transposed image?
+            pattern_array = array(image,Float)
         else:
             raise ValueError("PatternSampler instances must have a pattern or an image.")
 
@@ -226,11 +225,7 @@ class FastPatternSampler(param.Parameterized):
         # redesigned?  The interface to this function is pretty inscrutable.)
 
         im = ImageOps.fit(self.image,x.shape,self.sampling_method)
-
-        result = array(im.getdata(),dtype=Float)
-        result.shape = im.size[::-1]
-
-        return result
+        return array(im)
 
         
 # Would be best called Image, but that causes confusion with PIL's Image
