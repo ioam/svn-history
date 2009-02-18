@@ -56,9 +56,10 @@ p.add(
         The nominal_density to use for V1."""))
 
 
-def arc(x, y, height, radian_range, thickness, gaussian_width):
+def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
     """
-    Arc with Gaussian fall-off after the solid ring-shaped region.
+    Arc with Gaussian fall-off after the solid ring-shaped region and specified
+    by start and end radian.
     
     The first part of this function is based on ring function.
     """
@@ -102,9 +103,63 @@ def arc(x, y, height, radian_range, thickness, gaussian_width):
                      output_ring, 0.0)
 
 
+def arc_by_center(x, y, height, arc_box, thickness, gaussian_width):
+    """
+    Arc with Gaussian fall-off after the solid ring-shaped region and specified
+    by point of tangency (x and y) and arc width and height.
+    
+    The first part of this function is based on ring function.
+    """
+    arc_w = arc_box[0]
+    arc_h = arc_box[1]
+    #if arc_h > arc_w / 2:
+    radius = arc_h / 2.0 + arc_w ** 2.0 / (8 * arc_h)
+    y = y + radius
+    angle = arcsin(arc_w / 2.0 / radius)
+    angle_start = 3 / 2 * pi - angle
+    angle_end = 3 / 2 * pi + angle
+    
+    # Create a circular ring (same as in func ring)
+
+    half_thickness = thickness/2.0
+
+    distance_from_origin = sqrt(x**2+y**2)
+    distance_outside_outer_disk = distance_from_origin - radius - half_thickness
+    distance_inside_inner_disk = radius - half_thickness - distance_from_origin
+
+    ring = 1.0-bitwise_xor(greater_equal(distance_inside_inner_disk,0.0),greater_equal(distance_outside_outer_disk,0.0))
+
+    sigmasq = gaussian_width*gaussian_width
+
+    with topo.misc.patternfn.float_error_ignore():
+        inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
+        outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
+
+    output_ring = maximum(inner_falloff,maximum(outer_falloff,ring))
+
+    # Calculate radians (in 4 phases) and cut according to the set range)
+
+    sines = x / distance_from_origin
+    cosines = y / distance_from_origin
+    arcsines = arcsin(sines)
+
+    phase_1 = where(logical_or(sines >= 0, cosines >= 0), 2 * pi - arcsines, 0)
+    phase_2 = where(logical_or(sines >= 0, cosines < 0), pi + arcsines, 0)
+    phase_3 = where(logical_or(sines < 0, cosines < 0), pi + arcsines, 0)
+    phase_4 = where(logical_or(sines < 0, cosines >= 0), -arcsines, 0)
+    arcsines = phase_2 + phase_3
+
+    return where(logical_and(arcsines >= angle_start, arcsines <= angle_end), output_ring, 0.0)
+
+
 class Arc(PatternGenerator):
     """
     2D arc pattern generator.
+    
+    The shape of the arc can be either specified by start and end radian
+    (preferential) or by point of tangency and arc width and height. if parameter
+    'radian_range' is not set (i.e., default value (0.0, 0.0)), parameters
+    x and y (as point of tangency) and 'arc_box' will be used to draw the arc.
 
     See the Ring and Disk class for a note about the Gaussian fall-off.
     """
@@ -114,13 +169,19 @@ class Arc(PatternGenerator):
     
     smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
+
+    smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
+        precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
     
     aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the overall width.")
 
-    radian_range = param.NumericTuple(default=(0.0,2*pi), length=2,
-                                      doc = "Range of start and end radians.")
+    radian_range = param.NumericTuple(default = (0.0, 0.0), length = 2,
+        precedence = 0.62, doc = "Range of start and end radians.")
+
+    arc_box = param.NumericTuple(default = (1.0, 1.0), length = 2,
+        precedence = 0.64, doc = "Width and height of the arc. Height <= width/2.")
 
     size = param.Number(default=0.5)
 
@@ -128,40 +189,34 @@ class Arc(PatternGenerator):
         height = params['size']
         aspect_ratio = params['aspect_ratio']
         radian_range = params['radian_range']
+        arc_box = params['arc_box']
+        
+        if radian_range != (0.0, 0.0):  # the shape is specified by start and end radian
+            output = arc_by_radian(self.pattern_x/aspect_ratio, self.pattern_y, height,
+                                   radian_range, params['thickness'], params['smoothing'])
+        else:
+            output = arc_by_center(self.pattern_x/aspect_ratio, self.pattern_y, height,
+                                   arc_box, params['thickness'], params['smoothing'])
 
-        return arc(self.pattern_x/aspect_ratio,self.pattern_y,height,radian_range,
-                    params['thickness'],params['smoothing'])
+        return output
 
 
-class HappyFace(PatternGenerator):
+class HappyFace(pattern.Composite):
     """
     2D cartoon face pattern.
     
     The face has a round outline, two eyes and a curved mouth. It is parameterized
     by the 'happiness' value, which ranges from 1.0 (happy, concave) to -1.0
     (sad, convex). Happiness 0.0 represents a straight line.
-    
-    RCZALERT: It should be better to inherit this class from Composite rather than
-    PatternGenerator, as the face is no more than the composite of eyes and mouth.
-    However, the _advance_pattern_generators function in Composite doesn't support
-    parameterization for each of the generators, which prevents me to use the
-    'happiness' parameter.
     """
-
-    operator = param.Parameter(numpy.maximum,precedence=0.98,
-                               doc="""See details in class Composite""")
-
-    size = param.Number(default=2.0,doc="Scaling factor applied to all sub-patterns.")
-
-    orientation = param.Number(default=pi/2,doc="Orientation applied to all sub-patterns.")
 
     happiness = param.Number(default=1.0,bounds=(-1.0,1.0),
                              doc = """Happiness value that determines whether the mouth
                                       is concave (happy, positive) or convex
                                       (sad, negative).""")
     
-    def __init__(self,**params):
-        super(HappyFace,self).__init__(**params)
+    def __init__(self, **params):
+        super(HappyFace, self).__init__(**params)
         base = 3 * sqrt(3) / sin(40 * pi / 180 / 2.0)
         self.k_happy = (base - 6) / (base - 4.5)
         self.k_sad   = (base - 6) / (4.5 - base)
@@ -169,12 +224,15 @@ class HappyFace(PatternGenerator):
         self.b_sad   = 12 * self.k_sad   + 6.0
         self.max_shift = base - 4.5
 
-    def function(self,params):
+    def _advance_pattern_generators(self, generators):
         """Constructs combined pattern out of the individual ones."""
 
+        """
         orientation = params['orientation']
         size = params['size']
         happiness = params['happiness']
+        """
+        happiness = self.happiness
 
         lefteye =  pattern.Gaussian(aspect_ratio = 1.0, x = 1/24.0, y = 4.5/24.0,
                             size = 3.0 * 1.21/24.0 / 1.7, scale = 0.5, offset = 0.5059)
@@ -202,15 +260,8 @@ class HappyFace(PatternGenerator):
                           radian_range = radians,
                           thickness = 0.002, smoothing = 0.05, size = r * 2.0 / 24.0)
 
-        patterns = [pg(xdensity=params['xdensity'],ydensity=params['ydensity'],
-                       bounds=params['bounds'],mask=params['mask'],
-                       x=params['x']+size*(pg.x*cos(orientation)- pg.y*sin(orientation)),
-                       y=params['y']+size*(pg.x*sin(orientation)+ pg.y*cos(orientation)),
-                       orientation=pg.orientation+orientation,
-                       size=pg.size*params['size'])
-                    for pg in [lefteye, righteye, face, mouth]]
-        image_array = self.operator.reduce(patterns)
-        return image_array
+        return [lefteye, righteye, face, mouth]
+
 
 
 
