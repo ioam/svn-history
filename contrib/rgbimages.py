@@ -110,6 +110,7 @@ class RGBify(PatternGenerator):
 
 ############################################################
 from topo.pattern.image import FileImage,edge_average,PIL
+import ImageOps
 import numpy
 
 class ColorImage(FileImage):
@@ -119,67 +120,36 @@ class ColorImage(FileImage):
 
         if filename!=self.last_filename or self._image is None:
             self.last_filename=filename
-            self._image = PIL.open(self.filename)
+            rgbimage = PIL.open(self.filename)
+            R,G,B = rgbimage.split()
+            self._image_red  = R
+            self._image_green = G
+            self._image_blue = B
+            self._image = ImageOps.grayscale(rgbimage)
             return True
         else:
             return False
 
-
     def function(self,params):
-        xdensity = params['xdensity']
-        ydensity = params['ydensity']
-        x        = params['pattern_x']
-        y        = params['pattern_y']
-        size_normalization = params.get('scaling') or self.size_normalization  #params.get('scaling',self.size_normalization)
+        gray = super(ColorImage,self).function(params)
 
-        height = params['size']
-        width = params['aspect_ratio']*height
+        # now store red, green, blue
+        self.pattern_sampler._set_image(self._image_red)
+        self.pattern_sampler._initialize_image()
+        self._red = super(ColorImage,self).function(params)
 
-        whole_image_output_fns = params['whole_image_output_fns']
+        self.pattern_sampler._set_image(self._image_green)
+        self.pattern_sampler._initialize_image()
+        self._green = super(ColorImage,self).function(params)
 
-        if self._get_image(params) or whole_image_output_fns != self.last_wiofs:
-            self.last_wiofs = whole_image_output_fns
+        self.pattern_sampler._set_image(self._image_blue)
+        self.pattern_sampler._initialize_image()
+        self._blue = super(ColorImage,self).function(params)
 
-            R,G,B = self._image.split()
-            red_pattern_array = numpy.array(R,dtype=numpy.float32) 
-            green_pattern_array = numpy.array(G,dtype=numpy.float32)
-            blue_pattern_array = numpy.array(B,dtype=numpy.float32)
+        # note: currently, _red, _green, _blue have to be cached
+        return gray
 
-            # 3 pattern samplers for now because of whole image output
-            # fn and background value fn; need to sort those out
-            self.ps=self.pattern_sampler_type(pattern_array=red_pattern_array, 
-                                              whole_pattern_output_fns=self.last_wiofs,
-                                              background_value_fn=edge_average)
-            
-            self._gps = self.pattern_sampler_type(pattern_array=green_pattern_array, 
-                                              whole_pattern_output_fns=self.last_wiofs,
-                                              background_value_fn=edge_average)
-
-            self._bps = self.pattern_sampler_type(pattern_array=blue_pattern_array, 
-                                              whole_pattern_output_fns=self.last_wiofs,
-                                              background_value_fn=edge_average)
-            
-
-        self._red = self.ps(x.copy(),y.copy(),float(xdensity),float(ydensity),
-                            size_normalization,float(width),float(height))
-
-        self._green = self._gps(x.copy(),y.copy(),float(xdensity),float(ydensity),
-                                size_normalization,float(width),float(height)) 
-
-        self._blue = self._bps(x,y,float(xdensity),float(ydensity),
-                               size_normalization,float(width),float(height))
-
-        #print self._red
-
-        if not self.cache_image:
-            del self.ps     ; self.ps=None
-            del self._image ; self._image=None
-            # uh-oh: got to cache _red, _green, _blue for the moment
-            # can still get rid of _gps and _bps
-            
-        return self._red # should instead be grayscale
-
-
+    
 import random
 from contrib.rgbhsv import rgb_to_hsv_array ,hsv_to_rgb_array 
 class TColorImage(ColorImage):
