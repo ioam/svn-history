@@ -314,9 +314,6 @@ for e in eyes:
                 for f,i in zip(image_filenames,range(len(image_filenames)))]
                 input_composite=pattern.Selector(generators=inputs)
 
-            else:
-                raise ValueError("Unknown dataset '%s'"%p.dataset)
-
 
             if n != '':
                 input_moved=pattern.Sweeper(
