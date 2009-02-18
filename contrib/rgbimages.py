@@ -9,18 +9,22 @@ class ColorImageSheet(GeneratorSheet):
     """
     A GeneratorSheet that handles RGB images.
 
-    Any supplied input_generator is wrapped in the ExtendToRGB
-    PatternGenerator.  Red, green, and blue activities are sent out on
-    the Red, Green, and BlueActivity ports.
+    Accepts either a single-channel or a RGB input_generator.  If the
+    input_generator stores separate red, green, and blue patterns, it
+    is used as-is; other (monochrome) PatternGenerators are first
+    wrapped using ExtendToRGB to create the RGB patterns.
+
+    When a pattern is generated, a monochrome version is sent out on
+    the Activity port as usual for a GeneratorSheet, and red, green,
+    and blue activities are sent out on the RedActivity,
+    GreenActivity, and BlueActivity ports.  Thus this class can be used
+    just like GeneratorSheet, but with optional color channels.
     """
+
     src_ports=['Activity','RedActivity','GreenActivity','BlueActivity']
 
     def __init__(self,**params):
         super(ColorImageSheet,self).__init__(**params)
-
-        # should instead be array of zeros of same size,
-        # although this has same effect because activity is
-        # array of zeros to begin with
         self.activity_red=self.activity.copy()
         self.activity_green=self.activity.copy()
         self.activity_blue=self.activity.copy()
@@ -28,6 +32,7 @@ class ColorImageSheet(GeneratorSheet):
 
     def set_input_generator(self,new_ig,push_existing=False):
         """Wrap new_ig in ExtendToRGB if necessary."""
+
         if not hasattr(new_ig,'red'):
             new_ig = ExtendToRGB(generator=new_ig)
             
@@ -36,16 +41,16 @@ class ColorImageSheet(GeneratorSheet):
         
     def generate(self):
         """
-        As for the superclass, but also generates RGB output and sends
-        that out on the Red, Green, and BlueActivity ports.
+        Works as in the superclass, but also generates RGB output and sends
+        it out on the RedActivity, GreenActivity, and BlueActivity ports.
         """
         super(ColorImageSheet,self).generate()
         
         g = self.input_generator
         
-        self.activity_red[:] = g.red
+        self.activity_red[:]   = g.red
         self.activity_green[:] = g.green
-        self.activity_blue[:] = g.blue
+        self.activity_blue[:]  = g.blue
         
         if self.apply_output_fns:
             for output_fn in self.output_fns:
@@ -53,9 +58,9 @@ class ColorImageSheet(GeneratorSheet):
                 output_fn(self.activity_green)
                 output_fn(self.activity_blue)
 
-        self.send_output(src_port='RedActivity',data=self.activity_red)
+        self.send_output(src_port='RedActivity',  data=self.activity_red)
         self.send_output(src_port='GreenActivity',data=self.activity_green)
-        self.send_output(src_port='BlueActivity',data=self.activity_blue)
+        self.send_output(src_port='BlueActivity', data=self.activity_blue)
 
 
 
@@ -63,7 +68,11 @@ class ColorImageSheet(GeneratorSheet):
 import copy
 from topo.param.parameterized import ParamOverrides
 class ExtendToRGB(PatternGenerator):
-    # allows any pg to work with rgb
+    """
+    Wrapper for a single-channel (monochrome) PatternGenerator that
+    synthesizes Red, Green, and Blue channels, e.g. for use with
+    ColorImageSheet.
+    """
 
     channels = ["red","green","blue"]
 
@@ -111,8 +120,7 @@ class ExtendToRGB(PatternGenerator):
                 setattr(self,c,getattr(generator,c))
         else:
             # otherwise set red, green, blue from gray with r/g/b channel_strength
-            c_strength=iter(p.channel_strengths)
-            for c in self.channels:
+            for c,s in zip(self.channels,p.channel_strengths):
                 setattr(self,c,gray*c_strength.next())
 
         return gray
@@ -126,12 +134,11 @@ class ColorImage(FileImage):
     """
     A FileImage that handles RGB color images.
     """
-    def _get_image(self,params):
-        filename = params['filename']
 
-        if filename!=self.last_filename or self._image is None:
-            self.last_filename=filename
-            rgbimage = PIL.open(self.filename)
+    def _get_image(self,p):
+        if p.filename!=self.last_filename or self._image is None:
+            self.last_filename=p.filename
+            rgbimage = PIL.open(p.filename)
             R,G,B = rgbimage.split()
             self._image_red  = R
             self._image_green = G
@@ -146,6 +153,7 @@ class ColorImage(FileImage):
         In addition to returning grayscale, stores red, green, and
         blue components.
         """
+
         gray = super(ColorImage,self).function(params)
 
         # now store red, green, blue
