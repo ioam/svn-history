@@ -15,9 +15,9 @@ class ColorImageSheet(GeneratorSheet):
         # should instead be array of zeros of same size,
         # although this has same effect because activity is
         # array of zeros to begin with
-        self._redact=self.activity.copy()
-        self._greenact=self.activity.copy()
-        self._blueact=self.activity.copy()
+        self.activity_red=self.activity.copy()
+        self.activity_green=self.activity.copy()
+        self.activity_blue=self.activity.copy()
 
 #    def set_input_generator(self,new_ig,push_existing=False):
 #    def push_input_generator(self):
@@ -33,21 +33,21 @@ class ColorImageSheet(GeneratorSheet):
         # ABOVE looks like the super call to me
         g = self.input_generator
         
-        self._redact[:] = g._red
-        self._greenact[:] = g._green
-        self._blueact[:] = g._blue
+        self.activity_red[:] = g._red
+        self.activity_green[:] = g._green
+        self.activity_blue[:] = g._blue
         
         if self.apply_output_fns:
             for output_fn in self.output_fns:
                 output_fn(self.activity)
-                output_fn(self._redact)
-                output_fn(self._greenact)
-                output_fn(self._blueact)
+                output_fn(self.activity_red)
+                output_fn(self.activity_green)
+                output_fn(self.activity_blue)
 
         self.send_output(src_port='Activity',data=self.activity)
-        self.send_output(src_port='RedActivity',data=self._redact)
-        self.send_output(src_port='GreenActivity',data=self._greenact)
-        self.send_output(src_port='BlueActivity',data=self._blueact)
+        self.send_output(src_port='RedActivity',data=self.activity_red)
+        self.send_output(src_port='GreenActivity',data=self.activity_green)
+        self.send_output(src_port='BlueActivity',data=self.activity_blue)
 ############################################################    
 
 
@@ -114,7 +114,9 @@ import ImageOps
 import numpy
 
 class ColorImage(FileImage):
-
+    """
+    A FileImage that handles RGB color images.
+    """
     def _get_image(self,params):
         filename = params['filename']
 
@@ -131,6 +133,10 @@ class ColorImage(FileImage):
             return False
 
     def function(self,params):
+        """
+        In addition to returning grayscale, stores red, green, and
+        blue components.
+        """
         gray = super(ColorImage,self).function(params)
 
         # now store red, green, blue
@@ -152,30 +158,42 @@ class ColorImage(FileImage):
     
 import random
 from contrib.rgbhsv import rgb_to_hsv_array ,hsv_to_rgb_array 
-class TColorImage(ColorImage):
+class RotatedHuesImage(ColorImage):
+    """
+    A ColorImage that rotates the hues in the image by a random value.
+    """
+    def __init__(self,**params):
+        """
+        If seed=X is specified, sets the Random() instance's seed.
+        Otherwise, calls the instance's jumpahead() method to get a
+        state very likely to be different from any just used.
+        """
+        self.random_generator = random.Random()
+        if 'seed' in params:
+            self.random_generator.seed(params['seed'])
+            del params['seed']
+        else:
+            self.random_generator.jumpahead(10)
+        super(RotatedHuesImage,self).__init__(**params)
+        
 
     def function(self,params):
-        res = super(TColorImage,self).function(params)
+        gray = super(RotatedHuesImage,self).function(params)
 
         H,S,V = rgb_to_hsv_array(numpy.array(255*self._red,dtype=numpy.int32),
                                  numpy.array(255*self._green,dtype=numpy.int32),
                                  numpy.array(255*self._blue,dtype=numpy.int32))
 
-        rot = random.uniform(0,1.0)
-        #r2 = random.uniform(0,1.0)
-
-        #if r2>=0.5:
-        #    H+=rot
-        H+=rot
+        H+=self.random_generator.uniform(0,1.0)
         H%=1.0
 
         r,g,b = hsv_to_rgb_array(H,S,V)
 
-        self._red=r.astype(numpy.float32)/255.0 # 'activities' are always expected to be between 0&1
+        self._red=r.astype(numpy.float32)/255.0
         self._green=g.astype(numpy.float32)/255.0
         self._blue=b.astype(numpy.float32)/255.0
 
-        return res
+        return gray
 
     
 ######################################################################
@@ -296,7 +314,7 @@ if __name__=="__main__" or __name__=="__mynamespace__":
     import glob
     image_filenames = glob.glob('/disk/scratch/fast/v1cball/mcgill/foilage/*.tif') # sic
     images0 = [ColorImage(filename=f) for f in image_filenames]
-    images1 = [TColorImage(filename=f) for f in image_filenames]
+    images1 = [RotatedHuesImage(filename=f) for f in image_filenames]
     
     input_generator0 = pattern.Selector(generators=images0)
     input_generator1 = pattern.Selector(generators=images1)

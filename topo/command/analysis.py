@@ -223,8 +223,8 @@ def update_rgb_activities():
     for sheet in topo.sim.objects(Sheet).values():
         for c in ['Red','Green','Blue']:
             # should this ensure all of r,g,b are present? 
-            if hasattr(sheet,'_%sact'%c.lower()): # CB: _redact etc will be renamed
-                activity_copy = getattr(sheet,'_%sact'%c.lower()).copy()
+            if hasattr(sheet,'activity_%s'%c.lower()): 
+                activity_copy = getattr(sheet,'activity_%s'%c.lower()).copy()
                 new_view = SheetView((activity_copy,sheet.bounds),
                                      sheet.name,sheet.precedence,topo.sim.time(),sheet.row_precedence)
                 sheet.sheet_views['%sActivity'%c]=new_view
