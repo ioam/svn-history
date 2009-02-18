@@ -30,7 +30,7 @@ class PatternSampler(param.Parameterized):
     (x,y) coordinates outside the pattern_array are returned as the
     background value.
     """
-
+    
     whole_pattern_output_fns = param.List(class_=TransferFn,default=[],doc="""
         Functions to apply to the whole image before any sampling is done.""")
 
@@ -62,40 +62,40 @@ class PatternSampler(param.Parameterized):
         'original': no scaling is applied; each pixel of the pattern 
         corresponds to one matrix unit of the Sheet on which the
         pattern being displayed.""")
+
+    cache_pattern = param.Boolean(default=True,doc="""
+        If False, discards the pattern after drawing each time, to
+        make it possible to use very large databases of images without
+        running out of memory.""")
+  
                                 
 
-    def __init__(self, pattern_array=None, image=None, **params):
+    # CEB --- unfinished
+    def set_image(self,image):
+        pattern_array = array(image,Float)
+        self.set_array(pattern_array)
+
+    def set_array(self,pattern_array):
         """
         Create a SheetCoordinateSystem whose activity is pattern_array
         (where pattern_array is a NumPy array).
         """
-        super(PatternSampler,self).__init__(**params)
-
-        if pattern_array is not None and image is not None:
-            raise ValueError("PatternSampler instances can have a pattern or an image, but not both.")    
-        elif pattern_array is not None:
-            pass
-        elif image is not None:
-            pattern_array = array(image,Float)
-        else:
-            raise ValueError("PatternSampler instances must have a pattern or an image.")
-
         rows,cols = pattern_array.shape
-
         self.scs = SheetCoordinateSystem(xdensity=1.0,ydensity=1.0,
-            bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
-                                       ( cols/2.0, rows/2.0))))
+                                         bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
+                                                                    ( cols/2.0, rows/2.0))))
+        self.scs.activity=pattern_array
 
         for wpof in self.whole_pattern_output_fns:
             wpof(pattern_array)
             
-        self.scs.activity = pattern_array
-
         if not self.background_value_fn:
             self.background_value = 0.0
         else:
-            self.background_value = self.background_value_fn(self.scs.activity)
-        
+            self.background_value = self.background_value_fn(pattern_array)
+    # ------------------
+
+
 
     def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, **params):
         """
@@ -110,7 +110,7 @@ class PatternSampler(param.Parameterized):
         p=ParamOverrides(self,params)
         
         # create new pattern sample, filled initially with the background value
-        pattern_sample = ones(x.shape, Float)*p.background_value
+        pattern_sample = ones(x.shape, Float)*self.background_value
 
         # if the height or width is zero, there's no pattern to display...
         if width==0 or height==0:
@@ -142,6 +142,11 @@ class PatternSampler(param.Parameterized):
                     # indexes outside the pattern are left with the background color
                     if self.scs.bounds.contains_exclusive(x[i,j],y[i,j]):
                         pattern_sample[i,j] = self.scs.activity[r[i,j],c[i,j]]
+
+        if not p.cache_pattern:
+            # CEBALERT: so calling again without first calling
+            # set_array() will cause an error
+            self.scs.activity = None
 
         return pattern_sample
 
@@ -209,19 +214,15 @@ class FastPatternSampler(param.Parameterized):
        Python Imaging Library sampling method for resampling an image.
        Defaults to Image.NEAREST.""")
 
-       
-    def __init__(self, pattern=None, image=None, **params):
-        super(FastPatternSampler,self).__init__(**params)
 
-        if pattern and image:
-            raise ValueError("PatternSampler instances can have a pattern or an image, but not both.")    
-        elif pattern is not None:
-            self.image = PIL.new('L',pattern.shape)
-            self.image.putdata(pattern.ravel())
-        elif image is not None:
-            self.image = image
-        else:
-            raise ValueError("PatternSampler instances must have a pattern or an image.")
+    # CEB --- unfinished
+    def set_image(self,image):
+        self.image=image
+        
+    def set_array(self,pattern_array):
+        self.image = PIL.new('L',pattern_array.shape)
+        self.image.putdata(pattern_array.ravel())
+    # ------------------
 
 
     def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, **params):
@@ -264,6 +265,15 @@ class GenericImage(PatternGenerator):
     size  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,doc="Height of the image.")
         
+    pattern_sampler = param.Parameter(default=PatternSampler(), doc="""
+        The PatternSampler to use to resample/resize the image.""")
+
+    cache_image = param.Boolean(default=True,doc="""
+        If False, discards the image after drawing the pattern each time,
+        to make it possible to use very large databases of images without
+        running out of memory.""")
+        
+    # CEBALERT: going to remove these two
     size_normalization = param.Enumeration(default='fit_shortest',
         available=['fit_shortest','fit_longest','stretch_to_fit','original'],
         precedence=0.95,doc="""
@@ -273,17 +283,6 @@ class GenericImage(PatternGenerator):
         class_=TransferFn,precedence=0.96,doc="""
         Function(s) applied to the whole, original image array (before any cropping).""")
 
-    # CB: I guess it's a type rather than an instance because of the
-    # way PatternSampler is written (requiring values of many
-    # parameters on initialization).
-    pattern_sampler_type = param.Parameter(default=PatternSampler, doc="""
-        The type of PatternSampler to use to resample/resize the image.""")
-
-    cache_image = param.Boolean(default=True,doc="""
-        If False, discards the image after drawing the pattern each time,
-        to make it possible to use very large databases of images without
-        running out of memory.""")
-        
 
     def function(self,params):
         xdensity = params['xdensity']
@@ -293,23 +292,29 @@ class GenericImage(PatternGenerator):
         # CEBALERT: what's going on here? Where does scaling come
         # from? Why aren't params checked for size_normalization?
         size_normalization = params.get('scaling') or self.size_normalization  #params.get('scaling',self.size_normalization)
-
         height = params['size']
         width = params['aspect_ratio']*height
+        pattern_sampler = params['pattern_sampler']
+        cache_image = params['cache_image']
 
+
+        # CEBALERT: going to remove these
         whole_image_output_fns = params['whole_image_output_fns']
+        pattern_sampler.whole_pattern_output_fns=whole_image_output_fns
+        pattern_sampler.background_value_fn=edge_average
+
 
         if self._get_image(params) or whole_image_output_fns != self.last_wiofs:
             self.last_wiofs = whole_image_output_fns
-
-            self.ps=self.pattern_sampler_type(image=self._image,
-                                              whole_pattern_output_fns=whole_image_output_fns,
-                                              background_value_fn=edge_average)
+            pattern_sampler.set_image(self._image)
             
-        result = self.ps(x,y,float(xdensity),float(ydensity),float(width),float(height),scaling=size_normalization)
+        result = pattern_sampler(x,y,float(xdensity),float(ydensity),float(width),float(height),
+                                 scaling=size_normalization,
+                                 cache_pattern=cache_image)
 
-        if not self.cache_image:
-            del self.ps     ; self.ps=None
+        if not cache_image:
+            # CEBALERT: the "del" is useless, isn't it?
+            #del self.ps     ; self.ps=None
             del self._image ; self._image=None
 
         return result
