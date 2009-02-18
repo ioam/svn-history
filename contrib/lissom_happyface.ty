@@ -40,6 +40,8 @@ from topo.misc.util import frange
 from topo.analysis.featureresponses import FeatureMaps, Feature, PatternPresenter, Subplotting
 from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand, PositionMeasurementCommand, SingleInputResponseCommand, MeasureResponseCommand
 
+from topo.misc.patternfn import float_error_ignore
+
 from topo.misc.commandline import global_params as p
 p.add(
 
@@ -77,17 +79,17 @@ def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
 
     sigmasq = gaussian_width*gaussian_width
 
-    with topo.misc.patternfn.float_error_ignore():
+    with float_error_ignore():
         inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
         outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
 
     output_ring = maximum(inner_falloff,maximum(outer_falloff,ring))
 
     # Calculate radians (in 4 phases) and cut according to the set range)
-
-    sines = x / distance_from_origin
-    cosines = y / distance_from_origin
-    arcsines = arcsin(sines)
+    with float_error_ignore():
+        sines = numpy.divide(x,distance_from_origin)
+        cosines = numpy.divide(y,distance_from_origin)
+        arcsines = arcsin(sines)
 
     phase_1 = where(logical_and(sines >= 0, cosines < 0), 2 * pi - arcsines, 0)
     phase_2 = where(logical_and(sines >= 0, cosines >= 0), pi + arcsines, 0)
@@ -103,7 +105,8 @@ def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
                      output_ring, 0.0)
 
 
-def arc_by_center(x, y, height, arc_box, thickness, gaussian_width):
+#JABALERT: reimplement to call arc_by_radian instead
+def arc_by_center(x, y, arc_box, thickness, gaussian_width):
     """
     Arc with Gaussian fall-off after the solid ring-shaped region and specified
     by point of tangency (x and y) and arc width and height.
@@ -177,30 +180,53 @@ class Arc(PatternGenerator):
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the overall width.")
 
-    radian_range = param.NumericTuple(default = (0.0, 0.0), length = 2,
-        precedence = 0.62, doc = "Range of start and end radians.")
+    radian_start = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
+        precedence = 0.62, doc = "Start of the range, when using radians.")
 
-    arc_box = param.NumericTuple(default = (1.0, 1.0), length = 2,
-        precedence = 0.64, doc = "Width and height of the arc. Height <= width/2.")
+    radian_end = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
+        precedence = 0.62, doc = "End of the range, when using radians.")
 
     size = param.Number(default=0.5)
 
-    def function(self,params):
-        height = params['size']
-        aspect_ratio = params['aspect_ratio']
-        radian_range = params['radian_range']
-        arc_box = params['arc_box']
+    def function(self,p):
+        aspect_ratio = p.aspect_ratio
+        radian_range= (p.radian_start,p.radian_end)
         
-        if radian_range != (0.0, 0.0):  # the shape is specified by start and end radian
-            output = arc_by_radian(self.pattern_x/aspect_ratio, self.pattern_y, height,
-                                   radian_range, params['thickness'], params['smoothing'])
-        else:
-            output = arc_by_center(self.pattern_x/aspect_ratio, self.pattern_y, height,
-                                   arc_box, params['thickness'], params['smoothing'])
-
+        output = arc_by_radian(self.pattern_x/aspect_ratio, self.pattern_y, p.size,
+                               radian_range, p.thickness, p.smoothing)
         return output
 
 
+class Curve(Arc):
+    #JABALERT: doc needs updating; should handle negative curvatures
+    """
+    2D curve pattern generator.
+
+    Based on Arc, but centered on a particular point of the arc, with
+    curvature controlled directly rather than through the overall size
+    of the pattern.
+    
+    See the Ring and Disk class for a note about the Gaussian fall-off.
+    """
+
+    # Hide unused parameters
+    radian_start = param.Number(precedence = -1.0)
+    radian_end = param.Number(precedence = -1.0)
+    aspect_ratio = param.Number(precedence = -1.0)
+
+    curvature = param.Number(default=1.0,bounds=(0.5,None),softbounds=(0.5,10.0),
+        precedence = 0.64, doc = "Ratio of width to height of the arc.")
+
+    def function(self,p):
+        aspect_ratio = p.aspect_ratio
+        arc_box = (p.size,p.size*p.curvature)
+        
+        output = arc_by_center(self.pattern_x/aspect_ratio, self.pattern_y, 
+                               arc_box, p.thickness, p.smoothing)
+        return output
+
+
+#JABALERT: reimplement to call Curve instead
 class HappyFace(pattern.Composite):
     """
     2D cartoon face pattern.
@@ -275,7 +301,7 @@ class measure_happiness(MeasureResponseCommand):
 
 pg= create_plotgroup(name='Face Happiness',category="Preference Maps",
              doc='Measure preference for happy or sad faces.',
-             pre_plot_hooks=[measure_happiness.instance(display = True, weighted_average = False, pattern_presenter = PatternPresenter(pattern_generator = HappyFace(), apply_output_fn = True, duration = 1.0))])
+             pre_plot_hooks=[measure_happiness.instance(display = True, weighted_average = False, pattern_presenter = PatternPresenter(pattern_generator = HappyFace(), apply_output_fns = True, duration = 1.0))])
 pg.add_plot('Happiness Preference',[('Strength','HappinessPreference')])
 pg.add_plot('Happiness Selectivity',[('Strength','HappinessSelectivity')])
 
