@@ -32,35 +32,36 @@ class PatternSampler(param.Parameterized):
     """
 
     whole_pattern_output_fns = param.List(class_=TransferFn,default=[],doc="""
-    Functions to apply to the whole image before any sampling is done.""")
+        Functions to apply to the whole image before any sampling is done.""")
 
     background_value_fn = param.Callable(default=None,doc="""
-    Function to compute an appropriate background value. Must accept
-    an array and return a scalar.""")
+        Function to compute an appropriate background value. Must accept
+        an array and return a scalar.""")
 
-    scaling = param.Enumeration(
-        default='original',
+    scaling = param.Enumeration(default='original',
         available=['original','stretch_to_fit','fit_shortest','fit_longest'],
         doc="""
-    Determines how the pattern is scaled initially, relative to the
-    default retinal dimension of 1.0 in sheet coordinates:
-        
-    'stretch_to_fit': scale both dimensions of the pattern so they
-    would fill a Sheet with bounds=BoundingBox(radius=0.5) (disregards
-    the original's aspect ratio).
-
-    'fit_shortest': scale the pattern so that its shortest dimension
-    is made to fill the corresponding dimension on a Sheet with
-    bounds=BoundingBox(radius=0.5) (maintains the original's aspect
-    ratio).
-
-    'fit_longest': scale the pattern so that its longest dimension is
-    made to fill the corresponding dimension on a Sheet with
-    bounds=BoundingBox(radius=0.5) (maintains the original's aspect
-    ratio).
-
-    'original': no scaling is applied; one pixel of the pattern is put
-    in one unit of the sheet on which the pattern being displayed.""")
+        Determines how the pattern is scaled initially, relative to the
+        default retinal dimension of 1.0 in sheet coordinates:
+            
+        'stretch_to_fit': scale both dimensions of the pattern so they
+        would fill a Sheet with bounds=BoundingBox(radius=0.5) (disregards
+        the original's aspect ratio).
+    
+        'fit_shortest': scale the pattern so that its shortest dimension
+        is made to fill the corresponding dimension on a Sheet with
+        bounds=BoundingBox(radius=0.5) (maintains the original's aspect
+        ratio, filling the entire bounding box).
+    
+        'fit_longest': scale the pattern so that its longest dimension is
+        made to fill the corresponding dimension on a Sheet with
+        bounds=BoundingBox(radius=0.5) (maintains the original's
+        aspect ratio, fitting the image into the bounding box but not
+        necessarily filling it).
+    
+        'original': no scaling is applied; each pixel of the pattern 
+        corresponds to one matrix unit of the Sheet on which the
+        pattern being displayed.""")
                                 
 
     def __init__(self, pattern_array=None, image=None, **params):
@@ -194,6 +195,7 @@ def edge_average(a):
         return float(edge_sum)/num_values
 
 
+
 class FastPatternSampler(param.Parameterized):
     """
     A fast-n-dirty pattern sampler using Python Imaging Library
@@ -232,7 +234,8 @@ class FastPatternSampler(param.Parameterized):
         im = ImageOps.fit(self.image,x.shape,self.sampling_method)
         return array(im,dtype=Float)
 
-        
+
+
 # Would be best called Image, but that causes confusion with PIL's Image
 class GenericImage(PatternGenerator):
     """
