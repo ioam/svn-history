@@ -130,8 +130,8 @@ class PatternSampler(param.Parameterized):
             return pattern_sample
 
         # scale the supplied coordinates to match the pattern being at density=1
-        x*=sheet_xdensity 
-        y*=sheet_ydensity
+        x=x*sheet_xdensity # deliberately don't operate in place (so as not to change supplied x & y)
+        y=y*sheet_ydensity
       
         # scale according to initial pattern size_normalization selected (size_normalization)
         self.__apply_size_normalization(x,y,sheet_xdensity,sheet_ydensity,p.size_normalization)
