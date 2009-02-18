@@ -6,9 +6,15 @@ from topo.sheet.basic import GeneratorSheet,FunctionEvent,PeriodicEventSequence,
 from topo import pattern
 
 class ColorImageSheet(GeneratorSheet):
+    """
+    A GeneratorSheet that handles RGB images.
+
+    Any supplied input_generator is wrapped in the ExtendToRGB
+    PatternGenerator.  Red, green, and blue activities are sent out on
+    the Red, Green, and BlueActivity ports.
+    """
     src_ports=['Activity','RedActivity','GreenActivity','BlueActivity']
-    input_generator = param.ClassSelector(PatternGenerator,default=pattern.Selector()) # ** RGBify **
-    
+
     def __init__(self,**params):
         super(ColorImageSheet,self).__init__(**params)
 
@@ -19,18 +25,20 @@ class ColorImageSheet(GeneratorSheet):
         self.activity_green=self.activity.copy()
         self.activity_blue=self.activity.copy()
 
-#    def set_input_generator(self,new_ig,push_existing=False):
-#    def push_input_generator(self):
-#    def pop_input_generator(self):
 
+    def set_input_generator(self,new_ig,push_existing=False):
+        """Wrap new_ig in ExtendToRGB."""
+        super(ColorImageSheet,self).set_input_generator(ExtendToRGB(generator=new_ig),
+                                                        push_existing=push_existing)
+
+        
     def generate(self):
-        self.verbose("Generating a new pattern")
-
-        self.activity[:] = self.input_generator()
-
-        #g = self.input_generator.get_current_generator()
-
-        # ABOVE looks like the super call to me
+        """
+        As for the superclass, but also generates RGB output and sends
+        that out on the Red, Green, and BlueActivity ports.
+        """
+        super(ColorImageSheet,self).generate()
+        
         g = self.input_generator
         
         self.activity_red[:] = g.red
@@ -39,22 +47,20 @@ class ColorImageSheet(GeneratorSheet):
         
         if self.apply_output_fns:
             for output_fn in self.output_fns:
-                output_fn(self.activity)
                 output_fn(self.activity_red)
                 output_fn(self.activity_green)
                 output_fn(self.activity_blue)
 
-        self.send_output(src_port='Activity',data=self.activity)
         self.send_output(src_port='RedActivity',data=self.activity_red)
         self.send_output(src_port='GreenActivity',data=self.activity_green)
         self.send_output(src_port='BlueActivity',data=self.activity_blue)
-############################################################    
+
 
 
 
 import copy
 from topo.param.parameterized import ParamOverrides
-class RGBify(PatternGenerator):
+class ExtendToRGB(PatternGenerator):
     # allows any pg to work with rgb
 
     channels = ["red","green","blue"]
@@ -63,12 +69,6 @@ class RGBify(PatternGenerator):
 
     channel_strengths = param.List([1.0/3,1.0/3,1.0/3]) # not sure what to call it
     
-    def __init__(self,**params):
-        super(RGBify,self).__init__(**params)
-        # copy to ensure random number streams not affected by rgbification
-        #self._set_up_generators()
-
-
     def __call__(self,**params):
         p = ParamOverrides(self,params)
 
@@ -319,8 +319,8 @@ if __name__=="__main__" or __name__=="__mynamespace__":
     input_generator0 = pattern.Selector(generators=images0)
     input_generator1 = pattern.Selector(generators=images1)
 
-    topo.sim['Retina0']=ColorImageSheet(input_generator=RGBify(generator=input_generator0),nominal_density=48)
-    topo.sim['Retina1']=ColorImageSheet(input_generator=RGBify(generator=input_generator1),nominal_density=48)
+    topo.sim['Retina0']=ColorImageSheet(input_generator=input_generator0,nominal_density=48)
+    topo.sim['Retina1']=ColorImageSheet(input_generator=input_generator1,nominal_density=48)
 
     cone_types = ['Red','Green','Blue']
     for c in cone_types:
