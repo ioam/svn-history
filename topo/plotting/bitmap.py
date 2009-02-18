@@ -31,7 +31,7 @@ import numpy.oldnumeric as Numeric
 
 from .. import param
 
-from topo.misc.filepath import application_path, resolve_path
+from topo.misc.filepath import resolve_path
 
 # CEBALERT: while the Windows version of Python doesn't have the same
 # directory structure as the standard version, we need this
