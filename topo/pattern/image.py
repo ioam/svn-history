@@ -300,7 +300,7 @@ class GenericImage(PatternGenerator):
         if self._get_image(params): 
             pattern_sampler_params['image']=self._image
             
-        result = params['pattern_sampler'](x.copy(),y.copy(),float(xdensity),float(ydensity),float(width),float(height),
+        result = params['pattern_sampler'](x,y,float(xdensity),float(ydensity),float(width),float(height),
                                            **pattern_sampler_params)
 
         if cache_image is False:
