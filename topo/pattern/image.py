@@ -323,7 +323,11 @@ class GenericImage(PatternGenerator):
 
     ### support pickling of PIL.Image
 
-    # CEBALERT: almost identical code to that in topo.plotting.bitmap.Bitmap...
+    # CEBALERT: almost identical code to that in topo.plotting.bitmap.Bitmap.
+    # Can we instead patch PIL? (Note that we can't use copy_reg as we do for
+    # e.g. numpy ufuncs because PIL's Image is not a new-style class. So patching
+    # PIL is probably the only option to handle this problem in one place.)
+    
     # CEB: by converting to string and back, we probably incur some speed
     # penalty on copy()ing GenericImages (since __getstate__ and __setstate__ are
     # used for copying, unless __copy__ and __deepcopy__ are defined instead).
