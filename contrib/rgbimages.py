@@ -33,9 +33,9 @@ class ColorImageSheet(GeneratorSheet):
         # ABOVE looks like the super call to me
         g = self.input_generator
         
-        self.activity_red[:] = g._red
-        self.activity_green[:] = g._green
-        self.activity_blue[:] = g._blue
+        self.activity_red[:] = g.red
+        self.activity_green[:] = g.green
+        self.activity_blue[:] = g.blue
         
         if self.apply_output_fns:
             for output_fn in self.output_fns:
@@ -57,7 +57,7 @@ from topo.param.parameterized import ParamOverrides
 class RGBify(PatternGenerator):
     # allows any pg to work with rgb
 
-    channels = ["_red","_green","_blue"]
+    channels = ["red","green","blue"]
 
     generator = param.Parameter(default=pattern.Constant())
 
@@ -93,7 +93,7 @@ class RGBify(PatternGenerator):
             generator = p.generator
 
         
-        if hasattr(generator,'_red'):
+        if hasattr(generator,'red'):
             for c in self.channels:
                 setattr(self,c,getattr(generator,c))
         else:
@@ -142,17 +142,17 @@ class ColorImage(FileImage):
         # now store red, green, blue
         self.pattern_sampler._set_image(self._image_red)
         self.pattern_sampler._initialize_image()
-        self._red = super(ColorImage,self).function(params)
+        self.red = super(ColorImage,self).function(params)
 
         self.pattern_sampler._set_image(self._image_green)
         self.pattern_sampler._initialize_image()
-        self._green = super(ColorImage,self).function(params)
+        self.green = super(ColorImage,self).function(params)
 
         self.pattern_sampler._set_image(self._image_blue)
         self.pattern_sampler._initialize_image()
-        self._blue = super(ColorImage,self).function(params)
+        self.blue = super(ColorImage,self).function(params)
 
-        # note: currently, _red, _green, _blue have to be cached
+        # note: currently, red, green, blue have to be cached
         return gray
 
     
@@ -180,18 +180,18 @@ class RotatedHuesImage(ColorImage):
     def function(self,params):
         gray = super(RotatedHuesImage,self).function(params)
 
-        H,S,V = rgb_to_hsv_array(numpy.array(255*self._red,dtype=numpy.int32),
-                                 numpy.array(255*self._green,dtype=numpy.int32),
-                                 numpy.array(255*self._blue,dtype=numpy.int32))
+        H,S,V = rgb_to_hsv_array(numpy.array(255*self.red,dtype=numpy.int32),
+                                 numpy.array(255*self.green,dtype=numpy.int32),
+                                 numpy.array(255*self.blue,dtype=numpy.int32))
 
         H+=self.random_generator.uniform(0,1.0)
         H%=1.0
 
         r,g,b = hsv_to_rgb_array(H,S,V)
 
-        self._red=r.astype(numpy.float32)/255.0
-        self._green=g.astype(numpy.float32)/255.0
-        self._blue=b.astype(numpy.float32)/255.0
+        self.red=r.astype(numpy.float32)/255.0
+        self.green=g.astype(numpy.float32)/255.0
+        self.blue=b.astype(numpy.float32)/255.0
 
         return gray
 
