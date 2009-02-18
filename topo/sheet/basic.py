@@ -149,6 +149,9 @@ class GeneratorSheet(Sheet):
         """
         self.verbose("Generating a new pattern")
 
+        # JABALERT: What does the [:] achieve here?  Copying the
+        # values, instead of the pointer to the array?  Is that
+        # guaranteed?
         self.activity[:] = self.input_generator()
 
         if self.apply_output_fns:
