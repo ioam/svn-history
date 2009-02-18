@@ -11,6 +11,7 @@ import ImageOps
 from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from .. import param
+from topo.param.parameterized import ParamOverrides
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
@@ -30,18 +31,44 @@ class PatternSampler(param.Parameterized):
     background value.
     """
 
-    def __init__(self, pattern_array=None, image=None, whole_pattern_output_fns=None, background_value_fn=None):
+    whole_pattern_output_fns = param.List(class_=TransferFn,default=[],doc="""
+    Functions to apply to the whole image before any sampling is done.""")
+
+    background_value_fn = param.Callable(default=None,doc="""
+    Function to compute an appropriate background value. Must accept
+    an array and return a scalar.""")
+
+    scaling = param.Enumeration(
+        default='original',
+        available=['original','stretch_to_fit','fit_shortest','fit_longest'],
+        doc="""
+    Determines how the pattern is scaled initially, relative to the
+    default retinal dimension of 1.0 in sheet coordinates:
+        
+    'stretch_to_fit': scale both dimensions of the pattern so they
+    would fill a Sheet with bounds=BoundingBox(radius=0.5) (disregards
+    the original's aspect ratio).
+
+    'fit_shortest': scale the pattern so that its shortest dimension
+    is made to fill the corresponding dimension on a Sheet with
+    bounds=BoundingBox(radius=0.5) (maintains the original's aspect
+    ratio).
+
+    'fit_longest': scale the pattern so that its longest dimension is
+    made to fill the corresponding dimension on a Sheet with
+    bounds=BoundingBox(radius=0.5) (maintains the original's aspect
+    ratio).
+
+    'original': no scaling is applied; one pixel of the pattern is put
+    in one unit of the sheet on which the pattern being displayed.""")
+                                
+
+    def __init__(self, pattern_array=None, image=None, **params):
         """
         Create a SheetCoordinateSystem whose activity is pattern_array
-        (where pattern_array is a NumPy array), modified in place by
-        whole_pattern_output_fn.
-
-        If supplied, background_value_fn must accept an array and return a scalar.
+        (where pattern_array is a NumPy array).
         """
-        if whole_pattern_output_fns is None:
-            whole_pattern_output_fns = []
-            
-        super(PatternSampler,self).__init__()
+        super(PatternSampler,self).__init__(**params)
 
         if pattern_array is not None and image is not None:
             raise ValueError("PatternSampler instances can have a pattern or an image, but not both.")    
@@ -58,49 +85,31 @@ class PatternSampler(param.Parameterized):
             bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                        ( cols/2.0, rows/2.0))))
 
-        for wpof in whole_pattern_output_fns:
+        for wpof in self.whole_pattern_output_fns:
             wpof(pattern_array)
             
         self.scs.activity = pattern_array
 
-        if not background_value_fn:
+        if not self.background_value_fn:
             self.background_value = 0.0
         else:
-            self.background_value = background_value_fn(self.scs.activity)
+            self.background_value = self.background_value_fn(self.scs.activity)
         
 
-    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, scaling, width=1.0, height=1.0):
+    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, **params):
         """
         Return pixels from the pattern at the given Sheet (x,y) coordinates.
 
         sheet_density should be the density of the sheet on which the pattern
         is to be drawn.
 
-        scaling determines how the pattern is scaled initially; it can be:
-        
-        'stretch_to_fit': scale both dimensions of the pattern so they
-        would fill a Sheet with bounds=BoundingBox(radius=0.5)
-        (disregards the original's aspect ratio).
-
-        'fit_shortest': scale the pattern so that its shortest
-        dimension is made to fill the corresponding dimension on a
-        Sheet with bounds=BoundingBox(radius=0.5) (maintains the
-        original's aspect ratio).
-
-        'fit_longest': scale the pattern so that its longest dimension
-        is made to fill the corresponding dimension on a Sheet with
-        bounds=BoundingBox(radius=0.5) (maintains the original's
-        aspect ratio).
-
-        'original': no scaling is applied; one pixel of the pattern is
-        put in one unit of the sheet on which the pattern being
-        displayed.
 
         The pattern is further scaled according to the supplied width and height.
         """
+        p=ParamOverrides(self,params)
         
         # create new pattern sample, filled initially with the background value
-        pattern_sample = ones(x.shape, Float)*self.background_value
+        pattern_sample = ones(x.shape, Float)*p.background_value
 
         # if the height or width is zero, there's no pattern to display...
         if width==0 or height==0:
@@ -111,8 +120,7 @@ class PatternSampler(param.Parameterized):
         y*=sheet_ydensity
       
         # scale according to initial pattern scaling selected (size_normalization)
-        if not scaling=='original':
-            self.__apply_size_normalization(x,y,sheet_xdensity,sheet_ydensity,scaling)
+        self.__apply_size_normalization(x,y,sheet_xdensity,sheet_ydensity,p.scaling)
 
         # scale according to user-specified width and height
         x/=width
@@ -138,17 +146,14 @@ class PatternSampler(param.Parameterized):
 
 
     def __apply_size_normalization(self,x,y,sheet_xdensity,sheet_ydensity,scaling):
-        """
-        Initial pattern scaling (size_normalization), relative to the
-        default retinal dimension of 1.0 in sheet coordinates.
-
-        See __call__ for a description of the various scaling options.
-        """
         pattern_rows,pattern_cols = self.scs.activity.shape
 
         # Instead of an if-test, could have a class of this type of
         # function (c.f. OutputFunctions, etc)...
-        if scaling=='stretch_to_fit':
+        if scaling=='original':
+            return
+        
+        elif scaling=='stretch_to_fit':
             x_sf,y_sf = pattern_cols/sheet_xdensity, pattern_rows/sheet_ydensity
             x*=x_sf; y*=y_sf
 
@@ -203,8 +208,8 @@ class FastPatternSampler(param.Parameterized):
        Defaults to Image.NEAREST.""")
 
        
-    def __init__(self, pattern=None, image=None, whole_pattern_output_fns=None, background_value_fn=None):
-        super(FastPatternSampler,self).__init__()
+    def __init__(self, pattern=None, image=None, **params):
+        super(FastPatternSampler,self).__init__(**params)
 
         if pattern and image:
             raise ValueError("PatternSampler instances can have a pattern or an image, but not both.")    
@@ -217,7 +222,7 @@ class FastPatternSampler(param.Parameterized):
             raise ValueError("PatternSampler instances must have a pattern or an image.")
 
 
-    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, scaling, width=1.0, height=1.0):
+    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, **params):
 
         # JPALERT: Right now this ignores all options and just fits the image into given array.
         # It needs to be fleshed out to properly size and crop the
@@ -282,6 +287,8 @@ class GenericImage(PatternGenerator):
         ydensity = params['ydensity']
         x        = params['pattern_x']
         y        = params['pattern_y']
+        # CEBALERT: what's going on here? Where does scaling come
+        # from? Why aren't params checked for size_normalization?
         size_normalization = params.get('scaling') or self.size_normalization  #params.get('scaling',self.size_normalization)
 
         height = params['size']
@@ -296,7 +303,7 @@ class GenericImage(PatternGenerator):
                                               whole_pattern_output_fns=whole_image_output_fns,
                                               background_value_fn=edge_average)
             
-        result = self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
+        result = self.ps(x,y,float(xdensity),float(ydensity),float(width),float(height),scaling=size_normalization)
 
         if not self.cache_image:
             del self.ps     ; self.ps=None
