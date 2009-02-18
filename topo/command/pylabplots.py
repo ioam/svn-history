@@ -568,7 +568,7 @@ class tuning_curve(PylabPlotCommand):
         for i in xrange(0,num_ticks):
             y.append(y[-1]+numpy.pi/(num_ticks+1));
             x.append(x[-1]+numpy.pi/(num_ticks+1));
-        y.append(ticks[-1])
+        y.append(y[-1]+numpy.pi/(num_ticks+1));
         x.append(3.14)   
         return (x,y) 
                             
@@ -579,12 +579,12 @@ class tuning_curve(PylabPlotCommand):
         for coordinate in p.coords:
             i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
         
-            pylab.figure(figsize=(7,7))
+            f = pylab.figure(figsize=(7,7))
             isint=pylab.isinteractive()
             pylab.ioff()
     
-            pylab.ylabel('Response')
-            pylab.xlabel('%s (%s)' % (p.x_axis.capitalize(),p.unit))
+            pylab.ylabel('Response',fontsize='large')
+            pylab.xlabel('%s (%s)' % (p.x_axis.capitalize(),p.unit),fontsize='large')
             pylab.title('Sheet %s, coordinate(x,y)=(%0.3f,%0.3f) at time %s' % 
                         (sheet.name,coordinate[0],coordinate[1],topo.sim.timestr()))
             p.title='%s: %s Tuning Curve' % (topo.sim.name,p.x_axis.capitalize())
@@ -595,13 +595,13 @@ class tuning_curve(PylabPlotCommand):
                 
                 x_tick_values,ticks = self._reduce_ticks(ticks)
                 labels = [self._format_x_tick_label(x) for x in ticks]
-                pylab.xticks(x_tick_values, labels)
-                p.plot_type(x_values, y_values, label=curve_label)
+                pylab.xticks(x_tick_values, labels,fontsize='large')
+                pylab.yticks(fontsize='large')
+                p.plot_type(x_values, y_values, label=curve_label,lw=3.0)
                 self.first_curve=False
                  
             if isint: pylab.ion()
-            pylab.legend(loc=4)
-    
+            pylab.legend(loc=2)
             self._generate_figure(p)
 
 
