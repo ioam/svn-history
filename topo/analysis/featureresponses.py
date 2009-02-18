@@ -629,6 +629,14 @@ class PatternPresenter(param.Parameterized):
             ##########################
 
 
+# CEB: for measuring hue maps with a single color retina
+##         if features_values.has_key('hue'):
+##             from contrib import rgbimages
+##             r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
+##             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+##                 inputs[name] = rgbimages.ExtendToRGB(generator=inputs[name],
+##                                                      channel_strengths=[r,g,b])
+
         if features_values.has_key('hue'):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
                 r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
