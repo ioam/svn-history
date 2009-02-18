@@ -122,28 +122,28 @@ else:
 ###########################################
 # build simulation
 
-topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
+topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                 input_generator=input,  
                                 period=1.0, phase=0.05,
                                 nominal_bounds=BoundingBox(radius=core_size+0.25+0.375+0.5))
 
-topo.sim['FakeRetina1']=GeneratorSheet(nominal_density=48.0,
+topo.sim['FakeRetina1']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=retinal_waves,  
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=core_size+0.25+0.5))
 
-topo.sim['FakeRetina2']=GeneratorSheet(nominal_density=48.0,
+topo.sim['FakeRetina2']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=retinal_waves,  
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=core_size+0.25+0.5))
 
 
-topo.sim['LGNOn']=LISSOM(nominal_density=48.0,
+topo.sim['LGNOn']=LISSOM(nominal_density=24.0,
                           nominal_bounds=BoundingBox(radius=core_size+0.25+0.5),
                           output_fns=[HalfRectify()],tsettle=0,
                           measure_maps=False)
 
-topo.sim['LGNOff']=LISSOM(nominal_density=48.0,
+topo.sim['LGNOff']=LISSOM(nominal_density=24.0,
                            nominal_bounds=BoundingBox(radius=core_size+0.25+0.5),
                            output_fns=[HalfRectify()],tsettle=0,
                            measure_maps=False)
@@ -286,6 +286,7 @@ def secondStage():
     topo.sim['LGNOff'].in_connections[0].strength=0
     randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.1))
     
-from topo.analysis.featureresponses import MeasureResponseCommand
+from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps
+FeatureMaps.num_orientation=16
 MeasureResponseCommand.scale=3    
 
