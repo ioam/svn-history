@@ -1,7 +1,7 @@
 # Adding support for RGB images (work in progress)
 import topo
 
-############################################################
+
 from topo.sheet.basic import GeneratorSheet,FunctionEvent,PeriodicEventSequence,param,PatternGenerator
 from topo import pattern
 
@@ -27,9 +27,11 @@ class ColorImageSheet(GeneratorSheet):
 
 
     def set_input_generator(self,new_ig,push_existing=False):
-        """Wrap new_ig in ExtendToRGB."""
-        super(ColorImageSheet,self).set_input_generator(ExtendToRGB(generator=new_ig),
-                                                        push_existing=push_existing)
+        """Wrap new_ig in ExtendToRGB if necessary."""
+        if not hasattr(new_ig,'red'):
+            new_ig = ExtendToRGB(generator=new_ig)
+            
+        super(ColorImageSheet,self).set_input_generator(new_ig,push_existing=push_existing)
 
         
     def generate(self):
@@ -72,43 +74,45 @@ class ExtendToRGB(PatternGenerator):
     def __call__(self,**params):
         p = ParamOverrides(self,params)
 
-        #result = p.generator(**params) # oops passing extra params specific to this PG!
-
+        # as for Selector etc, pass through certain parameters to
+        # generator
         params['xdensity']=p.xdensity
         params['ydensity']=p.ydensity
         params['bounds']=p.bounds
+
+        # (not **p because that would be extra parameters)
+        gray = p.generator(**params)
         
-        result = p.generator(**params)
-        # method more complicated than it needs to be; maybe if the
-        # various selector pattern generators had a way of accessing
-        # the current generator's parameters, it could be simpler
-        
+        # CEB: method more complicated than it needs to be; maybe if
+        # the various selector pattern generators had a way of
+        # accessing the current generator's parameters, it could be
+        # simpler?
+
+        # got to get the generator that's actually making the pattern!
         if hasattr(p.generator,'get_current_generator'):
+            # access the generator without causing any index to be advanced
             generator = p.generator.get_current_generator()
         elif hasattr(p.generator,'generator'):
-            # could at least add appropriate get_current_generator()
-            # to patterns other than Selector, like Translator etc
+            # CB: could at least add appropriate
+            # get_current_generator() to patterns other than Selector,
+            # like Translator etc
             generator = p.generator.generator
         else:
             generator = p.generator
-
-        
+            
         if hasattr(generator,'red'):
+            # promote the red, green, blue from 'actual generator' if it has them
             for c in self.channels:
                 setattr(self,c,getattr(generator,c))
         else:
-            results = []
+            # otherwise set red, green, blue from gray with r/g/b channel_strength
             c_strength=iter(p.channel_strengths)
             for c in self.channels:
-                setattr(self,c,result*c_strength.next())
+                setattr(self,c,gray*c_strength.next())
 
-        return result
+        return gray
 
         
-
-
-
-############################################################
 from topo.pattern.image import FileImage,edge_average,PIL
 import ImageOps
 import numpy
@@ -140,6 +144,9 @@ class ColorImage(FileImage):
         gray = super(ColorImage,self).function(params)
 
         # now store red, green, blue
+        # (by repeating the super's function call, but each time first
+        # resetting the pattern sampler to use the right color
+        # channel)
         self.pattern_sampler._set_image(self._image_red)
         self.pattern_sampler._initialize_image()
         self.red = super(ColorImage,self).function(params)
@@ -199,6 +206,7 @@ class RotatedHuesImage(ColorImage):
 ######################################################################
 ######################################################################
 ## ONLINE ANALYSIS
+# (not special to rgb)
 
 def get_activity(**data):
     """Helper function: return 'Activity' from data."""
