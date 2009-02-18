@@ -70,7 +70,12 @@ class ExtendToRGB(PatternGenerator):
     generator = param.Parameter(default=pattern.Constant())
 
     channel_strengths = param.List([1.0/3,1.0/3,1.0/3]) # not sure what to call it
-    
+
+    def __init__(self,**params):
+        super(ExtendToRGB,self).__init__(**params)
+        for c in self.channels:
+            setattr(self,c,None)
+
     def __call__(self,**params):
         p = ParamOverrides(self,params)
 
