@@ -59,10 +59,12 @@ class TestImage(unittest.TestCase):
                       xdensity=8,
                       ydensity=8,
                       bounds=BoundingBox(radius=0.5),
-                      output_fns=[],
-                      whole_image_output_fns=[],
-                      size_normalization='original')
-
+                      output_fns=[])
+              
+        ps = image.pattern_sampler
+        ps.size_normalization='original'
+        ps.whole_pattern_output_fns=[]
+        
         assert_array_almost_equal(image_array,image())
 
 
@@ -188,10 +190,11 @@ class TestImage(unittest.TestCase):
                       ydensity=8,
                       size=2.0,
                       output_fns=[],
-                      whole_image_output_fns=[],
-                      size_normalization='fit_longest',
                       bounds=BoundingBox(radius=1.0))
 
+        ps = image.pattern_sampler
+        ps.size_normalization='fit_longest'
+        ps.whole_pattern_output_fns=[]
 
         assert_array_almost_equal(image_array,image())
 
@@ -273,9 +276,11 @@ class TestImage(unittest.TestCase):
                       xdensity=8,
                       ydensity=8,
                       output_fns=[],
-                      whole_image_output_fns=[],
-                      size_normalization='stretch_to_fit',
                       bounds=BoundingBox(radius=1.0))
+
+        ps = image.pattern_sampler
+        ps.size_normalization='stretch_to_fit'
+        ps.whole_pattern_output_fns=[]
 
         assert_array_almost_equal(image_array,image())
 
@@ -324,9 +329,11 @@ class TestImage(unittest.TestCase):
                       xdensity=15,
                       ydensity=15,
                       output_fns=[],
-                      whole_image_output_fns=[],
-                      size_normalization='fit_shortest',
                       bounds=BoundingBox(radius=0.5))
+
+        ps = image.pattern_sampler
+        ps.size_normalization='fit_shortest'
+        ps.whole_pattern_output_fns=[]
 
         assert_array_almost_equal(image_array,image())
 
