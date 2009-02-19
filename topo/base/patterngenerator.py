@@ -199,7 +199,7 @@ class PatternGenerator(param.Parameterized):
 
 # Override class type; must be set here rather than when mask_shape is declared,
 # to avoid referring to class not yet constructed
-PatternGenerator.get_param_descriptor("mask_shape")[0].class_=PatternGenerator
+PatternGenerator.params('mask_shape').class_=PatternGenerator
 
 
 # Trivial example of a PatternGenerator, provided for when a default is
