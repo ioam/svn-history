@@ -534,10 +534,8 @@ class Selector(PatternGenerator):
 
     def function(self,p):
         """Selects and returns one of the patterns in the list."""
-        # CEBALERT: self.index? or p.index?
-        int_index=int(len(self.generators)*wrap(0,1.0,self.index))
-        # CEBALERT: self.generators? or p.generators?
-        pg=self.generators[int_index]
+        int_index=int(len(self.generators)*wrap(0,1.0,p.index))
+        pg=p.generators[int_index]
 
         image_array = pg(xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
                          x=p.x+p.size*(pg.x*cos(p.orientation)-pg.y*sin(p.orientation)),
@@ -578,15 +576,14 @@ class GaussiansCorner(PatternGenerator):
 	input_1=Gaussian()
         input_2=Gaussian()
 
-        # CEBALERT: self.x or p.x?
 	patterns = [input_1(orientation = p.orientation, bounds = p.bounds, xdensity = p.xdensity,
                             ydensity = p.ydensity, offset = p.offset, size = p.size,
-                            x = self.x + cos(p.orientation) * p.size*0.9,
-                            y = self.y + sin(p.orientation) * p.size*0.9),
+                            x = p.x + cos(p.orientation) * p.size*0.9,
+                            y = p.y + sin(p.orientation) * p.size*0.9),
                     input_2(orientation = p.orientation+pi/2, bounds = p.bounds, xdensity = p.xdensity,
                             ydensity = p.ydensity, offset = p.offset, size = p.size,
-                            x = self.x + cos(p.orientation+pi/2) * p.size*0.9,
-                            y = self.y + sin(p.orientation+pi/2) * p.size*0.9)]
+                            x = p.x + cos(p.orientation+pi/2) * p.size*0.9,
+                            y = p.y + sin(p.orientation+pi/2) * p.size*0.9)]
 	
 	return numpy.maximum(patterns[0],patterns[1])
 
