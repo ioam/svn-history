@@ -282,42 +282,33 @@ class GenericImage(PatternGenerator):
         to make it possible to use very large databases of images without
         running out of memory.""")
         
-    def function(self,params):
-        xdensity = params['xdensity']
-        ydensity = params['ydensity']
-        x        = params['pattern_x']
-        y        = params['pattern_y']
-        height   = params['size']
-        width    = params['aspect_ratio']*height
-        cache_image = params['cache_image']
+    def function(self,p):
+        height   = p.size
+        width    = p.aspect_ratio*height
 
         # if pattern_sampler could be lazily created, we wouldn't need this
-        if params['pattern_sampler'] is None:
+        if p.pattern_sampler is None:
             self.pattern_sampler = copy.deepcopy(GenericImage.pattern_sampler)
                     
         pattern_sampler_params = {}
 
-        if self._get_image(params): 
+        if self._get_image(p): 
             pattern_sampler_params['image']=self._image
             
-        result = params['pattern_sampler'](x,y,float(xdensity),float(ydensity),float(width),float(height),
-                                           **pattern_sampler_params)
+        result = p.pattern_sampler(p.pattern_x,p.pattern_y,float(p.xdensity),float(p.ydensity),
+                                   float(width),float(height),**pattern_sampler_params)
 
-        if cache_image is False:
+        if p.cache_image is False:
             self.pattern_sampler = self._image = None
 
         return result
 
 
-    def _get_image(self,params):
+    def _get_image(self,p):
         """
-        Get a new image, if necessary.
-
-        If necessary as indicated by the parameters, get a new image,
-        assign it to self._image and return True.  If no new image is
-        needed, return False.
-        """
-        
+        Get a new image, if necessary (and return True in that case,
+        otherwise return False).
+        """        
         raise NotImplementedError
 
 
@@ -389,6 +380,11 @@ class FileImage(GenericImage):
 
 
     def _get_image(self,p):
+        """
+        If necessary as indicated by the parameters, get a new image,
+        assign it to self._image and return True.  If no new image is
+        needed, return False.
+        """
         if p.filename!=self.last_filename or self._image is None:
             self.last_filename=p.filename
             self._image = ImageOps.grayscale(PIL.open(p.filename))
