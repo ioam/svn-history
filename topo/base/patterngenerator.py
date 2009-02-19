@@ -113,7 +113,7 @@ class PatternGenerator(param.Parameterized):
         Optional function(s) to apply to the pattern array after it has been created.
         Can be used for normalization, thresholding, etc.""")
 
-    def __call__(self,**params):
+    def __call__(self,**params_to_override):
         """
         Call the subclass's 'function' method on a rotated and scaled coordinate system.
 
@@ -122,7 +122,7 @@ class PatternGenerator(param.Parameterized):
         as currently set on the object. Otherwise, any params
         specified override those currently set on the object.
         """
-        p=ParamOverrides(self,params)
+        p=ParamOverrides(self,params_to_override)
 
         # ALERT: position parameter is not currently supported:
         # position=params_to_override.get('position',None)
@@ -134,7 +134,7 @@ class PatternGenerator(param.Parameterized):
         self._apply_mask(p,fn_result)
         result = p.scale*fn_result+p.offset
             
-        for of in p['output_fns']:
+        for of in p.output_fns:
             of(result)
                                
         return result
@@ -158,7 +158,7 @@ class PatternGenerator(param.Parameterized):
         self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinate_arrays(x_points-x,y_points-y,orientation)
 
 
-    def function(self,params):
+    def function(self,p):
         """
         Function to draw a pattern that will then be scaled and rotated.
 
@@ -187,14 +187,12 @@ class PatternGenerator(param.Parameterized):
         return pattern_x, pattern_y
 
 
-    def _apply_mask(self,params,mat):
+    def _apply_mask(self,p,mat):
         """Create (if necessary) and apply the mask to the given matrix mat."""
-        mask = params['mask']
-        mask_shape = params['mask_shape']
-        if mask_shape is not None:
-            mask = mask_shape(
-                x=params['x'],y=params['y'],bounds=params['bounds'],
-                size=params['size'],ydensity=params['ydensity'],xdensity=params['xdensity'])
+        mask = p.mask
+        if p.mask_shape is not None:
+            mask = p.mask_shape(x=p.x,y=p.y,bounds=p.bounds,size=p.size,
+                                ydensity=p.ydensity,xdensity=p.xdensity)
         if mask is not None:
             mat*=mask
 
@@ -219,14 +217,14 @@ class Constant(PatternGenerator):
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params_to_override):
-        params = ParamOverrides(self,params_to_override)
+        p = ParamOverrides(self,params_to_override)
         
-        shape = SheetCoordinateSystem(params['bounds'],params['xdensity'],params['ydensity']).shape
+        shape = SheetCoordinateSystem(p.bounds,p.xdensity,p.ydensity).shape
 
-        result = params['scale']*ones(shape, Float)+params['offset']
-        self._apply_mask(params,result)
+        result = p.scale*ones(shape, Float)+p.offset
+        self._apply_mask(p,result)
 
-        for of in params['output_fns']:
+        for of in p.output_fns:
             output_fn(result)
 
         return result
