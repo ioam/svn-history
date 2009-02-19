@@ -92,7 +92,7 @@ class PatternSampler(param.Parameterized):
             self.background_value = self.background_value_fn(self.scs.activity)
 
 
-    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, image=None, **params):
+    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, image=None):
         """
         Return pixels from the supplied image at the given Sheet (x,y)
         coordinates.
@@ -112,8 +112,6 @@ class PatternSampler(param.Parameterized):
         height. sheet_xdensity and sheet_ydensity are the xdensity and
         ydensity of the sheet on which the pattern is to be drawn.
         """
-        p=ParamOverrides(self,params)
-        
         if image is not None:
             self._set_image(image)
 
@@ -129,7 +127,7 @@ class PatternSampler(param.Parameterized):
         y=y*sheet_ydensity
       
         # scale according to initial pattern size_normalization selected (size_normalization)
-        self.__apply_size_normalization(x,y,sheet_xdensity,sheet_ydensity,p.size_normalization)
+        self.__apply_size_normalization(x,y,sheet_xdensity,sheet_ydensity,self.size_normalization)
 
         # scale according to user-specified width and height
         x/=width
@@ -224,8 +222,7 @@ class FastPatternSampler(param.Parameterized):
             self.image = image
 
 
-    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, image=None,**params):
-
+    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, image=None):
         if image is not None:
             self._set_image(image)
 
@@ -285,13 +282,13 @@ class GenericImage(PatternGenerator):
         if p.pattern_sampler is None:
             self.pattern_sampler = copy.deepcopy(GenericImage.pattern_sampler)
                     
-        pattern_sampler_params = {}
-
-        if self._get_image(p): 
-            pattern_sampler_params['image']=self._image
-            
-        result = p.pattern_sampler(p.pattern_x,p.pattern_y,float(p.xdensity),float(p.ydensity),
-                                   float(width),float(height),**pattern_sampler_params)
+        if self._get_image(p):
+            result = p.pattern_sampler(p.pattern_x,p.pattern_y,float(p.xdensity),float(p.ydensity),
+                                       float(width),float(height),image=self._image)
+        else:
+            # don't pass image
+            result = p.pattern_sampler(p.pattern_x,p.pattern_y,float(p.xdensity),float(p.ydensity),
+                                       float(width),float(height))            
 
         if p.cache_image is False:
             self.pattern_sampler = self._image = None
