@@ -148,26 +148,25 @@ class ColorImage(FileImage):
         else:
             return False
 
-    def function(self,params):
+    def function(self,p):
         """
         In addition to returning grayscale, stores red, green, and
         blue components.
         """
-
-        gray = super(ColorImage,self).function(params)
+        gray = super(ColorImage,self).function(p)
 
         # now store red, green, blue
         # (by repeating the super's function call, but each time first
         # resetting the pattern sampler to use the right color
         # channel)
         self.pattern_sampler._set_image(self._image_red)
-        self.red = super(ColorImage,self).function(params)
+        self.red = super(ColorImage,self).function(p)
 
         self.pattern_sampler._set_image(self._image_green)
-        self.green = super(ColorImage,self).function(params)
+        self.green = super(ColorImage,self).function(p)
 
         self.pattern_sampler._set_image(self._image_blue)
-        self.blue = super(ColorImage,self).function(params)
+        self.blue = super(ColorImage,self).function(p)
 
         # note: currently, red, green, blue have to be cached
         return gray
@@ -194,8 +193,8 @@ class RotatedHuesImage(ColorImage):
         super(RotatedHuesImage,self).__init__(**params)
         
 
-    def function(self,params):
-        gray = super(RotatedHuesImage,self).function(params)
+    def function(self,p):
+        gray = super(RotatedHuesImage,self).function(p)
 
         H,S,V = rgb_to_hsv_array(numpy.array(255*self.red,dtype=numpy.int32),
                                  numpy.array(255*self.green,dtype=numpy.int32),
