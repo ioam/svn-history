@@ -225,7 +225,7 @@ class Constant(PatternGenerator):
         self._apply_mask(p,result)
 
         for of in p.output_fns:
-            output_fn(result)
+            of(result)
 
         return result
 
