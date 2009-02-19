@@ -388,12 +388,10 @@ class FileImage(GenericImage):
         self.last_filename = None
 
 
-    def _get_image(self,params):
-        filename = params['filename']
-
-        if filename!=self.last_filename or self._image is None:
-            self.last_filename=filename
-            self._image = ImageOps.grayscale(PIL.open(self.filename))
+    def _get_image(self,p):
+        if p.filename!=self.last_filename or self._image is None:
+            self.last_filename=p.filename
+            self._image = ImageOps.grayscale(PIL.open(p.filename))
             return True
         else:
             return False
