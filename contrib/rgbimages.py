@@ -120,9 +120,9 @@ class ExtendToRGB(PatternGenerator):
                 setattr(self,c,getattr(generator,c))
         else:
             # otherwise set red, green, blue from gray with r/g/b channel_strength
-            for c,s in zip(self.channels,p.channel_strengths):
+            c_strength=iter(p.channel_strengths)
+            for c in self.channels:
                 setattr(self,c,gray*c_strength.next())
-
         return gray
 
         
