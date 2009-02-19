@@ -35,10 +35,11 @@ class PatternSampler(param.Parameterized):
     # Stores a SheetCoordinateSystem with an activity matrix
     # representing the image
 
-    whole_pattern_output_fns = param.HookList(class_=TransferFn,default=[],doc="""
+    whole_pattern_output_fns = param.HookList(class_=TransferFn,default=[],
+        constant=True,doc="""
         Functions to apply to the whole image before any sampling is done.""")
 
-    background_value_fn = param.Callable(default=None,doc="""
+    background_value_fn = param.Callable(default=None,constant=True,doc="""
         Function to compute an appropriate background value. Must accept
         an array and return a scalar.""")
 
@@ -81,9 +82,7 @@ class PatternSampler(param.Parameterized):
                                          bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                                                     ( cols/2.0, rows/2.0))))
         self.scs.activity=image
-        self._image_initialized=False
 
-    def _initialize_image(self):
         # apply the whole_pattern_output_fns and set a background_value.
         for wpof in self.whole_pattern_output_fns:
             wpof(self.scs.activity)
@@ -91,7 +90,6 @@ class PatternSampler(param.Parameterized):
             self.background_value = 0.0
         else:
             self.background_value = self.background_value_fn(self.scs.activity)
-        self._image_initialized=True
 
 
     def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, image=None, **params):
@@ -119,9 +117,6 @@ class PatternSampler(param.Parameterized):
         if image is not None:
             self._set_image(image)
 
-        if self._image_initialized is False:
-            self._initialize_image()
-                    
         # create new pattern sample, filled initially with the background value
         pattern_sample = ones(x.shape, Float)*self.background_value
 

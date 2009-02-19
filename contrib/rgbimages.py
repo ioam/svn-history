@@ -161,15 +161,12 @@ class ColorImage(FileImage):
         # resetting the pattern sampler to use the right color
         # channel)
         self.pattern_sampler._set_image(self._image_red)
-        self.pattern_sampler._initialize_image()
         self.red = super(ColorImage,self).function(params)
 
         self.pattern_sampler._set_image(self._image_green)
-        self.pattern_sampler._initialize_image()
         self.green = super(ColorImage,self).function(params)
 
         self.pattern_sampler._set_image(self._image_blue)
-        self.pattern_sampler._initialize_image()
         self.blue = super(ColorImage,self).function(params)
 
         # note: currently, red, green, blue have to be cached
