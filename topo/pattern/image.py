@@ -278,7 +278,9 @@ class GenericImage(PatternGenerator):
         height   = p.size
         width    = p.aspect_ratio*height
 
-        # if pattern_sampler could be lazily created, we wouldn't need this
+        # CEBALERT: this is bad. If the pattern_sampler has been
+        # deleted (cache_image=False), we need to do something, but
+        # surely not this...
         if p.pattern_sampler is None:
             self.pattern_sampler = copy.deepcopy(GenericImage.pattern_sampler)
                     
