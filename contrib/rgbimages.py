@@ -172,27 +172,17 @@ class ColorImage(FileImage):
         return gray
 
     
-import random
+#import random
+from topo import numbergen
 from contrib.rgbhsv import rgb_to_hsv_array ,hsv_to_rgb_array 
 class RotatedHuesImage(ColorImage):
     """
     A ColorImage that rotates the hues in the image by a random value.
     """
-    def __init__(self,**params):
-        """
-        If seed=X is specified, sets the Random() instance's seed.
-        Otherwise, calls the instance's jumpahead() method to get a
-        state very likely to be different from any just used.
-        """
-        self.random_generator = random.Random()
-        if 'seed' in params:
-            self.random_generator.seed(params['seed'])
-            del params['seed']
-        else:
-            self.random_generator.jumpahead(10)
-        super(RotatedHuesImage,self).__init__(**params)
-        
 
+    random_generator = param.Callable(
+        default=numbergen.UniformRandom(lbound=0,ubound=1))
+    
     def function(self,p):
         gray = super(RotatedHuesImage,self).function(p)
 
@@ -200,7 +190,7 @@ class RotatedHuesImage(ColorImage):
                                  numpy.array(255*self.green,dtype=numpy.int32),
                                  numpy.array(255*self.blue,dtype=numpy.int32))
 
-        H+=self.random_generator.uniform(0,1.0)
+        H+=self.random_generator()
         H%=1.0
 
         r,g,b = hsv_to_rgb_array(H,S,V)
