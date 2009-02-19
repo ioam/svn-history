@@ -261,17 +261,17 @@ class TwoRectangles(Rectangle):
 
         return bitwise_or(
 	       bitwise_and(bitwise_and(
-			(self.pattern_x-self.x1)<=self.x1+width/4.0,
-			(self.pattern_x-self.x1)>=self.x1-width/4.0),
+			(self.pattern_x-p.x1)<=p.x1+width/4.0,
+			(self.pattern_x-p.x1)>=p.x1-width/4.0),
 		      bitwise_and(
-			(self.pattern_y-self.y1)<=self.y1+width/4.0,
-			(self.pattern_y-self.y1)>=self.y1-width/4.0)),
+			(self.pattern_y-p.y1)<=p.y1+width/4.0,
+			(self.pattern_y-p.y1)>=p.y1-width/4.0)),
 	       bitwise_and(bitwise_and(
-			(self.pattern_x-self.x2)<=self.x2+width/4.0,
-			(self.pattern_x-self.x2)>=self.x2-width/4.0),
+			(self.pattern_x-p.x2)<=p.x2+width/4.0,
+			(self.pattern_x-p.x2)>=p.x2-width/4.0),
 		      bitwise_and(
-			(self.pattern_y-self.y2)<=self.y2+width/4.0,
-			(self.pattern_y-self.y2)>=self.y2-width/4.0)))
+			(self.pattern_y-p.y2)<=p.y2+width/4.0,
+			(self.pattern_y-p.y2)>=p.y2-width/4.0)))
 
 
 class SquareGrating(PatternGenerator):
@@ -329,7 +329,7 @@ class Sweeper(PatternGenerator):
 
     def function(self,p):
         """Selects and returns one of the patterns in the list."""
-        pg = self.generator
+        pg = p.generator
         motion_orientation=p.orientation+pi/2.0
 
         new_x = p.x+p.size*pg.x
@@ -397,18 +397,13 @@ class Composite(PatternGenerator):
     size  = param.Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
 
     
-    def __init__(self,**params):
-        super(Composite,self).__init__(**params)
-        assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
-
-
-    def _advance_pattern_generators(self,generators):
+    def _advance_pattern_generators(self,p):
         """
         Subclasses can override this method to provide constraints on
         the values of generators' parameters and/or eliminate
         generators from this list if necessary.
         """
-        return generators
+        return p.generators
 
         
     # JABALERT: To support large numbers of patterns on a large input region,
@@ -416,7 +411,9 @@ class Composite(PatternGenerator):
     # combine them at the full Composite Bounding box size.
     def function(self,p):
         """Constructs combined pattern out of the individual ones."""
-        generators = self._advance_pattern_generators(p.generators)
+        generators = self._advance_pattern_generators(p)
+
+        assert hasattr(p.operator,'reduce'),repr(p.operator)+" does not support 'reduce'."
 
         # CEBALERT: mask gets applied by all PGs including the Composite itself
         # (leads to redundant calculations in current lissom_oo_or usage, but
@@ -428,7 +425,7 @@ class Composite(PatternGenerator):
                        orientation=pg.orientation+p.orientation,
                        size=pg.size*p.size)
                     for pg in generators]
-        image_array = self.operator.reduce(patterns)
+        image_array = p.operator.reduce(patterns)
         return image_array
 
 
@@ -467,7 +464,7 @@ class SeparatedComposite(Composite):
         met.""")
 
         
-    def __distance_valid(self, g0, g1):
+    def __distance_valid(self, g0, g1, p):
         """
         Returns true if the distance between the (x,y) locations of two generators
         g0 and g1 is greater than a minimum separation.
@@ -476,10 +473,10 @@ class SeparatedComposite(Composite):
         """
         dist = sqrt((g1.x - g0.x) ** 2 +
                     (g1.y - g0.y) ** 2)
-        return dist >= self.min_separation
+        return dist >= p.min_separation
 
 
-    def _advance_pattern_generators(self,generators):
+    def _advance_pattern_generators(self,p):
         """
         Advance the parameters for each generator for this presentation.
 
@@ -489,12 +486,12 @@ class SeparatedComposite(Composite):
         """
         
         valid_generators = []
-        for g in generators:
+        for g in p.generators:
             
             for trial in xrange(self.max_trials):
                 # Generate a new position and add generator if it's ok
                 
-                if alltrue([self.__distance_valid(g,v) for v in valid_generators]):
+                if alltrue([self.__distance_valid(g,v,p) for v in valid_generators]):
                     valid_generators.append(g)
                     break
                 
@@ -513,11 +510,11 @@ class Selector(PatternGenerator):
     PatternGenerator that selects from a list of other PatternGenerators.
     """
 
-    generators = param.List(default=[Constant()],precedence=0.97,
-                               class_=PatternGenerator,bounds=(1,None),
+    generators = param.List(precedence=0.97,class_=PatternGenerator,bounds=(1,None),
+        default=[Disk(x=-0.3,aspect_ratio=0.5), Rectangle(x=0.3,aspect_ratio=0.5)],
         doc="List of patterns from which to select.")
 
-    size  = param.Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
+    size = param.Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
 
     # CB: needs to have time_fn=None
     index = param.Number(default=UniformRandom(lbound=0,ubound=1.0,seed=76),
@@ -527,14 +524,10 @@ class Selector(PatternGenerator):
         random value or other number generator, to allow a different item
         to be selected each time.""")
 
-    def __init__(self,generators=[Disk(x=-0.3,aspect_ratio=0.5),
-                                  Rectangle(x=0.3,aspect_ratio=0.5)],**params):
-        super(Selector,self).__init__(**params)
-        self.generators = generators
 
     def function(self,p):
         """Selects and returns one of the patterns in the list."""
-        int_index=int(len(self.generators)*wrap(0,1.0,p.index))
+        int_index=int(len(p.generators)*wrap(0,1.0,p.index))
         pg=p.generators[int_index]
 
         image_array = pg(xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
@@ -602,6 +595,10 @@ class Translator(PatternGenerator):
     speed.  The orientation of the underlying generator should be set
     to 0 to get motion perpendicular to the generator's orientation
     (which is typical).
+
+    Note that at present the parameter values for x, y, and direction
+    cannot be passed in when the instance is called; only the values
+    set on the instance are used.
     """
     generator = param.ClassSelector(default=Gaussian(),
         class_=PatternGenerator,doc="""Pattern to be translated.""")
@@ -656,7 +653,15 @@ class Translator(PatternGenerator):
             else:
                 self._advance_params()
 
+        # JABALERT: Does not allow x, y, or direction to be passed in
+        # to the call; fixing this would require implementing
+        # inspect_value and force_new_dynamic_value (for
+        # use in _advance_params) for ParamOverrides.
+        #
         # Access parameter values without giving them new values
+        assert ('x' not in params_to_override and
+                'y' not in params_to_override and
+                'direction' not in params_to_override)
         x = self.inspect_value('x')
         y = self.inspect_value('y')
         direction = self.inspect_value('direction')

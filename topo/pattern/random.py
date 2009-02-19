@@ -46,21 +46,21 @@ class RandomGenerator(PatternGenerator):
         """)
 
         
-    def _distrib(self,shape,pos):
+    def _distrib(self,shape,p):
         """Method for subclasses to override with a particular random distribution."""
         raise NotImplementedError
     
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params_to_override):
-        params = ParamOverrides(self,params_to_override)
+        p = ParamOverrides(self,params_to_override)
 
-        shape = SheetCoordinateSystem(params['bounds'],params['xdensity'],params['ydensity']).shape
+        shape = SheetCoordinateSystem(p.bounds,p.xdensity,p.ydensity).shape
 
-        result = self._distrib(shape,params)
-        self._apply_mask(params,result)
+        result = self._distrib(shape,p)
+        self._apply_mask(p,result)
 
-        for of in params['output_fns']:
+        for of in p.output_fns:
             of(result)
                 
         return result
@@ -70,8 +70,8 @@ class RandomGenerator(PatternGenerator):
 class UniformRandom(RandomGenerator):
     """2D uniform random noise pattern generator."""
 
-    def _distrib(self,shape,params):
-        return self.random_generator.uniform(params['offset'], params['offset']+params['scale'], shape)
+    def _distrib(self,shape,p):
+        return p.random_generator.uniform(p.offset, p.offset+p.scale, shape)
 
 
 
@@ -89,9 +89,9 @@ class BinaryUniformRandom(RandomGenerator):
         Probability (in the range 0.0 to 1.0) that the binary value
         (before scaling) is on rather than off (1.0 rather than 0.0).""")
 
-    def _distrib(self,shape,params):
-        rmin = params['on_probability']-0.5
-        return params['offset']+params['scale']*(self.random_generator.uniform(rmin,rmin+1.0,shape).round())
+    def _distrib(self,shape,p):
+        rmin = p.on_probability-0.5
+        return p.offset+p.scale*(p.random_generator.uniform(rmin,rmin+1.0,shape).round())
 
 
 
@@ -107,8 +107,8 @@ class GaussianRandom(RandomGenerator):
     scale  = param.Number(default=0.25,softbounds=(0.0,2.0))
     offset = param.Number(default=0.50,softbounds=(-2.0,2.0))
 
-    def _distrib(self,shape,params):
-        return params['offset']+params['scale']*self.random_generator.standard_normal(shape)
+    def _distrib(self,shape,p):
+        return p.offset+p.scale*p.random_generator.standard_normal(shape)
 
 
 
@@ -124,8 +124,7 @@ class GaussianCloud(Composite):
         Ratio of gaussian width to height; width is gaussian_size*aspect_ratio.""")
 
     def __call__(self,**params_to_override):
-        params = ParamOverrides(self,params_to_override)
-        params['generators']=[
-            Gaussian(aspect_ratio=params['aspect_ratio'],size=params['gaussian_size']),
-            UniformRandom()]
-        return super(GaussianCloud,self).__call__(**params)
+        p = ParamOverrides(self,params_to_override)
+        p.generators=[Gaussian(aspect_ratio=p.aspect_ratio,size=p.gaussian_size),
+                      UniformRandom()]
+        return super(GaussianCloud,self).__call__(**p)

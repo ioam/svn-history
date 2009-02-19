@@ -63,32 +63,24 @@ class RandomDotStereogram(PatternGenerator):
 
 
     def __call__(self,**params_to_override):
+        p = ParamOverrides(self,params_to_override)
 
-        # Gather parameters
-        params = ParamOverrides(self,params_to_override)
-        
-        bounds      = params['bounds']
-        xdensity    = params['xdensity']
-        ydensity    = params['ydensity']
-        scale       = params['scale']
-        offset      = params['offset']
-        dotdensity  = params['dotdensity']
-        random_seed = params['random_seed']
-
-        xsize,ysize = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
+        xsize,ysize = SheetCoordinateSystem(p.bounds,p.xdensity,p.ydensity).shape
         xsize,ysize = int(round(xsize)),int(round(ysize))
         
-        xdisparity  = int(round(xsize*params['xdisparity']))  
-        ydisparity  = int(round(xsize*params['ydisparity']))   
-        dotsize     = int(round(xsize*params['dotsize']))
+        xdisparity  = int(round(xsize*p.xdisparity))  
+        ydisparity  = int(round(xsize*p.ydisparity))   
+        dotsize     = int(round(xsize*p.dotsize))
         
         bigxsize = 2*xsize
         bigysize = 2*ysize
-        ndots=int(round(dotdensity * (bigxsize+2*dotsize) * (bigysize+2*dotsize) /
+        ndots=int(round(p.dotdensity * (bigxsize+2*dotsize) * (bigysize+2*dotsize) /
                         min(dotsize,xsize) / min(dotsize,ysize)))
         halfdot = floor(dotsize/2)
     
         # Choose random colors and locations of square dots
+        random_seed = p.random_seed
+
         seed(random_seed*12,random_seed*99)
         col=where(random((ndots))>=0.5, 1.0, -1.0)
 
@@ -110,10 +102,10 @@ class RandomDotStereogram(PatternGenerator):
         for i in range(ndots):
             bigimage[y1[i]:y2[i]+1,x1[i]:x2[i]+1] = col[i]
             
-        result = offset + scale*bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity ,
-                                          (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
+        result = p.offset + p.scale*bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity ,
+                                              (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
 
-        for of in params['output_fns']:
+        for of in p.output_fns:
             of(result)
 
         return result
