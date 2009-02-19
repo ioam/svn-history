@@ -3188,17 +3188,21 @@ class AppWindow(ScrolledWindow):
 
 class ListWidget(T.Frame):
 
+    # CEBALERT: as with several of my compound widgets, need to deal
+    # with **config passed to __init__, by putting through config()
+    # (and so also need to add config() methods where currently
+    # missing).
     def __init__(self, master, variable,cmd,**widget_options):
         T.Frame.__init__(self, master)
-        w=T.Entry(self,textvariable=variable,state='disabled',disabledforeground='black') #CEBALERT: presumably disabledforeground won't work work with styles...
-        w.pack(fill='both',expand=1)
+        self.entry=T.Entry(self,textvariable=variable,state='disabled',disabledforeground='black') #CEBALERT: presumably disabledforeground won't work work with styles...
+        self.entry.pack(fill='both',expand=1)
 
         ### Right-click menu for widgets
         # CEBALERT: I can't work out how to make the right-click event
         # bound to the widget already (by the ParametersFrame) ever
         # activate!  It must be overwritten or something by tk. So I
         # have to duplicate the right-click menu code here.
-        w.bind("<<right-click>>",self._right_click)
+        self.entry.bind("<<right-click>>",self._right_click)
         master.option_add("*Menu.tearOff", "0") 
         self.menu = Menu(master)
         self.menu.insert_command('end',label='Properties',
@@ -3208,7 +3212,19 @@ class ListWidget(T.Frame):
         """
         Popup the right-click menu.
         """
-        self.menu.tk_popup(event.x_root, event.y_root)
+        if self.disabled is False:
+            self.menu.tk_popup(event.x_root, event.y_root)
+
+    def config(self,**options):
+        # all options are passed to the entry
+        # state=disabled->no right click menu
+        if 'state' in options:
+            if options['state']=='disabled':
+                self.disabled=True
+            elif options['state']=='normal':
+                self.disabled=False
+        return self.entry.config(**options)
+
 
 
 import new
@@ -3630,3 +3646,5 @@ class ListItemCtrlWidget(T.Frame):
         remove['image']=image
         self._hack.append(image)
         ###
+    
+
