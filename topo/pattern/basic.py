@@ -567,8 +567,6 @@ class GaussiansCorner(PatternGenerator):
 		
     size = param.Number(default=0.5,doc="The size of the corner")
     
-    angle = param.Number(default=pi/2,doc="The angle of the corner")
-    
     
     def __call__(self,**params_to_override):
         p = ParamOverrides(self,params_to_override)
