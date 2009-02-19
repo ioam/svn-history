@@ -59,9 +59,9 @@ class Gaussian(PatternGenerator):
         exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
         where ysigma=size/2 and xsigma=size/2*aspect_ratio.""")
 
-    def function(self,params):
-        ysigma = params['size']/2.0
-        xsigma = params['aspect_ratio']*ysigma
+    def function(self,p):
+        ysigma = p.size/2.0
+        xsigma = p.aspect_ratio*ysigma
         
         return gaussian(self.pattern_x,self.pattern_y,xsigma,ysigma)
 
@@ -75,9 +75,9 @@ class SineGrating(PatternGenerator):
     phase     = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
                        precedence=0.51,doc="Phase of the sine grating.")
 
-    def function(self,params):
+    def function(self,p):
         """Return a sine grating pattern (two-dimensional sine wave)."""
-        return 0.5 + 0.5*sin(params['frequency']*2*pi*self.pattern_y + params['phase'])        
+        return 0.5 + 0.5*sin(p.frequency*2*pi*self.pattern_y + p.phase)        
 
 
 
@@ -100,12 +100,12 @@ class Gabor(PatternGenerator):
     size = param.Number(default=0.25,doc="""
         Determines the height of the Gaussian component (see Gaussian).""")
 
-    def function(self,params):
-        height = params['size']/2.0
-        width = params['aspect_ratio']*height
+    def function(self,p):
+        height = p.size/2.0
+        width = p.aspect_ratio*height
         
-        return gabor( self.pattern_x,self.pattern_y,width,height,
-                      params['frequency'],params['phase'])
+        return gabor(self.pattern_x,self.pattern_y,width,height,
+                     p.frequency,p.phase)
 
 
 class Line(PatternGenerator):
@@ -118,8 +118,8 @@ class Line(PatternGenerator):
                        precedence=0.61,
                        doc="Width of the Gaussian fall-off.")
 
-    def function(self,params):
-        return line(self.pattern_y,params['thickness'],params['smoothing'])
+    def function(self,p):
+        return line(self.pattern_y,p.thickness,p.smoothing)
 
 
 class Disk(PatternGenerator):
@@ -144,13 +144,12 @@ class Disk(PatternGenerator):
     smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,doc="Width of the Gaussian fall-off")
     
-    def function(self,params):
-        height = params['size']
-        aspect_ratio = params['aspect_ratio']
+    def function(self,p):
+        height = p.size
 
         # CEBHACKALERT: this division should handle aspect_ratio=0
-        return disk(self.pattern_x/aspect_ratio,self.pattern_y,height,
-                         params['smoothing'])
+        return disk(self.pattern_x/p.aspect_ratio,self.pattern_y,height,
+                    p.smoothing)
 
 
 class Ring(PatternGenerator):
@@ -172,12 +171,10 @@ class Ring(PatternGenerator):
     
     size = param.Number(default=0.5)
 
-    def function(self,params):
-        height = params['size']
-        aspect_ratio = params['aspect_ratio']
-
-        return ring(self.pattern_x/aspect_ratio,self.pattern_y,height,
-                    params['thickness'],params['smoothing'])
+    def function(self,p):
+        height = p.size
+        return ring(self.pattern_x/p.aspect_ratio,self.pattern_y,height,
+                    p.thickness,p.smoothing)
     
 
 class OrientationContrast(SineGrating):
@@ -202,8 +199,8 @@ class OrientationContrast(SineGrating):
     aspect_ratio   = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),  doc="Ratio of width to height; size*aspect_ratio gives the overall width.")
     size           = param.Number(default=0.5)
 
-    def __call__(self,**params):
-        p = ParamOverrides(self,params)
+    def __call__(self,**params_to_override):
+        p = ParamOverrides(self,params_to_override)
       
         input_1=SineGrating(mask_shape=Disk(smoothing=0),phase=p.phase, frequency=p.frequency,
                             orientation=p.orientationcenter,
@@ -232,9 +229,9 @@ class Rectangle(PatternGenerator):
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
 
-    def function(self,params):
-        height = params['size']
-        width = params['aspect_ratio']*height
+    def function(self,p):
+        height = p.size
+        width = p.aspect_ratio*height
         
         return bitwise_and(abs(self.pattern_x)<=width/2.0,
                            abs(self.pattern_y)<=height/2.0)
@@ -258,9 +255,9 @@ class TwoRectangles(Rectangle):
     # YC: Maybe this can be implemented much more cleanly by calling
     # the parent's function() twice, but it's hard to see how to 
     # set the (x,y) offset for the parent.
-    def function(self,params):
-        height = params['size']
-        width = params['aspect_ratio']*height
+    def function(self,p):
+        height = p.size
+        width = p.aspect_ratio*height
 
         return bitwise_or(
 	       bitwise_and(bitwise_and(
@@ -290,11 +287,11 @@ class SquareGrating(PatternGenerator):
     # and there might be an easier way to do it than by
     # cropping a sine grating.
 
-    def function(self,params):
+    def function(self,p):
         """
         Return a square-wave grating (alternating black and white bars).
         """
-        return around(0.5 + 0.5*sin(params['frequency']*2*pi*self.pattern_y + params['phase']))
+        return around(0.5 + 0.5*sin(p.frequency*2*pi*self.pattern_y + p.phase))
 
 
 # CB: I removed motion_sign from this class because I think it is
@@ -330,33 +327,19 @@ class Sweeper(PatternGenerator):
     def __set_phase(self,new_val): self.generator.phase = new_val
     phase = property(__get_phase,__set_phase)
 
-    def function(self,params):
+    def function(self,p):
         """Selects and returns one of the patterns in the list."""
-        bounds = params['bounds']
-        xdensity=params['xdensity']
-        ydensity=params['ydensity']
-        x=params['x']
-        y=params['y']
-        scale=params['scale']
-        offset=params['offset']
-        size=params['size']
-        orientation=params['orientation']
-        
         pg = self.generator
+        motion_orientation=p.orientation+pi/2.0
 
-        motion_orientation=orientation+pi/2.0
-
-        speed=params['speed']
-        step=params['step']
-
-        new_x = x+size*pg.x
-        new_y = y+size*pg.y
+        new_x = p.x+p.size*pg.x
+        new_y = p.y+p.size*pg.y
         
-        image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                         x=new_x + speed*step*cos(motion_orientation),
-                         y=new_y + speed*step*sin(motion_orientation),
-                         orientation=orientation,
-                         scale=pg.scale*scale,offset=pg.offset+offset)
+        image_array = pg(xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
+                         x=new_x + p.speed*p.step*cos(motion_orientation),
+                         y=new_y + p.speed*p.step*sin(motion_orientation),
+                         orientation=p.orientation,
+                         scale=pg.scale*p.scale,offset=pg.offset+p.offset)
         
         return image_array
 
@@ -431,21 +414,19 @@ class Composite(PatternGenerator):
     # JABALERT: To support large numbers of patterns on a large input region,
     # should be changed to evaluate each pattern in a small box, and then
     # combine them at the full Composite Bounding box size.
-    def function(self,params):
+    def function(self,p):
         """Constructs combined pattern out of the individual ones."""
-        generators = self._advance_pattern_generators(params['generators'])
+        generators = self._advance_pattern_generators(p.generators)
 
         # CEBALERT: mask gets applied by all PGs including the Composite itself
         # (leads to redundant calculations in current lissom_oo_or usage, but
         # will lead to problems/limitations in the future).
-        orientation=params['orientation']
-        size = params['size']
-        patterns = [pg(xdensity=params['xdensity'],ydensity=params['ydensity'],
-                       bounds=params['bounds'],mask=params['mask'],
-                       x=params['x']+size*(pg.x*cos(orientation)- pg.y*sin(orientation)),
-                       y=params['y']+size*(pg.x*sin(orientation)+ pg.y*cos(orientation)),
-                       orientation=pg.orientation+orientation,
-                       size=pg.size*params['size'])
+        patterns = [pg(xdensity=p.xdensity,ydensity=p.ydensity,
+                       bounds=p.bounds,mask=p.mask,
+                       x=p.x+p.size*(pg.x*cos(p.orientation)- pg.y*sin(p.orientation)),
+                       y=p.y+p.size*(pg.x*sin(p.orientation)+ pg.y*cos(p.orientation)),
+                       orientation=pg.orientation+p.orientation,
+                       size=pg.size*p.size)
                     for pg in generators]
         image_array = self.operator.reduce(patterns)
         return image_array
@@ -551,27 +532,18 @@ class Selector(PatternGenerator):
         super(Selector,self).__init__(**params)
         self.generators = generators
 
-    def function(self,params):
+    def function(self,p):
         """Selects and returns one of the patterns in the list."""
-        bounds = params['bounds']
-        xdensity=params['xdensity']
-        ydensity=params['ydensity']
-        x=params['x']
-        y=params['y']
-        scale=params['scale']
-        offset=params['offset']
-        size=params['size']
-        orientation=params['orientation']
-        index=params['index']
-
+        # CEBALERT: self.index? or p.index?
         int_index=int(len(self.generators)*wrap(0,1.0,self.index))
+        # CEBALERT: self.generators? or p.generators?
         pg=self.generators[int_index]
 
-        image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                         x=x+size*(pg.x*cos(orientation)-pg.y*sin(orientation)),
-                         y=y+size*(pg.x*sin(orientation)+pg.y*cos(orientation)),
-                         orientation=pg.orientation+orientation,size=pg.size*size,
-                         scale=pg.scale*scale,offset=pg.offset+offset)
+        image_array = pg(xdensity=p.xdensity,ydensity=p.ydensity,bounds=p.bounds,
+                         x=p.x+p.size*(pg.x*cos(p.orientation)-pg.y*sin(p.orientation)),
+                         y=p.y+p.size*(pg.x*sin(p.orientation)+pg.y*cos(p.orientation)),
+                         orientation=pg.orientation+p.orientation,size=pg.size*p.size,
+                         scale=pg.scale*p.scale,offset=pg.offset+p.offset)
                        
         return image_array
 
@@ -601,22 +573,20 @@ class GaussiansCorner(PatternGenerator):
     
     
     def __call__(self,**params_to_override):
-        params = ParamOverrides(self,params_to_override)
-
-        bounds = params['bounds']
-        xdensity=params['xdensity']
-        ydensity=params['ydensity']
-        x=params['x']
-        y=params['y']
-        scale=params['scale']
-        offset=params['offset']
-        size=params['size']
-        orientation=params['orientation']
-        size=params['size']
+        p = ParamOverrides(self,params_to_override)
 	
 	input_1=Gaussian()
         input_2=Gaussian()
-	patterns = [input_1(orientation = orientation, bounds = bounds, xdensity = xdensity, ydensity = ydensity, offset = offset, size = size, x = self.x + cos(orientation) * size*0.9, y = self.y + sin(orientation)*size*0.9),input_2(orientation = orientation+pi/2, bounds = bounds, xdensity = xdensity, ydensity = ydensity, offset = offset, size = size,x = self.x + cos(orientation+pi/2) * size*0.9, y = self.y + sin(orientation+pi/2)*size*0.9)]
+
+        # CEBALERT: self.x or p.x?
+	patterns = [input_1(orientation = p.orientation, bounds = p.bounds, xdensity = p.xdensity,
+                            ydensity = p.ydensity, offset = p.offset, size = p.size,
+                            x = self.x + cos(p.orientation) * p.size*0.9,
+                            y = self.y + sin(p.orientation) * p.size*0.9),
+                    input_2(orientation = p.orientation+pi/2, bounds = p.bounds, xdensity = p.xdensity,
+                            ydensity = p.ydensity, offset = p.offset, size = p.size,
+                            x = self.x + cos(p.orientation+pi/2) * p.size*0.9,
+                            y = self.y + sin(p.orientation+pi/2) * p.size*0.9)]
 	
 	return numpy.maximum(patterns[0],patterns[1])
 
@@ -679,8 +649,8 @@ class Translator(PatternGenerator):
         self._advance_params()
 
         
-    def __call__(self,**params):
-        p=ParamOverrides(self,params)
+    def __call__(self,**params_to_override):
+        p=ParamOverrides(self,params_to_override)
         
         if topo.sim.time() >= self.last_time + p.reset_period:
             ## Returns early if within episode interval
