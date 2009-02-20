@@ -127,7 +127,7 @@ class save_plotgroup(ParameterizedFunction):
     
         plotgroup._set_name(name)
         # save_plotgroup's **params are passed to the plotgroup
-        for n,v in p.extra_keywords.items():
+        for n,v in p.extra_keywords().items():
             setattr(plotgroup,n,v)
 
         # Reset plot cache when time changes
@@ -144,7 +144,7 @@ class save_plotgroup(ParameterizedFunction):
                     update=False
                     break
 
-        keywords=" ".join(["%s" % (v.name if isinstance(v,param.Parameterized) else str(v)) for n,v in p.extra_keywords.items()])
+        keywords=" ".join(["%s" % (v.name if isinstance(v,param.Parameterized) else str(v)) for n,v in p.extra_keywords().items()])
         plot_description="%s%s%s" % (plotgroup.name," " if keywords else "",keywords)
         if update:
             self.previous_plotgroups.append(plotgroup)

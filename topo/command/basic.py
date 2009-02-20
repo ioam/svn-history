@@ -423,7 +423,7 @@ class run_batch(ParameterizedFunction):
         simname = prefix
     
         # Construct parameter-value portion of filename; should do more filtering
-        for a,val in p.extra_keywords.items():
+        for a,val in p.extra_keywords().items():
             # Special case to give reasonable filenames for lists
             valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
                      else str(val))
@@ -431,7 +431,7 @@ class run_batch(ParameterizedFunction):
     
         # Set provided parameter values in main namespace
         from topo.misc.commandline import global_params
-        global_params.set_in_context(**p.extra_keywords)
+        global_params.set_in_context(**p.extra_keywords())
     
         # Create output directories
         if not os.path.isdir(normalize_path(p['output_directory'])):

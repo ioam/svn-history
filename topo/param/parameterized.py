@@ -1593,11 +1593,16 @@ class PicklableClassAttributes(object):
 
 class ParamOverrides(dict):
     """
-    A dictionary that returns the attribute of an object if that
-    attribute is not present in itself.
+    A dictionary that returns the attribute of a specified object if
+    that attribute is not present in itself.
 
     Used to override the parameters of an object.
     """
+
+    # NOTE: Attribute names of this object block parameters of the
+    # same name, so all attributes of this object should have names
+    # starting with an underscore (_).
+    
     def __init__(self,overridden,dict_,allow_extra_keywords=False):
         """
         
@@ -1607,8 +1612,7 @@ class ParamOverrides(dict):
 
         If allow_extra_keywords is True, then any items in the
         supplied dict_ that are not also parameters of the overridden
-        object will be available through the attribute
-        'extra_keywords'.
+        object will be available via the extra_keywords() method.
         """
         # we'd like __init__ to be fast because it's going to be
         # called a lot. What's the fastest way to move the existing
@@ -1617,52 +1621,68 @@ class ParamOverrides(dict):
         #      ...
         #      dict.__init__(self,**kw)
         # be faster/easier to use?
-        self.overridden = overridden
+        self._overridden = overridden
         dict.__init__(self,dict_)
 
         if allow_extra_keywords:
-            self.extra_keywords=self._extract_extra_keywords(dict_)
+            self._extra_keywords=self._extract_extra_keywords(dict_)
         else:
             self._check_params(dict_)
-            
- 
-    def __missing__(self,attr):
-        """Return the attribute from overridden object."""
-        return getattr(self.overridden,attr)
+
+    def extra_keywords(self):
+        """
+        Return a dictionary containing items from the originally
+        supplied dict_ whose names are not parameters of the
+        overridden object.
+        """
+        return self._extra_keywords
+    
+    def __missing__(self,name):
+        # Return 'name' from the overridden object
+        return getattr(self._overridden,name)
         
     def __repr__(self):
-        """As dict.__repr__, but indicate the overridden object."""
-        # something like...
-        return dict.__repr__(self)+" overriding params from %s"%repr(self.overridden)
+        # As dict.__repr__, but indicate the overridden object
+        return dict.__repr__(self)+" overriding params from %s"%repr(self._overridden)
 
     def __getattr__(self,name):
         # Provide 'dot' access to entries in the dictionary.
+        # (This __getattr__ method is called only if 'name' isn't an
+        # attribute of self.)
         return self.__getitem__(name)
 
-
+    def __setattr__(self,name,val):
+        # Attributes whose name starts with _ are set on self (as
+        # normal), but all other attributes are inserted into the
+        # dictionary.
+        if not name.startswith('_'):
+            self.__setitem__(name,val)
+        else:
+            dict.__setattr__(self,name,val)
+            
     def _check_params(self,params):
         """
         Print a warning if params contains something that is not a
         Parameter of the overridden object.
         """
-        overridden_object_params = self.overridden.params().keys()
+        overridden_object_params = self._overridden.params().keys()
         for item in params:
             if item not in overridden_object_params:
                 self.warning("'%s' will be ignored (not a Parameter)."%item)
 
     def _extract_extra_keywords(self,params):
         """
-        Remove and return any items in params that are not also
+        Return any items in params that are not also
         parameters of the overridden object.
         """
         extra_keywords = {}
-        overridden_object_params = self.overridden.params()
+        overridden_object_params = self._overridden.params()
         for name,val in params.items():
             if name not in overridden_object_params:
                 extra_keywords[name]=val
-                # CEBALERT: and should we remove name from params,
-                # so that it's only available via extra_keywords?
-                # I think we don't need to do that.
+                # CEBALERT: should we remove name from params
+                # (i.e. del params[name]) so that it's only available
+                # via extra_keywords()?
         return extra_keywords
 
 

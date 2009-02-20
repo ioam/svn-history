@@ -313,7 +313,7 @@ class histogramplot(PylabPlotCommand):
         p=ParamOverrides(self,params,allow_extra_keywords=True)        
     
         pylab.figure(figsize=(4,2))
-        n,bins,bars = pylab.hist(data,**(p.extra_keywords))
+        n,bins,bars = pylab.hist(data,**(p.extra_keywords()))
     
         # if len(bars)!=len(colors), any extra bars won't have their
         # colors changed, or any extra colors will be ignored.
