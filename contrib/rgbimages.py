@@ -78,7 +78,8 @@ class ExtendToRGB(PatternGenerator):
 
     generator = param.Parameter(default=pattern.Constant())
 
-    channel_strengths = param.List([1.0/3,1.0/3,1.0/3]) # not sure what to call it
+    channel_strengths = param.List([1.0,1.0,1.0],doc="""
+        Scaling factor for each channel.""") 
 
     def __init__(self,**params):
         super(ExtendToRGB,self).__init__(**params)
@@ -113,16 +114,16 @@ class ExtendToRGB(PatternGenerator):
             generator = p.generator.generator
         else:
             generator = p.generator
-            
-        if hasattr(generator,'red'):
-            # promote the red, green, blue from 'actual generator' if it has them
-            for c in self.channels:
-                setattr(self,c,getattr(generator,c))
-        else:
-            # otherwise set red, green, blue from gray with r/g/b channel_strength
-            c_strength=iter(p.channel_strengths)
-            for c in self.channels:
-                setattr(self,c,gray*c_strength.next())
+
+        # Promote red, green, blue from 'actual generator' if it
+        # has them. Otherwise set red, green, blue to gray/3.
+        n_channels = len(self.channels)
+        channel_values=([gray/float(n_channels)]*n_channels if not hasattr(generator,'red') else \
+                        [getattr(generator,channel) for channel in self.channels])
+
+        for name,value,strength in zip(p.channels,channel_values,p.channel_strengths):
+            setattr(self,name,value*strength)
+
         return gray
 
         
@@ -323,7 +324,7 @@ if __name__=="__main__" or __name__=="__mynamespace__":
 
     from topo import sheet
     import glob
-    image_filenames = glob.glob('mcgill/foilage/*.tif') # sic
+    image_filenames = glob.glob('/disk/scratch/fast/v1cball/mcgill/foilage/*.tif') # sic
     images0 = [ColorImage(filename=f) for f in image_filenames]
     images1 = [RotatedHuesImage(filename=f) for f in image_filenames]
     
