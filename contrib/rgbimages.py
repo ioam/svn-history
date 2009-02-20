@@ -127,7 +127,7 @@ class ExtendToRGB(PatternGenerator):
 
         
 from topo.pattern.image import FileImage,edge_average,PIL
-import ImageOps
+import ImageOps, ImageEnhance
 import numpy
 
 class ColorImage(FileImage):
@@ -139,7 +139,11 @@ class ColorImage(FileImage):
         if p.filename!=self.last_filename or self._image is None:
             self.last_filename=p.filename
             rgbimage = PIL.open(p.filename)
-            R,G,B = rgbimage.split()
+            try:
+                R,G,B = rgbimage.split()
+            except ValueError:
+                # grayscale image, so just put 1/3 in each channel
+                R=G=B=ImageEnhance.Brightness(ImageOps.grayscale(rgbimage)).enhance(1.0/3.0)
             self._image_red  = R
             self._image_green = G
             self._image_blue = B
@@ -319,7 +323,7 @@ if __name__=="__main__" or __name__=="__mynamespace__":
 
     from topo import sheet
     import glob
-    image_filenames = glob.glob('/disk/scratch/fast/v1cball/mcgill/foilage/*.tif') # sic
+    image_filenames = glob.glob('mcgill/foilage/*.tif') # sic
     images0 = [ColorImage(filename=f) for f in image_filenames]
     images1 = [RotatedHuesImage(filename=f) for f in image_filenames]
     
