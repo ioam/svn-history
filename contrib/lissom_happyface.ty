@@ -31,7 +31,7 @@ import topo.sheet.optimized
 
 from topo.base.patterngenerator import PatternGenerator
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
-from numpy.oldnumeric import arcsin,logical_and,logical_or,tan,sin
+from numpy.oldnumeric import arcsin,logical_and,logical_or,tan,sin,less,minimum
 from numpy.oldnumeric import where,maximum,cos,sin,sqrt,divide,greater_equal,bitwise_xor,exp
 
 from topo.plotting.plotgroup import create_plotgroup
@@ -86,15 +86,27 @@ def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
     output_ring = maximum(inner_falloff,maximum(outer_falloff,ring))
 
     # Calculate radians (in 4 phases) and cut according to the set range)
+
+    """
+    Function float_error_ignore() cannot catch the exception when both dividend
+    and divisor are 0.0 (floating number), and when only divisor is 0.0
+    (floating number) it returns 'Inf' rather than 0.0. In x, y and
+    distance_from_origin, only one point in distance_from_origin can be 0.0
+    (circle center) and in this point x and y must be 0.0 as well. So here is a
+    hack to avoid the 'invalid value encountered in divide' error by turning
+    0.0 to 1e-5 in distance_from_origin.
+    """
+    distance_from_origin += where(distance_from_origin == 0.0, 1e-5, 0)
+
     with float_error_ignore():
-        sines = numpy.divide(x,distance_from_origin)
-        cosines = numpy.divide(y,distance_from_origin)
+        sines = divide(y, distance_from_origin)
+        cosines = divide(x, distance_from_origin)
         arcsines = arcsin(sines)
 
-    phase_1 = where(logical_and(sines >= 0, cosines < 0), 2 * pi - arcsines, 0)
-    phase_2 = where(logical_and(sines >= 0, cosines >= 0), pi + arcsines, 0)
-    phase_3 = where(logical_and(sines < 0, cosines >= 0), pi + arcsines, 0)
-    phase_4 = where(logical_and(sines < 0, cosines < 0), -arcsines, 0)
+    phase_1 = where(logical_and(sines >= 0, cosines >= 0), 2 * pi - arcsines, 0)
+    phase_2 = where(logical_and(sines >= 0, cosines < 0), pi + arcsines, 0)
+    phase_3 = where(logical_and(sines < 0, cosines < 0), pi + arcsines, 0)
+    phase_4 = where(logical_and(sines < 0, cosines >= 0), -arcsines, 0)
     arcsines = phase_1 + phase_2 + phase_3 + phase_4
 
     if radian_range[0] <= radian_range[1]:
@@ -105,67 +117,68 @@ def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
                      output_ring, 0.0)
 
 
-#JABALERT: reimplement to call arc_by_radian instead
+def rectangle(x, y, rec_w, rec_h, gaussian_width):
+    """
+    Rectangle with a solid central region, then Gaussian fall-off at the edges.
+    """
+    gaussian_x_coord = abs(x) - rec_w / 2.0
+    gaussian_y_coord = abs(y) - rec_h / 2.0
+        
+    box_x = less(gaussian_x_coord, 0.0)
+    box_y = less(gaussian_y_coord, 0.0)
+    sigmasq = gaussian_width * gaussian_width
+
+    with float_error_ignore():
+        falloff_x = exp(divide(-gaussian_x_coord * gaussian_x_coord, 2 * sigmasq))
+        falloff_y = exp(divide(-gaussian_y_coord * gaussian_y_coord, 2 * sigmasq))
+
+    return minimum(maximum(box_x, falloff_x), maximum(box_y, falloff_y))
+
+
 def arc_by_center(x, y, arc_box, thickness, gaussian_width):
     """
     Arc with Gaussian fall-off after the solid ring-shaped region and specified
     by point of tangency (x and y) and arc width and height.
-    
-    The first part of this function is based on ring function.
+
+    This function calculates the start and end radian from the given width and
+    height, and then calls arc_by_radian function to draw the curve.
     """
+
     arc_w = arc_box[0]
-    arc_h = arc_box[1]
-    #if arc_h > arc_w / 2:
-    radius = arc_h / 2.0 + arc_w ** 2.0 / (8 * arc_h)
-    y = y + radius
-    angle = arcsin(arc_w / 2.0 / radius)
-    angle_start = 3 / 2 * pi - angle
-    angle_end = 3 / 2 * pi + angle
-    
-    # Create a circular ring (same as in func ring)
+    arc_h = abs(arc_box[1])
 
-    half_thickness = thickness/2.0
+    if arc_w == 0.0:  # arc_w = 0, don't draw anything
+        radius = 0.0
+        angles = (0.0, 0.0)
+    elif arc_h == 0.0:  # draw a horizontal line, width = arc_w
+        return rectangle(x, y, arc_w, thickness, gaussian_width)
+    else:
+        # formulae evaluating radius and angle
+        radius = arc_h / 2.0 + arc_w ** 2.0 / (8 * arc_h)
+        angle = arcsin(arc_w / 2.0 / radius)
+        if arc_box[1] < 0:  # convex shape
+            y = y + radius
+            angles = (3.0 / 2.0 * pi - angle, 3.0 / 2.0 * pi + angle)
+        else:  # concave shape
+            y = y - radius
+            angles = (pi / 2.0 - angle, pi / 2.0 + angle)
 
-    distance_from_origin = sqrt(x**2+y**2)
-    distance_outside_outer_disk = distance_from_origin - radius - half_thickness
-    distance_inside_inner_disk = radius - half_thickness - distance_from_origin
-
-    ring = 1.0-bitwise_xor(greater_equal(distance_inside_inner_disk,0.0),greater_equal(distance_outside_outer_disk,0.0))
-
-    sigmasq = gaussian_width*gaussian_width
-
-    with topo.misc.patternfn.float_error_ignore():
-        inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
-        outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
-
-    output_ring = maximum(inner_falloff,maximum(outer_falloff,ring))
-
-    # Calculate radians (in 4 phases) and cut according to the set range)
-
-    sines = x / distance_from_origin
-    cosines = y / distance_from_origin
-    arcsines = arcsin(sines)
-
-    phase_1 = where(logical_or(sines >= 0, cosines >= 0), 2 * pi - arcsines, 0)
-    phase_2 = where(logical_or(sines >= 0, cosines < 0), pi + arcsines, 0)
-    phase_3 = where(logical_or(sines < 0, cosines < 0), pi + arcsines, 0)
-    phase_4 = where(logical_or(sines < 0, cosines >= 0), -arcsines, 0)
-    arcsines = phase_2 + phase_3
-
-    return where(logical_and(arcsines >= angle_start, arcsines <= angle_end), output_ring, 0.0)
+    return arc_by_radian(x, y, radius * 2.0, angles, thickness, gaussian_width)
 
 
 class Arc(PatternGenerator):
     """
     2D arc pattern generator.
     
-    The shape of the arc can be either specified by start and end radian
-    (preferential) or by point of tangency and arc width and height. if parameter
-    'radian_range' is not set (i.e., default value (0.0, 0.0)), parameters
-    x and y (as point of tangency) and 'arc_box' will be used to draw the arc.
+    The shape of the arc is specified by start and end radian (parameter
+    radian_start and radian_end), and diameter is specified by parameter size.
 
     See the Ring and Disk class for a note about the Gaussian fall-off.
     """
+
+    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc=
+        "Ratio of width to height; size*aspect_ratio gives the overall width.")
 
     thickness = param.Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.60,doc="Thickness (line width) of the ring.")
@@ -173,18 +186,11 @@ class Arc(PatternGenerator):
     smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
 
-    smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
-        precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
-    
-    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.31,doc=
-        "Ratio of width to height; size*aspect_ratio gives the overall width.")
-
     radian_start = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
         precedence = 0.62, doc = "Start of the range, when using radians.")
 
     radian_end = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
-        precedence = 0.62, doc = "End of the range, when using radians.")
+        precedence = 0.63, doc = "End of the range, when using radians.")
 
     size = param.Number(default=0.5)
 
@@ -198,35 +204,42 @@ class Arc(PatternGenerator):
 
 
 class Curve(Arc):
-    #JABALERT: doc needs updating; should handle negative curvatures
     """
     2D curve pattern generator.
 
-    Based on Arc, but centered on a particular point of the arc, with
-    curvature controlled directly rather than through the overall size
-    of the pattern.
-    
+    Based on Arc, but centered on a particular point of the arc, with curvature
+    controlled directly rather than through the overall size of the pattern.
+
+    Parameter curvature determines the ratio of height to width of the arc, and
+    positive curvature for concave shape and negative for convex. Parameter
+    size determines the width of the curve.
+
     See the Ring and Disk class for a note about the Gaussian fall-off.
     """
 
     # Hide unused parameters
     radian_start = param.Number(precedence = -1.0)
     radian_end = param.Number(precedence = -1.0)
-    aspect_ratio = param.Number(precedence = -1.0)
+    aspect_ratio = param.Number(default = 1.0, precedence = -1.0)
 
-    curvature = param.Number(default=1.0,bounds=(0.5,None),softbounds=(0.5,10.0),
-        precedence = 0.64, doc = "Ratio of width to height of the arc.")
+    curvature = param.Number(default = 0.5, bounds = (-0.5, 0.5), precedence = 0.64,
+                doc = """
+                      Ratio of height to width of the arc; positive value for concave and negative
+                      value for convex shape.
+                      """)
 
     def function(self,p):
+
         aspect_ratio = p.aspect_ratio
-        arc_box = (p.size,p.size*p.curvature)
+
+        # size: arc width; size*abs(curvature): arc height
+        arc_box = (p.size, p.size * p.curvature)
         
         output = arc_by_center(self.pattern_x/aspect_ratio, self.pattern_y, 
                                arc_box, p.thickness, p.smoothing)
         return output
 
 
-#JABALERT: reimplement to call Curve instead
 class HappyFace(pattern.Composite):
     """
     2D cartoon face pattern.
@@ -236,59 +249,67 @@ class HappyFace(pattern.Composite):
     (sad, convex). Happiness 0.0 represents a straight line.
     """
 
-    happiness = param.Number(default=1.0,bounds=(-1.0,1.0),
-                             doc = """Happiness value that determines whether the mouth
-                                      is concave (happy, positive) or convex
-                                      (sad, negative).""")
-    
-    def __init__(self, **params):
-        super(HappyFace, self).__init__(**params)
-        base = 3 * sqrt(3) / sin(40 * pi / 180 / 2.0)
-        self.k_happy = (base - 6) / (base - 4.5)
-        self.k_sad   = (base - 6) / (4.5 - base)
-        self.b_happy = 3  * self.k_happy + 6.0
-        self.b_sad   = 12 * self.k_sad   + 6.0
-        self.max_shift = base - 4.5
+    happiness = param.Number(default = 1.0, bounds = (-1.0, 1.0),
+        precedence = 0.60, doc = """Happiness value that determines whether the mouth
+                                    is concave (happy, positive) or convex
+                                    (sad, negative).""")
+
+    eyes_smoothing = param.Number(default = 3.0 * 1.21 / 1.7 / 24.0,
+        bounds = (0.0, None), softbounds = (0.0, 0.5),
+        precedence = 0.61, doc = "Width of the Gaussian fall-off of two eyes.")
+
+    face_thickness = param.Number(default = 0.002,bounds = (0.0, None), softbounds = (0.0,0.5),
+        precedence = 0.62, doc = "Thickness (line width) of face.")
+
+    face_smoothing = param.Number(default = 0.02, bounds = (0.0, None), softbounds = (0.0, 0.5),
+        precedence = 0.63, doc = "Width of the Gaussian fall-off of face.")
+
+    mouth_thickness = param.Number(default = 0.002,bounds=(0.0, None), softbounds = (0.0,0.5),
+        precedence = 0.64, doc = "Thickness (line width) of mouth.")
+
+    mouth_smoothing = param.Number(default = 0.05, bounds = (0.0, None), softbounds = (0.0, 0.5),
+        precedence = 0.65, doc = "Width of the Gaussian fall-off of mouth.")
+
 
     def _advance_pattern_generators(self, generators):
         """Constructs combined pattern out of the individual ones."""
 
-        """
-        orientation = params['orientation']
-        size = params['size']
-        happiness = params['happiness']
-        """
-        happiness = self.happiness
+        sb = 1.0 / 24.0
+        mouth_width = 20.8 / 2.0
+        mouth_curvature = self.happiness / 2.0 # less height, needs revision
+        mouth_y = -7.5 - 1.5 * self.happiness
 
-        lefteye =  pattern.Gaussian(aspect_ratio = 1.0, x = 1/24.0, y = 4.5/24.0,
-                            size = 3.0 * 1.21/24.0 / 1.7, scale = 0.5, offset = 0.5059)
-        righteye = pattern.Gaussian(aspect_ratio = 1.0, x = 1/24.0, y = -4.5/24.0,
-                            size = 3.0 * 1.21/24.0 / 1.7, scale = 0.5, offset = 0.5059)
-        face  =  pattern.Ring(aspect_ratio = 1.0, x = -3/24.0, y = 0.0/24.0,
-                              thickness = 0.002, smoothing = 0.02,
-                              size = 2.0 * 1.21/24.0 / 1.7 * 15)
-
-        if happiness == 0:
-            mouth = pattern.Rectangle(aspect_ratio = 0.1, size = 6 * sqrt(3) / 24.0,
-                                      x = -7.5/24.0, y = 0.0 / 24.0)
-        else:
-            if happiness > 0:
-                x_mouth = -3 + self.max_shift * (1 - happiness)
-                r       = x_mouth * self.k_happy + self.b_happy
-                angle   = arcsin(3 * sqrt(3) / r) * 180 / pi
-                radians = ((90 - angle) * pi / 180, (90 + angle) * pi / 180)
-            else:
-                x_mouth = -12 - self.max_shift * (1 + happiness)
-                r       = x_mouth * self.k_sad + self.b_sad
-                angle   = arcsin(3 * sqrt(3) / r) * 180 / pi
-                radians = ((270 - angle) * pi / 180, (270 + angle) * pi / 180)            
-            mouth   = Arc(aspect_ratio = 1.0, x = x_mouth / 24.0, y = 0.0 / 24.0,
-                          radian_range = radians,
-                          thickness = 0.002, smoothing = 0.05, size = r * 2.0 / 24.0)
+        lefteye  = pattern.Gaussian(aspect_ratio = 1.0, x = -4.5 * sb, y = 1.0 * sb,
+                            size = self.eyes_smoothing, scale = 0.5, offset = 0.5059)
+        righteye = pattern.Gaussian(aspect_ratio = 1.0, x = 4.5 * sb, y = 1.0 * sb,
+                            size = self.eyes_smoothing, scale = 0.5, offset = 0.5059)
+        face     = pattern.Ring(aspect_ratio = 1.0, x = 0.0 * sb, y = -3.0 * sb,
+                              thickness = self.face_thickness, smoothing = self.face_smoothing,
+                              size = 2.0 * 1.21/ 1.7 * 15.0 * sb)
+        mouth    = Curve(x = 0.0 * sb, y = mouth_y * sb,
+                        size = mouth_width * sb, curvature = mouth_curvature,
+                        thickness = self.mouth_thickness, smoothing = self.mouth_smoothing)
 
         return [lefteye, righteye, face, mouth]
 
 
+class RectangleWithSmoothing(PatternGenerator):
+    """2D smoothing rectangle pattern generator."""
+
+    aspect_ratio   = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc=
+        "Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
+    
+    size  = param.Number(default=0.5,doc="Height of the rectangle.")
+
+    smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
+        precedence=0.61,doc="Width of the Gaussian fall-off outside the rectangle.")
+
+    def function(self,p):
+        height = p.size
+        width = p.aspect_ratio*height
+
+        return rectangle(self.pattern_x, self.pattern_y, width, height, p.smoothing)
 
 
 class measure_happiness(MeasureResponseCommand):
@@ -319,7 +340,7 @@ projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotPr
 ### Input patterns
 num_inputs=1
 inputs = [HappyFace(happiness = numbergen.UniformRandom(lbound = -1.0, ubound = 1.0, seed = 91 + i),
-                    size = 2.0, orientation = pi / 2,
+                    size = 2.0, orientation = 0.0,
                     #orientation=numbergen.UniformRandom(lbound=17.0/36.0*pi,ubound=19.0/36.0*pi,
                     #                                    seed=56+i),
                     x = numbergen.UniformRandom(lbound = -65.0/48.0, ubound = 65.0/48.0, seed=12+i),
