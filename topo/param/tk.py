@@ -3194,6 +3194,12 @@ class ListWidget(T.Frame):
     # missing).
     def __init__(self, master, variable,cmd,**widget_options):
         T.Frame.__init__(self, master)
+
+        if 'state' in widget_options:
+            self.disabled=widget_options['state']
+        else:
+            self.disabled=False
+            
         self.entry=T.Entry(self,textvariable=variable,state='disabled',disabledforeground='black') #CEBALERT: presumably disabledforeground won't work work with styles...
         self.entry.pack(fill='both',expand=1)
 
