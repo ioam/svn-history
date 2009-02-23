@@ -37,6 +37,7 @@ class SheetMask(param.Parameterized):
 
     # Need this double indirection because Python property get/set
     # methods can't be overridden in subclasses(!).
+    # CEB: could use topo.param.parameterized's OProperty
     def __get_data(self): return self.get_data()
     def __set_data(self,data): self.set_data(data)
     data = property(__get_data,__set_data)
