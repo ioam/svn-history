@@ -78,7 +78,7 @@ class ExtendToRGB(PatternGenerator):
     generator.generator (e.g. ColorImage inside a Selector);
     otherwise, ExtendToRGB will attempt to get red, green, and blue
     from generator. If no red, green, and blue are found in these
-    ways, ExtendToRGB will synthasize the red, green, and blue
+    ways, ExtendToRGB will synthesize the red, green, and blue
     channels.
 
     After finding or synthesizing red, green, and blue, they are
