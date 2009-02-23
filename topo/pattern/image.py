@@ -125,6 +125,9 @@ class PatternSampler(ImageSampler):
         height. sheet_xdensity and sheet_ydensity are the xdensity and
         ydensity of the sheet on which the pattern is to be drawn.
         """
+        # CEB: could allow image=None in args and have 'if image is
+        # not None: self.image=image' here to avoid re-initializing the
+        # image.
         self.image=image
 
         for wpof in self.whole_pattern_output_fns:
