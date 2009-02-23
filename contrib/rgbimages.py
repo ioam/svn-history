@@ -1,5 +1,20 @@
 # Adding support for RGB images (work in progress)
 import topo
+from topo import param
+
+# CB: it's like a NumberGenerator, but it isn't one, so
+# I'm not sure where it should go.
+class ListGenerator(param.Parameterized):
+    """
+    When called, returns a list of the results of calling all its
+    generators.
+    """
+    generators = param.List(default=[],doc="""
+        List of callables used to produce the ListGenerator's items.""")
+
+    def __call__(self):
+        return [g() for g in self.generators]
+
 
 
 from topo.sheet.basic import GeneratorSheet,FunctionEvent,PeriodicEventSequence,param,PatternGenerator
@@ -82,14 +97,16 @@ class ExtendToRGB(PatternGenerator):
     channels.
 
     After finding or synthesizing red, green, and blue, they are
-    scaled according to channel_strengths.
+    scaled according to relative_channel_strengths.
     """
     channels = ["red","green","blue"]
 
-    generator = param.Parameter(default=pattern.Constant())
+    generator = param.ClassSelector(class_=pattern.PatternGenerator,
+                                    default=pattern.Constant())
 
-    channel_strengths = param.List([1.0,1.0,1.0],doc="""
-        Scaling factor for each channel.""") 
+    # CEB: not a tuple, because tuple elements cannot be changed
+    relative_channel_strengths = param.Dynamic(default=[1.0,1.0,1.0],doc="""
+        Scaling of each channel relative to the others.""") 
 
     def __init__(self,**params):
         super(ExtendToRGB,self).__init__(**params)
@@ -128,11 +145,15 @@ class ExtendToRGB(PatternGenerator):
         # Promote red, green, blue from 'actual generator' if it
         # has them. Otherwise set red, green, blue to gray/3.
         n_channels = len(self.channels)
-        channel_values=([gray/float(n_channels)]*n_channels if not hasattr(generator,'red') else \
+        channel_values=([gray]*n_channels if not hasattr(generator,'red') else \
                         [getattr(generator,channel) for channel in self.channels])
 
-        for name,value,strength in zip(p.channels,channel_values,p.channel_strengths):
-            setattr(self,name,value*strength)
+        total_strength = sum(p.relative_channel_strengths)
+        if total_strength==0:
+            total_strength=1.0
+            
+        for name,value,strength in zip(p.channels,channel_values,p.relative_channel_strengths):
+            setattr(self,name,n_channels*value*strength/total_strength)
 
         return gray
 

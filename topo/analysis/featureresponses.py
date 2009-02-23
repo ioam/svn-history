@@ -635,7 +635,7 @@ class PatternPresenter(param.Parameterized):
 ##             r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
 ##             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
 ##                 inputs[name] = rgbimages.ExtendToRGB(generator=inputs[name],
-##                                                      channel_strengths=[r,g,b])
+##                                                      relative_channel_strengths=[r,g,b])
 
         if features_values.has_key('hue'):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
