@@ -34,7 +34,8 @@ class ColorImageSheet(GeneratorSheet):
         """Wrap new_ig in ExtendToRGB if necessary."""
         # CEBALERT: this conditional wrapping of the input generator
         # is confusing.  Why have logic for supporting non-RGB
-        # patterns in ExtendToRGB and in ColorImageSheet?
+        # patterns in ExtendToRGB and in ColorImageSheet? (Comes down
+        # to problem of accessing parameters of subgenerators.)
         if not hasattr(new_ig,'red'):
             new_ig = ExtendToRGB(generator=new_ig)
             
@@ -69,9 +70,19 @@ import copy
 from topo.param.parameterized import ParamOverrides
 class ExtendToRGB(PatternGenerator):
     """
-    Wrapper for a single-channel (monochrome) PatternGenerator that
-    synthesizes Red, Green, and Blue channels, e.g. for use with
-    ColorImageSheet.
+    Wrapper for any PatternGenerator to support red, green, and blue
+    channels, e.g. for use with ColorImageSheet.
+
+    If the specified generator itself has a 'generator' attribute,
+    ExtendToRGB will attempt to get red, green, and blue from
+    generator.generator (e.g. ColorImage inside a Selector);
+    otherwise, ExtendToRGB will attempt to get red, green, and blue
+    from generator. If no red, green, and blue are found in these
+    ways, ExtendToRGB will synthasize the red, green, and blue
+    channels.
+
+    After finding or synthesizing red, green, and blue, they are
+    scaled according to channel_strengths.
     """
     channels = ["red","green","blue"]
 
