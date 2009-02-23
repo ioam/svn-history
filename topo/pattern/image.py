@@ -307,7 +307,7 @@ class GenericImage(PatternGenerator):
 
         if p.cache_image is False:
             self._image = None
-            self.pattern_sampler.image = None
+            del self.pattern_sampler.image 
 
         return result
 
