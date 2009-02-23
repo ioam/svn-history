@@ -9,7 +9,7 @@ class ColorImageSheet(GeneratorSheet):
     """
     A GeneratorSheet that handles RGB images.
 
-    Accepts either a single-channel or a RGB input_generator.  If the
+    Accepts either a single-channel or an RGB input_generator.  If the
     input_generator stores separate red, green, and blue patterns, it
     is used as-is; other (monochrome) PatternGenerators are first
     wrapped using ExtendToRGB to create the RGB patterns.
@@ -32,7 +32,9 @@ class ColorImageSheet(GeneratorSheet):
 
     def set_input_generator(self,new_ig,push_existing=False):
         """Wrap new_ig in ExtendToRGB if necessary."""
-
+        # CEBALERT: this conditional wrapping of the input generator
+        # is confusing.  Why have logic for supporting non-RGB
+        # patterns in ExtendToRGB and in ColorImageSheet?
         if not hasattr(new_ig,'red'):
             new_ig = ExtendToRGB(generator=new_ig)
             
@@ -46,11 +48,9 @@ class ColorImageSheet(GeneratorSheet):
         """
         super(ColorImageSheet,self).generate()
         
-        g = self.input_generator
-        
-        self.activity_red[:]   = g.red
-        self.activity_green[:] = g.green
-        self.activity_blue[:]  = g.blue
+        self.activity_red[:]   = self.input_generator.red
+        self.activity_green[:] = self.input_generator.green
+        self.activity_blue[:]  = self.input_generator.blue
         
         if self.apply_output_fns:
             for output_fn in self.output_fns:
@@ -73,7 +73,6 @@ class ExtendToRGB(PatternGenerator):
     synthesizes Red, Green, and Blue channels, e.g. for use with
     ColorImageSheet.
     """
-
     channels = ["red","green","blue"]
 
     generator = param.Parameter(default=pattern.Constant())
@@ -135,7 +134,6 @@ class ColorImage(FileImage):
     """
     A FileImage that handles RGB color images.
     """
-
     def _get_image(self,p):
         if p.filename!=self.last_filename or self._image is None:
             self.last_filename=p.filename
