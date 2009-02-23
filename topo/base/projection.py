@@ -9,6 +9,7 @@ import numpy
 from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 
 from .. import param
+from topo.param.parameterized import overridable_property
 
 from topo.misc.keyedlist import KeyedList # CEBALERT: not in base
 
@@ -31,42 +32,31 @@ class SheetMask(param.Parameterized):
     neurons that the Mask lists as active.
     """
 
-    # JPALERT: Is there anything about this class that assumes its sheet is a
-    # ProjectionSheet?
+    # JPALERT: Is there anything about this class that assumes its
+    # sheet is a ProjectionSheet?
 
+    def _get_data(self): 
+        assert(self._sheet != None)
+        return self._data
+    def _set_data(self,data): 
+        assert(self._sheet != None)
+        self._data = data
 
-    # Need this double indirection because Python property get/set
-    # methods can't be overridden in subclasses(!).
-    # CEB: could use topo.param.parameterized's OProperty
-    def __get_data(self): return self.get_data()
-    def __set_data(self,data): self.set_data(data)
-    data = property(__get_data,__set_data)
+    data = overridable_property(_get_data,_set_data,doc="""
+    Ensure that whenever somebody accesses the data they are not None.""")
+
+    def _get_sheet(self): 
+        assert(self._sheet != None)
+        return self._sheet
+    def _set_sheet(self,sheet): 
+        self._sheet = sheet 
+        if(self._sheet != None): self.reset()
     
-    def __get_sheet(self): return self.get_sheet()
-    def __set_sheet(self,sheet): self.set_sheet(sheet)
-    sheet = property(__get_sheet,__set_sheet)
-    
+    sheet = overridable_property(_get_sheet,_set_sheet)
     
     def __init__(self,sheet=None,**params):
         super(SheetMask,self).__init__(**params)
         self.sheet = sheet
-
-
-    # Ensure that whenever somebody accesses the data they are not None
-    def get_data(self): 
-        assert(self._sheet != None)
-        return self._data
-    def set_data(self,data): 
-        assert(self._sheet != None)
-        self._data = data
-
-    def get_sheet(self): 
-        assert(self._sheet != None)
-        return self._sheet
-    def set_sheet(self,sheet): 
-        self._sheet = sheet 
-        if(self._sheet != None): self.reset()
-
 
     def __and__(self,mask):
         return AndMask(self._sheet,submasks=[self,mask])
@@ -130,10 +120,10 @@ class CompositeSheetMask(SheetMask):
         """
         raise NotImplementedError
     
-    def set_sheet(self,sheet):
+    def _set_sheet(self,sheet):
         for m in self.submasks:
             m.sheet = sheet
-        super(CompositeSheetMask,self).set_sheet(sheet)
+        super(CompositeSheetMask,self)._set_sheet(sheet)
 
     def reset(self):
         for m in self.submasks:
