@@ -158,9 +158,7 @@ class ColorImage(FileImage):
             self._image_green = G
             self._image_blue = B
             self._image = ImageOps.grayscale(rgbimage)
-            return True
-        else:
-            return False
+        return self._image
 
     def function(self,p):
         """
@@ -171,15 +169,14 @@ class ColorImage(FileImage):
 
         # now store red, green, blue
         # (by repeating the super's function call, but each time first
-        # resetting the pattern sampler to use the right color
-        # channel)
-        self.pattern_sampler._set_image(self._image_red)
+        # setting _image to the appropriate channel's image)
+        self._image = self._image_red
         self.red = super(ColorImage,self).function(p)
 
-        self.pattern_sampler._set_image(self._image_green)
+        self._image = self._image_green
         self.green = super(ColorImage,self).function(p)
 
-        self.pattern_sampler._set_image(self._image_blue)
+        self._image = self._image_blue
         self.blue = super(ColorImage,self).function(p)
 
         # note: currently, red, green, blue have to be cached

@@ -13,7 +13,7 @@ import copy
 from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from .. import param
-from topo.param.parameterized import ParamOverrides
+from topo.param.parameterized import ParamOverrides,Oproperty
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
@@ -22,9 +22,35 @@ from topo.transferfn.basic import DivisiveNormalizeLinf,TransferFn
 from topo.misc.filepath import Filename
 
 
-# CEBALERT: Isn't it an image sampler? should at least make all
-# variable and parameter names be consistent.
-class PatternSampler(param.Parameterized):
+class ImageSampler(param.Parameterized):
+    """
+    A class of objects that, when called, sample an image.
+    """
+    __abstract=True
+
+    def _get_image(self):
+        # CB: In general, might need to consider caching to avoid
+        # loading of image/creation of scs and application of wpofs
+        # every time/whatever the sampler does to set up the image
+        # before sampling
+        return self._image
+
+    def _set_image(self,image):
+        self._image = image
+
+    def _del_image(self):
+        del self._image
+
+    # As noted by JP in FastImageSampler, this isn't easy to figure out.
+    def __call__(self,image,x,y,sheet_xdensity,sheet_ydensity,width=1.0,height=1.0):
+        raise NotImplementedError
+    
+    image = Oproperty(_get_image,_set_image,_del_image)
+    
+
+
+# CEBALERT: ArraySampler?
+class PatternSampler(ImageSampler):
     """
     When called, resamples - according to the size_normalization
     parameter - an image at the supplied (x,y) sheet coordinates.
@@ -32,14 +58,10 @@ class PatternSampler(param.Parameterized):
     (x,y) coordinates outside the image are returned as the background
     value.
     """
-    # Stores a SheetCoordinateSystem with an activity matrix
-    # representing the image
-
-    whole_pattern_output_fns = param.HookList(class_=TransferFn,default=[],
-        constant=True,doc="""
+    whole_pattern_output_fns = param.HookList(class_=TransferFn,default=[],doc="""
         Functions to apply to the whole image before any sampling is done.""")
 
-    background_value_fn = param.Callable(default=None,constant=True,doc="""
+    background_value_fn = param.Callable(default=None,doc="""
         Function to compute an appropriate background value. Must accept
         an array and return a scalar.""")
 
@@ -68,12 +90,12 @@ class PatternSampler(param.Parameterized):
         corresponds to one matrix unit of the Sheet on which the
         pattern being displayed.""")
 
-    # CEBALERT: would have to call _set_image() whenever this
-    # parameter is changed.
-    # image = param.Parameter(default=None)
+    def _get_image(self):
+        return self.scs.activity
 
     def _set_image(self,image):
-        # store the supplied image
+        # Stores a SheetCoordinateSystem with an activity matrix
+        # representing the image
         if not isinstance(image,numpy.ndarray):
             image = array(image,Float)
 
@@ -82,39 +104,36 @@ class PatternSampler(param.Parameterized):
                                          bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                                                     ( cols/2.0, rows/2.0))))
         self.scs.activity=image
+        
+    def _del_image(self):
+        self.scs = None
+        
 
-        # apply the whole_pattern_output_fns and set a background_value.
-        for wpof in self.whole_pattern_output_fns:
-            wpof(self.scs.activity)
-        if not self.background_value_fn:
-            self.background_value = 0.0
-        else:
-            self.background_value = self.background_value_fn(self.scs.activity)
-
-
-    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, image=None):
+    def __call__(self, image, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0):
         """
         Return pixels from the supplied image at the given Sheet (x,y)
         coordinates.
 
-        If no image is supplied, the last image that was supplied is
-        used.
-
-        If an image is supplied, the whole_image_output_fns are
-        applied, a background value is calculated, and the image is
-        stored for future calls. The image is assumed to be a NumPy
-        array or other object that exports the NumPy buffer interface
-        (i.e. can be converted to a NumPy array by passing it to
-        numpy.array(), e.g. PIL.Image).
+        The image is assumed to be a NumPy array or other object that
+        exports the NumPy buffer interface (i.e. can be converted to a
+        NumPy array by passing it to numpy.array(), e.g. PIL.Image).
+        The whole_pattern_output_fns are applied to the image before
+        any sampling is done.
 
         To calculate the sample, the image is scaled according to the
         size_normalization parameter, and any supplied width and
         height. sheet_xdensity and sheet_ydensity are the xdensity and
         ydensity of the sheet on which the pattern is to be drawn.
         """
-        if image is not None:
-            self._set_image(image)
+        self.image=image
 
+        for wpof in self.whole_pattern_output_fns:
+            wpof(self.image)
+        if not self.background_value_fn:
+            self.background_value = 0.0
+        else:
+            self.background_value = self.background_value_fn(self.image)
+        
         # create new pattern sample, filled initially with the background value
         pattern_sample = ones(x.shape, Float)*self.background_value
 
@@ -137,7 +156,7 @@ class PatternSampler(param.Parameterized):
         r,c = self.scs.sheet2matrixidx(x,y)
 
         # now sample pattern at the (r,c) corresponding to the supplied (x,y)
-        pattern_rows,pattern_cols = self.scs.activity.shape
+        pattern_rows,pattern_cols = self.image.shape
         if pattern_rows==0 or pattern_cols==0:
             return pattern_sample
         else:
@@ -147,13 +166,13 @@ class PatternSampler(param.Parameterized):
                 for j in xrange(cols):
                     # indexes outside the pattern are left with the background color
                     if self.scs.bounds.contains_exclusive(x[i,j],y[i,j]):
-                        pattern_sample[i,j] = self.scs.activity[r[i,j],c[i,j]]
+                        pattern_sample[i,j] = self.image[r[i,j],c[i,j]]
 
         return pattern_sample
 
 
     def __apply_size_normalization(self,x,y,sheet_xdensity,sheet_ydensity,size_normalization):
-        pattern_rows,pattern_cols = self.scs.activity.shape
+        pattern_rows,pattern_cols = self.image.shape
 
         # Instead of an if-test, could have a class of this type of
         # function (c.f. OutputFunctions, etc)...
@@ -200,31 +219,28 @@ def edge_average(a):
 
 
 
-class FastPatternSampler(param.Parameterized):
+class FastImageSampler(ImageSampler):
     """
-    A fast-n-dirty pattern sampler using Python Imaging Library
+    A fast-n-dirty image sampler using Python Imaging Library
     routines.  Currently this sampler doesn't support user-specified
-    size_normalization or cropping but rather simply scales and crops the image
-    to fit the given matrix size without distorting the aspect ratio
-    of the original picture.
+    size_normalization or cropping but rather simply scales and crops
+    the image to fit the given matrix size without distorting the
+    aspect ratio of the original picture.
     """
     
     sampling_method = param.Integer(default=PIL.NEAREST,doc="""
        Python Imaging Library sampling method for resampling an image.
        Defaults to Image.NEAREST.""")
 
-
     def _set_image(self,image):
         if not isinstance(image,PIL.Image):
-            self.image = PIL.new('L',image.shape)
-            self.image.putdata(image.ravel())
+            self._image = PIL.new('L',image.shape)
+            self._image.putdata(image.ravel())
         else:
-            self.image = image
-
-
-    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0, image=None):
-        if image is not None:
-            self._set_image(image)
+            self._image = image
+        
+    def __call__(self, image, x, y, sheet_xdensity, sheet_ydensity, width=1.0, height=1.0):
+        self.image=image
 
         # JPALERT: Right now this ignores all options and just fits the image into given array.
         # It needs to be fleshed out to properly size and crop the
@@ -244,14 +260,14 @@ class GenericImage(PatternGenerator):
     Subclasses should override the _get_image method to produce the
     image object.
 
-    The background value is calculated as an edge average: see edge_average().
-    Black-bordered images therefore have a black background, and
-    white-bordered images have a white background. Images with no
-    border have a background that is less of a contrast than a white
-    or black one.
+    The background value is calculated as an edge average: see
+    edge_average().  Black-bordered images therefore have a black
+    background, and white-bordered images have a white
+    background. Images with no border have a background that is less
+    of a contrast than a white or black one.
 
-    At present, rotation, size_normalization, etc. just resample; it would be nice
-    to support some interpolation options as well.
+    At present, rotation, size_normalization, etc. just resample; it
+    would be nice to support some interpolation options as well.
     """
 
     __abstract = True
@@ -261,9 +277,10 @@ class GenericImage(PatternGenerator):
         Ratio of width to height; size*aspect_ratio gives the width.""")
 
     size  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-                   precedence=0.30,doc="Height of the image.")
+        precedence=0.30,doc="""
+        Height of the image.""")
 
-    pattern_sampler = param.Parameter(instantiate=True,
+    pattern_sampler = param.ClassSelector(class_=ImageSampler,
         default=PatternSampler(background_value_fn=edge_average,
                                size_normalization='fit_shortest',
                                whole_pattern_output_fns=[DivisiveNormalizeLinf()]),doc="""
@@ -273,38 +290,26 @@ class GenericImage(PatternGenerator):
         If False, discards the image and pattern_sampler after drawing the pattern each time,
         to make it possible to use very large databases of images without
         running out of memory.""")
+
+
+    def _get_image(self,p):
+        raise NotImplementedError
+
+    # CEB: not currently possible, because _get_image needs access to p
+    #image = property(_get_image,_set_image,_del_image,doc=" ")
         
     def function(self,p):
         height   = p.size
         width    = p.aspect_ratio*height
-
-        # CEBALERT: this is bad. If the pattern_sampler has been
-        # deleted (cache_image=False), we need to do something, but
-        # surely not this...
-        if p.pattern_sampler is None:
-            self.pattern_sampler = copy.deepcopy(GenericImage.pattern_sampler)
                     
-        if self._get_image(p):
-            result = p.pattern_sampler(p.pattern_x,p.pattern_y,float(p.xdensity),float(p.ydensity),
-                                       float(width),float(height),image=self._image)
-        else:
-            # don't pass image
-            result = p.pattern_sampler(p.pattern_x,p.pattern_y,float(p.xdensity),float(p.ydensity),
-                                       float(width),float(height))            
+        result = p.pattern_sampler(self._get_image(p),p.pattern_x,p.pattern_y,float(p.xdensity),float(p.ydensity),
+                                   float(width),float(height))
 
         if p.cache_image is False:
-            self.pattern_sampler = self._image = None
+            self._image = None
+            self.pattern_sampler.image = None
 
         return result
-
-
-    def _get_image(self,p):
-        """
-        Get a new image, if necessary (and return True in that case,
-        otherwise return False).
-        """        
-        raise NotImplementedError
-
 
     ### support pickling of PIL.Image
 
@@ -382,9 +387,8 @@ class FileImage(GenericImage):
         if p.filename!=self.last_filename or self._image is None:
             self.last_filename=p.filename
             self._image = ImageOps.grayscale(PIL.open(p.filename))
-            return True
-        else:
-            return False
+        return self._image
+
 
 # PICKLEHACK (move to legacy)
 # Temporary as of 12/2007, for backwards compatibility
