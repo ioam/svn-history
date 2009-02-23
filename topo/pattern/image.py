@@ -13,7 +13,7 @@ import copy
 from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from .. import param
-from topo.param.parameterized import ParamOverrides,Oproperty
+from topo.param.parameterized import ParamOverrides,overridable_property
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
@@ -45,7 +45,7 @@ class ImageSampler(param.Parameterized):
     def __call__(self,image,x,y,sheet_xdensity,sheet_ydensity,width=1.0,height=1.0):
         raise NotImplementedError
     
-    image = Oproperty(_get_image,_set_image,_del_image)
+    image = overridable_property(_get_image,_set_image,_del_image)
     
 
 
