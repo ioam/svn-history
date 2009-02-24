@@ -117,7 +117,7 @@ def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
                      output_ring, 0.0)
 
 
-def rectangle(x, y, rec_w, rec_h, gaussian_width):
+def smooth_rectangle(x, y, rec_w, rec_h, gaussian_width_x, gaussian_width_y):
     """
     Rectangle with a solid central region, then Gaussian fall-off at the edges.
     """
@@ -126,14 +126,15 @@ def rectangle(x, y, rec_w, rec_h, gaussian_width):
         
     box_x = less(gaussian_x_coord, 0.0)
     box_y = less(gaussian_y_coord, 0.0)
-    sigmasq = gaussian_width * gaussian_width
+    sigmasq_x = gaussian_width_x * gaussian_width_x
+    sigmasq_y = gaussian_width_y * gaussian_width_y
 
     with float_error_ignore():
-        #falloff_x = exp(divide(-gaussian_x_coord * gaussian_x_coord, 2 * sigmasq))
-        falloff_y = exp(divide(-gaussian_y_coord * gaussian_y_coord, 2 * sigmasq))
+        falloff_x = exp(divide(-gaussian_x_coord * gaussian_x_coord, 2 * sigmasq_x))
+        falloff_y = exp(divide(-gaussian_y_coord * gaussian_y_coord, 2 * sigmasq_y))
 
-    #return minimum(maximum(box_x, falloff_x), maximum(box_y, falloff_y))
-    return minimum(box_x, maximum(box_y, falloff_y))
+    return minimum(maximum(box_x, falloff_x), maximum(box_y, falloff_y))
+
 
 
 def arc_by_center(x, y, arc_box, thickness, gaussian_width):
@@ -152,7 +153,7 @@ def arc_by_center(x, y, arc_box, thickness, gaussian_width):
         radius = 0.0
         angles = (0.0, 0.0)
     elif arc_h == 0.0:  # draw a horizontal line, width = arc_w
-        return rectangle(x, y, arc_w, thickness, gaussian_width)
+        return smooth_rectangle(x, y, arc_w, thickness, 0.0, gaussian_width)
     else:
         # formulae evaluating radius and angle
         radius = arc_h / 2.0 + arc_w ** 2.0 / (8 * arc_h)
@@ -165,6 +166,7 @@ def arc_by_center(x, y, arc_box, thickness, gaussian_width):
             angles = (pi / 2.0 - angle, pi / 2.0 + angle)
 
     return arc_by_radian(x, y, radius * 2.0, angles, thickness, gaussian_width)
+
 
 
 class Arc(PatternGenerator):
@@ -189,18 +191,14 @@ class Arc(PatternGenerator):
     smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
 
-    arc_end = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
+    arc_end = param.Number(default=pi,bounds=(0.0,None),softbounds=(0.0,2.0*pi),inclusive_bounds=(True,False),
         precedence = 0.62, doc = "End of the arc (starting from 0.0).")
 
     size = param.Number(default=0.5)
 
     def function(self,p):
-        aspect_ratio = p.aspect_ratio
-        radian_range= (0.0, p.arc_end)
-        
-        output = arc_by_radian(self.pattern_x/aspect_ratio, self.pattern_y, p.size,
-                               radian_range, p.thickness, p.smoothing)
-        return output
+        return arc_by_radian(self.pattern_x/p.aspect_ratio, self.pattern_y, p.size,
+                             (2*pi-p.arc_end, 0.0), p.thickness, p.smoothing)
 
 
 class Curve(Arc):
@@ -218,8 +216,7 @@ class Curve(Arc):
     """
 
     # Hide unused parameters
-    radian_start = param.Number(precedence = -1.0)
-    radian_end = param.Number(precedence = -1.0)
+    arc_end = param.Number(precedence = -1.0)
     aspect_ratio = param.Number(default = 1.0, precedence = -1.0)
 
     curvature = param.Number(default = 0.5, bounds = (-0.5, 0.5), precedence = 0.64,
@@ -309,7 +306,7 @@ class RectangleWithSmoothing(PatternGenerator):
         height = p.size
         width = p.aspect_ratio*height
 
-        return rectangle(self.pattern_x, self.pattern_y, width, height, p.smoothing)
+        return smooth_rectangle(self.pattern_x, self.pattern_y, width, height, p.smoothing, p.smoothing)
 
 
 class measure_happiness(MeasureResponseCommand):
