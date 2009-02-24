@@ -77,7 +77,7 @@ def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
 
     ring = 1.0-bitwise_xor(greater_equal(distance_inside_inner_disk,0.0),greater_equal(distance_outside_outer_disk,0.0))
 
-    sigmasq = gaussian_width*gaussian_width
+    sigmasq = gaussian_width * gaussian_width
 
     with float_error_ignore():
         inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
@@ -129,10 +129,11 @@ def rectangle(x, y, rec_w, rec_h, gaussian_width):
     sigmasq = gaussian_width * gaussian_width
 
     with float_error_ignore():
-        falloff_x = exp(divide(-gaussian_x_coord * gaussian_x_coord, 2 * sigmasq))
+        #falloff_x = exp(divide(-gaussian_x_coord * gaussian_x_coord, 2 * sigmasq))
         falloff_y = exp(divide(-gaussian_y_coord * gaussian_y_coord, 2 * sigmasq))
 
-    return minimum(maximum(box_x, falloff_x), maximum(box_y, falloff_y))
+    #return minimum(maximum(box_x, falloff_x), maximum(box_y, falloff_y))
+    return minimum(box_x, maximum(box_y, falloff_y))
 
 
 def arc_by_center(x, y, arc_box, thickness, gaussian_width):
@@ -170,8 +171,10 @@ class Arc(PatternGenerator):
     """
     2D arc pattern generator.
     
-    The shape of the arc is specified by start and end radian (parameter
-    radian_start and radian_end), and diameter is specified by parameter size.
+    The shape of the arc is specified by the end radian (parameter arc_end),
+    and diameter is specified by parameter size. This class draws an arc from
+    radian 0.0 to radian arc_end, can it can be rotated by parameter
+    'orientation' to get different arc starts.
 
     See the Ring and Disk class for a note about the Gaussian fall-off.
     """
@@ -186,17 +189,14 @@ class Arc(PatternGenerator):
     smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
 
-    radian_start = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
-        precedence = 0.62, doc = "Start of the range, when using radians.")
-
-    radian_end = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
-        precedence = 0.63, doc = "End of the range, when using radians.")
+    arc_end = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
+        precedence = 0.62, doc = "End of the arc (starting from 0.0).")
 
     size = param.Number(default=0.5)
 
     def function(self,p):
         aspect_ratio = p.aspect_ratio
-        radian_range= (p.radian_start,p.radian_end)
+        radian_range= (0.0, p.arc_end)
         
         output = arc_by_radian(self.pattern_x/aspect_ratio, self.pattern_y, p.size,
                                radian_range, p.thickness, p.smoothing)
@@ -347,6 +347,11 @@ inputs = [HappyFace(happiness = numbergen.UniformRandom(lbound = -1.0, ubound = 
                     y = numbergen.UniformRandom(lbound = -65.0/48.0, ubound = 65.0/48.0, seed=34+i))
         for i in xrange(num_inputs)]
 combined_inputs = pattern.SeparatedComposite(min_separation = 1.722972972972973, generators= inputs)
+
+# Draw multiple curves simultaneously
+#combined_inputs = pattern.Composite(generators= [Curve(x = 0.0, y = i * 1.5, size = 2.0,
+#    curvature = i, thickness = 0.2, smoothing = 0.2)
+#    for i in frange(-0.5, 0.6, 0.1)])
 
 
 ### Sheets
