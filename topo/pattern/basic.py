@@ -1,3 +1,4 @@
+from __future__ import with_statement
 """
 Simple two-dimensional mathematical or geometrical pattern generators.
 
@@ -5,8 +6,9 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy
 from math import pi, sin, cos, sqrt
+
+import numpy
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
@@ -18,8 +20,9 @@ import topo
 from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
-from topo.misc.patternfn import gaussian,gabor,line,disk,ring
+from topo.misc.patternfn import gaussian,gabor,line,disk,ring,float_error_ignore
 from topo.misc.numbergenerator import UniformRandom
+
 
 # Could add a Gradient class, where the brightness varies as a
 # function of an equation for a plane.  This could be useful as a
@@ -32,6 +35,23 @@ class Null(Constant):
     A constant pattern of zero activity.
     """
     scale = param.Number(default=0,constant=True,precedence=-1)
+
+
+class HalfPlane(PatternGenerator):
+    """
+    Constant pattern on in half of the plane, and off in the rest,
+    with optional Gaussian smoothing.
+    """
+    
+    smoothing = param.Number(default=0.02,bounds=(0.0,None),softbounds=(0.0,0.5),
+                             precedence=0.61,doc="Width of the Gaussian fall-off.")
+
+    def function(self,p):
+        with float_error_ignore():
+            falloff = numpy.exp(numpy.divide(-self.pattern_y*self.pattern_y,
+                                             2*p.smoothing*p.smoothing))
+
+        return numpy.where(self.pattern_y>0.0,1.0,falloff)
 
 
 class Gaussian(PatternGenerator):
