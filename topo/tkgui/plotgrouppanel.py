@@ -783,7 +783,7 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
         title = self._plot_title()
         
         self.plot_frame.configure(text=title)
-        self.parent.title(topo.sim.name+": "+title)
+        self.parent.title(str(topo.sim.name)+": "+title)
         # JABALERT: Used to say .replace(" at time ","/"); was there a reason?
     
     def destroy(self):
