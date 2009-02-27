@@ -49,7 +49,6 @@ p.add(
         How many input patterns to present at each iteration, when using discrete 
         patterns (e.g. Gaussians)."""),
 
-    # ALERT: Not yet respected
     area=param.Number(default=1.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
         Default cortical area to simulate; 1.0 gives a 1.0x1.0 Sheet area in V1."""),
@@ -146,13 +145,13 @@ elif p.dataset=="Natural":
 ### Sheets
 topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=p.retina_density,
     input_generator=combined_inputs, period=1.0, phase=0.05,
-    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.375+0.5))
+    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25+0.375+0.5))
 
 
 # LGN has lateral connections for divisive normalization
 for s in ['LGNOn','LGNOff']:
     topo.sim[s]=sheet.lissom.LISSOM(nominal_density=p.retina_density,
-        nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.5),
+        nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25+0.5),
         output_fns=[transferfn.HalfRectify()],
         tsettle=2,strict_tsettle=1,measure_maps=False)
 
@@ -173,7 +172,7 @@ V1_OF=transferfn.HomeostaticResponse(smoothing=p.V1_smoothing,eta=p.eta,
 
 topo.sim['V1'] = sheet.lissom.JointScaling(nominal_density=p.cortex_density,
     tsettle=16, plastic=True, apply_scaling=False, smoothing=p.smoothing,
-    nominal_bounds=sheet.BoundingBox(radius=0.5),
+    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0),
     output_fns=[AH,V1_OF])
 
 #make sure that activity is reset at the beginning of iteration
