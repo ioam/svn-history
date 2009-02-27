@@ -126,9 +126,11 @@ class save_plotgroup(ParameterizedFunction):
             setattr(plotgroup,'sheet',params['projection'].dest)
     
         plotgroup._set_name(name)
-        # save_plotgroup's **params are passed to the plotgroup
+        
+        # Specified parameters that aren't parameters of
+        # save_plotgroup() are set on the plotgroup
         for n,v in p.extra_keywords().items():
-            setattr(plotgroup,n,v)
+            plotgroup.set_param(n,v)
 
         # Reset plot cache when time changes
         if (topo.sim.time() != self.previous_time[0]):
