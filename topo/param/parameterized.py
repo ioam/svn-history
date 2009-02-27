@@ -883,8 +883,20 @@ class Parameterized(object):
             pass
 
 
+    @bothmethod
+    def set_param(self_or_cls,param_name,val):
+        """
+        Sets the value of param_name to val, after checking that param_name
+        is a parameter of this object.
 
+        (I.e., same as setattr(obj,param_name,val), except the
+        param_name's existence as a parameter is first checked.)
+        """
+        if param_name not in self_or_cls.params():
+            raise ValueError("'%s' is not a parameter of %s"%(param_name,self_or_cls))
+        setattr(self_or_cls,param_name,val)
 
+        
     # CEBALERT: I think I've noted elsewhere the fact that we
     # sometimes have a method on Parameter that requires passing the
     # owning Parameterized instance or class, and other times we have
