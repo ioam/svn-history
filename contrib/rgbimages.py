@@ -184,45 +184,20 @@ class ColorImage(FileImage):
 
 
     def __call__(self,**params_to_override):
-        # Uses super's call for grayscale and to set up self.red,
-        # self.green, self.blue, then does important things (mask,
-        # scale, ofs) from super's call to the individual color
-        # channels. This is a hack. Should have overridden __call__ instead
-        # of function() (although running setup_xy 4 times will have a
-        # performance hit)
         gray = super(ColorImage,self).__call__(**params_to_override)
- 
-        p = ParamOverrides(self,params_to_override)
-
-        for M in [self.red,self.green,self.blue]:
-            self._apply_mask(p,M)
-            M*=p.scale
-            M+=p.offset
-
-            for of in p.output_fns:
-                of(M)
-              
-        return gray
-
-
-    def function(self,p):
-        """
-        In addition to returning grayscale, stores red, green, and
-        blue components.
-        """
-        gray = super(ColorImage,self).function(p)
 
         # now store red, green, blue
-        # (by repeating the super's function call, but each time first
+        # (by repeating the super's call, but each time first
         # setting _image to the appropriate channel's image)
+        # CEBALERT: multiple PG.setupxy() calls slows things down?
         self._image = self._image_red
-        self.red = super(ColorImage,self).function(p)
+        self.red = super(ColorImage,self).__call__(**params_to_override)
 
         self._image = self._image_green
-        self.green = super(ColorImage,self).function(p)
+        self.green = super(ColorImage,self).__call__(**params_to_override)
 
         self._image = self._image_blue
-        self.blue = super(ColorImage,self).function(p)
+        self.blue = super(ColorImage,self).__call__(**params_to_override)
 
         # CEBALERT: currently, red, green, blue are cached
         return gray
@@ -238,9 +213,10 @@ class RotatedHuesImage(ColorImage):
 
     random_generator = param.Callable(
         default=numbergen.UniformRandom(lbound=0,ubound=1))
-    
-    def function(self,p):
-        gray = super(RotatedHuesImage,self).function(p)
+
+
+    def __call__(self,**params_to_override):
+        gray = super(RotatedHuesImage,self).__call__(**params_to_override)
 
         H,S,V = rgb_to_hsv_array(numpy.array(255*self.red,dtype=numpy.int32),
                                  numpy.array(255*self.green,dtype=numpy.int32),
