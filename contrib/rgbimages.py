@@ -124,7 +124,8 @@ class ExtendToRGB(PatternGenerator):
 
         # (not **p because that would be extra parameters)
         gray = p.generator(**params)
-        
+
+
         # CEB: method more complicated than it needs to be; maybe if
         # the various selector pattern generators had a way of
         # accessing the current generator's parameters, it could be
@@ -151,7 +152,7 @@ class ExtendToRGB(PatternGenerator):
         total_strength = sum(p.relative_channel_strengths)
         if total_strength==0:
             total_strength=1.0
-            
+
         for name,value,strength in zip(p.channels,channel_values,p.relative_channel_strengths):
             setattr(self,name,n_channels*value*strength/total_strength)
 
@@ -181,6 +182,29 @@ class ColorImage(FileImage):
             self._image = ImageOps.grayscale(rgbimage)
         return self._image
 
+
+    def __call__(self,**params_to_override):
+        # Uses super's call for grayscale and to set up self.red,
+        # self.green, self.blue, then does important things (mask,
+        # scale, ofs) from super's call to the individual color
+        # channels. This is a hack. Should have overridden __call__ instead
+        # of function() (although running setup_xy 4 times will have a
+        # performance hit)
+        gray = super(ColorImage,self).__call__(**params_to_override)
+ 
+        p = ParamOverrides(self,params_to_override)
+
+        for M in [self.red,self.green,self.blue]:
+            self._apply_mask(p,M)
+            M*=p.scale
+            M+=p.offset
+
+            for of in p.output_fns:
+                of(M)
+              
+        return gray
+
+
     def function(self,p):
         """
         In addition to returning grayscale, stores red, green, and
@@ -200,7 +224,7 @@ class ColorImage(FileImage):
         self._image = self._image_blue
         self.blue = super(ColorImage,self).function(p)
 
-        # note: currently, red, green, blue have to be cached
+        # CEBALERT: currently, red, green, blue are cached
         return gray
 
     
