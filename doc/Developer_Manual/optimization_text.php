@@ -1,6 +1,6 @@
 <H1>Optimization</H1>
 
-<P>According to Knuth, "Premature optimization is the root of all
+<P>According to C.A.R. Hoare, "Premature optimization is the root of all
 evil".  Although the performance of Topographica is critically
 important, the way to achieve high performance is by spending <i>all</i> of
 our optimization efforts on the very small portion of the code that
