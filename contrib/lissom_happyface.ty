@@ -137,7 +137,7 @@ def smooth_rectangle(x, y, rec_w, rec_h, gaussian_width_x, gaussian_width_y):
 
 
 
-def arc_by_center(x, y, arc_box, thickness, gaussian_width):
+def arc_by_center(x, y, arc_box, constant_length, thickness, gaussian_width):
     """
     Arc with Gaussian fall-off after the solid ring-shaped region and specified
     by point of tangency (x and y) and arc width and height.
@@ -155,9 +155,14 @@ def arc_by_center(x, y, arc_box, thickness, gaussian_width):
     elif arc_h == 0.0:  # draw a horizontal line, width = arc_w
         return smooth_rectangle(x, y, arc_w, thickness, 0.0, gaussian_width)
     else:
-        # formulae evaluating radius and angle
-        radius = arc_h / 2.0 + arc_w ** 2.0 / (8 * arc_h)
-        angle = arcsin(arc_w / 2.0 / radius)
+        if constant_length:
+            curvature = arc_h / arc_w
+            radius = arc_w / (2 * pi * curvature)
+            angle = curvature * (2 * pi) / 2.0
+        else:  # constant width
+            # formulae evaluating radius and angle
+            radius = arc_h / 2.0 + arc_w ** 2.0 / (8 * arc_h)
+            angle = arcsin(arc_w / 2.0 / radius)
         if arc_box[1] < 0:  # convex shape
             y = y + radius
             angles = (3.0 / 2.0 * pi - angle, 3.0 / 2.0 * pi + angle)
@@ -208,9 +213,22 @@ class Curve(Arc):
     Based on Arc, but centered on a particular point of the arc, with curvature
     controlled directly rather than through the overall size of the pattern.
 
-    Parameter curvature determines the ratio of height to width of the arc, and
-    positive curvature for concave shape and negative for convex. Parameter
-    size determines the width of the curve.
+    Parameter constant_length determines when 'size' is fixed, this class
+    should draw a curve with constant total length or constant width.
+
+    When 'constant_length' is set 'true', Parameter curvature determines the
+    ratio of height to width of the arc, and positive curvature for concave
+    shape and negative for convex. Parameter size determines the width of the
+    curve.
+
+    When 'constant_length' is set 'false', Parameter curvature determines the
+    portion of curve radian to 2pi, and curve radius is changed accordingly
+    following the formula
+
+    2 * pi * radius * curvature = size
+
+    So parameter size determines the total length of the curve. Positive
+    curvature stands for concave shape and negative for convex.
 
     See the Ring and Disk class for a note about the Gaussian fall-off.
     """
@@ -219,7 +237,15 @@ class Curve(Arc):
     arc_end = param.Number(precedence = -1.0)
     aspect_ratio = param.Number(default = 1.0, precedence = -1.0)
 
-    curvature = param.Number(default = 0.5, bounds = (-0.5, 0.5), precedence = 0.64,
+    constant_length = param.Boolean(default = True, precedence = 0.61,
+                doc = """
+                      Determining when 'size' is fixed, this class should draw a curve with
+                      constant total length or constant width. 'Size' means constant total length
+                      when this parameter is true, and means constant width when this parameter is
+                      false.
+                      """)
+
+    curvature = param.Number(default = 0.5, bounds = (-0.5, 0.5), precedence = 0.62,
                 doc = """
                       Ratio of height to width of the arc; positive value for concave and negative
                       value for convex shape.
@@ -229,11 +255,15 @@ class Curve(Arc):
 
         aspect_ratio = p.aspect_ratio
 
-        # size: arc width; size*abs(curvature): arc height
+        """
+        When constant_length is true, size: arc width; size*abs(curvature): arc height;
+        When constant_length is false, size: arc length; abs(curvature): arc radian in proportion
+        to 2pi;
+        """
         arc_box = (p.size, p.size * p.curvature)
         
         output = arc_by_center(self.pattern_x/aspect_ratio, self.pattern_y, 
-                               arc_box, p.thickness, p.smoothing)
+                               arc_box, p.constant_length, p.thickness, p.smoothing)
         return output
 
 
@@ -284,7 +314,7 @@ class HappyFace(pattern.Composite):
                               thickness = self.face_thickness, smoothing = self.face_smoothing,
                               size = 2.0 * 1.21/ 1.7 * 15.0 * sb)
         mouth    = Curve(x = 0.0 * sb, y = mouth_y * sb,
-                        size = mouth_width * sb, curvature = mouth_curvature,
+                        size = mouth_width * sb, curvature = mouth_curvature, constant_length = False,
                         thickness = self.mouth_thickness, smoothing = self.mouth_smoothing)
 
         return [lefteye, righteye, face, mouth]
