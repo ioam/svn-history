@@ -35,6 +35,7 @@ from topo.base.simulation import EventProcessor
 # from sheet and projection
 from topo.base.sheet import Sheet
 from topo.base.projection import Projection
+from topo.base.cf import CFProjection
 
 
 ###########################################################################
