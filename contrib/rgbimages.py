@@ -163,6 +163,14 @@ from topo.pattern.image import FileImage,edge_average,PIL
 import ImageOps, ImageEnhance
 import numpy
 
+# should use _opt versions
+from contrib.rgbhsv import rgb_to_hsv_array ,hsv_to_rgb_array 
+
+
+# CEB: might be simpler to use HSV internally and provide red, green,
+# and blue properties (that do and cache a conversion)...but PIL
+# doesn't support HSV.
+
 class ColorImage(FileImage):
     """
     A FileImage that handles RGB color images.
@@ -184,28 +192,57 @@ class ColorImage(FileImage):
 
 
     def __call__(self,**params_to_override):
+        # Uses super's call for grayscale and to set up self.red,
+        # self.green, self.blue, then performs the same actions
+        # as the super's call on the appropriate color channels
+        # of the image.
+
+        # PatternGenerator.__call__ does:
+        # function, apply_mask, scale+offset, outputfns
+
         gray = super(ColorImage,self).__call__(**params_to_override)
+ 
+        p = ParamOverrides(self,params_to_override)
+        
+        H,S,V = rgb_to_hsv_array(self.red,self.green,self.blue)
+
+        self._apply_mask(p,V)
+
+        V*=p.scale
+        V+=p.offset
+        
+        for of in p.output_fns:
+            of(V)
+
+        self.red,self.green,self.blue = hsv_to_rgb_array(H,S,V)
+
+        return gray
+
+
+    def function(self,p):
+        """
+        In addition to returning grayscale, stores red, green, and
+        blue components.
+        """
+        gray = super(ColorImage,self).function(p)
 
         # now store red, green, blue
-        # (by repeating the super's call, but each time first
+        # (by repeating the super's function call, but each time first
         # setting _image to the appropriate channel's image)
-        # CEBALERT: multiple PG.setupxy() calls slows things down?
         self._image = self._image_red
-        self.red = super(ColorImage,self).__call__(**params_to_override)
+        self.red = super(ColorImage,self).function(p)
 
         self._image = self._image_green
-        self.green = super(ColorImage,self).__call__(**params_to_override)
+        self.green = super(ColorImage,self).function(p)
 
         self._image = self._image_blue
-        self.blue = super(ColorImage,self).__call__(**params_to_override)
+        self.blue = super(ColorImage,self).function(p)
 
         # CEBALERT: currently, red, green, blue are cached
         return gray
 
     
-#import random
 from topo import numbergen
-from contrib.rgbhsv import rgb_to_hsv_array ,hsv_to_rgb_array 
 class RotatedHuesImage(ColorImage):
     """
     A ColorImage that rotates the hues in the image by a random value.
@@ -213,23 +250,16 @@ class RotatedHuesImage(ColorImage):
 
     random_generator = param.Callable(
         default=numbergen.UniformRandom(lbound=0,ubound=1))
+    
+    def function(self,p):
+        gray = super(RotatedHuesImage,self).function(p)
 
-
-    def __call__(self,**params_to_override):
-        gray = super(RotatedHuesImage,self).__call__(**params_to_override)
-
-        H,S,V = rgb_to_hsv_array(numpy.array(255*self.red,dtype=numpy.int32),
-                                 numpy.array(255*self.green,dtype=numpy.int32),
-                                 numpy.array(255*self.blue,dtype=numpy.int32))
+        H,S,V = rgb_to_hsv_array(self.red,self.green,self.blue)
 
         H+=self.random_generator()
         H%=1.0
 
-        r,g,b = hsv_to_rgb_array(H,S,V)
-
-        self.red=r.astype(numpy.float32)/255.0
-        self.green=g.astype(numpy.float32)/255.0
-        self.blue=b.astype(numpy.float32)/255.0
+        self.red,self.green,self.blue = hsv_to_rgb_array(H,S,V)
 
         return gray
 
@@ -250,11 +280,7 @@ def hue_from_rgb(**data):
     corresponding hues.
     """
     red,green,blue = data['RedActivity'],data['GreenActivity'],data['BlueActivity']
-    H,S,V = rgb_to_hsv_array(
-        numpy.array(255*red,dtype=numpy.int32),
-        numpy.array(255*green,dtype=numpy.int32),
-        numpy.array(255*blue,dtype=numpy.int32))
-    return H
+    return rgb_to_hsv_array(red,green,blue)[0]
 
 
 class DataAnalyser(param.Parameterized):
