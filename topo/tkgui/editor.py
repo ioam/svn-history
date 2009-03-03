@@ -28,16 +28,12 @@ import topo
 from topo.command.analysis import update_activity
 from topo.misc.util import shortclassname
 from topo.misc.filepath import normalize_path
-
-# import all sheets
-import topo.sheet
-from topo.sheet import *
-from topo.base.sheet import Sheet
 from topo.base.simulation import EventProcessor
 
-# import all projections
-import topo.projection
-from topo.projection import *
+# Make sure at least some sheets or projections are available to
+# choose from; rest will be available if some other module imports *
+# from sheet and projection
+from topo.base.sheet import Sheet
 from topo.base.projection import Projection
 
 
