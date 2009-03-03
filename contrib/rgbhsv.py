@@ -7,32 +7,35 @@ colorsys functions.
 $Id: rgbhsv.py 31 2008-12-15 11:40:30Z v1cball $
 """
 
-
 from topo.misc.inlinec import inline
 import numpy
+
+
+def _check_dims(A,B,C):
+    shape = A.shape
+    for M in (A,B,C):
+        assert M.shape==shape
+        assert M.min()>=0.0 and M.max()<=1.0, "Values must be on [0,1] (actual min,max=%s,%s)"%(M.min(),M.max())
+    return shape
 
 
 def rgb_to_hsv_array(r,g,b):
     """
     Equivalent to colorsys.rgb_to_hsv, except:
       * acts on arrays of red, green, and blue pixels
-      * works correctly when r,g,b are of type int
-      * returns arrays of type numpy.float32 for hue,saturation,and value
+      * asserts (rather than assumes) that inputs are on [0,1]
+      * returns arrays of type numpy.float32 for hue, saturation, and
+        value
     """
-    assert r.dtype==g.dtype==b.dtype==numpy.int32
+    shape = _check_dims(r,g,b)
     
     from colorsys import rgb_to_hsv
-    rows,cols=r.shape
-    h=numpy.zeros((rows,cols),dtype=numpy.float32)
-    v=numpy.zeros((rows,cols),dtype=numpy.float32)
-    s=numpy.zeros((rows,cols),dtype=numpy.float32)
-    for i in range(rows):
-        for j in range(cols):
-            # float() necessary because division in colorsys.rgb_to_hsv()
-            # will be integer division unless inputs are floats
-            h[i,j],s[i,j],v[i,j]=rgb_to_hsv(float(r[i,j]),
-                                            float(g[i,j]),
-                                            float(b[i,j]))
+    h=numpy.zeros(shape,dtype=numpy.float32)
+    v=numpy.zeros(shape,dtype=numpy.float32)
+    s=numpy.zeros(shape,dtype=numpy.float32)
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            h[i,j],s[i,j],v[i,j]=rgb_to_hsv(r[i,j],g[i,j],b[i,j])
     return h,s,v
 
 
@@ -40,27 +43,25 @@ def hsv_to_rgb_array(h,s,v):
     """
     Equivalent to colorsys.hsv_to_rgb, except:
       * acts on arrays of hue, saturation, and value
-      * returns arrays of type numpy.int32 for red, green, and blue.
+      * asserts (rather than assumes) that inputs are on [0,1]
+      * returns arrays of type numpy.float32 for red, green, and blue
     """
+    shape = _check_dims(h,s,v)
+    
     from colorsys import hsv_to_rgb
-    rows,cols = h.shape
-    r = numpy.zeros((rows,cols),dtype=numpy.int32)
-    g = numpy.zeros((rows,cols),dtype=numpy.int32)
-    b = numpy.zeros((rows,cols),dtype=numpy.int32)
-    for i in range(rows):
-        for j in range(cols):
-            red,grn,blu=hsv_to_rgb(h[i,j],s[i,j],v[i,j])
-            r[i,j]=int(round(red,0))
-            g[i,j]=int(round(grn,0))
-            b[i,j]=int(round(blu,0))
+    r = numpy.zeros(shape,dtype=numpy.float32)
+    g = numpy.zeros(shape,dtype=numpy.float32)
+    b = numpy.zeros(shape,dtype=numpy.float32)
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            r[i,j],g[i,j],b[i,j]=hsv_to_rgb(h[i,j],s[i,j],v[i,j])
     return r,g,b
 
 
 
 def rgb_to_hsv_array_opt(red,grn,blu):
     """Supposed to be equivalent to rgb_to_hsv_array()."""
-    shape = red.shape
-    assert grn.shape==blu.shape==shape
+    shape = _check_dims(red,grn,blu)
     
     hue = numpy.zeros(shape,dtype=numpy.float32)
     sat = numpy.zeros(shape,dtype=numpy.float32)
@@ -85,9 +86,9 @@ for (int i=0; i<Nred[0]; ++i) {
 
         // translation of Python's colorsys.rgb_to_hsv()
 
-        int r=RED2(i,j);
-        int g=GRN2(i,j);
-        int b=BLU2(i,j);
+        float r=RED2(i,j);
+        float g=GRN2(i,j);
+        float b=BLU2(i,j);
 
         float minc=MIN3(r,g,b); 
         float maxc=MAX3(r,g,b); 
@@ -132,12 +133,11 @@ for (int i=0; i<Nred[0]; ++i) {
 
 def hsv_to_rgb_array_opt(hue,sat,val):
     """Supposed to be equivalent to hsv_to_rgb_array()."""
-    shape = hue.shape
-    assert sat.shape==val.shape==shape
+    shape = _check_dims(hue,sat,val)
     
-    red = numpy.zeros(shape,dtype=numpy.int32)
-    grn = numpy.zeros(shape,dtype=numpy.int32)
-    blu = numpy.zeros(shape,dtype=numpy.int32)
+    red = numpy.zeros(shape,dtype=numpy.float32)
+    grn = numpy.zeros(shape,dtype=numpy.float32)
+    blu = numpy.zeros(shape,dtype=numpy.float32)
 
     code = """
 for (int i=0; i<Nhue[0]; ++i) {
@@ -196,9 +196,9 @@ for (int i=0; i<Nhue[0]; ++i) {
                     break;
             }
         }
-        RED2(i,j)=(int)round(r);
-        GRN2(i,j)=(int)round(g);
-        BLU2(i,j)=(int)round(b);
+        RED2(i,j)=r;
+        GRN2(i,j)=g;
+        BLU2(i,j)=b;
     }
 }
 """
@@ -212,24 +212,22 @@ for (int i=0; i<Nhue[0]; ++i) {
 
 if __name__=='__main__' or __name__=='__mynamespace__':
 
-    imagepath = 'images/f2/MERRY0006.tif'
+    imagepath = 'images/mcgill/foliage_b/14.png'
 
     import Image
     import numpy
 
-    from numpy.testing import assert_array_almost_equal,\
-                              assert_array_equal
+    from numpy.testing import assert_array_almost_equal
 
-    im = Image.open(imagepath)
-    R,G,B = im.split()
+    R,G,B = Image.open(imagepath).split()
 
-    # PIL 1.1.6 would simplify this
-    R = numpy.array(R.getdata(),dtype=numpy.int32)
-    R.shape = im.size
-    G = numpy.array(G.getdata(),dtype=numpy.int32)
-    G.shape = im.size
-    B = numpy.array(B.getdata(),dtype=numpy.int32)
-    B.shape = im.size
+    R = numpy.array(R,dtype=numpy.int32)
+    G = numpy.array(G,dtype=numpy.int32)
+    B = numpy.array(B,dtype=numpy.int32)
+
+    R/=255.0
+    G/=255.0
+    B/=255.0
 
     ## test rgb_to_hsv
     H,S,V = rgb_to_hsv_array_opt(R,G,B)
@@ -238,18 +236,19 @@ if __name__=='__main__' or __name__=='__mynamespace__':
     assert_array_almost_equal(s,S,decimal=6)
     assert_array_almost_equal(v,V,decimal=6)
 
+    dp=6
 
     ## test hsv_to_rgb 
     R2,G2,B2 = hsv_to_rgb_array_opt(H,S,V)
     r2,g2,b2 = hsv_to_rgb_array(H,S,V)
     # test python implementations
-    assert_array_equal(r2,R)
-    assert_array_equal(g2,G)
-    assert_array_equal(b2,B)
+    assert_array_almost_equal(r2,R,decimal=dp)
+    assert_array_almost_equal(g2,G,decimal=dp)
+    assert_array_almost_equal(b2,B,decimal=dp)
     # test C implementation
-    assert_array_equal(R2,R)
-    assert_array_equal(G2,G)
-    assert_array_equal(B2,B)
+    assert_array_almost_equal(R2,R,decimal=dp)
+    assert_array_almost_equal(G2,G,decimal=dp)
+    assert_array_almost_equal(B2,B,decimal=dp)
 
 
     print "OK"
