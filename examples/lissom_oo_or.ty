@@ -48,9 +48,14 @@ import topo.sheet.optimized
 from topo.misc.commandline import global_params as p
 p.add(
 
+    num_inputs=param.Integer(default=2,bounds=(1,None),doc="""
+        How many input patterns to present per unit area at each
+        iteration, when using discrete patterns (e.g. Gaussians)."""),
+
     area=param.Number(default=1.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
-        Default cortical area to simulate; 1.0 gives a 1.0x1.0 Sheet area in V1."""),
+        Linear size of cortical area to simulate.
+        2.0 gives a 2.0x2.0 Sheet area in V1."""),
 
     retina_density=param.Number(default=24.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
@@ -80,14 +85,16 @@ pattern.Gaussian.aspect_ratio=4.0
 
 
 ### Input patterns
-num_inputs=2
+total_num_inputs=int(p.num_inputs*p.area*p.area)
 input_type=pattern.Gaussian
-inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-                   y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
+inputs=[input_type(x=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
+                                             ubound= (p.area/2.0+0.25),seed=12+i),
+                   y=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
+                                             ubound= (p.area/2.0+0.25),seed=34+i),
                    orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
                    size=0.088388, aspect_ratio=4.66667, scale=1.0,
                    bounds=sheet.BoundingBox(radius=0.8))
-        for i in xrange(num_inputs)]
+        for i in xrange(total_num_inputs)]
 
 combined_inputs = pattern.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
@@ -170,7 +177,7 @@ topo.sim.connect(
 
 
 ### Actions scheduled to occur as the simulation proceeds.
-sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/num_inputs,aff_name="Afferent")
+sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/p.num_inputs,aff_name="Afferent")
 
 
 ### Default locations for model editor

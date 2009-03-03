@@ -46,12 +46,13 @@ p.add(
           :'Nature':   Shouval's 1999 monochrome 256x256 images"""),
 
     num_inputs=param.Integer(default=2,bounds=(1,None),doc="""
-        How many input patterns to present at each iteration, when using discrete 
-        patterns (e.g. Gaussians)."""),
+        How many input patterns to present per unit area at each
+        iteration, when using discrete patterns (e.g. Gaussians)."""),
 
     area=param.Number(default=1.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
-        Default cortical area to simulate; 1.0 gives a 1.0x1.0 Sheet area in V1."""),
+        Linear size of cortical area to simulate.
+        2.0 gives a 2.0x2.0 Sheet area in V1."""),
 
     retina_density=param.Number(default=24.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
@@ -120,11 +121,14 @@ pattern.Gaussian.aspect_ratio=4.0
 ### Input patterns
 if p.dataset=="Gaussian":
     input_type=pattern.Gaussian
-    inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-                       y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=35+i),
+    total_num_inputs=int(p.num_inputs*p.area*p.area)
+    inputs=[input_type(x=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
+                                                 ubound= (p.area/2.0+0.25),seed=12+i),
+                       y=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
+                                                 ubound= (p.area/2.0+0.25),seed=35+i),
                        orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
                        size=0.088388, aspect_ratio=4.66667, scale=p.scale)
-            for i in xrange(p.num_inputs)]
+            for i in xrange(total_num_inputs)]
     
     combined_inputs = pattern.SeparatedComposite(min_separation=0,generators=inputs)
     
