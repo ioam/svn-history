@@ -237,12 +237,11 @@ class Curve(Arc):
     arc_end = param.Number(precedence = -1.0)
     aspect_ratio = param.Number(default = 1.0, precedence = -1.0)
 
-    constant_length = param.Boolean(default = True, precedence = 0.61,
+    constant_length = param.Enumeration(default = True, available = [True, False], precedence = 0.61,
                 doc = """
-                      Determining when 'size' is fixed, this class should draw a curve with
-                      constant total length or constant width. 'Size' means constant total length
-                      when this parameter is true, and means constant width when this parameter is
-                      false.
+                      Determining to draw a curve with constant total length or constant width when
+                      'size' is fixed. 'Size' means constant total length when this parameter is
+                      true, and means constant width when this parameter is false.
                       """)
 
     curvature = param.Number(default = 0.5, bounds = (-0.5, 0.5), precedence = 0.62,
