@@ -20,7 +20,7 @@ import topo
 from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
-from topo.misc.patternfn import gaussian,gabor,line,disk,ring,float_error_ignore
+from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,float_error_ignore
 from topo.misc.numbergenerator import UniformRandom
 
 
@@ -84,6 +84,36 @@ class Gaussian(PatternGenerator):
         xsigma = p.aspect_ratio*ysigma
         
         return gaussian(self.pattern_x,self.pattern_y,xsigma,ysigma)
+
+
+class ExponentialDecay(PatternGenerator):
+    """
+    2D Exponential pattern generator.
+
+    Exponential decay based on distance from a central peak,
+    i.e. exp(-d), where d is the distance from the center (assuming
+    size=1.0 and aspect_ratio==1.0).  More generally, the size and
+    aspect ratio determine the scaling of x and y dimensions:
+
+      yscale=size/2
+      xscale=yscale*aspect_ratio
+
+    The exponential is then computed for the given (x,y) values as::
+    
+      exp(-sqrt((x/xscale)^2 - (y/yscale)^2))
+    """
+    
+    aspect_ratio = param.Number(default=1/0.31,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc="""Ratio of the width to the height.""")
+    
+    size = param.Number(default=0.155,doc="""
+        Overall scaling of the x and y dimensions.""")
+
+    def function(self,p):
+        yscale = p.size/2.0
+        xscale = p.aspect_ratio*yscale
+        
+        return exponential(self.pattern_x,self.pattern_y,xscale,yscale)
 
 
 class SineGrating(PatternGenerator):
