@@ -125,7 +125,7 @@ if p.dataset=="Gaussian":
     inputs=[input_type(x=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
                                                  ubound= (p.area/2.0+0.25),seed=12+i),
                        y=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
-                                                 ubound= (p.area/2.0+0.25),seed=35+i),
+                                                 ubound= (p.area/2.0+0.25),seed=34+i),
                        orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
                        size=0.088388, aspect_ratio=4.66667, scale=p.scale)
             for i in xrange(total_num_inputs)]
