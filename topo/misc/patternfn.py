@@ -72,6 +72,9 @@ def gabor(x, y, xsigma, ysigma, frequency, phase):
     """
     Gabor pattern (sine grating multiplied by a circular Gaussian).
     """
+    if xsigma==0.0 or ysigma==0.0:
+        return x*0.0
+    
     with float_error_ignore():
         x_w = divide(x,xsigma)
         y_h = divide(y,ysigma)
