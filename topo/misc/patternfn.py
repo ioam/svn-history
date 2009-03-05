@@ -46,10 +46,26 @@ def gaussian(x, y, xsigma, ysigma):
     bell curve, like a normal distribution but not necessarily summing
     to 1.0).
     """
+    if xsigma==0.0 or ysigma==0.0:
+        return x*0.0
+
     with float_error_ignore():
         x_w = divide(x,xsigma)
         y_h = divide(y,ysigma)
         return exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
+
+
+def exponential(x, y, xscale, yscale):
+    """
+    Two-dimensional oriented exponential decay pattern.
+    """
+    if xscale==0.0 or yscale==0.0:
+        return x*0.0
+    
+    with float_error_ignore():
+        x_w = divide(x,xscale)
+        y_h = divide(y,yscale)
+        return exp(-sqrt(x_w*x_w+y_h*y_h))
 
 
 def gabor(x, y, xsigma, ysigma, frequency, phase):
