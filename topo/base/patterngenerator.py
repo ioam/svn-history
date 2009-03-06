@@ -90,7 +90,7 @@ class PatternGenerator(param.Parameterized):
         Polar angle of pattern, i.e., the orientation in the Cartesian coordinate
         system, with zero at 3 o'clock and increasing counterclockwise.""")
     
-    size = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    size = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,6.0),
         precedence=0.30,doc="""Determines the overall size of the pattern.""")
 
     scale = param.Number(default=1.0,softbounds=(0.0,2.0),precedence=0.10,doc="""

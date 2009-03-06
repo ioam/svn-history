@@ -47,9 +47,12 @@ class HalfPlane(PatternGenerator):
                              precedence=0.61,doc="Width of the Gaussian fall-off.")
 
     def function(self,p):
-        with float_error_ignore():
-            falloff = numpy.exp(numpy.divide(-self.pattern_y*self.pattern_y,
-                                             2*p.smoothing*p.smoothing))
+        if p.smoothing==0.0:
+            falloff=self.pattern_y*0.0
+        else:
+            with float_error_ignore():
+                falloff=numpy.exp(numpy.divide(-self.pattern_y*self.pattern_y,
+                                                2*p.smoothing*p.smoothing))
 
         return numpy.where(self.pattern_y>0.0,1.0,falloff)
 
@@ -69,7 +72,7 @@ class Gaussian(PatternGenerator):
       exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
     """
     
-    aspect_ratio = param.Number(default=1/0.31,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio = param.Number(default=1/0.31,bounds=(0.0,None),softbounds=(0.0,6.0),
         precedence=0.31,doc="""
         Ratio of the width to the height.
         Specifically, xsigma=ysigma*aspect_ratio (see size).""")
@@ -197,7 +200,9 @@ class Disk(PatternGenerator):
     def function(self,p):
         height = p.size
 
-        # CEBHACKALERT: this division should handle aspect_ratio=0
+        if p.aspect_ratio==0.0:
+            return self.pattern_x*0.0
+
         return disk(self.pattern_x/p.aspect_ratio,self.pattern_y,height,
                     p.smoothing)
 
@@ -223,6 +228,9 @@ class Ring(PatternGenerator):
 
     def function(self,p):
         height = p.size
+        if p.aspect_ratio==0.0:
+            return self.pattern_x*0.0
+
         return ring(self.pattern_x/p.aspect_ratio,self.pattern_y,height,
                     p.thickness,p.smoothing)
     

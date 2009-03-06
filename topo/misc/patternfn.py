@@ -95,17 +95,15 @@ def line(y, thickness, gaussian_width):
     gaussian_y_coord = distance_from_line - thickness/2.0
     sigmasq = gaussian_width*gaussian_width
 
-    with float_error_ignore():
-        falloff = exp(divide(-gaussian_y_coord*gaussian_y_coord,2*sigmasq))
+    if sigmasq==0.0:
+        falloff = x*0.0
+    else:
+        with float_error_ignore():
+            falloff = exp(divide(-gaussian_y_coord*gaussian_y_coord,2*sigmasq))
 
     return where(gaussian_y_coord<=0, 1.0, falloff)
 
 
-# CEBALERT: when there is no smoothing (gaussian_width=0), it's possible
-# to get an invalid error if distance_outside_disk==0 (because 0/0 is nan).
-# We could select a different implementation if the smoothing is 0 to avoid
-# this problem, and to avoid needing any element-by-element checking for
-# 0/0). Similar alerts apply to line() and ring().
 def disk(x, y, height, gaussian_width):
     """
     Circular disk with Gaussian fall-off after the solid central region.
@@ -116,9 +114,12 @@ def disk(x, y, height, gaussian_width):
     distance_outside_disk = distance_from_origin - disk_radius
     sigmasq = gaussian_width*gaussian_width
 
-    with float_error_ignore():
-        falloff = exp(divide(-distance_outside_disk*distance_outside_disk,
-                             2*sigmasq))
+    if sigmasq==0.0:
+        falloff = x*0.0
+    else:
+        with float_error_ignore():
+            falloff = exp(divide(-distance_outside_disk*distance_outside_disk,
+                                  2*sigmasq))
 
     return where(distance_outside_disk<=0,1.0,falloff)
 
@@ -138,8 +139,12 @@ def ring(x, y, height, thickness, gaussian_width):
 
     sigmasq = gaussian_width*gaussian_width
 
-    with float_error_ignore():
-        inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
-        outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
+    if sigmasq==0.0:
+        inner_falloff = x*0.0
+        outer_falloff = x*0.0
+    else:
+        with float_error_ignore():
+            inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
+            outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
 
     return maximum(inner_falloff,maximum(outer_falloff,ring))
