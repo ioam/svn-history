@@ -60,14 +60,12 @@ p.add(
 
 def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
     """
-    Arc with Gaussian fall-off after the solid ring-shaped region and specified
-    by start and end radian.
-    
-    The first part of this function is based on ring function.
+    Radial arc with Gaussian fall-off after the solid ring-shaped
+    region with the given thickness, with shape specified by the
+    (start,end) radian_range.
     """
 
-    # Create a circular ring (same as in func ring)
-
+    # Create a circular ring (copied from the ring function)
     radius = height/2.0
     half_thickness = thickness/2.0
 
@@ -77,25 +75,28 @@ def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
 
     ring = 1.0-bitwise_xor(greater_equal(distance_inside_inner_disk,0.0),greater_equal(distance_outside_outer_disk,0.0))
 
-    sigmasq = gaussian_width * gaussian_width
+    sigmasq = gaussian_width*gaussian_width
 
-    with float_error_ignore():
-        inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
-        outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
-
+    if sigmasq==0.0:
+        inner_falloff = x*0.0
+        outer_falloff = x*0.0
+    else:
+        with float_error_ignore():
+            inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
+            outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
+            
     output_ring = maximum(inner_falloff,maximum(outer_falloff,ring))
 
     # Calculate radians (in 4 phases) and cut according to the set range)
 
-    """
-    Function float_error_ignore() cannot catch the exception when both dividend
-    and divisor are 0.0 (floating number), and when only divisor is 0.0
-    (floating number) it returns 'Inf' rather than 0.0. In x, y and
-    distance_from_origin, only one point in distance_from_origin can be 0.0
-    (circle center) and in this point x and y must be 0.0 as well. So here is a
-    hack to avoid the 'invalid value encountered in divide' error by turning
-    0.0 to 1e-5 in distance_from_origin.
-    """
+    # RZHACKALERT:
+    # Function float_error_ignore() cannot catch the exception when
+    # both dividend and divisor are 0.0, and when only divisor is 0.0
+    # it returns 'Inf' rather than 0.0. In x, y and
+    # distance_from_origin, only one point in distance_from_origin can
+    # be 0.0 (circle center) and in this point x and y must be 0.0 as
+    # well. So here is a hack to avoid the 'invalid value encountered
+    # in divide' error by turning 0.0 to 1e-5 in distance_from_origin.
     distance_from_origin += where(distance_from_origin == 0.0, 1e-5, 0)
 
     with float_error_ignore():
@@ -103,10 +104,10 @@ def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
         cosines = divide(x, distance_from_origin)
         arcsines = arcsin(sines)
 
-    phase_1 = where(logical_and(sines >= 0, cosines >= 0), 2 * pi - arcsines, 0)
-    phase_2 = where(logical_and(sines >= 0, cosines < 0), pi + arcsines, 0)
-    phase_3 = where(logical_and(sines < 0, cosines < 0), pi + arcsines, 0)
-    phase_4 = where(logical_and(sines < 0, cosines >= 0), -arcsines, 0)
+    phase_1 = where(logical_and(sines >= 0, cosines >= 0), 2*pi-arcsines, 0)
+    phase_2 = where(logical_and(sines >= 0, cosines <  0), pi+arcsines,   0)
+    phase_3 = where(logical_and(sines <  0, cosines <  0), pi+arcsines,   0)
+    phase_4 = where(logical_and(sines <  0, cosines >= 0), -arcsines,     0)
     arcsines = phase_1 + phase_2 + phase_3 + phase_4
 
     if radian_range[0] <= radian_range[1]:
@@ -121,19 +122,22 @@ def smooth_rectangle(x, y, rec_w, rec_h, gaussian_width_x, gaussian_width_y):
     """
     Rectangle with a solid central region, then Gaussian fall-off at the edges.
     """
-    gaussian_x_coord = abs(x) - rec_w / 2.0
-    gaussian_y_coord = abs(y) - rec_h / 2.0
+
+    gaussian_x_coord = abs(x)-rec_w/2.0
+    gaussian_y_coord = abs(y)-rec_h/2.0
         
-    box_x = less(gaussian_x_coord, 0.0)
-    box_y = less(gaussian_y_coord, 0.0)
-    sigmasq_x = gaussian_width_x * gaussian_width_x
-    sigmasq_y = gaussian_width_y * gaussian_width_y
+    box_x=less(gaussian_x_coord,0.0)
+    box_y=less(gaussian_y_coord,0.0)
+    sigmasq_x=gaussian_width_x*gaussian_width_x
+    sigmasq_y=gaussian_width_y*gaussian_width_y
 
     with float_error_ignore():
-        falloff_x = exp(divide(-gaussian_x_coord * gaussian_x_coord, 2 * sigmasq_x))
-        falloff_y = exp(divide(-gaussian_y_coord * gaussian_y_coord, 2 * sigmasq_y))
+        falloff_x=x*0.0 if sigmasq_x==0.0 else \
+            exp(divide(-gaussian_x_coord*gaussian_x_coord,2*sigmasq_x))
+        falloff_y=y*0.0 if sigmasq_y==0.0 else \
+            exp(divide(-gaussian_y_coord*gaussian_y_coord,2*sigmasq_y))
 
-    return minimum(maximum(box_x, falloff_x), maximum(box_y, falloff_y))
+    return minimum(maximum(box_x,falloff_x), maximum(box_y,falloff_y))
 
 
 
@@ -146,31 +150,30 @@ def arc_by_center(x, y, arc_box, constant_length, thickness, gaussian_width):
     height, and then calls arc_by_radian function to draw the curve.
     """
 
-    arc_w = arc_box[0]
-    arc_h = abs(arc_box[1])
+    arc_w=arc_box[0]
+    arc_h=abs(arc_box[1])
 
-    if arc_w == 0.0:  # arc_w = 0, don't draw anything
-        radius = 0.0
-        angles = (0.0, 0.0)
-    elif arc_h == 0.0:  # draw a horizontal line, width = arc_w
+    if arc_w==0.0: # arc_w=0, don't draw anything
+        radius=0.0
+        angles=(0.0,0.0)
+    elif arc_h==0.0:  # draw a horizontal line, width=arc_w
         return smooth_rectangle(x, y, arc_w, thickness, 0.0, gaussian_width)
     else:
         if constant_length:
-            curvature = arc_h / arc_w
-            radius = arc_w / (2 * pi * curvature)
-            angle = curvature * (2 * pi) / 2.0
+            curvature=arc_h/arc_w
+            radius=arc_w/(2*pi*curvature)
+            angle=curvature*(2*pi)/2.0
         else:  # constant width
-            # formulae evaluating radius and angle
-            radius = arc_h / 2.0 + arc_w ** 2.0 / (8 * arc_h)
-            angle = arcsin(arc_w / 2.0 / radius)
-        if arc_box[1] < 0:  # convex shape
-            y = y + radius
-            angles = (3.0 / 2.0 * pi - angle, 3.0 / 2.0 * pi + angle)
+            radius=arc_h/2.0+arc_w**2.0/(8*arc_h)
+            angle=arcsin(arc_w/2.0/radius)
+        if arc_box[1]<0: # convex shape
+            y=y+radius
+            angles=(3.0/2.0*pi-angle, 3.0/2.0*pi+angle)
         else:  # concave shape
-            y = y - radius
-            angles = (pi / 2.0 - angle, pi / 2.0 + angle)
+            y=y-radius
+            angles=(pi/2.0-angle, pi/2.0+angle)
 
-    return arc_by_radian(x, y, radius * 2.0, angles, thickness, gaussian_width)
+    return arc_by_radian(x, y, radius*2.0, angles, thickness, gaussian_width)
 
 
 
@@ -178,164 +181,163 @@ class Arc(PatternGenerator):
     """
     2D arc pattern generator.
     
-    The shape of the arc is specified by the end radian (parameter arc_end),
-    and diameter is specified by parameter size. This class draws an arc from
-    radian 0.0 to radian arc_end, can it can be rotated by parameter
-    'orientation' to get different arc starts.
+    Draws an arc (partial ring) of the specified size (radius*2),
+    starting at radian 0.0 and ending at arc_length.  The orientation
+    can be changed to choose other start locations.  The pattern is
+    centered at the center of the ring.
 
-    See the Ring and Disk class for a note about the Gaussian fall-off.
+    See the Disk class for a note about the Gaussian fall-off.
     """
 
-    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.31,doc=
-        "Ratio of width to height; size*aspect_ratio gives the overall width.")
+    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,6.0),
+        precedence=0.31,doc="""
+        Ratio of width to height; size*aspect_ratio gives the overall width.""")
 
     thickness = param.Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.60,doc="Thickness (line width) of the ring.")
     
-    smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
+    smoothing = param.Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
 
-    arc_end = param.Number(default=pi,bounds=(0.0,None),softbounds=(0.0,2.0*pi),inclusive_bounds=(True,False),
-        precedence = 0.62, doc = "End of the arc (starting from 0.0).")
+    arc_length = param.Number(default=pi,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
+                              inclusive_bounds=(True,False),precedence=0.62, doc="""
+        Length of the arc, in radians, starting from orientation 0.0.""")
 
     size = param.Number(default=0.5)
 
     def function(self,p):
+        if p.aspect_ratio==0.0:
+            return self.pattern_x*0.0
+
         return arc_by_radian(self.pattern_x/p.aspect_ratio, self.pattern_y, p.size,
-                             (2*pi-p.arc_end, 0.0), p.thickness, p.smoothing)
+                             (2*pi-p.arc_length, 0.0), p.thickness, p.smoothing)
 
 
 class Curve(Arc):
     """
     2D curve pattern generator.
 
-    Based on Arc, but centered on a particular point of the arc, with curvature
-    controlled directly rather than through the overall size of the pattern.
+    Based on Arc, but centered on a tangent point midway through the
+    arc, rather than at the center of a ring, and with curvature
+    controlled directly rather than through the overall size of the
+    pattern.
 
-    Parameter constant_length determines when 'size' is fixed, this class
-    should draw a curve with constant total length or constant width.
+    Depending on the size_type, the size parameter can control either
+    the width of the pattern, keeping this constant regardless of
+    curvature, or the length of the curve, keeping that constant
+    instead (as for a long thin object being bent).
 
-    When 'constant_length' is set 'true', Parameter curvature determines the
-    ratio of height to width of the arc, and positive curvature for concave
-    shape and negative for convex. Parameter size determines the width of the
-    curve.
+    Specifically, for size_type=='constant_length', the curvature
+    parameter determines the ratio of height to width of the arc, with
+    positive curvature for concave shape and negative for convex. The
+    size parameter determines the width of the curve.
 
-    When 'constant_length' is set 'false', Parameter curvature determines the
-    portion of curve radian to 2pi, and curve radius is changed accordingly
-    following the formula
+    For size_type=='constant_width', the curvature parameter
+    determines the portion of curve radian to 2pi, and the curve
+    radius is changed accordingly following the formula::
 
-    2 * pi * radius * curvature = size
+      size=2pi*radius*curvature
 
-    So parameter size determines the total length of the curve. Positive
-    curvature stands for concave shape and negative for convex.
+    Thus, the size parameter determines the total length of the
+    curve. Positive curvature stands for concave shape, and negative
+    for convex.
 
-    See the Ring and Disk class for a note about the Gaussian fall-off.
+    See the Disk class for a note about the Gaussian fall-off.
     """
 
     # Hide unused parameters
-    arc_end = param.Number(precedence = -1.0)
-    aspect_ratio = param.Number(default = 1.0, precedence = -1.0)
+    arc_length = param.Number(precedence=-1.0)
+    aspect_ratio = param.Number(default=1.0, precedence=-1.0)
 
-    constant_length = param.Enumeration(default = True, available = [True, False], precedence = 0.61,
-                doc = """
-                      Determining to draw a curve with constant total length or constant width when
-                      'size' is fixed. 'Size' means constant total length when this parameter is
-                      true, and means constant width when this parameter is false.
-                      """)
+    size_type = param.Enumeration(default='constant_length',
+        available=['constant_length','constant_width'],precedence=0.61,doc="""
+        For a given size, whether to draw a curve with that total length, 
+        or with that width, keeping it constant as curvature is varied.""")
 
-    curvature = param.Number(default = 0.5, bounds = (-0.5, 0.5), precedence = 0.62,
-                doc = """
-                      Ratio of height to width of the arc; positive value for concave and negative
-                      value for convex shape.
-                      """)
+    curvature = param.Number(default=0.5, bounds=(-0.5, 0.5), precedence=0.62, doc="""
+        Ratio of height to width of the arc, with positive value giving
+        a concave shape and negative value giving convex.""")
 
     def function(self,p):
-
-        aspect_ratio = p.aspect_ratio
-
-        """
-        When constant_length is true, size: arc width; size*abs(curvature): arc height;
-        When constant_length is false, size: arc length; abs(curvature): arc radian in proportion
-        to 2pi;
-        """
-        arc_box = (p.size, p.size * p.curvature)
-        
-        output = arc_by_center(self.pattern_x/aspect_ratio, self.pattern_y, 
-                               arc_box, p.constant_length, p.thickness, p.smoothing)
-        return output
+        return arc_by_center(self.pattern_x/p.aspect_ratio,self.pattern_y, 
+                             (p.size,p.size*p.curvature),
+                             (p.size_type=='constant_length'), 
+                             p.thickness, p.smoothing)
 
 
 class HappyFace(pattern.Composite):
     """
     2D cartoon face pattern.
     
-    The face has a round outline, two eyes and a curved mouth. It is parameterized
-    by the 'happiness' value, which ranges from 1.0 (happy, concave) to -1.0
-    (sad, convex). Happiness 0.0 represents a straight line.
+    The face has a round outline, two eyes and a curved mouth. It is
+    parameterized by the 'happiness' value, which ranges from 1.0
+    (happy, concave) to -1.0 (sad, convex). Happiness 0.0 represents a
+    straight line.
     """
 
-    happiness = param.Number(default = 1.0, bounds = (-1.0, 1.0),
-        precedence = 0.60, doc = """Happiness value that determines whether the mouth
-                                    is concave (happy, positive) or convex
-                                    (sad, negative).""")
+    happiness = param.Number(default=1.0, bounds=(-1.0, 1.0),
+        precedence=0.60, doc="""
+        Happiness value that determines whether the mouth
+        is concave (happy, positive) or convex
+        (sad, negative).""")
 
-    eyes_smoothing = param.Number(default = 3.0 * 1.21 / 1.7 / 24.0,
-        bounds = (0.0, None), softbounds = (0.0, 0.5),
-        precedence = 0.61, doc = "Width of the Gaussian fall-off of two eyes.")
+    eyes_smoothing = param.Number(default=3.0*1.21/1.7/24.0,
+        bounds=(0.0, None), softbounds=(0.0, 0.5),
+        precedence=0.61, doc="Width of the Gaussian fall-off of two eyes.")
 
-    face_thickness = param.Number(default = 0.002,bounds = (0.0, None), softbounds = (0.0,0.5),
-        precedence = 0.62, doc = "Thickness (line width) of face.")
+    face_thickness = param.Number(default=0.002,bounds=(0.0, None), softbounds=(0.0,0.5),
+        precedence=0.62, doc="Thickness (line width) of face.")
 
-    face_smoothing = param.Number(default = 0.02, bounds = (0.0, None), softbounds = (0.0, 0.5),
-        precedence = 0.63, doc = "Width of the Gaussian fall-off of face.")
+    face_smoothing = param.Number(default=0.02, bounds=(0.0, None), softbounds=(0.0, 0.5),
+        precedence=0.63, doc="Width of the Gaussian fall-off of face.")
 
-    mouth_thickness = param.Number(default = 0.002,bounds=(0.0, None), softbounds = (0.0,0.5),
-        precedence = 0.64, doc = "Thickness (line width) of mouth.")
+    mouth_thickness = param.Number(default=0.002,bounds=(0.0, None), softbounds=(0.0,0.5),
+        precedence=0.64, doc="Thickness (line width) of mouth.")
 
-    mouth_smoothing = param.Number(default = 0.05, bounds = (0.0, None), softbounds = (0.0, 0.5),
-        precedence = 0.65, doc = "Width of the Gaussian fall-off of mouth.")
+    mouth_smoothing = param.Number(default=0.05, bounds=(0.0, None), softbounds=(0.0, 0.5),
+        precedence=0.65, doc="Width of the Gaussian fall-off of mouth.")
 
 
     def _advance_pattern_generators(self, generators):
         """Constructs combined pattern out of the individual ones."""
 
-        sb = 1.0 / 24.0
-        mouth_width = 20.8 / 2.0
-        mouth_curvature = self.happiness / 2.0 # less height, needs revision
-        mouth_y = -7.5 - 1.5 * self.happiness
+        sb=1.0 / 24.0
+        mouth_width=20.8 / 2.0
+        mouth_curvature=self.happiness / 2.0 # less height, needs revision
+        mouth_y=-7.5 - 1.5 * self.happiness
 
-        lefteye  = pattern.Gaussian(aspect_ratio = 1.0, x = -4.5 * sb, y = 1.0 * sb,
-                            size = self.eyes_smoothing, scale = 0.5, offset = 0.5059)
-        righteye = pattern.Gaussian(aspect_ratio = 1.0, x = 4.5 * sb, y = 1.0 * sb,
-                            size = self.eyes_smoothing, scale = 0.5, offset = 0.5059)
-        face     = pattern.Ring(aspect_ratio = 1.0, x = 0.0 * sb, y = -3.0 * sb,
-                              thickness = self.face_thickness, smoothing = self.face_smoothing,
-                              size = 2.0 * 1.21/ 1.7 * 15.0 * sb)
-        mouth    = Curve(x = 0.0 * sb, y = mouth_y * sb,
-                        size = mouth_width * sb, curvature = mouth_curvature, constant_length = False,
-                        thickness = self.mouth_thickness, smoothing = self.mouth_smoothing)
+        lefteye = pattern.Gaussian(aspect_ratio=1.0, x=-4.5*sb, y=1.0*sb,
+                                   size=self.eyes_smoothing, scale=0.5, offset=0.5059)
+        righteye= pattern.Gaussian(aspect_ratio=1.0, x=4.5*sb, y=1.0*sb,
+                                   size=self.eyes_smoothing, scale=0.5, offset=0.5059)
+        face    = pattern.Ring(aspect_ratio=1.0, x=0.0*sb, y=-3.0*sb,
+                               thickness=self.face_thickness, smoothing=self.face_smoothing,
+                               size=2.0*1.21/1.7*15.0*sb)
+        mouth   = Curve(x=0.0*sb, y=mouth_y*sb,
+                        size=mouth_width*sb, curvature=mouth_curvature, size_type='constant_width',
+                        thickness=self.mouth_thickness, smoothing=self.mouth_smoothing)
 
         return [lefteye, righteye, face, mouth]
 
 
 class RectangleWithSmoothing(PatternGenerator):
-    """2D smoothing rectangle pattern generator."""
+    """2D rectangle pattern, with Gaussian smoothing around the edges."""
 
-    aspect_ratio   = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,6.0),
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
     
-    size  = param.Number(default=0.5,doc="Height of the rectangle.")
+    size = param.Number(default=0.5,doc="Height of the rectangle.")
 
-    smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
+    smoothing = param.Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.61,doc="Width of the Gaussian fall-off outside the rectangle.")
 
     def function(self,p):
-        height = p.size
-        width = p.aspect_ratio*height
+        height=p.size
+        width=p.aspect_ratio*height
 
-        return smooth_rectangle(self.pattern_x, self.pattern_y, width, height, p.smoothing, p.smoothing)
+        return smooth_rectangle(self.pattern_x, self.pattern_y, 
+                                width, height, p.smoothing, p.smoothing)
 
 
 class measure_happiness(MeasureResponseCommand):
@@ -344,11 +346,13 @@ class measure_happiness(MeasureResponseCommand):
     subplot = param.String("Happiness")
     
     def _feature_list(self,p):
-        return [Feature(name = "happiness", range=(-1.0, 1.0), step = 0.1, cyclic = False)]
+        return [Feature(name="happiness", range=(-1.0, 1.0), step=0.1, cyclic=False)]
+
+
 
 pg= create_plotgroup(name='Face Happiness',category="Preference Maps",
              doc='Measure preference for happy or sad faces.',
-             pre_plot_hooks=[measure_happiness.instance(display = True, weighted_average = False, pattern_presenter = PatternPresenter(pattern_generator = HappyFace(), apply_output_fns = True, duration = 1.0))])
+             pre_plot_hooks=[measure_happiness.instance(display=True, weighted_average=False, pattern_presenter=PatternPresenter(pattern_generator=HappyFace(), apply_output_fns=True, duration=1.0))])
 pg.add_plot('Happiness Preference',[('Strength','HappinessPreference')])
 pg.add_plot('Happiness Selectivity',[('Strength','HappinessSelectivity')])
 
@@ -365,18 +369,18 @@ projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotPr
 
 ### Input patterns
 num_inputs=1
-inputs = [HappyFace(happiness = numbergen.UniformRandom(lbound = -1.0, ubound = 1.0, seed = 91 + i),
-                    size = 2.0, orientation = 0.0,
+inputs=[HappyFace(happiness=numbergen.UniformRandom(lbound=-1.0, ubound=1.0, seed=91 + i),
+                    size=2.0, orientation=0.0,
                     #orientation=numbergen.UniformRandom(lbound=17.0/36.0*pi,ubound=19.0/36.0*pi,
                     #                                    seed=56+i),
-                    x = numbergen.UniformRandom(lbound = -65.0/48.0, ubound = 65.0/48.0, seed=12+i),
-                    y = numbergen.UniformRandom(lbound = -65.0/48.0, ubound = 65.0/48.0, seed=34+i))
+                    x=numbergen.UniformRandom(lbound=-65.0/48.0, ubound=65.0/48.0, seed=12+i),
+                    y=numbergen.UniformRandom(lbound=-65.0/48.0, ubound=65.0/48.0, seed=34+i))
         for i in xrange(num_inputs)]
-combined_inputs = pattern.SeparatedComposite(min_separation = 1.722972972972973, generators= inputs)
+combined_inputs=pattern.SeparatedComposite(min_separation=1.722972972972973, generators= inputs)
 
 # Draw multiple curves simultaneously
-#combined_inputs = pattern.Composite(generators= [Curve(x = 0.0, y = i * 1.5, size = 2.0,
-#    curvature = i, thickness = 0.2, smoothing = 0.2)
+#combined_inputs=pattern.Composite(generators= [Curve(x=0.0, y=i * 1.5, size=2.0,
+#    curvature=i, thickness=0.2, smoothing=0.2)
 #    for i in frange(-0.5, 0.6, 0.1)])
 
 
@@ -396,7 +400,7 @@ topo.sim['LGNOff']=sheet.CFSheet(
     nominal_bounds=sheet.BoundingBox(radius=1.542),
     output_fns=[transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)])
 
-topo.sim['FSA'] = sheet.lissom.LISSOM(
+topo.sim['FSA']=sheet.lissom.LISSOM(
     nominal_density=p.cortex_density,tsettle=9,
     nominal_bounds=sheet.BoundingBox(radius=0.5),
     output_fns=[transferfn.PiecewiseLinear(lower_bound=0.1,upper_bound=0.65)])
@@ -418,35 +422,41 @@ off_weights = pattern.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 
-topo.sim.connect('Retina','LGNOn',delay=0.05,
-                 connection_type=projection.SharedWeightCFProjection,strength=10.199999999999999,
-                 nominal_bounds_template=sheet.BoundingBox(radius=0.235),name='RetinaToLGNOn',
-                 weights_generator=on_weights)
+topo.sim.connect(
+    'Retina','LGNOn',delay=0.05,
+    connection_type=projection.SharedWeightCFProjection,strength=10.199999999999999,
+    nominal_bounds_template=sheet.BoundingBox(radius=0.235),name='RetinaToLGNOn',
+    weights_generator=on_weights)
 
-topo.sim.connect('Retina','LGNOff',delay=0.05,
-                 connection_type=projection.SharedWeightCFProjection,strength=10.199999999999999,
-                 nominal_bounds_template=sheet.BoundingBox(radius=0.235),name='RetinaToLGNOff',
-                 weights_generator=off_weights)
+topo.sim.connect(
+    'Retina','LGNOff',delay=0.05,
+    connection_type=projection.SharedWeightCFProjection,strength=10.199999999999999,
+    nominal_bounds_template=sheet.BoundingBox(radius=0.235),name='RetinaToLGNOff',
+    weights_generator=off_weights)
 
-topo.sim.connect('LGNOn','FSA',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
-                 connection_type=projection.CFProjection,strength=1.0700000000000001,name='LGNOnAfferent',
-                 weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.4167),
-                 nominal_bounds_template=sheet.BoundingBox(radius=1.0625),learning_rate=5.0)
+topo.sim.connect(
+    'LGNOn','FSA',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
+    connection_type=projection.CFProjection,strength=1.0700000000000001,name='LGNOnAfferent',
+    weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.4167),
+    nominal_bounds_template=sheet.BoundingBox(radius=1.0625),learning_rate=5.0)
 
-topo.sim.connect('LGNOff','FSA',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
-                 connection_type=projection.CFProjection,strength=1.07,name='LGNOffAfferent',
-                 weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.4167),
-                 nominal_bounds_template=sheet.BoundingBox(radius=1.0625),learning_rate=5.0,)
+topo.sim.connect(
+    'LGNOff','FSA',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
+    connection_type=projection.CFProjection,strength=1.07,name='LGNOffAfferent',
+    weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.4167),
+    nominal_bounds_template=sheet.BoundingBox(radius=1.0625),learning_rate=5.0,)
 
-topo.sim.connect('FSA','FSA',delay=0.05,name='LateralExcitatory',
-                 connection_type=projection.CFProjection,strength=0.9,
-                 weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.4167),
-                 nominal_bounds_template=sheet.BoundingBox(radius=0.166666666667),learning_rate=3.1856)
+topo.sim.connect(
+    'FSA','FSA',delay=0.05,name='LateralExcitatory',
+    connection_type=projection.CFProjection,strength=0.9,
+    weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.4167),
+    nominal_bounds_template=sheet.BoundingBox(radius=0.166666666667),learning_rate=3.1856)
 
-topo.sim.connect('FSA','FSA',delay=0.05,name='LateralInhibitory',
-                 connection_type=projection.CFProjection,strength=-0.9,
-                 weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.4167),
-                 nominal_bounds_template=sheet.BoundingBox(radius=0.416666666667),learning_rate=2.3627)
+topo.sim.connect(
+    'FSA','FSA',delay=0.05,name='LateralInhibitory',
+    connection_type=projection.CFProjection,strength=-0.9,
+    weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.4167),
+    nominal_bounds_template=sheet.BoundingBox(radius=0.416666666667),learning_rate=2.3627)
 
 
 
