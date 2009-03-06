@@ -29,7 +29,7 @@ class TestPatternGenerator(unittest.TestCase):
                                 [1,1]])
 
         r = Rectangle(bounds=pattern_bounds,xdensity=10,
-                      ydensity=10,aspect_ratio=1,size=1)
+                      ydensity=10,aspect_ratio=1,size=1,smoothing=0.0)
         assert_array_equal(r(),pattern_target)
         
 
@@ -59,7 +59,7 @@ class TestPatternGenerator(unittest.TestCase):
                          [0,0,0,0]])
 
         r = Rectangle(bounds=BoundingBox(radius=2),xdensity=1,
-                      ydensity=1,aspect_ratio=1,size=2)
+                      ydensity=1,aspect_ratio=1,size=2,smoothing=0.0)
         assert_array_equal(r(),initial)
 
         ### x offset
@@ -90,7 +90,7 @@ class TestPatternGenerator(unittest.TestCase):
         height = 0.4
 
         r = Rectangle(bounds=BoundingBox(radius=0.5),
-                      xdensity=10,ydensity=10,
+                      xdensity=10,ydensity=10,smoothing=0.0,
                       aspect_ratio=width/height,size=height)
 
         assert_array_equal(r(x=-0.4,y=-0.3),target)
@@ -111,7 +111,7 @@ class TestPatternGenerator(unittest.TestCase):
         height = 0.4
 
         bounds = BoundingBox(points=((-0.9,-0.8),(0.1,0.2)))
-        r = Rectangle(bounds=bounds,xdensity=10,ydensity=10,
+        r = Rectangle(bounds=bounds,xdensity=10,ydensity=10,smoothing=0.0,
                       aspect_ratio=width/height,size=height)
         
         assert_array_equal(r(x=-0.4,y=-0.3),target)
@@ -138,7 +138,7 @@ class TestPatternGenerator(unittest.TestCase):
         height = 4.0/ydensity
         
         rect = Rectangle(size=height,
-                         aspect_ratio=width/height,
+                         aspect_ratio=width/height,smoothing=0.0,
                          xdensity=xdensity,ydensity=ydensity,bounds=bounds)
 
         assert_array_equal(rect(),target)
@@ -181,8 +181,8 @@ class TestPatternGenerator(unittest.TestCase):
         c = Composite(generators=[g],bounds=bbox,xdensity=7,ydensity=7)
         assert_array_equal(g(bounds=bbox,xdensity=7,ydensity=7),c())
 
-        r1=Rectangle(size=0.2,aspect_ratio=1,x=0.3,y=0.3,orientation=0)
-        r2=Rectangle(size=0.2,aspect_ratio=1,x=-0.3,y=-0.3,orientation=0,bounds=BoundingBox(radius=0.8),xdensity=2)
+        r1=Rectangle(size=0.2,aspect_ratio=1,x=0.3,y=0.3,orientation=0,smoothing=0.0)
+        r2=Rectangle(size=0.2,aspect_ratio=1,x=-0.3,y=-0.3,orientation=0,bounds=BoundingBox(radius=0.8),xdensity=2,smoothing=0.0)
         c_true = r1(bounds=bbox,xdensity=7,ydensity=7)+r2(bounds=bbox,xdensity=7,ydensity=7)
         c = Composite(generators=[r1,r2],bounds=bbox,xdensity=7,ydensity=7)
         assert_array_equal(c(),c_true)

@@ -34,7 +34,7 @@ from topo.command.basic import pattern_present,restore_input_generators, save_in
 from topo.command.basic import wipe_out_activity, clear_event_queue
 from topo.misc.distribution import Distribution
 from topo.misc.util import cross_product, frange
-from topo.pattern.basic import SineGrating, Gaussian, Rectangle, Disk, OrientationContrast
+from topo.pattern.basic import SineGrating, Gaussian, RawRectangle, Disk, OrientationContrast
 from topo.plotting.plotgroup import plotgroups
 from topo.sheet import GeneratorSheet
 
@@ -1118,7 +1118,7 @@ class SingleInputResponseCommand(MeasureResponseCommand):
 
     # JABALERT: Presumably the size is overridden in the call, right?
     pattern_presenter = param.Callable(
-        default=PatternPresenter(Rectangle(size=0.1,aspect_ratio=1.0)))
+        default=PatternPresenter(RawRectangle(size=0.1,aspect_ratio=1.0)))
 
     static_parameters = param.List(default=["scale","offset","size"])
 

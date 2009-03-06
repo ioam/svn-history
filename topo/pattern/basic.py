@@ -20,7 +20,8 @@ import topo
 from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
-from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,float_error_ignore
+from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring
+from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,float_error_ignore
 from topo.misc.numbergenerator import UniformRandom
 
 
@@ -276,8 +277,11 @@ class OrientationContrast(SineGrating):
 
 
 
-class Rectangle(PatternGenerator):
-    """2D rectangle pattern generator."""
+class RawRectangle(PatternGenerator):
+    """
+    2D rectangle pattern generator with no smoothing, for use when drawing
+    patterns pixel by pixel.
+    """
     
     aspect_ratio   = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
@@ -285,14 +289,124 @@ class Rectangle(PatternGenerator):
     
     size  = param.Number(default=0.5,doc="Height of the rectangle.")
 
-    # We will probably want to add Fuzzy-style anti-aliasing to this.
-
     def function(self,p):
         height = p.size
         width = p.aspect_ratio*height
         
         return bitwise_and(abs(self.pattern_x)<=width/2.0,
                            abs(self.pattern_y)<=height/2.0)
+
+
+
+class Rectangle(PatternGenerator):
+    """2D rectangle pattern, with Gaussian smoothing around the edges."""
+
+    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,6.0),
+        precedence=0.31,doc=
+        "Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
+    
+    size = param.Number(default=0.5,doc="Height of the rectangle.")
+
+    smoothing = param.Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
+        precedence=0.61,doc="Width of the Gaussian fall-off outside the rectangle.")
+
+    def function(self,p):
+        height=p.size
+        width=p.aspect_ratio*height
+
+        return smooth_rectangle(self.pattern_x, self.pattern_y, 
+                                width, height, p.smoothing, p.smoothing)
+
+
+
+class Arc(PatternGenerator):
+    """
+    2D arc pattern generator.
+    
+    Draws an arc (partial ring) of the specified size (radius*2),
+    starting at radian 0.0 and ending at arc_length.  The orientation
+    can be changed to choose other start locations.  The pattern is
+    centered at the center of the ring.
+
+    See the Disk class for a note about the Gaussian fall-off.
+    """
+
+    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,6.0),
+        precedence=0.31,doc="""
+        Ratio of width to height; size*aspect_ratio gives the overall width.""")
+
+    thickness = param.Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
+        precedence=0.60,doc="Thickness (line width) of the ring.")
+    
+    smoothing = param.Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
+        precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
+
+    arc_length = param.Number(default=pi,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
+                              inclusive_bounds=(True,False),precedence=0.62, doc="""
+        Length of the arc, in radians, starting from orientation 0.0.""")
+
+    size = param.Number(default=0.5)
+
+    def function(self,p):
+        if p.aspect_ratio==0.0:
+            return self.pattern_x*0.0
+
+        return arc_by_radian(self.pattern_x/p.aspect_ratio, self.pattern_y, p.size,
+                             (2*pi-p.arc_length, 0.0), p.thickness, p.smoothing)
+
+
+class Curve(Arc):
+    """
+    2D curve pattern generator.
+
+    Based on Arc, but centered on a tangent point midway through the
+    arc, rather than at the center of a ring, and with curvature
+    controlled directly rather than through the overall size of the
+    pattern.
+
+    Depending on the size_type, the size parameter can control either
+    the width of the pattern, keeping this constant regardless of
+    curvature, or the length of the curve, keeping that constant
+    instead (as for a long thin object being bent).
+
+    Specifically, for size_type=='constant_length', the curvature
+    parameter determines the ratio of height to width of the arc, with
+    positive curvature for concave shape and negative for convex. The
+    size parameter determines the width of the curve.
+
+    For size_type=='constant_width', the curvature parameter
+    determines the portion of curve radian to 2pi, and the curve
+    radius is changed accordingly following the formula::
+
+      size=2pi*radius*curvature
+
+    Thus, the size parameter determines the total length of the
+    curve. Positive curvature stands for concave shape, and negative
+    for convex.
+
+    See the Disk class for a note about the Gaussian fall-off.
+    """
+
+    # Hide unused parameters
+    arc_length = param.Number(precedence=-1.0)
+    aspect_ratio = param.Number(default=1.0, precedence=-1.0)
+
+    size_type = param.Enumeration(default='constant_length',
+        available=['constant_length','constant_width'],precedence=0.61,doc="""
+        For a given size, whether to draw a curve with that total length, 
+        or with that width, keeping it constant as curvature is varied.""")
+
+    curvature = param.Number(default=0.5, bounds=(-0.5, 0.5), precedence=0.62, doc="""
+        Ratio of height to width of the arc, with positive value giving
+        a concave shape and negative value giving convex.""")
+
+    def function(self,p):
+        return arc_by_center(self.pattern_x/p.aspect_ratio,self.pattern_y, 
+                             (p.size,p.size*p.curvature),
+                             (p.size_type=='constant_length'), 
+                             p.thickness, p.smoothing)
+
+
 
 #JABALERT: Can't this be replaced with a Composite?
 class TwoRectangles(Rectangle):

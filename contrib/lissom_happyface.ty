@@ -30,9 +30,6 @@ import topo.sheet.lissom
 import topo.sheet.optimized
 
 from topo.base.patterngenerator import PatternGenerator
-from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
-from numpy.oldnumeric import arcsin,logical_and,logical_or,tan,sin,less,minimum
-from numpy.oldnumeric import where,maximum,cos,sin,sqrt,divide,greater_equal,bitwise_xor,exp
 
 from topo.plotting.plotgroup import create_plotgroup
 #from topo.command.analysis import PatternPresenter, Feature, Subplotting
@@ -56,213 +53,6 @@ p.add(
     cortex_density=param.Number(default=24.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
         The nominal_density to use for V1."""))
-
-
-def arc_by_radian(x, y, height, radian_range, thickness, gaussian_width):
-    """
-    Radial arc with Gaussian fall-off after the solid ring-shaped
-    region with the given thickness, with shape specified by the
-    (start,end) radian_range.
-    """
-
-    # Create a circular ring (copied from the ring function)
-    radius = height/2.0
-    half_thickness = thickness/2.0
-
-    distance_from_origin = sqrt(x**2+y**2)
-    distance_outside_outer_disk = distance_from_origin - radius - half_thickness
-    distance_inside_inner_disk = radius - half_thickness - distance_from_origin
-
-    ring = 1.0-bitwise_xor(greater_equal(distance_inside_inner_disk,0.0),greater_equal(distance_outside_outer_disk,0.0))
-
-    sigmasq = gaussian_width*gaussian_width
-
-    if sigmasq==0.0:
-        inner_falloff = x*0.0
-        outer_falloff = x*0.0
-    else:
-        with float_error_ignore():
-            inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
-            outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
-            
-    output_ring = maximum(inner_falloff,maximum(outer_falloff,ring))
-
-    # Calculate radians (in 4 phases) and cut according to the set range)
-
-    # RZHACKALERT:
-    # Function float_error_ignore() cannot catch the exception when
-    # both dividend and divisor are 0.0, and when only divisor is 0.0
-    # it returns 'Inf' rather than 0.0. In x, y and
-    # distance_from_origin, only one point in distance_from_origin can
-    # be 0.0 (circle center) and in this point x and y must be 0.0 as
-    # well. So here is a hack to avoid the 'invalid value encountered
-    # in divide' error by turning 0.0 to 1e-5 in distance_from_origin.
-    distance_from_origin += where(distance_from_origin == 0.0, 1e-5, 0)
-
-    with float_error_ignore():
-        sines = divide(y, distance_from_origin)
-        cosines = divide(x, distance_from_origin)
-        arcsines = arcsin(sines)
-
-    phase_1 = where(logical_and(sines >= 0, cosines >= 0), 2*pi-arcsines, 0)
-    phase_2 = where(logical_and(sines >= 0, cosines <  0), pi+arcsines,   0)
-    phase_3 = where(logical_and(sines <  0, cosines <  0), pi+arcsines,   0)
-    phase_4 = where(logical_and(sines <  0, cosines >= 0), -arcsines,     0)
-    arcsines = phase_1 + phase_2 + phase_3 + phase_4
-
-    if radian_range[0] <= radian_range[1]:
-        return where(logical_and(arcsines >= radian_range[0], arcsines <= radian_range[1]),
-                     output_ring, 0.0)
-    else:
-        return where(logical_or(arcsines >= radian_range[0], arcsines <= radian_range[1]),
-                     output_ring, 0.0)
-
-
-def smooth_rectangle(x, y, rec_w, rec_h, gaussian_width_x, gaussian_width_y):
-    """
-    Rectangle with a solid central region, then Gaussian fall-off at the edges.
-    """
-
-    gaussian_x_coord = abs(x)-rec_w/2.0
-    gaussian_y_coord = abs(y)-rec_h/2.0
-        
-    box_x=less(gaussian_x_coord,0.0)
-    box_y=less(gaussian_y_coord,0.0)
-    sigmasq_x=gaussian_width_x*gaussian_width_x
-    sigmasq_y=gaussian_width_y*gaussian_width_y
-
-    with float_error_ignore():
-        falloff_x=x*0.0 if sigmasq_x==0.0 else \
-            exp(divide(-gaussian_x_coord*gaussian_x_coord,2*sigmasq_x))
-        falloff_y=y*0.0 if sigmasq_y==0.0 else \
-            exp(divide(-gaussian_y_coord*gaussian_y_coord,2*sigmasq_y))
-
-    return minimum(maximum(box_x,falloff_x), maximum(box_y,falloff_y))
-
-
-
-def arc_by_center(x, y, arc_box, constant_length, thickness, gaussian_width):
-    """
-    Arc with Gaussian fall-off after the solid ring-shaped region and specified
-    by point of tangency (x and y) and arc width and height.
-
-    This function calculates the start and end radian from the given width and
-    height, and then calls arc_by_radian function to draw the curve.
-    """
-
-    arc_w=arc_box[0]
-    arc_h=abs(arc_box[1])
-
-    if arc_w==0.0: # arc_w=0, don't draw anything
-        radius=0.0
-        angles=(0.0,0.0)
-    elif arc_h==0.0:  # draw a horizontal line, width=arc_w
-        return smooth_rectangle(x, y, arc_w, thickness, 0.0, gaussian_width)
-    else:
-        if constant_length:
-            curvature=arc_h/arc_w
-            radius=arc_w/(2*pi*curvature)
-            angle=curvature*(2*pi)/2.0
-        else:  # constant width
-            radius=arc_h/2.0+arc_w**2.0/(8*arc_h)
-            angle=arcsin(arc_w/2.0/radius)
-        if arc_box[1]<0: # convex shape
-            y=y+radius
-            angles=(3.0/2.0*pi-angle, 3.0/2.0*pi+angle)
-        else:  # concave shape
-            y=y-radius
-            angles=(pi/2.0-angle, pi/2.0+angle)
-
-    return arc_by_radian(x, y, radius*2.0, angles, thickness, gaussian_width)
-
-
-
-class Arc(PatternGenerator):
-    """
-    2D arc pattern generator.
-    
-    Draws an arc (partial ring) of the specified size (radius*2),
-    starting at radian 0.0 and ending at arc_length.  The orientation
-    can be changed to choose other start locations.  The pattern is
-    centered at the center of the ring.
-
-    See the Disk class for a note about the Gaussian fall-off.
-    """
-
-    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,6.0),
-        precedence=0.31,doc="""
-        Ratio of width to height; size*aspect_ratio gives the overall width.""")
-
-    thickness = param.Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
-        precedence=0.60,doc="Thickness (line width) of the ring.")
-    
-    smoothing = param.Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
-        precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
-
-    arc_length = param.Number(default=pi,bounds=(0.0,None),softbounds=(0.0,2.0*pi),
-                              inclusive_bounds=(True,False),precedence=0.62, doc="""
-        Length of the arc, in radians, starting from orientation 0.0.""")
-
-    size = param.Number(default=0.5)
-
-    def function(self,p):
-        if p.aspect_ratio==0.0:
-            return self.pattern_x*0.0
-
-        return arc_by_radian(self.pattern_x/p.aspect_ratio, self.pattern_y, p.size,
-                             (2*pi-p.arc_length, 0.0), p.thickness, p.smoothing)
-
-
-class Curve(Arc):
-    """
-    2D curve pattern generator.
-
-    Based on Arc, but centered on a tangent point midway through the
-    arc, rather than at the center of a ring, and with curvature
-    controlled directly rather than through the overall size of the
-    pattern.
-
-    Depending on the size_type, the size parameter can control either
-    the width of the pattern, keeping this constant regardless of
-    curvature, or the length of the curve, keeping that constant
-    instead (as for a long thin object being bent).
-
-    Specifically, for size_type=='constant_length', the curvature
-    parameter determines the ratio of height to width of the arc, with
-    positive curvature for concave shape and negative for convex. The
-    size parameter determines the width of the curve.
-
-    For size_type=='constant_width', the curvature parameter
-    determines the portion of curve radian to 2pi, and the curve
-    radius is changed accordingly following the formula::
-
-      size=2pi*radius*curvature
-
-    Thus, the size parameter determines the total length of the
-    curve. Positive curvature stands for concave shape, and negative
-    for convex.
-
-    See the Disk class for a note about the Gaussian fall-off.
-    """
-
-    # Hide unused parameters
-    arc_length = param.Number(precedence=-1.0)
-    aspect_ratio = param.Number(default=1.0, precedence=-1.0)
-
-    size_type = param.Enumeration(default='constant_length',
-        available=['constant_length','constant_width'],precedence=0.61,doc="""
-        For a given size, whether to draw a curve with that total length, 
-        or with that width, keeping it constant as curvature is varied.""")
-
-    curvature = param.Number(default=0.5, bounds=(-0.5, 0.5), precedence=0.62, doc="""
-        Ratio of height to width of the arc, with positive value giving
-        a concave shape and negative value giving convex.""")
-
-    def function(self,p):
-        return arc_by_center(self.pattern_x/p.aspect_ratio,self.pattern_y, 
-                             (p.size,p.size*p.curvature),
-                             (p.size_type=='constant_length'), 
-                             p.thickness, p.smoothing)
 
 
 class HappyFace(pattern.Composite):
@@ -313,31 +103,11 @@ class HappyFace(pattern.Composite):
         face    = pattern.Ring(aspect_ratio=1.0, x=0.0*sb, y=-3.0*sb,
                                thickness=self.face_thickness, smoothing=self.face_smoothing,
                                size=2.0*1.21/1.7*15.0*sb)
-        mouth   = Curve(x=0.0*sb, y=mouth_y*sb,
-                        size=mouth_width*sb, curvature=mouth_curvature, size_type='constant_width',
-                        thickness=self.mouth_thickness, smoothing=self.mouth_smoothing)
+        mouth   = pattern.Curve(x=0.0*sb, y=mouth_y*sb,
+                                size=mouth_width*sb, curvature=mouth_curvature, size_type='constant_width',
+                                thickness=self.mouth_thickness, smoothing=self.mouth_smoothing)
 
         return [lefteye, righteye, face, mouth]
-
-
-class RectangleWithSmoothing(PatternGenerator):
-    """2D rectangle pattern, with Gaussian smoothing around the edges."""
-
-    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,6.0),
-        precedence=0.31,doc=
-        "Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
-    
-    size = param.Number(default=0.5,doc="Height of the rectangle.")
-
-    smoothing = param.Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
-        precedence=0.61,doc="Width of the Gaussian fall-off outside the rectangle.")
-
-    def function(self,p):
-        height=p.size
-        width=p.aspect_ratio*height
-
-        return smooth_rectangle(self.pattern_x, self.pattern_y, 
-                                width, height, p.smoothing, p.smoothing)
 
 
 class measure_happiness(MeasureResponseCommand):
@@ -379,7 +149,7 @@ inputs=[HappyFace(happiness=numbergen.UniformRandom(lbound=-1.0, ubound=1.0, see
 combined_inputs=pattern.SeparatedComposite(min_separation=1.722972972972973, generators= inputs)
 
 # Draw multiple curves simultaneously
-#combined_inputs=pattern.Composite(generators= [Curve(x=0.0, y=i * 1.5, size=2.0,
+#combined_inputs=pattern.Composite(generators= [pattern.Curve(x=0.0, y=i * 1.5, size=2.0,
 #    curvature=i, thickness=0.2, smoothing=0.2)
 #    for i in frange(-0.5, 0.6, 0.1)])
 

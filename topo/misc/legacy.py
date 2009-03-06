@@ -763,7 +763,7 @@ class SineGratingDisk(SineGrating):
     mask_shape = param.Parameter(default=Disk(smoothing=0))
 
 class SineGratingRectangle(SineGrating):
-   mask_shape = param.Parameter(default=Rectangle())
+   mask_shape = param.Parameter(default=Rectangle(smoothing=0))
 
 class SineGratingRing(SineGrating):
    mask_shape = param.Parameter(default=Ring(smoothing=0))
