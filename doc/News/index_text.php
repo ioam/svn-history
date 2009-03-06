@@ -1,3 +1,11 @@
+<!--
+  <div class="i2">- PatternGenerators: 
+  <?php classref('topo.transferfn.basic','ExponentialDecay')?>,
+  <?php classref('topo.transferfn.basic','Arc')?>,
+  <?php classref('topo.transferfn.basic','Curve')?>, and
+  <?php classref('topo.transferfn.basic','Rectangle')?> (now with smoothing)</div>
+-->
+
 <p><b>12 February 2009:</b> Version 0.9.6 released, including:
 
 <!-- Updated to r9984 -->
