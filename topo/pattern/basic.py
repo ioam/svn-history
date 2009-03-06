@@ -261,11 +261,11 @@ class OrientationContrast(SineGrating):
     def __call__(self,**params_to_override):
         p = ParamOverrides(self,params_to_override)
       
-        input_1=SineGrating(mask_shape=Disk(smoothing=0),phase=p.phase, frequency=p.frequency,
+        input_1=SineGrating(mask_shape=Disk(smoothing=0,size=1.0),phase=p.phase, frequency=p.frequency,
                             orientation=p.orientationcenter,
                             scale=p.scalecenter, offset=p.offsetcenter,
                             aspect_ratio=p.aspect_ratio,smoothing=0.0,x=p.x, y=p.y,size=p.sizecenter)
-        input_2=SineGrating(mask_shape=Ring(smoothing=0),phase=p.phase, frequency=p.frequency,
+        input_2=SineGrating(mask_shape=Ring(smoothing=0,size=1.0),phase=p.phase, frequency=p.frequency,
                             orientation=p.orientationsurround, scale=p.scalesurround, offset=p.offsetsurround,
                             thickness=p.thickness,aspect_ratio=p.aspect_ratio,smoothing=0.0,x=p.x, y=p.y, size=p.sizesurround)
         
@@ -292,7 +292,6 @@ class RawRectangle(PatternGenerator):
     def function(self,p):
         height = p.size
         width = p.aspect_ratio*height
-        
         return bitwise_and(abs(self.pattern_x)<=width/2.0,
                            abs(self.pattern_y)<=height/2.0)
 

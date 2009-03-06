@@ -745,7 +745,7 @@ def duplicate_SineGratingDisk():
     from topo import param
     class SineGratingDisk(SineGrating):
         """2D sine grating pattern generator with a circular mask."""
-        mask_shape = param.Parameter(default=Disk(smoothing=0))
+        mask_shape = param.Parameter(default=Disk(smoothing=0,size=1.0))
     topo.pattern.basic.SineGratingDisk = SineGratingDisk
 S.append(duplicate_SineGratingDisk)
 
@@ -760,13 +760,13 @@ def teststimuli_removed():
 from topo.pattern.basic import SineGrating,Disk,Rectangle,Ring
 from topo import param
 class SineGratingDisk(SineGrating):
-    mask_shape = param.Parameter(default=Disk(smoothing=0))
+    mask_shape = param.Parameter(default=Disk(smoothing=0,size=1.0))
 
 class SineGratingRectangle(SineGrating):
-   mask_shape = param.Parameter(default=Rectangle(smoothing=0))
+   mask_shape = param.Parameter(default=Rectangle(smoothing=0,size=1.0))
 
 class SineGratingRing(SineGrating):
-   mask_shape = param.Parameter(default=Ring(smoothing=0))
+   mask_shape = param.Parameter(default=Ring(smoothing=0,size=1.0))
 """
     fake_a_module('teststimuli',code,parent=topo.pattern)
 

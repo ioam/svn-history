@@ -1126,7 +1126,7 @@ class measure_retinotopy(SinusoidalMeasureResponseCommand):
         The number of different positions to measure in X and in Y.""")
 
     pattern_presenter = param.Callable(
-        default=PatternPresenter(SineGrating(mask_shape=RawRectangle(),size=0.5)),doc="""
+        default=PatternPresenter(SineGrating(mask_shape=RawRectangle(size=1.0),size=0.5)),doc="""
         Callable object that will present a parameter-controlled
         pattern to a set of Sheets.  For measuring position, the
         pattern_presenter should be spatially localized, yet also able

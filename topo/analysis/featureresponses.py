@@ -1207,7 +1207,7 @@ class UnitCurveCommand(FeatureCurveCommand):
     """
 
     pattern_presenter = param.Callable(
-        default=PatternPresenter(pattern_generator=SineGrating(mask_shape=Disk(smoothing=0.0)),
+        default=PatternPresenter(pattern_generator=SineGrating(mask_shape=Disk(smoothing=0.0,size=1.0)),
                                  contrast_parameter="weber_contrast"))
 
     size=param.Number(default=0.5,bounds=(0,None),doc="""
