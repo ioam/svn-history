@@ -190,9 +190,12 @@ class PatternGenerator(param.Parameterized):
     def _apply_mask(self,p,mat):
         """Create (if necessary) and apply the mask to the given matrix mat."""
         mask = p.mask
-        if p.mask_shape is not None:
-            mask = p.mask_shape(x=p.x,y=p.y,bounds=p.bounds,size=p.size,
-                                ydensity=p.ydensity,xdensity=p.xdensity)
+        ms=p.mask_shape
+        if ms is not None:
+            mask = ms(x=p.x+p.size*(ms.x*cos(p.orientation)-ms.y*sin(p.orientation)),
+                      y=p.y+p.size*(ms.x*sin(p.orientation)+ms.y*cos(p.orientation)),
+                      orientation=ms.orientation+p.orientation,size=ms.size*p.size,
+                      bounds=p.bounds,ydensity=p.ydensity,xdensity=p.xdensity)
         if mask is not None:
             mat*=mask
 
