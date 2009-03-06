@@ -1,6 +1,7 @@
 <!--
   <div class="i2">- PatternGenerators: 
   <?php classref('topo.transferfn.basic','ExponentialDecay')?>,
+  <?php classref('topo.transferfn.basic','HalfPlane')?>,
   <?php classref('topo.transferfn.basic','Arc')?>,
   <?php classref('topo.transferfn.basic','Curve')?>, and
   <?php classref('topo.transferfn.basic','Rectangle')?> (now with smoothing)</div>
