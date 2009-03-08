@@ -129,7 +129,7 @@ class PatternGenerator(param.Parameterized):
         # if position is not None:
         #   x,y = position
 
-        self.__setup_xy(p.bounds,p.xdensity,p.ydensity,p.x,p.y,p.orientation)
+        self._setup_xy(p.bounds,p.xdensity,p.ydensity,p.x,p.y,p.orientation)
         fn_result = self.function(p)
         self._apply_mask(p,fn_result)
         result = p.scale*fn_result+p.offset
@@ -140,7 +140,7 @@ class PatternGenerator(param.Parameterized):
         return result
                                
 
-    def __setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
+    def _setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
         """
         Produce pattern coordinate matrices from the bounds and
         density (or rows and cols), and transforms them according to
@@ -155,7 +155,7 @@ class PatternGenerator(param.Parameterized):
             
         # Generate matrices of x and y sheet coordinates at which to
         # sample pattern, at the correct orientation
-        self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinate_arrays(x_points-x,y_points-y,orientation)
+        self.pattern_x, self.pattern_y = self._create_and_rotate_coordinate_arrays(x_points-x,y_points-y,orientation)
 
 
     def function(self,p):
@@ -173,7 +173,7 @@ class PatternGenerator(param.Parameterized):
         raise NotImplementedError
 
         
-    def __create_and_rotate_coordinate_arrays(self, x, y, orientation):
+    def _create_and_rotate_coordinate_arrays(self, x, y, orientation):
         """
         Create pattern matrices from x and y vectors, and rotate
         them to the specified orientation.
