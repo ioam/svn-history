@@ -163,9 +163,10 @@ from topo.pattern.image import FileImage,edge_average,PIL
 import ImageOps, ImageEnhance
 import numpy
 
-# should use _opt versions
-from contrib.rgbhsv import rgb_to_hsv_array ,hsv_to_rgb_array 
+from contrib.rgbhsv import rgb_to_hsv_array_opt as rgb_to_hsv_array, \
+                           hsv_to_rgb_array_opt as hsv_to_rgb_array
 
+from topo import transferfn
 
 # CEB: might be simpler to use HSV internally and provide red, green,
 # and blue properties (that do and cache a conversion)...but PIL
@@ -194,27 +195,20 @@ class ColorImage(FileImage):
     def __call__(self,**params_to_override):
         # Uses super's call for grayscale and to set up self.red,
         # self.green, self.blue, then performs the same actions
-        # as the super's call on the appropriate color channels
-        # of the image.
+        # as the super's call on the separate color channels.
 
         # PatternGenerator.__call__ does:
         # function, apply_mask, scale+offset, outputfns
-
         gray = super(ColorImage,self).__call__(**params_to_override)
- 
         p = ParamOverrides(self,params_to_override)
-        
-        H,S,V = rgb_to_hsv_array(self.red,self.green,self.blue)
+        for M in (self.red,self.green,self.blue):
+            self._apply_mask(p,M)
+            M*=p.scale
+            M+=p.offset
 
-        self._apply_mask(p,V)
-
-        V*=p.scale
-        V+=p.offset
-        
-        for of in p.output_fns:
-            of(V)
-
-        self.red,self.green,self.blue = hsv_to_rgb_array(H,S,V)
+        # any output_fn would need to be applied to the V channel
+        # only, so for now just
+        assert len(p.output_fns)==0
 
         return gray
 
