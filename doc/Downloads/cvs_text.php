@@ -32,7 +32,7 @@ have all of the necessary programs and libraries required to obtain
 Topographica by SVN.  If your machine does not have <code>svn</code>
 installed, you will first need to obtain and install it. Instructions
 are given below for obtaining SVN on <A HREF="#mac">Mac</A> and
-<A HREF="#Windows">Windows</A> platforms.
+<A HREF="#windows">Windows</A> platforms.
 
 <P>Once you have SVN installed, the location (URL) of the Topographica
 repository to use is
@@ -65,7 +65,7 @@ instructions for <a href="index.html">installing Topographica</a> to
 go through the build process.
 
 
-<H4><A NAME="osx">Getting Subversion on Mac OS X</A></H4>
+<H4><A NAME="mac">Getting Subversion on Mac OS X</A></H4>
 
 <!-- note that out-of-date X11 instructions were removed in 
 r8900. At that revision, topographica wasn't working with X11.-->
