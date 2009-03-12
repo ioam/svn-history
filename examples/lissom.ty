@@ -546,6 +546,8 @@ topo.sim['V1'].row_precedence=0.9
 import topo.command
 
 # Declare which maps to measure
+# CEBALERT: get 'Hue Preference' twice for 'cr' (because having 'rg'
+# in dims causes 'cr' to be added also)
 preference_maps=[
 ('dy',['PhaseDisparity Preference']),
 ('cr',['Hue Preference']),
