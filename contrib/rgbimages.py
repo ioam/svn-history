@@ -210,6 +210,9 @@ class ColorImage(FileImage):
         # only, so for now just
         assert len(p.output_fns)==0
 
+        if p.cache_image is False:
+            self._image_red=self._image_green=self._image_blue=None
+
         return gray
 
 
@@ -220,6 +223,7 @@ class ColorImage(FileImage):
         """
         gray = super(ColorImage,self).function(p)
 
+        orig_image = self._image
         # now store red, green, blue
         # (by repeating the super's function call, but each time first
         # setting _image to the appropriate channel's image)
@@ -232,7 +236,8 @@ class ColorImage(FileImage):
         self._image = self._image_blue
         self.blue = super(ColorImage,self).function(p)
 
-        # CEBALERT: currently, red, green, blue are cached
+        self._image = orig_image
+        # CEBALERT: currently, red, green, blue arrays are cached
         return gray
 
     
