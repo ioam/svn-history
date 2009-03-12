@@ -1216,9 +1216,6 @@ http://blog.nanorails.com/tags/git
 http://blog.nanorails.com/articles/2008/1/31/getting-started-with-git
 
 
-
-My notes...
-
 ceball@san:~/dev/topographica-git$ git checkout -b tkgui-tk85 remotes/git-svn
 
 ceball@doozy:~$ mkdir git
