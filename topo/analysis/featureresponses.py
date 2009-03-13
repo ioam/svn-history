@@ -614,7 +614,7 @@ class PatternPresenter(param.Parameterized):
             #### old motion model ####
                 orientation = features_values['direction']+pi/2
                 from topo.pattern.basic import Sweeper            
-                for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+                for name in inputs.keys():
                     speed=features_values['speed']
                     try:
                         step=int(name[-1])
@@ -633,12 +633,12 @@ class PatternPresenter(param.Parameterized):
 ##         if features_values.has_key('hue'):
 ##             from contrib import rgbimages
 ##             r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
-##             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+##             for name in inputs.keys():
 ##                 inputs[name] = rgbimages.ExtendToRGB(generator=inputs[name],
 ##                                                      relative_channel_strengths=[r,g,b])
 
         if features_values.has_key('hue'):
-            for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+            for name in inputs.keys():
                 r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
                 if (name.count('Red')):
                     inputs[name].scale=r
@@ -688,7 +688,7 @@ class PatternPresenter(param.Parameterized):
         if features_values.has_key("phasedisparity"):
             temp_phase1=features_values['phase']-features_values['phasedisparity']/2.0
             temp_phase2=features_values['phase']+features_values['phasedisparity']/2.0
-            for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+            for name in inputs.keys():
                 if (name.count('Right')):
                     inputs[name].phase=wrap(0,2*pi,temp_phase1)
                 elif (name.count('Left')):
@@ -724,7 +724,7 @@ class PatternPresenter(param.Parameterized):
 
 
         if features_values.has_key("ocular"):
-            for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+            for name in inputs.keys():
                 if (name.count('Right')):
                     inputs[name].scale=2*features_values['ocular']
                 elif (name.count('Left')):
