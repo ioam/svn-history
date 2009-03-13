@@ -629,27 +629,39 @@ class PatternPresenter(param.Parameterized):
             ##########################
 
 
-# CEB: for measuring hue maps with a single color retina
-##         if features_values.has_key('hue'):
-##             from contrib import rgbimages
-##             r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
-##             for name in inputs.keys():
-##                 inputs[name] = rgbimages.ExtendToRGB(generator=inputs[name],
-##                                                      relative_channel_strengths=[r,g,b])
-
         if features_values.has_key('hue'):
-            for name in inputs.keys():
+
+            # could be three retinas (R, G, and B) or a single RGB
+            # retina for the color dimension; if every retina has
+            # 'Red' or 'Green' or 'Blue' in its name, then three
+            # retinas for color are assumed
+
+            three_retinas = False 
+            for name in input_sheet_names:
+                if not ('Red' in name or 'Green' in name or 'Blue' in name):
+                    rgb_retina=True
+
+            if three_retinas:
+                for name in inputs.keys():
+                    r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
+                    if (name.count('Red')):
+                        inputs[name].scale=r
+                    elif (name.count('Green')):
+                        inputs[name].scale=g
+                    elif (name.count('Blue')):
+                        inputs[name].scale=b
+                    else: 
+                        if not hasattr(self,'hue_warned'):
+                            self.warning('Unable to measure hue preference, because hue is defined only when there are different input sheets with names with Red, Green or Blue substrings.')
+                            self.hue_warned=True
+            else:
+                from contrib import rgbimages
                 r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
-                if (name.count('Red')):
-                    inputs[name].scale=r
-                elif (name.count('Green')):
-                    inputs[name].scale=g
-                elif (name.count('Blue')):
-                    inputs[name].scale=b
-                else: 
-                    if not hasattr(self,'hue_warned'):
-                        self.warning('Unable to measure hue preference, because hue is defined only when there are different input sheets with names with Red, Green or Blue substrings.')
-                        self.hue_warned=True
+                for name in inputs.keys():
+                    inputs[name] = rgbimages.ExtendToRGB(generator=inputs[name],
+                                                         relative_channel_strengths=[r,g,b])
+                # CEBALERT: should warn as above if not a color network
+
 
 
         if features_values.has_key('retinotopy'):
