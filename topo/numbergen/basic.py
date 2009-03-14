@@ -208,13 +208,15 @@ class VonMisesRandom(RandomDistribution):
     If kappa is zero, this distribution reduces to a uniform random
     angle over the range 0 to 2*pi.  Otherwise, it is concentrated to
     a greater or lesser degree (determined by kappa) around the mean
-    mu.  See the random module for further details.
+    mu.  For large kappa (narrow peaks), this distribution approaches
+    the Gaussian (normal) distribution with variance 1/kappa.  See the
+    random module for further details.
     """
-    #JABALERT: Shouldn't this have bounds=(0.0,2*pi)?
-    mu = param.Number(default=0.0,doc="""
+
+    mu = param.Number(default=0.0,softbounds=(0.0,2*pi)doc="""
         Mean value, in the range 0 to 2*pi.""")
     
-    kappa = param.Number(default=1.0,doc="""
+    kappa = param.Number(default=1.0,softbounds=(0.0,50.0)doc="""
         Concentration (inverse variance).""")
 
     def __call__(self):
@@ -245,7 +247,7 @@ class ExponentialDecay(NumberGenerator):
     # CEBALERT: default should be more like 'lambda:0', but that would
     # confuse GUI users.
     time_fn = param.Callable(default=topo.sim.time,doc="""
-     Function to generate the time used for the decay.""")
+        Function to generate the time used for the decay.""")
 
     def __call__(self):
         Vi = self.starting_value
