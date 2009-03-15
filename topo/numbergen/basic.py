@@ -9,7 +9,7 @@ __version__='$Revision: 8985 $'
 import random
 import operator
 
-from math import e
+from math import e,pi
 
 from .. import param
 
@@ -213,10 +213,10 @@ class VonMisesRandom(RandomDistribution):
     random module for further details.
     """
 
-    mu = param.Number(default=0.0,softbounds=(0.0,2*pi)doc="""
+    mu = param.Number(default=0.0,softbounds=(0.0,2*pi),doc="""
         Mean value, in the range 0 to 2*pi.""")
     
-    kappa = param.Number(default=1.0,softbounds=(0.0,50.0)doc="""
+    kappa = param.Number(default=1.0,softbounds=(0.0,50.0),doc="""
         Concentration (inverse variance).""")
 
     def __call__(self):
