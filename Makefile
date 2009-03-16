@@ -371,6 +371,13 @@ SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_o
 #@@	   	${RM} -r topographica-win 
 #@@endif
 
+# need to make sure python_topo isn't cleaned away on Windows
+win-distclean:
+	${MV} python_topo TMPpython_topo
+	make distclean
+	${MV} TMPpython_topo python_topo
+
+
 # Make public distribution archive
 distarc: FORCE distclean 
 	${CD} .. ; ${MAKE_ARCHIVE} ${DIST_DIRNAME} | ${COMPRESS_ARCHIVE} > ${DIST_ARCHIVE}
