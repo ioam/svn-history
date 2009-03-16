@@ -85,9 +85,13 @@ include those present in release-->
 
 <li><P>When the package is ready for release, copy binaries to
     SourceForge using their admin interface, and add a news release
-    and screenshots. As of 8/2008, the upload command would be something like
+    and screenshots. As at 3/2009, the upload command would be something like
     <code>rsync -avP -e ssh topographica-0.9.5.tar.gz  ceball@frs.sourceforge.net:uploads/</code>
 
+<!--
+how i made the zip file:
+zip -r topographica-0.9.6.zip topographica-0.9.6/*
+-->
 
 <li><P>Build on Windows and make .exe versions, test them, and upload
     them to SourceForge.
