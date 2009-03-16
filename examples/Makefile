@@ -5,7 +5,7 @@
 # JPALERT: Should consider rewriting this in Python so that it can run
 # easily under Windows as well.
 
-all_quick: hierarchical cfsom_or som_retinotopy lissom_oo_or
+all_quick: hierarchical som_retinotopy lissom_oo_or
 all_long: lissom_oo_or_10000.typ gca_lissom_10000.typ som_retinotopy_40000.typ lissom_or_10000.typ lissom_fsa_10000.typ
 saved-examples: lissom_oo_or_10000.typ
 
@@ -34,9 +34,6 @@ test_running:
 
 # Perform simple tests that the examples at least run; should be
 # replaced by more extensive tests.
-cfsom_or:
-	cd .. ; ./topographica -c "default_density=4" examples/cfsom_or.ty -c "topo.sim.run(1)"
-
 hierarchical:
 	cd .. ; ./topographica -c "default_density=4" examples/hierarchical.ty -c "topo.sim.run(1)"
 
