@@ -373,9 +373,9 @@ SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_o
 
 # need to make sure python_topo isn't cleaned away on Windows
 win-distclean:
-	${MV} python_topo TMPpython_topo
+	-mv python_topo TMPpython_topo
 	make distclean
-	${MV} TMPpython_topo python_topo
+	mv TMPpython_topo python_topo
 
 
 # Make public distribution archive
