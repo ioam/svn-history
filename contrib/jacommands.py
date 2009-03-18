@@ -514,11 +514,16 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple",prob=0.1):
             cf_off._has_norm_total=False
 
             ra = rand()
-            a = prob
-            if ra>=0.5: a = (1-a)
             
-            cf_on.weights*=a 
-            cf_off.weights*=(1-a)
+            ra=(ra-0.5)*2*prob+0.5
+            
+            cf_on.weights*=ra 
+            cf_off.weights*=(1-ra)
+            #a = prob
+            #if ra>=0.5: a = (1-a)
+            
+            #cf_on.weights*=a 
+            #cf_off.weights*=(1-a)
             
 
             
