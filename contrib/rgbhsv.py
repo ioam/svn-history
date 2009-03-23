@@ -1,10 +1,8 @@
 """
-Work in progress. Optimized functions to convert between rgb and hsv.
-Need to check input and output types are compatible with standard
-colorsys functions.
+Array-compatible and optimized versions of the colorsys module's
+rgb_to_hsv() and hsv_to_rgb() functions.
 
-
-$Id: rgbhsv.py 31 2008-12-15 11:40:30Z v1cball $
+$Id$
 """
 
 from topo.misc.inlinec import inline
