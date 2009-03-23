@@ -154,7 +154,7 @@ topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=p.retina_density,
 
 # LGN has lateral connections for divisive normalization
 for s in ['LGNOn','LGNOff']:
-    topo.sim[s]=sheet.lissom.LISSOM(nominal_density=p.retina_density,
+    topo.sim[s]=sheet.lissom.LISSOM(nominal_density=p.lgn_density,
         nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25+0.5),
         output_fns=[transferfn.HalfRectify()],
         tsettle=2,strict_tsettle=1,measure_maps=False)
