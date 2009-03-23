@@ -132,7 +132,7 @@ if p.dataset=="Gaussian":
     
     combined_inputs = pattern.SeparatedComposite(min_separation=0,generators=inputs)
     
-elif p.dataset=="Natural":
+elif p.dataset=="Nature":
     input_type=pattern.image.FileImage
     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
     inputs=[input_type(filename=f,
