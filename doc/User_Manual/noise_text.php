@@ -31,7 +31,7 @@ transfer functions for noise include variants of:
   PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=0.1,offset=-0.05),operator=numpy.add))
 </small></blockquote>
 
-where the scale and offset parameters determine the mean value and the
+where the offset and scale parameters determine the mean value and the
 range of the variation, respectively, the operator determines whether
 the noise is multiplicative, divisive, or some other type of
 combination, and the noise itself can either be Uniform or Gaussian
@@ -39,17 +39,19 @@ combination, and the noise itself can either be Uniform or Gaussian
 are also some other noise-related TransferFns available, such as
 ProportionalGaussian (variance proportional to the mean).
 
-<P>Hints: For additive noise, if you are modelling non-zero background
-levels of activity in a Sheet or Projection, you can use an offset of
-zero and a scale that is the level of noise you want.  In other cases
-where you want to avoid changing the average activity levels, you can
-get zero-mean additive noise by making the offset be a negative number
-that is half of the scale.  To keep the average activity levels
-constant with multiplicative noise requires an offset of
-1.0-scale/2.0; the scale then determines the noise level.  You can of
-course combine both types of noise in succession, in which case you
-will typically want to do the multiplicative noise first, to avoid scaling
-the additive noise.
+<P>Hints: For additive UniformRandom noise, if you are modelling
+non-zero background levels of activity in a Sheet or Projection, you
+can use an offset of zero and a scale that is the level of noise you
+want.  In other cases where you want to avoid changing the average
+activity levels, you can get zero-mean UniformRandom additive noise by
+making the offset be a negative number that is half of the scale.  To
+keep the average activity levels constant with multiplicative noise
+requires an offset of 1.0-scale/2.0; the scale then determines the
+noise level.  You can of course combine both types of noise in
+succession, in which case you will typically want to do the
+multiplicative noise first, to avoid scaling the additive noise.
+Note that GaussianRandom noise is zero mean already; the difference
+compared to UniformRandom is for historical reasons.
 
 <P>As an example, to inject zero-mean additive uniform random noise
 into the LateralExcitatory Projection of a LISSOM-based model, just change e.g.
