@@ -406,7 +406,7 @@ class KernelMax(TransferFn):
 
 
 
-
+# JAALERT: rename to something like PlasticTransferFn
 class TransferFnWithState(TransferFn):
     """
     Abstract base class for TransferFns that need to maintain a self.plastic parameter.
@@ -901,7 +901,7 @@ class HomeostaticResponse(TransferFnWithState):
         # recalculate the mu based on the input/ output ratio
 
 
-class Hysteresis(TransferFnWithState):
+class Hysteresis(TransferFnWithRandomState):
     """
     Smoothly interpolates a matrix between simulation time steps, with
     exponential falloff.
@@ -913,6 +913,7 @@ class Hysteresis(TransferFnWithState):
     def __init__(self,**params):
         super(Hysteresis,self).__init__(**params)
         self.first_call = True
+        self.__current_state_stack=[]
         self.old_a = 0 
         topo.base.functionfamily.PatternDrivenAnalysis.pre_presentation_hooks.append(self.reset)
         
@@ -930,6 +931,22 @@ class Hysteresis(TransferFnWithState):
     def reset(self):
         self.old_a *= 0
 
+    def state_push(self):
+        """
+        Save the current state of the output function to an internal stack.
+        """
+        self.__current_state_stack.append((copy.copy(self.old_a), copy.copy(self.first_call)))
+        super(Hysteresis,self).state_push()
+
+        
+    def state_pop(self):
+        """
+        Pop the most recently saved state off the stack.
+        
+        See state_push() for more details.
+        """
+        self.old_a,self.first_call =  self.__current_state_stack.pop()
+        super(Hysteresis,self).state_pop()
 
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,TransferFn)]))
