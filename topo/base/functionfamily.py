@@ -36,8 +36,19 @@ class TransferFn(param.Parameterized):
     def __call__(self,x):
         raise NotImplementedError
 
-
-
+    def state_push(self):
+        """
+        Save the current random number generator (onto the stack),
+        replacing it with a copy.
+        """
+        pass
+    
+    def state_pop(self):
+        """
+        Retrieve the previous random number generator from the stack.
+        """
+        pass
+        
 # Trivial example of a TransferFn, provided for when a default
 # is needed.  The other concrete OutputFunction classes are stored
 # in transferfn/, to be imported as needed.
