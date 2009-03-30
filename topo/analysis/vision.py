@@ -25,7 +25,7 @@ from topo.base.sheetview import SheetView
 from topo.misc.filepath import normalize_path
 from topo.misc.numbergenerator import UniformRandom
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
-
+from topo.command.analysis import measure_or_pref
 
 max_value = 0
 global_index = ()
@@ -249,12 +249,14 @@ def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename
               % simple_sheet_name
 
 
-def measure_and_analyze_complexity():
+class measure_and_analyze_complexity(measure_or_pref):
     """Macro for measuring orientation preference and then analyzing its complexity."""
-    from topo.command.analysis import measure_or_pref
-    fm = measure_or_pref()
-    analyze_complexity(fm,simple_sheet_name="V1Simple",complex_sheet_name="V1Complex",filename="ModulationRatio")
-
+    def __call__(self,**params):
+        fm = super(measure_and_analyze_complexity,self).__call__(**params)
+        #from topo.command.analysis import measure_or_pref
+        #fm = measure_or_pref()
+        analyze_complexity(fm,simple_sheet_name="V1Simple",complex_sheet_name="V1Complex",filename="ModulationRatio")
+    
 
 pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
