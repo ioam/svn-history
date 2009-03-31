@@ -36,7 +36,7 @@ p.add(
         inclusive_bounds=(False,True),doc="""
         The nominal_density to use for the retina."""),
 
-    cortex_density=param.Number(default=48.0,bounds=(0,None),
+    cortex_density=param.Number(default=10.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
         The nominal_density to use for V1."""),
 
