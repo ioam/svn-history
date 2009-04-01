@@ -88,7 +88,8 @@ echo IMPORTANT: if you are upgrading from a previous version, you should
 echo delete two temporary directories before running Topographica:
 echo "python25_compiled" and "python25_intermediate"
 echo.
-echo On your computer, these are likely to be located in either:
+echo On your computer, these are likely to be located inside a
+echo folder with your username, in either:
 echo %TEMP%
 echo or:
 echo %TMP%

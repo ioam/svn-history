@@ -2,9 +2,8 @@ Making a Windows installation package
 =====================================
 
 (1) First you need to be using a copy that has been set up to
-    work under SVN. This means you have topographica-win\ inside
-    the topographica\ directory, you have run setup.bat in the
-    setup_cvs_copy\ directory, and you've checked it all works!
+    work under SVN. This means you have already followed the
+    instructions in topographica-win\setup_cvs_copy\README.txt
 
 (2) You also need to have msys. topographica-win\ includes a 
     ready-made msys setup and instructions in the msys\ directory.
@@ -20,7 +19,7 @@ Making a Windows installation package
 
 (5) Change to the newly created distribution directory (e.g.
     ../distributions/topographica-0.9.5). Then:
-    $ make distclean
+    $ make win-distclean
 
 (6) Open a windows command prompt and change to the 
     distribution directory. Then change to topographica-win\create_installer
@@ -30,16 +29,13 @@ Making a Windows installation package
     deletes the script itself.)
 
 (4) Delete the doc/ subdirectory and replace it with one where the 
-    documentation has been compiled (I copy it over from a linux
-    version, but you could complile the php files on Windows, good
-    luck with that).  The doc directory should be cleaned up before it
-    is copied in (i.e. take it from a distribution-ready copy of Topographica
-    on linux).
+    documentation has been compiled (I copy doc/ over from the
+    equivalent linux release, downloaded from sf.net, but you could
+    complile the php files on Windows, good luck with that).
 
 (6) I use 'Inno Setup 5', an open-source installation package creator
     (see http://www.jrsoftware.org/isinfo.php).
     Move topographica.iss to anywhere outside the topographica directory, 
-    then open it from the new location, adjust the
-    paths marked *** to match those on your system, and finally choose
-    'compile' from the 'build' menu. You should get a setup.exe file
-    in a newly created 'Output' directory at the same level as topographica.iss.
+    then open it from the new location, and follow the instructions at the top of the file.
+
+

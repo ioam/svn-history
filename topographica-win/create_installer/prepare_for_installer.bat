@@ -30,7 +30,7 @@ copy ..\common\topographica.ico ..\..
 copy ..\create_installer\topographica.iss ..\..
 
 
-REM Clean this copy of Topographica...
+REM Clean this copy of Topographica (beyond what Makefile's clean did)...
 
 cd ..\..
 

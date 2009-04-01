@@ -20,6 +20,10 @@ necessary for Topographica developers to create this installer.
 To create an .exe installer
 ===========================
 
+Note: .bat scripts probably always assume they are running from their 
+own directory; please make sure you double click on the .bat, or use 
+cmd.exe to run the .bat from the directory in which it resides.
+
 (1) If external packages (such as python or numpy) need to be updated,
 follow the instructions in create_python_topo/README.txt
 

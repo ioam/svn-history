@@ -32,6 +32,10 @@ REM tooltip
 ..\util\gunzip -c ..\..\external\tooltip-1.4.tar.gz > ..\..\external\tooltip-1.4.tar
 ..\util\tar xf ..\..\external\tooltip-1.4.tar
 
+REM odict
+copy ..\..\external\odict.py .
+
+
 REM ******************************************************************
 
 
@@ -48,16 +52,21 @@ cd create_python_topo
 REM ******************************************************************
 REM INSTALL PACKAGES
 
-REM python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
+REM python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip odict
 
 REM * python
 start /w msiexec /i python-2.5.1.msi ALLUSERS=0 TARGETDIR=c:\python25 ADDLOCAL=DefaultFeature,TclTk
+REM quoting patch (http://bugs.python.org/issue4508)
+set storecpt=%cd%
+cd c:\python25\Lib\distutils
+%storecpt%\util\patch.exe -p0 < %storecpt%\distutils_compiler_quoting.diff
+cd %storecpt%
 
 REM * jpeg
 REM CEBALERT: included in PIL binary?
 
 REM * PIL
-start /w PIL-1.1.5.win32-py2.5.exe
+start /w PIL-1.1.6.win32-py2.5.exe
 
 REM * numpy
 start /w numpy-1.1.1-win32-superpack-python2.5.exe
@@ -110,10 +119,16 @@ cd ..
 REM * tooltip
 move tooltip-1.4 c:\python25\tcl\
 
+REM * odict
+move odict.py c:\python25\Lib\site-packages\odict.py
+
 REM * tile 0.8.2 (ADDITIONAL, until python 2.6 which has tk 8.5)
 util\gunzip -c tile0.8.2.tar.gz > tile0.8.2.tar
 util\tar xf tile0.8.2.tar
 move tile0.8.2 c:\python25\tcl\
+
+REM * readline
+start /w pyreadline-1.5-win32-setup.exe
 
 
 REM ******************************************************************
@@ -142,19 +157,9 @@ rmdir /Q /S create_python_topo
 
 echo.
 echo.
-echo Now test this has worked by moving c:\Python25 to your Topographica
-echo directory (replacing the one already there). To be sure this copy 
-echo works correctly, you should make sure any other copy of Topographica 
-echo is uninstalled first (or try on a computer that does not have Python 
-echo installed).
-echo.
-echo If successful, tar.gz this python_topo and add it to cvs at
-echo topographica-win\common\python_topo.tar.gz.
-echo.
-echo.
-echo.
 echo ** Before testing, you should proabably delete any previously compiled
-echo c++ code from python*_compiled and python*_intermediate in:
+echo c++ code from python*_compiled and python*_intermediate, located in a 
+echo folder with your username inside:
 echo %TEMP%
 echo or:
 echo %TMP%

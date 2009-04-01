@@ -24,6 +24,8 @@ import os
 
 create_associations=False
 compiler_path = "python_topo\\mingw\\bin"
+# following required for non-admin vista users?
+cc1plus_path = "python_topo\\mingw\\libexec\\gcc\\mingw32\\3.4.2" 
 
 
 # CEBHACKALERT: should check it's valid, etc.
@@ -41,13 +43,13 @@ if len(sys.argv)>2:
 # topographica script
 f = open(os.path.join(path,"topographica"),'w')
 
-f.write("#! python_topo/python.exe")
+f.write("#! python_topo/python.exe\n")
 f.write("# Startup script for Topographica\n")
 f.write("\n")
 f.write("# for gcc compiler\n")
 # Should keep current path, too? Or work out how to set gcc compiler path directly.
 f.write("from os import environ\n")
-f.write("environ['PATH']="+repr(os.path.join(path,compiler_path))+"\n")
+f.write("environ['PATH']="+repr(os.path.join(path,compiler_path)+ ";"+os.path.join(path,cc1plus_path))+"\n")
 f.write("\n")
 f.write('import topo'+'\n')
 # CEBHACKALERT: This is hard-coded twice: should be read from somewhere.
