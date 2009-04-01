@@ -358,7 +358,9 @@ SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_o
 #@@	   ${RM} current_profile ./topo/tests/testsnapshot.typ script ./topo/tests/*.ty_*DATA timing* ./topo/tests/testplotfilesaver*.png
 #@@	   ${RM} examples/*.typ
 #@@	   ${RM} -r Output
+#@@	   -mv images/ellen_arthur.pgm ./TMPellen_arthur.pgm
 #@@	   ${RM} -r images
+#@@	   mkdir images; mv ./TMPellen_arthur.pgm images/ellen_arthur.pgm
 #@@	   ${RM} -r win_build_exe.py
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r contrib/
