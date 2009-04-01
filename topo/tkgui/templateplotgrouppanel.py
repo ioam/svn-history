@@ -66,17 +66,29 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
     # probably a global 'monochrome' parameter that all plots respect,
     # and then people can modify the plot templates directly if they
     # need more control than that.
-    def redraw_plots(self):
+    def _strength_only_hack(self):
         # same as superclass, except that if strength only is true
         # it temporarily removes hue&conf from plot_templates
         original_templates = self.plotgroup.plot_templates
-        self.plotgroup.plot_templates = copy.deepcopy(self.plotgroup.plot_templates)        
+        self.plotgroup.plot_templates = copy.deepcopy(self.plotgroup.plot_templates)
         if self.strength_only:
             for name,template in self.plotgroup.plot_templates:
                 for c in ['Confidence','Hue']:
                     if c in template:
                         del template[c]
-
+        return original_templates
+        
+    def refresh_plots(self):
+        # same as superclass, except that if strength only is true
+        # it temporarily removes hue&conf from plot_templates
+        original_templates = self._strength_only_hack()
+        super(TemplatePlotGroupPanel,self).refresh_plots()
+        self.plotgroup.plot_templates = original_templates
+        
+    def redraw_plots(self):
+        # same as superclass, except that if strength only is true
+        # it temporarily removes hue&conf from plot_templates
+        original_templates = self._strength_only_hack()
         super(TemplatePlotGroupPanel,self).redraw_plots()
         self.plotgroup.plot_templates = original_templates
             
