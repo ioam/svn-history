@@ -13,22 +13,23 @@ array into another array of the same size and shape.  At many
 locations in the Topographica code, a parameter named output_fns is
 provided to allow the user to put in any desired functions of this
 type.  For instance, the output_fns of a Sheet (e.g. the Retina or V1)
-constitute its activation or transfer function.  The output_fns of a Projection
-(e.g. Afferent or LateralExcitatory) are applied to the activity in
-that Projection after it has been computed, and thus are also transfer functions.
+constitute its activation or transfer function.  The output_fns of a
+Projection (e.g. Afferent or LateralExcitatory) are applied to the
+activity in that Projection after it has been computed, and thus are
+also transfer functions.
 
-<p>Multiple TransferFns can be placed in Topographica output_fns, and will
-be applied sequentially. For instance,
-LISSOM V1 Sheets typically have one PiecewiseLinear() TransferFn in its list
-of output_fns; noise can be added to this by appending to output_fns a TransferFn that adds
-noise.  Others that have an empty list of output_fns  by default can again just append
-the new output_function to the list. Suitable
+<p>Multiple TransferFns can be placed in Topographica output_fns, and
+will be applied sequentially. For instance, LISSOM V1 Sheets typically
+have one PiecewiseLinear() TransferFn in the list of output_fns; noise
+can be added to this by appending to output_fns a TransferFn that adds
+noise.  Others that have an empty list of output_fns by default can
+again just append the new output_function to the list. Suitable
 transfer functions for noise include variants of:
 
 <blockquote><small>
-  PatternCombine(generator=topo.pattern.random.UniformRandom(scale=1.0,offset=1.0),operator=numpy.multiply)<br>
+  transferfn.PatternCombine(generator=pattern.random.UniformRandom(scale=1.0,offset=1.0),operator=numpy.multiply)<br>
 
-  PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=0.1,offset=-0.05),operator=numpy.add))
+  transferfn.PatternCombine(generator=pattern.random.GaussianRandom(scale=0.1,offset=-0.05),operator=numpy.add))
 </small></blockquote>
 
 where the offset and scale parameters determine the mean value and the
@@ -63,7 +64,7 @@ into the LateralExcitatory Projection of a LISSOM-based model, just change e.g.
 (if output_fns are specified) to e.g.:
 
 <pre>
-  output_fns=[PatternCombine(generator=topo.pattern.random.\
+  output_fns=[transferfn.PatternCombine(generator=pattern.random.\
       UniformRandom(scale=0.1,offset=-0.05),operator=numpy.add)]
 </pre>
 
@@ -87,7 +88,7 @@ realistic. Instead, you can specify a jittered mapping for the
 CFProjection, by adding:
 
 <pre>
-  coord_mapper = Jitter(gen=UniformRandom(seed=1023),scale=0.2)
+  coord_mapper = coordmapper.Jitter(gen=numbergen.UniformRandom(seed=1023),scale=0.2)
 </pre>
 
 to the topo.sim.connect command, to offset the values by a random
@@ -135,6 +136,7 @@ after any weight normalization.  E.g., a script that uses
 CFPOF_DivisiveNormalizeL1_opt or CFPOF_DivisiveNormalizeL1 could be
 changed to:
 
+<!--CEB: this command needs more than namespace updates-->
 <pre>
   CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1(single_cf_fn=(\
      PatternCombine(generator=topo.pattern.random.UniformRandom(scale=0.1,offset=-0.05),operator=numpy.add)+\
