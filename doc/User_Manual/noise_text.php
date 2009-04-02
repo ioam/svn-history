@@ -134,17 +134,20 @@ CFProjection.autosize_mask to be False.
 <!--CEBALERT: all this awkwardness is SF bug #2716972!-->
 
 
+
 <H2>Weight adjustment noise</H2>
 
 <P>One could imagine the process of adjusting weights to be a
 stochastic or quantized process, either of which would give some
 variability to the process of updating weight values.  For instance,
 this could be modeled with additive or multiplicative noise before or
-after any weight normalization.  E.g., a script that uses
-CFPOF_DivisiveNormalizeL1_opt or CFPOF_DivisiveNormalizeL1 could be
-changed to:
+after any weight normalization.  
 
-<!--CEB: this command needs more than namespace updates-->
+<!-- CEBALERT: SF #2716954
+
+E.g., a script that uses CFPOF_DivisiveNormalizeL1_opt or
+CFPOF_DivisiveNormalizeL1 could be changed to:
+
 <pre>
   CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1(single_cf_fn=(\
      PatternCombine(generator=topo.pattern.random.UniformRandom(scale=0.1,offset=-0.05),operator=numpy.add)+\
@@ -162,6 +165,7 @@ to add the noise only after the network has been initialized.  For
 LISSOM networks this can be achieved by setting
 LISSOM.post_initialization_weights_output_fns instead of
 CFProjection.weights_output_fns. 
+-->
 
 
 <H2>Spatially correlated noise</H2>
