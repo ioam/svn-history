@@ -118,12 +118,20 @@ varies the outgoing connection field of the LGN.
 Another type of noise is differences in the connection field shapes
 between neurons in the same projection.  Most of the example .ty files
 specify simple circular weights outlines, and to save memory by
-default all CFs in a projection share the same weight outline.
-If you want to try using noisy outlines where only some values within
-the circle have any effect, first set
-CFProjection.same_cf_shape_for_all_cfs=False, then set 
+default all CFs in a projection share the same weight outline.  If you
+want to try using noisy outlines where only some values within the
+circle have any effect, first set
+CFProjection.same_cf_shape_for_all_cfs=False, then set
 CFProjection.cf_shape to a PatternGenerator that returns different
-results each time it is evaluated.
+results each time it is evaluated. By default, dynamic parameters in
+Topographica only advance once per simulation time, so it is next
+necessary to call CFProjection.cf_shape.set_dynamic_time_fn(None),
+causing the PatternGenerator's dynamic values change each time it is
+evaluated. Note that one further command may be necessary in some
+cases: by default, the PatternGenerator used for cf_shape has its size
+set automatically; if instead you want to control the size, set
+CFProjection.autosize_mask to be False.  
+<!--CEBALERT: all this awkwardness is SF bug #2716972!-->
 
 
 <H2>Weight adjustment noise</H2>
