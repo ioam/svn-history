@@ -264,7 +264,7 @@ topo.sim.connect('V1ComplexInh','V1Complex',delay=0.05,name='LateralInhibitoryTo
                  learning_rate=locals().get('lat_inh_lr',0.0))
 
 topo.sim.connect('V1ComplexInh','V1ComplexInh',delay=0.05,name='LateralInhibitoryToInhibitory',
-                 connection_type=CFProjection,strength=-locals().get('CxLatInhInhStr',1.0),
+                 connection_type=CFProjection,strength=-locals().get('CxLatInhInhStr',1.3),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',0.08)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('CxLatInhBB',0.12)),
                  learning_rate=locals().get('lat_inh_lr',0.0))
