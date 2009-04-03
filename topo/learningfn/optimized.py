@@ -250,7 +250,7 @@ class CFPLF_BCMFixed(CFPLF_Plugin):
 provide_unoptimized_equivalent("CFPLF_BCMFixed_opt","CFPLF_Hebbian",locals())
 
 
-
+# CEBALERT: 2009/04/03 - when used in GCA-LISSOM, causes Python to crash.
 class CFPLF_Scaled_opt(CFPLF_PluginScaled):
     """
     CF-aware Scaled Hebbian learning rule.
