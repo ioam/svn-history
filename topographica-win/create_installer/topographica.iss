@@ -12,6 +12,7 @@
 ; (6) change 'lzma' back to 'none', repeat (3)
 ; (7) rename the resulting setup.exe to topographica-X.exe, where X is the version number
 ; (8) upload to sf.net
+; (9) update sf.net Windows download page so that the primary file is the new version
 
 
 [Setup]
