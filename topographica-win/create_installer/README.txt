@@ -14,8 +14,8 @@ Making a Windows installation package
 (3) A linux release should previously have been made (i.e. things
     such as release numbers are assumed to be correct)
 
-(4) $ make distdir
-    Then wait a long time.
+(4) $ make distdir  # NOT 'make dist' as in linux!
+    Then wait a long time.  
 
 (5) Change to the newly created distribution directory (e.g.
     ../distributions/topographica-0.9.5). Then:
