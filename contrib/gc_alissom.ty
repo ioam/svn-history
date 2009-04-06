@@ -174,17 +174,17 @@ else:
 topo.sim['Retina']=GeneratorSheet(nominal_density=default_retinal_density,
                                   input_generator=combined_inputs,
                                   period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375+0.5))
+                                  nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)+0.25+0.375+0.5))
 
 topo.sim['LGNOn']=LISSOM(nominal_density=default_retinal_density,
-                          nominal_bounds=BoundingBox(radius=0.5+0.25+0.5),
+                          nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)+0.25+0.5),
                           output_fns=LGN_on_output_fns,tsettle=0,
                           measure_maps=False)
 
 
 
 topo.sim['LGNOff']=LISSOM(nominal_density=default_retinal_density,
-                           nominal_bounds=BoundingBox(radius=0.5+0.25+0.5),
+                           nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)+0.25+0.5),
                            output_fns=LGN_off_output_fns,tsettle=0,
                            measure_maps=False)
 
@@ -192,7 +192,7 @@ topo.sim['LGNOff']=LISSOM(nominal_density=default_retinal_density,
 AddGC()
 
 topo.sim['V1'] = JointScaling(nominal_density=default_density,tsettle=16,plastic=True,apply_scaling=False,
-                                nominal_bounds=BoundingBox(radius=0.5),smoothing=smoothing,
+                                nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)),smoothing=smoothing,
                                 output_fns=V1_OF)
 
 #make sure that activity is reset at the beginning of iteration
