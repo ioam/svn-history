@@ -34,6 +34,7 @@ from topo.base.sheetcoords import SheetCoordinateSystem
 # Imported here so that all TransferFns will be in the same package
 from topo.base.functionfamily import IdentityTF
 from topo.pattern.basic import Gaussian
+from topo.misc.numbergenerator import NormalRandom
 
 
 # CEBHACKALERT: these need to respect the mask - which will be passed in.
@@ -879,6 +880,7 @@ class HomeostaticResponse(TransferFnWithState):
     def __init__(self,**params):
         super(HomeostaticResponse,self).__init__(**params)
         self.first_call = True
+        self.__current_state_stack=[]
         self.mu = 0
 
     def __call__(self,x):
@@ -900,8 +902,27 @@ class HomeostaticResponse(TransferFnWithState):
             self.t += self.eta * (self.y_avg - self.mu)
         # recalculate the mu based on the input/ output ratio
 
+    def state_push(self):
+        """
+        Save the current state of the output function to an internal stack.
+        """
+       
+        self.__current_state_stack.append((copy.copy(self.t), copy.copy(self.y_avg), copy.copy(self.first_call)))
+        super(HomeostaticResponse, self).state_push()
 
-class Hysteresis(TransferFnWithRandomState):
+        
+    def state_pop(self):
+        """
+        Pop the most recently saved state off the stack.
+        
+        See state_push() for more details.
+        """
+       
+        self.t, self.y_avg, self.first_call = self.__current_state_stack.pop()
+        super(HomeostaticResponse, self).state_pop()
+
+
+class Hysteresis(TransferFnWithState):
     """
     Smoothly interpolates a matrix between simulation time steps, with
     exponential falloff.
@@ -948,6 +969,18 @@ class Hysteresis(TransferFnWithRandomState):
         self.old_a,self.first_call =  self.__current_state_stack.pop()
         super(Hysteresis,self).state_pop()
 
+class IntrinsicNoise(TransferFn):
+    """
+    Output function that ads a noise from normal distribution to the output activity. 
+    """
+    magnitued = param.Number(default=0.0,doc="""The additive noise magnitued.""")
+    
+    def __init__(self,**params):
+        super(IntrinsicNoise,self).__init__(**params)
+        self.rand_dist = NormalRandom()
+        
+    def __call__(self,x):
+        x += self.rand_dist()*self.magnitued
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,TransferFn)]))
 
