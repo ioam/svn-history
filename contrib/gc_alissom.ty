@@ -16,11 +16,11 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.projfn import CFPLF_PluginScaled
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Scaled_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, AttributeTrackingTF 
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, AttributeTrackingTF, IntrinsicNoise 
 from topo.transferfn.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.image import Image
-from contrib.jacommands import SimpleHomeoLinearRelative, AddGC, ActivityHysteresis
+from contrib.jacommands import SimpleHomeoLinearRelative, AddGC, ActivityHysteresis,SimpleHomeoLinear
 
 import contrib.jsldefs
 from contrib.jsldefs import JointScaling_lronly, JointScaling_affonly, homeostatic_analysis_function
@@ -126,13 +126,21 @@ tracking=locals().get('tracking', False) # Turn tracking on or off
 
 AH = ActivityHysteresis(time_constant=0.5)
 Attrib_Tracker=AttributeTrackingTF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
-HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.15)
+
+if locals().get('Adaptation',"Relative") == 'Relative':
+    HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.15)
+elif locals().get('Adaptation',"Relative") == 'Absolute':
+    HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.01),t_init=0.15)
+else:
+    print "Unknow adaption type"     
+
 V1_Tracker=AttributeTrackingTF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=18)
+NN = IntrinsicNoise(magnitued=locals().get('intrinsic_noise',0.0))
 
 if tracking:
-    V1_OF = [AH,Attrib_Tracker,HE,V1_Tracker]
+    V1_OF = [AH,Attrib_Tracker,NN,HE,V1_Tracker]
 else: 
-    V1_OF = [AH,HE]
+    V1_OF = [AH,NN,HE]
     
 # Specify weight initialization, response function, and learning function
 CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
@@ -189,7 +197,8 @@ topo.sim['LGNOff']=LISSOM(nominal_density=default_retinal_density,
                            measure_maps=False)
 
 # Add the lateral connectivity to LGN
-AddGC()
+if locals().get('GC',True):
+    AddGC()
 
 topo.sim['V1'] = JointScaling(nominal_density=default_density,tsettle=16,plastic=True,apply_scaling=False,
                                 nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)),smoothing=smoothing,
@@ -263,12 +272,12 @@ if dataset=="NoisyDiskstoNatural":
 import topo.analysis.featureresponses
 
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
-topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
-topo.analysis.featureresponses.FeatureMaps.num_orientation=32
+topo.analysis.featureresponses.MeasureResponseCommand.apply_output_fns=True
+topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_orientation=32
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=2.0
 if tracking:
-    topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=32
+    topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=180
     topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":10},{"contrast":30},{"contrast":50},{"contrast":100}]
 else:
-    topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=16
+    topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=180
     topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":100}]
