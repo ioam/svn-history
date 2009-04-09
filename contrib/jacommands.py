@@ -16,7 +16,7 @@ from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.base.boundingregion import BoundingBox 
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.basic import Gaussian, Selector, Null
-from topo.transferfn.basic import DivisiveNormalizeL1, HomeostaticMaxEnt, TransferFnWithRandomState, Sigmoid, PiecewiseLinear
+from topo.transferfn.basic import DivisiveNormalizeL1, HomeostaticMaxEnt, TransferFnWithState, Sigmoid, PiecewiseLinear
 from topo.base.arrayutil import clip_lower
 from topo.sheet.lissom import LISSOM
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
@@ -250,6 +250,7 @@ def AddV2():
     #topo.sim["V1Complex"].output_fn.output_fns[1].r=7
     topo.sim["V1Simple"].plastic = False
     topo.sim["V1Complex"].plastic = False
+    topo.sim["V1ComplexInh"].plastic = False
     
     ### Lateral excitatory bounds changes
     #LE='topo.sim["V2"].projections()["V2LateralExcitatory"]'
@@ -291,7 +292,7 @@ def homeostatic_analysis_function():
   
     
 
-class SimpleHomeoSigmoid(TransferFnWithRandomState):
+class SimpleHomeoSigmoid(TransferFnWithState):
     mu = param.Number(default=0.01, doc="Target average activity.")
     a_init = param.Number(default=13, doc="Multiplicative parameter controlling the exponential.")
     b_init = param.Number(default= - 4, doc="Additive parameter controlling the exponential.")
@@ -345,9 +346,10 @@ class SimpleHomeoSigmoid(TransferFnWithRandomState):
         super(SimpleHomeoSigmoid, self).state_pop()
 
 
-class SimpleHomeoLinear(TransferFnWithRandomState):
+class SimpleHomeoLinear(TransferFnWithState):
     mu = param.Number(default=0.01, doc="Target average activity.")
     t_init = param.Number(default=0.0, doc="Threshold parameter")
+    alpha = param.Number(default=1.0, doc="Linear slope parameter")
     eta = param.Number(default=0.0002, doc="Learning rate for homeostatic plasticity.")
     smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
     randomized_init = param.Boolean(False, doc="Whether to randomize the initial t parameter")
@@ -372,6 +374,7 @@ class SimpleHomeoLinear(TransferFnWithRandomState):
         x_orig = copy(x)
         x -= self.t
         clip_lower(x, 0)
+        x *= self.alpha
 
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
             self.y_avg = (1.0 - self.smoothing) * x + self.smoothing * self.y_avg 
