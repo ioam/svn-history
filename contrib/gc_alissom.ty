@@ -273,6 +273,7 @@ import topo.analysis.featureresponses
 
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
 topo.analysis.featureresponses.MeasureResponseCommand.apply_output_fns=True
+topo.analysis.featureresponses.MeasureResponseCommand.scale=0.6
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_orientation=32
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=2.0
 if tracking:
