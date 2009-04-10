@@ -34,6 +34,7 @@ from topo.base.sheetcoords import SheetCoordinateSystem
 # Imported here so that all TransferFns will be in the same package
 from topo.base.functionfamily import IdentityTF
 from topo.pattern.basic import Gaussian
+from topo.pattern.random import GaussianRandom
 from topo.misc.numbergenerator import NormalRandom
 
 
@@ -980,7 +981,9 @@ class IntrinsicNoise(TransferFn):
         self.rand_dist = NormalRandom()
         
     def __call__(self,x):
-        x += self.rand_dist()*self.magnitued
+        
+        
+        x += topo.pattern.random.GaussianRandom()(xdensity=x.shape[0],ydensity=x.shape[1],scale=self.magnitued,offset=0.0)
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,TransferFn)]))
 
