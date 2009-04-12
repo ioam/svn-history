@@ -63,7 +63,7 @@ class PiecewiseLinear(TransferFn):
 
 class Sigmoid(TransferFn):
     """ 
-    Sigmoidal (logistic) output function: 1/(1+exp-(r*x+k)).
+    Sigmoidal (logistic) transfer function: 1/(1+exp-(r*x+k)).
 
     As defined in Jochen Triesch, ICANN 2005, LNCS 3696 pp. 65-70. 
     The parameters control the growth rate (r) and the x position (k)
@@ -241,7 +241,7 @@ class DivisiveNormalizeLp(TransferFn):
 
 class HalfRectifyAndSquare(TransferFn):
     """
-    Output function that applies a half-wave rectification (clips at zero)
+    Transfer function that applies a half-wave rectification (clips at zero)
     and then squares the values.
     """
     t = param.Number(default=0.0,doc="""
@@ -255,7 +255,7 @@ class HalfRectifyAndSquare(TransferFn):
 
 class HalfRectifyAndPower(TransferFn):
     """
-    Output function that applies a half-wave rectification (i.e.,
+    Transfer function that applies a half-wave rectification (i.e.,
     clips at zero), and then raises the result to the e-th power
     (where the exponent e can be selected arbitrarily).
     """
@@ -276,7 +276,7 @@ class HalfRectifyAndPower(TransferFn):
 
 class HalfRectify(TransferFn):
     """
-    Output function that applies a half-wave rectification (clips at zero)
+    Transfer function that applies a half-wave rectification (clips at zero)
     """
     t = param.Number(default=0.0,doc="""
         The threshold at which output becomes non-zero.""")
@@ -288,7 +288,7 @@ class HalfRectify(TransferFn):
 
 
 class Square(TransferFn):
-    """Output function that applies a squaring nonlinearity."""
+    """Transfer function that applies a squaring nonlinearity."""
 
     def __call__(self,x):
         x *= x     
@@ -512,7 +512,7 @@ class PoissonSample(TransferFnWithRandomState):
     """
     Simulate Poisson-distributed activity with specified mean values.
     
-    This output function interprets each matrix value as the
+    This transfer function interprets each matrix value as the
     (potentially scaled) rate of a Poisson process and replaces it
     with a sample from the appropriate Poisson distribution.
 
@@ -782,21 +782,11 @@ class HomeostaticMaxEnt(TransferFnWithRandomState):
 
 
     def state_push(self):
-        """
-        Save the current state of the output function to an internal stack.
-        """
-       
         self.__current_state_stack.append((copy.copy(self.a), copy.copy(self.b), copy.copy(self.y_avg), copy.copy(self.first_call)))
         super(HomeostaticMaxEnt,self).state_push()
 
         
     def state_pop(self):
-        """
-        Pop the most recently saved state off the stack.
-        
-        See state_push() for more details.
-        """
-       
         self.a, self.b, self.y_avg, self.first_call =  self.__current_state_stack.pop()
         super(HomeostaticMaxEnt,self).state_pop()
         
@@ -904,21 +894,11 @@ class HomeostaticResponse(TransferFnWithState):
         # recalculate the mu based on the input/ output ratio
 
     def state_push(self):
-        """
-        Save the current state of the output function to an internal stack.
-        """
-       
         self.__current_state_stack.append((copy.copy(self.t), copy.copy(self.y_avg), copy.copy(self.first_call)))
         super(HomeostaticResponse, self).state_push()
 
         
     def state_pop(self):
-        """
-        Pop the most recently saved state off the stack.
-        
-        See state_push() for more details.
-        """
-       
         self.t, self.y_avg, self.first_call = self.__current_state_stack.pop()
         super(HomeostaticResponse, self).state_pop()
 
@@ -954,36 +934,30 @@ class Hysteresis(TransferFnWithState):
         self.old_a *= 0
 
     def state_push(self):
-        """
-        Save the current state of the output function to an internal stack.
-        """
         self.__current_state_stack.append((copy.copy(self.old_a), copy.copy(self.first_call)))
         super(Hysteresis,self).state_push()
 
         
     def state_pop(self):
-        """
-        Pop the most recently saved state off the stack.
-        
-        See state_push() for more details.
-        """
         self.old_a,self.first_call =  self.__current_state_stack.pop()
         super(Hysteresis,self).state_pop()
 
+
+
 class IntrinsicNoise(TransferFn):
     """
-    Output function that ads a noise from normal distribution to the output activity. 
+    Transfer function that adds noise from a normal distribution to the output activity. 
     """
-    magnitued = param.Number(default=0.0,doc="""The additive noise magnitued.""")
+
+    magnitude = param.Number(default=0.0,doc="""The additive noise magnitude.""")
     
     def __init__(self,**params):
         super(IntrinsicNoise,self).__init__(**params)
         self.rand_dist = NormalRandom()
         
     def __call__(self,x):
-        
-        
-        x += topo.pattern.random.GaussianRandom()(xdensity=x.shape[0],ydensity=x.shape[1],scale=self.magnitued,offset=0.0)
+        x += topo.pattern.random.GaussianRandom()(xdensity=x.shape[0],ydensity=x.shape[1],scale=self.magnitude,offset=0.0)
+
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,TransferFn)]))
 
