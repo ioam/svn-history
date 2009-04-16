@@ -10,7 +10,7 @@ from .. import param
 from topo.base.functionfamily import TransferFn, IdentityTF
 from topo.base.projection import Projection, NeighborhoodMask
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
-from topo.sheet.lissom import LISSOM
+from topo.sheet.lissom import LISSOM, JointScaling
 from topo.sheet.basic import compute_joint_norm_totals
 
 
