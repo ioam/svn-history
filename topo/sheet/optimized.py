@@ -81,8 +81,20 @@ class LISSOM_Opt(LISSOM):
 
 provide_unoptimized_equivalent("LISSOM_Opt","LISSOM",locals())
 
+class JointScaling_Opt(JointScaling): 
+    """
+    Overrides the function JointNormalizingCFSheet.__compute_joint_norm_totals 
+    with C-optimized code for LISSOM sheets.
 
+    Also adds a NeighborhoodMask, which skips computation for neurons
+    sufficiently distant from all those activated in the first few steps
+    of settling.
+    """
+    joint_norm_fn = param.Callable(default=compute_joint_norm_totals_opt)
 
+provide_unoptimized_equivalent("JointScaling_Opt","JointScaling",locals())
+
+    
 class NeighborhoodMask_Opt(NeighborhoodMask):
     
     def calculate(self):
