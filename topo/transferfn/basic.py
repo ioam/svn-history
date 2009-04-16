@@ -34,7 +34,6 @@ from topo.base.sheetcoords import SheetCoordinateSystem
 # Imported here so that all TransferFns will be in the same package
 from topo.base.functionfamily import IdentityTF
 from topo.pattern.basic import Gaussian
-from topo.pattern.random import GaussianRandom
 from topo.misc.numbergenerator import NormalRandom
 
 
@@ -463,6 +462,19 @@ class TransferFnWithState(TransferFn):
         """
         self.plastic = self._plasticity_setting_stack.pop()                        
 
+    def state_push(self):
+        """
+        Save the current random number generator (onto the stack),
+        replacing it with a copy.
+        """
+        pass
+    
+    def state_pop(self):
+        """
+        Retrieve the previous random number generator from the stack.
+        """
+        pass
+
 
 # CB: it's not ideal that all TransferFnWithRandomState fns have
 # the plastic stuff (from TransferFnWithState).
@@ -735,11 +747,8 @@ class HomeostaticMaxEnt(TransferFnWithRandomState):
    
     b_init = param.Parameter(default=None,doc="Additive parameter controlling the exponential.")
 
-    step = param.Number(default=1, doc="""
-        How often to update the a and b parameters.
-	For instance, step=1 means to update it every time this OF is
+    step = param.Number(default=1, doc=""" How often to update the a and b parameters. 	For instance, step=1 means to update it every time this OF is
         called; step=2 means to update it every other time.""")
-    
 
     def __init__(self,**params):
         super(HomeostaticMaxEnt,self).__init__(**params)
@@ -867,7 +876,9 @@ class HomeostaticResponse(TransferFnWithState):
     noise_magnitude =  param.Number(default=0.1,doc="""
         The magnitude of the additive noise to apply to the t_init
         parameter at initialization.""")
-        
+
+    sheet_name = param.String(default="V1", doc="""The name of the sheet to which the output function belongs""")
+            
     def __init__(self,**params):
         super(HomeostaticResponse,self).__init__(**params)
         self.first_call = True
@@ -887,7 +898,7 @@ class HomeostaticResponse(TransferFnWithState):
         x_orig = copy.copy(x)
         x -= self.t
         clip_lower(x,0)
-        self.mu = topo.sim["V1"].x_avg/self.input_output_ratio
+        self.mu = topo.sim[self.sheet_name].x_avg/self.input_output_ratio
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
             self.t += self.eta * (self.y_avg - self.mu)
@@ -937,26 +948,10 @@ class Hysteresis(TransferFnWithState):
         self.__current_state_stack.append((copy.copy(self.old_a), copy.copy(self.first_call)))
         super(Hysteresis,self).state_push()
 
-        
     def state_pop(self):
         self.old_a,self.first_call =  self.__current_state_stack.pop()
         super(Hysteresis,self).state_pop()
 
-
-
-class IntrinsicNoise(TransferFn):
-    """
-    Transfer function that adds noise from a normal distribution to the output activity. 
-    """
-
-    magnitude = param.Number(default=0.0,doc="""The additive noise magnitude.""")
-    
-    def __init__(self,**params):
-        super(IntrinsicNoise,self).__init__(**params)
-        self.rand_dist = NormalRandom()
-        
-    def __call__(self,x):
-        x += topo.pattern.random.GaussianRandom()(xdensity=x.shape[0],ydensity=x.shape[1],scale=self.magnitude,offset=0.0)
 
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,TransferFn)]))
