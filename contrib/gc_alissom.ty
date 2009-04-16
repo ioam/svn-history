@@ -8,6 +8,7 @@ import topo.pattern.random
 
 from topo.pattern.basic import Gaussian
 from topo.sheet.lissom import JointScaling, LISSOM
+from topo.sheet.optimized JointScaling_Opt
 from topo.sheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
@@ -200,7 +201,7 @@ topo.sim['LGNOff']=LISSOM(nominal_density=default_retinal_density,
 if locals().get('GC',True):
     AddGC()
 
-topo.sim['V1'] = JointScaling(nominal_density=default_density,tsettle=16,plastic=True,apply_scaling=False,
+topo.sim['V1'] = JointScaling_Opt(nominal_density=default_density,tsettle=16,plastic=True,apply_scaling=False,
                                 nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)),smoothing=smoothing,
                                 output_fns=V1_OF)
 
