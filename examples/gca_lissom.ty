@@ -27,6 +27,7 @@ import topo.learningfn.optimized
 import topo.learningfn.projfn 
 import topo.transferfn.optimized 
 import topo.pattern.random
+import topo.pattern.image
 import topo.responsefn.optimized 
 import topo.sheet.lissom
 import topo.sheet.optimized
