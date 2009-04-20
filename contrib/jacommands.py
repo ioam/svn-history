@@ -331,7 +331,7 @@ class SimpleHomeoSigmoid(TransferFnWithState):
         Save the current state of the output function to an internal stack.
         """
        
-        self.__current_state_stack.append((copy(self.a), copy(self.b), copy(self.y_avg), copy(self.first_call)))
+        self.__current_state_stack.append(copy(self.b), copy(self.y_avg), copy(self.first_call))
         super(SimpleHomeoSigmoid, self).state_push()
 
         
@@ -342,7 +342,7 @@ class SimpleHomeoSigmoid(TransferFnWithState):
         See state_push() for more details.
         """
        
-        self.a, self.b, self.y_avg, self.first_call = self.__current_state_stack.pop()
+        self.b, self.y_avg, self.first_call = self.__current_state_stack.pop()
         super(SimpleHomeoSigmoid, self).state_pop()
 
 
