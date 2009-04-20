@@ -464,14 +464,14 @@ class TransferFnWithState(TransferFn):
 
     def state_push(self):
         """
-        Save the current random number generator (onto the stack),
+        Save the current state variables (onto the stack),
         replacing it with a copy.
         """
         pass
     
     def state_pop(self):
         """
-        Retrieve the previous random number generator from the stack.
+        Retrieve the previous state variables from the stack.
         """
         pass
 
