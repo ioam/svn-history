@@ -1089,7 +1089,8 @@ class Parameterized(object):
         Any of args may be functions, in which case they will be
         called. This allows delayed execution, preventing
         time-consuming code from being called unless the print level
-        requires it.
+        requires it. (The time-consuming code is usually that used to
+        build the repr().)
         """
         if level <= max(min_print_level,self.print_level):
 
