@@ -3053,13 +3053,15 @@ class ScrolledFrame(T.Frame):
     def __init__(self,parent,status=False,**config):
         T.Frame.__init__(self,parent,**config)
 
-        topframe = T.Frame(self)#,bd=2,relief='groove')
-        botframe = T.Frame(self)#,bd=2,relief='groove')
-
-        botframe.pack(side="bottom",expand="yes",fill="x")
-        topframe.pack(side="top",expand="yes",fill="both")
+        abovetopframe = T.Frame(self)
+        topframe = T.Frame(self)
+        botframe = T.Frame(self)
         
+        botframe.pack(side="bottom",expand="yes",fill="x")
+        abovetopframe.pack(side="top",expand="yes",fill="both")
+        topframe.pack(side="top")#,expand="no",fill="both")
 
+        self.noscroll = abovetopframe
 
         self.canvas = T.Canvas(topframe)
         self.canvas.pack()
@@ -3082,14 +3084,13 @@ class ScrolledFrame(T.Frame):
             self.status.pack(side="bottom",fill="both",expand="yes")
             
 
-
     def sizeright(self,event=None):
         self.content.update_idletasks()
         W = self.content.winfo_width()
-        H = self.content.winfo_height()
+        H = self.content.winfo_height()        
         self.canvas.configure(scrollregion=(0, 0, W, H))
         self.canvas.configure(width=W,height=H)
-
+        
 
 
 class ScrolledWindow(T.Toplevel):
@@ -3111,6 +3112,7 @@ class ScrolledWindow(T.Toplevel):
         self._scrolledframe = ScrolledFrame(self.topframe)
         self._scrolledframe.pack(expand=1,fill='both')
         self.content = self._scrolledframe.content
+        self.noscroll = self._scrolledframe.noscroll
 
     # required? presumably should be deleted
     def sizeright(self,event=None):

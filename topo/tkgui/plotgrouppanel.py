@@ -156,10 +156,10 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
 	self.zoom_factor = 1.2
         
         # CEBALERT: rename these frames
-        self.control_frame_1 = Frame(self)
+        self.control_frame_1 = Frame(master.noscroll)
         self.control_frame_1.pack(side=TOP,expand=NO,fill=X)
 
-	self.control_frame_2 = Frame(self)
+	self.control_frame_2 = Frame(master.noscroll)
         self.control_frame_2.pack(side=TOP,expand=NO,fill=X)
 
 	self.plot_frame = Tkinter.LabelFrame(self,text=self.plotgroup.name)
