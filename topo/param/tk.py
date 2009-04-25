@@ -3085,12 +3085,10 @@ class ScrolledFrame(T.Frame):
 
     def sizeright(self,event=None):
         self.content.update_idletasks()
-        self.canvas.configure(scrollregion=(0, 0, self.content.winfo_width(),
-                                           self.content.winfo_height()))
-        self.canvas.configure(width=self.content.winfo_width(),
-                             height=self.content.winfo_height())
-
-
+        W = self.content.winfo_width()
+        H = self.content.winfo_height()
+        self.canvas.configure(scrollregion=(0, 0, W, H))
+        self.canvas.configure(width=W,height=H)
 
 
 
