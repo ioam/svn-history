@@ -464,14 +464,18 @@ class TransferFnWithState(TransferFn):
 
     def state_push(self):
         """
-        Save the current state variables (onto the stack),
-        replacing it with a copy.
+        Save the current state onto a stack, to be restored using state_pop.
+        
+        Subclasses must implement state_push and state_pop if they
+        store any lasting state across invocations, so that the result
+        of state_pop will be the state that was present at the
+        previous state_push.
         """
         pass
     
     def state_pop(self):
         """
-        Retrieve the previous state variables from the stack.
+        Restore the state saved by the most recent state_push call.
         """
         pass
 
