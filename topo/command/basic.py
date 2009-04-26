@@ -350,7 +350,8 @@ class run_batch(ParameterizedFunction):
 
       - Generates a unique, well-defined name for each 'experiment'
         (i.e. simulation run) based on the date, script file, and
-        parameter settings
+        parameter settings. Note that very long names may be truncated
+        (see the max_name_length parameter).
 
       - Allows parameters to be varied on the command-line,
         to allow comparing various settings
@@ -408,6 +409,20 @@ class run_batch(ParameterizedFunction):
 
     vc_info=param.Boolean(True)
 
+    # CB: do any platforms also have a maximum total path length?
+    max_name_length = param.Number(default=200,doc=
+        """The experiment's directory name will be truncated at this
+        number of characters (since most filesystems have a
+        limit).""")
+
+    def _truncate(self,p,s):
+        """
+        If s is greater than the max_name_length parameter, truncate it
+        (and indicate that it has been truncated).
+        """
+        # '___' at the end is supposed to represent '...'
+        return s if len(s)<=p.max_name_length else s[0:p.max_name_length-3]+'___' 
+                
     def __call__(self,script_file,**params_to_override):
         p=ParamOverrides(self,params_to_override,allow_extra_keywords=True)
 
@@ -428,7 +443,7 @@ class run_batch(ParameterizedFunction):
             valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
                      else str(val))
             prefix += "," + a + "=" + valstr
-    
+
         # Set provided parameter values in main namespace
         from topo.misc.commandline import global_params
         global_params.set_in_context(**p.extra_keywords())
@@ -437,7 +452,7 @@ class run_batch(ParameterizedFunction):
         if not os.path.isdir(normalize_path(p['output_directory'])):
             os.mkdir(normalize_path(p['output_directory']))
     
-        filepath.output_path = normalize_path(os.path.join(p['output_directory'],prefix))
+        filepath.output_path = normalize_path(os.path.join(p['output_directory'],self._truncate(p,prefix)))
         
         if os.path.isdir(filepath.output_path):
             print "Batch run: Warning -- directory already exists!"
