@@ -185,7 +185,7 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
         self.no_plot_note_enabled=False
 
 
-        self.control_frame_3 = Frame(self)
+        self.control_frame_3 = Frame(master.noscroll_bottom)
         self.control_frame_3.pack(side=TOP,expand=NO,fill=X)
 
         self.control_frame_4 = Frame(self)

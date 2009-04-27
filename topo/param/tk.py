@@ -3055,13 +3055,16 @@ class ScrolledFrame(T.Frame):
 
         abovetopframe = T.Frame(self)
         topframe = T.Frame(self)
+        middleframe = T.Frame(self)
         botframe = T.Frame(self)
-        
+       
         botframe.pack(side="bottom",expand="yes",fill="x")
         abovetopframe.pack(side="top",expand="yes",fill="both")
         topframe.pack(side="top")#,expand="no",fill="both")
+        middleframe.pack(side="top",expand='yes',fill='x')
 
         self.noscroll = abovetopframe
+        self.noscroll_bottom = middleframe
 
         self.canvas = T.Canvas(topframe)
         self.canvas.pack()
@@ -3113,6 +3116,7 @@ class ScrolledWindow(T.Toplevel):
         self._scrolledframe.pack(expand=1,fill='both')
         self.content = self._scrolledframe.content
         self.noscroll = self._scrolledframe.noscroll
+        self.noscroll_bottom = self._scrolledframe.noscroll_bottom
 
     # required? presumably should be deleted
     def sizeright(self,event=None):
