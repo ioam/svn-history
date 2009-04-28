@@ -1,0 +1,188 @@
+#!bin/python
+
+# Creates a bash script that will launch multiple batch simulations.
+# 
+# Batch simulation running is done with topo.command.run_batch().
+# 
+# 
+# Instructions
+# ============
+# 
+# (1) Create a whitespace-delimited text file specifying the parameter
+# combinations you'd like to try. E.g.:
+# 
+# lgn_density  cortex_density  retina_density  dims         dataset     
+# 2            2               4               ["or","cr"]  "FoliageB"  
+# 2            4               2               ["or","dy"]  "Nature"    
+# 2            2               2               ["or"]       "FoliageB"
+# 
+# Each 'experiment' (i.e. combination of parameters) is on its own
+# row. (Parameters that should be common to all experiments are passed
+# at the commandline; see later.) Note that double quotes (") must be
+# used, since the command will already be inside single (') quotes.
+# 
+# 
+# (2) Set the topographica_script variable to the path to your
+# topographica script (note that some job submission systems require
+# an absolute path)
+#
+#
+# (3) Set the job_submit_template variable to the appropriate command
+# template for your system: _JOB_ will be replaced (by string
+# substitution) with the actual job. (Additionally, you can use
+# _COMBONUMBER_ in the template to get the combination number.)
+# 
+# 
+# (4) Run this script, passing the topographica .ty file you want to run
+# as the first argument, followed by the parameter combinations file, and then
+# specify any parameters you want to be common to all experiments.
+# 
+# E.g. 
+# $ ./parameter_search examples/lissom.ty combs.txt 'times=[1,2,3],astring="test"'
+# 
+# Note that the common parameters must be specified in a single-quoted
+# string, and that as above any strings must be enclosed in at least
+# double quotes.
+# 
+#
+# (5) The result is a script that, when run, will submit all the jobs.
+#
+#
+#
+# Potential problems
+# ==================
+#
+# (?) If you haven't run the example before on your system, there
+# could be a problem if multiple jobs simultaneously try to compile
+# the same weave code.
+#
+
+def usage():
+    print """
+Please see the script's docstring for full instructions.
+
+Usage: parameter_search [script] [combinations-file] (<common-params>)
+
+Examples:
+       parameter_search examples/lissom.ty combs.txt 
+       parameter_search examples/lissom.ty combs.txt 'times=[1,2,3],astring="test"'
+"""
+
+
+topographica_script = './topographica'
+topographica_output_path = './Output/' # if None, run_batch()'s default is used
+
+# note that absolute paths are required for some job submission
+# systems, e.g.
+# topographica_script = '/exports/informatics/inf_ianc/s0454615/lissom_rgb/topographica'
+# topographica_output_path = '/exports/informatics/inf_ianc/s0454615/lissom_rgb/topographica/Output'
+
+job_submit_template = 'nohup nice _JOB_ > combo_COMBONUMBER_.out &'
+# e.g.
+# job_submit_template = 'qsub -cwd -P ecdf_baseline -pe "memory" 1 -l s_rt=40:00:0 -R y _JOB_ '
+
+# supplied before any other options
+topographica_args = ['-a']
+
+
+# TODO:
+# allow more flexible job_command (e.g. allow background & nice for jupiter1)
+
+# submitter is the script that's used to submit the jobs;
+# the individual job commands will be in selector.
+submitter = 'submitter.sh'
+selector = 'selector.sh'
+
+
+
+import sys
+import string
+
+
+args = sys.argv[1::]    
+
+if len(args)<2 or len(args)>3:
+    usage()
+    sys.exit(-1)
+
+script = args[0]
+combinations_file = args[1]
+
+if len(args)==3:
+    common_params = args[2]
+else:
+    common_params = None
+
+def _string(s):
+    pass
+    
+
+def _generate_command(parameters):    
+    cmd = '"%s"'%script
+
+    if topographica_output_path is not None:
+        cmd+=',output_directory="%s"'%topographica_output_path
+
+    if common_params is not None:
+        cmd+=',%s'%common_params
+
+    for name,val in zip(names,parameters):
+        cmd += ',%s=%s'%(name,val)
+
+    cmd = "run_batch(%s)"%cmd
+    return "%s %s -c '%s'"%(topographica_script,
+                            string.join(topographica_args),
+                            cmd)
+
+
+f = open(combinations_file,'r')
+lines = f.readlines()
+names = lines[0].split()
+
+assert len(names)==len(set(names)), "Duplicate parameter names"
+
+combinations = []
+for line in lines[1::]:
+    if not (line.startswith('#') or line.startswith('\n')):
+        vals = line.split()
+        assert len(vals)==len(names),"Line '%s' does not contain correct number of values"%line
+        combinations.append(vals)
+
+shell_request = '#!/bin/bash -i'
+
+fout = open(selector,'w')
+fout.write(shell_request+'\n')
+
+for i,params in zip(range(len(combinations)),combinations):
+    cmd = _generate_command(params)
+    
+    nscript= """
+if [ "$1" = "%s" ]; then
+    %s
+fi
+    """%(i,cmd)
+    fout.write(nscript)
+
+fout.close()
+import os
+os.system('chmod +x %s'%selector)
+
+f = open(submitter,'w')
+
+
+submitcmd = job_submit_template.replace('_JOB_','./%s $i'%selector)
+submitcmd = submitcmd.replace('_COMBONUMBER_','$i')
+
+nscript = """#!/bin/bash
+
+for ((i=0;i<%i;i+=1)); do
+    %s
+done
+"""%(len(combinations),submitcmd)
+
+f.write(nscript)
+f.close()
+os.system('chmod +x %s'%submitter)
+
+print "Running the '%s' script will submit your %i specified parameter combinations (using '%s' to start the topographica jobs)."%(submitter,len(combinations),selector)
+
