@@ -102,7 +102,7 @@ def complexity(full_matrix):
                 pylab.figure()
                 pylab.plot(complex_matrix[x,y])
  
-            complexity[x,y] = res / (2*sum)
+            #complexity[x,y] = res / (2*sum)
             fft = numpy.fft.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
             first_har = 2048/len(complex_matrix[0,0])
             
@@ -235,7 +235,8 @@ def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename
                        if hasattr(s,'measure_maps') and s.measure_maps]
 
     for sheet in measured_sheets:   
-        complx = array(complexity(full_matrix[sheet]))
+        # Divide by two to get into 0-1 scale - that means simple/complex boundry is now at 0.5
+        complx = array(complexity(full_matrix[sheet]))/2.0 
         # Should this be renamed to ModulationRatio?
         sheet.sheet_views['ComplexSelectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time(),sheet.row_precedence)
     import topo.command.pylabplots
