@@ -85,8 +85,6 @@ job_submit_template = 'nohup nice _JOB_ > combo_COMBONUMBER_.out &'
 topographica_args = ['-a']
 
 
-# TODO:
-# allow more flexible job_command (e.g. allow background & nice for jupiter1)
 
 # submitter is the script that's used to submit the jobs;
 # the individual job commands will be in selector.
