@@ -8,7 +8,7 @@ import topo.pattern.random
 
 from topo.pattern.basic import Gaussian
 from topo.sheet.lissom import JointScaling, LISSOM
-from topo.sheet.optimized JointScaling_Opt
+from topo.sheet.optimized import JointScaling_Opt, LISSOM_Opt
 from topo.sheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
@@ -129,9 +129,9 @@ AH = ActivityHysteresis(time_constant=0.5)
 Attrib_Tracker=AttributeTrackingTF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
 
 if locals().get('Adaptation',"Relative") == 'Relative':
-    HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.15)
+    HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.55)
 elif locals().get('Adaptation',"Relative") == 'Absolute':
-    HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.01),t_init=0.15)
+    HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.01),t_init=0.55)
 else:
     print "Unknow adaption type"     
 
@@ -149,7 +149,7 @@ CFProjection.weights_generator = topo.pattern.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
-SharedWeightCFProjection.response_fns=[CFPRF_DotProduct_opt()]
+SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 
 # DoG weights for the LGN
@@ -185,14 +185,14 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=default_retinal_density,
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)+0.25+0.375+0.5))
 
-topo.sim['LGNOn']=LISSOM(nominal_density=default_retinal_density,
+topo.sim['LGNOn']=LISSOM_Opt(nominal_density=default_retinal_density,
                           nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)+0.25+0.5),
                           output_fns=LGN_on_output_fns,tsettle=0,
                           measure_maps=False)
 
 
 
-topo.sim['LGNOff']=LISSOM(nominal_density=default_retinal_density,
+topo.sim['LGNOff']=LISSOM_Opt(nominal_density=default_retinal_density,
                            nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)+0.25+0.5),
                            output_fns=LGN_off_output_fns,tsettle=0,
                            measure_maps=False)
