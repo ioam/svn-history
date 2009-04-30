@@ -465,7 +465,8 @@ results can also be examined at a finer timescale.  Be sure to leave
 the time clock at an even multiple of 1.0 before you do anything else,
 so that the network will be in a well-defined state.  (To do this,
 just type the fractional part into the "Run for:" box, i.e. 0.95 if
-the time is currently 10002.05, and then press "Go".)
+the time is currently 10002.05, press "Go", and then change "Run
+for:" to 1.0.)
 </li>
 </ol>
 
