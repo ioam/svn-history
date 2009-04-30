@@ -360,6 +360,7 @@ SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_o
 #@@	   ${RM} -r Output
 #@@	   -mv images/ellen_arthur.pgm ./TMPellen_arthur.pgm
 #@@	   ${RM} -r images
+#@@	   ${RM} -r info
 #@@	   mkdir images; mv ./TMPellen_arthur.pgm images/ellen_arthur.pgm
 #@@	   ${RM} -r win_build_exe.py
 #@@	   ${RM} -r tmp/
