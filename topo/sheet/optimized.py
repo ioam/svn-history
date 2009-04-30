@@ -66,13 +66,24 @@ provide_unoptimized_equivalent("compute_joint_norm_totals_opt",
 
 class LISSOM_Opt(LISSOM):
     """
-    Overrides the function JointNormalizingCFSheet.__compute_joint_norm_totals 
-    with C-optimized code for LISSOM sheets.
+    Faster but potentially unsafe optimized version of LISSOM.
 
-    Also adds a NeighborhoodMask, which skips computation for neurons
-    sufficiently distant from all those activated in the first few steps
-    of settling.
+    Adds a NeighborhoodMask that skips computation for neurons
+    sufficiently distant from all those activated in the first few
+    steps of settling.  This is safe only if activity bubbles reliably
+    shrink after the first few steps; otherwise the results will
+    differ from LISSOM.
+
+    Typically useful only for standard LISSOM simulations with
+    localized (e.g. Gaussian) inputs and that shrink the lateral
+    excitatory radius, which results in small patches of activity in
+    an otherwise inactive sheet.
+
+    Also overrides the function
+    JointNormalizingCFSheet.__compute_joint_norm_totals with
+    C-optimized code for LISSOM sheets.
     """
+    
     joint_norm_fn = param.Callable(default=compute_joint_norm_totals_opt)
 
     def __init__(self,**params):
@@ -81,20 +92,8 @@ class LISSOM_Opt(LISSOM):
 
 provide_unoptimized_equivalent("LISSOM_Opt","LISSOM",locals())
 
-class JointScaling_Opt(JointScaling): 
-    """
-    Overrides the function JointNormalizingCFSheet.__compute_joint_norm_totals 
-    with C-optimized code for LISSOM sheets.
 
-    Also adds a NeighborhoodMask, which skips computation for neurons
-    sufficiently distant from all those activated in the first few steps
-    of settling.
-    """
-    joint_norm_fn = param.Callable(default=compute_joint_norm_totals_opt)
 
-provide_unoptimized_equivalent("JointScaling_Opt","JointScaling",locals())
-
-    
 class NeighborhoodMask_Opt(NeighborhoodMask):
     
     def calculate(self):
@@ -142,3 +141,5 @@ class NeighborhoodMask_Opt(NeighborhoodMask):
             }
         """    
         inline(code, ['thr','activity','matradius','mask','rows','cols'], local_dict=locals())
+
+provide_unoptimized_equivalent("NeighborhoodMask_Opt","NeighborhoodMask",locals())
