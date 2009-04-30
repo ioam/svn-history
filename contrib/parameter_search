@@ -36,7 +36,8 @@
 # E.g. "/disk/scratch/big_experiment"
 #
 # Setting this to None will result in run_batch()'s default location
-# being used.
+# being used. For speed, you should usually supply a local path
+# (rather than one on a network).
 #
 #
 # (4) Set the job_submit_template variable to the appropriate command
