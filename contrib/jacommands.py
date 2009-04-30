@@ -369,7 +369,7 @@ class SimpleHomeoLinear(TransferFnWithState):
             else:
                 self.t = ones(x.shape, x.dtype.char) * self.t_init
             
-            self.y_avg = zeros(x.shape, x.dtype.char) * self.mu
+            self.y_avg = ones(x.shape, x.dtype.char) * self.mu
 
         x_orig = copy(x)
         x -= self.t
