@@ -33,8 +33,8 @@ dataset=locals().get('dataset',"Gaussian") #set the input type by choosing the d
 if dataset=="Gaussian":
     input_type=Gaussian
     num_inputs=locals().get('num_inputs',2) #in the case where dataset=Gaussian, must also set the number of Gaussians per iteration, default is 2
-    inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=35+i),
+    inputs=[input_type(x=UniformRandom(lbound=-locals().get('bound', 0.75),ubound=locals().get('bound', 0.75),seed=12+i),
+                       y=UniformRandom(lbound=-locals().get('bound', 0.75),ubound=locals().get('bound', 0.75),seed=35+i),
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
                        size=0.088388, aspect_ratio=4.66667, scale= locals().get('scale', 1.0), bounds=BoundingBox(radius=1.125))
             #Set the contrast of the gaussian patterns by setting the scale parameter.
@@ -131,8 +131,10 @@ Attrib_Tracker=AttributeTrackingTF(object="topo.sim['V1']", attrib_names=['x_avg
 if locals().get('Adaptation',"Relative") == 'Relative':
     HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.55)
 elif locals().get('Adaptation',"Relative") == 'Absolute':
-    HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.01),t_init=0.55)
-else:
+    HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.01),t_init=0.55,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
+elif locals().get('Adaptation',"Relative") == 'Fixed':
+    HE=HalfRectify(t_init=0.55,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))    
+else: 
     print "Unknow adaption type"     
 
 V1_Tracker=AttributeTrackingTF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=18)
