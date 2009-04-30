@@ -277,10 +277,28 @@ class HalfRectify(TransferFn):
     """
     Transfer function that applies a half-wave rectification (clips at zero)
     """
-    t = param.Number(default=0.0,doc="""
-        The threshold at which output becomes non-zero.""")
+    t_init = param.Number(default=0.0,doc="""The initial value of threshold at which output becomes non-zero..""")
+    
+    randomized_init = param.Boolean(False,doc="""
+        Whether to randomize the initial t parameter.""")
+    
+    noise_magnitude =  param.Number(default=0.1,doc="""
+        The magnitude of the additive noise to apply to the t_init
+        parameter at initialization.""")
+
+    def __init__(self,**params):
+        super(TransferFn,self).__init__(**params)
+        self.first_call = True
+
     
     def __call__(self,x):
+        if self.first_call:
+            self.first_call = False
+            if self.randomized_init:
+                self.t = ones(x.shape, x.dtype.char) * self.t_init + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitude*2
+            else:
+                self.t = ones(x.shape, x.dtype.char) * self.t_init
+        
         x -= self.t
         clip_lower(x,0)
 
@@ -897,7 +915,7 @@ class HomeostaticResponse(TransferFnWithState):
             else:
                 self.t = ones(x.shape, x.dtype.char) * self.t_init
             
-            self.y_avg = zeros(x.shape, x.dtype.char) * self.mu
+            self.y_avg = zeros(x.shape, x.dtype.char)
 
         x_orig = copy.copy(x)
         x -= self.t
