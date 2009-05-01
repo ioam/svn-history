@@ -105,8 +105,10 @@ def complexity(full_matrix):
             #complexity[x,y] = res / (2*sum)
             fft = numpy.fft.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
             first_har = 2048/len(complex_matrix[0,0])
-            
-            fftmeasure[x,y] = 2 *abs(fft[first_har]) /abs(fft[0])
+            if abs(fft[0]) != 0:
+                fftmeasure[x,y] = 2 *abs(fft[first_har]) /abs(fft[0])
+            else:
+                fftmeasure[x,y] = 0
     return fftmeasure
 
 
