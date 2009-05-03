@@ -308,8 +308,11 @@ def secondStage():
     topo.sim['LGNOff'].in_connections[0].strength=0
     randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.5))
     
-from topo.analysis.featureresponses import MeasureResponseCommand
+from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand
 MeasureResponseCommand.scale=3    
+FeatureMaps.num_orientation=16
+FeatureCurveCommand.curve_parameters=[{"contrast":30},{"contrast":90}]
+    
 
 def check_activity(a,b,c,d,e,f,g,h):
     print a,b,c,d,e,f,g
