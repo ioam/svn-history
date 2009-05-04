@@ -136,7 +136,7 @@ elif locals().get('Adaptation',"Relative") == 'Fixed':
     HE=HalfRectify(t_init=0.55,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
     Attrib_Tracker=IdentityTF()    
 else: 
-    print "Unknow adaption type"     
+    print "Unknown adaption type"     
 
 V1_Tracker=AttributeTrackingTF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=18)
 NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=locals().get('intrinsic_noise',0.0)),operator=numpy.add) 
