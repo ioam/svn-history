@@ -410,8 +410,8 @@ class run_batch(ParameterizedFunction):
     vc_info=param.Boolean(True)
 
     # CB: do any platforms also have a maximum total path length?
-    max_name_length = param.Number(default=200,doc=
-        """The experiment's directory name will be truncated at this
+    max_name_length = param.Number(default=200,doc="""
+        The experiment's directory name will be truncated at this
         number of characters (since most filesystems have a
         limit).""")
 
