@@ -20,7 +20,7 @@ import topo.pattern.random
 import topo.pattern.image
 
 from topo.sheet.lissom import LISSOM, JointScaling
-from topo.sheet.generator import GeneratorSheet
+from topo.sheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet

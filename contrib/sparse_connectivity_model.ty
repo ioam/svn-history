@@ -12,7 +12,7 @@ import topo.pattern.basic
 import topo.pattern.random
 from topo import param
 from topo.sheet.lissom import LISSOM,JointNormalizingCFSheet_Continuous
-from topo.sheet.generator import GeneratorSheet
+from topo.sheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
