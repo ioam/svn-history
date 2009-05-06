@@ -97,6 +97,12 @@ submitter = 'submitter.sh'
 selector = 'selector.sh'
 
 
+# support python 2.3
+try:
+    set
+except NameError:
+    from sets import Set as set
+
 
 import sys
 import string
