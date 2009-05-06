@@ -44,7 +44,7 @@
 # template for your system: _JOB_ will be replaced with the actual
 # job.
 #
-# E.g. "qsub -cwd -P ecdf_baseline -pe "memory" 1 -l s_rt=40:00:0 -R y _JOB_"
+# E.g. 'qsub -cwd -P ecdf_baseline -pe "memory" 1 -l s_rt=40:00:0 -R y _JOB_'
 #
 # Additionally, you can use _COMBONUMBER_ in the template to get the
 # combination number.
