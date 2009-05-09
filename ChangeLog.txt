@@ -1,3 +1,1239 @@
+2009-05-06  ceball
+
+	* [r10278] contrib/parameter_search:
+	  Minor fix to work with Python 2.3.
+
+	* [r10277] contrib/parameter_search:
+	  Minor correction in docstring.
+
+	* [r10276] doc/Downloads/git_text.php:
+	  Removed draft notes that were turning into a git tutorial.
+
+2009-05-04  jbednar
+
+	* [r10275]
+	  contrib/gc_lissom_oo_or_homeostatic_new.ty,
+	  contrib/laminar_oo_or.ty,
+	  contrib/laminar_or.ty,
+	  contrib/lesi.ty,
+	  contrib/lesi_whisker_barrels.ty,
+	  contrib/lgn_lateral.ty,
+	  contrib/lissom_oo_or_homeostatic.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked_new.ty,
+	  contrib/lissom_oo_or_noshrinking.ty,
+	  contrib/lissom_oo_or_noshrinking_latswitch.ty,
+	  contrib/lissom_oo_or_species.ty,
+	  contrib/lissom_oo_or_species_tracked.ty,
+	  contrib/lissom_or_noshrinking.ty,
+	  contrib/lissom_or_noshrinking_latswitch.ty,
+	  contrib/sparse_connectivity_LESI.ty,
+	  contrib/sparse_connectivity_model.ty,
+	  contrib/species_cf_jitter.ty,
+	  contrib/species_lateral_sparsity.ty:
+	  Fixed outdated ref to topo.sheet.generator
+
+	* [r10274] contrib/gc_alissom.ty:
+	  Fixed typo
+
+	* [r10273] contrib/cc_lesi_oo_or_new.ty:
+	  Added newlines
+
+	* [r10272] topo/command/basic.py:
+	  Formatted docstring
+
+2009-05-04  ceball
+
+	* [r10271] doc/buildbot/master.cfg:
+	  Reduced accuracy of unoptimized tests and altered an email
+	  address. Changes have been live on buildbot for at least a month.
+
+2009-05-03  antolikjan
+
+	* [r10270] contrib/gc_alissom.ty:
+	  switched of attribute tracking when fixed treshold output
+	  function is active
+
+	* [r10269] contrib/cc_lesi_oo_or_new.ty:
+	  reduced number of contrasts at which tuning curves are computed
+
+2009-05-02  antolikjan
+
+	* [r10268] contrib/cc_lesi_oo_or_new.ty:
+	  complex cell model with exactly the same connectivity (except
+	  strength) as in the lesi model in layer 2/3
+
+2009-05-01  antolikjan
+
+	* [r10267] topo/analysis/vision.py:
+	  Corrected potential division by zero bug
+
+2009-04-30  antolikjan
+
+	* [r10266] contrib/gc_alissom.ty:
+	  Added fixed treshold output function
+
+	* [r10265] topo/transferfn/basic.py:
+	  Extended HalfRectify with random treshold
+
+2009-04-30  ceball
+
+	* [r10264] contrib/parameter_search:
+	  Added note.
+
+2009-04-30  antolikjan
+
+	* [r10263] contrib/gc_alissom.ty:
+	  Removed JointScaling_opt
+
+	* [r10262] contrib/jacommands.py:
+	  Corrected SimpleHomeoLinear to set the initial y_avg to MU
+
+2009-04-30  jbednar
+
+	* [r10261] doc/Tutorials/lissom_oo_or_text.php:
+	  Minor clarification
+
+	* [r10260] Makefile:
+	  Delete generated info directory from distribution
+
+	* [r10259] topo/sheet/optimized.py:
+	  Removed unnecessary JointScaling_Opt class, and clarified
+	  docstring for LISSOM_Opt
+
+2009-04-29  antolikjan
+
+	* [r10258] contrib/cc_lesi_oo_or.ty:
+	  allowd for homeostasis also in layer 4C
+
+2009-04-29  ceball
+
+	* [r10257] contrib/parameter_search:
+	  Corrected path to python.
+
+2009-04-29  antolikjan
+
+	* [r10256] contrib/gc_alissom.ty:
+	  changed the t_init parameter
+
+	* [r10255] contrib/jacommands.py:
+	  corrected bug with state_push/pop stack
+
+2009-04-29  ceball
+
+	* [r10254] contrib/parameter_search:
+	  Tidied up script and documentation; should be no visible change.
+
+2009-04-29  antolikjan
+
+	* [r10253] topo/analysis/vision.py:
+	  made the modulation ratio to scale to 0-1.0 scale in order to
+	  achieve correct plotting
+
+	* [r10252]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  corrected bug with external parametriazation
+
+2009-04-29  ceball
+
+	* [r10251] contrib/parameter_search:
+	  Removed out-of-date note.
+
+2009-04-28  ceball
+
+	* [r10250] contrib/parameter_search:
+	  Initial version of script to help start multiple batch
+	  simulations.
+
+2009-04-27  ceball
+
+	* [r10249] topo/param/tk.py,
+	  topo/tkgui/plotgrouppanel.py:
+	  Addition to SF #2122761: pre_plot_hooks etc now also do not
+	  scroll.
+
+2009-04-26  ceball
+
+	* [r10248] topo/command/basic.py:
+	  Added max_name_length parameter to run_batch() to avoid
+	  generating experiment directory names that are too long for the
+	  filesystem.
+
+2009-04-25  jbednar
+
+	* [r10247] topo/transferfn/basic.py:
+	  Clarified docs
+
+2009-04-25  ceball
+
+	* [r10246] topo/param/tk.py,
+	  topo/tkgui/plotgrouppanel.py:
+	  Fix SF #2122761: PlotGroup control buttons now do not scroll.
+
+	* [r10245] topo/param/tk.py:
+	  Simplification - no visible change.
+
+2009-04-23  ceball
+
+	* [r10244] topo/param/parameterized.py:
+	  Minor clarification.
+
+2009-04-20  antolikjan
+
+	* [r10243] contrib/jacommands.py:
+	  Corrected a bug
+
+	* [r10242] topo/transferfn/basic.py:
+	  Corrected docstring of state_push/pop in TranfserFnWithState
+
+	* [r10241] topo/base/sheet.py:
+	  state_push/pop in Sheet now checks for existing state_push/pop
+	  function in output functions
+
+2009-04-17  ceball
+
+	* [r10240] examples/gca_lissom.ty:
+	  Added missing import.
+
+2009-04-16  antolikjan
+
+	* [r10239] topo/sheet/optimized.py:
+	  corrected bug with importing of JointScaling
+
+	* [r10238] contrib/gc_alissom.ty:
+	  Chaneged JointScaling to JointScaling_Opt
+
+	* [r10237] topo/sheet/optimized.py:
+	  Added optimized version of JointScaling
+
+	* [r10236] topo/base/sheet.py:
+	  state_push/pop in Sheet now check whether a given output function
+	  is of class TransferFnWithState begfore it calls its
+	  state_push/pop
+
+	* [r10235] topo/base/functionfamily.py:
+	  Removed the stat_push/pop from TransferFn (they were moved to
+	  TransferFnWithState)
+
+	* [r10234] topo/transferfn/basic.py:
+	  Removed IntrinsicNoise function, moved the definition of
+	  state_push/pop into TranfserFnWithState, and made Hysteresis have
+	  sheet_name parameter
+
+	* [r10233] contrib/gc_alissom.ty:
+	  Replaced the IntrinsicNoise transfer function with existing
+	  composite equivalent
+
+2009-04-12  jbednar
+
+	* [r10232] topo/transferfn/basic.py:
+	  Cleaned up docs and fixed spelling error on parameter
+
+2009-04-10  antolikjan
+
+	* [r10231] topo/transferfn/basic.py:
+	  corrected the IntrinsicNoise OF
+
+	* [r10230] contrib/gc_alissom.ty:
+	  changed the default analysis input scale
+
+2009-04-09  antolikjan
+
+	* [r10229] topo/transferfn/basic.py:
+	  Added Intrinsic Noise output function and corrected some issues
+	  with state_push/pop
+
+	* [r10228] topo/analysis/vision.py:
+	  corrected the measure_and_analyze_complexity to be derived from
+	  the right class
+
+	* [r10227] contrib/jacommands.py:
+	  various minor changes
+
+	* [r10226] contrib/gc_alissom.ty:
+	  added intrinsic noise and made relative adaptation and gain
+	  control optional
+
+	* [r10225]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  added external parameter
+
+	* [r10224] topo/base/sheet.py:
+	  Made sheet to call state_push/pop on all output functions when
+	  its state_push/pop is called
+
+2009-04-06  antolikjan
+
+	* [r10223] contrib/gc_alissom.ty:
+	  made the size of V1 to be external parameter
+
+2009-04-04  ceball
+
+	* [r10222]
+	  /releases/0.9.6/topographica-win/common/python_topo.tar.gz:
+	  Added missing python25.dll
+
+	* [r10221] /trunk/topographica-win/create_installer/README.txt:
+	  Added 10217 from 0.9.6 (note in release instructions).
+
+	* [r10220]
+	  /trunk/topographica-win/create_installer/topographica.iss:
+	  Added a step to instructions for Windows release.
+
+2009-04-04  antolikjan
+
+	* [r10219]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  added external parameters
+
+	* [r10218] contrib/cc_lesi_oo_or.ty:
+	  added external parameters
+
+2009-04-04  ceball
+
+	* [r10217]
+	  /releases/0.9.6/topographica-win/create_installer/README.txt:
+	  Added note.
+
+2009-04-03  ceball
+
+	* [r10216] topo/learningfn/optimized.py:
+	  Added ALERT.
+
+	* [r10215] /releases/0.9.6/topographica/examples/gca_lissom.ty:
+	  Applied r10212 from trunk: in gca_lissom, "replaced
+	  CFPLF_Scaled_opt with CFPLF_Hebbian_opt - we do not use different
+	  learning rates for individual neurons anymore".
+
+2009-04-03  antolikjan
+
+	* [r10214] contrib/cc_lesi_oo_or.ty:
+	  change of default parameters
+
+	* [r10213] contrib/cc_lesi_oo_or.ty:
+	  allowed for changing the lateral connections learning rate
+
+	* [r10212] examples/gca_lissom.ty:
+	  replaced CFPLF_Scaled_opt with CFPLF_Hebbian_opt - we do not use
+	  different learning rates for individual neurons anymore
+
+2009-04-02  ceball
+
+	* [r10211]
+	  /releases/0.9.6/topographica/doc/User_Manual/noise_text.php:
+	  Applied change that was missed from r10209 (r10203 - class name
+	  qualification in the noise documentation).
+
+	* [r10210]
+	  /releases/0.9.6/topographica/topo/tkgui/templateplotgrouppanel.py:
+	  Applied r10202 from trunk ('Applied strength-only hack to
+	  refresh_plots() (previously, it was only applied to
+	  redraw_plots()). Fixes SF #2724032.')
+
+	* [r10209]
+	  /releases/0.9.6/topographica/doc/User_Manual/noise_text.php:
+	  Applied r10183, r10204, and r10205 from trunk (fixes to noise
+	  documentation).
+
+	* [r10208] /releases/0.9.6/topographica/Makefile:
+	  Applied r10167 and r10168 from trunk ("Added separate
+	  win-distclean target so that python_topo/ can be preserved during
+	  distclean on Windows. (Want to keep the binaries for Windows
+	  distribution, but usually during clean we do want to remove
+	  python_topo/)").
+
+	* [r10207] /releases/0.9.6/topographica/examples/Makefile:
+	  Applied r10164 from trunk ("Removed references to cfsom_or").
+
+	* [r10206]
+	  /releases/0.9.6/topographica/topo/tests/test_map_measurement.py:
+	  Applied r10161 from trunk ("Removed 'Retinotopy' from the list of
+	  map measurements to test").
+
+	* [r10205] doc/User_Manual/noise_text.php:
+	  Commented out 'weight adjustment noise' example, since this
+	  specific code cannot currently be used.
+
+	* [r10204] doc/User_Manual/noise_text.php:
+	  Described how to get dynamic numbers for weight generation.
+
+	* [r10203] doc/User_Manual/noise_text.php:
+	  Qualified some names with the module (e.g. PatternCombine ->
+	  transferfn.PatternCombine.
+
+2009-04-01  ceball
+
+	* [r10202]
+	  topo/tkgui/templateplotgrouppanel.py:
+	  Applied strength-only hack to refresh_plots() (previously, it was
+	  only applied to redraw_plots()). Fixes SF #2724032.
+
+	* [r10201] /trunk/topographica-win/README.txt,
+	  /trunk/topographica-win/common/python_topo.tar.gz,
+	  /trunk/topographica-win/common/setup.py,
+	  /trunk/topographica-win/create_installer/README.txt,
+	  /trunk/topographica-win/create_installer/prepare_for_installer.bat,
+	  /trunk/topographica-win/create_installer/topographica.iss,
+	  /trunk/topographica-win/create_python_topo/PIL-1.1.5.win32-py2.5.exe,
+	  /trunk/topographica-win/create_python_topo/PIL-1.1.6.win32-py2.5.exe,
+	  /trunk/topographica-win/create_python_topo/README.txt,
+	  /trunk/topographica-win/create_python_topo/distutils_compiler_quoting.diff,
+	  /trunk/topographica-win/create_python_topo/pyreadline-1.5-win32-setup.exe,
+	  /trunk/topographica-win/create_python_topo/setup.bat,
+	  /trunk/topographica-win/setup_cvs_copy/README.txt,
+	  /trunk/topographica-win/setup_cvs_copy/setup.bat,
+	  /trunk/topographica-win/util/gzip.exe:
+	  Merged changes r10135:10191 from releases/0.9.6/topographica-win
+	  into the trunk version of topographica-win.
+
+	* [r10200] /releases/0.9.6/topographica/Makefile:
+	  Applied 10199 from trunk: fixes missing images/ellen_arthur.pgm.
+
+	* [r10199] Makefile:
+	  Preserve images/ellen_arthur.pgm in release distribtions. Fixes
+	  SF #2724036.
+
+2009-03-31  jbednar
+
+	* [r10198] /releases/0.9.6/topographica/examples/som_retinotopy.ty:
+	  Fixed density to match tutorial
+
+	* [r10197] examples/som_retinotopy.ty:
+	  Fixed cortex_density; in r9809 it was mistakenly set to 48
+	  instead of 10.
+
+2009-03-30  antolikjan
+
+	* [r10196] topo/transferfn/basic.py:
+	  made Hysteresis to push/pop state
+
+	* [r10195] topo/base/functionfamily.py:
+	  Introduced push pop function for all output fns
+
+	* [r10194] topo/analysis/vision.py:
+	  Made the measure_and_analyse_complexity be a measure_or_pref
+	  class
+
+	* [r10193] contrib/jacommands.py:
+	  Big revamp after the move from Eclipse to command line svn
+
+	* [r10192]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Changed to use shouval dataset
+
+2009-03-28  ceball
+
+	* [r10191] /releases/0.9.6/topographica-win/common/setup.py:
+	  Fixed a typo.
+
+	* [r10190]
+	  /releases/0.9.6/topographica-win/common/python_topo.tar.gz:
+	  Updated with recent changes.
+
+	* [r10189]
+	  /releases/0.9.6/topographica-win/create_python_topo/setup.bat:
+	  Fixed a typo resulting in odict being missed (odict isn't missing
+	  from existing binaries because it was copied in manually).
+
+	* [r10188]
+	  /releases/0.9.6/topographica-win/create_python_topo/README.txt:
+	  Fixed a typo.
+
+	* [r10187]
+	  /releases/0.9.6/topographica-win/create_python_topo/setup.bat:
+	  Correction to location of weave's compiled code cache.
+
+	* [r10186]
+	  /releases/0.9.6/topographica-win/create_python_topo/distutils_compiler_quoting.patch:
+	  Deletion missed from an earlier commit.
+
+	* [r10185] /releases/0.9.6/topographica-win/common/setup.py:
+	  Added extra directory to PATH (required for non-admin Vista
+	  users?).
+
+2009-03-28  machalekj
+
+	* [r10184] contrib/basic.py,
+	  contrib/hegdeessen.py,
+	  contrib/patternfn.py:
+	  Implementation of Hegde and Van Essen grating and contour
+	  stimuli. Four new basic patterns added to allow this.
+
+2009-03-26  jbednar
+
+	* [r10183] doc/User_Manual/noise_text.php:
+	  Clarified how scale and offset work
+
+	* [r10182] topo/base/projection.py:
+	  Fixed whitespace
+
+2009-03-24  antolikjan
+
+	* [r10181] contrib/cc_lesi_oo_or.ty:
+	  the lesie version of the complex cell model
+
+2009-03-23  ceball
+
+	* [r10180] contrib/cbmisc.py,
+	  contrib/rgbhsv.py,
+	  contrib/rgbimages.py:
+	  Reorganization of some of my code.
+
+	* [r10179] examples/gca_lissom.ty:
+	  Fixed another typo in code ('Nature' dataset can now be used).
+
+	* [r10178] examples/gca_lissom.ty:
+	  Fixed typo in code (p.lgn_density was being ignored).
+
+2009-03-18  ceball
+
+	* [r10177]
+	  /releases/0.9.6/topographica-win/create_python_topo/pyreadline-1.5-win32-setup.exe,
+	  /releases/0.9.6/topographica-win/create_python_topo/setup.bat:
+	  Added pyreadline.
+
+2009-03-18  antolikjan
+
+	* [r10176] contrib/jacommands.py:
+	  made the lgn channel afferent strength normalization uniform
+	  random
+
+2009-03-18  ceball
+
+	* [r10175]
+	  /releases/0.9.6/topographica-win/create_python_topo/distutils_compiler_quoting.diff,
+	  /releases/0.9.6/topographica-win/create_python_topo/setup.bat:
+	  Changed distutils_compiler_quoting patch into a format that works
+	  with the Windows version of patch.
+
+	* [r10174]
+	  /releases/0.9.6/topographica-win/create_python_topo/distutils_compiler_quoting.patch,
+	  /releases/0.9.6/topographica-win/create_python_topo/setup.bat:
+	  http://bugs.python.org/issue4508
+
+	* [r10173]
+	  /releases/0.9.6/topographica-win/create_installer/topographica.iss:
+	  Removed debugging test.
+
+	* [r10172]
+	  /releases/0.9.6/topographica-win/create_installer/topographica.iss:
+	  Added check for required Windows system dlls; if they are
+	  missing, and the user is not running the installation program as
+	  a Power User or Administrator, the installation is aborted (with
+	  a message to that effect, and the instruction to re-run with
+	  appropriate privileges). Also updated paths to match my current
+	  setup.
+
+2009-03-16  ceball
+
+	* [r10171]
+	  /releases/0.9.6/topographica-win/setup_cvs_copy/README.txt:
+	  Added more info.
+
+	* [r10170]
+	  /releases/0.9.6/topographica-win/create_installer/topographica.iss:
+	  Added conditional installation of some required .dll files.
+
+	* [r10169]
+	  /releases/0.9.6/topographica-win/create_installer/README.txt:
+	  Updated to use win-distclean.
+
+	* [r10168] Makefile:
+	  Fixed command for renaming.
+
+	* [r10167] Makefile:
+	  Added separate win-distclean target so that python_topo/ can be
+	  preserved during distclean on Windows. (Want to keep the binaries
+	  for Windows distribution, but usually during clean we do want to
+	  remove python_topo/.)
+
+	* [r10166]
+	  /releases/0.9.6/topographica-win/create_installer/prepare_for_installer.bat:
+	  Minor clarification.
+
+	* [r10165]
+	  doc/Developer_Manual/releases_text.php:
+	  Minor updates.
+
+	* [r10164] examples/Makefile:
+	  Removed references to cfsom_or.
+
+	* [r10163]
+	  /releases/0.9.6/topographica-win/create_installer/README.txt,
+	  /releases/0.9.6/topographica-win/create_installer/topographica.iss:
+	  Clarified instructions.
+
+	* [r10162]
+	  /releases/0.9.6/topographica-win/create_installer/README.txt:
+	  Clarified documentation.
+
+	* [r10161] topo/tests/test_map_measurement.py:
+	  Removed 'Retinotopy' from the list of map measurements to test.
+
+2009-03-15  ceball
+
+	* [r10160]
+	  /releases/0.9.6/topographica-win/setup_cvs_copy/README.txt:
+	  Fixed typo.
+
+	* [r10159]
+	  /releases/0.9.6/topographica-win/create_installer/README.txt:
+	  Cut down on duplicated instructions.
+
+	* [r10158] topo/numbergen/basic.py:
+	  Fixed syntax and import error.
+
+	* [r10157]
+	  /releases/0.9.6/topographica-win/setup_cvs_copy/setup.bat:
+	  Correction to printed instruction.
+
+2009-03-14  ceball
+
+	* [r10156] /releases/0.9.6/topographica-win/common/setup.py:
+	  Added missing newline character.
+
+2009-03-14  jbednar
+
+	* [r10155] /releases/0.9.6/topographica/examples/gca_lissom.ty,
+	  /releases/0.9.6/topographica/examples/lissom_oo_or.ty,
+	  /releases/0.9.6/topographica/examples/tiny.ty,
+	  /releases/0.9.6/topographica/topo/base/patterngenerator.py,
+	  /releases/0.9.6/topographica/topo/tkgui/plotgrouppanel.py:
+	  Ported bugfixes from the main branch
+
+	* [r10154] topo/numbergen/basic.py:
+	  Minor clarifications to docstrings; added softbounds
+
+2009-03-13  ceball
+
+	* [r10153] topo/analysis/featureresponses.py:
+	  For 'hue', PatternPresenter detects whether there are three
+	  separate retinas for the color dimension, allowing e.g.
+	  measure_hue_pref() to work with a single, color retina, or with
+	  three separate retinas. (Should be no change to the measurement
+	  for each case.)
+
+	* [r10152] topo/analysis/featureresponses.py:
+	  Simplifications - should be no visible change.
+
+2009-03-12  ceball
+
+	* [r10151] examples/lissom.ty:
+	  Added ALERT.
+
+	* [r10150] contrib/rgbimages.py:
+	  Added handling of cache parameter to ColorImage.
+
+	* [r10149] doc/Future_Work/current_text.php:
+	  Test commit.
+
+2009-03-11  antolikjan
+
+	* [r10148] contrib/gc_alissom.ty:
+	  parameter changes
+
+2009-03-10  jbednar
+
+	* [r10147] /releases/0.9.6/topographica/doc/shared/trailer.php:
+	  Updated sf.net logo as they requested
+
+2009-03-09  ceball
+
+	* [r10146] contrib/rgbimages.py:
+	  Now uses weave versions of rgb/hsv conversion functions.
+
+	* [r10145] /releases/0.9.6/topographica-win/README.txt,
+	  /releases/0.9.6/topographica-win/create_python_topo/README.txt:
+	  Clarified and moved note about running setup.bat files.
+
+	* [r10144]
+	  /releases/0.9.6/topographica-win/common/python_topo.tar.gz:
+	  Updated external packages.
+
+	* [r10143]
+	  /releases/0.9.6/topographica-win/create_python_topo/setup.bat:
+	  Added odict
+
+	* [r10142]
+	  /releases/0.9.6/topographica-win/setup_cvs_copy/README.txt:
+	  Added a note about MSVCP71.DLL
+
+	* [r10141]
+	  /releases/0.9.6/topographica-win/create_python_topo/README.txt,
+	  /releases/0.9.6/topographica-win/create_python_topo/setup.bat:
+	  Simplified instructions.
+
+	* [r10140] /releases/0.9.6/topographica-win/util/gzip.exe:
+	  Added gzip.
+
+	* [r10139]
+	  /releases/0.9.6/topographica-win/create_python_topo/setup.bat:
+	  Minor alteration to text.
+
+	* [r10138]
+	  /releases/0.9.6/topographica-win/create_python_topo/README.txt:
+	  Minor addition to text.
+
+	* [r10137]
+	  /releases/0.9.6/topographica-win/create_python_topo/setup.bat:
+	  Missed from previous commit.
+
+	* [r10136]
+	  /releases/0.9.6/topographica-win/create_python_topo/PIL-1.1.5.win32-py2.5.exe,
+	  /releases/0.9.6/topographica-win/create_python_topo/PIL-1.1.6.win32-py2.5.exe:
+	  Updated to PIL 1.16
+
+	* [r10135] doc/Downloads/cvs_text.php:
+	  Fixed links.
+
+2009-03-09  jbednar
+
+	* [r10134] doc/User_Manual/noise_text.php:
+	  Fixed typo
+
+2009-03-08  jbednar
+
+	* [r10133] topo/base/patterngenerator.py:
+	  Made __setup_xy and __create_and_rotate_coordinate_arrays not be
+	  private, because it prevented __call__ from being reimplemented
+	  with minor changes in a subclass
+
+2009-03-06  jbednar
+
+	* [r10132] topo/base/patterngenerator.py,
+	  topo/tests/lissom_oo_or_t000100.00_Retinotopy.data:
+	  Changed mask_shape to calculate its x, y, and orientation
+	  relative to those of the owning pattern, to allow the mask to be
+	  offset or a different size from the main pattern. These
+	  parameters were previously ignored, and they must now be set to
+	  1.0, 1.0, and 0.0 to get the same results as before. Thus it is
+	  possible for this change to change results for a pattern using
+	  mask_shape, but the old behavior should be easily obtainable by
+	  adding parameter settings.
+
+	* [r10131] topo/analysis/featureresponses.py,
+	  topo/command/pylabplots.py,
+	  topo/misc/legacy.py,
+	  topo/pattern/basic.py:
+	  Added explicit size specification for pattern masks, so that they
+	  can later respect their given size
+
+	* [r10130] topo/command/pylabplots.py:
+	  Reverted Rectangle to RawRectangle to make tests pass
+
+	* [r10129] doc/News/index_text.php:
+	  Added list of new pattern generators, as a comment
+
+	* [r10128] doc/News/index_text.php:
+	  Added list of new pattern generators, as a comment
+
+	* [r10127] contrib/lissom_happyface.ty,
+	  examples/leaky_lissom_or.ty,
+	  topo/analysis/featureresponses.py,
+	  topo/command/pylabplots.py,
+	  topo/misc/legacy.py,
+	  topo/misc/patternfn.py,
+	  topo/pattern/basic.py,
+	  topo/tests/testpatterngenerator.py:
+	  Moved Arc, Curve, and SmoothedRectangle classes into topo/,
+	  renaming the old Rectangle class to RawRectangle (possibly to be
+	  removed?), and changing SmoothedRectangle to Rectangle. Old code
+	  that uses Rectangle will now have a small amount of smoothing by
+	  default; to avoid this change Rectangle to RawRectangle in the
+	  old code, or set smoothing to zero.
+
+	* [r10126] contrib/lissom_happyface.ty:
+	  Major cleanup of documentation, spacing, floating-point errors
+	  for parameter values of 0.0, and parameter names. Changed default
+	  smoothing values, arc_end to arc_length
+
+	* [r10125] topo/base/patterngenerator.py,
+	  topo/misc/patternfn.py,
+	  topo/pattern/basic.py:
+	  Increased soft bounds on size and aspect_ratio to make working
+	  with them in the GUI easier. Added guards for case of zero
+	  smoothing, to avoid floating-point errors in extreme cases. Fixes
+	  HACKALERT.
+
+2009-03-05  jbednar
+
+	* [r10124] topo/pattern/basic.py:
+	  Added ExponentialDecay pattern.
+
+	* [r10123] examples/gca_lissom.ty,
+	  topo/tests/gca_lissom.ty_DATA:
+	  Changed y position seed to match lissom_oo_or.ty; will change
+	  results
+
+	* [r10122] topo/misc/patternfn.py:
+	  Fixed errors in Gabor when aspect_ratio or size was zero
+
+	* [r10121] topo/misc/patternfn.py:
+	  Added ExponentialDecay pattern. Fixed errors in Gaussian when
+	  aspect_ratio or size was zero
+
+2009-03-04  rczhao
+
+	* [r10120] contrib/lissom_happyface.ty:
+	  Replaced Boolean parameter in class Curve with Enumeration.
+
+2009-03-03  ceball
+
+	* [r10119] contrib/rgbhsv.py:
+	  File missed from previous checkin (r10118).
+
+	* [r10118] contrib/rgbimages.py:
+	  Undid changes to ColorImage from 10111. Corrected how mask,
+	  scale, offset, output_fns are applied. (Also changed from RGB
+	  values on [0,255] to [0,1]; I'd misread the colorsys module
+	  documentation.)
+
+2009-03-03  rczhao
+
+	* [r10117] contrib/lissom_happyface.ty:
+	  Revised class Curve and function arc_by_center so that Curve can
+	  draw both constant-length and constant-width curves.
+
+2009-03-03  jbednar
+
+	* [r10116] topo/tkgui/editor.py:
+	  Added import removed in previous revision; was breaking gui-tests
+
+2009-03-03  ceball
+
+	* [r10115] examples/tiny.ty:
+	  Fixed list of imports.
+
+2009-03-03  jbednar
+
+	* [r10114]
+	  doc/Developer_Manual/optimization_text.php:
+	  Fixed attribution
+
+	* [r10113] topo/tkgui/editor.py:
+	  Removed duplicate importing of sheets and projections
+
+	* [r10112] examples/gca_lissom.ty,
+	  examples/lissom_oo_or.ty:
+	  Fixed area scaling; had not been using the right area or number
+	  of inputs for large areas
+
+2009-03-02  ceball
+
+	* [r10111] contrib/rgbimages.py:
+	  Simplified code for ColorImage by overriding __call__ instead of
+	  function().
+
+	* [r10110] contrib/rgbimages.py:
+	  Fixed ColorImage: scale, offset, mask, and output_fns were not
+	  being applied to the color channels.
+
+2009-02-27  ceball
+
+	* [r10109] topo/command/analysis.py:
+	  save_plotgroup() now uses Parameterized's set_param() method to
+	  set parameters on the plotgroup, thereby giving an error if the
+	  wrong name is given for a plotgroup parameter (e.g.
+	  save_plotgroup('Activity',normalized=True).
+
+	* [r10108] topo/param/parameterized.py:
+	  Added set_param() method to Parameterized, for use when setting
+	  parameters (instead of setattr(), which does not check for that
+	  the named attribute is actually a Parameter).
+
+2009-02-27  jbednar
+
+	* [r10107] examples/gca_lissom.ty:
+	  Added support for area parameter
+
+	* [r10106] topo/tkgui/plotgrouppanel.py:
+	  Made it possible to open Test Pattern window for a simulation
+	  created in the Model Editor
+
+2009-02-25  jbednar
+
+	* [r10105] topo/pattern/basic.py:
+	  Added HalfPlane pattern from Stuart
+
+2009-02-24  jbednar
+
+	* [r10104] contrib/lissom_happyface.ty:
+	  Fixed RectangleWithSmoothing to be smoothed in both directions.
+	  Changed Arc.arc_end to increase from zero as angles do. Fixed
+	  hiding of Curve.arc_end.
+
+2009-02-24  rczhao
+
+	* [r10103] contrib/lissom_happyface.ty:
+	  Revised Arc class and rectangle()
+
+2009-02-23  ceball
+
+	* [r10102] contrib/lissom_rgb.ty:
+	  Updated dataset=Gaussian to work with color retina.
+
+	* [r10101] contrib/rgbimages.py,
+	  topo/analysis/featureresponses.py:
+	  Added ListGenerator, to create lists dynamically. Changed
+	  ExtendToRGB's channel_strengths to relative_channel_strengths.
+
+	* [r10100] images/mcgill/foliage_b/01.png,
+	  images/mcgill/foliage_b/02.png,
+	  images/mcgill/foliage_b/03.png,
+	  images/mcgill/foliage_b/04.png,
+	  images/mcgill/foliage_b/05.png,
+	  images/mcgill/foliage_b/06.png,
+	  images/mcgill/foliage_b/07.png,
+	  images/mcgill/foliage_b/08.png,
+	  images/mcgill/foliage_b/09.png,
+	  images/mcgill/foliage_b/10.png,
+	  images/mcgill/foliage_b/11.png,
+	  images/mcgill/foliage_b/12.png,
+	  images/mcgill/foliage_b/13.png,
+	  images/mcgill/foliage_b/14.png,
+	  images/mcgill/foliage_b/15.png,
+	  images/mcgill/foliage_b/16.png,
+	  images/mcgill/foliage_b/17.png,
+	  images/mcgill/foliage_b/18.png,
+	  images/mcgill/foliage_b/19.png,
+	  images/mcgill/foliage_b/20.png,
+	  images/mcgill/foliage_b/21.png,
+	  images/mcgill/foliage_b/22.png,
+	  images/mcgill/foliage_b/23.png,
+	  images/mcgill/foliage_b/24.png,
+	  images/mcgill/foliage_b/25.png:
+	  Added single-file (i.e. color) versions of existing images (the
+	  existing images will be deleted in the future).
+
+	* [r10099] examples/lissom.ty:
+	  Simplified parentheses.
+
+	* [r10098] topo/base/projection.py:
+	  Simplified SheetMask's sheet and data properties by making them
+	  both overridable properties. Should be no visible change.
+
+	* [r10097] topo/param/parameterized.py,
+	  topo/pattern/image.py:
+	  Renamed Oproperty to overridable_property, and cleaned up docs
+	  and spacing.
+
+2009-02-23  jbednar
+
+	* [r10096] contrib/rgbimages.py:
+	  Fixed typo
+
+2009-02-23  ceball
+
+	* [r10095] topo/pattern/image.py:
+	  Added comment.
+
+	* [r10094] topo/pattern/image.py:
+	  Fixed error deleting PatternSampler's cache of the image.
+
+	* [r10093] contrib/rgbimages.py,
+	  topo/pattern/image.py:
+	  Simplified PatternSampler by removing the caching of image array.
+	  (The cache no longer appeared to be having much of an impact on
+	  performance, since PIL.Image can now be efficiently converted to
+	  an array.) Created base class ImageSampler, from which
+	  PatternSampler and FastImageSampler (formerly FastPatternSampler)
+	  now inherit. Simplified GenericImage's _get_image().
+
+	* [r10092] topo/base/projection.py,
+	  topo/param/parameterized.py:
+	  Added Oproperty, an implementation of 'property' that allows
+	  subclasses to override the get/set/del methods.
+
+	* [r10091] contrib/rgbimages.py:
+	  Updated docs.
+
+	* [r10090] contrib/lissom_rgb.ty:
+	  Initial version.
+
+	* [r10089] contrib/rgbimages.py:
+	  Added ALERT, plus minor cleanup (should be no visible change).
+
+	* [r10088] topo/param/tk.py:
+	  Fixed bug with ListWidget where e.g. right clicking on output_fns
+	  list in the Test Pattern window caused an error. (The 'disabled'
+	  attribute was not being created during __init__.)
+
+2009-02-21  rczhao
+
+	* [r10087] contrib/lissom_happyface.ty:
+	  Many improvements.
+
+2009-02-20  ceball
+
+	* [r10086] contrib/rgbimages.py:
+	  Simplified application of channel_strengths (now applies in both
+	  color and monochrome cases.
+
+	* [r10085] contrib/rgbimages.py:
+	  If ColorImage gets a grayscale image, sets R, G, and B channels
+	  to the same (each to 1/3 of grayscale) rather than giving an
+	  error.
+
+	* [r10084] examples/lissom.ty:
+	  Removed accidentally duplicated line (which I think was having no
+	  effect).
+
+	* [r10083] topo/command/analysis.py,
+	  topo/command/basic.py,
+	  topo/command/pylabplots.py,
+	  topo/param/parameterized.py:
+	  Fixed problem that became apparent in r10076: e.g. p.x=y (where p
+	  is a ParamOverrides instance) would be lost when passing on p via
+	  **p, because p.x did not result in x being put into the
+	  ParamOverrides dictionary (it was only set as an attribute, and
+	  hence was lost on converting ParamOverrides to a dictionary via
+	  **). ParamOverrides now inserts into its dictionary any attribute
+	  that does not start with an underscore. Genuine attributes of
+	  ParamOverrides (e.g. extra_keywords) have now been renamed to
+	  begin with an underscore (this is better anyway because it
+	  reduces the chance for a parameter to have the same name as an
+	  attribute of ParamOverrides).
+
+2009-02-19  ceball
+
+	* [r10082] topo/pattern/image.py:
+	  Added ALERT.
+
+	* [r10081] contrib/rgbimages.py:
+	  Simplified RotatedHuesImage's random number generation.
+
+	* [r10080] contrib/rgbimages.py:
+	  ParamOverrides-related renaming for consistency. Should be no
+	  visible change.
+
+	* [r10079] topo/pattern/image.py:
+	  Removed ability to override PatternSampler's parameter when
+	  calling it (was unused).
+
+	* [r10078] contrib/rgbimages.py,
+	  topo/pattern/image.py:
+	  Removed PatternSampler's _initialize_image() method, and made its
+	  whole_pattern_output_fns and background_value_fn be constant
+	  parameters.
+
+	* [r10077] topo/param/tk.py:
+	  Added support to ListWidget for constant List parameters (i.e.
+	  don't show a popup menu for a right click if the parameter is
+	  constant).
+
+2009-02-19  jbednar
+
+	* [r10076] topo/pattern/basic.py,
+	  topo/pattern/random.py,
+	  topo/pattern/rds.py:
+	  Updated to use cleaner parameter accessing style and to fix cases
+	  where parameters supplied in the call to a PatternGenerator
+	  instance would be ignored. Should be no change in results except
+	  for cases where instances were called with explicit parameters
+
+2009-02-19  ceball
+
+	* [r10075] contrib/rgbimages.py:
+	  Restored line that went missing sometime recently.
+
+	* [r10074] topo/pattern/basic.py:
+	  Removed unused parameter.
+
+	* [r10073] topo/pattern/image.py:
+	  Made ParamOverrides-related naming more consistent. Should be no
+	  visible change.
+
+	* [r10072] topo/pattern/basic.py:
+	  Some patterns' __call__ methods were ignoring some parameters if
+	  they were passed in.
+
+	* [r10071] topo/pattern/basic.py:
+	  Made ParamOverrides-related naming more consistent. Should be no
+	  visible change.
+
+	* [r10070] topo/base/patterngenerator.py:
+	  Minor code simplification.
+
+	* [r10069] topo/base/patterngenerator.py:
+	  Fixed bug in Constant pattern generator; since output_fn was
+	  changed to output_fns, Constant has not been working whenever it
+	  has had any output_fns.
+
+	* [r10068] topo/base/patterngenerator.py:
+	  Made ParamOverrides-related naming more consistent. Should be no
+	  visible change.
+
+	* [r10067] topo/pattern/image.py:
+	  Ensure FileImage's _get_image() uses a filename that's passed
+	  into __call__().
+
+2009-02-18  jbednar
+
+	* [r10066] contrib/rgbimages.py:
+	  Cleaned up docs, some code
+
+2009-02-18  ceball
+
+	* [r10065] contrib/rgbimages.py:
+	  Made ExtendToRGB have red, green, blue attributes on creation.
+
+	* [r10064] topo/sheet/basic.py:
+	  Added ALERT.
+
+	* [r10063] topo/analysis/featureresponses.py:
+	  Added commented-out code for measuring hue maps with a single
+	  color retina.
+
+	* [r10062] contrib/rgbimages.py:
+	  More simplification. Should be no visible change.
+
+	* [r10061] contrib/rgbimages.py:
+	  Simplified ColorImageSheet: automatically wraps input_generator
+	  in ExtendToRGB.
+
+	* [r10060] contrib/rgbimages.py:
+	  More renaming of variables.
+
+	* [r10059] contrib/rgbimages.py,
+	  topo/command/analysis.py:
+	  Various RGB-related renaming and documentation.
+
+	* [r10058] contrib/rgbimages.py:
+	  Simplified ColorImage after recent changes to GenericImage.
+
+	* [r10057] topo/pattern/image.py:
+	  Made PatternSampler's __call__ not change the supplied x and y
+	  matrices. (Changing the supplied x any matrices prevents their
+	  reuse e.g. in a subclass of GenericImage that makes more than one
+	  sample.)
+
+	* [r10056] topo/pattern/image.py:
+	  Reverted change accidentally introduced during recent
+	  reorganization.
+
+	* [r10055] topo/pattern/image.py:
+	  Added to comment.
+
+2009-02-18  jbednar
+
+	* [r10054] contrib/lissom_happyface.ty:
+	  Reorganized Arc; added Curve class; still needs more work
+
+2009-02-18  antolikjan
+
+	* [r10053]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  decreased the density of retina to increase speed
+
+2009-02-18  rczhao
+
+	* [r10052] contrib/lissom_happyface.ty:
+	  Arc class now can draw an arc by either specifying start and end
+	  radian, or by specifying the arc width and height.
+
+2009-02-18  antolikjan
+
+	* [r10051] topo/command/pylabplots.py:
+	  made the tuning curves plotting use larger fonts and thicker
+	  plots lines
+
+2009-02-18  ceball
+
+	* [r10050] topo/pattern/image.py,
+	  topo/tests/testimage.py:
+	  Simplified GenericImage and PatternSampler by removing duplicate
+	  parameters size_normalization and whole_image_output_fns from
+	  GenericImage.
+
+	* [r10049] topo/pattern/image.py:
+	  Intermediate checkin: changing GenericImage to have a
+	  PatternSampler instance, rather than creating one from a type
+	  each time. Should simplify code and cut down on parameter
+	  duplication.
+
+	* [r10048] examples/lissom.ty:
+	  Removed redundant check.
+
+2009-02-18  jbednar
+
+	* [r10047] topo/pattern/image.py:
+	  Fixed formatting of docstrings; minor clarifications
+
+	* [r10046] topo/plotting/bitmap.py:
+	  Removed unused import
+
+2009-02-18  ceball
+
+	* [r10045] topo/pattern/image.py:
+	  Changed some of PatternSampler's various method arguments to be
+	  parameters. Should be no visible change.
+
+2009-02-17  ceball
+
+	* [r10044] topo/pattern/image.py:
+	  Restored Float argument accidentally deleted in previous commit.
+
+	* [r10043] topo/pattern/image.py:
+	  Simplified converting PIL Image into array (became possible after
+	  upgrading to PIL 1.1.6). Should be no visible change.
+
+	* [r10042] examples/lissom.ty:
+	  Fixed typo.
+
+	* [r10041] contrib/rgbimages.py:
+	  Code simplification: no visible change.
+
+2009-02-17  antolikjan
+
+	* [r10040] contrib/gc_alissom.ty:
+	  selectivity multiplier change
+
+2009-02-17  ceball
+
+	* [r10039] examples/lissom.ty:
+	  Updated doc (for script-level parameters).
+
+2009-02-16  ceball
+
+	* [r10038] contrib/rgbimages.py:
+	  Corrected import.
+
+2009-02-13  rczhao
+
+	* [r10037] contrib/lissom_happyface.ty:
+	  A LISSOM-based happy face (cartoon face with a curved mouth)
+	  simulation.
+
+2009-02-12  jbednar
+
+	* [r10036] /releases/0.9.6:
+	  Create release 0.9.6
+
+	* [r10035] /tags/LATEST_STABLE/trunk:
+	  Update LATEST_STABLE.
+
+	* [r10034] doc/Team_Members/index_text.php:
+	  Updated team
+
+	* [r10033] doc/Tutorials/gca_lissom_text.php,
+	  doc/Tutorials/images/gca_natural_image_oo_or.png:
+	  Fixed refs to LISSOM. Updated image of face
+
+	* [r10032] Makefile,
+	  examples/README.txt:
+	  Fixed syntax for distclean. Added gca_lissom.ty to list to keep
+
+	* [r10031] ChangeLog.txt:
+	  Updated with current changes
+
+2009-02-12  ceball
+
+	* [r10030] etc/update_095_to_096:
+	  Added 'output_fn=X'->'output_fns=[X'.
+
+	* [r10029] doc/Reference_Manual/index_text.php:
+	  Added info about Cython.
+
 2009-02-12  antolikjan
 
 	* [r10028] contrib/gc_alissom.ty:
