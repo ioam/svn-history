@@ -255,6 +255,9 @@ def AddV2():
     topo.sim["V1Complex"].plastic = False
     topo.sim["V1ComplexInh"].plastic = False
     
+    topo.sim["V1Simple"].output_fns[1].plastic=False
+    topo.sim["V1Complex"].output_fns[1].plastic=False
+    
     ### Lateral excitatory bounds changes
     #LE='topo.sim["V2"].projections()["V2LateralExcitatory"]'
 
