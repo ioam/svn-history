@@ -220,18 +220,21 @@ def AddV2():
     combined_corners = corners[0]
 
     topo.sim['Retina'].set_input_generator(combined_corners)
+    AH = ActivityHysteresis(time_constant=0.5)
+    HE=SimpleHomeoLinear(smoothing=0.999,eta=locals().get('V2_eta',0.001), mu=locals().get('V2MU',0.01),t_init=0.55)
+    V2_OF = [AH,HE]
     
     topo.sim['V2'] = LISSOM(nominal_density=__main__.__dict__.get('default_density', 48.0),
-                        nominal_bounds=BoundingBox(radius=__main__.__dict__.get('CS', 0.5)), tsettle=9,
-                        #output_fn=HomeostaticMaxEnt(a_init=14.5, b_init=__main__.__dict__.get('BINI',-4), mu=__main__.__dict__.get('V2MU',0.01)))
-                        output_fn=Sigmoid(r=locals().get('r_init', 8), k=locals().get('k_init', - 3)))
+                        nominal_bounds=BoundingBox(radius=__main__.__dict__.get('CS', 0.5)), tsettle=16,
+                        
+                        output_fns=V2_OF)
 
     topo.sim.connect('V1Complex', 'V2', delay=0.05, dest_port=('Activity', 'JointNormalize', 'Afferent'),
-                    connection_type=CFProjection, strength=__main__.__dict__.get('V2aff_str', 0.8), name='V1Afferent',
+                    connection_type=CFProjection, strength=__main__.__dict__.get('V2aff_str', 1.8), name='V1Afferent',
                     weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply,
                                                                     generators=[Gaussian(aspect_ratio=1.0, size=3), #__main__.__dict__.get('V1aff_size',30)),
                                                                                 topo.pattern.random.UniformRandom()]),
-                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2aff_size', 2 * 0.27083) / 2), learning_rate=1.0);
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2aff_size', 4 * 0.27083) / 2), learning_rate=1.0);
 
     topo.sim.connect('V2', 'V2', delay=0.025, name='V2LateralExcitatory',
                     connection_type=CFProjection, strength=0.9,
