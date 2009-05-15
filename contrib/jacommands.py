@@ -234,15 +234,15 @@ def AddV2():
                     weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply,
                                                                     generators=[Gaussian(aspect_ratio=1.0, size=3), #__main__.__dict__.get('V1aff_size',30)),
                                                                                 topo.pattern.random.UniformRandom()]),
-                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2aff_size', 4 * 0.27083) / 2), learning_rate=1.0);
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2aff_size', 4 * 0.27083) / 2), learning_rate=__main__.__dict__.get('V2_lr', 1.0));
 
     topo.sim.connect('V2', 'V2', delay=0.025, name='V2LateralExcitatory',
-                    connection_type=CFProjection, strength=0.9,
+                    connection_type=CFProjection, strength=__main__.__dict__.get('V2lat_exc_str', 0.9),
                     weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_exc_size', 0.04)),
                     nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_exc_size', 0.08) / 2), learning_rate=0) 
                 
     topo.sim.connect('V2', 'V2', delay=0.025, name='V2LateralInhibitory',
-                    connection_type=CFProjection, strength= - 0.9,
+                    connection_type=CFProjection, strength= - __main__.__dict__.get('V2lat_inh_str', 0.9),
                     weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply,
                                                                     generators=[Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_inh_size', 2 * 0.22917)),
                                                                                 topo.pattern.random.UniformRandom()]),
