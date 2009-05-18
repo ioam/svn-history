@@ -150,9 +150,10 @@ class SharedWeightCFProjection(CFProjection):
 
     def change_bounds(self, nominal_bounds_template):
         """
-        Change the bounding box for all of the ConnectionFields in this Projection.
+        Change the bounding box for all of the existing ConnectionFields in this Projection.
 
-	Not yet implemented.
+	Not yet implemented; requires cropping or extending the weight matrix
+        in place (see ConnectionField.change_bounds for an example).
 	"""
         raise NotImplementedError
 
