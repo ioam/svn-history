@@ -221,13 +221,17 @@ def AddV2():
 
     topo.sim['Retina'].set_input_generator(combined_corners)
     AH = ActivityHysteresis(time_constant=0.5)
-    HE=SimpleHomeoLinear(smoothing=0.999,eta=locals().get('V2_eta',0.001), mu=locals().get('V2MU',0.01),t_init=0.55)
+    HE=SimpleHomeoLinear(smoothing=0.999,eta=locals().get('V2_eta',0.001), mu=locals().get('V2MU',0.01),t_init=0.05)
     V2_OF = [AH,HE]
+    
     
     topo.sim['V2'] = LISSOM(nominal_density=__main__.__dict__.get('default_density', 48.0),
                         nominal_bounds=BoundingBox(radius=__main__.__dict__.get('CS', 0.5)), tsettle=16,
-                        
                         output_fns=V2_OF)
+
+    #make sure that activity is reset at the beginning of iteration
+    topo.sim['V2'].beginning_of_iteration.append(AH.reset)
+
 
     topo.sim.connect('V1Complex', 'V2', delay=0.05, dest_port=('Activity', 'JointNormalize', 'Afferent'),
                     connection_type=CFProjection, strength=__main__.__dict__.get('V2aff_str', 1.8), name='V1Afferent',
@@ -237,14 +241,14 @@ def AddV2():
                     nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2aff_size', 4 * 0.27083) / 2), learning_rate=__main__.__dict__.get('V2_lr', 1.0));
 
     topo.sim.connect('V2', 'V2', delay=0.025, name='V2LateralExcitatory',
-                    connection_type=CFProjection, strength=__main__.__dict__.get('V2lat_exc_str', 0.9),
-                    weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_exc_size', 0.04)),
-                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_exc_size', 0.08) / 2), learning_rate=0) 
+                    connection_type=CFProjection, strength=__main__.__dict__.get('V2lat_exc_str', 2.5),
+                    weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_exc_size', 0.05)),
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_exc_size', 0.104)), learning_rate=0) 
                 
     topo.sim.connect('V2', 'V2', delay=0.025, name='V2LateralInhibitory',
-                    connection_type=CFProjection, strength= - __main__.__dict__.get('V2lat_inh_str', 0.9),
+                    connection_type=CFProjection, strength= - __main__.__dict__.get('V2lat_inh_str', 2.0),
                     weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply,
-                                                                    generators=[Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_inh_size', 2 * 0.22917)),
+                                                                    generators=[Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_inh_size', 0.15)),
                                                                                 topo.pattern.random.UniformRandom()]),
                     nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_inh_size', 2 * 0.22917) / 2), learning_rate=0)
 
