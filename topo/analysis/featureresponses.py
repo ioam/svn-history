@@ -58,10 +58,10 @@ class DistributionMatrix(param.Parameterized):
     (which can be used as a preference map) and/or a selectivity
     map (which measures the peakedness of each distribution).
     """
-    def __init__(self,matrix_shape,axis_range=(0.0,1.0), cyclic=False):
+    def __init__(self,matrix_shape,axis_range=(0.0,1.0), cyclic=False,keep_peak=True):
         """Initialize the internal data structure: a matrix of Distribution objects."""
         self.axis_range=axis_range
-        new_distribution = vectorize(lambda x: Distribution(axis_range,cyclic,True),
+        new_distribution = vectorize(lambda x: Distribution(axis_range,cyclic,keep_peak),
                                      doc="Return a Distribution instance for each element of x.")
         self.distribution_matrix = new_distribution(empty(matrix_shape))
 
@@ -176,6 +176,10 @@ class FeatureResponses(PatternDrivenAnalysis):
     # CEB: we might want to measure the map on a sheet due
     # to a specific projection, rather than measure the map due
     # to all projections.
+    num_repetitions = param.Integer(default=1,doc="""This parameter defines how many 
+    times will given stimuli be presented. The activities over these repetitions
+    are than averaged and only these averages are passed to the rest of analysis 
+    process""")
     
     _fullmatrix = {}
 
@@ -190,9 +194,11 @@ class FeatureResponses(PatternDrivenAnalysis):
     def initialize_featureresponses(self,features):
         """Create an empty DistributionMatrix for each feature and each sheet."""
         self._featureresponses = {}
+        self._activities = {}
         FeatureResponses._fullmatrix = {}
         for sheet in self.sheets_to_measure():
             self._featureresponses[sheet] = {}
+            self._activities[sheet]=zeros(sheet.shape)
             for f in features:
                 self._featureresponses[sheet][f.name]=DistributionMatrix(sheet.shape,axis_range=f.range,cyclic=f.cyclic)
             FeatureResponses._fullmatrix[sheet] = FullMatrix(sheet.shape,features)
@@ -245,34 +251,45 @@ class FeatureResponses(PatternDrivenAnalysis):
 
     def present_permutation(self,permutation):
         """Present a pattern with the specified set of feature values."""
-        topo.sim.state_push()
+        for sheet in self.sheets_to_measure():
+            self._activities[sheet]*=0
 
         # Calculate complete set of settings
         permuted_settings = zip(self.feature_names, permutation)
         complete_settings = permuted_settings + \
             [(f.name,f.compute_fn(permuted_settings)) for f in self.features_to_compute]
-            
-        # Run hooks before and after pattern presentation.
-        # Could use complete_settings here, to avoid some
-        # PatternPresenter special cases, but that might cause
-        # conflicts with the existing PatternPresenter code.
-        for f in self.pre_presentation_hooks: f()
-        #valstring = " ".join(["%s=%s" % (n,v) for n,v in complete_settings])
-        #self.message("Presenting pattern %s" % valstring)
-        self.pattern_presenter(dict(permuted_settings),self.param_dict)
-        for f in self.post_presentation_hooks: f()
 
-        if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
 
+        for i in xrange(0,self.num_repetitions):
+            print i
+            topo.sim.state_push()
+
+            # Run hooks before and after pattern presentation.
+            # Could use complete_settings here, to avoid some
+            # PatternPresenter special cases, but that might cause
+            # conflicts with the existing PatternPresenter code.
+            for f in self.pre_presentation_hooks: f()
+            #valstring = " ".join(["%s=%s" % (n,v) for n,v in complete_settings])
+            #self.message("Presenting pattern %s" % valstring)
+            self.pattern_presenter(dict(permuted_settings),self.param_dict)
+            for f in self.post_presentation_hooks: f()
+    
+            if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
+            for sheet in self.sheets_to_measure():
+                self._activities[sheet]+=sheet.activity
+            topo.sim.state_pop()
+
+        for sheet in self.sheets_to_measure():
+            self._activities[sheet]=self._activities[sheet] / self.num_repetitions
+        
         self._update(complete_settings)
-        topo.sim.state_pop()
-
+         
     def _update(self,current_values):
         # Update each DistributionMatrix with (activity,bin)
         for sheet in self.sheets_to_measure():
             for feature,value in current_values:
-                self._featureresponses[sheet][feature].update(sheet.activity, value)
-            FeatureResponses._fullmatrix[sheet].update(sheet.activity,current_values)
+                self._featureresponses[sheet][feature].update(self._activities[sheet], value)
+            FeatureResponses._fullmatrix[sheet].update(self._activities[sheet],current_values)
 
 
 
@@ -496,7 +513,7 @@ class Feature(object):
     Stores the parameters required for generating a map of one input feature.
     """
 
-    def __init__(self, name, range=None, step=0.0, values=None, cyclic=False, compute_fn=None, offset=0):
+    def __init__(self, name, range=None, step=0.0, values=None, cyclic=False, compute_fn=None, offset=0,keep_peak=True):
          """
          Users can provide either a range and a step size, or a list of values.
          If a list of values is supplied, the range can be omitted unless the
@@ -512,6 +529,7 @@ class Feature(object):
          self.cyclic=cyclic
          self.compute_fn=compute_fn
          self.range=range
+         self.keep_peak=keep_peak
                      
          if values is not None:
              self.values=values if offset == 0 else [v+offset for v in values]
