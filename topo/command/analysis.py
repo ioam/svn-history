@@ -617,7 +617,7 @@ class measure_corner_or_pref(PositionMeasurementCommand):
 
     divisions=param.Integer(default=10)
 
-    pattern_presenter = param.Callable(PatternPresenter(gaussian_corner,apply_output_fns=False,duration=0.175))
+    pattern_presenter = param.Callable(PatternPresenter(gaussian_corner,apply_output_fns=False,duration=1.0))
 
     x_range=param.NumericTuple((-1.2,1.2))
 
