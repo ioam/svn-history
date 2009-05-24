@@ -774,7 +774,7 @@ progressbar-uninstall:
 
 #############################################################
 # GNU MP
-GMP = gmp-4.2.2
+GMP = gmp-4.3.1
 
 GMP_UNINSTALL += lib/libgmp.* 
 GMP_UNINSTALL += include/gmp.h
