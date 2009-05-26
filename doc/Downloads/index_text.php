@@ -115,14 +115,15 @@ php5-cli m4 tetex imagemagick transfig</code>.  However, this takes
 about half a day to run, as it needs to compile everything from
 source, and is not necessary for Topographica itself to run.
 
-<li>If you have trouble running <code>fink</code>, make sure the Fink
+</ul>
+
+<P>If you have trouble running <code>fink</code>, make sure the Fink
 installation is actually in your path (the default Fink path is
 <code>/sw/bin/</code>; the installer should have set this up for
 you). Also, if you prefer not to use the commandline, you can install
 <a href="http://finkcommander.sourceforge.net/">FinkCommander</a>, a
 GUI for Fink that allows you to search for the packages above and
 click to install them.
-</ul>
 
 <P>Finally, if you do not already have Tcl/Tk version 8.5 or later
 installed on your system, you will need to install it to use the
