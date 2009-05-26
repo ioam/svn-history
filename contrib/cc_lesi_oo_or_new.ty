@@ -123,16 +123,10 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                 period=1.0, phase=0.05,
                                 nominal_bounds=BoundingBox(radius=core_size+0.25+0.375+0.5))
 
-topo.sim['FakeRetina1']=GeneratorSheet(nominal_density=24.0,
+topo.sim['FakeRetina']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=retinal_waves,  
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=core_size+0.25+0.5))
-
-topo.sim['FakeRetina2']=GeneratorSheet(nominal_density=24.0,
-                                  input_generator=retinal_waves,  
-                                  period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=core_size+0.25+0.5))
-
 
 topo.sim['LGNOn']=LISSOM(nominal_density=24.0,
                           nominal_bounds=BoundingBox(radius=core_size+0.25+0.5),
@@ -170,11 +164,11 @@ off_weights = topo.pattern.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 
-topo.sim.connect('FakeRetina1','LGNOn',delay=0.05,
+topo.sim.connect('FakeRetina','LGNOn',delay=0.05,
                  connection_type=OneToOneProjection,strength=0.5,
                  nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
 
-topo.sim.connect('FakeRetina2','LGNOff',delay = 0.05,
+topo.sim.connect('FakeRetina','LGNOff',delay = 0.05,
                  connection_type=OneToOneProjection,strength=0.5,
                  nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
 
@@ -302,8 +296,7 @@ def secondStage():
                     nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOffAfferent1',
                     weights_generator=off_weights)
     
-    topo.sim['FakeRetina1'].set_input_generator(zeroInput)
-    topo.sim['FakeRetina2'].set_input_generator(zeroInput)
+    topo.sim['FakeRetina'].set_input_generator(zeroInput)
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
     randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.5))
