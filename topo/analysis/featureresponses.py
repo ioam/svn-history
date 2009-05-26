@@ -176,7 +176,7 @@ class FeatureResponses(PatternDrivenAnalysis):
     # CEB: we might want to measure the map on a sheet due
     # to a specific projection, rather than measure the map due
     # to all projections.
-    num_repetitions = param.Integer(default=1,doc="""This parameter defines how many 
+    repetitions = param.Integer(default=1,doc="""This parameter defines how many 
     times will given stimuli be presented. The activities over these repetitions
     are than averaged and only these averages are passed to the rest of analysis 
     process""")
@@ -260,8 +260,7 @@ class FeatureResponses(PatternDrivenAnalysis):
             [(f.name,f.compute_fn(permuted_settings)) for f in self.features_to_compute]
 
 
-        for i in xrange(0,self.num_repetitions):
-            print i
+        for i in xrange(0,self.repetitions):
             topo.sim.state_push()
 
             # Run hooks before and after pattern presentation.
@@ -280,7 +279,7 @@ class FeatureResponses(PatternDrivenAnalysis):
             topo.sim.state_pop()
 
         for sheet in self.sheets_to_measure():
-            self._activities[sheet]=self._activities[sheet] / self.num_repetitions
+            self._activities[sheet]=self._activities[sheet] / self.repetitions
         
         self._update(complete_settings)
          
