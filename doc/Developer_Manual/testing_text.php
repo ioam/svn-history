@@ -9,6 +9,8 @@ bugs. Obviously, truly exhaustive tests capable of detecting arbitrary
 
 <P>The default set of unit tests that are run must complete very
 quickly, with no extraneous output, no GUI windows popping up, etc.,
+<!--CEBALERT: should either remove the no-GUI statement (we have
+xvfb-run), or should remove the basic GUI class tests from 'make tests')-->
 because these tests are (and should be) run automatically many times
 each day during active development.  All the output from such tests
 must be checked automatically, with any output generated for the user
