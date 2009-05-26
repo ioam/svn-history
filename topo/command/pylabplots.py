@@ -1020,6 +1020,9 @@ class measure_size_response(UnitCurveCommand):
     num_sizes = param.Integer(default=10,bounds=(1,None),softbounds=(1,50),
                               doc="Number of different sizes to test.")
 
+    max_size = param.Number(default=1.0,bounds=(1,None),softbounds=(1,50),
+                              doc="Maximum extent of the grating")
+
     x_axis = param.String(default='size',constant=True)
 
 
@@ -1041,7 +1044,7 @@ class measure_size_response(UnitCurveCommand):
     def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
                #Feature(name="frequency",values=p.frequencies),
-                Feature(name="size",range=(0.1,1.0),step=1.0/p.num_sizes,cyclic=False)]
+                Feature(name="size",range=(0.1,self.max_size),step=1.0/p.num_sizes,cyclic=False)]
 
 
 create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
