@@ -234,7 +234,7 @@ def AddV2():
 
 
     topo.sim.connect('V1Complex', 'V2', delay=0.05, dest_port=('Activity', 'JointNormalize', 'Afferent'),
-                    connection_type=CFProjection, strength=__main__.__dict__.get('V2aff_str', 1.8), name='V1Afferent',
+                    connection_type=CFProjection, strength=__main__.__dict__.get('V2aff_str', 2), name='V1Afferent',
                     weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply,
                                                                     generators=[Gaussian(aspect_ratio=1.0, size=3), #__main__.__dict__.get('V1aff_size',30)),
                                                                                 topo.pattern.random.UniformRandom()]),
@@ -877,6 +877,93 @@ def run_combinations(func, params):
     run_combinations_counter = 0
     _run_combinations_rec(func, [], params, 0)
     
-    
 
-        
+
+def surround_analysis(steps=1,sheet_name="V1Complex",ns=10,step_size=1):
+    from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand
+    import pylab
+    
+    sheet=topo.sim[sheet_name]
+    # Center mask to matrixidx center
+    center_r,center_c = sheet.sheet2matrixidx(0,0)
+    center_x,center_y = sheet.matrixidx2sheet(center_r,center_c)
+    FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":100}]
+    FeatureCurveCommand.num_phase=4
+
+    peak_near_facilitation_hist = []
+    peak_supression_hist  = []   
+    peak_far_facilitation_hist  = []
+
+    
+    #save_plotgroup("Orientation Preference and Complexity")
+    #save_plotgroup("Position Preference")
+    for x in xrange(0,steps):
+        for y in xrange(0,steps):
+            xindex = center_r+(x-steps/2)*step_size
+            yindex = center_c+(y-steps/2)*step_size
+            xcoor,ycoor = sheet.matrixidx2sheet(xindex,yindex)
+            print (xindex,yindex)
+            print (xcoor,ycoor)
+            topo.command.pylabplots.measure_size_response.instance(sheet=topo.sim[sheet_name],num_sizes=ns,max_size=4,coords=[(xcoor,ycoor)])()        
+            #topo.command.pylabplots.tuning_curve.instance(x_axis="size",filename="STC["+str(xcoor)+ "," +str(xcoor) +"]",sheet=topo.sim[sheet_name],coords=[(xcoor,ycoor)])()
+            
+            
+            ## plot tuning curve with important indexes marked            
+            fig = pylab.figure()
+            f = fig.add_subplot(111,autoscale_on=False,xlim=(-0.1,4.2), ylim=(-0.1,0.7))
+            for curve_label in sorted(sheet.curve_dict['size'].keys()):
+                curve = topo.sim[sheet_name].curve_dict['size'][curve_label]
+                x_values=sorted(curve.keys())
+                y_values=[curve[key].view()[0][xindex,yindex] for key in x_values]
+    
+                # compute critical indexes in the size tuning curves
+                
+                peak_near_facilitation = numpy.argmax(y_values)
+                peak_near_facilitation_hist.append(x_values[peak_near_facilitation])
+                
+                if(peak_near_facilitation < (len(y_values)-1)):
+                    peak_supression = peak_near_facilitation+numpy.argmin(y_values[peak_near_facilitation+1:])+1
+                    peak_supression_hist.append(x_values[peak_supression])
+                else:
+                    peak_supression = -1
+                
+                if((peak_supression < (len(y_values)-1)) and  (peak_supression != -1)):
+                    peak_far_facilitation = peak_supression+numpy.argmax(y_values[peak_supression+1:])+1
+                    peak_far_facilitation_hist.append(x_values[peak_far_facilitation])
+                else:
+                    peak_far_facilitation = -1
+                    
+                f.plot(x_values,y_values,lw=3, color='purple')
+                
+                f.annotate('', xy=(x_values[peak_near_facilitation], y_values[peak_near_facilitation]),  xycoords='data',
+                xytext=(-1, 20), textcoords='offset points',arrowprops=dict(facecolor='black', shrink=0.05))
+
+                if peak_supression != -1:
+                    f.annotate('', xy=(x_values[peak_supression], y_values[peak_supression]),  xycoords='data',
+                               xytext=(-1, 20), textcoords='offset points',arrowprops=dict(facecolor='red', shrink=0.05))
+                
+                if peak_far_facilitation != -1:
+                    f.annotate('', xy=(x_values[peak_far_facilitation], y_values[peak_far_facilitation]),  xycoords='data',
+                               xytext=(-1, 20), textcoords='offset points',arrowprops=dict(facecolor='blue', shrink=0.05))
+    
+            release_fig("STC[" +str(xcoor) + ","+ str(ycoor)+ "]")       
+    fig = pylab.figure()            
+    pylab.hist(peak_supression_hist)
+    release_fig("peak_supression_hist")
+    fig = pylab.figure()     
+    pylab.hist(peak_far_facilitation_hist)
+    release_fig("peak_far_facilitation_hist")
+    fig = pylab.figure()
+    pylab.hist(peak_near_facilitation_hist)
+    release_fig("peak_near_facilitation_hist")       
+
+
+def release_fig(filename=None):
+    import pylab        
+    pylab.show._needmain=False
+    if filename is not None:
+       # JABALERT: need to reformat this as for other plots
+       fullname=filename+str(topo.sim.time())+".png"
+       pylab.savefig(normalize_path(fullname))
+    else:
+       pylab.show()
