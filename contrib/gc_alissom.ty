@@ -141,10 +141,18 @@ else:
 V1_Tracker=AttributeTrackingTF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=18)
 NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=locals().get('intrinsic_noise',0.0)),operator=numpy.add) 
 
-if tracking:
-    V1_OF = [AH,Attrib_Tracker,NN,HE,V1_Tracker]
-else: 
-    V1_OF = [AH,NN,HE]
+if locals().get('ah',True): 
+    if tracking:
+        V1_OF = [AH,Attrib_Tracker,NN,HE,V1_Tracker]
+    else: 
+        V1_OF = [AH,NN,HE]
+else:
+    if tracking:
+        V1_OF = [Attrib_Tracker,NN,HE,V1_Tracker]
+    else: 
+        V1_OF = [NN,HE]
+        
+      
     
 # Specify weight initialization, response function, and learning function
 CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
@@ -276,7 +284,7 @@ if dataset=="NoisyDiskstoNatural":
                       
                       
 import topo.analysis.featureresponses
-
+topo.analysis.featureresponses.FeatureResponses.num_repetitions=10
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
 topo.analysis.featureresponses.MeasureResponseCommand.apply_output_fns=True
 topo.analysis.featureresponses.MeasureResponseCommand.scale=0.6
