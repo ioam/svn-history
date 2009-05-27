@@ -831,6 +831,7 @@ class mpq(object):
     try:
         import gmpy
     except ImportError:
+        from topo import param
         param.Parameterized().warning("gmpy.mpq not available: using fixedpoint.FixedPoint as a replacement.")
         fake_a_module('gmpy',code)
 
