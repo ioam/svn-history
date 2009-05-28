@@ -69,15 +69,15 @@ def add_scheduled_outputfn_changes(sim):
     ### delta/beta changes
     #
     sim.schedule_command(  199, 'topo.sim["Primary"].output_fns[0].lower_bound=delta_i+0.01; topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.01')
-    sim.schedule_command(  499, 'topo.sim["Primary"].ouput_fns[0].lower_bound=delta_i+0.02; topo.sim["Primary"].ouput_fns[0].upper_bound=beta_i+0.02')
-    sim.schedule_command(  999, 'topo.sim["Primary"].ouput_fns[0].lower_bound=delta_i+0.05; topo.sim["Primary"].ouput_fns[0].upper_bound=beta_i+0.03')
-    sim.schedule_command( 1999, 'topo.sim["Primary"].ouput_fns[0].lower_bound=delta_i+0.08; topo.sim["Primary"].ouput_fns[0].upper_bound=beta_i+0.05')
-    sim.schedule_command( 2999, 'topo.sim["Primary"].ouput_fns[0].lower_bound=delta_i+0.10; topo.sim["Primary"].ouput_fns[0].upper_bound=beta_i+0.08')
-    sim.schedule_command( 3999,                                                    'topo.sim["Primary"].ouput_fns[0].upper_bound=beta_i+0.11')
-    sim.schedule_command( 4999, 'topo.sim["Primary"].ouput_fns[0].lower_bound=delta_i+0.11; topo.sim["Primary"].ouput_fns[0].upper_bound=beta_i+0.14')
-    sim.schedule_command( 6499, 'topo.sim["Primary"].ouput_fns[0].lower_bound=delta_i+0.12; topo.sim["Primary"].ouput_fns[0].upper_bound=beta_i+0.17')
-    sim.schedule_command( 7999, 'topo.sim["Primary"].ouput_fns[0].lower_bound=delta_i+0.13; topo.sim["Primary"].ouput_fns[0].upper_bound=beta_i+0.20')
-    sim.schedule_command(19999, 'topo.sim["Primary"].ouput_fns[0].lower_bound=delta_i+0.14; topo.sim["Primary"].ouput_fns[0].upper_bound=beta_i+0.23')
+    sim.schedule_command(  499, 'topo.sim["Primary"].output_fns[0].lower_bound=delta_i+0.02; topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.02')
+    sim.schedule_command(  999, 'topo.sim["Primary"].output_fns[0].lower_bound=delta_i+0.05; topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.03')
+    sim.schedule_command( 1999, 'topo.sim["Primary"].output_fns[0].lower_bound=delta_i+0.08; topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.05')
+    sim.schedule_command( 2999, 'topo.sim["Primary"].output_fns[0].lower_bound=delta_i+0.10; topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.08')
+    sim.schedule_command( 3999,                                                    'topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.11')
+    sim.schedule_command( 4999, 'topo.sim["Primary"].output_fns[0].lower_bound=delta_i+0.11; topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.14')
+    sim.schedule_command( 6499, 'topo.sim["Primary"].output_fns[0].lower_bound=delta_i+0.12; topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.17')
+    sim.schedule_command( 7999, 'topo.sim["Primary"].output_fns[0].lower_bound=delta_i+0.13; topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.20')
+    sim.schedule_command(19999, 'topo.sim["Primary"].output_fns[0].lower_bound=delta_i+0.14; topo.sim["Primary"].output_fns[0].upper_bound=beta_i+0.23')
 
 def add_scheduled_tsettle_changes(sim):
     #tsettle changes
