@@ -822,14 +822,19 @@ def provide_gmpy_equivalent():
     ## really high?
     code = \
 """
+from __future__ import division
 import fixedpoint
+from topo import param
 class mpq(object):
     def __new__(self,*args,**kw):
-        return fixedpoint.FixedPoint(args[0],precision=4)
+        n = fixedpoint.FixedPoint(eval(str(args[0])),precision=4)
+        param.Parameterized().debug("%s replaced by %s"%(args[0],n))
+        return n
 """
     # only replace gmpy if necessary
     try:
         import gmpy
+        raise ImportError
     except ImportError:
         from topo import param
         param.Parameterized().warning("gmpy.mpq not available: using fixedpoint.FixedPoint as a replacement.")
