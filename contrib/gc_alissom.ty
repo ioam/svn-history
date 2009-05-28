@@ -89,7 +89,7 @@ elif dataset=="NoisyDiskstoNatural":
                                                             size=2.0, aspect_ratio=1.0, scale=disk_scale,
                                                             offset=0.5,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.1),
-                                   topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',-0.5), scale=locals().get('rand_scale',1.0))])]
+                                   topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',-0.5), scale=locals().get('rand_scale',0.3))])]
 
     combined_inputs =topo.pattern.basic.Selector(generators=disks_inputs)      
    
