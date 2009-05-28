@@ -108,12 +108,12 @@ command:
 <code>fink install libpng3 freetype219</code>. 
 <!--libpng might already be present on macs...--> 
 
-<li> If you want to compile a local copy of the documentation
+<li> <em>Optional</em>: If you want to compile a local copy of the documentation
 (e.g. for online help), use Fink to get imagemagick, transfig, php,
 and m4 (if these are not already installed): <code>fink install
 php5-cli m4 tetex imagemagick transfig</code>.  However, this takes
-about half a day to run, as it needs to compile everything from
-source, and is not necessary for Topographica itself to run.
+about half a day to run (as it needs to compile everything from
+source), and you first have to set fink to its <a href="http://www.finkproject.org/faq/usage-fink.php?phpLang=en#unstable">unstable branch</a>.
 
 </ul>
 
