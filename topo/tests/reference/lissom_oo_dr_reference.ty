@@ -131,7 +131,7 @@ CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.pattern.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
-CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
 
 SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
@@ -227,20 +227,20 @@ for i in range(num_eyes):
                 orientation=lambda x=i:doh(x)),
         precedence=i)
 
-    topo.sim['Ganglia%s0'%i]=CFSheet(output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                               upper_bound=1.0),
+    topo.sim['Ganglia%s0'%i]=CFSheet(output_fns=[PiecewiseLinear(lower_bound=0.0,
+                                                                 upper_bound=1.0)],
                                      precedence=num_eyes+1)
     
-    topo.sim['Ganglia%s1'%i]=CFSheet(output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                               upper_bound=1.0),
+    topo.sim['Ganglia%s1'%i]=CFSheet(output_fns=[PiecewiseLinear(lower_bound=0.0,
+                                                                 upper_bound=1.0)],
                                      precedence=num_eyes+1)
 
 
 topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
                              nominal_bounds=BoundingBox(radius=0.5),
                              tsettle=tsettle,
-                             output_fn=PiecewiseLinear(lower_bound=delta_i,
-                                                       upper_bound=beta_i),
+                             output_fns=[PiecewiseLinear(lower_bound=delta_i,
+                                                         upper_bound=beta_i)],
                              precedence=num_eyes+2)
 
 
@@ -248,11 +248,11 @@ topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
 # Gaussian in retinalobjs (and elsewhere)
 centerg = topo.pattern.basic.Gaussian(
     size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1.0,
-    output_fn=DivisiveNormalizeL1(norm_value=blur_scale))
+    output_fns=[DivisiveNormalizeL1(norm_value=blur_scale)])
 
 surroundg = topo.pattern.basic.Gaussian(
     size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1.0,
-    output_fn=DivisiveNormalizeL1(norm_value=blur_scale))
+    output_fns=[DivisiveNormalizeL1(norm_value=blur_scale)])
 
 
 on_weights = topo.pattern.basic.Composite(
