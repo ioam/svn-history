@@ -176,10 +176,17 @@ class FeatureResponses(PatternDrivenAnalysis):
     # CEB: we might want to measure the map on a sheet due
     # to a specific projection, rather than measure the map due
     # to all projections.
-    repetitions = param.Integer(default=1,doc="""This parameter defines how many 
-    times will given stimuli be presented. The activities over these repetitions
-    are than averaged and only these averages are passed to the rest of analysis 
-    process""")
+    
+    repetitions = param.Integer(default=1,bounds=(1,None),doc="""
+        How many times each stimulus will be presented.
+
+        Each stimulus is specified by a particular feature
+        combination, and need only be presented once if the network
+        has no other source of variability.  If results differ for
+        each presentation of an identical stimulus (e.g. due to
+        intrinsic noise), then this parameter can be increased
+        so that results will be an average over the specified
+        number of repetitions.""")
     
     _fullmatrix = {}
 
