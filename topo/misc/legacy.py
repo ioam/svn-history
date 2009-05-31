@@ -803,9 +803,11 @@ def cf_bounds_readonly():
 S.append(cf_bounds_readonly)
 
 
+# (Currently, the code below is already run in topo.__init__ if gmpy
+# isn't available.)
 ## If gmpy.mpq is not available, use fixedpoint.FixedPoint. 
-from topo.misc.util import gmpyImporter
-sys.meta_path.append(gmpyImporter())
+#from topo.misc.util import gmpyImporter
+#sys.meta_path.append(gmpyImporter())
 
 
 def param_add_allow_None():

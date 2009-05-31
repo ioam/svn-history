@@ -114,16 +114,29 @@ _instance_method_pickle_support()
 
 
 # Set the default value of Simulation.time_type to gmpy.mpq
-# (or the slower fixedpoint.FixedPoint if gmpy is unavailable)
+# If gmpy is unavailable, use the slower fixedpoint.FixedPoint. Also,
+# provide a fake gmpy.mpq (to allow e.g. pickled test data to be
+# loaded).
+# CEBALERT: here while gmpy is not universally available (i.e. for the
+# mac). Once it's always available, the code below should be removed,
+# and gmpy support should be uncommented in topo.misc.legacy (to
+# provide support for pre-gmpy snapshots).
 try:
     import gmpy
     time_type = gmpy.mpq
     time_type_args = ()
     _mpq_pickle_support()
 except ImportError:
+    import param
     import fixedpoint
+    param.Parameterized().warning('gmpy.mpq not available; using fixedpoint.FixedPoint for simulation time.')
     time_type = fixedpoint.FixedPoint
     time_type_args = (4,)  # gives precision=4
+    
+    from topo.misc.util import gmpyImporter
+    import sys
+    sys.meta_path.append(gmpyImporter())
+
 
 from topo.base.simulation import Simulation
 Simulation.time_type = time_type
