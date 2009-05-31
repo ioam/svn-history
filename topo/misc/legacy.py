@@ -150,7 +150,6 @@ def fake_a_module(name,source_code,parent=None,parent_name=None):
         sys.modules[name]=module
     else:
         module_redirect(name,parent,module,parent_name)
-        
 
 
 class DuplicateCheckingList(list):
@@ -804,42 +803,9 @@ def cf_bounds_readonly():
 S.append(cf_bounds_readonly)
 
 
-def provide_gmpy_equivalent():
-    ## If gmpy.mpq not available, use fixedpoint.FixedPoint. 
-    ## 
-    ## Note that this won't replace gmpy.mpq in the snapshot
-    ## itself, because Simulation.time_type will remain gmpy.mpq.
-    ## This has the advantage of not affecting the snapshot
-    ## itself, but has the disadvantage of showing mpq as the
-    ## time_type when it's actually FixedPoint on this run. We
-    ## could easily replace time_type, too. I'm not sure which is
-    ## better.
-    ##
-    ## (only implements creation of mpq)
-    ##
-    ## CEBALERT: not sure what precision should be used for
-    ## FixedPoint to replace rational. Should we set the precision
-    ## really high?
-    code = \
-"""
-from __future__ import division
-import fixedpoint
-from topo import param
-class mpq(object):
-    def __new__(self,*args,**kw):
-        n = fixedpoint.FixedPoint(eval(str(args[0])),precision=4)
-        param.Parameterized().debug("%s replaced by %s"%(args[0],n))
-        return n
-"""
-    # only replace gmpy if necessary
-    try:
-        import gmpy
-    except ImportError:
-        from topo import param
-        param.Parameterized().warning("gmpy.mpq not available: using fixedpoint.FixedPoint as a replacement.")
-        fake_a_module('gmpy',code)
-
-S.append(provide_gmpy_equivalent)
+## If gmpy.mpq is not available, use fixedpoint.FixedPoint. 
+from topo.misc.util import gmpyImporter
+sys.meta_path.append(gmpyImporter())
 
 
 def param_add_allow_None():

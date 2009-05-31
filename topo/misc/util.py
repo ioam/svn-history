@@ -340,3 +340,64 @@ class MultiFile(object):
                 return all_out
 
             setattr(self,method,functools.partial(looped_method,method))
+
+
+
+
+# CEBALERT: should be moved to legacy, once that file is reorganized
+# so that classes can be imported from it relatively independently,
+# without requiring all the legacy functions to be loaded.
+# (Right now, topo.__init__ can't import gmpyFaker from
+# topo.misc.legacy because importing topo.misc.legacy causes various
+# pieces of code to run that depend on topo.sim existing.)
+
+############################################################        
+# Alternative module faking using import hooks (see
+# http://www.python.org/dev/peps/pep-0302/).
+# Based on http://orestis.gr/blog/2008/12/20/python-import-hooks/.
+import os,sys,imp
+class ModuleFaker(object):
+    def load_module(self,name):
+        if name not in sys.modules:
+            module = self.create_module(name)
+            module.__file__ = self.path
+            sys.modules[name] = module
+            if '.' in name:
+                parent_name, child_name = name.rsplit('.', 1)
+                setattr(sys.modules[parent_name], child_name, module)
+        return sys.modules[name]
+    
+    def create_module(self,name):
+        raise NotImplementedError
+
+class ModuleImporter(object):
+    def find_module(self,fullname,path=None):
+        raise NotImplementedError
+
+class gmpyFaker(ModuleFaker):
+    def create_module(self,name):
+        module = imp.new_module(name)
+        # CEBALERT: not sure what precision should be used for FixedPoint to
+        # replace rational. Should we set the precision really high?
+        code = \
+"""
+from __future__ import division
+import fixedpoint
+from topo import param
+class mpq(object):
+    def __new__(self,*args,**kw):
+        n = fixedpoint.FixedPoint(eval(str(args[0])),precision=4)
+        param.Parameterized().warning("gmpy.mpq('%s') replaced by fixedpoint.FixedPoint('%s')"%(args[0],n))
+        return n
+"""
+        exec code in module.__dict__
+        return module
+
+class gmpyImporter(ModuleImporter):
+
+    def find_module(self, fullname, path=None):
+        if fullname == 'gmpy' or fullname.startswith('gmpy.'):
+            g = gmpyFaker()
+            g.path = path
+            return g
+        return None
