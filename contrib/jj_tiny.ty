@@ -12,9 +12,11 @@ import numpy
 from topo import learningfn,numbergen,transferfn,param,pattern,projection,responsefn,sheet
 
 import topo.learningfn.projfn 
+import topo.learningfn.optimized
 import topo.transferfn.projfn
 import topo.pattern.random
 import topo.responsefn.optimized 
+import topo.transferfn.optimized 
 import topo.sheet.lissom
 
 from topo.base.functionfamily import LearningFn
