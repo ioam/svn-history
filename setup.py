@@ -25,5 +25,6 @@ setup(name='Topographica',
                 'topo.responsefn',
                 'topo.sheet',
                 'topo.tests',
-                'topo.tkgui']
+                'topo.tkgui'],
+      scripts = ['topographica']
      )
