@@ -15,9 +15,10 @@ from topo.sheet import GeneratorSheet
 from topo.command.basic import save_snapshot,load_snapshot
 from topo.pattern.basic import Gaussian, Line
 from topo.base.simulation import Simulation,SomeTimer
+from topo.misc.filepath import resolve_path
 
 
-SNAPSHOT_LOCATION = "topo/tests/testsnapshot.typ"
+SNAPSHOT_LOCATION = resolve_path("tests/testsnapshot.typ")
 SIM_NAME = "testsnapshots"
 
 class TestSnapshots(unittest.TestCase):
