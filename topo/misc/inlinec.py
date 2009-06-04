@@ -53,7 +53,13 @@ def inline(*params,**nparams): raise NotImplementedError
 
 try:
     if import_weave:
-        import weave
+        # CEBALERT: we supply weave separately with the source
+        # distribution, but e.g. the ubuntu package uses scipy.
+        try:
+            import weave
+        except ImportError:
+            from scipy import weave
+
         weave_imported = True
 
     # Default parameters to add to the inline_weave() call.
