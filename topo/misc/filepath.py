@@ -19,6 +19,36 @@ import sys
 
 from .. import param
 
+
+# copied from scipy/weave/catalog.py
+import socket,tempfile
+def is_writable(dir):
+    """Determine whether a given directory is writable in a portable manner.
+
+    :Parameters:
+     - dir: string
+       A string represeting a path to a directory on the filesystem.
+
+    :Returns:
+      True or False.
+    """
+
+    # Do NOT use a hardcoded name here due to the danger from race conditions
+    # on NFS when multiple processes are accessing the same base directory in
+    # parallel.  We use both hostname and pocess id for the prefix in an
+    # attempt to ensure that there can really be no name collisions (tempfile
+    # appends 6 random chars to this prefix).
+    prefix = 'dummy_%s_%s_' % (socket.gethostname(),os.getpid())
+    try:
+        tmp = tempfile.TemporaryFile(prefix=prefix,dir=dir)
+    except OSError:
+        return False
+    # The underlying file is destroyed upon closing the file object (under
+    # *nix, it was unlinked at creation time)
+    tmp.close()
+    return True
+
+
 class Filename(param.Parameter):
     """
     Filename is a Parameter that can be set to a string specifying the
@@ -69,10 +99,19 @@ class Filename(param.Parameter):
 # Is there a more obvious way of getting this path?
 # (Needs to work on unix and windows.)
 # the application base directory
+# os.path.split(os.path.split(topo.__file__)[0])[0]
 application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 
-# Location in which to create files; defaults to application_path
-output_path = application_path
+# Location in which to create files; defaults to application_path.  If
+# that's not writable, uses ~/topographica (creating it if necessary).
+if is_writable(application_path):
+    output_path = application_path 
+else:
+    home_topographica = os.path.join(os.path.expanduser("~"),'topographica')
+    if not os.path.exists(home_topographica):
+        os.mkdir(home_topographica)
+    output_path = home_topographica
+
 
 def resolve_path(path,search_paths=[]):
     """
