@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+# CB: work in progress. Current issues:
+#
+# (1) why does topo end up in /usr/local/lib/python2.6/dist-packages/
+#     rather than site-packages?
+# (2) data files not yet copied (e.g. topo/tests/testsnapshots.typ)
+
 from distutils.core import setup
 
 setup(name='Topographica',
