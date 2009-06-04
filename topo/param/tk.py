@@ -189,6 +189,8 @@ from . import Boolean,String,Number,Selector,ClassSelector,\
 # need. I guess we should consider how much of topo.misc.filepath
 # we might want in topo/param...
 ########################################
+import topo
+package_path = os.path.split(topo.__file__)[0]
 application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 
 def resolve_path(path,search_paths=[]):
@@ -211,7 +213,7 @@ def resolve_path(path,search_paths=[]):
 
     if os.path.isabs(path): return path
 
-    all_search_paths = search_paths + [os.getcwd()] + [application_path]
+    all_search_paths = search_paths + [os.getcwd()] + [package_path] + [application_path]
 
     paths_tried = []
     for prefix in set(all_search_paths): # does set() keep order?            
@@ -3405,7 +3407,7 @@ class EditingParametersFrameWithApply(ParametersFrameWithApply):
         ### CB: should use button parameter and pack_param
         self._hack=[]
         image=ImageTk.PhotoImage(ImageOps.fit(
-            Image.open(resolve_path('topo/tkgui/icons/edit_add.png')),(20,20)))
+            Image.open(resolve_path('tkgui/icons/edit_add.png')),(20,20)))
         ad['image']=image
         self._hack.append(image)
         ###
@@ -3641,17 +3643,17 @@ class ListItemCtrlWidget(T.Frame):
         ### CEBALERT: should use button parameter & pack_param
         self._hack = []
         image=ImageTk.PhotoImage(ImageOps.fit(
-            Image.open(resolve_path('topo/tkgui/icons/arrow-up.png')),(20,20)))
+            Image.open(resolve_path('tkgui/icons/arrow-up.png')),(20,20)))
         up['image']=image
         self._hack.append(image)
 
         image=ImageTk.PhotoImage(ImageOps.fit(
-            Image.open(resolve_path('topo/tkgui/icons/arrow-down-2.0.png')),(20,20)))
+            Image.open(resolve_path('tkgui/icons/arrow-down-2.0.png')),(20,20)))
         down['image']=image
         self._hack.append(image)
 
         image=ImageTk.PhotoImage(ImageOps.fit(
-            Image.open(resolve_path('topo/tkgui/icons/edit_remove.png')),(20,20)))
+            Image.open(resolve_path('tkgui/icons/edit_remove.png')),(20,20)))
         remove['image']=image
         self._hack.append(image)
         ###
