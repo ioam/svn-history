@@ -190,7 +190,6 @@ from . import Boolean,String,Number,Selector,ClassSelector,\
 # we might want in topo/param...
 ########################################
 application_path = os.path.split(os.path.split(sys.executable)[0])[0]
-output_path = application_path
 
 def resolve_path(path,search_paths=[]):
     """
