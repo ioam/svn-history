@@ -172,16 +172,21 @@ is considered the actual response of each unit.  (The Projection
 activity is just a handy way of computing and reasoning about the
 contribution of each Projection to this overall Sheet activity.)
 
-<P>One specific type of Projection currently implemented is 
-<?php classref('topo.base.cf','CFProjection')?>, i.e. a Projection that
+<P>One specific type of Projection currently implemented is <?php
+classref('topo.base.cf','CFProjection')?>, i.e. a Projection that
 consists of a set of <?php
 classref('topo.base.cf','ConnectionField')?> objects, each of which
 contains the connections to one unit in the destination CFSheet.
-A special type of CFProjection, 
-<?php classref('topo.projection.basic','SharedWeightCFProjection')?> 
-is used to perform the mathematical operation of convolution, i.e.,
-applying a set of weights to all points in a plane, and is equivalent
-to having one ConnectionField shared by every destination neuron.
+CFProjection is very general, and with appropriate parameters can
+implement either spatially restricted localized CFs, all-to-all
+projections (using a nominal_bounds_template BoundingBox with a radius
+larger than the source Sheet), or one-to-one projections (using a
+nominal_bounds_template sized to cover only a single unit on the
+source Sheet).  A special type of CFProjection, <?php
+classref('topo.projection.basic','SharedWeightCFProjection')?> is used
+to perform the mathematical operation of convolution, i.e., applying a
+set of weights to all points in a plane, and is equivalent to having
+one ConnectionField shared by every destination neuron.
 
 
 <H3>PatternGenerators</H3>
