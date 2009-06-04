@@ -7,6 +7,8 @@ __version__='$Revision$'
 
 import unittest
 import os
+import tempfile
+import shutil
 
 from topo.base.simulation import Simulation
 from topo.base.cf import CFSheet, CFProjection
@@ -21,11 +23,7 @@ from topo.plotting.plotgroup import PlotGroup
 from topo.command.analysis import save_plotgroup
 
 
-# remove old test output
-tests_dir=normalize_path("topo/tests/")
-for f in os.listdir(tests_dir):
-    if f.startswith("testplotfilesaverPGS_test") and f.endswith(".png"):
-        os.remove(os.path.join(tests_dir,f))
+
 
 import __main__
 exec "from topo.command.analysis import *" in __main__.__dict__
@@ -33,15 +31,29 @@ exec "from topo.command.analysis import *" in __main__.__dict__
 
 class TestPlotGroupSaverBase(unittest.TestCase):
 
+    def exists(self,name):
+        self.assert_(os.path.exists(os.path.join(self.tests_dir,name)))
+
     def setUp(self):
-        self.sim = Simulation(register=True,name="PGS_test")
+        self.tests_dir=tempfile.mkdtemp()
+        self.sim = Simulation(register=True,name="testplotfilesaver")
         self.sim['A'] = GeneratorSheet(nominal_density=2)
         self.sim['B'] = CFSheet(nominal_density=2)
         self.sim.connect('A','B',connection_type=CFProjection,name='Afferent')        
 
+    def tearDown(self):
+        shutil.rmtree(self.tests_dir)
+
     def save(self,name,**params):
         save_plotgroup(name,
-                       saver_params={"filename_prefix":"topo/tests/testplotfilesaver"},
+                       # CEBALERT: rather than setting filename_prefix
+                       # here, shouldn't I be setting
+                       # filepath.output_path to a temporary path?
+                       # That should be done before any tests are run,
+                       # thus giving all tests access to a temporary
+                       # directory that will be removed after all
+                       # tests have run.
+                       saver_params={"filename_prefix":self.tests_dir+'/'},
                        **params)        
 
 
@@ -50,19 +62,19 @@ class TestPlotGroupSaver(TestPlotGroupSaverBase):
 
     def test_activity_saving(self):
         self.save('Activity')
-        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_A_Activity.png")
-        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Activity.png")
+        self.exists("testplotfilesaver_000000.00_A_Activity.png")
+        self.exists("testplotfilesaver_000000.00_B_Activity.png")
 
     def test_orientation_preference_saving(self):
         self.save('Orientation Preference')
-        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Orientation_Preference.png")
-        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Orientation_PreferenceAndSelectivity.png")
-        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Orientation_Selectivity.png")
-        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00__Color_Key.png")
+        self.exists("testplotfilesaver_000000.00_B_Orientation_Preference.png")
+        self.exists("testplotfilesaver_000000.00_B_Orientation_PreferenceAndSelectivity.png")
+        self.exists("testplotfilesaver_000000.00_B_Orientation_Selectivity.png")
+        self.exists("testplotfilesaver_000000.00__Color_Key.png")
 
     def test_cf_saving(self):
         self.save("Connection Fields",sheet=self.sim['B'])
-        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_Afferent_(from_A).png")
+        self.exists("testplotfilesaver_000000.00_Afferent_(from_A).png")
 
         
 class TestCFProjectionPlotGroupSaver(TestPlotGroupSaverBase):
@@ -70,7 +82,7 @@ class TestCFProjectionPlotGroupSaver(TestPlotGroupSaverBase):
     def test_cfprojection_saving(self):
         self.save('Projection',
                   projection=self.sim['B'].projections('Afferent'))
-        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Afferent.png")
+        self.exists("testplotfilesaver_000000.00_B_Afferent.png")
 
 
 ###########################################################
