@@ -17,12 +17,6 @@ from topo.pattern.basic import Gaussian, Line
 from topo.base.simulation import Simulation,SomeTimer
 
 
-# CEBHACKALERT: this test must depend on something that happens in
-# another one, (or there is some other problem) because when run on
-# its own it fails with a strange error.
-# ./topographica -c 'import topo.tests.testsnapshots; topo.tests.run(test_modules=[topo.tests.testsnapshots])'
-
-
 SNAPSHOT_LOCATION = "topo/tests/testsnapshot.typ"
 SIM_NAME = "testsnapshots"
 
