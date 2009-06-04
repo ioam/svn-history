@@ -5,7 +5,7 @@ $Id$
 __version__='$Revision$'
 
 import cPickle as pickle
-import gnosis.xml.pickle
+
 from xml.parsers.expat import ExpatError
 
 import os,sys,re,string,time
@@ -168,6 +168,13 @@ def save_snapshot(snapshot_name=None,xml=False):
     package. See the topo.param.parameterized.PicklableClassAttributes
     class for more information.
     """
+    if xml:
+        try:
+            import gnosis.xml.pickle
+        except ImportError:
+            param.Parameterized().warning("'gnosis' module not available; snapshot will be saved in default format.")
+            xml=False
+
     if not snapshot_name:
         snapshot_name = topo.sim.basename() + ".typ"
 
