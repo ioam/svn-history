@@ -22,7 +22,7 @@ from .. import param
 
 from topo.base.simulation import EventProcessor
 from topo.plotting.bitmap import RGBBitmap, MontageBitmap, TITLE_FONT
-from topo.misc.filepath import normalize_path, application_path
+from topo.misc.filepath import normalize_path
 from topo.misc.util import Struct
 
 
