@@ -97,8 +97,8 @@ def generate(plotgroup_names):
         if hasattr(sheet,'curve_dict'):
             sheets_views['curve_dict'] = sheet.curve_dict
 
-        f = open(normalize_path('topo/tests/%s_t%s_%s.data'%(sim_name,topo.sim.timestr(),
-                                                             name.replace(' ','_'))),'wb')
+        f = open(normalize_path('tests/%s_t%s_%s.data'%(sim_name,topo.sim.timestr(),
+                                                        name.replace(' ','_'))),'wb')
         pickle.dump((topo.version,views),f)
         f.close()
     
@@ -115,8 +115,8 @@ def test(plotgroup_names):
         _reset_views(sheet)
         plotgroups[name]._exec_pre_plot_hooks()
 
-        f = open(resolve_path('topo/tests/%s_t%s_%s.data'%(sim_name,topo.sim.timestr(),
-                                                            name.replace(' ','_'))),'r')
+        f = open(resolve_path('tests/%s_t%s_%s.data'%(sim_name,topo.sim.timestr(),
+                                                      name.replace(' ','_'))),'r')
         topo_version,previous_views = pickle.load(f)
         f.close()
 

@@ -44,7 +44,7 @@ from testpattern import TestPattern
 from editor import ModelEditor
 
 
-tk.AppWindow.window_icon_path = resolve_path('topo/tkgui/icons/topo.xbm')
+tk.AppWindow.window_icon_path = resolve_path('tkgui/icons/topo.xbm')
 
 SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),
                     ('Python scripts','*.py'),
