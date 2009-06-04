@@ -39,6 +39,7 @@ from topo.misc.filepath import resolve_path
 # or 'MSYS' Windows; those two have different directories.) This
 # serves as an example of what needs to be fixed in the Windows
 # versions.
+# CB: this kind of thing won't work at all for e.g. an ubuntu package
 try:
     vera_path = resolve_path('lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf')
 except:
