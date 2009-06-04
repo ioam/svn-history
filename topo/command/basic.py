@@ -18,6 +18,7 @@ try:
 except ImportError:
     pass
 
+
 from .. import param
 from ..param.parameterized import PicklableClassAttributes, ParameterizedFunction
 from ..param.parameterized import ParamOverrides
@@ -31,6 +32,13 @@ from topo.misc.util import MultiFile
 from topo.misc.picklemain import PickleMain
 from topo.misc.filepath import normalize_path
 from topo.misc import filepath
+
+try:
+    import gnosis.xml.pickle
+    gnosis_imported = True
+except ImportError:
+    param.Parameterized().message("No 'gnosis' module: xml snapshots unavailable.")
+    gnosis_imported = False
 
 
 
@@ -168,13 +176,6 @@ def save_snapshot(snapshot_name=None,xml=False):
     package. See the topo.param.parameterized.PicklableClassAttributes
     class for more information.
     """
-    if xml:
-        try:
-            import gnosis.xml.pickle
-        except ImportError:
-            param.Parameterized().warning("'gnosis' module not available; snapshot will be saved in default format.")
-            xml=False
-
     if not snapshot_name:
         snapshot_name = topo.sim.basename() + ".typ"
 
@@ -208,12 +209,16 @@ def save_snapshot(snapshot_name=None,xml=False):
 
 
 def _load_pickle(snapshot):
-    # If it's not xml, open as a normal pickle.
-    try:
-        gnosis.xml.pickle.load(snapshot,allow_rawpickles=True,class_search=gnosis.xml.pickle.SEARCH_ALL)
-    except ExpatError:
-        snapshot.seek(0) 
+    if gnosis_imported:
+        try:
+            gnosis.xml.pickle.load(snapshot,allow_rawpickles=True,class_search=gnosis.xml.pickle.SEARCH_ALL)
+        except ExpatError:
+            snapshot.seek(0) 
+            # If it's not xml, open as a normal pickle.
+            pickle.load(snapshot)
+    else:
         pickle.load(snapshot)
+
     
 
 def load_snapshot(snapshot_name):
