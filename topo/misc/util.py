@@ -11,8 +11,6 @@ import re
 import string
 import random
 import numpy
-import cProfile
-import pstats
 import sys
 import functools
 
@@ -197,6 +195,8 @@ def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=False):
     """
     # This function simply wraps some functions from the cProfile
     # module, making profiling easier.
+    import cProfile, pstats
+
 
     # CB: leaves around "filename": should give this a proper name and maybe
     # put in /tmp/ and maybe allow someone to choose where to save it
