@@ -96,10 +96,12 @@ class Filename(param.Parameter):
         return state
 
 
-# Is there a more obvious way of getting this path?
-# (Needs to work on unix and windows.)
-# the application base directory
-# os.path.split(os.path.split(topo.__file__)[0])[0]
+import topo
+package_path = os.path.split(topo.__file__)[0]
+
+# CEBALERT: we should try to remove this as soon as possible; anything
+# relying on the location of the 'topographica' script should be
+# re-thought (removed, or changed to output_path or package_path).
 application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 
 # Location in which to create files; defaults to application_path.  If
@@ -137,7 +139,7 @@ def resolve_path(path,search_paths=[]):
         else:
             raise IOError('File "%s" not found.'%path)
     else:
-        all_search_paths = search_paths + [os.getcwd()] + [application_path]
+        all_search_paths = search_paths + [os.getcwd()] + [package_path] + [application_path]
 
         paths_tried = []
         for prefix in set(all_search_paths): # does set() keep order?            
