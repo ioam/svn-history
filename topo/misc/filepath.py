@@ -114,8 +114,8 @@ else:
         os.mkdir(home_topographica)
     output_path = home_topographica
 
-# CEBALERT: default [] argument? Looks like a mistake.
-def resolve_path(path,search_paths=[]):
+
+def resolve_path(path,search_paths=None):
     """
     Find the path to an existing file, searching in the specified
     search paths if the filename is not absolute, and converting a
@@ -139,7 +139,7 @@ def resolve_path(path,search_paths=[]):
         else:
             raise IOError('File "%s" not found.'%path)
     else:
-        all_search_paths = search_paths + [os.getcwd()] + [output_path] + [package_path] + [application_path]
+        all_search_paths = search_paths or [] + [os.getcwd()] + [output_path] + [package_path] + [application_path]
 
         paths_tried = []
         for prefix in set(all_search_paths): # CEBALERT: set() loses order
