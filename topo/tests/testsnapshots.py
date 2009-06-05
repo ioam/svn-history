@@ -4,7 +4,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import unittest, copy
+import unittest, copy, shutil, tempfile
 from numpy.testing import assert_array_equal
 
 import topo
@@ -18,7 +18,7 @@ from topo.base.simulation import Simulation,SomeTimer
 from topo.misc.filepath import resolve_path
 
 
-SNAPSHOT_LOCATION = resolve_path("tests/testsnapshot.typ")
+SNAPSHOT_NAME = "testsnapshot.typ"
 SIM_NAME = "testsnapshots"
 
 class TestSnapshots(unittest.TestCase):
@@ -30,7 +30,10 @@ class TestSnapshots(unittest.TestCase):
         to topo.sim by other tests).
         """
         Simulation(register=True,name=SIM_NAME)
+        self.tmp = tempfile.mkdtemp()
 
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
 
     def basic_save_load_snapshot(self,xml=False):
         """
@@ -47,7 +50,7 @@ class TestSnapshots(unittest.TestCase):
         Line.x = 12.0
         topo.sim.startup_commands.append("z=99")
 
-        save_snapshot(SNAPSHOT_LOCATION,xml)
+        save_snapshot(SNAPSHOT_NAME,xml)
 
 
         Line.x = 9.0
@@ -56,7 +59,7 @@ class TestSnapshots(unittest.TestCase):
         topo.sim['R'].set_input_generator(Line())
         topo.sim.run(1)
 
-        load_snapshot(SNAPSHOT_LOCATION)
+        load_snapshot(resolve_path(SNAPSHOT_NAME,search_paths=[self.tmp]))
 
         
         # CEBALERT: should also test that unpickling order is correct
