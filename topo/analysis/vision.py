@@ -270,6 +270,6 @@ pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pg.add_plot('Modulation Ratio',[('Strength','ComplexSelectivity')])
 pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
-pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
+pg.add_static_image('Color Key','command/or_key_white_vert_small.png')
 
 

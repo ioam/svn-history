@@ -474,7 +474,7 @@ pg.add_plot('Orientation Preference&Selectivity',
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
 pg.add_plot('Phase Selectivity',[('Strength','PhaseSelectivity')])
-pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
+pg.add_static_image('Color Key','command/or_key_white_vert_small.png')
 
 
 pg= create_plotgroup(name='Spatial Frequency Preference',category="Preference Maps",
@@ -527,7 +527,7 @@ pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps"
              pre_plot_hooks=[measure_phasedisparity.instance()],normalize=True)
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
-pg.add_static_image('Color Key','topo/command/disp_key_white_vert_small.png')
+pg.add_static_image('Color Key','command/disp_key_white_vert_small.png')
 
 
 
@@ -570,7 +570,7 @@ pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
 pg.add_plot('Direction Selectivity',[('Strength','DirectionSelectivity')])
 pg.add_plot('Speed Preference',[('Strength','SpeedPreference')])
 pg.add_plot('Speed Selectivity',[('Strength','SpeedSelectivity')])
-pg.add_static_image('Color Key','topo/command/dr_key_white_vert_small.png')
+pg.add_static_image('Color Key','command/dr_key_white_vert_small.png')
 
 
 

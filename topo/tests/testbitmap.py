@@ -18,6 +18,7 @@ from topo.plotting.bitmap import *
 import Image
 import numpy.oldnumeric as Numeric
 import unittest
+from topo.misc.filepath import resolve_path
 
 class TestBitmap(unittest.TestCase):
 
@@ -26,7 +27,7 @@ class TestBitmap(unittest.TestCase):
         """
         Uses testbitmap.jpg in the topographica/tests directory
         """
-        miata = Image.open('topo/tests/testbitmap.jpg')
+        miata = Image.open(resolve_path('tests/testbitmap.jpg'))
         miata = miata.resize((miata.size[0]/2,miata.size[1]/2))
         self.rIm, self.gIm, self.bIm = miata.split()
         self.rseq = self.rIm.getdata()

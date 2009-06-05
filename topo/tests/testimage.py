@@ -26,7 +26,7 @@ from numpy.oldnumeric import array,Float,pi
 from topo.base.boundingregion import BoundingBox
 from topo.pattern.image import FileImage
 from topo.transferfn.basic import IdentityTF
-
+from topo.misc.filepath import resolve_path
 
 
 class TestImage(unittest.TestCase):
@@ -55,7 +55,7 @@ class TestImage(unittest.TestCase):
          96.59090909,  96.59090909,  96.59090909,]],Float)
 
         
-        image = FileImage(filename = 'topo/tests/testimage.pgm',
+        image = FileImage(filename = resolve_path('tests/testimage.pgm'),
                       xdensity=8,
                       ydensity=8,
                       bounds=BoundingBox(radius=0.5),
@@ -100,7 +100,7 @@ class TestImage(unittest.TestCase):
 ##          96.59090909,  96.59090909,  96.59090909,  96.59090909,]],Float)
 
         
-##         image = FileImage(filename = 'topo/tests/testimage.pgm',
+##         image = FileImage(filename = resolve_path('tests/testimage.pgm'),
 ##                       xdensity=9,
 ##                       ydensity=9,
 ##                       output_fn=IdentityTF(),
@@ -185,7 +185,7 @@ class TestImage(unittest.TestCase):
          96.59090909,]],Float)
 
 
-        image = FileImage(filename = 'topo/tests/testimage.pgm',
+        image = FileImage(filename = resolve_path('tests/testimage.pgm'),
                       xdensity=8,
                       ydensity=8,
                       size=2.0,
@@ -272,7 +272,7 @@ class TestImage(unittest.TestCase):
          96.59090909,]])
         
 
-        image = FileImage(filename = 'topo/tests/testimage.pgm',
+        image = FileImage(filename = resolve_path('tests/testimage.pgm'),
                       xdensity=8,
                       ydensity=8,
                       output_fns=[],
@@ -325,7 +325,7 @@ class TestImage(unittest.TestCase):
             0.,   0.,]])
 
 
-        image = FileImage(filename = 'topo/tests/testimage.pgm',
+        image = FileImage(filename = resolve_path('tests/testimage.pgm'),
                       xdensity=15,
                       ydensity=15,
                       output_fns=[],
@@ -359,7 +359,7 @@ class TestImage(unittest.TestCase):
 ##  [  96.59090909,  96.59090909,  96.59090909,  96.59090909,  96.59090909,
 ##          96.59090909,  96.59090909,  96.59090909,]],Float)
         
-##         image = FileImage(filename = 'topo/tests/testimage.pgm',
+##         image = FileImage(filename = resolve_path('tests/testimage.pgm'),
 ##                       density=8,
 ##                       bounds=BoundingBox(radius=0.5),
 ##                       output_fn=IdentityTF(),
