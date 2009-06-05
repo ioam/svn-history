@@ -137,6 +137,11 @@ __all__ = [re.sub('\.py$','',f)
 
 all_doctest = sorted(fnmatch.filter(os.listdir(__path__[0]),'test*.txt'))
 
+import gmpy
+if gmpy.__file__ is None:
+    from topo import param
+    param.Parameterized().warning('no gmpy module: testgmpynumber.txt skipped')
+    all_doctest.remove('testgmpynumber.txt')
 
 # CEBALERT: we need to rename these/reorganize the tests
 __all__.remove('test_script')
