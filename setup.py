@@ -4,6 +4,7 @@
 #
 # (1) why does topo end up in /usr/local/lib/python2.6/dist-packages/
 #     rather than site-packages?
+# Maybe it's supposed to? E.g. https://bugs.launchpad.net/ubuntu/+source/python2.6/+bug/362570
 
 from distutils.core import setup
 
