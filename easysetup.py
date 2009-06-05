@@ -7,9 +7,6 @@ from setuptools import setup#,find_packages
 
 from _setup import common
 
-install_requires=[
-    ]
-
 setup(
       install_requires=["numpy >= 1.0",
                         "gmpy >= 1.0",
@@ -22,7 +19,7 @@ setup(
                         # python-tk          
                         # tcllib
                         # tklib
-                        ]
+                        ],
       # pil pypi entry seems is broken?
       dependency_links=['http://www.pythonware.com/products/pil/'],
       **common
