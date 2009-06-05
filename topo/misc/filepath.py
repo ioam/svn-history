@@ -142,7 +142,7 @@ def resolve_path(path,search_paths=None):
         all_search_paths = search_paths or [] + [os.getcwd()] + [output_path] + [package_path] + [application_path]
 
         paths_tried = []
-        for prefix in set(all_search_paths): # CEBALERT: set() loses order
+        for prefix in all_search_paths:
             try_path = os.path.join(os.path.normpath(prefix),path)
             if os.path.isfile(try_path): return try_path
             paths_tried.append(try_path)
