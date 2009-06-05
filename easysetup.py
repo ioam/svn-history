@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-# CB: work in progress. 
+# CB: work in progress. We need numpy, scipy, and pil to work with
+# easy_install before we can make any more progress...
 
-from setuptools import setup#,find_packages
-# consider using packages=find_packages()?
+# Script to allow 'easy_install topographica'
+
+from setuptools import setup
 
 from _setup import common
 
@@ -20,7 +22,7 @@ setup(
                         # tcllib
                         # tklib
                         ],
-      # pil pypi entry seems is broken?
+      # pil pypi links are broken?
       dependency_links=['http://www.pythonware.com/products/pil/'],
       **common
      )
