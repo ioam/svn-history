@@ -175,14 +175,16 @@ import Tkinter as T
 from inspect import getdoc
 
 from tkMessageBox import _show,QUESTION,YESNO
-from Tile import Combobox
 from scrodget import Scrodget
 
 from parameterized import Parameterized,ParameterizedMetaclass,\
      classlist
-     
+
+from external import Combobox,OrderedDict
+
 from . import Boolean,String,Number,Selector,ClassSelector,\
      ObjectSelector,Callable,Dynamic,Parameter,List,HookList
+
 
 
 # CEBALERT: copied from topo.misc.filepath, to make it clear what we
@@ -3239,7 +3241,7 @@ class ListWidget(T.Frame):
 
 
 import new
-import odict
+
 
 
 # CEBALERT: dict stuff is just half implemented! does enough
@@ -3256,7 +3258,7 @@ def dict_to_parameterized(class_name,parameter_values):
 
 def list_to_parameterized(list_,class_=None):
 
-    parameter_values = odict.OrderedDict([('a'*i,item) for item,i in zip(list_,range(1,len(list_)+1))])
+    parameter_values = OrderedDict([('a'*i,item) for item,i in zip(list_,range(1,len(list_)+1))])
 
     if class_ is None:
         parameter_objs = dict([(name,Parameter(default=value))
@@ -3432,7 +3434,7 @@ class EditingParametersFrameWithApply(ParametersFrameWithApply):
         for name in self.params_to_display.keys():
             new_pos[int(self.representations[name]['widget'].grid_info()['row'])]=name
 
-        self._extraPO.represented = odict.OrderedDict()
+        self._extraPO.represented = OrderedDict()
         
         for name,pos in zip(sorted(self.params_to_display),range(len(self.params_to_display))):
             self._tkvars[name]=old[new_pos[pos]][0]

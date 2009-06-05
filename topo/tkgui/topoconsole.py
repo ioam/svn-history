@@ -19,7 +19,6 @@ import webbrowser
 
 from inspect import getdoc
 
-import Tile
 from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, \
      NORMAL, Scrollbar, Y, DoubleVar, Widget,Toplevel
@@ -27,6 +26,7 @@ from tkFileDialog import asksaveasfilename,askopenfilename
 
 from .. import param
 from ..param import tk
+from ..param.external import Notebook
 
 import topo
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
@@ -152,10 +152,10 @@ class PlotsMenuEntry(param.Parameterized):
         return open_plotgroup_panel(self.class_,new_plotgroup,**kw)
 
 
-class DockManager(Tile.Notebook):
+class DockManager(Notebook):
     """Manages windows that can be tabs in a notebook, or toplevels."""
     def __init__(self, master=None, cnf={}, **kw):
-        Tile.Notebook.__init__(self, master, cnf=cnf, **kw)
+        Notebook.__init__(self, master, cnf=cnf, **kw)
         self._tab_ids = {}
 
     def _set_tab_title(self,win,title):
@@ -169,7 +169,7 @@ class DockManager(Tile.Notebook):
 
     def add(self, child, cnf={}, **kw):
         self._tab_ids[child]=len(self.tabs())
-        Tile.Notebook.add(self,child,cnf=cnf,**kw)
+        Notebook.add(self,child,cnf=cnf,**kw)
 
 ##     def unhide(self,win):
 ##         if win in self._tab_ids:
