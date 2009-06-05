@@ -722,7 +722,7 @@ def default_input_sheet():
         raise ValueError("Unable to find a suitable input sheet.")
     sht=sheets[0]
     if len(sheets)>1:
-        self.message("Using input sheet %s." % sht.name)
+        param.Parameterized().message("Using input sheet %s." % sht.name)
     return sht
 
 
