@@ -33,22 +33,37 @@ from .. import param
 
 from topo.misc.filepath import resolve_path
 
-# CEBALERT: while the Windows version of Python doesn't have the same
-# directory structure as the standard version, we need this
-# try/except. (Note that Windows could be 'normal'/'binary' Windows,
-# or 'MSYS' Windows; those two have different directories.) This
-# serves as an example of what needs to be fixed in the Windows
-# versions.
-# CB: this kind of thing won't work at all for e.g. an ubuntu package
+
+######################################################################
+# CEBALERT!! This should instead be using python code to find where is
+# site-packages or dist-packages (i.e. location of matplotlib
+# package).
+MPLVERA = 'matplotlib/mpl-data/fonts/ttf/Vera.ttf'
 try:
-    vera_path = resolve_path('lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf')
+    # topographica built from source
+    vera_path = resolve_path('lib/python2.5/site-packages/'+MPLVERA)
 except:
     try:
-        vera_path = resolve_path('python_topo/Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf')
+        # windows 'binary'
+        vera_path = resolve_path('python_topo/Lib/site-packages/'+MPLVERA)
     except:
-        vera_path = resolve_path('Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf')
+        try:
+            # windows 'msys'
+            vera_path = resolve_path('Lib/site-packages/'+MPLVERA)
+        except:
+            try:
+                # topo installed as package (should be one level pack 
+                # from package_path)
+                vera_path = resolve_path('../'+MPLVERA)
+            except:
+                vera_path = None
 
-TITLE_FONT = ImageFont.truetype(vera_path,20)
+if vera_path is not None:
+    TITLE_FONT = ImageFont.truetype(vera_path,20) 
+else:
+    TITLE_FONT = ImageFont.load_default()
+######################################################################
+
 
 ### JCALERT: To do:
 ###        - Update the test file.
