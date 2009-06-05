@@ -20,7 +20,7 @@ import sys
 from .. import param
 
 
-# copied from scipy/weave/catalog.py
+# copied from scipy/weave/catalog.py (scipy svn 5552)
 import socket,tempfile
 def is_writable(dir):
     """Determine whether a given directory is writable in a portable manner.
