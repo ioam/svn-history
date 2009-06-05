@@ -524,7 +524,7 @@ mlabwrap-uninstall:
 ##############################################################
 # SCRODGET  (provides decent scrollbars)
 #
-SCRODGET = pyscrodget-0.0.1_2.1
+SCRODGET = pyscrodget-0.0.2_2.1
 
 SCRODGET_UNINSTALL += share/pyscrodget
 SCRODGET_UNINSTALL += ${PYTHON_LIB}/site-packages/pyscrodget
