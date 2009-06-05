@@ -2,7 +2,7 @@
 # Load the setup script, defining TopRowMask, etc..
 #
 >>> from topo.misc.filepath import resolve_path
->>> execfile(resolve_path('topo/tests/sheetmask_setup.py'))
+>>> execfile(resolve_path('tests/sheetmask_setup.py'))
 >>> from topo.base.boundingregion import BoundingBox
 >>> ProjectionSheet.nominal_bounds=BoundingBox(radius=0.5)
 >>> s = ProjectionSheet(nominal_density=2,mask=LeftColMask() & TopRowMask())
