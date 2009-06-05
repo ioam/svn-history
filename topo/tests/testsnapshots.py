@@ -30,11 +30,13 @@ class TestSnapshots(unittest.TestCase):
         to topo.sim by other tests).
         """
         Simulation(register=True,name=SIM_NAME)
-        self.tmp = tempfile.mkdtemp()
+        self.original_output_path = topo.misc.filepath.output_path
+        topo.misc.filepath.output_path = tempfile.mkdtemp()
 
     def tearDown(self):
-        shutil.rmtree(self.tmp)
-
+        shutil.rmtree(topo.misc.filepath.output_path)
+        topo.misc.filepath.output_path=self.original_output_path
+        
     def basic_save_load_snapshot(self,xml=False):
         """
         Very basic test to check the activity matrix of a GeneratorSheet
@@ -59,7 +61,7 @@ class TestSnapshots(unittest.TestCase):
         topo.sim['R'].set_input_generator(Line())
         topo.sim.run(1)
 
-        load_snapshot(resolve_path(SNAPSHOT_NAME,search_paths=[self.tmp]))
+        load_snapshot(resolve_path(SNAPSHOT_NAME))
 
         
         # CEBALERT: should also test that unpickling order is correct
