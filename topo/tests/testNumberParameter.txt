@@ -1,20 +1,9 @@
 >>> from topo import param
 >>> from topo.misc.numbergenerator import UniformRandom
->>> from fixedpoint import FixedPoint
-
-# CEBALERT: tests needs to use mpq if it's available
-# >>> from gmpy import mpq
-
-
 
 >>> class TestPO1(param.Parameterized):
 ...    x = param.Number(default=UniformRandom(lbound=-1,ubound=1,seed=1),bounds=(-1,1))
 ...    y = param.Number(default=1,bounds=(-1,1))
-...    z = param.Number(default=FixedPoint('1.00'))
-
-#...    z = param.Number(default=mpq(1))
-
-
 
 >>> t1 = TestPO1()
 
@@ -38,30 +27,6 @@
 ...     assert False, "Should raise ValueError."
 
 
-### Check Number accepts FixedPoint
->>> t1.z
-FixedPoint('1.00', 2)
-
->>> t1.x = FixedPoint('0.999',3)
->>> t1.x-=0.0004
->>> t1.x
-FixedPoint('0.999', 3)
-
->>> t1.x-=0.0004
->>> t1.x
-FixedPoint('0.999', 3)
-
->>> t1.x-=0.0004
->>> t1.x
-FixedPoint('0.999', 3)
-
-
->>> try:
-...    t1.x+=0.002
-... except ValueError:
-...    pass
-... else:
-...    raise AssertionError("Number's bounds were not respected")
 
 
 
