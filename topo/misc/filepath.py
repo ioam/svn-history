@@ -139,8 +139,7 @@ def resolve_path(path,search_paths=[]):
         else:
             raise IOError('File "%s" not found.'%path)
     else:
-        # CEBALERT: should output_path be included here?
-        all_search_paths = search_paths + [os.getcwd()] + [package_path] + [application_path]
+        all_search_paths = search_paths + [os.getcwd()] + [output_path] + [package_path] + [application_path]
 
         paths_tried = []
         for prefix in set(all_search_paths): # CEBALERT: set() loses order
