@@ -34,6 +34,8 @@ setup(name='Topographica',
                 'topo.sheet',
                 'topo.tests',
                 'topo.tkgui'],
-      package_data={'topo.tkgui': ['icons/*.*']},
+      package_data={'topo.tkgui': ['icons/*.*'],
+                    'topo.command':['*.png','*.pdf'],
+                    'topo.tests':['*.txt','*.jpg','*.pgm']},
       scripts = ['topographica']
      )
