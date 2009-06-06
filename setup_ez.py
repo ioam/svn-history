@@ -1,9 +1,18 @@
-#!/usr/bin/env python
+"""
+easy_install build script for Topographica.
 
-# CB: work in progress. We need numpy, scipy, and pil to work with
-# easy_install before we can make any more progress...
+("easy_install topographica")
 
-# Script to allow 'easy_install topographica'
+Work in progress
+
+Usage:
+    python setup.py develop
+or
+    pythin setup.py install
+"""
+
+# We need numpy, scipy, and pil to work with easy_install before we
+# can make any more progress...
 
 from setuptools import setup
 
