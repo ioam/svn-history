@@ -1,5 +1,11 @@
-# CB: work in progress
-# Create exe in Windows
+"""
+py2exe build script for Topographica.
+
+Work in progress
+
+Usage:
+    python setup.py py2exe
+"""
 
 from distutils.core import setup
 import py2exe
