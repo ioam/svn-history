@@ -97,6 +97,8 @@ you wish: you can download binaries, or, if you have a package manager
 such as <A HREF="http://www.finkproject.org/">Fink</A>
 or <A HREF="http://www.macports.org/">MacPorts</A>, you can use it to
 obtain and install them. We have used Fink successfully:
+<!--CB: maybe we should consider using macports instead?
+https://sourceforge.net/forum/message.php?msg_id=7426788-->
 <ul>
 <li>Download and install the <A
 HREF="http://www.finkproject.org/download/">Fink 0.9.0 Binary
