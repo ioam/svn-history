@@ -10,5 +10,9 @@ Usage:
 from distutils.core import setup
 import py2exe
 
+import _setup
+_setup.create_topographica_script()
+
+
 setup(console=['topographica'])
 # (we won't want console eventually - use windows= instead)

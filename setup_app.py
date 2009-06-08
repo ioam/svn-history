@@ -41,6 +41,10 @@ from setuptools import setup
 #    )
 #
 
+import _setup
+
+_setup.create_topographica_script()
+
 OPTIONS = {
     'packages': ['numpy','matplotlib','PIL'] # ...more to go
     }

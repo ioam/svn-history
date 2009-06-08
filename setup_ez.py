@@ -16,7 +16,9 @@ or
 
 from setuptools import setup
 
-from _setup import common
+import _setup
+
+_setup.create_topographica_script()
 
 setup(
       install_requires=["numpy >= 1.0",
@@ -33,5 +35,5 @@ setup(
                         ],
       # pil pypi links are broken?
       dependency_links=['http://www.pythonware.com/products/pil/'],
-      **common
+      **_setup.common
      )

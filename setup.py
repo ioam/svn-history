@@ -8,7 +8,8 @@
 
 from distutils.core import setup
 
-from _setup import common
+import _setup
 
-setup(**common)
+_setup.create_topographica_script()
+setup(**_setup.common)
 
