@@ -177,9 +177,10 @@ os.system('chmod +x %s'%selector)
 
 
 ## Generate script that will submit all combinations
+substitutions = {'job':'./%s $i'%selector,
+                 'combonumber':'%i'}
 f = open(submitter,'w')
-submitcmd = job_submit_template%{'job':'./%s $i'%selector}
-submitcmd = submitcmd%{'combonumber':'$i'}
+submitcmd = job_submit_template%substitutions
 
 nscript = """#!/bin/bash
 
