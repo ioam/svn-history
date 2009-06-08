@@ -41,15 +41,15 @@
 #
 #
 # (4) Set the job_submit_template variable to the appropriate command
-# template for your system: _JOB_ will be replaced with the actual
+# template for your system: %(job)s will be replaced with the actual
 # job.
 #
-# E.g. 'qsub -cwd -P ecdf_baseline -pe "memory" 1 -l s_rt=40:00:0 -R y _JOB_'
+# E.g. 'qsub -cwd -P ecdf_baseline -pe "memory" 1 -l s_rt=40:00:0 -R y %(job)s'
 #
-# Additionally, you can use _COMBONUMBER_ in the template to get the
+# Additionally, you can use %(combonumber)s in the template to get the
 # combination number.
 #
-# E.g. "nohup nice _JOB_ > combo_COMBONUMBER_.out &"
+# E.g. "nohup nice %(job)s > combo%(combonumber)s.out &"
 #
 # 
 # (5) Run this script by passing the topographica .ty file you want to run
@@ -81,7 +81,7 @@ Examples:
 #### VARIABLES YOU SHOULD SET ####
 topographica_script = './topographica'
 topographica_output_path = './Output/' # if None, run_batch()'s default is used
-job_submit_template = 'nohup nice _JOB_ > combo_COMBONUMBER_.out &'
+job_submit_template = 'nohup nice %(job)s > combo%(combonumber)s.out &'
 ##################################
 
 
@@ -178,8 +178,8 @@ os.system('chmod +x %s'%selector)
 
 ## Generate script that will submit all combinations
 f = open(submitter,'w')
-submitcmd = job_submit_template.replace('_JOB_','./%s $i'%selector)
-submitcmd = submitcmd.replace('_COMBONUMBER_','$i')
+submitcmd = job_submit_template%{'job':'./%s $i'%selector}
+submitcmd = submitcmd%{'combonumber':'$i'}
 
 nscript = """#!/bin/bash
 
