@@ -518,7 +518,7 @@ class run_batch(ParameterizedFunction):
         try:
             execfile(script_file,__main__.__dict__) #global_params.context
             global_params.check_for_unused_names()
-    
+            print_sizes()
             topo.sim.name=simname
     
             # Run each segment, doing the analysis and saving the script state each time
@@ -573,8 +573,8 @@ def n_bytes():
     """
     Estimate the minimum memory needed for the Sheets in this Simulation, in bytes.
 
-    This estimate is a lower bound only, based on memory for the matrices used
-    for activity and connections.
+    This estimate is a lower bound only, based primarily on memory for
+    the matrices used for activity and connections.
     """
     return sum([s.n_bytes() for s in topo.sim.objects(Sheet).values()])
 
@@ -587,7 +587,11 @@ def n_conns():
     return sum([s.n_conns() for s in topo.sim.objects(ProjectionSheet).values()])
 
 
+def print_sizes():
+    print "Defined %d-connection network; %0.0fMB required for weight storage." % \
+    (n_conns(),max(n_bytes()/1024.0/1024.0,1.0))
 
+            
 # maybe an explicit list would be better?
 import types
 __all__ = list(set([k for k,v in locals().items()
