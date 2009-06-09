@@ -19,7 +19,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.sheet import activity_type
 from topo.base.sheetcoords import Slice
 from topo.base.cf import CFProjection,ConnectionField,MaskedCFIter,\
-     CFPLearningFn,CFPLF_Identity,CFPOutputFn
+     CFPLearningFn,CFPLF_Identity,CFPOutputFn,CFIter
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.functionfamily import CoordinateMapperFn,IdentityMF
 from topo.misc.util import rowcol2idx
@@ -187,7 +187,14 @@ class SharedWeightCFProjection(CFProjection):
 
 
     def n_bytes(self):
-        return self.activity.nbytes + self.__sharedcf.weights.nbytes
+        # Assumes 8-byte Python floats; may not be correct
+        return self.activity.nbytes + self.__sharedcf.weights.nbytes + \
+               sum([(8*4 + 8*4 + \
+                     cf.weights_slice.nbytes)
+                    for cf,r,c in CFIter(self)()])
+               # 8*4: x,y,mask,input_sheet, 8*4: weights_slice
+                   
+
 
 
 
