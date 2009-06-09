@@ -568,6 +568,26 @@ def wipe_out_activity():
                 c.activity*=0.0
 
 
+
+def n_bytes():
+    """
+    Estimate the minimum memory needed for the Sheets in this Simulation, in bytes.
+
+    This estimate is a lower bound only, based on memory for the matrices used
+    for activity and connections.
+    """
+    return sum([s.n_bytes() for s in topo.sim.objects(Sheet).values()])
+
+
+
+def n_conns():
+    """
+    Count the number of connections in all ProjectionSheets in the current Simulation.  
+    """	    
+    return sum([s.n_conns() for s in topo.sim.objects(ProjectionSheet).values()])
+
+
+
 # maybe an explicit list would be better?
 import types
 __all__ = list(set([k for k,v in locals().items()

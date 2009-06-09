@@ -802,6 +802,25 @@ class CFProjection(Projection):
                 cf.weights_slice=None
 
 
+    def n_bytes(self):
+        # Could also count the input_sheet_slice
+        rows,cols=self.cfs.shape
+        return sum([self.cfs[r,c].weights.nbytes + 
+                    self.cfs[r,c].mask.nbytes
+                    for r in xrange(rows)
+                    for c in xrange(cols)])
+
+
+    def n_conns(self):
+        # Counts non-masked values, if mask is available; otherwise counts 
+        # weights as connections if nonzero
+        rows,cols=self.cfs.shape
+        return sum([len((cf.mask if cf.mask is not None else cf.weights).ravel().nonzero()[0])
+                    for cf,r,c in MaskedCFIter(self)()])
+
+
+
+
 class CFIter(object):
     """
     Iterator to walk through all ConnectionFields of all neurons in

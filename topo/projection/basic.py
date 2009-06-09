@@ -123,7 +123,6 @@ class SharedWeightCFProjection(CFProjection):
         slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
                                min_matrix_radius=self.cf_type.min_matrix_radius)
         self.bounds_template = slice_template.bounds
-
         self.__sharedcf=self.cf_type(self.src,
                                      x=self.center_unitxcenter,
                                      y=self.center_unitycenter,
@@ -139,6 +138,8 @@ class SharedWeightCFProjection(CFProjection):
             row = []
             for x in self.dest.sheet_cols():
                 x_cf,y_cf = self.coord_mapper(x,y)
+                # Does not pass the mask, as it would have to be sliced
+                # for each cf, and is only used for learning.
                 cf = SharedWeightCF(scf,self.src,x=x_cf,y=y_cf, #JUDE ADDED
                                     template=slice_template)
                 row.append(cf)
@@ -185,7 +186,13 @@ class SharedWeightCFProjection(CFProjection):
         pass
 
 
+    def n_bytes(self):
+        return self.activity.nbytes + self.__sharedcf.weights.nbytes
 
+
+
+# JABALERT: Can this be replaced with a CFProjection with a Hysteresis output_fn?
+# If not it should probably be replaced with a new output_fn type instead.
 class LeakyCFProjection(CFProjection):
     """
     A projection that has a decay_rate parameter so that incoming
@@ -211,6 +218,9 @@ class LeakyCFProjection(CFProjection):
         self.leaky_input_buffer = input_activity + self.leaky_input_buffer*exp(-self.decay_rate) 
         super(LeakyCFProjection,self).activate(self.leaky_input_buffer)
 
+    def n_bytes(self):
+        return super(LeakyCFProjection).n_bytes + \
+               self.activity.nbytes*1 # for leaky_input_buffer
 
 
 class ScaledCFProjection(CFProjection):
@@ -291,6 +301,11 @@ class ScaledCFProjection(CFProjection):
             of(self.activity)
         self.calculate_sf()
         self.do_scaling()
+
+
+    def n_bytes(self):
+        return super(ScaledCFProjection).n_bytes + \
+               self.activity.nbytes*4 # for x_avg,sf,lr_sf,scaled_x_avg
 
 
 

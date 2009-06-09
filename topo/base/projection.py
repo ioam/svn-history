@@ -300,6 +300,27 @@ class Projection(EPConnection):
         return ProjectionView((self.activity.copy(),self.dest.bounds),self,timestamp)
 
 
+    def n_bytes(self):
+        """
+        Estimate the memory bytes taken by this Projection.
+
+        Subclasses should implement this method to count the bytes
+        taken by the activity array, weight arrays, and any similar
+        arrays, as a rough lower bound from which memory requirements
+        and memory usage patterns can be estimated.
+        """
+        raise NotImplementedError
+    
+    
+    def n_conns(self):
+        """
+        Return the size of this projection, in number of connections.  
+        
+        Must be implemented by subclasses, if only to declare that no
+        connections are stored.
+        """         
+        raise NotImplementedError
+
 
 
 class ProjectionSheet(Sheet):
@@ -580,6 +601,36 @@ class ProjectionSheet(Sheet):
                 proj.restore_plasticity_state()
         
     
+    def n_bytes(self):
+        """
+        Estimate the memory bytes taken by this Sheet and its Projections.
+
+        Typically, this number will include the activity array and any
+        similar arrays, plus memory taken by all incoming Projections.
+        It will not usually include memory taken by the Python
+        dictionary or various "housekeeping" attributes, which usually
+        contribute only a small amount to the memory requirements.
+        Thus this value should be considered only a rough lower bound
+        from which memory requirements and memory usage patterns can
+        be estimated.
+
+        Subclasses should reimplement this method if they store a
+        significant amount of data other than in the activity array
+        and the projections.
+        """
+        return self.activity.nbytes + \
+               sum([p.n_bytes() for p in self.in_connections
+                    if isinstance(p,Projection)])
+    
+    
+    def n_conns(self):
+        """
+        Count the total size of all incoming projections, in number of connections.  
+        """
+        return sum([p.n_conns() for p in self.in_connections
+                    if isinstance(p,Projection)])
+
+
 
 class NeighborhoodMask(SheetMask):
     """

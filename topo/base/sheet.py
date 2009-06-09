@@ -241,5 +241,20 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
         self.plastic = self._plasticity_setting_stack.pop()
 
 
+    def n_bytes(self):
+        """
+        Return a lower bound for the memory taken by this sheet, in bytes.
+
+        Typically, this number will include the activity array and any
+        similar arrays, plus any other significant data owned (in some
+        sense) by this Sheet.  It will not usually include memory
+        taken by the Python dictionary or various "housekeeping"
+        attributes, which usually contribute only a small amount to
+        the memory requirements.
+
+        Subclasses should reimplement this method if they store a
+        significant amount of data other than in the activity array.
+        """
+        return self.activity.nbytes
 
 
