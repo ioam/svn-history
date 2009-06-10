@@ -304,12 +304,14 @@ class Projection(EPConnection):
         """
         Estimate the memory bytes taken by this Projection.
 
-        Subclasses should implement this method to count the bytes
-        taken by the activity array, weight arrays, and any similar
-        arrays, as a rough lower bound from which memory requirements
-        and memory usage patterns can be estimated.
+        By default, counts only the activity array, but subclasses
+        should implement this method to include also the bytes taken
+        by weight arrays and any similar arrays, as a rough lower
+        bound from which memory requirements and memory usage patterns
+        can be estimated.
         """
-        raise NotImplementedError
+        (rows,cols) = self.activity.shape
+        return rows*cols
     
     
     def n_conns(self):

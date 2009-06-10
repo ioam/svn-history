@@ -805,7 +805,8 @@ class CFProjection(Projection):
     def n_bytes(self):
         # Could also count the input_sheet_slice
         rows,cols=self.cfs.shape
-        return sum([cf.weights.nbytes + 
+        return super(CFProjection,self).n_bytes() + \
+               sum([cf.weights.nbytes + 
                     cf.mask.nbytes
                     for cf,r,c in CFIter(self)()])
 

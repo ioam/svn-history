@@ -226,7 +226,7 @@ class LeakyCFProjection(CFProjection):
         super(LeakyCFProjection,self).activate(self.leaky_input_buffer)
 
     def n_bytes(self):
-        return super(LeakyCFProjection).n_bytes + \
+        return super(LeakyCFProjection,self).n_bytes() + \
                self.activity.nbytes*1 # for leaky_input_buffer
 
 
@@ -311,7 +311,7 @@ class ScaledCFProjection(CFProjection):
 
 
     def n_bytes(self):
-        return super(ScaledCFProjection).n_bytes + \
+        return super(ScaledCFProjection,self).n_bytes() + \
                self.activity.nbytes*4 # for x_avg,sf,lr_sf,scaled_x_avg
 
 
@@ -401,6 +401,9 @@ class OneToOneProjection(Projection):
         rows,cols=self.activity.shape
         return rows*cols
     
+    def n_bytes(self):
+        return super(OneToOneProjection,self).n_bytes() + \
+               self.activity.nbytes
 
             
 __all__ = list(set([k for k,v in locals().items()
