@@ -397,6 +397,10 @@ class OneToOneProjection(Projection):
                              self.weights,
                              self.learning_rate)
 
+    def n_conns(self):
+        rows,cols=self.activity.shape
+        return rows*cols
+    
 
             
 __all__ = list(set([k for k,v in locals().items()
