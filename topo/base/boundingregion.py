@@ -210,9 +210,6 @@ class BoundingEllipse(BoundingBox):
     """
     __slots__ = []
 
-    def __init__(self,**args):
-        super(BoundingEllipse,self).__init__(**args)
-        
     def contains(self,x,y):
         left,bottom,right,top = self.aarect().lbrt()
         xr = (right-left)/2.0
@@ -256,8 +253,6 @@ class BoundingCircle(BoundingRegion):
 
 
 class Unbounded(BoundingRegion):
-    def __init__(self,**args):
-        super(Unbounded,self).__init__(**args)
     def contains(self,x,y):
         return True
     def scale(self,xs,ys):
