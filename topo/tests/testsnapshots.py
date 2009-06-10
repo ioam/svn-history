@@ -61,7 +61,7 @@ class TestSnapshots(unittest.TestCase):
         topo.sim['R'].set_input_generator(Line())
         topo.sim.run(1)
 
-        load_snapshot(resolve_path(SNAPSHOT_NAME))
+        load_snapshot(resolve_path(SNAPSHOT_NAME,search_paths=[topo.misc.filepath.output_path]))
 
         
         # CEBALERT: should also test that unpickling order is correct
