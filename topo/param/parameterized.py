@@ -1475,6 +1475,13 @@ _param_name_changes = {}
 #
 # (not yet finished - do we need to add information about version numbers?)
 
+# classes that aren't parameterized any more (same ALERT about being in legacy
+# as above)
+do_not_restore = ['topo.base.boundingregion.BoundingRegion',
+                  'topo.base.boundingregion.BoundingBox',
+                  'topo.base.boundingregion.BoundingCircle',
+                  'topo.base.boundingregion.BoundingEllipse']
+
 # CEBALERT: Can't this stuff move to the ParameterizedMetaclass?
 class PicklableClassAttributes(object):
     """
@@ -1522,6 +1529,10 @@ class PicklableClassAttributes(object):
             
         for class_path,state in state['class_attributes'].items():
             # from e.g. "topo.base.parameter.Parameter", we want "topo.base.parameter"
+
+            if class_path in do_not_restore:
+                #print "Did not restore:",class_path
+                break
 
             module_path = class_path[0:class_path.rindex('.')]
             class_name = class_path[class_path.rindex('.')+1::]

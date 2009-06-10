@@ -13,14 +13,17 @@ from numpy import inf
 ### translated, etc. easily.
 ###
 from .. import param
+from ..param.parameterized import get_all_slots
 
-class BoundingRegion(param.Parameterized):
+class BoundingRegion(object):
     """
     Abstract bounding region class, for any portion of a 2D plane.
 
     Only subclasses can be instantiated directly.
     """
     __abstract = True
+
+    __slots__ = ['_aarect']
     
     def contains(self,x,y):
         raise NotImplementedError
@@ -42,12 +45,27 @@ class BoundingRegion(param.Parameterized):
     def set(self,points):
         self._aarect=AARectangle(*points)
 
+    # CEBALERT: same as methods on Parameter
+    def __getstate__(self):
+        # BoundingRegions have slots, not a dict, so we have to
+        # support pickle and deepcopy ourselves.
+        state = {}
+        for slot in get_all_slots(type(self)):
+            state[slot] = getattr(self,slot)
+        return state
+
+    def __setstate__(self,state):
+        for (k,v) in state.items():
+            setattr(self,k,v)
+
 
 class BoundingBox(BoundingRegion):
     """
     A rectangular bounding box defined either by two points forming
     an axis-aligned rectangle (or simply a radius for a square).
     """
+    __slots__ = []
+
     def __str__(self):
         """
         Return BoundingBox(points=((left,bottom),(right,top)))
@@ -190,6 +208,8 @@ class BoundingEllipse(BoundingBox):
     Similar to BoundingBox, but the region is the ellipse
     inscribed within the rectangle.
     """
+    __slots__ = []
+
     def __init__(self,**args):
         super(BoundingEllipse,self).__init__(**args)
         
@@ -212,10 +232,15 @@ class BoundingCircle(BoundingRegion):
     Takes parameters center (a single 2D point (x,y)) and radius (a
     scalar radius).
     """
-    radius = param.Number(0.5,bounds=(0.0,None))
-    center = Cartesian2DPoint((0.0,0.0))
+    
+    __slots__ = ['radius','center']
 
-    def __init__(self,**args):
+    #radius = param.Number(0.5,bounds=(0.0,None))
+    #center = Cartesian2DPoint((0.0,0.0))
+
+    def __init__(self,center=(0.0,0.0),radius=0.5,**args):
+        self.center=center
+        self.radius=radius
         super(BoundingCircle,self).__init__(**args)
 
     def contains(self,x,y):
@@ -228,6 +253,7 @@ class BoundingCircle(BoundingRegion):
         xc,yc = self.center
         r = self.radius
         return AARectangle((xc-r,yc-r),(xc+r,yc+r))
+
 
 class Unbounded(BoundingRegion):
     def __init__(self,**args):

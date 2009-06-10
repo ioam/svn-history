@@ -841,3 +841,15 @@ def onedpowerspectrum_was_in_basic():
 S.append(onedpowerspectrum_was_in_basic)
 
 
+def boundingregion_not_parameterized():
+    import topo.base.boundingregion
+
+    def _boundingregion_not_parameterized(instance,state):
+        for a in ['initialized', '_name_param_value', 'nopickle']:
+            if a in state:
+                del state[a]
+
+    preprocess_state(topo.base.boundingregion.BoundingRegion,
+                     _boundingregion_not_parameterized)
+
+S.append(boundingregion_not_parameterized)
