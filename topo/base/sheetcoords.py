@@ -357,6 +357,10 @@ class Slice(ndarray):
     do not respect the bounds. To ensure that the slice is within the
     SheetCoordinateSystem's bounds, use crop_to_sheet().
     """
+
+    # CEBALERT: presumably should use __slots__, since there could be
+    # many instances.
+    # __slots__ = ['_scs','bounds']
     
     def __new__(cls, bounds, sheet_coordinate_system, force_odd=False,
                 min_matrix_radius=1): # CEBALERT: min_matrix_radius only used for odd slice
