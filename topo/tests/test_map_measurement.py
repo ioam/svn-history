@@ -104,6 +104,8 @@ def generate(plotgroup_names):
     
 
 def test(plotgroup_names):
+    import topo
+    from topo import param
     assert topo.sim.name==sim_name
     assert topo.sim['V1'].nominal_density==8
     assert topo.sim.time()==100
@@ -117,7 +119,16 @@ def test(plotgroup_names):
 
         f = open(resolve_path('tests/%s_t%s_%s.data'%(sim_name,topo.sim.timestr(),
                                                       name.replace(' ','_'))),'r')
-        topo_version,previous_views = pickle.load(f)
+
+        try:
+            topo_version,previous_views = pickle.load(f)
+        except AttributeError:
+            import topo.misc.legacy
+            param.Parameterized().debug("Loading legacy bounding region support.")
+            topo.misc.legacy.boundingregion_not_parameterized()
+            f.seek(0)
+            topo_version,previous_views = pickle.load(f)
+
         f.close()
 
         if 'sheet_views' in previous_views[sheet.name]:
