@@ -312,12 +312,14 @@ class ReverseCorrelation(FeatureResponses):
     def initialize_featureresponses(self,features): # CB: doesn't need features!
 
         self._featureresponses = {}
+        self._activities = {}
         assert hasattr(self.input_sheet,'shape')
         
         # surely there's a way to get an array of 0s for each element without
         # looping? (probably had same question for distributionmatrix).
         for sheet in self.sheets_to_measure():
             self._featureresponses[sheet]= numpy.ones(sheet.activity.shape,dtype=object) 
+	    self._activities[sheet]=numpy.zeros(sheet.shape)
             rows,cols = sheet.activity.shape
             for r in range(rows):
                 for c in range(cols):
@@ -361,7 +363,7 @@ class ReverseCorrelation(FeatureResponses):
             rows,cols = sheet.activity.shape
             for ii in range(rows): 
                 for jj in range(cols):
-                    self._featureresponses[sheet][ii,jj]+=sheet.activity[ii,jj]*self.input_sheet.activity
+                    self._featureresponses[sheet][ii,jj]+=self._activities[sheet][ii,jj]*self.input_sheet.activity
 
 
 
