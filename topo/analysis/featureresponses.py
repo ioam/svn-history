@@ -249,7 +249,7 @@ class FeatureResponses(PatternDrivenAnalysis):
         if hasattr(topo,'guimain'):
             topo.guimain.open_progress_window(timer)
         else:
-            self.message("Presenting %d test patterns (%s)." % (len(self.permutations),values_description))
+            self.verbose("Presenting %d test patterns (%s)." % (len(self.permutations),values_description))
 
         timer.call_fixed_num_times(self.permutations)
         
@@ -307,6 +307,8 @@ class ReverseCorrelation(FeatureResponses):
 
     input_sheet = param.Parameter(default=None)
 
+    # JABALERT: Should _featureresponses be renamed here?; It's a different
+    # data structure using different indexing (r,c instead of feature).
     def initialize_featureresponses(self,features): # CB: doesn't need features!
 
         self._featureresponses = {}
