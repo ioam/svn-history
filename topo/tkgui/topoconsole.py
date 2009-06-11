@@ -456,6 +456,17 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         """Quit topographica."""
         if not check or (check and tk.askyesno("Quit Topographica","Really quit?")):
             self.destroy() 
+
+            # matplotlib's tk backend starts its own Tk instances; we
+            # need to close these ourselves (at least to avoid error
+            # message about 'unusual termination' in Windows).
+            try: # not that there should be an error, but just in case...
+                import matplotlib._pylab_helpers
+                for figman in matplotlib._pylab_helpers.Gcf.get_all_fig_managers():
+                    figman.destroy()
+            except:
+                pass
+                
             print "Quit selected; exiting"
 
             # Workaround for obscure problem on some UNIX systems
