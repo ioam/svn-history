@@ -452,7 +452,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
 
 
             
-    def quit_topographica(self,check=True):
+    def quit_topographica(self,check=True,exit_status=0):
         """Quit topographica."""
         if not check or (check and tk.askyesno("Quit Topographica","Really quit?")):
             self.destroy() 
@@ -483,7 +483,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
                 try: os.system("stty sane")
                 except: pass
                 
-            sys.exit()
+            sys.exit(exit_status)
 
 
     def run_script(self):
