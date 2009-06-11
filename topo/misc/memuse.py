@@ -90,7 +90,7 @@ def allsizes_mb():
 def default_memuse_analysis_fn(prefix=""):
     """Basic memuse function for use with memuse_batch()"""
     import topo
-    print "%sMemuse at time %s: %s" % (prefix,topo.sim.timestr(),allsizes_mb())
+    print "%st%s: %s" % (prefix,topo.sim.timestr(),allsizes_mb())
 
 
 
