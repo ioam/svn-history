@@ -33,7 +33,7 @@ def cmd_to_string(cmd):
 
 def topsize():
     """Return the RES size of this process as reported by the top(1) command."""
-    top_line=cmd_to_string("top -n 1 -b -p %d | grep '^%d '" % (os.getpid(),os.getpid()))
+    top_line=cmd_to_string("top -n 1 -b -p %d | grep '^[ ]*%d '" % (os.getpid(),os.getpid()))
     return top_line.split()[5]
 
 
