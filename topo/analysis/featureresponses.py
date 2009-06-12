@@ -430,26 +430,28 @@ class FeatureMaps(FeatureResponses):
             ### but still we should catch the error.
             ### Also, what happens in case of negative values?
             # CB: (see also ALERT by SheetView's norm_factor.)
+            #JL: Should be able to get rid of norm factor and incorporate with value_multiplier
+            #should also add similar method for selectivity_offset and selectivity_multiplier
                 cyclic = self._featureresponses[sheet][feature].distribution_matrix[0,0].cyclic
                 if cyclic:
                     norm_factor = self._featureresponses[sheet][feature].distribution_matrix[0,0].axis_range
                 else:
                     norm_factor = 1.0
 
-                #JLHACKALERT - normfactor changes depending on the number of squares the retina
-                #is divided into during retinotopy measurement.
-                if feature=="retinotopy":
-                    norm_factor = (pattern_presenter.divisions)*(pattern_presenter.divisions)
-                    
-                if weighted_average:
-                    preference_map = SheetView(
-                        ((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
-                         bounding_box), sheet.name, sheet.precedence, topo.sim.time(),sheet.row_precedence)
-                else:
-                    preference_map = SheetView(
-                        ((self._featureresponses[sheet][feature].max_value_bin())/norm_factor,
-                         bounding_box), sheet.name, sheet.precedence, topo.sim.time(),sheet.row_precedence)
+              
+                value_offset = [f.value_offset for f in self.features if f.name==feature]
+                value_multiplier = [f.value_multiplier for f in self.features if f.name==feature]
 
+             
+                if weighted_average:
+                    
+                    preference_map = SheetView((((self._featureresponses[sheet][feature].weighted_average())+value_offset)*value_multiplier/norm_factor,
+                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time())
+
+                else:
+                    preference_map = SheetView((((self._featureresponses[sheet][feature].max_value_bin())+value_offset)*value_multiplier/norm_factor,
+                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time())    
+               
                 preference_map.cyclic = cyclic
                 preference_map.norm_factor = norm_factor
                     
@@ -523,7 +525,7 @@ class Feature(object):
     Stores the parameters required for generating a map of one input feature.
     """
 
-    def __init__(self, name, range=None, step=0.0, values=None, cyclic=False, compute_fn=None, offset=0,keep_peak=True):
+    def __init__(self, name, range=None, step=0.0, values=None, cyclic=False, value_offset=0.0, value_multiplier=1.0, compute_fn=None, offset=0, keep_peak=True):
          """
          Users can provide either a range and a step size, or a list of values.
          If a list of values is supplied, the range can be omitted unless the
@@ -540,7 +542,10 @@ class Feature(object):
          self.compute_fn=compute_fn
          self.range=range
          self.keep_peak=keep_peak
-                     
+         self.value_offset=value_offset
+         self.value_multiplier=value_multiplier
+                 
+                             
          if values is not None:
              self.values=values if offset == 0 else [v+offset for v in values]
              if not self.range:
@@ -691,7 +696,8 @@ class PatternPresenter(param.Parameterized):
                 # CEBALERT: should warn as above if not a color network
 
 
-
+        #JL: This is only used for retinotopy measurement in jude laws contrib/jsldefs.py
+        #Also needs cleaned up
         if features_values.has_key('retinotopy'):
             #Calculates coordinates of the center of each patch to be presented 
             coordinate_x=[]
@@ -723,7 +729,10 @@ class PatternPresenter(param.Parameterized):
                 inputs[name].x = x_coord
                 inputs[name].y = y_coord
           
-                
+        if features_values.has_key('retx'):
+            for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+                inputs[name].x = features_values['retx']
+                inputs[name].y = features_values['rety']           
           
         if features_values.has_key("phasedisparity"):
             temp_phase1=features_values['phase']-features_values['phasedisparity']/2.0
