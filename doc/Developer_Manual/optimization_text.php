@@ -1,4 +1,4 @@
-<H1>Optimization</H1>
+<H1>Performance optimization</H1>
 
 <P>According to C.A.R. Hoare, "Premature optimization is the root of all
 evil".  Although the performance of Topographica is critically
@@ -35,11 +35,15 @@ like the optimization is worthwhile, brainstorm with other team
 members to figure out a way to do it cleanly and check in the clean
 version instead.
 
-<P>For a good overview of how to optimize memory usage, which is often
-the bottleneck for our simulations, see
-<A href="http://lwn.net/Articles/250967/">Ulrich Drepper's article</A>.
-If you are ambitious, even the most optimized components in
-Topographica could be further improved using these techniques,
+<P>This document considers runtime performance primarily; optimizing
+total memory is considered separately under
+<A href="memuse.html">Memory usage</a>.  On the other hand, the
+<i>patterns</i> of access to memory are crucially important for
+performance in large simulations.  For a good overview of how to
+optimize memory usage patterns,
+<A href="http://lwn.net/Articles/250967/">Ulrich Drepper's
+article</A>.  If you are ambitious, even the most optimized components
+in Topographica could be further improved using these techniques,
 possibly substantially.
 
 

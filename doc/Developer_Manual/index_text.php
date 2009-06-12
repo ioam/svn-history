@@ -26,8 +26,11 @@ parameters, units, and external imports.
 <P><DT><A href="gui.html"><strong>GUI programming</strong></A></DT>
 <DD>How to add functionality to the GUI</DD>
 
-<P><DT><A href="optimization.html"><strong>Optimization</strong></A></DT>
+<P><DT><A href="optimization.html"><strong>Performance optimization</strong></A></DT>
 <DD>When (and when not!) to optimize for performance, and how to do it</DD>
+
+<P><DT><A href="memuse.html"><strong>Memory usage</strong></A></DT>
+<DD>How to measure memory usage and reduce it</DD>
 
 <P><DT><A href="revisioncontrol.html"><strong>Revision control</strong></A></DT>
 <DD>How we keep track of changes to the code and other files</DD>

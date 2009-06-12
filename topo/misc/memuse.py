@@ -113,6 +113,12 @@ def plotting_and_saving_analysis_fn(prefix=""):
 def memuse_batch(script_file,times=[0],analysis_fn=default_memuse_analysis_fn,**params):
     """
     Similar to run_batch, but analyzes the memory requirement of a simulation at different times.
+    
+    First, the specified script file will be run using the specified parameters.
+    Then at each of the specified times, the given analysis_fn (which
+    calls allsizes_mb() by default) is run.  The output is labeled
+    with the script file, time, and parameters so that results from
+    different runs can be compared.
     """
     
     import os,sys,re,time,__main__,topo
