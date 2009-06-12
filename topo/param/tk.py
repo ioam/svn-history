@@ -1748,7 +1748,8 @@ class TkParameterized(TkParameterizedBase):
 
         param_obj = self.get_parameter_object(param_name)
         class_=None
-        if hasattr(param_obj,'class_') and isinstance(param_obj.class_,type):
+        if hasattr(param_obj,'class_') and and hasattr(param_obj.class_,'get_range'):
+            # i.e. we can represent with ClassSelector
             class_ = param_obj.class_
 
         parameterized_instance = list_to_parameterized(val,class_)
