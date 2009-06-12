@@ -324,6 +324,15 @@ class BinaryThreshold(TransferFn):
         x += above_threshold
 
 
+class Threshold(TransferFn):
+    """
+    Forces all values below a threshold to zero, and leaves others unchanged.
+    """
+    threshold = param.Number(default=0.25, doc="Decision point for determining binary value.")
+
+    def __call__(self,x):
+        clip_upper(x,self.threshold)
+        
 
 ### JABALERT: Is this the right location for this class?  It brings in
 ### dependencies on PatternGenerator, which is not something that many
