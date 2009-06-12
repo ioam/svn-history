@@ -19,7 +19,7 @@ and whether optimizing these is possible, and then briefly discusses
 how to optimize them.
 
 
-<2>Topsize</H2>
+<H2>Topsize</H2>
 
 <P>On a UNIX-like system, you can measure the total real memory of any
 process using the <code>top</code> command.  For instance, if you have
