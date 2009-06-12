@@ -23,7 +23,7 @@ from .. import param
 
 from topo.base.functionfamily import CoordinateMapperFn, IdentityMF
 from topo.misc.util import signabs
-from topo.misc.numbergenerator import UniformRandom
+from topo.misc.numbergenerator import UniformRandom, NormalRandom
 
 
 ##########################################################################
@@ -74,6 +74,18 @@ class Jitter(CoordinateMapperFn):
 
     def __call__(self,x,y):
         return x+(self.gen()-0.5)*self.scale,y+(self.gen()-0.5)*self.scale
+
+
+class NormalJitter(CoordinateMapperFn):
+    """
+    Additively modifies calculated x,y coordinates with Gaussian random noise.
+    """
+
+    gen = param.Parameter(default=NormalRandom(),doc=
+         "Number generator to use, typically a Gaussian distribution.")
+    
+    def __call__(self,x,y):
+        return x+self.gen(),y+self.gen()
 
 
 class Grid(CoordinateMapperFn):
