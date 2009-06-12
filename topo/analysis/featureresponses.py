@@ -312,14 +312,12 @@ class ReverseCorrelation(FeatureResponses):
     def initialize_featureresponses(self,features): # CB: doesn't need features!
 
         self._featureresponses = {}
-        self._activities = {}
         assert hasattr(self.input_sheet,'shape')
         
         # surely there's a way to get an array of 0s for each element without
         # looping? (probably had same question for distributionmatrix).
         for sheet in self.sheets_to_measure():
             self._featureresponses[sheet]= numpy.ones(sheet.activity.shape,dtype=object) 
-	    self._activities[sheet]=numpy.zeros(sheet.shape)
             rows,cols = sheet.activity.shape
             for r in range(rows):
                 for c in range(cols):
@@ -357,13 +355,39 @@ class ReverseCorrelation(FeatureResponses):
         super(ReverseCorrelation,self).measure_responses(pattern_presenter,param_dict,
                                                          features,display)
                                                          
+    def present_permutation(self,permutation):
+        """Present a pattern with the specified set of feature values."""
+
+        # Calculate complete set of settings
+        permuted_settings = zip(self.feature_names, permutation)
+        complete_settings = permuted_settings + \
+            [(f.name,f.compute_fn(permuted_settings)) for f in self.features_to_compute]
+
+        topo.sim.state_push()
+
+        # Run hooks before and after pattern presentation.
+        # Could use complete_settings here, to avoid some
+        # PatternPresenter special cases, but that might cause
+        # conflicts with the existing PatternPresenter code.
+        for f in self.pre_presentation_hooks: f()
+        #valstring = " ".join(["%s=%s" % (n,v) for n,v in complete_settings])
+        #self.message("Presenting pattern %s" % valstring)
+        self.pattern_presenter(dict(permuted_settings),self.param_dict)
+        for f in self.post_presentation_hooks: f()
+    
+        if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
+
+        self._update(complete_settings)
+         
+        topo.sim.state_pop()
+
     # Ignores current_values; they simply provide distinct patterns on the retina
     def _update(self,current_values):
         for sheet in self.sheets_to_measure():
             rows,cols = sheet.activity.shape
             for ii in range(rows): 
                 for jj in range(cols):
-                    self._featureresponses[sheet][ii,jj]+=self._activities[sheet][ii,jj]*self.input_sheet.activity
+                    self._featureresponses[sheet][ii,jj]+=sheet.activity[ii,jj]*self.input_sheet.activity
 
 
 
