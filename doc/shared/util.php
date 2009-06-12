@@ -115,4 +115,16 @@ function classref($module,$class) {
 #  print "<a href=\"../Reference_Manual/$module.html#$class\">$class</a>";
 }
 
+# Refer and link to a function in a specific module in the Reference Manual
+function fnref($module,$fn) {
+  # Epydoc version:
+  print "<a href=\"../Reference_Manual/$module-module.html#$fn\">$fn</a>";
+}
+
+# Refer and link to a function in a specific module in the Reference Manual
+function moduleref($module) {
+  # Epydoc version:
+  print "<a href=\"../Reference_Manual/$module-module.html\">$module</a>";
+}
+	
 ?>
