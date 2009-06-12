@@ -144,6 +144,14 @@ def clip_lower(mat,lower_bound):
     mat *= to_keep
     mat += lower_cropping*lower_bound
 
+def clip_upper(mat,upper_bound):
+    """One-sided version of clip_in_place."""
+    upper_cropping = mat>upper_bound
+    to_keep = logical_not(upper_cropping)
+
+    mat *= to_keep
+    mat += upper_cropping*upper_bound
+
 
 def wrap(lower, upper, x):
     """
