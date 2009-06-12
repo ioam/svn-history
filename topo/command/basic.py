@@ -588,6 +588,7 @@ def n_conns():
 
 
 def print_sizes():
+    """Format the results from n_conns() and n_bytes() for use in batch output."""
     print "Defined %d-connection network; %0.0fMB required for weight storage." % \
     (n_conns(),max(n_bytes()/1024.0/1024.0,1.0))
 
