@@ -131,8 +131,6 @@ TK = tk8.5.5
 TK_UNINSTALL += lib/tk8.5 lib/libtk8.5.so lib/libtkstub8.5.a
 TK_UNINSTALL += include/tk*.h lib/tkConfig.sh
 
-# sudo apt-get install libxft-dev
-
 tk: ${TK}-src.tar.gz tcl
 	tar -xzf ${TK}-src.tar.gz
 	cd ${TK}/unix; ./configure --prefix=${PREFIX} --enable-xft

@@ -158,7 +158,8 @@ such as
 <code>libfreetype-dev</code>,
 <code>libpng</code>,
 <code>libpng-dev</code>,
-<code>libx11-dev</code>, and
+<code>libx11-dev</code>, 
+<code>libxft-dev</code> <!--for antialiased fonts-->, and 
 <code>zlib</code>,
 before <code>make</code> will succeed.  On some systems the
 <code>-dev</code> packages are called <code>-devel</code>, and
