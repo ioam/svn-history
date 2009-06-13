@@ -23,7 +23,7 @@ __version__ = '$Revision$'
 
 
 from numpy import zeros,array,arange
-from numpy.oldnumeric import Float
+from numpy import float64
 
 from .. import param
 
@@ -32,7 +32,7 @@ from sheetcoords import SheetCoordinateSystem
 from boundingregion import BoundingBox, BoundingRegionParameter
 
 
-activity_type = Float
+activity_type = float64
 
 # (disable W0223 because input_event is deliberately still not implemented)
 class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
