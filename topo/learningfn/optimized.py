@@ -57,9 +57,9 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
             Py_DECREF(weights_descr);
 
             ///// GET SLICE OFFSET
-            PyMemberDescrObject *slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
-            Py_ssize_t slice_offset = slice_descr->d_member->offset;
-            Py_DECREF(slice_descr);
+            PyMemberDescrObject *input_sheet_slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
+            Py_ssize_t input_sheet_slice_offset = input_sheet_slice_descr->d_member->offset;
+            Py_DECREF(input_sheet_slice_descr);
 
             ///// GET MASK OFFSET
             PyMemberDescrObject *mask_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"mask");
@@ -78,17 +78,18 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                         PyObject *cf = PyList_GetItem(cfsr,l);
 
                         PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
-                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
+                        float *weights = (float *)(weights_obj->data);
+                        
+                        PyArrayObject *input_sheet_slice_obj = *((PyArrayObject **)((char *)cf + input_sheet_slice_offset));
+                        int *input_sheet_slice = (int *)(input_sheet_slice_obj->data);
+                        
                         PyArrayObject *mask_obj = *((PyArrayObject **)((char *)cf + mask_offset));
+                        float *mask = (float *)(mask_obj->data);
                         
-                        float *wi = (float *)(weights_obj->data);
-                        int *slice = (int *)(slice_obj->data);
-                        float *m = (float *)(mask_obj->data);
-                        
-                        int rr1 = *slice++;
-                        int rr2 = *slice++;
-                        int cc1 = *slice++;
-                        int cc2 = *slice;
+                        int rr1 = *input_sheet_slice++;
+                        int rr2 = *input_sheet_slice++;
+                        int cc1 = *input_sheet_slice++;
+                        int cc2 = *input_sheet_slice;
                         
                         double total = 0.0;
                         
@@ -100,11 +101,11 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                                 // The mask is floating point, so we have to 
                                 // use a robust comparison instead of testing 
                                 // against exactly 0.0.
-                                if (*(m++) >= 0.000001) {
-                                    *wi += load * *inpi;
-                                    total += fabs(*wi);
+                                if (*(mask++) >= 0.000001) {
+                                    *weights += load * *inpi;
+                                    total += fabs(*weights);
                                 }
-                                ++wi;
+                                ++weights;
                                 ++inpi;
                             }
                             inpj += icols;
