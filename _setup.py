@@ -1,3 +1,20 @@
+
+
+## Here's how I set up Topographica on my Ubuntu 9.04 machine...
+
+## I can get all but one of the required dependencies by executing
+## this command:
+## $ sudo apt-get install python-numpy python-gmpy python-matplotlib
+## python-scipy ipython python-tk python-imaging python-imaging-tk
+## tcllib tklib
+## 
+## The single remaining dependency (for which there isn't an Ubuntu
+## package) can be installed like this:
+## $ cd topographica/external/ # topographica/ is an svn source code checkout
+## $ tar xvf pyscrodget-0.0.2_2.1.tar.gz
+## $ cd pyscrodget-0.0.2_2.1/
+## $ sudo python setup.py install
+## 
 common = dict(
 
     name='Topographica',
