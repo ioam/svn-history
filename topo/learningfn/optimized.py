@@ -16,7 +16,7 @@ from topo.base.sheet import activity_type
 from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.learningfn.projfn import CFPLF_PluginScaled
 from topo.base.functionfamily import Hebbian,LearningFn
-from topo.misc.inlinec import inline, provide_unoptimized_equivalent
+from topo.misc.inlinec import inline,provide_unoptimized_equivalent,c_header
 from topo.learningfn.basic import BCMFixed
 
 from projfn import CFPLF_Trace
@@ -48,24 +48,10 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
         
         irows,icols = input_activity.shape
         cf_type = iterator.proj.cf_type
-        code = """
-            // CEBALERT: should provide a macro for getting offset
-
-            ///// GET WEIGHTS OFFSET
-            PyMemberDescrObject *weights_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"weights");
-            Py_ssize_t weights_offset = weights_descr->d_member->offset;
-            Py_DECREF(weights_descr);
-
-            ///// GET SLICE OFFSET
-            PyMemberDescrObject *input_sheet_slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
-            Py_ssize_t input_sheet_slice_offset = input_sheet_slice_descr->d_member->offset;
-            Py_DECREF(input_sheet_slice_descr);
-
-            ///// GET MASK OFFSET
-            PyMemberDescrObject *mask_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"mask");
-            Py_ssize_t mask_offset = mask_descr->d_member->offset;
-            Py_DECREF(mask_descr);
-
+        code = c_header + """
+            DECLARE_SLOT_OFFSET(weights,cf_type);
+            DECLARE_SLOT_OFFSET(input_sheet_slice,cf_type);
+            DECLARE_SLOT_OFFSET(mask,cf_type);
 
             double *x = output_activity;
             for (int r=0; r<rows; ++r) {
@@ -76,20 +62,12 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                         load *= single_connection_learning_rate;
 
                         PyObject *cf = PyList_GetItem(cfsr,l);
-
-                        PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
-                        float *weights = (float *)(weights_obj->data);
                         
-                        PyArrayObject *input_sheet_slice_obj = *((PyArrayObject **)((char *)cf + input_sheet_slice_offset));
-                        int *input_sheet_slice = (int *)(input_sheet_slice_obj->data);
+                        LOOKUP_FROM_SLOT_OFFSET(float,weights,cf);
+                        LOOKUP_FROM_SLOT_OFFSET(int,input_sheet_slice,cf);
+                        LOOKUP_FROM_SLOT_OFFSET(float,mask,cf);
                         
-                        PyArrayObject *mask_obj = *((PyArrayObject **)((char *)cf + mask_offset));
-                        float *mask = (float *)(mask_obj->data);
-                        
-                        int rr1 = *input_sheet_slice++;
-                        int rr2 = *input_sheet_slice++;
-                        int cc1 = *input_sheet_slice++;
-                        int cc2 = *input_sheet_slice;
+                        UNPACK_FOUR_TUPLE(int,rr1,rr2,cc1,cc2,input_sheet_slice);
                         
                         double total = 0.0;
                         
