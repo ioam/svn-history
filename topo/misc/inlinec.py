@@ -119,6 +119,35 @@ if not optimized and not warn_for_each_unoptimized_component:
     print "Note: Inline-optimized components are currently disabled; see topo.misc.inlinec"
 
 
+# Definitions useful for working with optimized Python code;
+# prepend to the code for an inlinec call if you want to use them.
+c_header = """
+/* Declaration for interfacing to numpy floats */
+typedef double npfloat;
+
+/* For a given class cls and an attribute attr, defines a variable
+   attr_offset containing the offset of that attribute in the class's
+   __slots__ data structure. */
+#define DECLARE_SLOT_OFFSET(attr,cls) \
+  PyMemberDescrObject *attr ## _descr = (PyMemberDescrObject *)PyObject_GetAttrString(cls,#attr); \
+  Py_ssize_t attr ## _offset = attr ## _descr->d_member->offset; \
+  Py_DECREF(attr ## _descr)
+
+/* After a previous declaration of DECLARE_SLOT_OFFSET, for an
+   instance obj of that class and the given attr, retrieves the value
+   of that attribute from its slot. */
+#define LOOKUP_FROM_SLOT_OFFSET(type,attr,obj) \
+  PyArrayObject *attr ## _obj = *((PyArrayObject **)((char *)obj + attr ## _offset)); \
+  type *attr = (type *)(attr ## _obj->data)
+
+#define UNPACK_FOUR_TUPLE(type,i1,i2,i3,i4,tuple) \
+  type i1 = *tuple++; \
+  type i2 = *tuple++; \
+  type i3 = *tuple++; \
+  type i4 = *tuple
+"""
+
+
 # Simple test
 if __name__ == '__main__':
     inline('printf("Hello World!!\\n");')
