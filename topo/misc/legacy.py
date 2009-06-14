@@ -19,6 +19,11 @@ import sys
 # rather than having (effectively) a list in each.
 
 
+def _setstate(inst,state):
+    for k,v in state.items():
+        setattr(inst,k,v)
+
+
 def preprocess_state(class_,state_mod_fn): 
     """
     Allow processing of state with state_mod_fn before
@@ -26,6 +31,10 @@ def preprocess_state(class_,state_mod_fn):
 
     state_mod_fn must accept two arguments: instance and state.
     """
+    if not hasattr(class_,'__setstate__'):
+        # e.g. class_ used to be Parameterized, but now isn't
+        class_.__setstate__ = _setstate
+
     old_setstate = class_.__setstate__
     def new_setstate(instance,state):
         # passing instance here allows us to avoid having to list
