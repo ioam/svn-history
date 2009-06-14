@@ -12,7 +12,7 @@ from .. import param
 
 from topo.base.functionfamily import ResponseFn,DotProduct
 from topo.base.cf import CFPResponseFn, CFPRF_Plugin
-from topo.misc.inlinec import inline, provide_unoptimized_equivalent
+from topo.misc.inlinec import inline,provide_unoptimized_equivalent,c_header
 from topo.responsefn.projfn import CFPRF_EuclideanDistance
 
 
@@ -41,7 +41,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 
         cf_type = iterator.proj.cf_type
     
-        code = """
+        code = c_header + """
             // CEBALERT: should provide a macro for getting offset
 
             ///// GET WEIGHTS OFFSET
@@ -54,7 +54,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
             Py_ssize_t slice_offset = slice_descr->d_member->offset;
             Py_DECREF(slice_descr);
 
-            double *tact = temp_act;
+            npfloat *tact = temp_act;
 	    float *wj;
 	    PyArrayObject *array;
 
@@ -93,11 +93,11 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                         int cc1 = *slice++;
                         int cc2 = *slice;
                         double tot = 0.0;
-                        double *xj = X+icols*rr1+cc1;
+                        npfloat *xj = X+icols*rr1+cc1;
     
                         // computes the dot product
                         for (int i=rr1; i<rr2; ++i) {
-                            double *xi = xj;
+                            npfloat *xi = xj;
                             float *wi = wj;                       
                             for (int j=cc1; j<cc2; ++j) {
                                 tot += *wi * *xi;
@@ -146,9 +146,9 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
         X = input_activity.ravel()
         cfs = iterator.proj._cfs
 
-        code = """
+        code = c_header + """
 	    #include <math.h>
-            double *tact = temp_act;
+            npfloat *tact = temp_act;
  	    double max_dist=0.0;
     
             for (int r=0; r<rows; ++r) {
@@ -166,12 +166,12 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                     int cc1 = *slice++;
                     int cc2 = *slice;
 
-                    double *xj = X+icols*rr1+cc1;
+                    npfloat *xj = X+icols*rr1+cc1;
     
                     // computes the dot product
 		    double tot = 0.0;
                     for (int i=rr1; i<rr2; ++i) {
-                        double *xi = xj;                        
+                        npfloat *xi = xj;                        
                         float *wi = wj;
                         for (int j=cc1; j<cc2; ++j) {
                             double diff = *wi - *xi;

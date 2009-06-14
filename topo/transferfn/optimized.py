@@ -11,7 +11,7 @@ from .. import param
 
 from topo.base.cf import CFPOutputFn,CFPOF_Plugin
 from topo.base.functionfamily import TransferFn, IdentityTF
-from topo.misc.inlinec import inline, provide_unoptimized_equivalent
+from topo.misc.inlinec import inline,provide_unoptimized_equivalent,c_header
 
 from basic import DivisiveNormalizeL1
 
@@ -38,7 +38,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
         # The original code normalized only the CFs for units that were
         # activated; it might be possible to restore that extra optimization
         # if some way is found to override that for the first iteration.
-        code = """
+        code = c_header + """
             // CEBALERT: should provide a macro for getting offset
 
             ///// GET WEIGHTS OFFSET
@@ -54,7 +54,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
             // CB: I doubt norm_total can be a property and a slot, but maybe
             // it could be, or maybe we could use the actual attribute...
             
-            double *x = mask;
+            npfloat *x = mask;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {

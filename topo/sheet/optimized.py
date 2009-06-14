@@ -9,7 +9,7 @@ from .. import param
 
 from topo.base.functionfamily import TransferFn, IdentityTF
 from topo.base.projection import Projection, NeighborhoodMask
-from topo.misc.inlinec import inline, provide_unoptimized_equivalent
+from topo.misc.inlinec import inline,provide_unoptimized_equivalent,c_header
 from topo.sheet.lissom import LISSOM, JointScaling
 from topo.sheet.basic import compute_joint_norm_totals
 
@@ -26,8 +26,8 @@ def compute_joint_norm_totals_opt(projlist,mask):
     rows,cols = projlist[0].cfs.shape
     length = len(projlist)
 
-    code = """
-        double *x = mask;
+    code = c_header + """
+        npfloat *x = mask;
         for (int r=0; r<rows; ++r) {
             for (int l=0; l<cols; ++l) {
                 double load = *x++;
@@ -105,12 +105,12 @@ class NeighborhoodMask_Opt(NeighborhoodMask):
         activity = self.sheet.activity
         mask = self.data
         
-        code = """
+        code = c_header + """
             #define min(x,y) (x<y?x:y)
             #define max(x,y) (x>y?x:y)
             
-            double *X = mask;
-            double *A = activity;
+            npfloat *X = mask;
+            npfloat *A = activity;
             for (int r=0; r<rows; ++r) {
                 for (int l=0; l<cols; ++l) {
                     int lbx = max(0,r-matradius);
@@ -124,7 +124,7 @@ class NeighborhoodMask_Opt(NeighborhoodMask):
                     {
                         for(int l=lby;l<hby;l++)
                         {
-                            double *a = A+k*rows + l;
+                            npfloat *a = A+k*rows + l;
                             if(*a > thr)
                             {
                                 *X = 1.0;

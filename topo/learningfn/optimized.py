@@ -53,7 +53,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
             DECLARE_SLOT_OFFSET(input_sheet_slice,cf_type);
             DECLARE_SLOT_OFFSET(mask,cf_type);
 
-            double *x = output_activity;
+            npfloat *x = output_activity;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
@@ -72,9 +72,9 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                         double total = 0.0;
                         
                         // modify non-masked weights
-                        double *inpj = input_activity+icols*rr1+cc1;
+                        npfloat *inpj = input_activity+icols*rr1+cc1;
                         for (int i=rr1; i<rr2; ++i) {
-                            double *inpi = inpj;
+                            npfloat *inpi = inpj;
                             for (int j=cc1; j<cc2; ++j) {
                                 // The mask is floating point, so we have to 
                                 // use a robust comparison instead of testing 
@@ -142,7 +142,7 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
         
         irows,icols = input_activity.shape
         cf_type = iterator.proj.cf_type
-        code = """
+        code = c_header + """
             // CEBALERT: should provide a macro for getting offset
 
             ///// GET WEIGHTS OFFSET
@@ -161,7 +161,7 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
             Py_DECREF(mask_descr);
 
 
-            double *x = output_activity;
+            npfloat *x = output_activity;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
@@ -188,9 +188,9 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
                         double total = 0.0;
                         
                         // modify non-masked weights
-                        double *inpj = input_activity+icols*rr1+cc1;
+                        npfloat *inpj = input_activity+icols*rr1+cc1;
                         for (int i=rr1; i<rr2; ++i) {
-                            double *inpi = inpj;
+                            npfloat *inpi = inpj;
                             for (int j=cc1; j<cc2; ++j) {
                                 // The mask is floating point, so we have to 
                                 // use a robust comparison instead of testing 
@@ -257,8 +257,8 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
             return
         
         irows,icols = input_activity.shape
-        code = """
-            double *x = output_activity;
+        code = c_header + """
+            npfloat *x = output_activity;
             double *sclr = learning_rate_scaling_factor;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
@@ -286,9 +286,9 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
                         double total = 0.0;
                         
                         // modify non-masked weights
-                        double *inpj = input_activity+icols*rr1+cc1;
+                        npfloat *inpj = input_activity+icols*rr1+cc1;
                         for (int i=rr1; i<rr2; ++i) {
-                            double *inpi = inpj;
+                            npfloat *inpi = inpj;
                             for (int j=cc1; j<cc2; ++j) {
                                 // The mask is floating point, so we have to 
                                 // use a robust comparison instead of testing 
@@ -356,8 +356,8 @@ class CFPLF_Trace_opt(CFPLearningFn):
         self.traces = (self.trace_strength*output_activity)+((1-self.trace_strength)*self.traces)
         traces = self.traces
         
-        code = """
-            double *x = traces;
+        code = c_header + """
+            npfloat *x = traces;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
@@ -382,9 +382,9 @@ class CFPLF_Trace_opt(CFPLearningFn):
                         double total = 0.0;
                         
                         // modify non-masked weights
-                        double *inpj = input_activity+icols*rr1+cc1;
+                        npfloat *inpj = input_activity+icols*rr1+cc1;
                         for (int i=rr1; i<rr2; ++i) {
-                            double *inpi = inpj;
+                            npfloat *inpi = inpj;
                             for (int j=cc1; j<cc2; ++j) {
                                 // The mask is floating point, so we have to 
                                 // use a robust comparison instead of testing 
