@@ -62,10 +62,9 @@ class ConnectionField(object):
     the output sheet, and is normally used as part of a Projection
     including many other ConnectionFields.
     """
-    _has_norm_total = False
-
     __slots__ = ['input_sheet','x','y','weights',
-                 'input_sheet_slice','mask','weights_slice','__dict__']
+                 'input_sheet_slice','mask','weights_slice',
+                 '_has_norm_total','_norm_total']
 
     def __get_norm_total(self):
         """
@@ -165,6 +164,14 @@ class ConnectionField(object):
         over the edge of the input sheet then the weights will
         actually be half-moon (or similar) rather than circular.
         """
+        # CB: has to be set for C code. Can't be initialized at the
+        # class level, or it would become a read-only class attribute
+        # (because it's a slot:
+        # http://docs.python.org/reference/datamodel.html). Can we
+        # somehow avoid having to think about _has_norm_total in the
+        # python code? Could the C code initialize this value?
+        self._has_norm_total=False
+
         self.x=x
         self.y=y
 

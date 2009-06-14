@@ -861,3 +861,23 @@ def boundingregion_not_parameterized():
                      _boundingregion_not_parameterized)
 
 S.append(boundingregion_not_parameterized)
+
+
+def cf_not_parameterized():
+    from topo.base.cf import ConnectionField
+
+    def _cf_not_parameterized(instance,state):
+        
+        for p in [('_y_param_value','y'),('_x_param_value','x')]:
+            if p[0] in state:
+                state[p[1]]=state[p[0]]
+                del state[p[0]]
+
+        for p in ['_name_param_value','initialized','nopickle','bounds_template']:
+            if p in state:
+                del state[p]
+
+
+    preprocess_state(ConnectionField,_cf_not_parameterized)
+
+S.append(cf_not_parameterized)

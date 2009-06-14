@@ -61,6 +61,7 @@ class SharedWeightCF(ConnectionField):
         """
         # CEBALERT: There's no call to super's __init__; see JAHACKALERT
         # below.
+        self._has_norm_total=False
         self.x = x
         self.y = y
         self.mask=mask 
