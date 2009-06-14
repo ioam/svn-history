@@ -877,6 +877,9 @@ def cf_not_parameterized():
             if p in state:
                 del state[p]
 
+        # rXXXX weights_slice no longer stored
+        if 'weights_slice' in state:
+            del state['weights_slice']
 
     preprocess_state(ConnectionField,_cf_not_parameterized)
 
