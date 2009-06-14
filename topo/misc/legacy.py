@@ -19,7 +19,6 @@ import sys
 # rather than having (effectively) a list in each.
 
 
-from topo.sheet.lissom import LISSOM
 def preprocess_state(class_,state_mod_fn): 
     """
     Allow processing of state with state_mod_fn before
