@@ -24,7 +24,6 @@ from topo.base.projection import Projection
 from topo.base.sheet import activity_type, BoundingBox
 from topo.base.simulation import EPConnectionEvent
 from topo.base.simulation import FunctionEvent, PeriodicEventSequence
-from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
 from topo.misc.util import NxN
 from topo.transferfn.basic import PiecewiseLinear
