@@ -63,7 +63,7 @@ class ConnectionField(object):
     including many other ConnectionFields.
     """
     __slots__ = ['input_sheet','x','y','weights',
-                 'input_sheet_slice','mask','weights_slice',
+                 'input_sheet_slice','mask',
                  '_has_norm_total','_norm_total']
 
     def __get_norm_total(self):
@@ -180,7 +180,9 @@ class ConnectionField(object):
             
         self.input_sheet = input_sheet
 
-        self._create_input_sheet_slice(template,min_matrix_radius)
+        # CEBALERT: now even more confusing; weights_slice is
+        # different from input_sheet_slice. At least need to rename.
+        weights_slice = self._create_input_sheet_slice(template,min_matrix_radius)
 
         # CBALERT: need to deal with mask is None
 ##         if mask is None:
@@ -189,8 +191,9 @@ class ConnectionField(object):
 
         # CBNOTE: this would be clearer (but not perfect, and probably slower)
         # m = mask_template[self.weights_slice()]
-        self.mask = self.weights_slice.submatrix(mask)  # view of original mask
+        self.mask = weights_slice.submatrix(mask)  # view of original mask
         self.mask = array(self.mask,copy=1) # CEBALERT: why is this necessary?
+
         # (without it, optimized learning function creates artifacts in CFs at
         # left and right edges of sheet, at some densities)
         
@@ -249,7 +252,7 @@ class ConnectionField(object):
 
         # not copied because we don't use again
         template.positionlesscrop(self.x,self.y)
-        self.weights_slice = template
+        return template
 
 
     # CEBALERT: unnecessary method; can use something like
@@ -279,7 +282,7 @@ class ConnectionField(object):
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.input_sheet_slice
 
-        self._create_input_sheet_slice(template,min_matrix_radius)
+        weights_slice = self._create_input_sheet_slice(template,min_matrix_radius)
                     
         r1,r2,c1,c2 = self.input_sheet_slice
 
@@ -292,9 +295,10 @@ class ConnectionField(object):
             # self.weights=self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],
             # is also slower).
             
-            self.mask = self.weights_slice.submatrix(mask)
+            self.mask = weights_slice.submatrix(mask)
             self.mask = array(self.mask,copy=1) # CB: why's this necessary?
                                                 # (see ALERT in __init__)
+
             self.weights *= self.mask
             for of in output_fns:
                 of(self.weights)
