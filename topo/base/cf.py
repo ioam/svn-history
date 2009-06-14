@@ -62,16 +62,9 @@ class ConnectionField(object):
     the output sheet, and is normally used as part of a Projection
     including many other ConnectionFields.
     """
-
-    # CEBALERT: should be in proj
-    min_matrix_radius = 1 #param.Integer(default=1,bounds=(0,None),doc="""
-    # Enforced minimum for radius of weights matrix.
-    # The default of 1 gives a minimum matrix of 3x3. 0 would
-    # allow a 1x1 matrix.""")
-
     _has_norm_total = False
 
-    __slots__ = ['input_sheet','x','y','min_matrix_radius','weights',
+    __slots__ = ['input_sheet','x','y','weights',
                  'input_sheet_slice','mask','weights_slice','__dict__']
 
     def __get_norm_total(self):
@@ -144,7 +137,7 @@ class ConnectionField(object):
     # CEBALERT: do something for mask_template=None
     def __init__(self,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),
                  weights_generator=patterngenerator.Constant(),mask=None,
-                 output_fns=None):
+                 output_fns=None,min_matrix_radius=1):
         """
         Create weights at the specified (x,y) location on the
         specified input_sheet.
@@ -180,7 +173,7 @@ class ConnectionField(object):
             
         self.input_sheet = input_sheet
 
-        self._create_input_sheet_slice(template)
+        self._create_input_sheet_slice(template,min_matrix_radius)
 
         # CBALERT: need to deal with mask is None
 ##         if mask is None:
@@ -220,7 +213,7 @@ class ConnectionField(object):
 
 
     # CB: can this be renamed to something better?
-    def _create_input_sheet_slice(self,template):
+    def _create_input_sheet_slice(self,template,min_matrix_radius):
         """
         Create the input_sheet_slice, which provides the appropriate
         Slice for this CF on the input_sheet (as well as providing
@@ -232,7 +225,7 @@ class ConnectionField(object):
         # (copy template because it gets modified)
         if not isinstance(template,Slice):
             template = Slice(copy(template),self.input_sheet,force_odd=True,
-                             min_matrix_radius=self.min_matrix_radius)
+                             min_matrix_radius=min_matrix_radius)
         else:
             template = copy(template)
 
@@ -260,7 +253,7 @@ class ConnectionField(object):
         return self.input_sheet_slice.submatrix(activity)
 
 
-    def change_bounds(self,template,mask,output_fns=None):
+    def change_bounds(self,template,mask,output_fns=None,min_matrix_radius=1):
         """
         Change the bounding box for this ConnectionField.
 
@@ -279,7 +272,7 @@ class ConnectionField(object):
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.input_sheet_slice
 
-        self._create_input_sheet_slice(template)
+        self._create_input_sheet_slice(template,min_matrix_radius)
                     
         r1,r2,c1,c2 = self.input_sheet_slice
 
@@ -553,6 +546,12 @@ class CFProjection(Projection):
         Whether to apply the output function to connection fields (e.g. for 
         normalization) when the CFs are first created.""")
 
+    min_matrix_radius = param.Integer(default=1,bounds=(0,None),doc="""
+        Enforced minimum for radius of weights matrix.
+        The default of 1 gives a minimum matrix of 3x3. 0 would
+        allow a 1x1 matrix.""")
+
+
     precedence = param.Number(default=0.8)
 
 
@@ -579,7 +578,7 @@ class CFProjection(Projection):
         # nominal_bounds_template to ensure an odd slice, and to be
         # cropped to sheet if necessary
         slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
-                               min_matrix_radius=self.cf_type.min_matrix_radius)
+                               min_matrix_radius=self.min_matrix_radius)
         
         self.bounds_template = slice_template.bounds
         
@@ -596,7 +595,6 @@ class CFProjection(Projection):
         if initialize_cfs:            
             # set up array of ConnectionFields translated to each x,y in the src sheet
             cflist = []
-
             for r,y in enumerate(self.dest.sheet_rows()[::-1]):
                 row = []
                 for c,x in enumerate(self.dest.sheet_cols()):
@@ -615,7 +613,8 @@ class CFProjection(Projection):
                                                 template=slice_template,
                                                 weights_generator=self.weights_generator,
                                                 mask=mask_template, 
-                                                output_fns=ofs))
+                                                output_fns=ofs,
+                                                min_matrix_radius=self.min_matrix_radius))
                     except NullCFError:
                         if self.allow_null_cfs:
                             row.append(None)
@@ -749,7 +748,7 @@ class CFProjection(Projection):
         bounds_template = copy(nominal_bounds_template)
 
         slice_template = Slice(bounds_template,self.src,force_odd=True,
-                               min_matrix_radius=self.cf_type.min_matrix_radius)
+                               min_matrix_radius=self.min_matrix_radius)
 
         if not self.bounds_template.containsbb_exclusive(bounds_template):
             if self.bounds_template.containsbb_inclusive(bounds_template):
@@ -771,8 +770,9 @@ class CFProjection(Projection):
             for c in xrange(cols):
                 # CB: listhack - loop is candidate for replacement by numpy fn
                 cfs[r,c].change_bounds(template=slice_template,
-                                        mask=mask_template,
-                                        output_fns=output_fns)
+                                       mask=mask_template,
+                                       output_fns=output_fns,
+                                       min_matrix_radius=self.min_matrix_radius)
 
 
     def change_density(self, new_wt_density):

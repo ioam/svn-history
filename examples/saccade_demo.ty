@@ -100,9 +100,6 @@ topo.sim.connect('SC','SaccadeControl',name="Efferent",
                  weights_generator = topo.pattern.basic.Gaussian(),
                  nominal_bounds_template = BoundingBox(radius=0),
                  response_fn = CFPRF_DotProduct_opt(),
-                 # CEBERRORALERT: I moved this attribute's location in
-                 # the past when I began reorganizing ConnectionField;
-                 # need to finish that and then correct this
                  min_matrix_radius=0,
                  coord_mapper = OttesSCMotorMapper(amplitude_scale=decoder.amplitude_scale,
                                                    direction_scale=decoder.direction_scale)

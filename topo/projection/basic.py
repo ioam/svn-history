@@ -47,7 +47,7 @@ class SharedWeightCF(ConnectionField):
     
     __slots__ = []
 	
-    def __init__(self,cf,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),mask=None):
+    def __init__(self,cf,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),mask=None,min_matrix_radius=1):
         """
         From an existing copy of ConnectionField (CF) that acts as a
 	template, create a new CF that shares weights with the
@@ -65,7 +65,7 @@ class SharedWeightCF(ConnectionField):
         self.y = y
         self.mask=mask 
         self.input_sheet = input_sheet
-        self._create_input_sheet_slice(template)
+        self._create_input_sheet_slice(template,min_matrix_radius=1)
         self.weights = self.weights_slice.submatrix(cf.weights)
         
 	# JAHACKALERT the TransferFn cannot be applied in SharedWeightCF
@@ -114,7 +114,7 @@ class SharedWeightCFProjection(CFProjection):
                                                                                  center_col)
 
         slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
-                               min_matrix_radius=self.cf_type.min_matrix_radius)
+                               min_matrix_radius=self.min_matrix_radius)
         self.bounds_template = slice_template.bounds
         self.__sharedcf=self.cf_type(self.src,
                                      x=self.center_unitxcenter,
@@ -122,7 +122,8 @@ class SharedWeightCFProjection(CFProjection):
                                      template=slice_template,
                                      weights_generator=self.weights_generator,
                                      mask=self.mask_template,
-                                     output_fns=[wof.single_cf_fn for wof in self.weights_output_fns])
+                                     output_fns=[wof.single_cf_fn for wof in self.weights_output_fns],
+                                     min_matrix_radius=self.min_matrix_radius)
 
         cflist = []
         scf = self.__sharedcf
@@ -134,7 +135,7 @@ class SharedWeightCFProjection(CFProjection):
                 # Does not pass the mask, as it would have to be sliced
                 # for each cf, and is only used for learning.
                 cf = SharedWeightCF(scf,self.src,x=x_cf,y=y_cf, #JUDE ADDED
-                                    template=slice_template)
+                                    template=slice_template,min_matrix_radius=self.min_matrix_radius)
                 row.append(cf)
             cflist.append(row)
         self._cfs = cflist
@@ -142,7 +143,7 @@ class SharedWeightCFProjection(CFProjection):
         self.cfs = array(cflist)
 
 
-    def change_bounds(self, nominal_bounds_template):
+    def change_bounds(self, nominal_bounds_template, min_matrix_radius=1):
         """
         Change the bounding box for all of the existing ConnectionFields in this Projection.
 
