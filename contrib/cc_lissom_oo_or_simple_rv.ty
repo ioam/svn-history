@@ -106,7 +106,7 @@ if locals().get('SOF',"Homeo") == "HR":
 elif locals().get('SOF',"Homeo") == "Homeo":
 	V1Simple_OF = SimpleHomeoSigmoid(a_init=22,b_init=-12,mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
 elif locals().get('SOF',"Homeo") == "SimpleHomeo":
-    V1Simple_OF = SimpleHomeoLinear(t_init=locals().get('STresh',7),alpha=locals().get('SAlpha',1),mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
+    V1Simple_OF = SimpleHomeoLinear(t_init=locals().get('STresh',0.9),alpha=locals().get('SAlpha',4),mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
 else:
 	V1Simple_OF=Sigmoid(r=22,k=-12)
 
@@ -155,7 +155,7 @@ topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=local
 
 # DoG weights for the LGN
 #centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
-centerg   = Gaussian(size=0.15,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
+centerg   = Gaussian(size=locals().get('LGNCenterSize',0.15),aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
 surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
 
 on_weights = topo.pattern.basic.Composite(
@@ -190,7 +190,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNorma
                  coord_mapper=jitterOn,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
                                ExponentialDecay(starting_value = locals().get('S_lr',5),
-                                                time_constant=locals().get('S_tc',16000)))))
+                                                time_constant=locals().get('S_tc',12000)))))
 
 
 topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
@@ -202,7 +202,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
                  coord_mapper=jitterOff,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
                                ExponentialDecay(starting_value = locals().get('S_lr',5),
-                                                time_constant=locals().get('S_tc',16000)))))
+                                                time_constant=locals().get('S_tc',12000)))))
 
 
 simpleLateral  =  locals().get('SL',False)
@@ -257,7 +257,7 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LateralInhibitory',
                  nominal_bounds_template=BoundingBox(radius=0.22917),
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
                                ExponentialDecay(starting_value = locals().get('LatInh_lr',0.3),
-                                                time_constant=locals().get('LatInh_tc',3200)))))
+                                                time_constant=locals().get('LatInh_tc',1600)))))
 
 topo.sim.schedule_command(__main__.__dict__.get('SST',10000),"secondStage()")
 
