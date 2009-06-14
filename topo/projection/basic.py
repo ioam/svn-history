@@ -44,6 +44,8 @@ class CFPOF_SharedWeight(CFPOutputFn):
 
 
 class SharedWeightCF(ConnectionField):
+    
+    __slots__ = []
 	
     def __init__(self,cf,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),mask=None):
         """
@@ -57,22 +59,13 @@ class SharedWeightCF(ConnectionField):
 	the CF are implemented as a numpy view into the single master
 	copy of the weights stored in the CF template.
         """
-        ### CEB: see JAHACKALERT below
-        # (Note that x and y should not be specified in the __init__
-        # definition above, and that then these three lines should be
-        # removed. But currently there is no call to super's
-        # __init__.)
-        self.initialized=False
-        self.x = x; self.y = y
-        self.initialized=True
-        ###
-        self.mask=mask # CEBALERT: same deal: mask would be set if __init__ called,
-        # along with some of the other attributes below - needs cleaning up!
-        
+        # CEBALERT: There's no call to super's __init__; see JAHACKALERT
+        # below.
+        self.x = x
+        self.y = y
+        self.mask=mask 
         self.input_sheet = input_sheet
-
         self._create_input_sheet_slice(template)
-
         self.weights = self.weights_slice.submatrix(cf.weights)
         
 	# JAHACKALERT the TransferFn cannot be applied in SharedWeightCF

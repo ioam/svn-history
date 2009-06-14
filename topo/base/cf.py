@@ -54,7 +54,7 @@ class NullCFError(ValueError):
         ValueError.__init__(self,"ConnectionField at (%s,%s) (input_sheet=%s) has a zero-sized weights matrix (%s,%s); you may need to supply a larger bounds_template or increase the density of the sheet."%(x,y,input,rows,cols))
     
                  
-class ConnectionField(param.Parameterized):
+class ConnectionField(object):
     """
     A set of weights on one input Sheet.
 
@@ -63,24 +63,16 @@ class ConnectionField(param.Parameterized):
     including many other ConnectionFields.
     """
 
-    x = param.Number(default=0.0,softbounds=(-1.0,1.0),constant=True,doc="""
-        The x coordinate of the location of the center of this ConnectionField
-        on the input Sheet, e.g. for use when determining where the weight matrix
-        lines up with the input Sheet matrix.""")
-    
-    y = param.Number(default=0.0,softbounds=(-1.0,1.0),constant=True,doc="""
-        The y coordinate of the location of the center of this ConnectionField
-        on the input Sheet, e.g. for use when determining where the weight matrix
-        lines up with the input Sheet matrix.""")
-
-    min_matrix_radius = param.Integer(default=1,bounds=(0,None),doc="""
-        Enforced minimum for radius of weights matrix.
-        The default of 1 gives a minimum matrix of 3x3. 0 would
-        allow a 1x1 matrix.""")
+    # CEBALERT: should be in proj
+    min_matrix_radius = 1 #param.Integer(default=1,bounds=(0,None),doc="""
+    # Enforced minimum for radius of weights matrix.
+    # The default of 1 gives a minimum matrix of 3x3. 0 would
+    # allow a 1x1 matrix.""")
 
     _has_norm_total = False
-    
-    __slots__ = ['weights','input_sheet_slice','mask']
+
+    __slots__ = ['input_sheet','x','y','min_matrix_radius','weights',
+                 'input_sheet_slice','mask','weights_slice','__dict__']
 
     def __get_norm_total(self):
         """
@@ -150,9 +142,9 @@ class ConnectionField(param.Parameterized):
 
 
     # CEBALERT: do something for mask_template=None
-    def __init__(self,input_sheet,template=BoundingBox(radius=0.1),
+    def __init__(self,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),
                  weights_generator=patterngenerator.Constant(),mask=None,
-                 output_fns=None,**params):
+                 output_fns=None):
         """
         Create weights at the specified (x,y) location on the
         specified input_sheet.
@@ -180,10 +172,12 @@ class ConnectionField(param.Parameterized):
         over the edge of the input sheet then the weights will
         actually be half-moon (or similar) rather than circular.
         """
+        self.x=x
+        self.y=y
+
         if output_fns is None:
             output_fns = []
             
-        super(ConnectionField,self).__init__(**params)
         self.input_sheet = input_sheet
 
         self._create_input_sheet_slice(template)

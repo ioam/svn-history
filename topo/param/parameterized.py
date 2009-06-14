@@ -1480,7 +1480,9 @@ _param_name_changes = {}
 do_not_restore = ['topo.base.boundingregion.BoundingRegion',
                   'topo.base.boundingregion.BoundingBox',
                   'topo.base.boundingregion.BoundingCircle',
-                  'topo.base.boundingregion.BoundingEllipse']
+                  'topo.base.boundingregion.BoundingEllipse',
+                  'topo.base.cf.ConnectionField',
+                  'topo.projection.basic.SharedWeightCF']
 
 # CEBALERT: Can't this stuff move to the ParameterizedMetaclass?
 class PicklableClassAttributes(object):
