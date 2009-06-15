@@ -1034,7 +1034,7 @@ class measure_size_response(UnitCurveCommand):
         for coord in p.coords:
             # Orientations are stored as a normalized value beween 0
             # and 1, so we scale them by pi to get the true orientations.
-            self.orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
+            self.orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')            
             self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
             self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
             self._compute_curves(p,sheet)
@@ -1137,30 +1137,33 @@ class measure_orientation_contrast(UnitCurveCommand):
     sizesurround=param.Number(default=1.0,bounds=(0,None),doc="""
         The size of the surround pattern to present.""")
 
-    contrasts = param.List(class_=int,default=[10,20,30,40,50,60,70,80,90,100])
-
-    relative_orientations = param.List(class_=float,default=[0.0, pi/2])
-
     thickness=param.Number(default=0.5,bounds=(0,None),softbounds=(0,1.5),doc="""Ring thickness.""")
     
-    contrastsurround=param.Number(default=80,bounds=(0,100),doc="""Contrast of the surround.""")
+    contrastsurround=param.Number(default=100,bounds=(0,100),doc="""Contrast of the surround.""")
     
-    x_axis = param.String(default='contrastcenter',constant=True)
+    contrastcenter=param.Number(default=100,bounds=(0,100),doc="""Contrast of the center.""")
+    
+    x_axis = param.String(default='orientationsurround',constant=True)
 
     units = param.String(default=" rad")
 
-    static_parameters = param.List(default=["x","y","sizecenter","sizesurround","orientationcenter","contrastsurround","thickness"])
+    static_parameters = param.List(default=["x","y","sizecenter","sizesurround","orientationcenter","thickness","contrastcenter"])
 
+    curve_parameters=param.Parameter([{"contrastsurround":30},{"contrastsurround":60},{"contrastsurround":80},{"contrastsurround":90}],doc="""
+        List of parameter values for which to measure a curve.""")
+
+    or_surrounds = []
+    
     def __call__(self,**params):
         p=ParamOverrides(self,params)
         self.params('sheet').compute_default()
         sheet=p.sheet
-
         for coord in p.coords:
+            self.or_surrounds=[]
             orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
             self.orientationcenter=orientation
-            self.curve_parameters=[{"orientationsurround":orientation+ro} for ro in self.relative_orientations]
-            
+            for i in xrange(0,self.num_orientation):
+                self.or_surrounds.append(numpy.mod(orientation+i*pi/self.num_orientation,numpy.pi*2))    
             self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
             self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
             
@@ -1168,14 +1171,12 @@ class measure_orientation_contrast(UnitCurveCommand):
 
     def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
-                Feature(name="frequency",values=p.frequencies),
-                Feature(name="contrastcenter",values=p.contrasts,cyclic=False)]
-
+                Feature(name="orientationsurround",values=self.or_surrounds,cyclic=True)]
 
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
                  doc='Measure the response of one unit to a center and surround sine grating disk.',
                  pre_plot_hooks=[measure_orientation_contrast.instance()],
-                 plot_hooks=[tuning_curve.instance(x_axis="contrastcenter",unit="%")],
+                 plot_hooks=[tuning_curve.instance(x_axis="orientationsurround",unit="%")],
                  prerequisites=['OrientationPreference','XPreference'])        
 
 
