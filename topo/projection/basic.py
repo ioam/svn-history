@@ -183,7 +183,7 @@ class SharedWeightCFProjection(CFProjection):
 
     def n_bytes(self):
         return self.activity.nbytes + self.__sharedcf.weights.nbytes + \
-               sum([cf.weights_slice.nbytes
+               sum([cf.input_sheet_slice.nbytes
                     for cf,r,c in CFIter(self)()])
                    
 
