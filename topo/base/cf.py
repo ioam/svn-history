@@ -62,8 +62,7 @@ class ConnectionField(object):
     the output sheet, and is normally used as part of a Projection
     including many other ConnectionFields.
     """
-    __slots__ = ['input_sheet','x','y','weights',
-                 'input_sheet_slice','mask',
+    __slots__ = ['x','y','weights','input_sheet_slice','mask',
                  '_has_norm_total','_norm_total']
 
     def __get_norm_total(self):
@@ -178,11 +177,9 @@ class ConnectionField(object):
         if output_fns is None:
             output_fns = []
             
-        self.input_sheet = input_sheet
-
         # CEBALERT: now even more confusing; weights_slice is
         # different from input_sheet_slice. At least need to rename.
-        weights_slice = self._create_input_sheet_slice(template,min_matrix_radius)
+        weights_slice = self._create_input_sheet_slice(input_sheet,template,min_matrix_radius)
 
         # CBALERT: need to deal with mask is None
 ##         if mask is None:
@@ -223,7 +220,7 @@ class ConnectionField(object):
 
 
     # CB: can this be renamed to something better?
-    def _create_input_sheet_slice(self,template,min_matrix_radius):
+    def _create_input_sheet_slice(self,input_sheet,template,min_matrix_radius):
         """
         Create the input_sheet_slice, which provides the appropriate
         Slice for this CF on the input_sheet (as well as providing
@@ -234,7 +231,7 @@ class ConnectionField(object):
         """
         # (copy template because it gets modified)
         if not isinstance(template,Slice):
-            template = Slice(copy(template),self.input_sheet,force_odd=True,
+            template = Slice(copy(template),input_sheet,force_odd=True,
                              min_matrix_radius=min_matrix_radius)
         else:
             template = copy(template)
@@ -247,7 +244,7 @@ class ConnectionField(object):
         # happen at this stage because of cropping)
         nrows,ncols = input_sheet_slice.shape_on_sheet()
         if nrows<1 or ncols<1:
-            raise NullCFError(self.x,self.y,self.input_sheet,nrows,ncols)
+            raise NullCFError(self.x,self.y,input_sheet,nrows,ncols)
         self.input_sheet_slice = input_sheet_slice
 
         # not copied because we don't use again
@@ -282,7 +279,10 @@ class ConnectionField(object):
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.input_sheet_slice
 
-        weights_slice = self._create_input_sheet_slice(template,min_matrix_radius)
+        # CEBALERT: should just pass this into change_bounds?
+        input_sheet = self.input_sheet_slice._scs
+
+        weights_slice = self._create_input_sheet_slice(input_sheet,template,min_matrix_radius)
                     
         r1,r2,c1,c2 = self.input_sheet_slice
 

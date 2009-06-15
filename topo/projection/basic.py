@@ -65,8 +65,7 @@ class SharedWeightCF(ConnectionField):
         self.x = x
         self.y = y
         self.mask=mask 
-        self.input_sheet = input_sheet
-        weights_slice = self._create_input_sheet_slice(template,min_matrix_radius=min_matrix_radius)
+        weights_slice = self._create_input_sheet_slice(input_sheet,template,min_matrix_radius=min_matrix_radius)
         self.weights = weights_slice.submatrix(cf.weights)
         
 	# JAHACKALERT the TransferFn cannot be applied in SharedWeightCF

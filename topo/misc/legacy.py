@@ -881,6 +881,10 @@ def cf_not_parameterized():
         if 'weights_slice' in state:
             del state['weights_slice']
 
+        # rXXXX input_sheet no longer stored
+        if 'input_sheet' in state:
+            del state['input_sheet']
+
     preprocess_state(ConnectionField,_cf_not_parameterized)
 
 S.append(cf_not_parameterized)
