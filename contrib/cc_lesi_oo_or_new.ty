@@ -99,7 +99,7 @@ if locals().get('SOF',"Sigmoid") == "HR":
 elif locals().get('SOF',"Sigmoid") == "Homeo":
     V1Simple_OF = SimpleHomeoSigmoid(a_init=locals().get('a_init',22),b_init=-12,mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
 elif locals().get('SOF',"Sigmoid") == "SimpleHomeo":
-    V1Simple_OF = SimpleHomeoLinear(t_init=locals().get('STresh',7),alpha=locals().get('SAlpha',1),mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
+    V1Simple_OF = SimpleHomeoLinear(t_init=locals().get('STresh',0.9),alpha=locals().get('SAlpha',4),mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
 else:
     V1Simple_OF=Sigmoid(r=22,k=-12)
 
