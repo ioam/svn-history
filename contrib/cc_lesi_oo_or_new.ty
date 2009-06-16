@@ -149,7 +149,7 @@ topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=local
 
 topo.sim['V1ComplexInh'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fns=[ActivityHysteresis(time_constant=0.35),V1Complex_OF])
+                        output_fns=[ActivityHysteresis(time_constant=0.35),HalfRectify(t_init=locals().get('V1CInhTresh',0.0))])
 
 
 # DoG weights for the LGN
