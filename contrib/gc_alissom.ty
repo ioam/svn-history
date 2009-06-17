@@ -5,6 +5,7 @@ from fixedpoint import FixedPoint
 
 import topo.pattern.basic
 import topo.pattern.random
+import os
 
 from topo.pattern.basic import Gaussian
 from topo.sheet.lissom import JointScaling, LISSOM
@@ -43,16 +44,34 @@ if dataset=="Gaussian":
     combined_inputs = topo.pattern.basic.SeparatedComposite(min_separation=0,generators=inputs)
     
 elif dataset=="Natural":
-    
+    import topo.pattern.image 
     input_type=topo.pattern.image.Image
-    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-    inputs=[input_type(filename=f,
+    if locals().get('imageset',"Shouval") == 'Shouval':
+            image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+            inputs=[input_type(filename=f,
                        size=10.0,  #size_normalization='original',(size=10.0)
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
-        for f in image_filenames]
-
+                    for f in image_filenames]
+                
+    elif locals().get('imageset',"Shouval") == 'Konig':
+        image_filenames=["images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
+        inputs=[input_type(filename=f,
+                        size=10.0,  #size_normalization='original',(size=10.0)
+                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+                    for f in image_filenames]
+    elif locals().get('imageset',"Shouval") == 'NPS':
+        image_filenames=os.listdir("images/NPS")
+        inputs=[input_type(filename="images/NPS/"+f,
+                        size=10.0,  #size_normalization='original',(size=10.0)
+                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       orientation=0)
+                    for f in image_filenames]
+    
     combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 elif dataset=="NoisyDisks":
     disk_scale=locals().get('diskscale',0.35)
