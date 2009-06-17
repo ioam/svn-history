@@ -350,7 +350,7 @@ pychecker-uninstall:
 # logilab common files, required for pylint (but should be 
 # removed if pylint is removed)
 #
-COMMON = logilab-common-0.25.0
+COMMON = logilab-common-0.41.0
 COMMON_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/common
 
 common: ${COMMON}.tar.gz python
@@ -368,8 +368,7 @@ common-uninstall:
 ################################################################
 # logilab astng, required for pylint (but should be 
 # removed if pylint is removed)
-# #CB need to make pylint depend on this after update to python 2.5
-ASTNG = logilab-astng-0.17.2
+ASTNG = logilab-astng-0.19.0
 ASTNG_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/astng
 
 astng: ${ASTNG}.tar.gz python
@@ -387,7 +386,7 @@ astng-uninstall:
 ##############################################################
 # pylint (optional source-code checker)
 #
-PYLINT = pylint-0.14.0
+PYLINT = pylint-0.18.0
 PYLINT_UNINSTALL = ${PYTHON_LIB}/site-packages/pylint
 
 pylint: ${PYLINT}.tar.gz python common astng
