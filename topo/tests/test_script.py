@@ -381,7 +381,7 @@ def run_multiple_density_comparisons(ref_script):
 
     cmds = []
     for spec in x:
-        c="""./topographica -c "verbose=False;BaseRN=%s;BaseN=%s;comparisons=True;stop_at_1000=True" topo/tests/reference/%s"""%(spec[0],spec[1],ref_script)
+        c="""./topographica -c "verbose=False;BaseRN=%s;BaseN=%s;comparisons=True;stop_at_1000=False" topo/tests/reference/%s"""%(spec[0],spec[1],ref_script)
         cmds.append(c)
 
     results = []
