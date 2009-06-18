@@ -50,9 +50,9 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
             Py_DECREF(weights_descr);
 
             ///// GET SLICE OFFSET
-            PyMemberDescrObject *slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
-            Py_ssize_t slice_offset = slice_descr->d_member->offset;
-            Py_DECREF(slice_descr);
+            PyMemberDescrObject *input_sheet_slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
+            Py_ssize_t input_sheet_slice_offset = input_sheet_slice_descr->d_member->offset;
+            Py_DECREF(input_sheet_slice_descr);
 
             npfloat *tact = temp_act;
 
@@ -75,13 +75,13 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                             weights = (float *) array->data;
                         }
 
-                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
-                        int *slice = (int *)(slice_obj->data);
+                        PyArrayObject *input_sheet_slice_obj = *((PyArrayObject **)((char *)cf + input_sheet_slice_offset));
+                        int *input_sheet_slice = (int *)(input_sheet_slice_obj->data);
 
-                        int rr1 = *slice++;
-                        int rr2 = *slice++;
-                        int cc1 = *slice++;
-                        int cc2 = *slice;
+                        int rr1 = *input_sheet_slice++;
+                        int rr2 = *input_sheet_slice++;
+                        int cc1 = *input_sheet_slice++;
+                        int cc2 = *input_sheet_slice;
                         
                         double tot = 0.0;
                         npfloat *xj = X+icols*rr1+cc1;
