@@ -55,8 +55,6 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
             Py_DECREF(slice_descr);
 
             npfloat *tact = temp_act;
-	    float *wj;
-	    PyArrayObject *array;
 
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
@@ -68,44 +66,37 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 
 
                         PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
-                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
-                                                    
-                        // This code is optimized for contiguous arrays, which are typical,
-                        // but we make it work for noncontiguous arrays (e.g. views) by
-                        // creating a contiguous copy if necessary.
-
-                        // CEBALERT: I think there are better alternatives
-                        // e.g. PyArray_GETCONTIGUOUS (PyArrayObject*) (PyObject* op)
-                        // (p248 of numpybook), which only acts if necessary...
-                        // Do we have a case where we know this code is being
-                        // called, so that I can test it easily?
-                        array=0;
+	                float *weights=0;
+	                PyArrayObject *array=0;
                         if(PyArray_ISCONTIGUOUS(weights_obj))
-                            wj = (float *)(weights_obj->data);
+                            weights = (float *)(weights_obj->data);
                         else {
                             array = (PyArrayObject*) PyArray_ContiguousFromObject((PyObject*)weights_obj,PyArray_FLOAT,2,2);
-                            wj = (float *) array->data;
+                            weights = (float *) array->data;
                         }
+
+                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
                         int *slice = (int *)(slice_obj->data);
-                        
+
                         int rr1 = *slice++;
                         int rr2 = *slice++;
                         int cc1 = *slice++;
                         int cc2 = *slice;
+                        
                         double tot = 0.0;
                         npfloat *xj = X+icols*rr1+cc1;
     
                         // computes the dot product
                         for (int i=rr1; i<rr2; ++i) {
                             npfloat *xi = xj;
-                            float *wi = wj;                       
+                            float *wi = weights;                       
                             for (int j=cc1; j<cc2; ++j) {
                                 tot += *wi * *xi;
                                 ++wi;
                                 ++xi;
                             }
                             xj += icols;
-                            wj += cc2-cc1;
+                            weights += cc2-cc1;
                         }  
                         *tact = tot*strength;
                         
