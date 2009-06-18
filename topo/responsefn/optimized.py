@@ -42,17 +42,8 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
         cf_type = iterator.proj.cf_type
     
         code = c_header + """
-            // CEBALERT: should provide a macro for getting offset
-
-            ///// GET WEIGHTS OFFSET
-            PyMemberDescrObject *weights_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"weights");
-            Py_ssize_t weights_offset = weights_descr->d_member->offset;
-            Py_DECREF(weights_descr);
-
-            ///// GET SLICE OFFSET
-            PyMemberDescrObject *input_sheet_slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
-            Py_ssize_t input_sheet_slice_offset = input_sheet_slice_descr->d_member->offset;
-            Py_DECREF(input_sheet_slice_descr);
+            DECLARE_SLOT_OFFSET(weights,cf_type);
+            DECLARE_SLOT_OFFSET(input_sheet_slice,cf_type);
 
             npfloat *tact = temp_act;
 
@@ -64,24 +55,10 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                     else {
                         PyObject *cf = PyList_GetItem(cfsr,l);
 
-
-                        PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
-	                float *weights=0;
-	                PyArrayObject *array=0;
-                        if(PyArray_ISCONTIGUOUS(weights_obj))
-                            weights = (float *)(weights_obj->data);
-                        else {
-                            array = (PyArrayObject*) PyArray_ContiguousFromObject((PyObject*)weights_obj,PyArray_FLOAT,2,2);
-                            weights = (float *) array->data;
-                        }
-
-                        PyArrayObject *input_sheet_slice_obj = *((PyArrayObject **)((char *)cf + input_sheet_slice_offset));
-                        int *input_sheet_slice = (int *)(input_sheet_slice_obj->data);
-
-                        int rr1 = *input_sheet_slice++;
-                        int rr2 = *input_sheet_slice++;
-                        int cc1 = *input_sheet_slice++;
-                        int cc2 = *input_sheet_slice;
+                        CONTIGUOUS_ARRAY_FROM_SLOT_OFFSET(float,weights,cf)
+                        LOOKUP_FROM_SLOT_OFFSET(int,input_sheet_slice,cf);
+                        
+                        UNPACK_FOUR_TUPLE(int,rr1,rr2,cc1,cc2,input_sheet_slice);
                         
                         double tot = 0.0;
                         npfloat *xj = X+icols*rr1+cc1;
@@ -99,9 +76,8 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                             weights += cc2-cc1;
                         }  
                         *tact = tot*strength;
-                        
-                        if(array != 0)
-                            Py_DECREF(array);
+
+                        DECREF_CONTIGUOUS_ARRAY(weights);
                     }
                     ++tact;    
                 }
