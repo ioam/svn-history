@@ -140,6 +140,36 @@ typedef double npfloat;
   PyArrayObject *attr ## _obj = *((PyArrayObject **)((char *)obj + attr ## _offset)); \
   type *attr = (type *)(attr ## _obj->data)
 
+/* Same as LOOKUP_FROM_SLOT_OFFSET but ensures the array is contiguous.
+   Must call DECREF_CONTIGUOUS_ARRAY(attr) to release temporary.
+   Does PyArray_FLOAT need to be an argument for this to work with doubles? */
+// This code is optimized for contiguous arrays, which are typical,
+// but we make it work for noncontiguous arrays (e.g. views) by
+// creating a contiguous copy if necessary.
+//
+// CEBALERT: I think there are better alternatives
+// e.g. PyArray_GETCONTIGUOUS (PyArrayObject*) (PyObject* op)
+// (p248 of numpybook), which only acts if necessary...
+// Do we have a case where we know this code is being
+// called, so that I can test it easily?
+   
+#define CONTIGUOUS_ARRAY_FROM_SLOT_OFFSET(type,attr,obj) \
+  PyArrayObject *attr ## _obj = *((PyArrayObject **)((char *)obj + attr ## _offset)); \
+  type *attr = 0; \
+  PyArrayObject * attr ## _array = 0; \
+  if(PyArray_ISCONTIGUOUS(weights_obj)) \
+      attr = (type *)(attr ## _obj->data); \
+  else { \
+      attr ## _array = (PyArrayObject*) PyArray_ContiguousFromObject((PyObject*)attr ## _obj,PyArray_FLOAT,2,2); \
+      attr = (type *) attr ## _array->data; \
+  }
+
+#define DECREF_CONTIGUOUS_ARRAY(attr) \
+   if(attr ## _array != 0) \
+       Py_DECREF(attr ## _array)
+
+
+
 #define UNPACK_FOUR_TUPLE(type,i1,i2,i3,i4,tuple) \
   type i1 = *tuple++; \
   type i2 = *tuple++; \
