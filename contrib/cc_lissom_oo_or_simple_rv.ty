@@ -47,24 +47,36 @@ dataset=locals().get('dataset',"Line") #set the input type by choosing the datas
 if dataset=="Line":
 	input= Translator(generator=topo.pattern.basic.Line(   x=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=1023),   y=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.04,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
 elif dataset=="Natural":
-	import topo.pattern.image 
-	input_type=topo.pattern.image.Image
-	
-	image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-	inputs=[input_type(filename=f,
-				size=10.0,  #size_normalization='original',(size=10.0)
-				x=0,
-				y=0,
-				orientation=0)
-			for f in image_filenames]
-	input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02),seed=5013)
+    print locals().get('imageset',"Shouval")
+    import topo.pattern.image 
+    input_type=topo.pattern.image.Image
+    if locals().get('imageset',"Shouval") == 'Shouval':
+            image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+            inputs=[input_type(filename=f,
+        	           size=10.0,  #size_normalization='original',(size=10.0)
+        				x=0,
+        				y=0,
+        				orientation=0)
+        			for f in image_filenames]
+    			
+    elif locals().get('imageset',"Shouval") == 'Konig':
+        image_filenames=["images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
+        print image_filenames
+        inputs=[input_type(filename=f,
+                        size=10.0,  #size_normalization='original',(size=10.0)
+                        x=0,
+                        y=0,
+                        orientation=0)
+                    for f in image_filenames]
+
+    input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02),seed=5013)
 
 disk_scale=locals().get('diskscale',0.35)
-ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-1.1,ubound=1.1,seed=12),
-                                                            y=UniformRandom(lbound=-1.1,ubound=1.1,seed=36),
+ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-1.7,ubound=1.7,seed=12),
+                                                            y=UniformRandom(lbound=-1.7,ubound=1.7,seed=36),
                        generators=[topo.pattern.basic.Ring(size=2, aspect_ratio=1.0, scale=0.25,thickness=locals().get('Thickness',0.01),
                                                             offset=0.0,
-                                                            bounds=BoundingBox(radius=1.125), smoothing=0.03),
+                                                            bounds=BoundingBox(radius=2.125), smoothing=0.03),
                                    topo.pattern.random.UniformRandom(seed=13,offset=locals().get('rand_offset',0), scale=locals().get('rand_scale',0.05))])
 
  
@@ -115,7 +127,7 @@ if locals().get('COF',"Sigmoid") == "HR":
 else:
 	V1Complex_OF=Sigmoid(r=locals().get('r_init',14.5),k=locals().get('k_init',-3))
 
-NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(seed=513,scale=locals().get('intrinsic_noise',0.0)),operator=numpy.add)
+NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=locals().get('intrinsic_noise',0.0),offset=0.0),operator=numpy.add)
 
 
 
@@ -144,9 +156,10 @@ topo.sim['LGNOff']=LISSOM(nominal_density=24.0,
                            output_fns=[HalfRectify()],tsettle=0,
                            measure_maps=False)
 
+#topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
 topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fns=[ActivityHysteresis(time_constant=0.5),NN,V1Simple_OF])
+                        output_fns=[ActivityHysteresis(time_constant=0.5),V1Simple_OF])
 
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
