@@ -129,7 +129,7 @@ elif dataset=="NoisyDiskstoNatural":
 #Sheet coordinates of units to track for debugging
 units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
 default_density = locals().get('default_density',48)
-default_retinal_density = locals().get('default_retinal_density',default_density/4)
+default_retinal_density = 24 #locals().get('default_retinal_density',default_density/4)
   
 #Smoothing value for exponential averaging
 smoothing=locals().get('smoothing',0.999)
@@ -148,17 +148,18 @@ AH = ActivityHysteresis(time_constant=0.5)
 Attrib_Tracker=AttributeTrackingTF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
 
 if locals().get('Adaptation',"Relative") == 'Relative':
-    HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.55)
+    HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.0)
 elif locals().get('Adaptation',"Relative") == 'Absolute':
-    HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.01),t_init=0.55,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
+    HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.0185),t_init=0.0,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
 elif locals().get('Adaptation',"Relative") == 'Fixed':
-    HE=HalfRectify(t_init=0.55,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
-    Attrib_Tracker=IdentityTF()    
+    HE=HalfRectify(t_init=0.0,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
+    Attrib_Tracker=IdentityTF()
+    V1_Tracker=IdentityTF()    
 else: 
     print "Unknown adaption type"     
 
 V1_Tracker=AttributeTrackingTF(object=HE, coordframe="topo.sim['V1']",attrib_names=['t','y_avg'], units=units, step=18)
-NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=locals().get('intrinsic_noise',0.0)),operator=numpy.add) 
+NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=locals().get('intrinsic_noise',0.0),offset=0.0),operator=numpy.add) 
 
 if locals().get('ah',True): 
     if tracking:
@@ -169,6 +170,7 @@ else:
     if tracking:
         V1_OF = [Attrib_Tracker,NN,HE,V1_Tracker]
     else: 
+        #V1_OF = [NN,HE]
         V1_OF = [NN,HE]
         
       
@@ -253,36 +255,29 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,
                  learning_fn=CFPLF_Scaled_opt(),
-                 strength=locals().get('aff_str',15.0),name='LGNOnAfferent',
+                 strength=locals().get('aff_str',0.75),name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
-         learning_rate=locals().get('aff_lr',2))
+         learning_rate=locals().get('aff_lr',0.1))
                      
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
          connection_type=CFProjection,
                  learning_fn=CFPLF_Scaled_opt(),
-                 strength=locals().get('aff_str',20.0),name='LGNOffAfferent',
+                 strength=locals().get('aff_str',0.75),name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
-         learning_rate=locals().get('aff_lr',1.0))
+         learning_rate=locals().get('aff_lr',0.1))
 
 # BACHAAAAAAAAAAAAAAAAAAAAAAAAA
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=CFProjection,
-                 strength=1.0*locals().get('exc_strength',2.5),
+                 strength=1.0*locals().get('exc_strength',2.0),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.05),
                  nominal_bounds_template=BoundingBox(radius=0.104),learning_rate=locals().get('lat_exc_lr',0.0)) 
 
-#topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
-#                 connection_type=CFProjection,
-#                 strength=1.0*locals().get('exc_strength',2.0),
-#                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.04), 
-#                 nominal_bounds_template=BoundingBox(radius=0.1),learning_rate=locals().get('lat_exc_lr',1.80873))  
-
-        
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  connection_type=CFProjection,
-                 strength=-1.0*locals().get('inh_strength',2.0),
+                 strength=-1.0*locals().get('inh_strength',1.6),
                  #inh_strength should be increased for more distributed datasets i.e. when the frequency parameter is higher
                  weights_generator=gauss_rand(size=0.15), #!!! put 2* back
                  nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_inh_lr',0.3))
