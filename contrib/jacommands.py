@@ -546,10 +546,10 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
 
             ra = rand()
             
-            ra = (ra - 0.5) * 2 * prob + 0.5
+            ra = (ra-0.5)*2.0 * prob
             
-            cf_on.weights *= ra 
-            cf_off.weights *= (1 - ra)
+            cf_on.weights *= 1-ra 
+            cf_off.weights *= (1 + ra)
             #a = prob
             #if ra>=0.5: a = (1-a)
             
@@ -562,10 +562,12 @@ ActivityHysteresis = topo.transferfn.basic.Hysteresis
 SimpleHomeoLinearRelative = topo.transferfn.basic.HomeostaticResponse
 
 def _divide_with_constant(x, y):
-    return numpy.divide(x, y + 1.0)
+    y = numpy.clip(y, 0, 10000)
+    x = numpy.clip(x, 0, 10000)
+    return numpy.divide(x, y + 0.11)
 
 
-def add_gc(sheet_name, surround_gaussian_size=0.5, strength=135):
+def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
     """
     Add divisive normalization to topo.sim[sheet_name], providing
     contrast gain control and contrast-invariant tuning.  Should
@@ -921,10 +923,10 @@ class surround_analysis():
                 self.plot_orientation_contrast_tuning_abs(xindex,yindex)
                 
                 
-        lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,0.1)                
+        lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,0.5)                
         self.plot_map_feature_to_surround_modulation_feature_correlations(lhi,"Local Homogeneity Index")
         self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationSelectivity'].view()[0],"OrientationSelectivity")
-        self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationPreference'].view()[0],"OrientationPreference"*pi)
+        self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationPreference'].view()[0]*numpy.pi,"OrientationPreference")
         self.plot_histograms_of_measures()
         
         f = open("dict.dat",'wb')
