@@ -194,8 +194,6 @@ class FeatureResponses(PatternDrivenAnalysis):
         super(FeatureResponses,self).__init__(**params)
         self.initialize_featureresponses(features)
         self.pre_analysis_session_hooks.append(save_input_generators)
-        self.pre_presentation_hooks.append(wipe_out_activity)
-        self.pre_presentation_hooks.append(clear_event_queue)
         self.post_analysis_session_hooks.append(restore_input_generators)
         
     def initialize_featureresponses(self,features):
