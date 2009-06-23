@@ -316,12 +316,14 @@ class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
     Note that learning occurs only when the time is a whole number.
     """
     def process_current_time(self):
-        if(float(topo.sim.time()) % 1.0 == 0.0):
-            #self.activate()
-            if (self.plastic):
-                 self.learn()
-        else:
-             self.activate()
+        if self.new_input:
+           self.new_input = False
+           if(float(topo.sim.time()) % 1.0 == 0.0):
+               #self.activate()
+               if (self.plastic):
+                   self.learn()
+           else:
+               self.activate()
 
 
 
