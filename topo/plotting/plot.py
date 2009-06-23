@@ -308,16 +308,14 @@ class TemplatePlot(Plot):
         # It's possible we can move some of the functionality
         # into SheetCoordinateSystem.
         if plot_bounding_box.containsbb_exclusive(box):
-
              ct = SheetCoordinateSystem(plot_bounding_box,density,density)
              new_mat = zeros(ct.shape,Float)
-
-             ct2 = SheetCoordinateSystem(plot_bounding_box,density,density)
-             r1,r2,c1,c2 = Slice(box,ct2)
+             r1,r2,c1,c2 = Slice(box,ct)
              new_mat[r1:r2,c1:c2] = mat
         else:
-             s=Slice(plot_bounding_box,SheetCoordinateSystem(box,density,density))
-             s.crop_to_sheet()
+             scs = SheetCoordinateSystem(box,density,density)
+             s=Slice(plot_bounding_box,scs)
+             s.crop_to_sheet(scs)
              new_mat = s.submatrix(mat)
 
         return new_mat

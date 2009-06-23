@@ -582,13 +582,13 @@ class ExtraSheetTests(unittest.TestCase):
         cf_bounds = BoundingBox(points=((0.3,0.3),(0.6,0.6)))
 
         slice_ = Slice(cf_bounds,sheet)
-        slice_.crop_to_sheet()
+        slice_.crop_to_sheet(sheet)
 
         # check it's been cropped to fit onto sheet...
         self.assertEqual(slice_.tolist(),[0,2,8,10])
 
         # now check that it gives the correct bounds...
-        cropped_bounds = slice_.bounds
+        cropped_bounds = slice_.compute_bounds(sheet)
         
         true_cropped_bounds = BoundingBox(points=((0.3,0.3),(0.5,0.5)))
         for a,b in zip(cropped_bounds.lbrt(),true_cropped_bounds.lbrt()):

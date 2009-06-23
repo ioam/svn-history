@@ -127,9 +127,8 @@ class ConnectionField(object):
         """)
 
 
-    def get_bounds(self):
-        return self.input_sheet_slice.bounds
-    bounds = property(get_bounds)
+    def get_bounds(self,input_sheet):
+        return self.input_sheet_slice.compute_bounds(input_sheet)
 
 
     # CEBALERT: do something for mask_template=None
@@ -197,7 +196,8 @@ class ConnectionField(object):
         # CBENHANCEMENT: might want to do something about a size
         # that's specified (right now the size is assumed to be that
         # of the bounds)
-        w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
+        # shouldn't be extra computation of boundingbox because it's gone from Slice.__init__; could avoid extra lookups by getting straight from slice
+        w = weights_generator(x=self.x,y=self.y,bounds=self.get_bounds(input_sheet),
                               xdensity=input_sheet.xdensity,
                               ydensity=input_sheet.ydensity,
                               mask=self.mask)
@@ -232,23 +232,27 @@ class ConnectionField(object):
         # (copy template because it gets modified)
         if not isinstance(template,Slice):
             template = Slice(copy(template),input_sheet,force_odd=True,
-                             min_matrix_radius=min_matrix_radius)
+                              min_matrix_radius=min_matrix_radius)
         else:
             template = copy(template)
 
+
         # copy required because the template gets modified
         input_sheet_slice = copy(template)
-        input_sheet_slice.positionedcrop(self.x,self.y)
+        input_sheet_slice.positionedcrop(self.x,self.y,input_sheet)
+        input_sheet_slice.crop_to_sheet(input_sheet)
 
         # weights matrix cannot have a zero-sized dimension (could
         # happen at this stage because of cropping)
         nrows,ncols = input_sheet_slice.shape_on_sheet()
         if nrows<1 or ncols<1:
             raise NullCFError(self.x,self.y,input_sheet,nrows,ncols)
+
         self.input_sheet_slice = input_sheet_slice
 
+
         # not copied because we don't use again
-        template.positionlesscrop(self.x,self.y)
+        template.positionlesscrop(self.x,self.y,input_sheet)
         return template
 
 
@@ -260,7 +264,7 @@ class ConnectionField(object):
         return self.input_sheet_slice.submatrix(activity)
 
 
-    def change_bounds(self,template,mask,output_fns=None,min_matrix_radius=1):
+    def change_bounds(self,input_sheet,template,mask,output_fns=None,min_matrix_radius=1):
         """
         Change the bounding box for this ConnectionField.
 
@@ -279,9 +283,6 @@ class ConnectionField(object):
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.input_sheet_slice
 
-        # CEBALERT: should just pass this into change_bounds?
-        input_sheet = self.input_sheet_slice._scs
-
         weights_slice = self._create_input_sheet_slice(input_sheet,template,min_matrix_radius)
                     
         r1,r2,c1,c2 = self.input_sheet_slice
@@ -294,15 +295,17 @@ class ConnectionField(object):
             # (so the obvious choice,
             # self.weights=self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],
             # is also slower).
-            
+
             self.mask = weights_slice.submatrix(mask)
             self.mask = array(self.mask,copy=1) # CB: why's this necessary?
                                                 # (see ALERT in __init__)
+
 
             self.weights *= self.mask
             for of in output_fns:
                 of(self.weights)
             del self.norm_total
+
 
 
     def change_density(self, new_wt_density):
@@ -590,8 +593,8 @@ class CFProjection(Projection):
         # cropped to sheet if necessary
         slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
                                min_matrix_radius=self.min_matrix_radius)
-        
-        self.bounds_template = slice_template.bounds
+
+        self.bounds_template = slice_template.compute_bounds(self.src)
         
         self.mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
         mask_template = self.mask_template
@@ -696,6 +699,11 @@ class CFProjection(Projection):
         return self.cfs[r,c]
 
 
+    def cf_bounds(self,r,c):
+        """Return the bounds of the specified ConnectionField."""
+        return self.cfs[r,c].get_bounds(self.src)
+
+
     def get_view(self, sheet_x, sheet_y, timestamp):
         """
         Return a single connection field UnitView, for the unit
@@ -759,7 +767,7 @@ class CFProjection(Projection):
         slice_template = Slice(copy(nominal_bounds_template),self.src,force_odd=True,
                                min_matrix_radius=self.min_matrix_radius)
 
-        bounds_template = slice_template.bounds
+        bounds_template = slice_template.compute_bounds(self.src)
 
         if not self.bounds_template.containsbb_exclusive(bounds_template):
             if self.bounds_template.containsbb_inclusive(bounds_template):
@@ -770,7 +778,9 @@ class CFProjection(Projection):
 
         # it's ok so we can store the bounds and resize the weights
         mask_template = self.create_mask(self.cf_shape,bounds_template,self.src)
+
         self.nominal_bounds_template = nominal_bounds_template
+
         self.bounds_template = bounds_template
 
         cfs = self.cfs
@@ -780,7 +790,8 @@ class CFProjection(Projection):
         for r in xrange(rows):
             for c in xrange(cols):
                 # CB: listhack - loop is candidate for replacement by numpy fn
-                cfs[r,c].change_bounds(template=slice_template,
+                cfs[r,c].change_bounds(input_sheet=self.src,
+                                       template=slice_template,
                                        mask=mask_template,
                                        output_fns=output_fns,
                                        min_matrix_radius=self.min_matrix_radius)

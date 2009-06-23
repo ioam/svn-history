@@ -115,7 +115,8 @@ class SharedWeightCFProjection(CFProjection):
 
         slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
                                min_matrix_radius=self.min_matrix_radius)
-        self.bounds_template = slice_template.bounds
+        self.bounds_template = slice_template.compute_bounds(self.src)
+        
         self.__sharedcf=self.cf_type(self.src,
                                      x=self.center_unitxcenter,
                                      y=self.center_unitycenter,
@@ -143,7 +144,7 @@ class SharedWeightCFProjection(CFProjection):
         self.cfs = array(cflist)
 
 
-    def change_bounds(self, nominal_bounds_template, min_matrix_radius=1):
+    def change_bounds(self, input_sheet, nominal_bounds_template, min_matrix_radius=1):
         """
         Change the bounding box for all of the existing ConnectionFields in this Projection.
 
