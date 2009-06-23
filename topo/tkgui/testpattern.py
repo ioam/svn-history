@@ -27,6 +27,7 @@ from ..param import tk
 
 import topo
 
+from topo.base.functionfamily import PatternDrivenAnalysis
 from topo.base.sheetview import SheetView
 from topo.base.patterngenerator import PatternGenerator, Constant
 from topo.sheet import GeneratorSheet
@@ -59,7 +60,7 @@ class TestPatternPlotGroup(SheetPlotGroup):
 
 
 
-class TestPattern(SheetPanel):
+class TestPattern(SheetPanel,PatternDrivenAnalysis):
 
     sheet_type = GeneratorSheet
     
@@ -173,12 +174,12 @@ class TestPattern(SheetPanel):
         topo.sim.run(0.0)  # ensure EPs are start()ed
         
         topo.sim.state_push()
-        wipe_out_activity()
-        topo.sim.event_clear()
+        for f in self.pre_presentation_hooks: f()
         input_dict = dict([(sheet.name,sheet.input_generator) \
                            for sheet in self.plotgroup._sheets()])
         pattern_present(input_dict,self.duration,
                         plastic=self.plastic,overwrite_previous=False)
         topo.guimain.auto_refresh()
+        for f in self.post_presentation_hooks: f()
         topo.sim.state_pop()
         
