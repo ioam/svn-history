@@ -756,10 +756,10 @@ class CFProjection(Projection):
 	Currently only allows reducing the size, but should be
         extended to allow increasing as well.
         """
-        bounds_template = copy(nominal_bounds_template)
-
-        slice_template = Slice(bounds_template,self.src,force_odd=True,
+        slice_template = Slice(copy(nominal_bounds_template),self.src,force_odd=True,
                                min_matrix_radius=self.min_matrix_radius)
+
+        bounds_template = slice_template.bounds
 
         if not self.bounds_template.containsbb_exclusive(bounds_template):
             if self.bounds_template.containsbb_inclusive(bounds_template):
