@@ -32,6 +32,7 @@ from topo.misc.util import MultiFile
 from topo.misc.picklemain import PickleMain
 from topo.misc.filepath import normalize_path
 from topo.misc import filepath
+from topo.base.functionfamily import PatternDrivenAnalysis
 
 try:
     import gnosis.xml.pickle
@@ -591,6 +592,10 @@ def print_sizes():
     """Format the results from n_conns() and n_bytes() for use in batch output."""
     print "Defined %d-connection network; %0.0fMB required for weight storage." % \
     (n_conns(),max(n_bytes()/1024.0/1024.0,1.0))
+
+# added these two function to the PatternDrivenAnalysis hooks 
+PatternDrivenAnalysis.pre_presentation_hooks.append(wipe_out_activity)
+PatternDrivenAnalysis.pre_presentation_hooks.append(clear_event_queue)
 
             
 # maybe an explicit list would be better?
