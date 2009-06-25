@@ -301,7 +301,7 @@ import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureResponses.num_repetitions=10
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_phase=8
 topo.analysis.featureresponses.MeasureResponseCommand.apply_output_fns=True
-topo.analysis.featureresponses.MeasureResponseCommand.scale=0.6
+topo.analysis.featureresponses.MeasureResponseCommand.scale=2.0
 topo.analysis.featureresponses.SinusoidalMeasureResponseCommand.num_orientation=32
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=2.0
 if tracking:
@@ -309,4 +309,4 @@ if tracking:
     topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":10},{"contrast":30},{"contrast":50},{"contrast":100}]
 else:
     topo.analysis.featureresponses.FeatureCurveCommand.num_orientation=180
-    topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":100}]
+    topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":30},{"contrast":60},{"contrast":100}]
