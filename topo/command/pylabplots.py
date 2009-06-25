@@ -1145,7 +1145,7 @@ class measure_orientation_contrast(UnitCurveCommand):
     
     x_axis = param.String(default='orientationsurround',constant=True)
 
-    units = param.String(default=" rad")
+    units = param.String(default="%")
 
     static_parameters = param.List(default=["x","y","sizecenter","sizesurround","orientationcenter","thickness","contrastcenter"])
 
@@ -1167,7 +1167,7 @@ class measure_orientation_contrast(UnitCurveCommand):
             self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
             self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
             
-            self._compute_curves(p,sheet,val_format="%.4f")
+            self._compute_curves(p,sheet)
 
     def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
