@@ -918,7 +918,7 @@ class surround_analysis():
                 self.data_dict[(xindex,yindex)]["ST"] = self.calculate_RF_sizes(xindex, yindex)
                 self.plot_size_tunning(xindex,yindex)
                 
-                self.data_dict[(xindex,yindex)]["OCT"] = self.perform_orientation_contrast_analysis(self.data_dict[(xindex,yindex)]["ST"],xcoor,ycoor)
+                self.data_dict[(xindex,yindex)]["OCT"] = self.perform_orientation_contrast_analysis(self.data_dict[(xindex,yindex)]["ST"],xcoor,ycoor,xindex,yindex)
                 self.plot_orientation_contrast_tuning(xindex,yindex)
                 self.plot_orientation_contrast_tuning_abs(xindex,yindex)
                 
@@ -934,7 +934,7 @@ class surround_analysis():
         pickle.dump(self.data_dict,f)
         
 
-    def perform_orientation_contrast_analysis(self,data,xcoor,ycoor):
+    def perform_orientation_contrast_analysis(self,data,xcoor,ycoor,xindex,yindex):
         curve_data={}
         hc_curve = data["Contrast = " + str(self.high_contrast) + "%" ]
         lc_curve = data["Contrast = " + str(self.low_contrast) + "%" ]
@@ -945,12 +945,17 @@ class surround_analysis():
                                                              display=True,
                                                              contrastcenter=self.high_contrast,
                                                              thickness=2.0-hc_curve["measures"]["peak_near_facilitation"],
-                                                             num_orientation=7,num_phase=4,
+                                                             num_orientation=8,num_phase=4,
                                                              curve_parameters=[{"contrastsurround":self.low_contrast},{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
         
         for curve_label in sorted(self.sheet.curve_dict['orientationsurround'].keys()):
+            print curve_label
             curve_data[curve_label]={}
             curve_data[curve_label]["data"]=self.sheet.curve_dict['orientationsurround'][curve_label]
+            curve_data[curve_label]["measures"]={}
+            orr=numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
+            osi=self.sheet.curve_dict['orientationsurround'][curve_label][orr].view()[0][xindex][yindex]/self.sheet.curve_dict['orientationsurround'][curve_label][orr+numpy.pi/2].view()[0][xindex][yindex]
+            curve_data[curve_label]["measures"]["or_suppression_index"]=osi 
         
         return curve_data 
         
@@ -1104,18 +1109,26 @@ class surround_analysis():
         raster_plots_lc={}
         raster_plots_hc={}
         for (xcoord,ycoord) in self.data_dict.keys():
-            for measure_name in self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.high_contrast) + "%"]["measures"].keys():
-                if not raster_plots_hc.has_key(measure_name):
-                     raster_plots_hc[measure_name]=[[],[]]    
-                raster_plots_hc[measure_name][0].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.high_contrast) + "%"]["measures"][measure_name])
-                raster_plots_hc[measure_name][1].append(map_feature[xcoord,ycoord])        
+            for curve_type in self.data_dict[(xcoord,ycoord)].keys():
+                print curve_type
+                if curve_type == "ST":
+                   curve_label = "Contrast"
+                else:
+                   curve_label = "Contrastsurround" 
+                
+                print self.data_dict[(xcoord,ycoord)][curve_type].keys()
+                
+                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
+                    if not raster_plots_hc.has_key(measure_name):
+                         raster_plots_hc[measure_name]=[[],[]]    
+                    raster_plots_hc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"][measure_name])
+                    raster_plots_hc[measure_name][1].append(map_feature[xcoord,ycoord])        
 
-        for (xcoord,ycoord) in self.data_dict.keys():
-            for measure_name in self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.low_contrast) + "%"]["measures"].keys():
-                if not raster_plots_lc.has_key(measure_name):
-                     raster_plots_lc[measure_name]=[[],[]]    
-                raster_plots_lc[measure_name][0].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.low_contrast) + "%"]["measures"][measure_name])
-                raster_plots_lc[measure_name][1].append(map_feature[xcoord,ycoord])        
+                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"].keys():
+                    if not raster_plots_lc.has_key(measure_name):
+                         raster_plots_lc[measure_name]=[[],[]]    
+                    raster_plots_lc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = "  + str(self.low_contrast) + "%"]["measures"][measure_name])
+                    raster_plots_lc[measure_name][1].append(map_feature[xcoord,ycoord])        
 
         for key in raster_plots_hc.keys():
                 fig = pylab.figure()
@@ -1145,10 +1158,10 @@ class surround_analysis():
         histograms_lc = {} 
         histograms_hc = {}
         for (xcoord,ycoord) in self.data_dict.keys():
-            for measure_name in self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.low_contrast) + "%"]["measures"].keys():
+            for measure_name in self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.high_contrast) + "%"]["measures"].keys():
                 if not histograms_hc.has_key(measure_name):
                    histograms_hc[measure_name]=[]
-                histograms_hc[measure_name].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.low_contrast) + "%"]["measures"][measure_name])   
+                histograms_hc[measure_name].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.high_contrast) + "%"]["measures"][measure_name])
 
         for (xcoord,ycoord) in self.data_dict.keys():
             for measure_name in self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.low_contrast) + "%"]["measures"].keys():
