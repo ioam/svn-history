@@ -303,6 +303,9 @@ class Number(Dynamic):
         dynamically generated, check the bounds.
         """
         result = super(Number,self).__get__(obj,objtype)
+        # CEBALERT: results in extra lookups (_value_is_dynamic() is
+        # also looking up 'result' - should just pass it in). Note
+        # that this method is called often.
         if self._value_is_dynamic(obj,objtype): self._check_value(result)
         return result
 
