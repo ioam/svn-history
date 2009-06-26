@@ -96,7 +96,7 @@ class ConnectionField(object):
     the output sheet, and is normally used as part of a Projection
     including many other ConnectionFields.
     """
-    __slots__ = ['x','y','weights','input_sheet_slice','mask',
+    __slots__ = ['weights','input_sheet_slice','mask',
                  '_has_norm_total','_norm_total']
 
     def __get_norm_total(self):
@@ -206,15 +206,12 @@ class ConnectionField(object):
         # python code? Could the C code initialize this value?
         self._has_norm_total=False
 
-        self.x=x
-        self.y=y
-
         if output_fns is None:
             output_fns = []
             
         # CEBALERT: now even more confusing; weights_slice is
         # different from input_sheet_slice. At least need to rename.
-        weights_slice = self._create_input_sheet_slice(input_sheet,template,min_matrix_radius)
+        weights_slice = self._create_input_sheet_slice(input_sheet,x,y,template,min_matrix_radius)
 
         # CBALERT: need to deal with mask is None
 ##         if mask is None:
@@ -233,7 +230,7 @@ class ConnectionField(object):
         # that's specified (right now the size is assumed to be that
         # of the bounds)
         # shouldn't be extra computation of boundingbox because it's gone from Slice.__init__; could avoid extra lookups by getting straight from slice
-        w = weights_generator(x=self.x,y=self.y,bounds=self.get_bounds(input_sheet),
+        w = weights_generator(x=x,y=y,bounds=self.get_bounds(input_sheet),
                               xdensity=input_sheet.xdensity,
                               ydensity=input_sheet.ydensity,
                               mask=self.mask)
@@ -256,7 +253,7 @@ class ConnectionField(object):
 
 
     # CB: can this be renamed to something better?
-    def _create_input_sheet_slice(self,input_sheet,template,min_matrix_radius):
+    def _create_input_sheet_slice(self,input_sheet,x,y,template,min_matrix_radius):
         """
         Create the input_sheet_slice, which provides the appropriate
         Slice for this CF on the input_sheet (as well as providing
@@ -275,20 +272,20 @@ class ConnectionField(object):
 
         # copy required because the template gets modified
         input_sheet_slice = copy(template)
-        input_sheet_slice.positionedcrop(self.x,self.y,input_sheet)
+        input_sheet_slice.positionedcrop(x,y,input_sheet)
         input_sheet_slice.crop_to_sheet(input_sheet)
 
         # weights matrix cannot have a zero-sized dimension (could
         # happen at this stage because of cropping)
         nrows,ncols = input_sheet_slice.shape_on_sheet()
         if nrows<1 or ncols<1:
-            raise NullCFError(self.x,self.y,input_sheet,nrows,ncols)
+            raise NullCFError(x,y,input_sheet,nrows,ncols)
 
         self.input_sheet_slice = input_sheet_slice
 
 
         # not copied because we don't use again
-        template.positionlesscrop(self.x,self.y,input_sheet)
+        template.positionlesscrop(x,y,input_sheet)
         return template
 
 
@@ -916,7 +913,8 @@ class ResizableCFProjection(CFProjection):
 	Currently only allows reducing the size, but should be
         extended to allow increasing as well.
         """
-        slice_template = Slice(copy(nominal_bounds_template),self.src,force_odd=True,
+        slice_template = Slice(copy(nominal_bounds_template),
+                               self.src,force_odd=True,
                                min_matrix_radius=self.min_matrix_radius)
 
         bounds_template = slice_template.compute_bounds(self.src)
@@ -934,6 +932,7 @@ class ResizableCFProjection(CFProjection):
         self.nominal_bounds_template = nominal_bounds_template
 
         self.bounds_template = bounds_template
+        self._slice_template = slice_template
 
         cfs = self.cfs
         rows,cols = cfs.shape
@@ -941,8 +940,10 @@ class ResizableCFProjection(CFProjection):
 
         for r in xrange(rows):
             for c in xrange(cols):
+                xcf,ycf = self.X_cf[0,c],self.Y_cf[r,0]
                 # CB: listhack - loop is candidate for replacement by numpy fn
                 self._change_cf_bounds(cfs[r,c],input_sheet=self.src,
+                                       x=xcf,y=ycf,
                                        template=slice_template,
                                        mask=mask_template,
                                        output_fns=output_fns,
@@ -958,7 +959,7 @@ class ResizableCFProjection(CFProjection):
         raise NotImplementedError
 
 
-    def _change_cf_bounds(self,cf,input_sheet,template,mask,output_fns=None,min_matrix_radius=1):
+    def _change_cf_bounds(self,cf,input_sheet,x,y,template,mask,output_fns=None,min_matrix_radius=1):
         """
         Change the bounding box for this ConnectionField.
 
@@ -977,7 +978,7 @@ class ResizableCFProjection(CFProjection):
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = cf.input_sheet_slice
 
-        weights_slice = cf._create_input_sheet_slice(input_sheet,template,min_matrix_radius)
+        weights_slice = cf._create_input_sheet_slice(input_sheet,x,y,template,min_matrix_radius)
                     
         r1,r2,c1,c2 = cf.input_sheet_slice
 

@@ -3,7 +3,7 @@ import numpy
 
 from topo.base.simulation import Simulation
 from topo.base.boundingregion import BoundingBox
-from topo.base.cf import CFIter,MaskedCFIter,CFProjection,CFSheet
+from topo.base.cf import CFIter,MaskedCFIter,ResizableCFProjection,CFSheet
 
 class TestIter(unittest.TestCase):
 
@@ -15,7 +15,7 @@ class TestIter(unittest.TestCase):
         self.sim['Src'] = CFSheet(nominal_density=10,nominal_bounds=BoundingBox(radius=0.5))
 
         self.sim.connect('Src','Dest',
-                         connection_type = CFProjection,
+                         connection_type = ResizableCFProjection,
                          )
 
     def test_iterate_all(self):
@@ -29,7 +29,8 @@ class TestIter(unittest.TestCase):
             total += 1
             self.failUnless(0 <= r < 10, "CFIter generated bogus CF row index")
             self.failUnless(0 <= c < 10, "CFIter generated bogus CF col index")
-            self.failUnlessEqual((cf.x,cf.y),dest.matrixidx2sheet(r,c))
+            cfxy = (proj.X_cf[r,c],proj.Y_cf[r,c])
+            self.failUnlessEqual(cfxy,dest.matrixidx2sheet(r,c))
         self.failUnlessEqual(total,100)
 
 

@@ -62,10 +62,8 @@ class SharedWeightCF(ConnectionField):
         # CEBALERT: There's no call to super's __init__; see JAHACKALERT
         # below.
         self._has_norm_total=False
-        self.x = x
-        self.y = y
         self.mask=mask 
-        weights_slice = self._create_input_sheet_slice(input_sheet,template,min_matrix_radius=min_matrix_radius)
+        weights_slice = self._create_input_sheet_slice(input_sheet,x,y,template,min_matrix_radius=min_matrix_radius)
         self.weights = weights_slice.submatrix(cf.weights)
         
 	# JAHACKALERT the TransferFn cannot be applied in SharedWeightCF

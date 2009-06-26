@@ -863,6 +863,7 @@ def boundingregion_not_parameterized():
 S.append(boundingregion_not_parameterized)
 
 
+cf_xy_warned=False
 def cf_not_parameterized():
     from topo.base.cf import ConnectionField
 
@@ -885,6 +886,18 @@ def cf_not_parameterized():
         if 'input_sheet' in state:
             del state['input_sheet']
 
+        # rXXXX x,y no longer stored
+        if 'x' in state: # assume 'y' also in state
+            global cf_xy_warned
+            if not cf_xy_warned:
+                from topo import param
+                param.Parameterized().warning("Not restoring ConnectionField's (x,y) location. Bounds resizing will not work -- please file a support request via the website.") # could add support by loading ResizableCFProjection for any CFProjection with CFs that have x and y, and moving x and y to the ResizableProjection.
+                cf_xy_warned=True
+            del state['x']
+            del state['y']
+            
+
     preprocess_state(ConnectionField,_cf_not_parameterized)
 
 S.append(cf_not_parameterized)
+
