@@ -104,44 +104,38 @@ class SharedWeightCFProjection(CFProjection):
         # do want anything that CFProjection defines.
         super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
 
-
         # We want the sharedcf to be located on the grid, so use the
         # center of a unit
         sheet_rows,sheet_cols=self.src.shape
         # arbitrary (e.g. could use 0,0) 
         center_row,center_col = sheet_rows/2,sheet_cols/2
-        self.center_unitxcenter,self.center_unitycenter=self.src.matrixidx2sheet(center_row,
-                                                                                 center_col)
+        center_unitxcenter,center_unitycenter=self.src.matrixidx2sheet(center_row,
+                                                                       center_col)
 
-        slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
-                               min_matrix_radius=self.min_matrix_radius)
-        self.bounds_template = slice_template.compute_bounds(self.src)
         
         self.__sharedcf=self.cf_type(self.src,
-                                     x=self.center_unitxcenter,
-                                     y=self.center_unitycenter,
-                                     template=slice_template,
+                                     x=center_unitxcenter,
+                                     y=center_unitycenter,
+                                     template=self._slice_template,
                                      weights_generator=self.weights_generator,
                                      mask=self.mask_template,
                                      output_fns=[wof.single_cf_fn for wof in self.weights_output_fns],
                                      min_matrix_radius=self.min_matrix_radius)
 
-        cflist = []
-        scf = self.__sharedcf
-        bounds_template = self.bounds_template
-        for y in self.dest.sheet_rows()[::-1]:
-            row = []
-            for x in self.dest.sheet_cols():
-                x_cf,y_cf = self.coord_mapper(x,y)
-                # Does not pass the mask, as it would have to be sliced
-                # for each cf, and is only used for learning.
-                cf = SharedWeightCF(scf,self.src,x=x_cf,y=y_cf, #JUDE ADDED
-                                    template=slice_template,min_matrix_radius=self.min_matrix_radius)
-                row.append(cf)
-            cflist.append(row)
-        self._cfs = cflist
-        # (see note about cfs and _cfs in ConnectionField.__init__)
-        self.cfs = array(cflist)
+        self._create_cfs()
+
+
+
+    def _create_cf(self,x,y):
+        x_cf,y_cf = self.coord_mapper(x,y)
+        # Does not pass the mask, as it would have to be sliced
+        # for each cf, and is only used for learning.
+        CF = SharedWeightCF(self.__sharedcf,self.src,x=x_cf,y=y_cf, #JUDE ADDED
+                            template=self._slice_template,
+                            min_matrix_radius=self.min_matrix_radius)
+
+        return CF
+        
 
 
     def change_bounds(self, input_sheet, nominal_bounds_template, min_matrix_radius=1):

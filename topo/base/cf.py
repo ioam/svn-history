@@ -23,7 +23,7 @@ __version__ = '$Revision$'
 
 from copy import copy
 
-from numpy import abs,array,zeros,where, ones
+from numpy import abs,array,zeros,where, ones, vectorize
 from numpy.oldnumeric import Float,Float32
 
 from .. import param
@@ -38,6 +38,31 @@ from projection import Projection,ProjectionSheet, SheetMask
 from sheetcoords import Slice
 from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
+
+
+# CEBALERT: shouldn't be necessary, and depends on the implementation
+# of numpy.vectorize
+def simple_vectorize(fn,output_typecode='O',doc=''):
+    """
+    Simplify creation of numpy.vectorize(fn) in the case where fn has
+    one output.
+    """
+    # I cannot figure out how I am supposed to stop vectorize()
+    # calling fn one extra time at the start. (It's supposed to call
+    # an extra time at the start to determine the output types UNLESS
+    # the output types are specified.)
+    assert len(output_typecode)==1
+    vfn = vectorize(fn,doc=doc)
+    # stop vectorize calling fn an extra time at the start
+    # (works for our current numpy (1.1.1))
+    vfn.nout=len(output_typecode) # number of outputs of fn
+    vfn.otypes=output_typecode # typecode of outputs of fn
+    import inspect
+    fn_args = inspect.getargs(fn.func_code)[0]
+    extra = 1 if fn_args[0]=='self' else 0
+    vfn.lastcallargs=len(fn_args)-extra # num args of fn
+
+    return vfn
 
 
 
@@ -162,6 +187,8 @@ class ConnectionField(object):
         over the edge of the input sheet then the weights will
         actually be half-moon (or similar) rather than circular.
         """
+        #print "Create CF",input_sheet.name,x,y,"template=",template,"wg=",weights_generator,"m=",mask,"ofs=",output_fns,"min r=",min_matrix_radius
+
         # CB: has to be set for C code. Can't be initialized at the
         # class level, or it would become a read-only class attribute
         # (because it's a slot:
@@ -591,64 +618,71 @@ class CFProjection(Projection):
         # get the actual bounds_template by adjusting a copy of the
         # nominal_bounds_template to ensure an odd slice, and to be
         # cropped to sheet if necessary
-        slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
-                               min_matrix_radius=self.min_matrix_radius)
+        self._slice_template = Slice(copy(self.nominal_bounds_template),
+                                     self.src,force_odd=True,
+                                     min_matrix_radius=self.min_matrix_radius)
 
-        self.bounds_template = slice_template.compute_bounds(self.src)
+        self.bounds_template = self._slice_template.compute_bounds(self.src)
         
-        self.mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
-        mask_template = self.mask_template
+        self.mask_template = self.create_mask(self.cf_shape,self.bounds_template,
+                                              self.src)
+        
+        if initialize_cfs:
+            self._create_cfs()
 
-        # CB: instead of building as a list of list, should build as
-        # an array.  Note that the list of lists must still be
-        # available in _cfs as it is used by the optimized C
-        # functions.  (Weave does not support arrays of dtype=object,
-        # so the optimized functions cannot be made to work with the
-        # array).
-
-        if initialize_cfs:            
-            # set up array of ConnectionFields translated to each x,y in the src sheet
-            cflist = []
-            for r,y in enumerate(self.dest.sheet_rows()[::-1]):
-                row = []
-                for c,x in enumerate(self.dest.sheet_cols()):
-                    x_cf,y_cf = self.coord_mapper(x,y)
-                    self.debug("Creating CF(%d,%d) from src (%.3f,%.3f) to  dest (%.3f,%.3f)"%(r,c,x_cf,y_cf,x,y))
-                    try:
-                        if self.apply_output_fns_init:
-                            ofs = [wof.single_cf_fn for wof in self.weights_output_fns]
-                        else:
-                            ofs = []
-                            
-                        if not self.same_cf_shape_for_all_cfs:
-                            mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
-                                
-                        row.append(self.cf_type(self.src,x=x_cf,y=y_cf,
-                                                template=slice_template,
-                                                weights_generator=self.weights_generator,
-                                                mask=mask_template, 
-                                                output_fns=ofs,
-                                                min_matrix_radius=self.min_matrix_radius))
-                    except NullCFError:
-                        if self.allow_null_cfs:
-                            row.append(None)
-                        else:
-                            raise
-                cflist.append(row)
-
-            self.cfs = array(cflist,dtype=object)
-            # CB: this is supposed to be accessed by weave functions
-            # only, and should disappear one day
-            self._cfs = cflist
-
-
-
+            
         ### JCALERT! We might want to change the default value of the
         ### input value to self.src.activity; but it fails, raising a
         ### type error. It probably has to be clarified why this is
         ### happening
         self.input_buffer = None
         self.activity = array(self.dest.activity)
+
+
+    # CB: should be _initialize_cfs() since we already have 'initialize_cfs' flag?
+    def _create_cfs(self):
+        X,Y = self.dest.sheetcoords_of_idx_grid()
+        self.cfs = simple_vectorize(self._create_cf)(X,Y)
+        # CB: this is supposed to be accessed by weave functions
+        # only, and should disappear one day
+        self._cfs = self.cfs.tolist()
+
+        
+    def _create_cf(self,x,y):
+        """
+        Create a ConnectionField at self.coord_mapper(x,y) in the src
+        sheet.
+        """
+        x_cf,y_cf = self.coord_mapper(x,y)
+        # (to restore would need to have an r,c counter)
+        # self.debug("Creating CF(%d,%d) from src (%.3f,%.3f) to  dest (%.3f,%.3f)"%(r,c,x_cf,y_cf,x,y))
+
+        try:
+            if self.apply_output_fns_init:
+                ofs = [wof.single_cf_fn for wof in self.weights_output_fns]
+            else:
+                ofs = []
+
+            if not self.same_cf_shape_for_all_cfs:
+                mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
+            else:
+                mask_template = self.mask_template
+
+            CF = self.cf_type(self.src,x=x_cf,y=y_cf,
+                              template=self._slice_template,
+                              weights_generator=self.weights_generator,
+                              mask=mask_template, 
+                              output_fns=ofs,
+                              min_matrix_radius=self.min_matrix_radius)
+        except NullCFError:
+            if self.allow_null_cfs:
+                CF = None
+            else:
+                raise
+        
+        return CF
+
+
         
 
     # CEB: have not yet decided proper location for this method
