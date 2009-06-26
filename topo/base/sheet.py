@@ -136,6 +136,8 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
             del self.sheet_views[view_name]
 
 
+    # CEBALERT: can we remove this? We're not using it (and don't appear
+    # to have ever used it).
     def sheet_offset(self):
         """
         Return the offset of the sheet origin from the lower-left
