@@ -159,7 +159,7 @@ topo.sim['LGNOff']=LISSOM(nominal_density=24.0,
 #topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
 topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fns=[ActivityHysteresis(time_constant=0.5),V1Simple_OF])
+                        output_fns=[ActivityHysteresis(time_constant=0.5),NN,V1Simple_OF])
 
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
