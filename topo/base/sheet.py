@@ -136,16 +136,6 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
             del self.sheet_views[view_name]
 
 
-    # CEBALERT: can we remove this? We're not using it (and don't appear
-    # to have ever used it).
-    def sheet_offset(self):
-        """
-        Return the offset of the sheet origin from the lower-left
-        corner of the sheet, in sheet coordinates.
-        """
-        return -self.bounds.aarect().left(),-self.bounds.aarect().bottom()
-
-
     # CB: what to call this? sheetcoords()? sheetcoords_of_grid()? idxsheetcoords()?
     def sheetcoords_of_idx_grid(self):
         """
