@@ -22,7 +22,7 @@ $Id$
 __version__ = '$Revision$'
 
 
-from numpy import zeros,array,arange
+from numpy import zeros,array,arange,meshgrid
 from numpy import float64
 
 from .. import param
@@ -146,6 +146,22 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
         return -self.bounds.aarect().left(),-self.bounds.aarect().bottom()
 
 
+    # CB: what to call this? sheetcoords()? sheetcoords_of_grid()? idxsheetcoords()?
+    def sheetcoords_of_idx_grid(self):
+        """
+        Return an array of x-coordinates and an array of y-coordinates
+        corresponding to the activity matrix of the sheet.
+        """
+        nrows,ncols=self.activity.shape
+
+        C,R = meshgrid(arange(ncols),
+                       arange(nrows))
+
+        X,Y = self.matrixidx2sheet(R,C)
+        return X,Y
+        
+
+    # CB: check whether we need this function any more.
     def row_col_sheetcoords(self):
         """
         Return an array of Y-coordinates corresponding to the rows of
@@ -156,13 +172,16 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
         # sheet) order (hence the reversals below).
         nrows,ncols = self.activity.shape
         return self.matrixidx2sheet(arange(nrows-1,-1,-1),arange(ncols))[::-1]
-        
 
-    # CBALERT: to be removed once other code has been updated
+
+    # CBALERT: to be removed once other code uses
+    # row_col_sheetcoords() or sheetcoords_of_idx_grid().
     def sheet_rows(self):
         return self.row_col_sheetcoords()[0]
     def sheet_cols(self):
         return self.row_col_sheetcoords()[1]
+
+
 
 
     def state_push(self):
