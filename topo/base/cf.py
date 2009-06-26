@@ -23,7 +23,7 @@ __version__ = '$Revision$'
 
 from copy import copy
 
-from numpy import abs,array,zeros,where, ones, vectorize
+from numpy import abs,array,zeros,where, ones
 from numpy.oldnumeric import Float,Float32
 
 from .. import param
@@ -42,26 +42,35 @@ from boundingregion import BoundingBox,BoundingRegionParameter
 
 # CEBALERT: shouldn't be necessary, and depends on the implementation
 # of numpy.vectorize
-def simple_vectorize(fn,output_typecode='O',doc=''):
+def simple_vectorize(fn,num_outputs=1,output_type=object,doc=''):
     """
-    Simplify creation of numpy.vectorize(fn) in the case where fn has
-    one output.
+    Simplify creation of numpy.vectorize(fn) objects where all outputs
+    have the same typecode.
     """
-    # I cannot figure out how I am supposed to stop vectorize()
-    # calling fn one extra time at the start. (It's supposed to call
-    # an extra time at the start to determine the output types UNLESS
-    # the output types are specified.)
-    assert len(output_typecode)==1
+    from numpy import vectorize,sctype2char
+
+    # This function exists because I cannot figure out how I am
+    # supposed to stop vectorize() calling fn one extra time at the
+    # start. (It's supposed to call an extra time at the start to
+    # determine the output types UNLESS the output types are
+    # specified.)
+
     vfn = vectorize(fn,doc=doc)
     # stop vectorize calling fn an extra time at the start
     # (works for our current numpy (1.1.1))
-    vfn.nout=len(output_typecode) # number of outputs of fn
-    vfn.otypes=output_typecode # typecode of outputs of fn
+    vfn.nout=num_outputs # number of outputs of fn
+    output_typecode = sctype2char(output_type)
+    vfn.otypes=output_typecode*num_outputs # typecodes of outputs of fn
     import inspect
-    fn_args = inspect.getargs(fn.func_code)[0]
+    
+    try:
+        fn_code = fn.func_code if hasattr(fn,'func_code') else fn.__call__.func_code
+    except:
+        raise TypeError("Couldn't find code of %s"%fn)
+
+    fn_args = inspect.getargs(fn_code)[0]
     extra = 1 if fn_args[0]=='self' else 0
     vfn.lastcallargs=len(fn_args)-extra # num args of fn
-
     return vfn
 
 
@@ -639,10 +648,19 @@ class CFProjection(Projection):
         self.activity = array(self.dest.activity)
 
 
+    def _generate_coords(self):
+        X,Y = self.dest.sheetcoords_of_idx_grid()
+        vectorized_coord_mapper = simple_vectorize(self.coord_mapper,
+                                                   num_outputs=2,
+                                                   # CB: could switch to float32?
+                                                   output_type=float) 
+        return vectorized_coord_mapper(X,Y)
+
+
     # CB: should be _initialize_cfs() since we already have 'initialize_cfs' flag?
     def _create_cfs(self):
-        X,Y = self.dest.sheetcoords_of_idx_grid()
-        self.cfs = simple_vectorize(self._create_cf)(X,Y)
+        vectorized_create_cf = simple_vectorize(self._create_cf)
+        self.cfs = vectorized_create_cf(*self._generate_coords())
         # CB: this is supposed to be accessed by weave functions
         # only, and should disappear one day
         self._cfs = self.cfs.tolist()
@@ -650,10 +668,8 @@ class CFProjection(Projection):
         
     def _create_cf(self,x,y):
         """
-        Create a ConnectionField at self.coord_mapper(x,y) in the src
-        sheet.
+        Create a ConnectionField at x,y in the src sheet.
         """
-        x_cf,y_cf = self.coord_mapper(x,y)
         # (to restore would need to have an r,c counter)
         # self.debug("Creating CF(%d,%d) from src (%.3f,%.3f) to  dest (%.3f,%.3f)"%(r,c,x_cf,y_cf,x,y))
 
@@ -668,7 +684,7 @@ class CFProjection(Projection):
             else:
                 mask_template = self.mask_template
 
-            CF = self.cf_type(self.src,x=x_cf,y=y_cf,
+            CF = self.cf_type(self.src,x=x,y=y,
                               template=self._slice_template,
                               weights_generator=self.weights_generator,
                               mask=mask_template, 
