@@ -170,7 +170,7 @@ for e in eyes:
                         
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
-                 connection_type=projection.CFProjection,strength=1.2, 
+                 connection_type=projection.ResizableCFProjection,strength=1.2, 
                  weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.10417),
                  nominal_bounds_template=sheet.BoundingBox(radius=0.10417),learning_rate=2.55528/ids) 
             

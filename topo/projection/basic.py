@@ -19,7 +19,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.sheet import activity_type
 from topo.base.sheetcoords import Slice
 from topo.base.cf import CFProjection,ConnectionField,MaskedCFIter,\
-     CFPLearningFn,CFPLF_Identity,CFPOutputFn,CFIter
+     CFPLearningFn,CFPLF_Identity,CFPOutputFn,CFIter,ResizableCFProjection
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.functionfamily import CoordinateMapperFn,IdentityMF
 from topo.misc.util import rowcol2idx
@@ -135,27 +135,7 @@ class SharedWeightCFProjection(CFProjection):
                             min_matrix_radius=self.min_matrix_radius)
 
         return CF
-        
-
-
-    def change_bounds(self, input_sheet, nominal_bounds_template, min_matrix_radius=1):
-        """
-        Change the bounding box for all of the existing ConnectionFields in this Projection.
-
-	Not yet implemented; requires cropping or extending the weight matrix
-        in place (see ConnectionField.change_bounds for an example).
-	"""
-        raise NotImplementedError
-
-
-    def change_density(self, new_wt_density):
-        """
-        Rescales the weight matrix in place, interpolating or resampling as needed.
-	
-	Not yet implemented.
-	"""
-        raise NotImplementedError
-    
+            
     
     def learn(self):
         """
@@ -186,7 +166,7 @@ class SharedWeightCFProjection(CFProjection):
 
 # JABALERT: Can this be replaced with a CFProjection with a Hysteresis output_fn?
 # If not it should probably be replaced with a new output_fn type instead.
-class LeakyCFProjection(CFProjection):
+class LeakyCFProjection(ResizableCFProjection):
     """
     A projection that has a decay_rate parameter so that incoming
     input is decayed over time as x(t) = input + x(t-1)*exp(-decay_rate),

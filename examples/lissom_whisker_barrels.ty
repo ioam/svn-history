@@ -437,7 +437,7 @@ import random
 from topo.pattern.basic import Gaussian,Sweeper
 from topo.sheet.lissom import LISSOM
 from topo.sheet.basic import GeneratorSheet
-from topo.projection.basic import CFProjection
+from topo.projection.basic import CFProjection,ResizableCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
@@ -495,7 +495,7 @@ topo.sim.connect('Ganglia0','S1',delay=FixedPoint("0.05"),dest_port=('Activity',
 		  
 
 topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralExcitatory',
-                 connection_type=CFProjection,strength=1.0,
+                 connection_type=ResizableCFProjection,strength=1.0,
                  weights_generator=topo.pattern.random.UniformRandom(),
                  nominal_bounds_template=BoundingBox(radius=locals().get("ex_radius",0.3)), learning_rate=1.0) #ExponentialDecay(starting_value=1.0, time_constant=1000.0))
 		           

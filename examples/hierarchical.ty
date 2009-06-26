@@ -88,7 +88,7 @@ topo.sim['V3'] = sheet.CFSheet(nominal_density=5)
 
 # Projections to V1
 topo.sim.connect('LeftRetina','V1',delay=0.5,name='AfferentLeft',
-                 connection_type=projection.CFProjection)
+                 connection_type=projection.ResizableCFProjection)
 topo.sim.connect('RightRetina','V1',delay=0.5,name='AfferentRight',
                  connection_type=projection.CFProjection)
 

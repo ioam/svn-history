@@ -24,7 +24,7 @@ import numpy.oldnumeric as Numeric
 
 from topo.sheet.lissom import LISSOM
 from topo.sheet import GeneratorSheet
-from topo.projection.basic import CFProjection, SharedWeightCFProjection
+from topo.projection.basic import CFProjection, SharedWeightCFProjection,ResizableCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
@@ -287,7 +287,7 @@ topo.sim.connect('LGNOff','FSA',delay=FixedPoint("0.05"),
 CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
 
 topo.sim.connect('FSA','FSA',delay=FixedPoint("0.05"),
-          connection_type=CFProjection,strength=gammaexc,name='LateralExcitatory',
+          connection_type=ResizableCFProjection,strength=gammaexc,name='LateralExcitatory',
           nominal_bounds_template=excitatory_weight_bounds, learning_rate = alpha_exc * n_exc_units)
 
 topo.sim.connect('FSA','FSA',delay=FixedPoint("0.05"),

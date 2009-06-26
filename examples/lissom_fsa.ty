@@ -131,7 +131,7 @@ topo.sim.connect('LGNOff','FSA',delay=0.05, dest_port=('Activity','JointNormaliz
                  nominal_bounds_template=sheet.BoundingBox(radius=1.0625),learning_rate=5.0,)
 
 topo.sim.connect('FSA','FSA',delay=0.05,name='LateralExcitatory',
-                 connection_type=projection.CFProjection,strength=0.9,
+                 connection_type=projection.ResizableCFProjection,strength=0.9,
                  weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.4167),
                  nominal_bounds_template=sheet.BoundingBox(radius=0.166666666667),learning_rate=3.1856)
 

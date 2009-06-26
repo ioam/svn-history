@@ -300,55 +300,6 @@ class ConnectionField(object):
         return self.input_sheet_slice.submatrix(activity)
 
 
-    def change_bounds(self,input_sheet,template,mask,output_fns=None,min_matrix_radius=1):
-        """
-        Change the bounding box for this ConnectionField.
-
-        Discards weights or adds new (zero) weights as necessary,
-        preserving existing values where possible.
-
-        Currently only supports reducing the size, not increasing, but
-        should be extended to support increasing as well.
-
-        Note that the supplied template will be modified, so if you're
-        also using them elsewhere you should pass copies.
-        """
-        if output_fns is None:
-            output_fns = []
-            
-        # CEBALERT: re-write to allow arbitrary resizing
-        or1,or2,oc1,oc2 = self.input_sheet_slice
-
-        weights_slice = self._create_input_sheet_slice(input_sheet,template,min_matrix_radius)
-                    
-        r1,r2,c1,c2 = self.input_sheet_slice
-
-
-        if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
-            # CB: note that it's faster to copy (i.e. replacing copy=1 with copy=0
-            # below slows down change_bounds().
-            self.weights = array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
-            # (so the obvious choice,
-            # self.weights=self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],
-            # is also slower).
-
-            self.mask = weights_slice.submatrix(mask)
-            self.mask = array(self.mask,copy=1) # CB: why's this necessary?
-                                                # (see ALERT in __init__)
-
-
-            self.weights *= self.mask
-            for of in output_fns:
-                of(self.weights)
-            del self.norm_total
-
-
-
-    def change_density(self, new_wt_density):
-        """Rescale the weight matrix in place, interpolating or decimating as necessary."""
-        raise NotImplementedError
-
-
 
 class CFPResponseFn(param.Parameterized):
     """
@@ -798,64 +749,6 @@ class CFProjection(Projection):
             of(MaskedCFIter(self),mask)
 
 
-    ### This could be changed into a special __set__ method for
-    ### bounds_template, instead of being a separate function, but
-    ### having it be explicit like this might be clearer.
-    ###
-    ### This implementation is fairly slow, and for some algorithms
-    ### that rely on changing the bounds frequently, it may be worth
-    ### re-implementing it in C.
-    def change_bounds(self, nominal_bounds_template):
-        """
-        Change the bounding box for all of the ConnectionFields in this Projection.
-
-        Calls change_bounds() on each ConnectionField.
-
-	Currently only allows reducing the size, but should be
-        extended to allow increasing as well.
-        """
-        slice_template = Slice(copy(nominal_bounds_template),self.src,force_odd=True,
-                               min_matrix_radius=self.min_matrix_radius)
-
-        bounds_template = slice_template.compute_bounds(self.src)
-
-        if not self.bounds_template.containsbb_exclusive(bounds_template):
-            if self.bounds_template.containsbb_inclusive(bounds_template):
-                self.debug('Initial and final bounds are the same.')
-            else:
-                self.warning('Unable to change_bounds; currently allows reducing only.')
-            return
-
-        # it's ok so we can store the bounds and resize the weights
-        mask_template = self.create_mask(self.cf_shape,bounds_template,self.src)
-
-        self.nominal_bounds_template = nominal_bounds_template
-
-        self.bounds_template = bounds_template
-
-        cfs = self.cfs
-        rows,cols = cfs.shape
-        output_fns = [wof.single_cf_fn for wof in self.weights_output_fns]
-
-        for r in xrange(rows):
-            for c in xrange(cols):
-                # CB: listhack - loop is candidate for replacement by numpy fn
-                cfs[r,c].change_bounds(input_sheet=self.src,
-                                       template=slice_template,
-                                       mask=mask_template,
-                                       output_fns=output_fns,
-                                       min_matrix_radius=self.min_matrix_radius)
-
-
-    def change_density(self, new_wt_density):
-        """
-        Rescales the weight matrix in place, interpolating or resampling as needed.
-	
-	Not yet implemented.
-	"""
-        raise NotImplementedError
-
-
     # CEBALERT: see gc alert in simulation.__new__
     def _cleanup(self):
         for cf in self.cfs.flat:
@@ -985,3 +878,126 @@ class CFSheet(ProjectionSheet):
     ### JCALERT! This should probably be deleted...
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
+
+
+
+
+class ResizableCFProjection(CFProjection):
+    """
+    A CFProjection with resizable weights.
+    """
+    # Less efficient memory usage than CFProjection because it stores
+    # the (x,y) position of each ConnectionField.
+
+    
+    def _generate_coords(self):
+        # same as super's, but also stores the coords.
+
+        # CB: this is storing redundant info because generate_coords()
+        # returns output from mgrid. Might be better to store the 1d x
+        # and y coords, and generate the grids when needed?
+        self.X_cf,self.Y_cf = super(ResizableCFProjection,self)._generate_coords()
+        return self.X_cf,self.Y_cf
+        
+
+    ### This could be changed into a special __set__ method for
+    ### bounds_template, instead of being a separate function, but
+    ### having it be explicit like this might be clearer.
+    ###
+    ### This implementation is fairly slow, and for some algorithms
+    ### that rely on changing the bounds frequently, it may be worth
+    ### re-implementing it in C.
+    def change_bounds(self, nominal_bounds_template):
+        """
+        Change the bounding box for all of the ConnectionFields in this Projection.
+
+        Calls change_bounds() on each ConnectionField.
+
+	Currently only allows reducing the size, but should be
+        extended to allow increasing as well.
+        """
+        slice_template = Slice(copy(nominal_bounds_template),self.src,force_odd=True,
+                               min_matrix_radius=self.min_matrix_radius)
+
+        bounds_template = slice_template.compute_bounds(self.src)
+
+        if not self.bounds_template.containsbb_exclusive(bounds_template):
+            if self.bounds_template.containsbb_inclusive(bounds_template):
+                self.debug('Initial and final bounds are the same.')
+            else:
+                self.warning('Unable to change_bounds; currently allows reducing only.')
+            return
+
+        # it's ok so we can store the bounds and resize the weights
+        mask_template = self.create_mask(self.cf_shape,bounds_template,self.src)
+
+        self.nominal_bounds_template = nominal_bounds_template
+
+        self.bounds_template = bounds_template
+
+        cfs = self.cfs
+        rows,cols = cfs.shape
+        output_fns = [wof.single_cf_fn for wof in self.weights_output_fns]
+
+        for r in xrange(rows):
+            for c in xrange(cols):
+                # CB: listhack - loop is candidate for replacement by numpy fn
+                self._change_cf_bounds(cfs[r,c],input_sheet=self.src,
+                                       template=slice_template,
+                                       mask=mask_template,
+                                       output_fns=output_fns,
+                                       min_matrix_radius=self.min_matrix_radius)
+
+
+    def change_density(self, new_wt_density):
+        """
+        Rescales the weight matrix in place, interpolating or resampling as needed.
+	
+	Not yet implemented.
+	"""
+        raise NotImplementedError
+
+
+    def _change_cf_bounds(self,cf,input_sheet,template,mask,output_fns=None,min_matrix_radius=1):
+        """
+        Change the bounding box for this ConnectionField.
+
+        Discards weights or adds new (zero) weights as necessary,
+        preserving existing values where possible.
+
+        Currently only supports reducing the size, not increasing, but
+        should be extended to support increasing as well.
+
+        Note that the supplied template will be modified, so if you're
+        also using them elsewhere you should pass copies.
+        """
+        if output_fns is None:
+            output_fns = []
+            
+        # CEBALERT: re-write to allow arbitrary resizing
+        or1,or2,oc1,oc2 = cf.input_sheet_slice
+
+        weights_slice = cf._create_input_sheet_slice(input_sheet,template,min_matrix_radius)
+                    
+        r1,r2,c1,c2 = cf.input_sheet_slice
+
+
+        if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
+            # CB: note that it's faster to copy (i.e. replacing copy=1 with copy=0
+            # below slows down change_bounds().
+            cf.weights = array(cf.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
+            # (so the obvious choice,
+            # cf.weights=cf.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],
+            # is also slower).
+
+            cf.mask = weights_slice.submatrix(mask)
+            cf.mask = array(cf.mask,copy=1) # CB: why's this necessary?
+                                                # (see ALERT in __init__)
+
+
+            cf.weights *= cf.mask
+            for of in output_fns:
+                of(cf.weights)
+            del cf.norm_total
+
+

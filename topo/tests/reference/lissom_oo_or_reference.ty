@@ -23,7 +23,7 @@ import topo.pattern.basic
 
 from topo.sheet.lissom import LISSOM
 from topo.sheet import GeneratorSheet
-from topo.projection.basic import CFProjection,SharedWeightCFProjection
+from topo.projection.basic import CFProjection,SharedWeightCFProjection,ResizableCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.sheet import BoundingBox
 from topo.base.cf import CFSheet
@@ -207,7 +207,7 @@ Af01 = topo.sim.connect('Ganglia01','Primary',delay=FixedPoint("0.05"),
 
 
 LE = topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
-                 connection_type=CFProjection,strength=0.9,
+                 connection_type=ResizableCFProjection,strength=0.9,
                  name='LateralExcitatory',
                  nominal_bounds_template=excitatory_weight_bounds)
             

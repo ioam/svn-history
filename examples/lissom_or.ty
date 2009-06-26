@@ -108,7 +108,7 @@ topo.sim.connect(
 
 topo.sim.connect(
     'V1','V1',delay=0.05,strength=0.9,name='LateralExcitatory',
-    connection_type=projection.CFProjection,learning_rate=2.55528,
+    connection_type=projection.ResizableCFProjection,learning_rate=2.55528,
     nominal_bounds_template=sheet.BoundingBox(radius=0.10417),
     weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.10417))
             
