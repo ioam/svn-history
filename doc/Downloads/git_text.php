@@ -56,11 +56,11 @@ $ export TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica
 $ mkdir topographica; cd topographica
 
 # create a new Git repository
-$ git-svn init $TOPOROOT/trunk/topographica
+$ git svn init $TOPOROOT/trunk/topographica
 
 # retrieve the SVN files and history
 # (you can choose a value for r)
-$ git-svn fetch -r7986; git-svn rebase
+$ git svn fetch -r7986; git svn rebase
 </pre>
 
 (substituting values appropriate for what you wish to do; e.g. you can
@@ -90,7 +90,7 @@ range of historical versions of Topographica.
 probably also want to instruct git to ignore the same files as SVN
 ignores:
 <pre>
-(echo; git-svn show-ignore) >> .git/info/exclude
+(echo; git svn show-ignore) >> .git/info/exclude
 </pre>
 If <code>svn:ignore</code> properties are subsequently changed in the
 SVN repository, you will have to update your <code>exclude</code>
@@ -104,7 +104,7 @@ repository, you are free to work on it as you wish. You can commit
 files, add files, delete files, and so on. All operations that you
 perform with <code>git</code> (such as <code>diff</code>
 and <code>commit</code>) are local; only operations
-with <code>git-svn</code> have the potential to modify the SVN
+with <code>git svn</code> have the potential to modify the SVN
 repository.
 
 <P>If you are new to Git, you might find
@@ -149,13 +149,13 @@ your Git repository. These are discussed in the following sections.
 
 <P>To get updates from the Topographica SVN repository, your own copy
 should have no uncommitted changes. (If you do have uncommitted changes,
-the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-stash.html">git-stash</A>
+the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-stash.html">git stash</A>
 command allows you to store those changes for later retrieval.)
 
 <pre>
-# (git-stash if required)
-$ git-svn rebase
-# (git-stash apply; git-stash clear if required)
+# (git stash if required)
+$ git svn rebase
+# (git stash apply; git stash clear if required)
 </pre>
 
 <code>rebase</code> moves a whole branch to a newer "base" commit;
@@ -173,7 +173,7 @@ be part of the main Topographica distribution.  If you do want your
 changes to be made public, then run:
 
 <pre>
-git-svn dcommit
+git svn dcommit
 </pre>
 
 This will send each of your git commits, in order, to the SVN
@@ -189,13 +189,13 @@ git svn dcommit -n
 
 <P>As with SVN, before committing to the central repository you should
 first check that you have updated and tested your code with changes
-from others (<code>git-svn rebase; make tests</code>) to ensure that
+from others (<code>git svn rebase; make tests</code>) to ensure that
 your changes are compatible (and not just that they apply
-cleanly). Any actual conflict encountered by git-svn (e.g.  you try to
-commit a file which has been updated by someone else while you were
-working on it) will stop the <code>dcommit</code> process, and the SVN
-error will be reported. At this point, you can use the usual git
-commands to deal with such merge conflicts.
+cleanly). Any actual conflict encountered by <code>git svn</code>
+(e.g.  you try to commit a file which has been updated by someone else
+while you were working on it) will stop the <code>dcommit</code>
+process, and the SVN error will be reported. At this point, you can
+use the usual git commands to deal with such merge conflicts.
 
 
 <!--

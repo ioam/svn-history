@@ -229,6 +229,7 @@ bibtex, convert, and fig2dev commands installed; type <code>make
 all</code> instead of (or after) <code>make</code>.  (If you don't
 have those commands, in most distributions you can get them by
 installing the php5-cli, m4, tetex, imagemagick, and transfig
+<!--CEBALERT: tetex not in ubuntu 9.04; not sure what the new package is-->
 packages).  <code>make all</code> will also run the regression tests
 and example files, to ensure that everything is functioning properly
 on your system.  If you do the tests on a machine without a
