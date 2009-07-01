@@ -79,8 +79,6 @@ $Id$
 __version__ = '$Revision$'
 
 
-from copy import copy
-
 from numpy import array,floor,ceil,round_,arange
 
 from boundingregion import BoundingBox
