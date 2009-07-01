@@ -23,7 +23,7 @@ __version__ = '$Revision$'
 
 from copy import copy
 
-from numpy import abs,array,zeros,where, ones
+from numpy import abs,array,zeros,where
 from numpy.oldnumeric import Float,Float32
 
 from .. import param
