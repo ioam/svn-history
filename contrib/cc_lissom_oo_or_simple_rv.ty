@@ -201,7 +201,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNorma
                  ,topo.pattern.random.UniformRandom(seed=513)]),
                  nominal_bounds_template=BoundingBox(radius=locals().get('V1Aff_size',0.27083)),
                  coord_mapper=jitterOn,apply_output_fns_init=False,
-                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
+                 learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value = locals().get('S_lr',5),
                                                 time_constant=locals().get('S_tc',12000)))))
 
@@ -213,7 +213,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
                  ,topo.pattern.random.UniformRandom(seed=17)]),
                  nominal_bounds_template=BoundingBox(radius=locals().get('V1Aff_size',0.27083)),
                  coord_mapper=jitterOff,apply_output_fns_init=False,
-                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
+                 learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value = locals().get('S_lr',5),
                                                 time_constant=locals().get('S_tc',12000)))))
 
@@ -232,7 +232,7 @@ if simpleLateral:
 	                     generators=[Gaussian(aspect_ratio=1.0, size=locals().get('SxLatInhSize',0.22917)),
 	                                topo.pattern.random.UniformRandom(seed=11)]),
 	                 nominal_bounds_template=BoundingBox(radius=0.22917),
-	                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
+	                 learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value = locals().get('LatInh_lr',0.3),
                                                 time_constant=locals().get('LatInh_tc',16000)))))
 
@@ -268,7 +268,7 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LateralInhibitory',
                      generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',2*0.22917)),
                                 topo.pattern.random.UniformRandom(seed=7)]),
                  nominal_bounds_template=BoundingBox(radius=0.22917),
-                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
+                 learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value = locals().get('LatInh_lr',0.3),
                                                 time_constant=locals().get('LatInh_tc',1600)))))
 
