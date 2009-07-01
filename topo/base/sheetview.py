@@ -96,10 +96,10 @@ class SheetView(param.Parameterized):
         """
         super(SheetView,self).__init__(**params)
 
-	self.src_name = src_name
-	self.precedence = precedence
+        self.src_name = src_name
+        self.precedence = precedence
         self.row_precedence = row_precedence
-	self.timestamp = timestamp
+        self.timestamp = timestamp
         
         # Assume there's no such thing as an operator that can be mistaken
         # for a matrix_data element.  This is true as long as the real
@@ -199,8 +199,8 @@ class ProjectionView(SheetView):
         """
         Subclass of SheetView. 
         """
-	super(ProjectionView,self).__init__(term_tuple, projection.src.name, projection.src.precedence, timestamp, row_precedence = projection.src.row_precedence, **params)
-	self.projection = projection
+        super(ProjectionView,self).__init__(term_tuple, projection.src.name, projection.src.precedence, timestamp, row_precedence = projection.src.row_precedence, **params)
+        self.projection = projection
 
 
 
