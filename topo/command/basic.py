@@ -432,6 +432,14 @@ class run_batch(ParameterizedFunction):
         number of characters (since most filesystems have a
         limit).""")
 
+    name_time_format = param.String(default="%Y%m%d%H%M",doc="""
+        String format for the time included in the output directory
+        and file names.  See the Python time module library
+        documentation for codes.
+        
+        E.g. Adding '%S' to the default would include seconds.""")
+                                       
+
     def _truncate(self,p,s):
         """
         If s is greater than the max_name_length parameter, truncate it
@@ -450,7 +458,7 @@ class run_batch(ParameterizedFunction):
         # Construct simulation name, etc.
         scriptbase= re.sub('.ty$','',os.path.basename(script_file))
         prefix = ""
-        prefix += time.strftime("%Y%m%d%H%M")
+        prefix += time.strftime(p.name_time_format)
         prefix += "_" + scriptbase
         simname = prefix
     
