@@ -115,6 +115,32 @@ print "Reading options from '%s'."%config_file
 config.read(config_file)
 options = process_section('Options',config)
 
+import string
+import os.path
+import shutil
+output_path = os.path.join(options['results_path'],combinations_file)
+
+if not os.path.isdir(output_path):
+    os.mkdir(output_path)
+
+saved_combinations_file = os.path.join(output_path,combinations_file)
+if os.path.isfile(saved_combinations_file):
+    old_combinations_file=saved_combinations_file+'.old'
+    print "WARNING: %s already exists; renaming to %s.old"%(saved_combinations_file,
+                                                            old_combinations_file)
+    shutil.copy(saved_combinations_file,old_combinations_file)
+shutil.copy(combinations_file,saved_combinations_file)
+
+saved_cmd_file = os.path.join(output_path,'cmd')
+if os.path.isfile(saved_cmd_file):
+    old_cmd_file=saved_cmd_file+'.old'
+    print "WARNING: %s already exists; renaming to %s"%(saved_cmd_file,
+                                                        old_cmd_file)
+    shutil.copy(saved_cmd_file,old_cmd_file)
+f = open(saved_cmd_file,'w')
+f.write(string.join(sys.argv))
+f.close()
+
 
 
 substitutions = {'job':'./%s $i'%options['selector'],
@@ -126,8 +152,7 @@ def _generate_command(parameters,i):
     """Generate a command for running Topographica with the supplied parameters."""
     cmd = '"%s"'%script
 
-    if options['topographica_output_path'] is not None:
-        cmd+=',output_directory="%s"'%options['topographica_output_path']
+    cmd+=',output_directory="%s"'%output_path
 
     # CEBHACKALERT: passing i into this function, etc - it's all a hack
     tmp_subs = copy.copy(substitutions)
