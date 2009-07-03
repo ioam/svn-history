@@ -20,18 +20,20 @@
 # row. (Parameters that should be common to all experiments are passed
 # at the commandline; see later.) Note that double quotes (") must be
 # used, since the command will already be inside single (') quotes.
+# There should be no blank line at the end, and there can be no
+# comments.
 # 
 # 
 # (2) Create a suitable config file; see the example
 # parameter_search.cfg.
 #
 #
-# (3) Run this script by passing a configuration file as the first
+# (3) Run this script by passing the config file as the first
 # argument, the topographica .ty file you want to run as the second
 # argument, the parameter combinations file as the third, and finally
 # specify any parameters you want to be common to all experiments.
 # E.g: 
-#  ./parameter_search ps.cfg script.ty combs.txt 'times=[1],a="def"'
+#  ./parameter_search ps.cfg script.ty combs 'times=[1],a="def"'
 # 
 # Note that the common parameters must be specified in a single-quoted
 # string, and that as above any strings must be enclosed in at least
@@ -39,6 +41,17 @@
 # 
 #
 # (4) The result is a script that, when run, will submit all the jobs.
+
+def usage():
+    print """
+Please see the script's docstring for full instructions.
+
+Usage: parameter_search [config-file] [script] [combinations-file] (<common-params>)
+
+Examples:
+       parameter_search cfg examples/lissom.ty combs 
+       parameter_search cfg examples/lissom.ty combs 'times=[1,2],astring="test"'
+"""
 
 
 # support python 2.3
@@ -51,17 +64,8 @@ import sys
 import string
 import os
 import ConfigParser
-
-def usage():
-    print """
-Please see the script's docstring for full instructions.
-
-Usage: parameter_search [config-file] [script] [combinations-file] (<common-params>)
-
-Examples:
-       parameter_search ps.cfg examples/lissom.ty combs.txt 
-       parameter_search ps.cfg examples/lissom.ty combs.txt 'times=[1,2,3],astring="test"'
-"""
+import os.path
+import shutil
 
 
 # CEBALERT: duplicates fn in nobrain script
@@ -115,9 +119,6 @@ print "Reading options from '%s'."%config_file
 config.read(config_file)
 options = process_section('Options',config)
 
-import string
-import os.path
-import shutil
 output_path = os.path.join(options['results_path'],combinations_file)
 
 if not os.path.isdir(output_path):
@@ -225,4 +226,3 @@ os.system('chmod +x %s'%options['submitter'])
 
 
 print "Running '%s' will submit your %i specified parameter combinations (using '%s' to start the topographica jobs)."%(options['submitter'],len(combinations),options['selector'])
-
