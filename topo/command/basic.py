@@ -422,6 +422,10 @@ class run_batch(ParameterizedFunction):
 
     vc_info=param.Boolean(True)
 
+    dirname_prefix = param.String(default="",doc="""
+        Optional prefix for the directory name (allowing e.g. easy
+        grouping).""")
+
     # CB: do any platforms also have a maximum total path length?
     max_name_length = param.Number(default=200,doc="""
         The experiment's directory name will be truncated at this
@@ -465,7 +469,9 @@ class run_batch(ParameterizedFunction):
         if not os.path.isdir(normalize_path(p['output_directory'])):
             os.mkdir(normalize_path(p['output_directory']))
     
-        filepath.output_path = normalize_path(os.path.join(p['output_directory'],self._truncate(p,prefix)))
+        
+        dirname = self._truncate(p,p.dirname_prefix+prefix)
+        filepath.output_path = normalize_path(os.path.join(p['output_directory'],dirname))
         
         if os.path.isdir(filepath.output_path):
             print "Batch run: Warning -- directory already exists!"
