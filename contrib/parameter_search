@@ -71,7 +71,7 @@ def process_section(name,config):
     ConfigParser config.
 
     Entries in the ConfigParser that end '_template' will be created
-    as string.Templates (allowing later substitution of {}-delimited
+    as string.Templates (allowing later substitution of ${}-delimited
     variables).
     """
     import string
@@ -117,13 +117,24 @@ options = process_section('Options',config)
 
 
 
+substitutions = {'job':'./%s $i'%options['selector'],
+                 'combonumber':'$i'}
 
-def _generate_command(parameters):
+
+import copy
+def _generate_command(parameters,i):
     """Generate a command for running Topographica with the supplied parameters."""
     cmd = '"%s"'%script
 
     if options['topographica_output_path'] is not None:
         cmd+=',output_directory="%s"'%options['topographica_output_path']
+
+    # CEBHACKALERT: passing i into this function, etc - it's all a hack
+    tmp_subs = copy.copy(substitutions)
+    tmp_subs['combonumber']="%02i"%i
+
+    if options['topographica_dirname_prefix_template'] is not None:
+        cmd+=',dirname_prefix="%s"'%options['topographica_dirname_prefix_template'].substitute(tmp_subs)
 
     if common_params is not None:
         cmd+=',%s'%common_params
@@ -158,7 +169,7 @@ fout = open(options['selector'],'w')
 fout.write('#!/bin/bash -i\n')
 
 for i,params in zip(range(len(combinations)),combinations):
-    cmd = _generate_command(params)
+    cmd = _generate_command(params,i)
     
     nscript= """
 if [ "$1" = "%s" ]; then
@@ -172,8 +183,6 @@ os.system('chmod +x %s'%options['selector'])
 
 
 ## Generate script that will submit all combinations
-substitutions = {'job':'./%s $i'%options['selector'],
-                 'combonumber':'%i'}
 f = open(options['submitter'],'w')
 submitcmd = options['job_submit_template'].substitute(substitutions)
 
