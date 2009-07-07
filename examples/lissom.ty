@@ -86,6 +86,8 @@ import copy
 
 from colorsys import hsv_to_rgb
 
+from topo.misc.util import linearly_interpolate
+
 from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet,param
 
 import topo.learningfn.optimized
@@ -170,6 +172,10 @@ p.add(
         Maximum disparity between input pattern positions in left and
         right eyes."""),
 
+    speed=param.Number(default=0.0,bounds=(0,None),doc="""
+        Distance in sheet coordinates between successive frames, when
+        translating patterns."""),
+
     expand_sf_test_range=param.Boolean(default=False,doc="""
         By default, measure_sine_pref() measures SF at the sizes of RF
         used, for speed, but if expand_sf_test_range is True, will
@@ -209,7 +215,10 @@ if 'od' in p.dims or 'dy' in p.dims:
     
 if 'dr' in p.dims: 
     lags=['0','1','2','3']
-    speed=2.0 # Useful speeds range from 0.0 - 3.0.
+    if p.speed == 0:
+        speed=2.0/24.0 # Useful speeds range from 0.0 - 3.0/24.0.
+    else:
+        speed=p.speed
 
 if 'dy' in p.dims: 
     disparity_bound = p.max_disparity*0.041665/2.0
@@ -316,7 +325,7 @@ for e in eyes:
             if n != '':
                 input_moved=pattern.Sweeper(
                     generator=copy.deepcopy(input_composite),
-                    step=int(n),speed=speed/24.0,
+                    step=int(n),speed=speed,
                     orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=input_seed-1))
             else: input_moved=input_composite
 
@@ -353,11 +362,15 @@ centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,
 surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,
                              output_fns=[transferfn.DivisiveNormalizeL1()])
 
-strength=[2.33, 2.38, 2.53, 2.8] # 2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
+# Scale the strength of the afferent connections, depending on how much patterns overlap
+strength=[2.33, 2.38, 2.53, 2.8] # For speed=0,1/24.0,2/24.0,3/24.0; from CMVC
 if p.dataset in natural_image_sets:
-    strength=[4.7, 4.8, 5.1, 5.8] 
+    strength=[4.7, 4.8, 5.1, 5.8]
 
-# Convenience variable; number of afferent connections to V1
+strength_scale=linearly_interpolate(strength,speed*24.0)
+
+     
+# Convenience variable: number of afferent connections to V1
 num_aff=len(center_polarities)*len(eyes)*len(lags)*len(opponent_types)
 
 for e in eyes:
@@ -369,14 +382,14 @@ for e in eyes:
                 topo.sim.connect(
                     e+cone+'Retina'+n, e+opponentcenter+'LGN'+l+n, name='AfferentCenter', 
                     connection_type=projection.SharedWeightCFProjection, delay=0.05,
-                    strength=strength[int(speed)]*(-1)**center_polarities.index(l), 
+                    strength=strength_scale*(-1)**center_polarities.index(l), 
                     nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius),
                     weights_generator=centerg)
 
                 topo.sim.connect(
                     e+cone+'Retina'+n, e+opponentsurround+'LGN'+l+n, name='AfferentSurround',
                     connection_type=projection.SharedWeightCFProjection, delay=0.05,
-                    strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l)), 
+                    strength=strength_scale*(-1)**(1+center_polarities.index(l)), 
                     nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius),
                     weights_generator=surroundg)
 
@@ -386,7 +399,7 @@ for e in eyes:
                             e+cone+'Retina'+n, e+opponentcenter+'LGN'+l+n+'SF'+str(channel), 
                             name='AfferentCenter'+str(channel),
                             delay=0.05,connection_type=projection.SharedWeightCFProjection,
-                            strength=strength[int(speed)]*(-1)**center_polarities.index(l), 
+                            strength=strength_scale*(-1)**center_polarities.index(l), 
                             nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                             
                             weights_generator=pattern.Gaussian(size=0.07385*sf_spacing**(channel-1),aspect_ratio=1.0,
@@ -396,7 +409,7 @@ for e in eyes:
                             e+cone+'Retina'+n, e+opponentsurround+'LGN'+l+n+'SF'+str(channel), 
                             name='AfferentSurround'+str(channel),
                             delay=0.05,connection_type=projection.SharedWeightCFProjection,
-                            strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l)), 
+                            strength=strength_scale*(-1)**(1+center_polarities.index(l)), 
                             nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                             
                             weights_generator=pattern.Gaussian(size=0.29540*sf_spacing**(channel-1),aspect_ratio=1.0,
@@ -426,7 +439,7 @@ for e in eyes:
                         e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, 
                         name='AfferentCenter'+cone,
                         delay=0.05,connection_type=projection.SharedWeightCFProjection,
-                        strength=strength[int(speed)]*(-1)**center_polarities.index(l)/len(cone_types),
+                        strength=strength_scale*(-1)**center_polarities.index(l)/len(cone_types),
                         nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius),
                         weights_generator=centerg)
 
@@ -434,7 +447,7 @@ for e in eyes:
                         e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, 
                         name='AfferentSurround'+cone, 
                         delay=0.05,connection_type=projection.SharedWeightCFProjection,
-                        strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l))/len(cone_types),
+                        strength=strength_scale*(-1)**(1+center_polarities.index(l))/len(cone_types),
                         nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius),
                         weights_generator=surroundg)
 
@@ -443,7 +456,7 @@ for e in eyes:
                             e+cone+'Retina'+n, e+'LGN'+l+n+'SF'+str(channel), 
                             name='AfferentCenter'+cone+str(channel),
                             delay=0.05,connection_type=projection.SharedWeightCFProjection,
-                            strength=strength[int(speed)]*(-1)**center_polarities.index(l)/len(cone_types),
+                            strength=strength_scale*(-1)**center_polarities.index(l)/len(cone_types),
                             nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                             
                             weights_generator=pattern.Gaussian(size=0.07385*sf_spacing**(channel-1),aspect_ratio=1.0,
@@ -453,7 +466,7 @@ for e in eyes:
                             e+cone+'Retina'+n, e+'LGN'+l+n+'SF'+str(channel), 
                             name='AfferentSurround'+cone+str(channel),
                             delay=0.05,connection_type=projection.SharedWeightCFProjection,
-                            strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l))/len(cone_types),
+                            strength=strength_scale*(-1)**(1+center_polarities.index(l))/len(cone_types),
                             nominal_bounds_template=sheet.BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                             
                             weights_generator=pattern.Gaussian(size=0.29540*sf_spacing**(channel-1),aspect_ratio=1.0,
