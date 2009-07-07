@@ -286,6 +286,8 @@ def centroid(pts,weights):
     # CEBALERT: use numpy.sum? Worthwhile if weights is a numpy.array.
     return numpy.dot(numpy.transpose(pts),weights)/sum(weights)
 
+
+
 def signabs(x):
     """
     Split x into its sign and absolute value.
@@ -300,6 +302,35 @@ def signabs(x):
         sgn = 1
 
     return sgn,abs(x)
+
+
+def linearly_interpolate(table,value):
+    """
+    Interpolate an appropriate value from the given list of values, by number.
+
+    Assumes the table is a list of items to be returned for integer values, 
+    and interpolates between those items for non-integer values.
+    """ 
+
+    lower_index=int(value)
+    upper_index=lower_index+1
+
+    # Intermediate value; interpolate or return exact value as appropriate
+    if lower_index+1<len(table):
+       lookup=table[lower_index]+(value%1.0)*(table[upper_index]-table[lower_index])
+    
+    # Upper bound -- return largest value
+    elif lower_index+1==len(table):
+       lookup=table[len(table)-1]
+
+    # Over upper bound -- return largest value and print warning
+    # JABALERT: Printing a warning message is not necessarily the most useful behavior
+    else:
+       lookup=table[len(table)-1]
+       print "Warning -- value %f out of range; returning maximum of %f" % (value,lookup)
+
+    return lookup
+
 
 
 # CB: note that this has only really been tested for output;
