@@ -1116,7 +1116,7 @@ class MeasureResponseCommand(ParameterizedFunction):
 class SinusoidalMeasureResponseCommand(MeasureResponseCommand):
     """Parameterized command for presenting sine gratings and measuring responses."""
     
-    pattern_presenter = param.Callable(
+    pattern_presenter = param.Callable(instantiate=True,
         default=PatternPresenter(pattern_generator=SineGrating()),doc="""
         Callable object that will present a parameter-controlled pattern to a
         set of Sheets.  By default, uses a SineGrating presented for a short
