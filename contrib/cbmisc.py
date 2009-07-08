@@ -3,6 +3,55 @@ Miscellaneous code used by Chris B.
 """
 
 
+def _create_single_generatorsheet_plotgroup(dim,sheet):
+    import topo
+    from topo.plotting.plotgroup import create_plotgroup
+    from topo.command.analysis import measure_sine_pref
+    pg= create_plotgroup(name='%s %s Preference'%(sheet,dim),category="Preference Maps",
+                         doc='Measure preference for sine grating orientation.',
+                         pre_plot_hooks=[measure_sine_pref.instance(sheet_views_prefix=sheet,generator_sheets=[topo.sim[sheet]])])
+    pg.add_plot('%s %s Preference'%(sheet,dim),[('Hue','%s%sPreference'%(sheet,dim))])
+    pg.add_plot('%s %s Preference&Selectivity'%(sheet,dim),
+                [('Hue','%s%sPreference'%(sheet,dim)), 
+                 ('Confidence','%s%sSelectivity'%(sheet,dim))])
+    pg.add_plot('%s %s Selectivity'%(sheet,dim),[('Strength','%s%sSelectivity'%(sheet,dim))])
+    pg.add_static_image('Color Key','command/or_key_white_vert_small.png')
+    return pg
+
+def add_one_eye_plotgroups():
+    # Create Right and LeftRetina versions of Orientation Preference
+    # plotgroup.
+    import topo
+    import copy
+    import topo.plotting.plotgroup as P
+    for sheet in ['LeftRetina','RightRetina']:
+        for dim in ['Orientation']:#,'Hue']:
+            pg = _create_single_generatorsheet_plotgroup(dim,sheet)
+            P.plotgroups[pg.name]=pg
+
+    if hasattr(topo,'guimain'):
+        topo.guimain.refresh_plots_menu()
+
+
+def orcrod_analysis_function():
+    # default_analysis_function + L & R eye OR,CR maps
+
+    from topo.command.basic import default_analysis_function
+    default_analysis_function()
+    import topo
+    if ('LeftRetina' in topo.sim) and ('RightRetina' in topo.sim):
+        from topo.command.analysis import save_plotgroup
+        # (check the one-eye plotgroups have been created)
+        import topo.plotting.plotgroup as P
+        if 'LeftRetina Orientation Preference' not in P.plotgroups:
+            add_one_eye_plotgroups()
+
+        for s in ['LeftRetina','RightRetina']:
+            save_plotgroup("%s Orientation Preference"%s,
+                           use_cached_results=False)
+            #save_plotgroup("%s Hue Preference"%s,
+            #               use_cached_results=False)
+
 
 
 ######################################################################
