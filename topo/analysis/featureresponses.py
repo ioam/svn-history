@@ -34,6 +34,7 @@ from topo.command.basic import pattern_present,restore_input_generators, save_in
 from topo.command.basic import wipe_out_activity, clear_event_queue
 from topo.misc.distribution import Distribution
 from topo.misc.util import cross_product, frange
+from topo import pattern
 from topo.pattern.basic import SineGrating, Gaussian, RawRectangle, Disk, OrientationContrast
 from topo.plotting.plotgroup import plotgroups
 from topo.sheet import GeneratorSheet
@@ -648,10 +649,12 @@ class PatternPresenter(param.Parameterized):
         for feature,value in features_values.iteritems():
            self.gen.__setattr__(feature,value)
 
+        all_input_sheet_names = topo.sim.objects(GeneratorSheet).keys()
+
         if len(self.generator_sheets)>0:
             input_sheet_names = [sheet.name for sheet in self.generator_sheets]
         else:
-            input_sheet_names = topo.sim.objects(GeneratorSheet).keys()
+            input_sheet_names = all_input_sheet_names
 
         # Copy the given generator once for every GeneratorSheet
         inputs = dict.fromkeys(input_sheet_names)
@@ -894,6 +897,10 @@ class PatternPresenter(param.Parameterized):
                 for g in inputs.itervalues():
                     g.offset=0.0
                     g.scale=g.contrast
+
+        # blank patterns for unused generator sheets
+        for sheet_name in set(all_input_sheet_names).difference(set(input_sheet_names)):
+            inputs[sheet_name]=pattern.Constant(scale=0)
             
         pattern_present(inputs, self.duration, plastic=False,
                      apply_output_fns=self.apply_output_fns)
