@@ -620,23 +620,41 @@ class PatternPresenter(param.Parameterized):
         other models that do not follow that convention or if a
         linear response is desired.""")
 
+    # CEBALERT: generator_sheets=[] is probably a surprising way of
+    # actually getting all the generator sheets.
+    generator_sheets = param.List(default=[], doc="""
+        The set of GeneratorSheets onto which patterns will be drawn.
+        
+        By default (i.e. for an empty list), all GeneratorSheets in
+        the simulation will be used.
+        """)
 
     def __init__(self,pattern_generator,**params):
+        """
+        pattern_generator is the PatternGenerator that will be drawn
+        on the generator_sheets (the parameters of the
+        pattern_generator are specified during calls.
+        """
         super(PatternPresenter,self).__init__(**params)
         self.gen = pattern_generator # Why not a Parameter?
-        
+
         
     def __call__(self,features_values,param_dict):
         for param,value in param_dict.iteritems():
+           # CEBALERT: why not setattr(self.gen,param,value)
+           # CEBALERT: messed up spacing?
            self.gen.__setattr__(param,value)
                
         for feature,value in features_values.iteritems():
            self.gen.__setattr__(feature,value)
 
-        gen_list=topo.sim.objects(GeneratorSheet)
-        input_sheet_names=gen_list.keys()
+        if len(self.generator_sheets)>0:
+            input_sheet_names = [sheet.name for sheet in self.generator_sheets]
+        else:
+            input_sheet_names = topo.sim.objects(GeneratorSheet).keys()
+
         # Copy the given generator once for every GeneratorSheet
-        inputs = dict().fromkeys(gen_list)
+        inputs = dict.fromkeys(input_sheet_names)
         for k in inputs.keys():
             inputs[k]=copy.deepcopy(self.gen)
 
