@@ -408,6 +408,14 @@ class FeatureMaps(FeatureResponses):
         combining selectivity with other plots as when using Confidence
         subplots.""")
     
+    # CBENHANCEMENT: could allow full control over the generated names
+    # using a format parameter. The default would be
+    # ${prefix}${feature}${type} (where type is Preference or
+    # Selectivity)
+    sheet_views_prefix = param.String(default="",doc="""
+        Prefix to add to the name under which results are stored in
+        sheet_views.""")
+
     def __init__(self,features,**params):
         super(FeatureMaps,self).__init__(features,**params)
         self.features=features
@@ -478,12 +486,13 @@ class FeatureMaps(FeatureResponses):
                 preference_map.cyclic = cyclic
                 preference_map.norm_factor = norm_factor
                     
-                sheet.sheet_views[feature.capitalize()+'Preference']=preference_map
+                
+                sheet.sheet_views[self.sheet_views_prefix+feature.capitalize()+'Preference']=preference_map
                 
                 selectivity_map = SheetView((self.selectivity_multiplier*
                                              self._featureresponses[sheet][feature].selectivity(),
                                              bounding_box), sheet.name , sheet.precedence, topo.sim.time(),sheet.row_precedence)
-                sheet.sheet_views[feature.capitalize()+'Selectivity']=selectivity_map
+                sheet.sheet_views[self.sheet_views_prefix+feature.capitalize()+'Selectivity']=selectivity_map
 
                 
 class FeatureCurves(FeatureResponses):
@@ -1110,14 +1119,19 @@ class MeasureResponseCommand(ParameterizedFunction):
         set to this value.  Provides a simple way to set
         this commonly changed option of PatternPresenter.""")
 
+    sheet_views_prefix = param.String(default="",doc="""
+        Optional prefix to add to the name under which results are
+        stored in sheet_views. Can be used e.g. to distinguish maps as
+        originating from a particular GeneratorSheet.""")
+
     __abstract = True
 
 
     def __call__(self,**params):
         """Measure the response to the specified pattern and store the data in each sheet."""
-        
         p=ParamOverrides(self,params)
-        x=FeatureMaps(self._feature_list(p),name="FeatureMaps_for_"+self.name)
+        x=FeatureMaps(self._feature_list(p),name="FeatureMaps_for_"+self.name,
+                      sheet_views_prefix=p.sheet_views_prefix)
         static_params = dict([(s,p[s]) for s in p.static_parameters])
         if p.duration is not None:
             p.pattern_presenter.duration=p.duration
