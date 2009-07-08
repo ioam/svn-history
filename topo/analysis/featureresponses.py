@@ -1124,6 +1124,11 @@ class MeasureResponseCommand(ParameterizedFunction):
         stored in sheet_views. Can be used e.g. to distinguish maps as
         originating from a particular GeneratorSheet.""")
 
+    generator_sheets = param.List(default=[],doc="""
+        pattern_presenter.generator_sheets will be set to this value.
+        The default value of [] results in all GeneratorSheets being
+        used.""")
+
     __abstract = True
 
 
@@ -1137,6 +1142,8 @@ class MeasureResponseCommand(ParameterizedFunction):
             p.pattern_presenter.duration=p.duration
         if p.apply_output_fns is not None:
             p.pattern_presenter.apply_output_fns=p.apply_output_fns
+        p.pattern_presenter.generator_sheets=p.generator_sheets
+
         x.collect_feature_responses(p.pattern_presenter,static_params,
                                     p.display,p.weighted_average)
 
