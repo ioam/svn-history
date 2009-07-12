@@ -129,7 +129,7 @@ elif dataset=="NoisyDiskstoNatural":
 #Sheet coordinates of units to track for debugging
 units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
 default_density = locals().get('default_density',48)
-default_retinal_density = 24 #locals().get('default_retinal_density',default_density/4)
+default_retinal_density = locals().get('default_retinal_density',default_density/2)
   
 #Smoothing value for exponential averaging
 smoothing=locals().get('smoothing',0.999)
@@ -194,6 +194,8 @@ on_weights = topo.pattern.basic.Composite(
 off_weights = topo.pattern.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
+
+
 #Function for generating Gaussian random initial weights
 def gauss_rand(size):
     return topo.pattern.basic.Composite(operator=numpy.multiply, 
@@ -201,12 +203,12 @@ def gauss_rand(size):
                                                      topo.pattern.random.UniformRandom()])
 
 #Whether or not to use divisive weights normalization
-norm=locals().get('norm',True)
+#norm=locals().get('norm',True)
 
-if norm==False:
-    pi=topo.base.cf.CFPOF_Plugin(single_cf_fn=topo.transferfn.basic.IdentityTF())
-else:
-    pi = None
+#if norm==False:
+#    pi=topo.base.cf.CFPOF_Plugin(single_cf_fn=topo.transferfn.basic.IdentityTF())
+#else:
+#    pi = None
 
 
 ###########################################
@@ -219,17 +221,17 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=default_retinal_density,
 
 topo.sim['LGNOn']=LISSOM_Opt(nominal_density=default_retinal_density,
                           nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)+0.25+0.5),
-                          output_fns=LGN_on_output_fns,tsettle=0,
+                          output_fns=LGN_on_output_fns,tsettle=0,strict_tsettle=0,
                           measure_maps=False)
 
 
 
 topo.sim['LGNOff']=LISSOM_Opt(nominal_density=default_retinal_density,
                            nominal_bounds=BoundingBox(radius=locals().get('CS',0.5)+0.25+0.5),
-                           output_fns=LGN_off_output_fns,tsettle=0,
+                           output_fns=LGN_off_output_fns,tsettle=0,strict_tsettle=0,
                            measure_maps=False)
 
-# Add the lateral connectivity to LGN
+#Add the lateral connectivity to LGN
 if locals().get('GC',True):
     AddGC()
 
