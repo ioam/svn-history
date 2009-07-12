@@ -36,6 +36,7 @@ from numpy import seterr
 
 from topo import param
 from topo.pattern.basic import *
+from topo.base.patterngenerator import PatternGenerator
 from topo.misc.patternfn import float_error_ignore,arc_by_radian
 
 ## New patterns for grating stimuli
@@ -87,7 +88,7 @@ class SpiralGrating(PatternGenerator):
         with float_error_ignore():
             falloff = exp(divide(-distance_from_spiral*distance_from_spiral, 2.0*sigmasq))
 
-        return maximum(falloff,spiral)
+        return maximum(falloff, spiral)
 
 
 class HyperbolicGrating(PatternGenerator):
@@ -115,28 +116,25 @@ class HyperbolicGrating(PatternGenerator):
         aspect_ratio = params['aspect_ratio']
         x = self.pattern_x/aspect_ratio
         y = self.pattern_y
-        white_thickness = params['thickness']
+        thickness = params['thickness']
         gaussian_width = params['smoothing']
         size = params['size']
 
-        # To have zero value in middle point this pattern calculates zero-value hyperbolas instead of
-        # the one-value ones. But to be consistent with the rest of functions the parameters
-        # are connected to one-value hyperbolas - like half_thickness is now recalculated for zero-value hyperbola:
-        half_thickness = ((size-white_thickness)/2.0)*greater_equal(size-white_thickness,0.0)
+        half_thickness = thickness / 2.0
 
         distance_from_vertex_middle = fmod(sqrt(absolute(x**2 - y**2)),size)
         distance_from_vertex_middle = minimum(distance_from_vertex_middle,size - distance_from_vertex_middle)
 
         distance_from_vertex = distance_from_vertex_middle - half_thickness
 
-        hyperbola = 0.0 + greater_equal(distance_from_vertex,0.0)
+        hyperbola = 1.0 - greater_equal(distance_from_vertex,0.0)
 
         sigmasq = gaussian_width*gaussian_width
 
         with float_error_ignore():
             falloff = exp(divide(-distance_from_vertex*distance_from_vertex, 2.0*sigmasq))
 
-        return maximum(falloff,hyperbola)
+        return maximum(falloff, hyperbola)
 
 
 class RadialGrating(PatternGenerator):
@@ -174,7 +172,7 @@ class RadialGrating(PatternGenerator):
         with float_error_ignore():
             falloff = exp(divide(-distance*distance, 2.0*sigmasq))
 
-        return maximum(radius,falloff)
+        return maximum(radius, falloff)
 
 
 class ConcentricRings(PatternGenerator):
@@ -201,14 +199,11 @@ class ConcentricRings(PatternGenerator):
         aspect_ratio = params['aspect_ratio']
         x = self.pattern_x/aspect_ratio
         y = self.pattern_y
-        white_thickness = params['thickness']
+        thickness = params['thickness']
         gaussian_width = params['smoothing']
         size = params['size']
 
-        # To have zero value in middle point this pattern calculates zero-value rings instead of
-        # the one-value ones. But to be consistent with the rest of functions the parameters
-        # are connected to one-value rings - like half_thickness is now recalculated for zero-value ring:
-        half_thickness = ((size-white_thickness)/2.0)*greater_equal(size-white_thickness,0.0)
+        half_thickness = thickness / 2.0
 
         distance_from_origin = sqrt(x**2+y**2)
 
@@ -217,14 +212,14 @@ class ConcentricRings(PatternGenerator):
 
         distance_from_ring = distance_from_ring_middle - half_thickness
 
-        ring = 0.0 + greater_equal(distance_from_ring,0.0)
+        ring = 1.0 - greater_equal(distance_from_ring,0.0)
 
         sigmasq = gaussian_width*gaussian_width
 
         with float_error_ignore():
             falloff = exp(divide(-distance_from_ring*distance_from_ring, 2.0*sigmasq))
 
-        return maximum(falloff,ring)
+        return maximum(falloff, ring)
 
 class ArcCentered(Arc):
     """
@@ -241,6 +236,7 @@ class ArcCentered(Arc):
 
         if p.aspect_ratio==0.0:
             return self.pattern_x*0.0
+        self.pattern_x -= (1+cos(pi-p.arc_length/2))*p.size/4
        
         return arc_by_radian((self.pattern_x+p.size/2)/p.aspect_ratio, self.pattern_y, p.size,
                              (2*pi-p.arc_length/2, p.arc_length/2), p.thickness, p.smoothing)
@@ -253,49 +249,49 @@ variants = 4
 ## GRATINGS ##
 
 # Sinusoidal
-sin1 = [SineGrating(phase=3*pi/2,frequency=1.6,orientation=i*pi/variants)
+sin1 = [SineGrating(phase=pi/2,frequency=2.0,orientation=i*pi/variants)
         for i in range(variants)]
-sin2 = [SineGrating(phase=3*pi/2,frequency=2.6,orientation=i*pi/variants)
+sin2 = [SineGrating(phase=pi/2,frequency=3.1,orientation=i*pi/variants)
         for i in range(variants)]
-sin3 = [SineGrating(phase=3*pi/2,frequency=3.6,orientation=i*pi/variants)
+sin3 = [SineGrating(phase=pi/2,frequency=4.2,orientation=i*pi/variants)
         for i in range(variants)]
 
 # Hyperbolic
-hyp1 = [HyperbolicGrating(orientation=i*pi/(2*variants),size=0.75,
-                          smoothing=0.10,thickness=0.05)
+hyp1 = [HyperbolicGrating(orientation=i*pi/(2*variants),size=0.36,
+                          smoothing=0.05,thickness=0.04)
         for i in range(variants)]
-hyp2 = [HyperbolicGrating(orientation=i*pi/(2*variants),size=0.55,
-                          smoothing=0.075,thickness=0.05)
+hyp2 = [HyperbolicGrating(orientation=i*pi/(2*variants),size=0.27,
+                          smoothing=0.05,thickness=0.03)
         for i in range(variants)]
-hyp3 = [HyperbolicGrating(orientation=i*pi/(2*variants),size=0.35,
-                          smoothing=0.05,thickness=0.05)
+hyp3 = [HyperbolicGrating(orientation=i*pi/(2*variants),size=0.18,
+                          smoothing=0.05,thickness=0.015)
         for i in range(variants)]
 
 # Polar
-pol1 = [ConcentricRings(size=1.2/(1+j),thickness=0.025-j*0.005,smoothing=0.04/(1+j*0.15))
+pol1 = [ConcentricRings(size=0.35/(1+j*0.5),thickness=0.05/(1+j*0.35),smoothing=0.05/(1+j*0.15))
         for j in range(variants)]
-pol2 = [Composite(generators=[SpiralGrating(size=0.45/(1+j),thickness=0.03-j*0.005,
-                  smoothing=0.15/(j+1),orientation=(i*2+1)*pi/2) for i in range(2)])
+pol2 = [Composite(generators=[SpiralGrating(size=0.45/(1+j),thickness=0.16-j*0.012,
+                  smoothing=0.05/(1+j*0.15),orientation=(i*2+1)*pi/2) for i in range(2)])
         for j in range(variants)]
-pol3 = [Composite(generators=[SpiralGrating(size=0.75/(1+j*0.8),thickness=0.03-j*0.005,
-                  smoothing=0.15/(j+1),orientation=i*2*pi/4) for i in range(4)])
+pol3 = [Composite(generators=[SpiralGrating(size=0.75/(1+j*0.8),thickness=0.17-j*0.013,
+                  smoothing=0.06/(1+j*0.15),orientation=i*2*pi/4) for i in range(4)])
         for j in range(variants)]
-pol4 = [Composite(generators=[SpiralGrating(size=1.05/(1+j*0.7),thickness=0.03-j*0.003,
-                  smoothing=0.15/(j+1),orientation=i*2*pi/6) for i in range(6)])
+pol4 = [Composite(generators=[SpiralGrating(size=1.05/(1+j*0.7),thickness=0.18-j*0.014,
+                  smoothing=0.07/(1+j*0.15),orientation=i*2*pi/6) for i in range(6)])
         for j in range(variants)]
-pol5 = [Composite(generators=[SpiralGrating(size=1.35/(1+j*0.6),thickness=0.03-j*0.003,
-                  smoothing=0.15/(j+1),orientation=i*2*pi/8) for i in range(8)])
+pol5 = [Composite(generators=[SpiralGrating(size=1.35/(1+j*0.6),thickness=0.19-j*0.015,
+                  smoothing=0.08/(1+j*0.15),orientation=i*2*pi/8) for i in range(8)])
         for j in range(variants)]
-pol6 = [Composite(generators=[RadialGrating(arc_length=0.85/(j*2.0+1),smoothing=0.25/(j*0.4+1),
+pol6 = [Composite(generators=[RadialGrating(arc_length=1.0/(j*2.0+1),smoothing=0.15/(1+j*0.4),
                   orientation=i*2*pi/((j+1)*2)) for i in range((j+1)*2)])
         for j in range(variants)]
 
 ## CONTOUR STIMULI ##
 
 # Bar
-bar1 = [Rectangle(orientation=j*pi/4,smoothing=0.015,aspect_ratio=0.04,size=1.0)
+bar1 = [Rectangle(orientation=j*pi/4,smoothing=0.015,aspect_ratio=0.1,size=0.5)
         for j in range(variants)]
-bar2 = [Rectangle(orientation=j*pi/4,smoothing=0.015,aspect_ratio=0.08,size=0.5)
+bar2 = [Rectangle(orientation=j*pi/4,smoothing=0.015,aspect_ratio=0.2,size=0.25)
         for j in range(variants)]
 
 # Tri-star
@@ -306,13 +302,13 @@ par = 3 # number of parts of pattern
 def angs(i,j):
   """Calculation of angles."""
   return j*pi/2+i*2*pi/par
-size = 1.0 # size of basic pattern part
-star1 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,aspect_ratio=0.08,
+size = 0.5 # size of basic pattern part
+star1 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,aspect_ratio=0.2,
                    size=size/2,x=-size/4*sin(angs(i,j)),y=size/4*cos(angs(i,j)))
                    for i in range(par)])
          for j in range(variants)]
-size = 0.5
-star2 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,aspect_ratio=0.16,
+size = 0.25
+star2 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,aspect_ratio=0.4,
                    size=size/2,x=-size/4*sin(angs(i,j)),y=size/4*cos(angs(i,j)))
                    for i in range(par)])
          for j in range(variants)]
@@ -323,10 +319,10 @@ def angs(i,j):
   """Calculation of angles."""
   return j*pi/8+i*pi/par
 star3 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,
-                   aspect_ratio=0.04,size=1.0) for i in range(par)])
+                   aspect_ratio=0.1,size=0.5) for i in range(par)])
          for j in range(variants)]
 star4 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,
-                   aspect_ratio=0.08,size=0.5) for i in range(par)])
+                   aspect_ratio=0.2,size=0.25) for i in range(par)])
          for j in range(variants)]
 
 # Star/Circle
@@ -334,88 +330,88 @@ par = 5
 def angs(i,j):
   """Calculation of angles."""
   return j*pi+i*2*pi/par
-size = 1.0
-star5 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,aspect_ratio=0.08,
+size = 0.5
+star5 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,aspect_ratio=0.2,
                    size=size/2,x=-size/4*sin(angs(i,j)),y=size/4*cos(angs(i,j))) for i in range(par)])
          for j in range(2)]
 par = 3
 star5.append(Composite(generators=[Rectangle(orientation=i*2*pi/par,smoothing=0.015,
-                       aspect_ratio=0.04,size=size) for i in range(par)]))
-star5.append(Ring(smoothing=0.015,thickness=0.04,size=0.9))
+                       aspect_ratio=0.1,size=size) for i in range(par)]))
+star5.append(Ring(smoothing=0.015,thickness=0.05,size=0.5))
 
 par = 5
 def angs(i,j):
   """Calculation of angles."""
   return j*pi+i*2*pi/par
-size = 0.5
-star6 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,aspect_ratio=0.16,
+size = 0.25
+star6 = [Composite(generators=[Rectangle(orientation=angs(i,j),smoothing=0.015,aspect_ratio=0.4,
                    size=size/2,x=-size/4*sin(angs(i,j)),y=size/4*cos(angs(i,j))) for i in range(par)])
          for j in range(2)]
 par = 3
 star6.append(Composite(generators=[Rectangle(orientation=i*2*pi/par,smoothing=0.015,
-                       aspect_ratio=0.08,size=size) for i in range(par)]))
-star6.append(Ring(smoothing=0.015,thickness=0.04,size=0.45))
+                       aspect_ratio=0.2,size=size) for i in range(par)]))
+star6.append(Ring(smoothing=0.015,thickness=0.05,size=0.25))
 
 # Acute angle
 angs = [(i*2*pi/16) for i in [-1,1]]
-size = 1.0
+size = 0.5
 ang1 = [Composite(generators=[Rectangle(orientation=angs[i],smoothing=0.015,
-                aspect_ratio=0.04,size=size,x=-size/2*sin(angs[i]),y=size/2*cos(angs[i]))
+                aspect_ratio=0.1,size=size,x=-size/2*sin(angs[i]))
                 for i in range(2)],orientation=j*2*pi/variants)
         for j in range(variants)]
-size = 0.5
+size = 0.25
 ang2 = [Composite(generators=[Rectangle(orientation=angs[i],smoothing=0.015,
-                aspect_ratio=0.08,size=size,x=-size/2*sin(angs[i]),y=size/2*cos(angs[i]))
+                aspect_ratio=0.2,size=size,x=-size/2*sin(angs[i]))
                 for i in range(2)],orientation=j*2*pi/variants)
         for j in range(variants)]
 
 # Right angle
 angs = [(i*2*pi/8) for i in [-1,1]]
-size = 1.0
+size = 0.5
 ang3 = [Composite(generators=[Rectangle(orientation=angs[i],smoothing=0.015,
-                aspect_ratio=0.04,size=size,x=-size/2*sin(angs[i]),y=size/2*cos(angs[i]))
+                aspect_ratio=0.1,size=size,x=-size/2*sin(angs[i]))
                 for i in range(2)],orientation=j*2*pi/variants)
         for j in range(variants)]
-size = 0.5
+size = 0.25
 ang4 = [Composite(generators=[Rectangle(orientation=angs[i],smoothing=0.015,
-                aspect_ratio=0.08,size=size,x=-size/2*sin(angs[i]),y=size/2*cos(angs[i]))
+                aspect_ratio=0.2,size=size,x=-size/2*sin(angs[i]))
                 for i in range(2)],orientation=j*2*pi/variants)
         for j in range(variants)]
 
 # Obtuse angle
 angs = [(i*2*pi/6) for i in [-1,1]]
-size = 1.0
+size = 0.5
 ang5 = [Composite(generators=[Rectangle(orientation=angs[i],smoothing=0.015,
-                aspect_ratio=0.04,size=size,x=-size/2*sin(angs[i]),y=size/2*cos(angs[i]))
+                aspect_ratio=0.1,size=size,x=-size/2*sin(angs[i]))
                 for i in range(2)],orientation=j*2*pi/variants)
         for j in range(variants)]
-size = 0.5
+size = 0.25
 ang6 = [Composite(generators=[Rectangle(orientation=angs[i],smoothing=0.015,
-                aspect_ratio=0.08,size=size,x=-size/2*sin(angs[i]),y=size/2*cos(angs[i]))
+                aspect_ratio=0.2,size=size,x=-size/2*sin(angs[i]))
                 for i in range(2)],orientation=j*2*pi/variants)
         for j in range(variants)]
 
 # Quarter arc
-arc1 = [ArcCentered(arc_length=pi/2,smoothing=0.015,thickness=0.04,size=0.9,
+arc1 = [ArcCentered(arc_length=pi/2,smoothing=0.015,thickness=0.05,size=0.5,
                     orientation=i*2*pi/variants)
         for i in range(variants)]
-arc2 = [ArcCentered(arc_length=pi/2,smoothing=0.015,thickness=0.04,size=0.45,
+arc2 = [ArcCentered(arc_length=pi/2,smoothing=0.015,thickness=0.05,size=0.25,
                     orientation=i*2*pi/variants)
         for i in range(variants)]
 
 # Semi-circle
-arc3 = [ArcCentered(arc_length=pi,smoothing=0.015,thickness=0.04,size=0.9,
+arc3 = [ArcCentered(arc_length=pi,smoothing=0.015,thickness=0.05,size=0.5,
                     orientation=i*2*pi/variants)
         for i in range(variants)]
-arc4 = [ArcCentered(arc_length=pi,smoothing=0.015,thickness=0.04,size=0.45,
+arc4 = [ArcCentered(arc_length=pi,smoothing=0.015,thickness=0.05,size=0.25,
                     orientation=i*2*pi/variants)
         for i in range(variants)]
 
 # 3/4 arc
-arc5 = [ArcCentered(arc_length=3*pi/2,smoothing=0.015,thickness=0.04,size=0.9,
+arc5 = [ArcCentered(arc_length=3*pi/2,smoothing=0.015,thickness=0.05,size=0.5,
                     orientation=i*2*pi/variants)
         for i in range(variants)]
-arc6 = [ArcCentered(arc_length=3*pi/2,smoothing=0.015,thickness=0.04,size=0.45,
+arc6 = [ArcCentered(arc_length=3*pi/2,smoothing=0.015,thickness=0.05,size=0.25,
                     orientation=i*2*pi/variants)
         for i in range(variants)]
 
@@ -437,26 +433,39 @@ quarter = arc1 + arc2
 semi = arc3 + arc4
 threeqtrs = arc5 + arc6
 
-stimuli_subclasses = [sinusoidal,
-                      hyperbolic,
-                      concentric_like,
-                      radial_like,
-                      bar,
-                      tristar,
-                      cross,
-                      star,
-                      acute,
-                      right,
-                      obtuse,
-                      quarter,
-                      semi,
-                      threeqtrs ]
+## Stimuli subclasses
+all_stimuli_subclasses = [sinusoidal,
+                          hyperbolic,
+                          concentric_like,
+                          radial_like,
+                          bar,
+                          tristar,
+                          cross,
+                          star,
+                          acute,
+                          right,
+                          obtuse,
+                          quarter,
+                          semi,
+                          threeqtrs ]
+grating_stimuli_subclasses = all_stimuli_subclasses[:4]
+contour_stimuli_subclasses = all_stimuli_subclasses[4:]
 
-## Stimuli classes
-simple_grating = sinusoidal
-simple_contour = bar
-complex_grating = hyperbolic + polar
-complex_contour = tristar + cross + star + acute + right + obtuse + quarter + semi + threeqtrs
-all_stimuli = sinusoidal + hyperbolic + polar + bar + tristar + cross + star +\
-              acute + right + obtuse + quarter + semi + threeqtrs
+## Stimuli subclasses labels
+all_stimuli_subclasses_labels = ['sinusoidal',
+                             'hyperbolic',
+                             'concentric-like',
+                             'radial-like',
+                             'bar',
+                             'tri-star',
+                             'cross',
+                             'star/circle',
+                             'acute angle',
+                             'right angle',
+                             'obtuse angle',
+                             'quarter arc',
+                             'semi-circle',
+                             '3/4 arc' ]
+grating_stimuli_subclasses_labels = all_stimuli_subclasses_labels[:4]
+contour_stimuli_subclasses_labels = all_stimuli_subclasses_labels[4:]
 
