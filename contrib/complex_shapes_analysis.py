@@ -1,3 +1,11 @@
+"""
+Complex shapes analysis and measuring of responses for Hegde and Van Essen stimuli sets.
+Contains measuring of best subclasses, modulation by complex shapes etc.
+
+$Id$
+"""
+__version__ = "$Revision$"
+
 import operator
 import random
 
