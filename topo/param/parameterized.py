@@ -1076,10 +1076,17 @@ class Parameterized(object):
         return "<%s %s>" % (self.__class__.__name__,self.name)
 
 
-    # CB: I'm not sure why we allow multiple args here rather than just one
-    # message (given that the caller can easily use string substitution with
-    # "%s"%var etc). I think this makes things more complicated, but I might
-    # be missing something.
+    # CEBALERT: designed to avoid any processing unless the print
+    # level is high enough (e.g. to avoid expensive str(Parameterized
+    # instance) calls). Not all callers are taking advantage of this
+    # (either calling str() themselves, resulting in potentially
+    # expensive operations for things that might never be printed, or
+    # redundantly using lambda functions to avoid the
+    # processing. Should fix that.
+    #
+    # Note that Python's logging module would simplify print
+    # statements still further (see "topographica's debug printing"
+    # emails between CB&JB).
     def __db_print(self,level=NORMAL,*args):
         """
         Print each of the given args iff print_level or
