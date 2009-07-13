@@ -603,7 +603,7 @@ def runModelFit():
     mf = BasicModelFit()
     mf.retina_diameter = 1.0
     mf.density = density
-    mf.epochs=locals().get('epochs',500)
+    mf.epochs=locals().get('epochs',10)
     mf.num_of_units = 60
     mf.init()
 
@@ -626,9 +626,19 @@ def runModelFit():
     
     return mf
 
+def showRF(mf,index,density):
+    w = mf.weigths[index].reshape(density,density)
+    pylab.figure()
+    pylab.show._needmain=False
+    pylab.imshow(w,vmin=-1.0,vmax=1.0)
+    pylab.show()
+    
+
 def analyseDataSet(data_set):
 #        for cell in dataset:
         for z in xrange(0,10):
 		pylab.figure()
 		pylab.plot(numpy.arange(0,num_im,1),a[z],'bo')	
 	pylab.show()
+        
+runModelFit()
