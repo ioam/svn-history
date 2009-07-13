@@ -561,7 +561,7 @@ def clump_low_responses(dataset,threshold):
     
 def runModelFit():
     
-    density=100
+    density=240
     
     dataset = loadRandomizedDataSet("Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL",6,15,125,60)
     
