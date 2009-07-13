@@ -603,6 +603,7 @@ def runModelFit():
     mf = BasicModelFit()
     mf.retina_diameter = 1.0
     mf.density = density
+    mf.learning_rate = locals().get('lr',0.00001)
     mf.epochs=locals().get('epochs',10)
     mf.num_of_units = 60
     mf.init()
