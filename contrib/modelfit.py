@@ -4,6 +4,10 @@ import pylab
 from numpy import array, size, mat, shape, ones, arange
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.base.functionfamily import IdentityTF
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, AttributeTrackingTF,PatternCombine,Sigmoid, HalfRectify
+from topo.base.cf import CFSheet
+from topo.projection.basic import CFProjection, SharedWeightCFProjection
+from fixedpoint import FixedPoint
 import topo
 from topo.command.pylabplots import matrixplot
 from topo.sheet import GeneratorSheet 
@@ -17,8 +21,8 @@ class ModelFit():
     weigths = []
     retina_diameter=1.0
     density=24
-    epochs = 100
-    learning_rate = 0.0001
+    epochs = 500
+    learning_rate = 0.00001
     inputDC = 0
     modelDC = 0
     meanModelResponses=[]
@@ -28,7 +32,7 @@ class ModelFit():
     
     def init(self):
         self.reliable_indecies = ones(self.num_of_units)
-        for freq in [32.0]:
+        for freq in [16.0]:
         #for freq in [8.0]:
             for xpos in xrange(0,int(freq)):
                 for ypos in xrange(0,int(freq)):
@@ -84,7 +88,7 @@ class ModelFit():
         # substract the mean from model responses
         for i in xrange(0,len(modelResponses)):
             modelResponses[i] = modelResponses[i] - self.meanModelResponses
-        
+            
 	# substract the mean from validation responses
 	for i in xrange(0,len(validationModelResponses)):
             validationModelResponses[i] = validationModelResponses[i] - self.meanModelResponses
@@ -101,12 +105,17 @@ class ModelFit():
         mean_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
         
         old_error = 10000000 * ones(shape(activities[0]))
+        
+        first_val_error=0
+        val_err=0
+        
         for k in xrange(0,self.epochs):
             mean_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
 	    validation_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
             tmp_weigths=numpy.mat(numpy.zeros((size(activities,1),size(modelResponses[0],1))))
             for i in xrange(0,len(inputs)):
                 error = ((activities[i].T - self.weigths*modelResponses[i].T - self.modelDC.T))
+                
                 tmp_weigths = tmp_weigths + (error * modelResponses[i])
                 mean_error=mean_error+numpy.power(error,2)
             
@@ -126,6 +135,9 @@ class ModelFit():
             err = numpy.sum(mean_error)/len(inputs)/len(mean_error)    
 	    val_err = numpy.sum(validation_error)/len(validation_inputs)/len(validation_error)    
             
+            if k == 0:
+               first_val_error=val_err
+            
             # adjust learning rates based on new errors
             print (k,err,val_err)
             #print delta[0]
@@ -139,12 +151,18 @@ class ModelFit():
             #print (learning_rates[0][0]) 
         
 #        print mean_error/len(inputs)
-
+        
+        print "First val error:" + str(first_val_error) + "\nLast val error:" + str(val_err) + "\nImprovement:" + str((first_val_error - val_err)/first_val_error * 100) + "%"
+        
         # recalculate a new model DC based on what we have learned
         self.modelDC*=0.0
-        for i in xrange(0,len(inputs)):
-            self.modelDC+=(activities[i].T - self.weigths*modelResponses[i].T).T
-        self.modelDC = self.modelDC/len(inputs)    
+        #for i in xrange(0,len(inputs)):
+        #    self.modelDC+=(activities[i].T - self.weigths*modelResponses[i].T).T
+        #self.modelDC = self.modelDC/len(inputs)    
+        
+        for i in xrange(0,len(validation_inputs)):
+            self.modelDC+=(validation_activities[i].T - self.weigths*validationModelResponses[i].T).T
+        self.modelDC = self.modelDC/len(validation_inputs)   
     
     def calculateReliabilities(self,inputs,activities,top_percentage):
         corr_coef=numpy.zeros(self.num_of_units)
@@ -208,7 +226,7 @@ class ModelFit():
     
         tmp = []
         correct = 0
-        pylab.figure()
+        #pylab.figure()
         
         #print shape(numpy.abs(activities[0].T - modelActivities[0]))
         #print shape(numpy.mat(self.reliable_indecies).T)
@@ -218,6 +236,7 @@ class ModelFit():
         for i in target_inputs:
             tmp = []
             for j in target_inputs:
+                
                 tmp.append(numpy.sum(
                                      numpy.multiply(numpy.abs(activities[i].T - modelActivities[j]),numpy.mat(self.reliable_indecies).T)
                                     ))
@@ -326,8 +345,15 @@ class MotionModelFit(ModelFit):
             
             return numpy.mat(res)    
 
+class BasicModelFit(ModelFit):
+      def init(self):
+          self.reliable_indecies = ones(self.num_of_units)
+      def calculateModelResponse(self,inputs,index):
+          return  numpy.mat(inputs[index].flatten().tolist())
+
+
 def showMotionEnergyPatterns():
-    
+
     topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=SineGrating(),
                                   period=1.0, phase=0.01,
@@ -371,1022 +397,238 @@ def toMatrix(array,x,y):
                
     return tmp
 
-def runLISSOMModelFit():
-    
-    
-    train_image_filenames=["images/mymix/%d.pgm" %(i) for i in xrange(99)]
-    train_inputs=[Image(filename=f,
-                       size=2.0,  size_normalization='stretch_to_fit',
-                       #x=UniformRandom(lbound=-0.75,ubound=0.75,seed=511),
-                       #y=UniformRandom(lbound=-0.75,ubound=0.75,seed=1023),
-                       x=0,
-                       y=0)
-                       #orientation=UniformRandom(lbound=-3.14,ubound=3.14,seed=511))
-    for f in train_image_filenames]
-    
-    train_combined_inputs =contrib.jacommands.SequenceSelector(generators=train_inputs)
-
-    test_image_filenames=["images/mymix/%d.pgm" %(i+100) for i in xrange(90)]
-    test_inputs=[Image(filename=f,
-                       size=2.0,  size_normalization='stretch_to_fit',
-                       #x=UniformRandom(lbound=-0.75,ubound=0.75,seed=511),
-                       #y=UniformRandom(lbound=-0.75,ubound=0.75,seed=1023),
-                       x=0,
-                       y=0)
-                       #orientation=UniformRandom(lbound=-3.14,ubound=3.14,seed=511))
-    for f in test_image_filenames]
-    test_combined_inputs =contrib.jacommands.SequenceSelector(generators=test_inputs)
-    
-    mf = ModelFit()
-    
-    mf.retina_diameter = (0.5+0.25+0.375)*2
-    mf.density = topo.sim["Retina"].nominal_density
-    mf.init()
-    topo.sim["V1"].plastic = False
-
-    topo.sim['Retina'].set_input_generator(train_combined_inputs)
-    
-    inputs = []
-    activities = []
-    topo.sim["V1"].output_fn=IdentityTF()    
-    for i in xrange(0,99):
-        topo.sim.run(0.15)
-        inputs.append(topo.sim["Retina"].activity.copy())
-        activities.append(topo.sim["V1"].activity.copy().flatten())
-        topo.sim.run(0.85)
-    print float(topo.sim.time())
-    
-    mf.trainModel(inputs,numpy.mat(activities))    
-    
-    mf.testModel(inputs,numpy.mat(activities))
-
-    topo.sim['Retina'].set_input_generator(test_combined_inputs)
-
-    inputs = []
-    activities = []
-        
-    for i in xrange(0,90):
-        topo.sim.run(0.15)
-        inputs.append(topo.sim["Retina"].activity.copy())
-        activities.append(topo.sim["V1"].activity.copy().flatten())
-        topo.sim.run(0.85)        
-    
-    mf.testModel(inputs,numpy.mat(activities))
-    return mf
-
-def runSineGratingsModelFit():
-    f = file("Flogl/gratings.txt", "r")
+def loadRandomizedDataSet(directory,num_rep,num_frames,num_stimuli,n_cells):
+    f = file(directory + "/combined_data", "r") 
     data = [line.split() for line in f]
     f.close()
-    pylab.figure(1)
-    pylab.plot(numpy.array(numpy.matrix(data).T[29].T))
-      
-    # transform data into floats
-    (sizex,sizey) = shape(data)
-    print sizex,sizey
-    # getting rid of last 3 cells!
-    sizey=sizey-4
-    activities = numpy.zeros((sizex/10,sizey))
-    for i in xrange(0,sizex):
-        for j in xrange(0,sizey):
-            activities[i/10,j] += float(data[i][j]) 
-                                
-    topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
+
+    f = file(directory +"/image_sequence", "r") 
+    random = [line.split() for line in f]
+    random=numpy.array(random)
+    random = random[0]
+    f.close()
+    r=[]
+    for j in random:
+	r.append(int(float(j)))
+    random = r
+
+    dataset = [([[] for i in xrange(0,num_stimuli)]) for i in xrange(0,n_cells)]
+
+    (recordings,num_cells) = shape(data)
+
+    assert recordings == (num_rep * num_stimuli * num_frames)
+    assert recordings / num_frames == len(random)
+    assert n_cells == num_cells
+    
+    for k in xrange(0,num_cells):
+        for i in xrange(0,num_rep*num_stimuli):
+            f = []
+            for fr in xrange(0,num_frames):
+			f.append(float(data[i*num_frames+fr][k]))
+            dataset[k][random[i]-1].append(f)
+
+    return (numpy.arange(0,num_stimuli),dataset)
+    
+def averageRangeFrames(dataset,min,max):
+    (index,data) = dataset
+    for cell in data:
+        for stimulus in cell:
+            for r in xrange(0,len(stimulus)):
+                stimulus[r]=[numpy.average(stimulus[r][min:max])]
+    return (index,data)
+
+def averageRepetitions(dataset):
+    (index,data) = dataset
+    (num_cells,num_stim,num_rep,num_frames) = shape(data)
+    for cell in data:
+        for stimulus in xrange(0,num_stim):
+            r = [0 for i in range(0,num_frames)]
+            for rep in xrange(0,num_rep):
+                for f in xrange(0,num_frames):
+                    r[f]+=cell[stimulus][rep][f]/num_rep
+            cell[stimulus]=[r]
+    return (index,data)
+
+
+def splitDataset(dataset,ratio):
+    (index,data) = dataset
+    (num_cells,num_stim,trash1,trash2) = shape(data)
+
+    dataset1=[]
+    dataset2=[]
+    index1=[]
+    index2=[]
+
+    for i in xrange(0,num_stim):
+        if i < numpy.floor(num_stim*ratio):
+            index1.append(index[i])
+        else:    
+            index2.append(index[i])
+    
+    for cell in data:
+        d1=[]
+        d2=[]
+        for i in xrange(0,num_stim):
+            if i < numpy.floor(num_stim*ratio):
+               d1.append(cell[i])
+            else:    
+               d2.append(cell[i])
+        dataset1.append(d1)
+        dataset2.append(d2)
+
+    return ((index1,dataset1),(index2,dataset2))
+
+def generateTrainingSet(dataset):
+    (index,data) = dataset
+
+    training_set=[]
+    for cell in data:
+        cell_set=[]
+        for stimuli in cell:
+           for rep in stimuli:
+                for frame in rep:
+                    cell_set.append(frame)
+        training_set.append(cell_set)
+    return numpy.array(numpy.matrix(training_set).T)
+
+def generateInputs(dataset,directory,image_matching_string,density,LGN=False,LGN_size=1.0):
+    (index,data) = dataset
+
+    image_filenames=[directory+image_matching_string %(i) for i in index]
+    inputs=[Image(filename=f,size=0.55, x=0,y=0)   for f in image_filenames]
+    combined_inputs =contrib.jacommands.SequenceSelector(generators=inputs)
+
+    topo.sim['Retina']=GeneratorSheet(nominal_density=density,	
                                   input_generator=SineGrating(),
                                   period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = ModelFit()
-    mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density
-    mf.num_of_units = sizey
-    mf.init()
-
+                                  nominal_bounds=BoundingBox(radius=0.5+0.1))
+                                  
+    ## DoG weights for the LGN
+    centerg   = Gaussian(size=0.005*LGN_size,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
+    surroundg = Gaussian(size=0.02*LGN_size,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
+        
+    on_weights = topo.pattern.basic.Composite(
+        generators=[centerg,surroundg],operator=numpy.subtract)
     
-    inputs = []
-    for z in xrange(0,5):
-        for i in xrange(0,8):
-            input = SineGrating(frequency=2.4,orientation=2*numpy.pi/8*i)
-            topo.sim['Retina'].set_input_generator(input)
-            topo.sim.run(1.0)
+    topo.sim["Retina"].input_generator.index=0
+    topo.sim['LGNOn'] = CFSheet(nominal_density=density/2,nominal_bounds=BoundingBox(radius=0.5),                    output_fns=[HalfRectify()],measure_maps=False)
+
+    topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=locals().get('ret_strength',2.33),
+                 nominal_bounds_template=BoundingBox(radius=0.1),name='Afferent',
+                 weights_generator=on_weights)
+
+    inputs=[]
+    topo.sim['Retina'].set_input_generator(combined_inputs)
+    for j in xrange(0,len(index)):
+        topo.sim.run(1)
+        if LGN:
+            inputs.append(topo.sim["LGNOn"].activity.copy())
+        else: 
             inputs.append(topo.sim["Retina"].activity.copy())
-
-    print shape(numpy.mat(activities[0:35]))
-    print shape(inputs[0:35])
-    mf.trainModel(inputs[0:35],numpy.mat(activities[0:35]))
+    training_inputs=[]
     
-    mf.calculateReliabilities(inputs[0:35],numpy.mat(activities[0:35]),10)                        
+    for s in range(len(data[0])):
+        for rep in data[0][s]:
+            for frame in rep:
+                training_inputs.append(inputs[s])
+    return inputs
+
+def clump_low_responses(dataset,threshold):
+    (index,data) = dataset
     
-    print shape(numpy.mat(activities[32:40]))
-    print shape(inputs[36:40])
-    mf.testModel(inputs[36:40],numpy.mat(activities[36:40]))
-    pylab.show()
-    return mf
-
-        
-
-def runSineGratingsMotionModelFit():
-    f = file("Flogl/gratings.txt", "r")
-    data = [line.split() for line in f]
-    f.close()
+    avg=0
+    count=0
     
-    # transform data into floats
-    (sizex,sizey) = shape(data)
-    # getting rid of last 3 cells!
-    sizey=sizey-4
-    activities = numpy.zeros((sizex,sizey))
-    for i in xrange(0,sizex):
-        for j in xrange(0,sizey):
-            activities[i,j] += float(data[i][j]) 
- 
-    #pylab.figure(2)
-    #pylab.plot(numpy.array(numpy.matrix(activities).T[29].T))
-
-    topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = MotionModelFit()
-    mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density
-    mf.num_of_units = sizey
-    mf.init()
-
+    for cell in data:
+        for stimuli in cell:
+           for rep in stimuli:
+                for frame in rep:
+                    avg+=frame
+                    count+=1
+    avg = avg/count
+   
+    for index1, cell in enumerate(data): 
+        for index2, stimulus in enumerate(cell):
+            for index3, repetition in enumerate(stimulus):
+                for index4, frame in enumerate(repetition):
+                    if frame>=avg*(1.0+threshold):
+                       repetition[index4]=frame
+                    else:
+                       repetition[index4]=0
+                       
+    return (index,data)
     
-    inputs = []
-    for z in xrange(0,5):
-        for i in xrange(0,8):
-            for x in xrange(0,10):
-                input = SineGrating(frequency=1.0,orientation=2*numpy.pi/8*i,phase=numpy.pi/10*x)
-                topo.sim['Retina'].set_input_generator(input)
-                topo.sim.run(1.0)
-                inputs.append(topo.sim["Retina"].activity.copy())
-    if False:
-        pylab.figure()
-        #f1 = fig.add_subplot(112, autoscale_on=True)
-        f1 = pylab.subplot(121)
-        f2 = pylab.subplot(122,autoscale_on=False,ylim=(-800, 800))
-        pylab.ylim(-800,800)
-        pylab.hold(False)
-        import time
-        #f2 = fig.add_subplot(112, autoscale_on=True)
-        for i in xrange(0,80):
-            act = mf.calculateModelResponse(inputs,i)
-            f1.imshow(inputs[i])
-            f2.plot(numpy.array(act[0].T),'ro',scaley=False)
-            pylab.show._needmain=False
-            pylab.show()
-            time.sleep(2)
-
+def runModelFit():
     
-    print shape(inputs[0:320])
-    mf.trainModel(inputs[0:320],numpy.mat(activities[0:320]))                        
+    density=100
     
-    #mf.calculateReliabilities(inputs[0:320],numpy.mat(activities[0:320]),100)
+    dataset = loadRandomizedDataSet("Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL",6,15,125,60)
     
-    
-    #print shape(inputs[320:400])
-    #mf.testModel(inputs[240:320],numpy.mat(activities[240:320]),[9,19,29,39,49,59,69,79])
-    mf.calculateReliabilities(inputs[0:320],numpy.mat(activities[0:320]),100)
-    mf.testModel(inputs[320:400],numpy.mat(activities[320:400]),[8,18,28,38,48,58,68,78])
-    #mf.testModel(inputs[240:320],numpy.mat(activities[240:320]),[8,18,28,38,48,58,68,78])
-    #mf.testModel(inputs[160:240],numpy.mat(activities[160:240]),[8,18,28,38,48,58,68,78])
-    #mf.testModel(inputs[80:160],numpy.mat(activities[80:160]),[8,18,28,38,48,58,68,78])
-    #mf.testModel(inputs[0:80],numpy.mat(activities[0:80]),[8,18,28,38,48,58,68,78])
-
-    pylab.show()
-    return mf
-
-
-def runSineGratingsEpisodicMotionModelFit():
-    f = file("Flogl/gratings.txt", "r")
-    data = [line.split() for line in f]
-    f.close()
-    
-    # transform data into floats
-    (sizex,sizey) = shape(data)
-    # getting rid of last 3 cells!
-    sizey=sizey-4
-    activities = numpy.zeros((sizex/10,sizey))
      
-    for i in xrange(0,sizex/10):
-        for j in xrange(0,sizey):
-            for r in xrange(0,10):
-                activities[i,j] += float(data[i*10+r][j]) 
-
-    for i in xrange(0,sizex/10):
-        for j in xrange(0,sizey):
-            activities[i,j] /=10    
-    
-    #pylab.figure(2)
-    #pylab.plot(numpy.array(numpy.matrix(activities).T[29].T))
-
-    topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = MotionModelFit()
-    mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density
-    mf.num_of_units = sizey
-    mf.real_time=False
-    mf.init()
+    print shape(dataset[1])
+    dataset = clump_low_responses(dataset,locals().get('ClumpMag',0.1))
+    print shape(dataset[1])
+    dataset = averageRangeFrames(dataset,0,15)
+    print shape(dataset[1])
+    dataset = averageRepetitions(dataset)
+    print shape(dataset[1])
     
     
-    inputs = []
-    for z in xrange(0,5):
-        for i in xrange(0,8):
-            inn = []
-            for x in xrange(0,9):
-                input = SineGrating(frequency=1.0,orientation=2*numpy.pi/8*i,phase=numpy.pi/9*x)
-                topo.sim['Retina'].set_input_generator(input)
-                topo.sim.run(1.0)
-                inn.append(topo.sim["Retina"].activity.copy())
-            inputs.append(inn)    
+    (dataset,validation_data_set) = splitDataset(dataset,0.9)
+    (dataset,testing_data_set) = splitDataset(dataset,0.9)
 
+    training_set = generateTrainingSet(dataset)
+    training_inputs=generateInputs(dataset,"Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL","/images/testing01_%03d.tif",density,LGN=locals().get('LGNOn',False),LGN_size=locals().get('LGNSize',1.0))
     
-    print shape(inputs[0:32])
-    mf.trainModel(inputs[0:32],numpy.mat(activities[0:32]))                        
-    mf.calculateReliabilities(inputs[0:32],numpy.mat(activities[0:32]),20)
-    mf.testModel(inputs[0:8],numpy.mat(activities[32:40]))
-    #mf.testModel(inputs[0:8],numpy.mat(activities[32:40]))
-    #mf.testModel(inputs[0:8],numpy.mat(activities[32:40]))
-    #mf.testModel(inputs[0:8],numpy.mat(activities[32:40]))
-    #mf.testModel(inputs[0:8],numpy.mat(activities[32:40]))
+    validation_set = generateTrainingSet(validation_data_set)
+    validation_inputs=generateInputs(validation_data_set,"Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL","/images/testing01_%03d.tif",density,LGN=locals().get('LGNOn',False),LGN_size=locals().get('LGNSize',1.0))
+    
+    testing_set = generateTrainingSet(testing_data_set)
+    testing_inputs=generateInputs(testing_data_set,"Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL","/images/testing01_%03d.tif",density,LGN=locals().get('LGNOn',False),LGN_size=locals().get('LGNSize',1.0))
     
     
-
-    pylab.show()
-    return mf
-
-
-
-def runMoviesModelRepeatabilityFit():
-    f = file("Flogl/newdata.txt", "r")
-    data = [line.split() for line in f]
-    f.close()
- 
-    num_trials = 20
-    num_frames = 30
-    num_test = 1
-     
-    # transform data into floats
-    (trash,num_cells) = shape(data)
-    # getting rid of last 3 cells!
-    num_cells=num_cells-10
-    train_activities = numpy.zeros((num_frames,num_cells))
-    test_activities = numpy.zeros((num_frames,num_cells))
-    for t in xrange(0,num_trials-num_test):
-        for i in xrange(0,num_frames):
-            for j in xrange(0,num_cells):
-                train_activities[i][j] += float(data[t*30+i][j])
-
-    for t in xrange(num_trials-num_test,num_trials):
-        for i in xrange(0,num_frames):
-            for j in xrange(0,num_cells):
-                test_activities[i][j] += float(data[t*30+i][j])
-                
-    train_activities/=(num_trials-num_test)
-    test_activities/=num_test
-         
-    range = arange(1,31,1) 
-    ######################################################################################
-    image_filenames=["Flogl/first-avi/frame%03d.png" %(i) for i in range]
-    inputs=[Image(filename=f,
-                       size=2.0,  size_normalization='stretch_to_fit',
-                       x=0,
-                       y=0)
-    for f in image_filenames]
+    print shape(training_set)
+    print shape(validation_set)
+    print shape(testing_set)
     
-    combined_inputs =contrib.jacommands.SequenceSelector(generators=inputs)
-    
-    topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = ModelFit()
-    mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density#
-    mf.num_of_units = num_cells
-    mf.init()
-
-
-    topo.sim['Retina'].set_input_generator(combined_inputs)    
-    inputs = []
-    for i in xrange(0,num_frames):
-        topo.sim.run(1.0)
-        inputs.append(topo.sim["Retina"].activity.copy())
-
-
-
-
-    mf.trainModel(inputs,numpy.mat(train_activities))
-
-    mf.testModel(inputs,numpy.mat(train_activities))
-    mf.testModel(inputs,numpy.mat(test_activities))
-    
-    mf.calculateReliabilities(inputs,numpy.mat(train_activities),50)
-    mf.testModel(inputs,numpy.mat(test_activities))
-
-    mf.calculateReliabilities(inputs,numpy.mat(train_activities),20)
-    mf.testModel(inputs,numpy.mat(test_activities))
-
-    mf.calculateReliabilities(inputs,numpy.mat(train_activities),10)
-    mf.testModel(inputs,numpy.mat(test_activities))
-
-    #mf.calculateReliabilities(inputs,numpy.mat(train_activities),1)
-    #mf.testModel(inputs,numpy.mat(test_activities))
-    
-    #mf.calculateReliabilities(inputs,numpy.mat(train_activities),2)
-    #mf.testModel(inputs,numpy.mat(test_activities))
-    
-    #mf.calculateReliabilities(inputs,numpy.mat(train_activities),5)
-    #mf.testModel(inputs,numpy.mat(test_activities))
-    
-    #mf.calculateReliabilities(inputs,numpy.mat(train_activities),10)
-    #mf.testModel(inputs,numpy.mat(test_activities))
-    
-    #mf.calculateReliabilities(inputs,numpy.mat(train_activities),15)
-    #mf.testModel(inputs,numpy.mat(test_activities))
-
-
-    
-    #for i in xrange(0,100):
-    #    mf.testModel(inputs,numpy.mat(train_activities))
-    
-
-    return mf
-
-
-def runMoviesMotionModelRepeatabilityFit():
-    f = file("Flogl/newdata.txt", "r")
-    data = [line.split() for line in f]
-    f.close()
- 
-    num_trials = 20
-    num_frames = 30
-    num_test = 1
-     
-    # transform data into floats
-    (trash,num_cells) = shape(data)
-    # getting rid of last 3 cells!
-    num_cells=num_cells-10
-    train_activities = numpy.zeros((num_frames,num_cells))
-    test_activities = numpy.zeros((num_frames,num_cells))
-    for t in xrange(0,num_trials-num_test):
-        for i in xrange(0,num_frames):
-            for j in xrange(0,num_cells):
-                train_activities[i][j] += float(data[t*30+i][j])
-
-    for t in xrange(num_trials-num_test,num_trials):
-        for i in xrange(0,num_frames):
-            for j in xrange(0,num_cells):
-                test_activities[i][j] += float(data[t*30+i][j])
-                
-    train_activities/=(num_trials-num_test)
-    test_activities/=num_test
-         
-    range = arange(1,900,1) 
-    ######################################################################################
-    image_filenames=["Flogl/hf-avi/frame%03d.png" %(i) for i in range]
-    inputs=[Image(filename=f,
-                       size=2.0,  size_normalization='stretch_to_fit',
-                       x=0,
-                       y=0)
-    for f in image_filenames]
-    
-    combined_inputs =contrib.jacommands.SequenceSelector(generators=inputs)
-    
-    topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = MotionModelFit()
-    mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density#
-    mf.num_of_units = num_cells
-    mf.real_time=False
-    mf.init()
-
-
-    topo.sim['Retina'].set_input_generator(combined_inputs)    
-    inputs = []
-    for i in xrange(0,num_frames):
-        inn = []
-        for j in xrange(0,30):
-            topo.sim.run(1.0)
-            inn.append(topo.sim["Retina"].activity.copy())
-        inputs.append(inn)    
-
-
-
-    mf.trainModel(inputs,numpy.mat(train_activities))
-
-    mf.testModel(inputs,numpy.mat(train_activities))
-    mf.testModel(inputs,numpy.mat(test_activities))
-
-    mf.calculateReliabilities(inputs,numpy.mat(train_activities),5)
-    mf.testModel(inputs,numpy.mat(test_activities))
-
-    mf.calculateReliabilities(inputs,numpy.mat(train_activities),10)
-    mf.testModel(inputs,numpy.mat(test_activities))
-    
-    mf.calculateReliabilities(inputs,numpy.mat(train_activities),20)
-    mf.testModel(inputs,numpy.mat(test_activities))
-
-    mf.calculateReliabilities(inputs,numpy.mat(train_activities),50)
-    mf.testModel(inputs,numpy.mat(test_activities))
-
-
-    return mf
-    
-    
-def runMoviesModelAveragedFit():
-    f = file("Flogl/newdata.txt", "r")
-    data = [line.split() for line in f]
-    f.close()
- 
-    num_trials = 20
-    num_frames = 30
-     
-    # transform data into floats
-    (trash,num_cells) = shape(data)
-    # getting rid of last 3 cells!
-    num_cells=num_cells-10
-    train_activities = numpy.zeros((num_frames/2,num_cells))
-    test_activities = numpy.zeros((num_frames/2,num_cells))
-    for t in xrange(0,num_trials):
-        for i in xrange(0,num_frames/2):
-            for j in xrange(0,num_cells):
-                train_activities[i][j] += float(data[t*30+2*i][j])
-                test_activities[i][j] += float(data[t*30+2*i+1][j])
-    train_activities/=num_trials/2
-    test_activities/=num_trials/2
-         
-    train_range = arange(1,16,1) * 2 
-    test_range = arange(1,16,1) * 2 +1
-    ######################################################################################
-    train_image_filenames=["Flogl/first-avi/frame%03d.png" %(i) for i in train_range]
-    train_inputs=[Image(filename=f,
-                       size=2.0,  size_normalization='stretch_to_fit',
-                       x=0,
-                       y=0)
-    for f in train_image_filenames]
-    
-    train_combined_inputs =contrib.jacommands.SequenceSelector(generators=train_inputs)
-    ######################################################################################
-    test_image_filenames=["Flogl/first-avi/frame%03d.png" %(i) for i in test_range]
-    test_inputs=[Image(filename=f,
-                       size=2.0,  size_normalization='stretch_to_fit',
-                       x=0,
-                       y=0)
-    for f in test_image_filenames]
-    
-    test_combined_inputs =contrib.jacommands.SequenceSelector(generators=test_inputs)
-    ######################################################################################
- 
-    topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = ModelFit()
-    mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density#
-    mf.num_of_units = num_cells
-    mf.init()
-
-
-    topo.sim['Retina'].set_input_generator(train_combined_inputs)    
-    train_inputs = []
-    for i in xrange(0,num_frames/2):
-        topo.sim.run(1.0)
-        train_inputs.append(topo.sim["Retina"].activity.copy())
-
-
-    topo.sim['Retina'].set_input_generator(test_combined_inputs)    
-    test_inputs = []
-    for i in xrange(0,num_frames/2):
-        topo.sim.run(1.0)
-        test_inputs.append(topo.sim["Retina"].activity.copy())
-    
-
-
-
-    mf.trainModel(train_inputs,numpy.mat(train_activities))
-    mf.testModel(train_inputs,numpy.mat(train_activities))
-    
-    
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-
-    mf.reliability_trehsold=10.0
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),10)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    mf.reliability_trehsold=8
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),15)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    mf.reliability_trehsold=3
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),20)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    mf.reliability_trehsold=1.0
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),25)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    mf.reliability_trehsold=0.8
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),30)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    
-    
-    
-def runMoviesModelFit():
-    f = file("Flogl/newdata.txt", "r")
-    data = [line.split() for line in f]
-    f.close()
- 
-    num_trials = 20
-    num_frames = 30
-     
-    # transform data into floats
-    (trash,num_cells) = shape(data)
-    # getting rid of last 3 cells!
-    num_cells=num_cells-10
-    train_activities = numpy.zeros((num_frames*(num_trials-1),num_cells))
-    test_activities = numpy.zeros((num_frames,num_cells))
-    for t in xrange(0,num_trials-1):
-        for i in xrange(0,num_frames):
-            for j in xrange(0,num_cells):
-                train_activities[t*num_frames+i][j] = float(data[t*num_frames+i][j])
-
-    for t in xrange(num_trials-1,num_trials):
-        for i in xrange(0,num_frames):
-            for j in xrange(0,num_cells):
-                test_activities[i][j] = float(data[t*30+i][j])
-         
-    range = arange(1,31,1) 
-    ######################################################################################
-    image_filenames=["Flogl/first-avi/frame%03d.png" %(i) for i in range]
-    inputs=[Image(filename=f,
-                       size=2.0,  size_normalization='stretch_to_fit',
-                       x=0,
-                       y=0)
-    for f in image_filenames]
-    
-    combined_inputs =contrib.jacommands.SequenceSelector(generators=inputs)
-    
-    topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = ModelFit()
-    mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density#
-    mf.num_of_units = num_cells
-    mf.init()
-
-
-    topo.sim['Retina'].set_input_generator(combined_inputs)    
-    train_inputs = []
-    test_inputs = []
-    for j in xrange(0,num_trials-1):
-        topo.sim["Retina"].input_generator.index=0
-        for i in xrange(0,num_frames):
-            topo.sim.run(1.0)
-            train_inputs.append(topo.sim["Retina"].activity.copy())
-
-    topo.sim["Retina"].input_generator.index=0
-    for i in xrange(0,num_frames):
-        topo.sim.run(1.0)
-        test_inputs.append(topo.sim["Retina"].activity.copy())
-
-    mf.trainModel(train_inputs,numpy.mat(train_activities))
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),20)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-
-    #mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),2)
-    #mf.testModel(test_inputs,numpy.mat(test_activities))
-
-    
-    #mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),2)
-    #mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    #mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),5)
-    #mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    #mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),10)
-    #mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    #mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),15)
-    #mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    #for i in xrange(0,100):
-    #    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),i)
-    #    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-
-    return mf
-
-def runMoviesMotionModelFit():
-    f = file("Flogl/newdata.txt", "r")
-    data = [line.split() for line in f]
-    f.close()
- 
-    num_trials = 20
-    num_frames = 30
-     
-    # transform data into floats
-    (trash,num_cells) = shape(data)
-    # getting rid of last 3 cells!
-    num_cells=num_cells-10
-    train_activities = numpy.zeros((num_frames*(num_trials-1),num_cells))
-    test_activities = numpy.zeros((num_frames,num_cells))
-    for t in xrange(0,num_trials-1):
-        for i in xrange(0,num_frames):
-            for j in xrange(0,num_cells):
-                train_activities[t*num_frames+i][j] = float(data[t*num_frames+i][j])
-
-    for t in xrange(num_trials-1,num_trials):
-        for i in xrange(0,num_frames):
-            for j in xrange(0,num_cells):
-                test_activities[i][j] = float(data[t*30+i][j])
-         
-    range = arange(1,900,1) 
-    ######################################################################################
-    image_filenames=["Flogl/hf-avi/frame%03d.png" %(i) for i in range]
-    inputs=[Image(filename=f,
-                       size=2.0,  size_normalization='stretch_to_fit',
-                       x=0,
-                       y=0)
-    for f in image_filenames]
-    
-    combined_inputs =contrib.jacommands.SequenceSelector(generators=inputs)
-    
-    topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = MotionModelFit()
-    mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density#
-    mf.num_of_units = num_cells
-    mf.real_time=True
-    mf.init()
-
-
-    topo.sim['Retina'].set_input_generator(combined_inputs)    
-    train_inputs = []
-    test_inputs = []
-    for j in xrange(0,num_trials-1):
-        topo.sim["Retina"].input_generator.index=0
-        for i in xrange(0,num_frames):
-            inn = []
-            for k in xrange(0,30):
-                topo.sim.run(1.0)
-                inn.append(topo.sim["Retina"].activity.copy())
-            train_inputs.append(inn)
-
-    topo.sim["Retina"].input_generator.index=0
-    for i in xrange(0,num_frames):
-        topo.sim.run(1.0)
-        test_inputs.append(topo.sim["Retina"].activity.copy())
-
-    mf.trainModel(train_inputs,numpy.mat(train_activities))
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),20)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-
-    return mf
-
-
-def runStaticImageModelFit():
-    f = file("./Flogl/JAN/stationary_region1_depth155_testing01_ALL/combined_data", "r") 
-    data = [line.split() for line in f]
-    f.close()
-    
-    f = file("./Flogl/JAN/stationary_region1_depth155_testing01_ALL/image_sequence", "r") 
-    random = [line.split() for line in f]
-    random=numpy.array(random)
-    random = random[0]
-    f.close()
-    
-    r = []
-    for j in random:
-	r.append(int(float(j)))
-    random = r
-    
-    
-    analyseDataSet(data,random)
-    return 
- 
-    best_frame_avg_frac=1.0
-    num_frames = 13
-    num_images = 125
-    num_of_repetitions=10
-    test_set_ratio=0.2
-    validation_set_ratio=0.1
-    
-    test_set_length = numpy.int(numpy.floor(test_set_ratio*num_images))
-    validation_set_length = numpy.int(numpy.floor(validation_set_ratio*num_images))
-      
-     
-    # transform data into floats
-    (trash,num_cells) = shape(data)
-    
-    
-    train_activities = numpy.zeros(((num_images-test_set_length-validation_set_length)*num_of_repetitions,num_cells))
-    validation_activities = numpy.zeros((validation_set_length,num_cells))
-    test_activities = numpy.zeros((test_set_length,num_cells))   
-    
-    
-    
-    assert trash == (num_of_repetitions * num_images * num_frames)
-    assert trash / num_frames == len(random)
-    
-    
-    counter=0
-    for j in xrange(0,trash/num_frames):
-	index = random[j]-1
-	
-	if index < num_images-test_set_length-validation_set_length:
-	   counter+=1
-	
-        for k in xrange(0,num_cells):
-                tmp=[]
-		for i in xrange(0,num_frames):
-			tmp.append(float(data[j*num_frames+i][k]))
-		tmp.sort()
-		aveg=0.0
-		for i in xrange(0,int(numpy.floor(num_frames*best_frame_avg_frac))):
-			aveg+=tmp[num_frames-i-1]		
-		aveg=aveg/numpy.floor(num_frames*best_frame_avg_frac)
-		
-		if index < num_images-test_set_length-validation_set_length:
-		    #print counter		
-                    train_activities[counter-1][k] = aveg
-                elif index < num_images-test_set_length:
-		    validation_activities[index-num_images+validation_set_length+test_set_length][k] += aveg/(num_of_repetitions) 
-		else:	
-                    test_activities[index-num_images+test_set_length][k] += aveg/(num_of_repetitions) 
-    	
-    
-    range = arange(0,num_images,1) 
-    ######################################################################################
-    image_filenames=["Flogl/JAN/stationary_region1_depth155_testing01_ALL/testing01/testing01_%03d.tif" %(i) for i in range]
-    inputs=[Image(filename=f,
-                       size=0.7, size_normalization='stretch_to_fit',
-		       
-                       x=0,
-                       y=0)
-    for f in image_filenames]
-    
-    combined_inputs =contrib.jacommands.SequenceSelector(generators=inputs)
-    
-    topo.sim['Retina']=GeneratorSheet(nominal_density=120,	
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = ModelFit()
-    mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density#
-    mf.num_of_units = num_cells
-    mf.init()
-
-
-    topo.sim['Retina'].set_input_generator(combined_inputs)
-    train_images = []
-    train_inputs = []
-    validation_inputs=[]
-    test_inputs=[]
-    #topo.sim["Retina"].input_generator.index=0
-    
-    for j in xrange(0,num_images-test_set_length):
-        topo.sim.run(1)
-        train_images.append(topo.sim["Retina"].activity.copy())
-	
-    pylab.figure(1)	
-    #pylab.imshow(train_images[0])
-    #pylab.show._needmain=False
-    #matrixplot(train_images[0])
+    #pylab.plot(numpy.array(numpy.mat(training_set).T)[0])
+    #pylab.plot(numpy.array(numpy.mat(training_set).T)[1])
+    #matrixplot(training_inputs[0])
+    #matrixplot(training_inputs[1])
+    #matrixplot(validation_inputs[0])
+    #matrixplot(validation_inputs[1])
     #pylab.show()
-    #return
-    		
-    for index in random:
-	if (int(float(index))-1) < num_images-test_set_length:
-		train_inputs.append(train_images[int(float(index))-1])
     
-    for j in xrange(0,validation_set_length):
-        topo.sim.run(1)
-        validation_inputs.append(topo.sim["Retina"].activity.copy())
-    
-    
-    for j in xrange(0,test_set_length):
-        topo.sim.run(1)
-        test_inputs.append(topo.sim["Retina"].activity.copy())
-        
-    mf.trainModel(train_inputs,numpy.mat(train_activities),validation_inputs,numpy.mat(validation_activities))
-    mf.testModel(train_inputs,numpy.mat(train_activities))
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),50)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),40)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),30)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
-    
-
-    return mf
-
-
-def runStaticImageModelFit1():
-    f = file("./Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL/combined_data", "r") 
-    data = [line.split() for line in f]
-    f.close()
-    
-    f = file("./Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL/image_sequence", "r") 
-    random = [line.split() for line in f]
-    random=numpy.array(random)
-    random = random[0]
-    f.close()
-    
-    r = []
-    for j in random:
-	r.append(int(float(j)))
-    random = r
-    print len(random)
-    best_frame_avg_frac=1.0
-    num_frames = 15
-    num_images = 125
-    num_of_repetitions=6
-    test_set_ratio=0.1
-    validation_set_ratio=0.1
-    
-    test_set_length = numpy.int(numpy.floor(test_set_ratio*num_images))
-    validation_set_length = numpy.int(numpy.floor(validation_set_ratio*num_images))
-      
-     
-    # transform data into floats
-    (trash,num_cells) = shape(data)
-    
-    
-    train_activities = numpy.zeros(((num_images-test_set_length-validation_set_length)*num_of_repetitions,num_cells))
-    validation_activities = numpy.zeros((validation_set_length,num_cells))
-    test_activities = numpy.zeros((test_set_length,num_cells))   
-    
-    
-    
-    assert trash == (num_of_repetitions * num_images * num_frames)
-    assert trash / num_frames == len(random)
-    
-    
-    counter=0
-    for j in xrange(0,trash/num_frames):
-	index = random[j]-1
-	
-	if index < num_images-test_set_length-validation_set_length:
-	   counter+=1
-	
-        for k in xrange(0,num_cells):
-                tmp=[]
-		for i in xrange(0,num_frames):
-			tmp.append(float(data[j*num_frames+i][k]))
-		tmp.sort()
-		aveg=0.0
-		for i in xrange(0,int(numpy.floor(num_frames*best_frame_avg_frac))):
-			aveg+=tmp[num_frames-i-1]		
-		aveg=aveg/numpy.floor(num_frames*best_frame_avg_frac)
-		
-		if index < num_images-test_set_length-validation_set_length:
-		    #print counter		
-                    train_activities[counter-1][k] = aveg
-                elif index < num_images-test_set_length:
-		    validation_activities[index-num_images+validation_set_length+test_set_length][k] += aveg/(num_of_repetitions) 
-		else:	
-                    test_activities[index-num_images+test_set_length][k] += aveg/(num_of_repetitions) 
-    	
-    
-    range = arange(0,num_images,1) 
-    ######################################################################################
-    image_filenames=["Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL/testing01/testing01_%03d.tif" %(i) for i in range]
-    inputs=[Image(filename=f,
-                       size=0.7, size_normalization='stretch_to_fit',
-		       
-                       x=0,
-                       y=0)
-    for f in image_filenames]
-    
-    combined_inputs =contrib.jacommands.SequenceSelector(generators=inputs)
-    
-    topo.sim['Retina']=GeneratorSheet(nominal_density=48,	
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5))
-
-    mf = ModelFit()
+    mf = BasicModelFit()
     mf.retina_diameter = 1.0
-    mf.density = topo.sim["Retina"].nominal_density#
-    mf.num_of_units = num_cells
+    mf.density = density
+    mf.epochs=locals().get('epochs',500)
+    mf.num_of_units = 60
     mf.init()
 
-
-    topo.sim['Retina'].set_input_generator(combined_inputs)
-    train_images = []
-    train_inputs = []
-    validation_inputs=[]
-    test_inputs=[]
-    #topo.sim["Retina"].input_generator.index=0
-    
-    for j in xrange(0,num_images-test_set_length):
-        topo.sim.run(1)
-        train_images.append(topo.sim["Retina"].activity.copy())
-	
-    pylab.figure(1)	
-    #pylab.imshow(train_images[0])
-    #pylab.show._needmain=False
-    #matrixplot(train_images[0])
-    #pylab.show()
-    #return
-    		
-    for index in random:
-	if (int(float(index))-1) < num_images-test_set_length-validation_set_length:
-		train_inputs.append(train_images[int(float(index))-1])
-    
-    for j in xrange(0,validation_set_length):
-        topo.sim.run(1)
-        validation_inputs.append(topo.sim["Retina"].activity.copy())
-    
-    
-    for j in xrange(0,test_set_length):
-        topo.sim.run(1)
-        test_inputs.append(topo.sim["Retina"].activity.copy())
-        
-    mf.trainModel(train_inputs,numpy.mat(train_activities),validation_inputs,numpy.mat(validation_activities))
-    mf.testModel(train_inputs,numpy.mat(train_activities))
-    mf.testModel(test_inputs,numpy.mat(test_activities))
+    mf.trainModel(training_inputs,numpy.mat(training_set),validation_inputs,numpy.mat(validation_set))
+    mf.testModel(training_inputs,numpy.mat(training_set))
+    mf.testModel(testing_inputs,numpy.mat(testing_set))
     
 
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),50)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
+    mf.calculateReliabilities(training_inputs,numpy.mat(training_set),50)
+    mf.testModel(testing_inputs,numpy.mat(testing_set))
     
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),40)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
+    mf.calculateReliabilities(training_inputs,numpy.mat(training_set),40)
+    mf.testModel(testing_inputs,numpy.mat(testing_set))
 
-    mf.calculateReliabilities(train_inputs,numpy.mat(train_activities),30)
-    mf.testModel(test_inputs,numpy.mat(test_activities))
+    mf.calculateReliabilities(training_inputs,numpy.mat(training_set),30)
+    mf.testModel(testing_inputs,numpy.mat(testing_set))
+
+    mf.calculateReliabilities(training_inputs,numpy.mat(training_set),10)
+    mf.testModel(testing_inputs,numpy.mat(testing_set))
     
-
     return mf
 
-
-
-
-
-
-
-
-def analyseDataSet(dataset,random):
-	dataset = numpy.array(numpy.mat(dataset).T)
-	num_fr=15
-	num_im=125
-	num_rep=5
-	a = []
-	print shape(dataset)
-	for x in xrange(0,10):
-	    a.append([])	
-	
-	for z in xrange(0,10):
-		for x in xrange(0,num_im):
-		    a[z].append([])	
-	
-		for i in xrange(0,num_rep*num_im):
-			av = 0 	
-			for x in xrange(2,7):
-				av+= float(dataset[z][i*num_fr+x])
-			av=av/num_fr
-			a[z][random[i]-1].append(av)
-	
-	pylab.figure(1)
-	
-	for z in xrange(0,10):
+def analyseDataSet(data_set):
+#        for cell in dataset:
+        for z in xrange(0,10):
 		pylab.figure()
 		pylab.plot(numpy.arange(0,num_im,1),a[z],'bo')	
 	pylab.show()
