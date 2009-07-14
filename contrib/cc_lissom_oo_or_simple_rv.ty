@@ -41,7 +41,7 @@ core_size=locals().get('CS',0.5)
 
 num_inputs=1
 
-dataset=locals().get('dataset',"Line") #set the input type by choosing the dataset parameter 
+dataset=locals().get('dataset',"Natural") #set the input type by choosing the dataset parameter 
 
 
 if dataset=="Line":
@@ -177,7 +177,7 @@ on_weights = topo.pattern.basic.Composite(
 off_weights = topo.pattern.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
-if True:
+if False:
     topo.sim.connect('FakeRetina','LGNOn',delay=0.05,
                         connection_type=SharedWeightCFProjection,strength=2.33,
                         nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOnAfferent1',
@@ -188,19 +188,19 @@ if True:
                         nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOffAfferent2',
                         weights_generator=off_weights)
 else:
-    #topo.sim.connect('FakeRetina','LGNOn',delay=0.05,
-    #                 connection_type=OneToOneProjection,strength=0.5,
-    #                 nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
+    topo.sim.connect('FakeRetina','LGNOn',delay=0.05,
+                     connection_type=OneToOneProjection,strength=0.5,
+                     nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
     
-    #topo.sim.connect('FakeRetina','LGNOff',delay = 0.05,
-    #                 connection_type=OneToOneProjection,strength=0.5,
-    #                 nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
+    topo.sim.connect('FakeRetina','LGNOff',delay = 0.05,
+                     connection_type=OneToOneProjection,strength=0.5,
+                     nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
 
 
 
-g1 = Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.4,ubound=0.4,seed=56))
+g1 = Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.8,ubound=0.8,seed=56))
 g1._Dynamic_time_fn = None
-g2 = Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.4,ubound=0.4,seed=56))
+g2 = Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.8,ubound=0.8,seed=56))
 g2._Dynamic_time_fn = None
 
 #V1 Simple
@@ -234,7 +234,7 @@ if simpleLateral:
 	topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralExcitatoryL4',
 	                 connection_type=CFProjection,strength=locals().get('SxLatExcStr',0.1),
 	                 weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=locals().get('SxLatExcSize',0.04)),
-	                 nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.04)),
+	                 nominal_bounds_template=BoundingBox(radius=locals().get('SxLatExcBB',0.04)),
 	                 learning_rate=0.0)
 	
 	topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralInhibitoryL4',
@@ -307,7 +307,7 @@ def secondStage():
     
 from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand
 FeatureMaps.num_orientation=16
-MeasureResponseCommand.scale=3    
+MeasureResponseCommand.scale=3.0
 FeatureCurveCommand.num_orientation=90
 FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":90}]
 
