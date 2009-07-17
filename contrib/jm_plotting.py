@@ -323,6 +323,7 @@ class scatter_plot_phase_preference_simple_cell(PylabPlotCommand):
         f = pylab.figure()
         ax = f.add_subplot(111, aspect='equal')
         pylab.plot(datax,datay,'ro')
+        pylab.title('Phase preference scatter plot, sheet '+sheet_name,fontsize=10)
         pylab.plot([0,360],[-180,180])
         pylab.plot([-180,180],[0,360])
         pylab.plot([-180,-180],[360,360])
