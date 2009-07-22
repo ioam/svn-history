@@ -107,7 +107,7 @@ class IterableIPShell:
 
   def complete(self, line):
     split_line = self.complete_sep.split(line)
-    possibilities = self.IP.complete(split_line[-1])
+    possibilities = self.IP.complete(split_line[0])
     if possibilities:
       common_prefix = reduce(self._commonPrefix, possibilities)
       completed = line[:-len(split_line[-1])]+common_prefix
