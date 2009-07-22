@@ -320,7 +320,7 @@ topo_parser.add_option("-l","--legacy",action="callback",callback=l_action,dest=
 launch Topographica with legacy support enabled.""")
 
 
-def gui(start=True):
+def gui(start=True,dock=False):
     """Start the GUI as if -g were supplied in the command used to launch Topographica."""
     if matplotlib_imported: 
         from matplotlib import rcParams
@@ -328,7 +328,7 @@ def gui(start=True):
     auto_import_commands()
     if start:
         import topo.tkgui
-        topo.tkgui.start()
+        topo.tkgui.start(dock=dock)
 
 
 ###### CB: TESTING (Jun 2008)
@@ -368,7 +368,7 @@ def G_action(option,opt_str,value,parser):
     """Callback function for the -mg option."""
     boolean_option_action(option,opt_str,value,parser)
     interactive()
-    gui(start=False)
+    gui(start=False,dock=True)
 
 
 topo_parser.add_option("-G","--more_gui",action="callback",callback=G_action,dest="more_gui",default=False,help="""\
