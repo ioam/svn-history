@@ -36,17 +36,6 @@ from topo.sheet import GeneratorSheet
 
 import topo
 
-BORDERWIDTH = 1
-
-# Unfortunately, the canvas creation, border placement, and image
-# positioning of Tkinter are very fragile.  This value boosts the size
-# of the canvas that the plot image is displayed on.  Too large and
-# the border will not be close, too small, and some of the image is
-# not displayed.  
-CANVASBUFFER = 1
-
-
-
 def with_busy_cursor(fn):
     """
     Decorator to show busy cursor for duration of fn call.
@@ -312,31 +301,18 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
         event_info = {'event':event} # store event in case more info needed elsewhere
 
         # Later functions assume that if event_info does not contain
-        # 'plot', then the event did not occur on a plot of a sheet
-        # (or occurred outside the sheet's bounds).  If sometime in
-        # the future we want to do things for plots that do not have
-        # sheets, then this can be changed (e.g. we can put in plot
-        # but not coords, and use a check for coords to discover if
-        # there is a sheet or not).
-
+        # 'plot', then the event did not occur on a plot of a sheet.
         if plot.plot_src_name is not '':
-            canvas_x,canvas_y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
-            sf = plot.scale_factor
-            # CEBALERT: now check this!
-            canvas_r,canvas_c=int(floor(canvas_y/sf)),int(floor(canvas_x/sf))
-
-            sheet = topo.sim[plot.plot_src_name]
-            r,c = canvas_r,canvas_c 
-            x,y = sheet.matrixidx2sheet(r,c)
-
-            ## The plot doesn't correspond exactly to the sheet (there
-            ## is some kind of border), so only store the plot and
-            ## coords if we're actually on the sheet
-            max_r,max_c = sheet.activity.shape
-            if 0<=r<max_r and 0<=c<max_c:
+            plot_width,plot_height=plot.bitmap.width(),plot.bitmap.height()
+            if 0<=event.x<plot_width and 0<=event.y<plot_height:
+                left,bottom,right,top=plot.plot_bounding_box.lbrt()
+                # float() to avoid integer division
+                x = (right-left)*float(event.x)/plot_width + left
+                y = top - (top-bottom)*float(event.y)/plot_height 
+                r,c = topo.sim[plot.plot_src_name].sheet2matrixidx(x,y)
                 event_info['plot'] = plot
                 event_info['coords'] = [(r,c),(x,y)]
-
+            
         func(event_info)
         
 
@@ -375,7 +351,6 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
         """
         Update dynamic information.
         """
-
         if 'plot' in event_info:
             plot = event_info['plot']
             (r,c),(x,y) = event_info['coords']
@@ -522,9 +497,8 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
         
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
 
-
-        new_sizes = [(str(zi.width()+BORDERWIDTH*2+CANVASBUFFER),
-                      str(zi.height()+BORDERWIDTH*2+CANVASBUFFER))
+        new_sizes = [(str(zi.width()),
+                      str(zi.height()))
                      for zi in self.zoomed_images]
         old_sizes = [(canvas['width'],canvas['height'])
                      for canvas in self.canvases]
@@ -532,30 +506,22 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
         # If the number of canvases or their sizes has changed, then
         # create a new set of canvases.  If the new images will fit into the
         # old canvases, reuse them (prevents flicker)
+        
+
 
         if len(self.zoomed_images) != len(self.canvases) or \
                new_sizes != old_sizes:
             # Need new canvases...
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_container,
-                               width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
-                               height=image.height()+BORDERWIDTH*2+CANVASBUFFER,
-                               bd=0)
+                                    width=image.width(),
+                                    height=image.height(),
+                                    borderwidth=1,highlightthickness=0,
+                                    relief='groove') 
                              for image in self.zoomed_images]
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
-                # BORDERWIDTH is added because the border is drawn on the
-                # canvas, overwriting anything underneath it.
-                # The +1 is necessary since the TKinter Canvas object
-                # has a problem with axis alignment, and 1 produces
-                # the best result.
-                canvas.create_rectangle(1, 1, image.width()+BORDERWIDTH*2,
-                                        image.height()+BORDERWIDTH*2,
-                                        width=BORDERWIDTH,outline="black")
-                canvas.create_image(image.width()/2+BORDERWIDTH+1,
-                                    image.height()/2+BORDERWIDTH+1,
-                                    image=image)
-                canvas.config(highlightthickness=0,borderwidth=0,relief=FLAT)
+                canvas.create_image(1,1,anchor="nw",image=image)
                 canvas.grid(row=self._rows[i],column=self._cols[i],padx=5)
 
                 
@@ -567,15 +533,15 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
             # Don't need new canvases...
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
-                canvas.create_image(image.width()/2+BORDERWIDTH+1,
-                                    image.height()/2+BORDERWIDTH+1,image=image)
+                canvas.create_image(1,1,anchor="nw",image=image)
                 canvas.grid(row=self._rows[i],column=self._cols[i],padx=5)
 
+        self._add_canvas_bindings()
 
-                
 
+    def _add_canvas_bindings(self):
         ### plotting over; bind events to each canvas
-        for plot,canvas in zip(plots,self.canvases):
+        for plot,canvas in zip(self.plotgroup.plots,self.canvases):
             # Store the corresponding plot with each canvas so that the
             # plot information (e.g. scale_factor) will be available
             # for the right_click menu.

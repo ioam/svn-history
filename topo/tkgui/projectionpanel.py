@@ -35,14 +35,6 @@ def cmp_projections(p1,p2):
 
 
 UNIT_PADDING = 1
-BORDERWIDTH = 1
-
-# JDALERT: The canvas creation, border placement, and image
-# positioning of Tkinter is very fragile.  This value boosts the size
-# of the canvas that the plot image is displayed on.  Too large and
-# the border will not be close, too small, and some of the image is
-# not displayed.
-CANVASBUFFER = 1
 
 
 
@@ -95,12 +87,6 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
                                for p in s.in_connections])]
         self.plotgroup.params()['sheet'].objects = sheets
         self.plotgroup.sheet = sheets[0] # CB: necessary?
-
-
-    # CB: dynamic info not finished: see current tasks
-    def _update_dynamic_info(self,e):
-        self.messageBar.message('state',"")
-
 
 
 
@@ -226,9 +212,10 @@ class PlotMatrixPanel(ProjectionSheetPanel):
         old_canvases = self.canvases
 
         self.canvases = [Canvas(self.plot_container,
-                           width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
-                           height=image.height()+BORDERWIDTH*2+CANVASBUFFER,
-                           bd=0)
+                                width=image.width(),
+                                height=image.height(),
+                                borderwidth=1,highlightthickness=0,
+                                relief='groove')
                          for image in self.zoomed_images]
 
         # Lay out images
@@ -237,23 +224,14 @@ class PlotMatrixPanel(ProjectionSheetPanel):
             canvas.grid(row=i//self.plotgroup.proj_plotting_shape[1],
                         column=i%self.plotgroup.proj_plotting_shape[1],
                         padx=UNIT_PADDING,pady=UNIT_PADDING)
-            # BORDERWIDTH is added because the border is drawn on the
-            # canvas, overwriting anything underneath it.
-            # The +1 is necessary since the TKinter Canvas object
-            # has a problem with axis alignment, and 1 produces
-            # the best result.
-            canvas.create_image(image.width()/2+BORDERWIDTH+1,
-                                image.height()/2+BORDERWIDTH+1,
-                                image=image)
-            canvas.config(highlightthickness=0,borderwidth=0,relief='flat')
-            canvas.create_rectangle(1, 1, image.width()+BORDERWIDTH*2,
-                                    image.height()+BORDERWIDTH*2,
-                                    width=BORDERWIDTH,outline="black")
+            canvas.create_image(1,1,anchor='nw',image=image)
 
 
         # Delete old ones.  This may resize the grid.
         for c in old_canvases:
             c.grid_forget()
+
+        self._add_canvas_bindings()
 
 
     def display_labels(self):
