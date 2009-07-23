@@ -36,7 +36,6 @@ common = dict(
               'topo.command',
               'topo.coordmapper',
               'topo.ep',
-              'topo.ipythonTk',
               'topo.learningfn',
               'topo.misc',
               'topo.numbergen',
