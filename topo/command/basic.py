@@ -192,6 +192,13 @@ def save_snapshot(snapshot_name=None,xml=False):
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
+    #
+    # CB: if we first pickle.dumps() each of these things, then
+    # pickle.dump() a dictionary (probably), we'll have more control
+    # over unpickling. E.g. we could in the future choose not to
+    # unpickle something. And we can certainly control the unpickling
+    # order this way.
+    
     to_save = (_VersionPrinter(topo.release,topo.version),PickleMain(),global_params,topoPOclassattrs,topo.sim)
 
     if not xml:
