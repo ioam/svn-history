@@ -198,17 +198,16 @@ process, and the SVN error will be reported. At this point, you can
 use the usual git commands to deal with such merge conflicts.
 
 
-<!--
 <H3>Taking advantage of more Git features</H3>
 
-<P>Git is very flexible, and provides far more than is mentioned above.
-Because it can take a while to become aware of this flexibility, we mention
-a few things below:
-(various notes removed after r10275)
-** editing history
-** branching your own repository
-** sharing repository
--->
+<P>Git is very flexible, and provides far more than is mentioned
+above.  There are many useful git tutorials on the web explaining more
+advanced git usage (e.g. <a
+href="http://www-cs-students.stanford.edu/~blynn/gitmagic/">Git
+Magic</a>). One thing that you will probably want to do as soon as you
+are familiar with basic git-svn operation is to use one branch to
+track the svn repository, and then use a new branch for each
+independent set of changes.
 
 
 
