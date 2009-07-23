@@ -1,0 +1,71 @@
+17d16
+< import Pmw
+134c133,137
+<     
+---
+> 
+>     # CEBALERT: \n added by tkinter? Probably should find out where
+>     # this \n comes from.
+>     rv=rv.rstrip("\n")
+>         
+223c226,227
+<   def __init__(self,root,banner=None):
+---
+>     # CB: use **kw?
+>   def __init__(self,root,banner=None,user_ns=None):
+227c231
+<                              input_func=self.raw_input)
+---
+>                              input_func=self.raw_input,user_ns=user_ns)
+252,253c256,257
+< 	
+< class IPythonTopLevel(Pmw.MegaToplevel):
+---
+> 
+> class IPythonTopLevel(Tkinter.Toplevel):
+255,257c259
+< 	    
+<         # Initialise base class 
+<         Pmw.MegaToplevel.__init__(self, root)
+---
+>         Tkinter.Toplevel.__init__(self,root)
+259,275c261,264
+<         self.title('CCP1GUI IPython Shell')
+<     
+<         scrollR = self.createcomponent('console-scroll-right',
+< 				       (),
+< 				       None,
+< 				       Tkinter.Scrollbar,
+< 				       self.interior()
+< 				       )
+< 	scrollR.pack(side='right',fill='y')
+< 
+<         console = self.createcomponent('console',
+< 				       (),
+< 				       None,
+< 				       IPythonView,
+< 				       self.interior(),
+<                                        banner=banner
+< 				       )
+---
+>         yscroll = Tkinter.Scrollbar(self)
+>         yscroll.pack(side='right',fill='y')
+> 
+>         console = IPythonView(self)
+277,280c266,269
+< 	
+<         console.config(yscrollcommand=scrollR.set )
+< 	scrollR.config(command=console.yview)
+<   
+---
+> 
+>         console.config(yscrollcommand=yscroll.set)
+>         yscroll.config(command=console.yview)
+>     
+283a273,274
+>     import __main__
+>     __main__.__dict__['rooot']=root
+285d275
+<     v.show()    
+286a277
+> 

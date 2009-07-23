@@ -203,19 +203,27 @@ class DockManager(Notebook):
 
 
 
-from topo.ipythonTk.ipythonTk import IPythonView
-class IPythonInAFrame(Frame):
-    def __init__(self, root, banner=None, user_ns=None,**kw):
-        Frame.__init__(self,root)
 
-        yscroll = Scrollbar(self)
-        yscroll.pack(side='right',fill='y')
+try:
+    import ipythonTk
+    ipythonTk_imported = True
+except:
+    ipythonTk_imported = False
 
-        console = IPythonView(self,user_ns=user_ns)
-        console.pack(fill='both',expand=1)
+if ipythonTk_imported:
+    from ipythonTk.ipythonTk import IPythonView
+    class IPythonInAFrame(Frame):
+        def __init__(self, root, banner=None, user_ns=None,**kw):
+            Frame.__init__(self,root)
 
-        console.config(yscrollcommand=yscroll.set)
-        yscroll.config(command=console.yview)
+            yscroll = Scrollbar(self)
+            yscroll.pack(side='right',fill='y')
+
+            console = IPythonView(self,user_ns=user_ns)
+            console.pack(fill='both',expand=1)
+
+            console.config(yscrollcommand=yscroll.set)
+            yscroll.config(command=console.yview)
 
 
 
@@ -338,7 +346,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         self.step_button.pack(side=LEFT)
 
         # CEBALERT: total hack
-        if console:
+        if console and ipythonTk_imported:
             self.console_frame = Frame(self)
             self.console_frame.pack(expand=1,fill='both')
 
