@@ -143,6 +143,13 @@ topographica: external Makefile topo/*/*.py examples/*.ty
 	echo "" >> topographica
 	chmod a+x ${PREFIX}topographica
 
+# CB: experimental
+topographicagui: 
+	echo "import topo.tkgui;topo.tkgui.start(mainloop=False)" > _gui.py
+	echo "${PREFIX}bin/idle -n -t 'Topographica shell' -r _gui.py" > topographicagui
+	echo "" >> topographicagui
+	chmod a+x ${PREFIX}topographicagui
+
 
 check:
 	${PYCHECKER} topo/*.py topo/*/*.py
