@@ -81,6 +81,8 @@ python: ${PYTHON}.tgz tk blt readline
 	patch -p0 < Python_64bit_pickle.diff
 # Tkinter: support None in BooleanVar
 	patch -p0 < Tkinter_bool_none.diff
+# IDLE: work with tk 8.5 (see http://bugs.python.org/issue2693).
+	patch -p0 < idle_tk8.5.patch
 # Configure for specific operating system versions
 ifeq ("$(shell uname -s)","Darwin")
 	patch -p0 < Python_OSX_tk.diff # build python with tcl/tk from /Library/Frameworks
