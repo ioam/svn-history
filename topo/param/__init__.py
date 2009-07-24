@@ -615,15 +615,16 @@ class ObjectSelector(Selector):
     """
     Parameter whose value is set to an object from its list of possible objects.
     """
-    __slots__ = ['objects','allow_None','compute_default_fn']
+    __slots__ = ['objects','allow_None','compute_default_fn','check_on_set']
 
     # ObjectSelector is usually used to allow selection from a list of
     # existing objects, therefore instantiate is False by default.
     def __init__(self,default=None,objects=[],instantiate=False,allow_None=False,
-                 compute_default_fn=None,**params):
+                 compute_default_fn=None,check_on_set=False,**params):
         self.objects = objects
         self.allow_None = (default is None or allow_None)
         self.compute_default_fn = compute_default_fn
+        self.check_on_set=check_on_set
         self._check_value(default)
         super(ObjectSelector,self).__init__(default=default,instantiate=instantiate,**params)
         
@@ -662,9 +663,10 @@ class ObjectSelector(Selector):
 # of this Parameter would have to be sure to update the list of possible
 # objects before setting the Parameter's value. As it is, only users who care about the
 # correct list of objects being displayed need to update the list.
-##     def __set__(self,obj,val):
-##         self._check_value(val,obj)
-##         super(ObjectSelector,self).__set__(obj,val)
+    def __set__(self,obj,val):
+        if self.check_on_set:
+            self._check_value(val,obj)
+        super(ObjectSelector,self).__set__(obj,val)
 
 
     # CebAlert; move some bits into superclass (same for clsselector)?
@@ -674,7 +676,13 @@ class ObjectSelector(Selector):
 
         (Returns the dictionary {object.name:object}.)
         """
-        d=dict([(obj.name,obj) for obj in self.objects if obj is not None])
+        # CEBHACKALERT: was written assuming it would only operate on
+        # Parameterized instances. Think this is an sf.net bug/feature
+        # request. Temporary fix: don't use obj.name if unavailable.
+        try:
+            d=dict([(obj.name,obj) for obj in self.objects if obj is not None])
+        except AttributeError:
+            d=dict([(obj,obj) for obj in self.objects if obj is not None])
         if self.allow_None:
             d['None']=None
         return d
