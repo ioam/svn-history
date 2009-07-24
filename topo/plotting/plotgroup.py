@@ -1,8 +1,9 @@
 """
-Hierarchy of PlotGroup classes, i.e. output-device-independent sets of plots.
+Hierarchy of PlotGroup classes, i.e. output-device-independent sets of
+plots.
 
-Includes PlotGroups for standard plots of anything in a Sheet database,
-plus weight plots for one unit, and projections.
+Includes PlotGroups for standard plots of anything in a Sheet
+database, plus weight plots for one unit, and projections.
 
 $Id$
 """
@@ -10,25 +11,33 @@ __version__='$Revision$'
 
 import copy
 import Image
-import __main__
 
 from .. import param
+from topo.param.parameterized import ParamOverrides
 
 import topo
-from topo.base.sheet import Sheet
+
 from topo.base.cf import CFSheet,CFProjection,Projection
 from topo.base.projection import ProjectionSheet
+from topo.sheet import GeneratorSheet,Sheet
 from topo.misc.keyedlist import KeyedList
 from topo.misc.filepath import resolve_path
 
 from plot import make_template_plot, Plot
 from plotfilesaver import PlotGroupSaver,CFProjectionPlotGroupSaver
 
-from topo.param.parameterized import ParameterizedFunction,ParamOverrides,Parameterized
+# General CEBALERTs for this file:
+# * It is very difficult to understand what is happening in these
+#   classes!
+# * Improve hierarchy. E.g. GridPlotGroup should be a mixin?
+# * Oh yeah, and don't forget about the TestPattern window. It has
+#   some kind of PlotGroup in it too...
+# * There are missing classes (e.g. currently only the CFProjections
+#   can be plotted for CFSheets).
+# * There are no unit tests
 
-from topo.sheet import GeneratorSheet
 
-def cmp_plot(plot1,plot2):
+def _cmp_plot(plot1,plot2):
     """
     Comparison function for sorting Plots.
     It compares the precedence number first and then the src_name and name attributes.
@@ -38,20 +47,6 @@ def cmp_plot(plot1,plot2):
     else:
 	return cmp((plot1.plot_src_name+plot1.name),
 		   (plot2.plot_src_name+plot2.name))
-
-
-
-# general CEBALERTs for this file:
-#
-# Before 0.9.4:
-# * Clean up what's here: names and doc
-# * Clean up keyname stuff 
-#
-# After 0.9.4
-# * Improve hierarchy (i.e. making methods as general as possible,
-#   and there are also missing classes - currently only CFProjections
-#   for CFSheets can be plotted).
-# * There are no unit tests
 
 
 class PlotGroup(param.Parameterized):
@@ -81,54 +76,23 @@ class PlotGroup(param.Parameterized):
         template for this plot, but various arguments can be passed, a
         modified version substituted, etc.""")
 
-    # CB: make clear the distinction between self.plots and self.plot_list
+    # I guess the interace for users of the class (I just mean methods
+    # likely to be used) is:
+    # make_plots()   
+    # scale_images()  
+    # + parameters
     
-    def __init__(self,**params):
-
-        super(PlotGroup,self).__init__(**params)
-
-        self.plot_list = []
-	self.labels = [] 
-
-        # In the future, it might be good to be able to specify the
-        # plot rows and columns using tuples.  For instance, if three
-        # columns are desired with the plots laid out from left to
-        # right, we could use (None, 3).  If three rows are desired
-        # then (3, None).  Another method that would work is [3,2,4]
-        # would have the first row with 3, the second row with 2, the
-        # third row with 4, etc.  The default left-to-right ordering
-        # in one row could perhaps be represented as (None, Inf).
-        # 
-        # Alternatively, we could add another precedence value, so that
-        # the usual precedence value controls where the plot appears left to right,
-        # while a rowprecedence value would control where it appears top to bottom.
-        # All plots with the same rowprecedence would go on the same row, and the
-        # actual value of the rowprecedence would determine which row goes first.
-        
-	self.time = None
-
-        self.filesaver = PlotGroupSaver(self)
-    
-
-    # CB: (subclasses add more commands)
-    def _exec_pre_plot_hooks(self,**args):
-        for f in self.pre_plot_hooks: 
-            f(**args)
+    # And the interface for subclasses (I mean methods likely to be
+    # overridden) is:
+    # _generate_plots()      - return the list of plots
+    # _generate_labels()     - return the list of labels
+    # _sort_plots()          - sort the list of plots
+    # _exec_pre_plot_hooks() - run the pre_plot_hooks
+    # _exec_plot_hooks()     - run the plot_hooks
 
 
-    def _exec_plot_hooks(self,**args):
-        for f in self.plot_hooks: 
-            f(**args)
-
-        
-    def _plot_list(self):
-	"""
-        Return the list of plots.
-
-        Can be re-implemented in subclasses to *contruct* the list.
-	"""
-	return self.plot_list
-
+    ##############################
+    ########## interface for users
 
     def make_plots(self,update=True):
 	"""
@@ -140,52 +104,90 @@ class PlotGroup(param.Parameterized):
         self._create_images(update)
         self.scale_images()
 
+    def scale_images(self,zoom_factor=None):
+        """Scale the images by the given zoom factor, if appropriate; default is to do nothing."""
+        pass
 
+
+    ###################################
+    ########## interface for subclasses
+    
+    def _generate_plots(self):
+        """Return the list of Plots"""
+        # subclasses may have dynamically generated Plots to add
+        return self._static_plots[:]
+
+
+    def _generate_labels(self):
+        return [plot.label() for plot in self.plots]
+
+
+    def _sort_plots(self):
+	"""Sort plots according to their precedence, then alphabetically."""
+	self.plots.sort(_cmp_plot)
+
+
+    def __init__(self,**params):
+        super(PlotGroup,self).__init__(**params)
+        self._static_plots = []
+        self.plots = []
+	self.labels = [] 
+	self.time = None
+        self.filesaver = PlotGroupSaver(self)
+
+        # In the future, it might be good to be able to specify the
+        # plot rows and columns using tuples.  For instance, if three
+        # columns are desired with the plots laid out from left to
+        # right, we could use (None, 3).  If three rows are desired
+        # then (3, None).  Another method that would work is [3,2,4]
+        # would have the first row with 3, the second row with 2, the
+        # third row with 4, etc.  The default left-to-right ordering
+        # in one row could perhaps be represented as (None, Inf).
+        # 
+        # Alternatively, we could add another precedence value, so
+        # that the usual precedence value controls where the plot
+        # appears left to right, while a rowprecedence value would
+        # control where it appears top to bottom.  All plots with the
+        # same rowprecedence would go on the same row, and the actual
+        # value of the rowprecedence would determine which row goes
+        # first.
+        
+
+    def _exec_pre_plot_hooks(self,**kw):
+        for f in self.pre_plot_hooks: 
+            f(**kw)
+
+
+    def _exec_plot_hooks(self,**kw):
+        for f in self.plot_hooks: 
+            f(**kw)
+
+
+    # unlikely to be overridden?
     def _create_images(self,update):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
         """
-        plot_list = self._plot_list()
-        self.plots = [plot for plot in plot_list if plot != None]
+        self.plots = [plot for plot in self._generate_plots() if plot is not None]
 
         # Suppress plots in the special case of plots not being updated 
         # and having no resizable images, to suppress plotgroups that
         # have nothing but a color key
-        resizeable_plots = [p for p in self.plots if p.resize]
+        resizeable_plots = [plot for plot in self.plots if plot.resize]
         if not update and not resizeable_plots:
             self.plots=[]
 
         # Take the timestamps from the underlying Plots
-	timestamps = [plot.timestamp for plot in plot_list
-                      if plot != None and plot.timestamp >= 0]
-        if timestamps != []:
+	timestamps = [plot.timestamp for plot in self.plots
+                      if plot.timestamp >= 0]
+        if len(timestamps)>0:
             self.time = max(timestamps)
             if max(timestamps) != min(timestamps):
                 self.warning("Combining Plots from different times (%s,%s)" %
                              (min(timestamps),max(timestamps)))
 
 	self._sort_plots()	
-	self.generate_labels()
-
-
-    def scale_images(self,zoom_factor=None):
-        """Scale the images by the given zoom factor, if appropriate; default is to do nothing."""
-        pass
-
-    
-    def generate_labels(self):
-	"""Generate labels for the plots."""
-	self.labels = []
-	for plot in self.plots:
-	    self.labels.append(plot.label())
-
-
-    def _sort_plots(self):
-	"""
-        Sort plots according to their precedence, then alphabetically.
-	"""
-	self.plots.sort(cmp_plot)
-
+	self.labels = self._generate_labels()
 
 
 
@@ -196,8 +198,13 @@ class PlotGroup(param.Parameterized):
 ### set when the plotgroup is instantiated. Then if sheet=None, the
 ### sheet's range can be used as the list of sheets.
 
-
 class SheetPlotGroup(PlotGroup):
+
+    # CEBALERT: shouldn't this be abstract? Currently it wouldn't do
+    # anything with its sheets if you asked it to make plots.
+    #
+    # (TemplatePlotGroup and TestPatternPlotGroup are the only two
+    # immediate children at the moment.)
 
     sheet_coords = param.Boolean(default=False,doc="""
         Whether to scale plots based on their relative sizes in sheet
@@ -207,15 +214,23 @@ class SheetPlotGroup(PlotGroup):
         similar sizes on screen, regardless of their corresponding
         sheet areas, which maximizes the size of each plot.""")
 
-    normalize = param.Boolean(default=False,doc="""
-        Whether to scale plots so that the peak value will be white
-        and the minimum value black.  Otherwise, 0.0 will be black
-        and 1.0 will be white.  Normalization has the advantage of
-        ensuring that any data that is present will be visible, but
-        the disadvantage that the absolute scale will be obscured.
-        Non-normalized plots are guaranteed to be on a known scale,
-        but only values between 0.0 and 1.0 will be visibly
-        distinguishable.""")
+    # CEBALERT: in the GUI, this isn't getting the right help text. I
+    # suspect I put in a hack for these parameters in parametersframe,
+    # sp when used outside of a parametersframe, they don't get the
+    # help text.
+    normalize = param.ObjectSelector(default='None',check_on_set=True,
+                                     objects=['None','Independent'],
+                                  doc="""
+        'Independent': scale each plot so that the peak value will be white
+        and the minimum value black.  
+
+        'None': no scaling - 0.0 will be black and 1.0 will be white.  
+
+        Normalization has the advantage of ensuring that any data that
+        is present will be visible, but the disadvantage that the
+        absolute scale will be obscured.  Non-normalized plots are
+        guaranteed to be on a known scale, but only values between 0.0
+        and 1.0 will be visibly distinguishable.""")
 
     integer_scaling = param.Boolean(default=False,doc="""
         When scaling bitmaps, whether to ensure that the scaled bitmap is an even
@@ -252,22 +267,16 @@ class SheetPlotGroup(PlotGroup):
         acceptable to turn this check off when working with matrix
         sizes much larger than your screen resolution.""")
 
+    # For users, adds:
+    # sheets()
+    # update_maximum_plot_height()
+    # scale_images() 
 
-    # CEBALERT: SheetPlotGroup works on a list of sheets, and so does
-    # TemplatePlotGroup.  (TestPattern uses this to set its own list
-    # of sheets.) The classes after TemplatePlotGroup
-    # (ProjectionSheetPlotGroup onwards) work on a *single*
-    # sheet. Having a sheets attribute is confusing. How do we get
-    # round this?
-    def __init__(self,sheets=None,**params):
-        self.sheets = sheets
-        super(SheetPlotGroup,self).__init__(**params)
+    #########################
+    ########## adds for users
 
-    def _sheets(self):
-        return self.sheets or topo.sim.objects(Sheet).values()
-
-    def make_plots(self,update=True):
-        super(SheetPlotGroup,self).make_plots(update)
+    def sheets(self):
+        return topo.sim.objects(Sheet).values()
 
 
     def update_maximum_plot_height(self,zoom_factor=None):
@@ -338,7 +347,6 @@ class SheetPlotGroup(PlotGroup):
         return True
             
 
-
     ### CEB: At least some of this scaling would be common to all
     ### plotgroups, if some (e.g. featurecurve) didn't open new
     ### windows.
@@ -386,6 +394,26 @@ class SheetPlotGroup(PlotGroup):
 
         return True
 
+
+
+def _get_value_range(plots):
+    """
+    Helper function to return the (min,max) given by the value_ranges of
+    the given plots.
+
+    Return None if there were no plots with value_range.
+    """
+    mins = []
+    maxs = []
+    for plot in plots:
+        if hasattr(plot,'value_range'):
+            mins.append(plot.value_range[0])
+            maxs.append(plot.value_range[1])
+
+    if len(mins)==0:
+        return None
+    else:
+        return (min(mins),max(maxs))
 
 
 class TemplatePlotGroup(SheetPlotGroup):
@@ -465,6 +493,62 @@ class TemplatePlotGroup(SheetPlotGroup):
     category = param.String(default="User",doc="""
         Category to which this plot belongs, which will be created if necessary.""")
 
+    # CEBALERT: how to avoid repeating documentation?
+    # CB: also, documentation for normalization types needs cleaning up.
+    normalize = param.ObjectSelector(default='None',
+                                     objects=['None','Independent','All'],doc="""
+        
+        'Independent': scale each plot so that its maximum value is
+        white and its minimum value black.
+
+        'None': no scaling (0.0 will be black and 1.0 will be white).
+
+        'All': scale each plot so that the highest maximum value is
+        white, and the lowest minimum value is black.
+
+    
+        'Independent' normalization has the advantage of ensuring that
+        any data that is present will be visible, but the disadvantage
+        that the absolute scale will be obscured.  Non-normalized
+        plots are guaranteed to be on a known scale, but only values
+        between 0.0 and 1.0 will be visibly distinguishable.""")
+
+
+
+    # Overrides:
+    # _generate_plots() - supports normalize=='All'
+
+    # For users, adds:
+    # add_template()
+    # add_static_image()
+
+    # For subclasses, adds:
+    # _template_plots()             - 
+    # _make_template_plot()         - 
+    # _kw_for_make_template_plots() -
+
+
+    #####################
+    ########## overridden
+
+    def _generate_plots(self):
+        if self.normalize=='All':
+            range_ = _get_value_range(self._template_plots(range_=None))
+        else:
+            range_ = False
+        return self._static_plots[:]+self._template_plots(range_=range_)
+
+
+    def __init__(self,plot_templates=None,static_images=None,**params):
+	super(TemplatePlotGroup,self).__init__(**params)
+	self.plot_templates = KeyedList(plot_templates or [])
+	# Add plots for the static images, if any
+        for image_name,file_path in static_images or []:
+            add_static_image(image_name,file_path)
+
+
+    #########################
+    ########## adds for users
 
     # JCALERT! We might eventually write these two functions
     # 'Python-like' by using keyword argument to specify each
@@ -474,13 +558,14 @@ class TemplatePlotGroup(SheetPlotGroup):
     # JABALERT: We should also be able to store a documentation string
     # describing each plot (for hovering help text) within each
     # plot template.
-    #
-    # JAB: Maybe add_template would be a better name, to contrast with add_static_image
-    def add_plot(self,name,specification_tuple_list):
+
+    def add_template(self,name,specification_tuple_list):
 	dict_={}
 	for key,value in specification_tuple_list:
 	    dict_[key]=value
 	self.plot_templates.append((name,dict_))
+
+    add_plot = add_template # CEBALERT: should be removed when callers updated
 
 
     def add_static_image(self,name,file_path):
@@ -489,43 +574,47 @@ class TemplatePlotGroup(SheetPlotGroup):
         """
         image = Image.open(resolve_path(file_path))
         plot = Plot(image,name=name)
-        self.plot_list.append(plot)
+        self._static_plots.append(plot)
+            
 
 
-    def __init__(self,plot_templates=[],static_images=[],**params):
-	super(TemplatePlotGroup,self).__init__(**params)
+    ##############################
+    ########## adds for subclasses
 
-	self.plot_templates = KeyedList(plot_templates)
-                
-	# Add plots for the static images, if any
-        for image_name,file_path in static_images:
-            add_static_image(image_name,file_path)
-
-	
-    def _plot_list(self):
-        """Construct a list of plots as specified by the template."""
-        # CEBALERT: I don't understand what this is doing. Appending?
-        # Replacing?  Must be replacing self.plot_list with a new
-        # list, and returns that same list. Anyway, this method
-        # together with self.plot_list is confusing. Certainly callers
-        # must avoid using _plot_list() as a way of just getting
-        # self.plot_list. Wouldn't it be clearer to call this method
-        # create_plot_list() and store result in self.plot_list? Or
-        # else make self.plot_list a property that creates the list if
-        # necessary.
-	plot_list = self.plot_list
-        for sheet in self._sheets():
-	    for (pt_name,pt) in self.plot_templates:
-		plot_list = plot_list + self._create_plots(pt_name,pt,sheet)
-    	return plot_list
+    def _template_plots(self,range_=False):
+        # calls make_template_plot for all plot_templates for all kw returned
+        # by _kw_for_make_template_plot!!
+        template_plots = []
+        for plot_template_name,plot_template in self.plot_templates:
+            for kw in self._kw_for_make_template_plot(range_):
+                template_plots.append(self._make_template_plot(plot_template_name,plot_template,**kw))
+    	return template_plots
 
 
-    def _create_plots(self,pt_name,pt,sheet):
-        return [make_template_plot(pt,sheet.sheet_views,sheet.xdensity,
-                                   sheet.bounds,self.normalize,name=pt_name)]
+    def _kw_for_make_template_plot(self,range_):
+        # Return a list of dictionaries; for each dictionary,
+        # _make_template_plot() will be called with that dictionary
+        # as keyword arguments.
+        #
+        # Allows subclasses to control what range of things (sheets,
+        # projections) _make_template_plot() is called over, and to
+        # control what keyword arguments
+        # (sheet=,proj_=,range_=,bounds=,x=,...) are supplied.
+        return [dict(sheet=sheet,range_=range_) for sheet in self.sheets()]
 
 
+    def _make_template_plot(self,plot_template_name,plot_template,**kw):
+        return make_template_plot(plot_template,
+                                  kw['sheet'].sheet_views,
+                                  kw['sheet'].xdensity,
+                                  kw['sheet'].bounds,
+                                  self.normalize,
+                                  # CEBALERT: after this class, p.t. name never used
+                                  name=plot_template_name,
+                                  range_=kw['range_'])
 
+
+    
 def default_measureable_sheet():
     """Returns the first sheet for which measure_maps is True (if any), or else the first sheet, for use as a default value."""
 
@@ -537,27 +626,159 @@ def default_measureable_sheet():
         raise ValueError("Unable to find a suitable measureable sheet.")
     sht=sheets[0]
     if len(sheets)>1:
-        Parameterized().message("Using sheet %s." % sht.name)
+        param.Parameterized().message("Using sheet %s." % sht.name)
     return sht
 
 
 
 class ProjectionSheetPlotGroup(TemplatePlotGroup):
-    """
-    Abstract PlotGroup for visualizations of the Projections of one ProjectionSheet.
-
-    Requires self.keyname to be set to the name of a placeholder
-    SheetView that will be replaced with a key that is unique to a
-    particular Projection of the current Sheet.
-    """
+    """Abstract PlotGroup for visualizations of the Projections of one ProjectionSheet."""
     __abstract = True
 
-    keyname = "ProjectionSheet" # CB: what is this keyname?
+    # Class attribute; forms part of the key for sheet_views (see
+    # the _key() method).
+    keyname = "ProjectionSheet" 
 
-    sheet = param.ObjectSelector(default=None,compute_default_fn=default_measureable_sheet,doc="""
-    The Sheet from which to produce plots.""")
+    sheet = param.ObjectSelector(default=None,
+                                 compute_default_fn=default_measureable_sheet,
+                                 doc=
+        """The Sheet from which to produce plots.""")
+
+    normalize = param.ObjectSelector(default='None',
+                                  objects=['None','Independent','All','Joint'],doc="""
+        'Independent': scale each plot so that the peak value will be white
+        and the minimum value black.
+
+        'None': no scaling - 0.0 will be black and 1.0 will be white.  
+
+        'All': scale each plot so that the peak value of all the plots
+        is white, and the minimum value of all the plots will be
+        black.
+
+        'Joint': as 'Independent', except that plots produced from
+        projections whose weights are jointly normalized will be
+        jointly normalized.
+        
+        Normalization has the advantage of ensuring that any data that
+        is present will be visible, but the disadvantage that the
+        absolute scale will be obscured.  Non-normalized plots are
+        guaranteed to be on a known scale, but only values between 0.0
+        and 1.0 will be visibly distinguishable.""")
+
 
     sheet_type = ProjectionSheet
+
+    # Overrides:
+    # _exec*plot_hooks()           - passes sheet to hooks
+    # sheet()                      - returns only a single sheet
+    # _kw_for_make_template_plot() - adds projections (+ assumes one sheet) 
+    # _template_plots()            - support joint normalization
+    # _make_template_plot()        -
+    # _generate_labels()           - 
+
+    # Adds for users:
+    # projections() - 
+
+    # Adds for subclasses:
+    # _key() - 
+    # _kw_for_one_proj() - 
+    # _check_sheet_type() - 
+    # _check_data_exist() - 
+
+
+    #########################
+    ########## adds for users
+
+    def projections(self):
+        return self.sheet.projections().values()
+
+
+    #####################
+    ########## overridden
+
+    def sheets(self):
+        return [self.sheet]
+
+    def _exec_pre_plot_hooks(self,**kw):
+        self.params('sheet').compute_default()
+        self._check_sheet_type()
+        super(ProjectionSheetPlotGroup,self)._exec_pre_plot_hooks(sheet=self.sheet,**kw)
+
+
+    def _exec_plot_hooks(self,**kw):
+        super(ProjectionSheetPlotGroup,self)._exec_plot_hooks(sheet=self.sheet,**kw)
+
+
+    def _kw_for_make_template_plot(self,range_):
+        args = []
+        for proj in self.projections():
+            for d in self._kw_for_one_proj(proj):
+                d['range_']=range_[proj.name]
+                args.append(d)
+        return args
+
+
+    def _template_plots(self,range_=False):
+        # all the extra processing is for normalize=='Joint'
+
+        # {name:range_} for the projections
+        named_ranges = dict.fromkeys([proj.name for proj in self.projections()],range_)
+
+        if self.normalize=='Joint':
+            ranges = {}
+            for group_key in self.sheet._grouped_in_projections('JointNormalize').keys():
+                if group_key is None:
+                    ranges[group_key]=False
+                else:
+                    projlist = self.sheet._grouped_in_projections('JointNormalize')[group_key]
+                    self._check_data_exist(projlist)
+
+                    # hack: need a _kw_for_make_template() that works
+                    # with a single range value and restricts
+                    # projections to those with a specified key.
+                    self._group_key = group_key
+                    _orig = self._kw_for_make_template_plot
+                    self._kw_for_make_template_plot = self._hack
+
+                    plotlist = super(ProjectionSheetPlotGroup,self)._template_plots(range_=None)
+                    self._kw_for_make_template_plot = _orig
+                    ranges[group_key] = _get_value_range(plotlist) 
+
+            for key,proj in self.__keyed_projections():
+                named_ranges[proj.name] = ranges[key]
+
+        return super(ProjectionSheetPlotGroup,self)._template_plots(range_=named_ranges)
+
+
+    def _make_template_plot(self,plot_template_name,plot_template,**kw):#sheet,proj
+        return make_template_plot(self._channels(plot_template,**kw),
+                                  kw['proj'].src.sheet_views,
+                                  kw['proj'].src.xdensity,
+                                  None,
+                                  self.normalize,
+                                  name=kw['proj'].name,
+                                  range_=kw['range_'])
+
+
+    def _generate_labels(self):
+        return ["%s \n(from %s)"%(plot.name,plot.plot_src_name) 
+                for plot in self.plots]
+
+
+    ##############################
+    ########## adds for subclasses
+
+    def _key(self,**kw):
+        # the key for sheet_views 
+        return (self.keyname,self.sheet.name,kw['proj'].name)
+
+
+    def _kw_for_one_proj(self,proj):
+        # Return a list of dictionaries; for each dictionary,
+        # _make_template_plot() will be called with that dictionary as
+        # keyword arguments.
+        return [dict(proj=proj)]
+
 
     # CB: this isn't really necessary for these classes
     # themselves. Right now we have it provide a useful error message
@@ -568,55 +789,53 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
                 "%s's sheet Parameter must be set to a %s instance (currently %s, type %s)." \
                 %(self,self.sheet_type,self.sheet,type(self.sheet))) 
 
-    def _sheets(self):
-        return [self.sheet]
 
-    def _exec_pre_plot_hooks(self,**args):
-        self.params('sheet').compute_default()
-        self._check_sheet_type()
-        super(ProjectionSheetPlotGroup,self)._exec_pre_plot_hooks(sheet=self.sheet,**args)
+    def _check_data_exist(self,projlist):
+        # for joint normalization, not all data required may be
+        # measured and displayed by the PlotGroup (in subclasses that
+        # don't display all projections at once).
+        pass
 
-    def _exec_plot_hooks(self,**args):
-        super(ProjectionSheetPlotGroup,self)._exec_plot_hooks(sheet=self.sheet,**args)
-
-
+    # CEB: I guess this comment is out of date and should be removed?
+    #
     # Special case: if the Strength is set to self.keyname, we
     # request UnitViews (i.e. by changing the Strength key in
-    # the plot_channels). Otherwise, we consider Strength as
+    # the channels). Otherwise, we consider Strength as
     # specifying an arbitrary SheetView.
 
-    # CB/JAB: Should replace this custom routine with simply providing
-    # a method for constructing a special key name; then maybe nearly
-    # all the fancy processing in the various _create_plots functions
-    # can be eliminated
-
-    # (this method isn't the solution to the above, it's just beginning
-    # to remove some duplication)
-    def _change_key(self,plotgroup_template,sheet,proj):
-        plot_channels = copy.deepcopy(plotgroup_template)
-        key = (self.keyname,sheet.name,proj.name)
-        plot_channels['Strength']=key
-        return plot_channels
-
-    def _create_plots(self,pt_name,pt,sheet):
-        # Note: the UnitView is in the src_sheet view_dict,
-        # and the name in the key is the destination sheet.
-        return [make_template_plot(self._change_key(pt,sheet,proj),
-                                   proj.src.sheet_views,
-                                   proj.src.xdensity,
-                                   None,
-                                   self.normalize,
-                                   name=proj.name) for proj in sheet.in_connections]
-
- 
-    def generate_labels(self):
-	self.labels = []
-	for plot in self.plots:
-	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
+    # unlikely to be overridden?
+    def _channels(self,plotgroup_template,**kw):
+        channels = copy.deepcopy(plotgroup_template)
+        channels['Strength']=self._key(**kw)
+        return channels
 
 
+    # CEBALERT: used to temporarily override
+    # _kw_for_make_template_plot(), to allow calculation of range for
+    # joint normalization. A mess.
+    def _hack(self,range_):
+        for key,projlist in self.sheet._grouped_in_projections('JointNormalize'):
+            if key==self._group_key:
+                args = []
+                for proj in projlist or self.projections():
+                    for d in self._kw_for_one_proj(proj):
+                        d['range_']=range_
+                        args.append(d)
+                return args
+        raise
 
-class ProjectionSheetMeasurementCommand(ParameterizedFunction):
+
+    def __keyed_projections(self):
+        # helper method to return a list of (key,proj) pairs from self.sheet
+        keys_and_projns = []
+        for key,projlist in self.sheet._grouped_in_projections('JointNormalize'):
+            for proj in projlist:
+                keys_and_projns.append((key,proj))
+        return keys_and_projns
+
+
+
+class ProjectionSheetMeasurementCommand(param.ParameterizedFunction):
     """A callable Parameterized command for measuring or plotting a specified Sheet."""
 
     sheet = param.ObjectSelector(default=None,doc="""
@@ -626,25 +845,26 @@ class ProjectionSheetMeasurementCommand(ParameterizedFunction):
 
 
 
-
-
-
-
-
 class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
     """Visualize the activity of all Projections into a ProjectionSheet."""
 
     keyname='ProjectionActivity' 
 
-    def _create_plots(self,pt_name,pt,sheet):
-        return [make_template_plot(self._change_key(pt,sheet,proj),
-                                   proj.dest.sheet_views,
-                                   proj.dest.xdensity,
-                                   proj.dest.bounds,
-                                   self.normalize,
-                                   name=proj.name) for proj in sheet.in_connections]
+    #####################
+    ########## overridden
+
+    def _make_template_plot(self,plot_template_name,plot_template,**kw):
+        return make_template_plot(self._channels(plot_template,**kw),
+                                  kw['proj'].dest.sheet_views,
+                                  kw['proj'].dest.xdensity,
+                                  kw['proj'].dest.bounds,
+                                  self.normalize,
+                                  name=kw['proj'].name,
+                                  range_=kw['range_'])
 
 
+# CEBALERT: Total mess. should be a mix-in class, or something like
+# that.  
 class GridPlotGroup(ProjectionSheetPlotGroup):
     """
     A ProjectionSheetPlotGroup capable of generating coordinates on a 2D grid.
@@ -658,9 +878,57 @@ class GridPlotGroup(ProjectionSheetPlotGroup):
                      softbounds=(5.0,50.0),doc="""
                      Number of units to plot per 1.0 distance in sheet coordinates""")
 
+    normalize = param.ObjectSelector(default='None',
+                                  objects=['None','Independent','All']) # joint is removed
 
-    def __init__(self,**params):
-        super(GridPlotGroup,self).__init__(**params)
+
+    # Adds for subclasses:
+    # generate_coords() - 
+
+    # Overrides:
+    # _sort_plots()
+    # _kw_for_make_template_plot() - no projection
+    # _key()                       - no projection
+    # _make_template_plot()        - no projection
+
+    #####################
+    ########## overridden
+
+    def _sort_plots(self):
+	"""Skips plot sorting for to keep the generated order."""
+	pass
+
+
+    def _kw_for_make_template_plot(self,range_):
+        args = []
+        for x,y in self.generate_coords():
+            x_center,y_center = self.sheet.closest_cell_center(x,y)
+            args.append(dict(x=x_center,y=y_center,sheet=self.sheet,range_=range_))
+        return args
+
+
+    def _key(self,**kw):
+        return (self.keyname,self.sheet.name,kw['x'],kw['y'])
+
+
+    def _make_template_plot(self,plot_template_name,plot_template,**kw):
+        return make_template_plot(self._channels(plot_template,**kw),
+                                  self.input_sheet.sheet_views,
+                                  self.input_sheet.xdensity,
+                                  self.input_sheet.bounds,
+                                  self.normalize,
+                                  range_=kw['range_'])
+
+    # (should *skip* the joint normalization additions in
+    # projectionsheet for some subclasses (e.g. RFProjectionPlot), but
+    # should not for other subclasses (e.g. ProjectionPlotGroup))
+#    def _template_plots(self,range_=False):
+#        return TemplatePlotGroup._dynamic_plot(self,range_)
+
+
+
+    ##############################
+    ########## adds for subclasses
 
     def generate_coords(self):
         """
@@ -688,35 +956,9 @@ class GridPlotGroup(ProjectionSheetPlotGroup):
         return coords
 
 
-    def _change_key(self,plotgroup_template,sheet,x,y):
-        plot_channels = copy.deepcopy(plotgroup_template)
-        key = (self.keyname,sheet.name,x,y)
-        plot_channels['Strength']=key
-        return plot_channels
-
-
-    def _create_plots(self,pt_name,pt,sheet):
-        plot_list=[]
-        for x,y in self.generate_coords():
-            x_center,y_center = sheet.closest_cell_center(x,y)
-            plot_channels = self._change_key(pt,sheet,x_center,y_center)
-            plot_list.append(make_template_plot(plot_channels,
-                                                self.input_sheet.sheet_views,
-                                                self.input_sheet.xdensity,
-                                                self.input_sheet.bounds,
-                                                self.normalize))
-        return plot_list
-
-
-    def _sort_plots(self):
-	"""Skips plot sorting for to keep the generated order."""
-	pass
-
-
 
 def default_input_sheet():
     """Returns the first GeneratorSheet defined, for use as a default value."""
-
     sheets=topo.sim.objects(GeneratorSheet).values()
     if len(sheets)<1:
         raise ValueError("Unable to find a suitable input sheet.")
@@ -732,37 +974,94 @@ class RFProjectionPlotGroup(GridPlotGroup):
     input_sheet = param.ObjectSelector(default=None,compute_default_fn=default_input_sheet,
                                        doc="The sheet on which to measure the RFs.")
 
-    def _exec_pre_plot_hooks(self,**args): # RFHACK
+
+    # Overrides:
+    # _template_plots()      - no projection
+    # _exec_pre_plot_hooks() - 
+
+
+    #####################
+    ########## overridden
+
+    def _template_plots(self,range_=False):
+        return TemplatePlotGroup._template_plots(self,range_=range_)
+
+
+    def _exec_pre_plot_hooks(self,**kw): # RFHACK
         self.params('input_sheet').compute_default()
-        super(RFProjectionPlotGroup,self)._exec_pre_plot_hooks(input_sheet=self.input_sheet,**args)
+        super(RFProjectionPlotGroup,self)._exec_pre_plot_hooks(input_sheet=self.input_sheet,**kw)
 
 
+
+
+
+# CEBALERT: haven't modified; might need updating. Doesn't seem to be
+# a way to call it from the GUI - is it known to be broken?
 class RetinotopyPlotGroup(TemplatePlotGroup):
     input_sheet = param.ObjectSelector(default=None,compute_default_fn=default_input_sheet,
                                        doc="The sheet on which to measure the RFs.")
 
-    def _exec_pre_plot_hooks(self,**args): # RFHACK
+    def _exec_pre_plot_hooks(self,**kw): # RFHACK
         self.params('input_sheet').compute_default()
         super(RetinotopyPlotGroup,self)._exec_pre_plot_hooks(
-            input_sheet=self.input_sheet,**args)
+            input_sheet=self.input_sheet,**kw)
 
 
 
 class ProjectionPlotGroup(GridPlotGroup):
 
+    keyname='Weights'
+
     projection = param.ObjectSelector(default=None,doc="The projection to visualize.")
-    keyname='Weights'                     
 
-    def _change_key(self,plotgroup_template,sheet,proj,x,y):
-        plot_channels = copy.deepcopy(plotgroup_template)
-        key = (self.keyname,sheet.name,proj.name,x,y)
-        plot_channels['Strength']=key
-        return plot_channels
+    # ProjectionSheetPlotGroup
+    normalize = param.ObjectSelector(default='None',
+                                  objects=['None','Independent','All','Joint'])
 
-    def _exec_pre_plot_hooks(self,**args):
-        coords=self.generate_coords()
-        super(ProjectionPlotGroup,self)._exec_pre_plot_hooks(coords=coords,projection=self.projection,**args)
 
+    # Overrides:
+    # _projections()               - one projection
+    # _key()                       - restores projection
+    # _kw_for_make_template_plot() - restores projection
+    # _exec_pre_plot_hooks()       - pass coords to hooks
+    # _check_data_exist() - check for data from other jointly normalized projections 
+
+
+    #####################
+    ########## overridden
+
+    def projections(self):
+        return [self.projection]
+
+
+    # GridPlotGroup+ProjectionSheetPlotGroup
+    def _key(self,**kw):
+        return (self.keyname,self.sheet.name,kw['proj'].name,kw['x'],kw['y'])
+
+
+    # ProjectionSheetPlotGroup
+    def _check_data_exist(self,projlist):
+        nodata = []
+        for proj in projlist:
+            d = self._kw_for_one_proj(proj)[0] # only checking one (x,y)
+            if self._key(**d) not in proj.src.sheet_views:
+                nodata.append(proj.name)
+        if len(nodata)>0:
+            raise ValueError("Joint normalization cannot proceed unless data has been measured for all jointly normalized projections (no data for %s)"%nodata)
+
+
+    # GridPlotGroup+ProjectionSheetPlotGroup
+    def _kw_for_make_template_plot(self,range_):
+        args = self._kw_for_one_proj(self.projection)
+        for d in args:
+            d['range_']=range_[d['proj'].name]
+        return args
+
+
+    # GridPlotGroup+ProjectionSheetPlotGroup
+    def _exec_pre_plot_hooks(self,**kw):
+        coords=self.generate_coords() # why not in gridplotgroup?
+        super(ProjectionPlotGroup,self)._exec_pre_plot_hooks(coords=coords,projection=self.projection,**kw)
 
 
 
@@ -796,13 +1095,53 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
                      
     sheet_type = CFSheet
 
+    # Overrides:
+    # _make_template_plot()  - add bounds
+    # _kw_for_one_proj()     - add bounds
+    # _exec_pre_plot_hooks() - check proj type 
+
+    # Adds for subclasses:
+    # _check_projection_type() - 
+
+
+    #####################
+    ########## overridden
+
+    def _make_template_plot(self,plot_template_name,plot_template,**kw):
+        return make_template_plot(self._channels(plot_template,**kw),
+                                  kw['proj'].src.sheet_views,
+                                  kw['proj'].src.xdensity,
+                                  kw['bounds'],
+                                  self.normalize,
+                                  name=kw['proj'].name,
+                                  range_=kw['range_'])
+
+
+    def _kw_for_one_proj(self,proj):
+        args = []
+        for x,y in self.generate_coords():            
+            if self.situate:
+                bounds = proj.src.bounds
+            else:
+                (r,c) = proj.dest.sheet2matrixidx(x,y)
+                bounds = proj.cf_bounds(r,c)
+            args.append(dict(x=x,y=y,proj=proj,bounds=bounds))
+
+        return args
+
+
+    def _exec_pre_plot_hooks(self,**kw): 
+        self._check_projection_type()
+        super(CFProjectionPlotGroup,self)._exec_pre_plot_hooks(**kw)
+
+
     def __init__(self,**params):
         super(CFProjectionPlotGroup,self).__init__(**params)    
         self.filesaver = CFProjectionPlotGroupSaver(self)
 
-    def _exec_pre_plot_hooks(self,**args): 
-        self._check_projection_type()
-        super(CFProjectionPlotGroup,self)._exec_pre_plot_hooks(**args)
+
+    ##############################
+    ########## adds for subclasses
 
     # CB: same comment for ProjectionSheetPlotGroup's _check_sheet_type.
     def _check_projection_type(self):
@@ -811,32 +1150,8 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
                 "%s's projection Parameter must be set to a %s instance (currently %s, type %s)." \
                 %(self,CFProjection,self.projection,type(self.projection))) 
 
-		
-    def _create_plots(self,pt_name,pt,sheet):
-	projection = self.projection
-        plot_list=[]
-        src_sheet=projection.src
 
-        for x,y in self.generate_coords():
-            
-            plot_channels = self._change_key(pt,sheet,projection,x,y)
-            
-            if self.situate:
-                bounds = src_sheet.bounds
-            else:
-                (r,c) = projection.dest.sheet2matrixidx(x,y)
-                bounds = projection.cf_bounds(r,c)
-                                                    
-            plot_list.append(make_template_plot(plot_channels,
-                                                src_sheet.sheet_views,
-                                                src_sheet.xdensity,
-                                                bounds,
-                                                self.normalize))
-        return plot_list
-
-
-
-
+# a mix-in? 
 class UnitPlotGroup(ProjectionSheetPlotGroup):
     """
     Visualize anything related to a unit.
@@ -848,19 +1163,21 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
 ## """Sheet coordinate location desired.  The unit nearest this location will be returned.
 ## It is an error to request a unit outside the area of the Sheet.""")
 
-    def _change_key(self,plotgroup_template,sheet,x,y):
-        plot_channels = copy.deepcopy(plotgroup_template)
-        key = (self.keyname,sheet.name,x,y)
-        plot_channels['Strength']=key
-        return plot_channels
+    # Overrides:
+    # _key()        - removes projection, adds coords
+    # _exec*hooks() - includes coords 
 
-        
-    def _exec_pre_plot_hooks(self,**args):
-	super(UnitPlotGroup,self)._exec_pre_plot_hooks(coords=[(self.x,self.y)],**args)
+    #####################
+    ########## overridden
 
-    def _exec_plot_hooks(self,**args):
-	super(UnitPlotGroup,self)._exec_plot_hooks(coords=[(self.x,self.y)],**args)
+    def _key(self,**kw):
+        return (self.keyname,self.sheet.name,self.x,self.y)
 
+    def _exec_pre_plot_hooks(self,**kw):
+	super(UnitPlotGroup,self)._exec_pre_plot_hooks(coords=[(self.x,self.y)],**kw)
+
+    def _exec_plot_hooks(self,**kw):
+	super(UnitPlotGroup,self)._exec_plot_hooks(coords=[(self.x,self.y)],**kw)
 
 
 
@@ -877,40 +1194,50 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
     for all weights outside the ConnectionField.  If False, plots only
     the actual weights that are stored.""")
 
-    def _change_key(self,plotgroup_template,sheet,proj,x,y):
-        plot_channels = copy.deepcopy(plotgroup_template)
-        key = (self.keyname,sheet.name,proj.name,x,y)
-        plot_channels['Strength']=key
-        return plot_channels
+    # Overrides:
+    # _key()                - adds projection back
+    # _make_template_plot() - adds projection back
+    # _kw_for_one_proj()    - includes bounds
 
 
-    def _create_plots(self,pt_name,pt,sheet):
-        plot_list = []
-        for p in sheet.in_connections:
-            plot_channels = self._change_key(pt,sheet,p,self.x,self.y)
-            if self.situate:
-                bounds = None
-            else:
-                (r,c) = p.dest.sheet2matrixidx(self.x,self.y)
-                bounds = p.cf_bounds(r,c)
-            plot_list.append(make_template_plot(plot_channels,
-                                                p.src.sheet_views,
-                                                p.src.xdensity,
-                                                bounds,
-                                                self.normalize,
-                                                name=p.name))
-        return plot_list
+    #####################
+    ########## overridden
+
+    def _key(self,**kw):
+        return (self.keyname,self.sheet.name,kw['proj'].name,self.x,self.y)
+
+
+    def _make_template_plot(self,plot_template_name,plot_template,**kw):
+        return make_template_plot(self._channels(plot_template,**kw),
+                                  kw['proj'].src.sheet_views,
+                                  kw['proj'].src.xdensity,
+                                  kw['bounds'],
+                                  self.normalize,
+                                  name=kw['proj'].name,
+                                  range_=kw['range_'])
+
+
+    def _kw_for_one_proj(self,proj):
+        if self.situate:
+            bounds = None
+        else:
+            (r,c) = proj.dest.sheet2matrixidx(self.x,self.y)
+            bounds = proj.cf_bounds(r,c)
+        return [dict(proj=proj,bounds=bounds)]
+
+
+
 
 
 
 class FeatureCurvePlotGroup(UnitPlotGroup):
 
-    def _exec_pre_plot_hooks(self,**args):
-        super(FeatureCurvePlotGroup,self)._exec_pre_plot_hooks(**args)
+    def _exec_pre_plot_hooks(self,**kw):
+        super(FeatureCurvePlotGroup,self)._exec_pre_plot_hooks(**kw)
         self.get_curve_time()
 
-    def _exec_plot_hooks(self,**args):
-        super(FeatureCurvePlotGroup,self)._exec_plot_hooks(**args)
+    def _exec_plot_hooks(self,**kw):
+        super(FeatureCurvePlotGroup,self)._exec_plot_hooks(**kw)
         self.get_curve_time()
 
     def get_curve_time(self):
@@ -928,7 +1255,6 @@ class FeatureCurvePlotGroup(UnitPlotGroup):
             if max(timestamps) != min(timestamps):
                 self.warning("Displaying curves from different times (%s,%s)" %
                              (min(timestamps),max(timestamps)))
-
 
 
 

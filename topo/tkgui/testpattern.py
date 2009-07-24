@@ -40,23 +40,31 @@ from topo.base.sheet import Sheet
 from plotgrouppanel import SheetPanel
 
 
+# CEBALERT: this uses make_template_plot(), so how is it not a
+# TemplatePlotGroup? 
 class TestPatternPlotGroup(SheetPlotGroup):
-    def _plot_list(self):
-        plot_list = []
-        for sheet in self._sheets():
-            plot_list.append(self._create_plot(sheet))
 
-        return plot_list
+    def sheets(self):
+        if hasattr(self,'_sheets'):
+            return self._sheets
+        else:
+            return super(TestPatternPlotGroup,self).sheets()
+
+    def _generate_plots(self):
+        dynamic_plots = []
+        for kw in [dict(sheet=sheet) for sheet in self.sheets()]:
+            sheet = kw['sheet']
+            new_view = SheetView((sheet.input_generator(),sheet.bounds),
+                                  sheet.name,sheet.precedence,topo.sim.time())
+            sheet.sheet_views['Activity']=new_view
+            channels = {'Strength':'Activity','Hue':None,'Confidence':None}
         
-    def _create_plot(self,sheet):
-        new_view = SheetView((sheet.input_generator(),sheet.bounds),
-                              sheet.name,sheet.precedence,topo.sim.time())        
-        sheet.sheet_views['Activity']=new_view
-        channels = {'Strength':'Activity','Hue':None,'Confidence':None}
+            ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
+            dynamic_plots.append(make_template_plot(channels,sheet.sheet_views,
+                                                    sheet.xdensity,sheet.bounds,self.normalize,
+                                                    name=''))
 
-        ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
-        return make_template_plot(channels,sheet.sheet_views,
-                                  sheet.xdensity,sheet.bounds,self.normalize,name='')
+    	return self._static_plots[:]+dynamic_plots
 
 
 
@@ -94,7 +102,7 @@ class TestPattern(SheetPanel,PatternDrivenAnalysis):
             self.hide_param(name)
 
         edit_sheet_param = self.get_parameter_object('edit_sheet')
-        edit_sheet_param.objects = self.plotgroup._sheets()
+        edit_sheet_param.objects = self.plotgroup.sheets()
 
         self.pg_control_pane = Frame(self) #,bd=1,relief="sunken")
         self.pg_control_pane.pack(side="top",expand='yes',fill='x')
@@ -128,10 +136,10 @@ class TestPattern(SheetPanel,PatternDrivenAnalysis):
         super(TestPattern,self).setup_plotgroup()
         
         # CB: could copy the sheets instead (deleting connections etc)
-        self.plotgroup.sheets = [GeneratorSheet(name=gs.name,
-                                                nominal_bounds=gs.nominal_bounds,
-                                                nominal_density=gs.nominal_density)
-                                 for gs in topo.sim.objects(GeneratorSheet).values()]
+        self.plotgroup._sheets = [GeneratorSheet(name=gs.name,
+                                                 nominal_bounds=gs.nominal_bounds,
+                                                 nominal_density=gs.nominal_density)
+                                  for gs in topo.sim.objects(GeneratorSheet).values()]
         self.plotgroup._set_name("Test Pattern")
 
 
@@ -151,7 +159,7 @@ class TestPattern(SheetPanel,PatternDrivenAnalysis):
         # (presumably tk.py).
         self.params_frame.set_PO(self.pattern_generator)
 
-        for sheet in self.plotgroup._sheets():
+        for sheet in self.plotgroup.sheets():
             if sheet==self.edit_sheet:
                 sheet.set_input_generator(self.pattern_generator)
         
@@ -176,7 +184,7 @@ class TestPattern(SheetPanel,PatternDrivenAnalysis):
         topo.sim.state_push()
         for f in self.pre_presentation_hooks: f()
         input_dict = dict([(sheet.name,sheet.input_generator) \
-                           for sheet in self.plotgroup._sheets()])
+                           for sheet in self.plotgroup.sheets()])
         pattern_present(input_dict,self.duration,
                         plastic=self.plastic,overwrite_previous=False)
         topo.guimain.auto_refresh()

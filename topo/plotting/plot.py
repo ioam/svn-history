@@ -42,7 +42,6 @@ class Plot(param.Parameterized):
        """)
      
      def __init__(self,image=None,**params):
-          
           super(Plot,self).__init__(**params)
           self._orig_bitmap = Bitmap(image)
           self.bitmap = self._orig_bitmap # Possibly scaled copy (at first identical)
@@ -121,20 +120,23 @@ def _sane_plot_data(channels,sheet_views):
 # value_range below for a start. I *think* that would work, but maybe
 # there is some simpler way?
 def make_template_plot(channels,sheet_views,density=None,
-              plot_bounding_box=None,normalize=False,name='None'):
+                       plot_bounding_box=None,normalize='None',
+                       name='None',range_=False):
      """
      Factory function for constructing a Plot object whose type is not yet known.
 
-     Typically, a Plot will be constructed through this call, because
+     Typically, a TemplatePlot will be constructed through this call, because
      it selects the appropriate type automatically, rather than calling
-     one of the Plot subclasses automatically.  See Plot.__init__ for
+     one of the Plot subclasses automatically.  See TemplatePlot.__init__ for
      a description of the arguments.
      """
      if _sane_plot_data(channels,sheet_views):
           plot_types=[SHCPlot,RGBPlot,PalettePlot]
           for pt in plot_types:
-               plot = pt(channels,sheet_views,density,plot_bounding_box,normalize,name=name)
-               if plot.bitmap is not None:
+               plot = pt(channels,sheet_views,density,plot_bounding_box,normalize,
+                         name=name,range_=range_)
+               if plot.bitmap is not None or range_ is None:
+                    # range_ is None means we're calculating the range
                     return plot
      
      param.Parameterized(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
@@ -152,7 +154,8 @@ class TemplatePlot(Plot):
 
 
     def __init__(self,channels,sheet_views,density,
-                 plot_bounding_box,normalize,**params):
+                 plot_bounding_box,normalize,
+                 range_=False,**params):
 	"""
         Build a plot out of a set of SheetViews as determined by a plot_template.
         
@@ -174,15 +177,22 @@ class TemplatePlot(Plot):
         apply if specified.  If not, the bounds of
         the smallest SheetView are used.
 
-	normalize specifies whether the Plot should be normalized to
-	fill the maximum dynamic range, i.e. 0.0 to 1.0.  If not
-        normalized, values are clipped at 1.0.
-    
+	normalize specifies how the Plot should be normalized: any
+        value of normalize other than 'None' will result in normalization
+        according to the value of the range argument: 
+
+          range=(A,B) - scale plot so that A is 0 and B is 1
+
+          range=False - scale plot so that min(plot) is 0 and 
+                        max(plot) is 1 (i.e. fill the maximim 
+                        dynamic range)
+ 
+          range=None  - calculate value_range only
+
         
         name (which is inherited from Parameterized) specifies the name
         to use for this plot.
         """
-
         super(TemplatePlot,self).__init__(**params) 
         # for a template plot, resize is True by default
         self.resize=True
@@ -265,32 +275,57 @@ class TemplatePlot(Plot):
         return shape,box
 
 
-    def _normalize(self,a):
+    # CEBALERT: needs simplification! (To begin work on joint
+    # normalization, I didn't want to interfere with the existing
+    # normalization calculations.)  Also need to update this
+    # docstring.
+    #
+    # range=None  - calculate value_range; don't scale a
+    # range=(A,B) - scale a so that A is 0 and B is 1
+    # range=False - scale a so that min(array) is 0 and max(array) is 1 
+    def _normalize(self,a,range_):
         """ 
         Normalize an array s to be in the range 0 to 1.0.
         For an array of identical elements, returns an array of ones
         if the elements are greater than zero, and zeros if the
         elements are less than or equal to zero.
         """
+        if range_: # i.e. not False, not None (expecting a tuple)
+             range_min = float(range_[0])
+             range_max = float(range_[1])
 
-        # Store range of values, as a start to supporting joint normalization
-        #if not hasattr(self,value_range):
-        #     self.value_range=(a.min(),a.max())
-        #else: # If normalizing multiple matrices, take the largest values
-        #     self.value_range=(min(self.value_range[0],a.min()),
-        #                       max(self.value_range[1],a.max()))
-
-        a_offset = a-a.min()
-        max_a_offset = a_offset.max()
-
-        if max_a_offset>0:
-             a = divide(a_offset,float(max_a_offset))
-        else:
-             if min(a.ravel())<=0:
-                  a=zeros(a.shape,Float)
+             if range_min==range_max:
+                  if range_min>0: 
+                       resu = ones(a.shape)
+                  else:
+                       resu = zeros(a.shape)
              else:
-                  a=ones(a.shape,Float)
-        return a
+                  a_offset = a - range_min
+                  resu = a_offset/range_max  
+            
+             return resu
+        else:
+             if range_ is None:
+                  if not hasattr(self,'value_range'):
+                       self.value_range=(a.min(),a.max())
+                  else: 
+                       # If normalizing multiple matrices, take the largest values
+                       self.value_range=(min(self.value_range[0],a.min()),
+                                         max(self.value_range[1],a.max()))
+                  return None # (indicate that array was not scaled)
+             else: # i.e. range_ is False
+                  a_offset = a-a.min()
+                  max_a_offset = a_offset.max()
+
+                  if max_a_offset>0:
+                       a = divide(a_offset,float(max_a_offset))
+                  else:
+                       if min(a.ravel())<=0:
+                            a=zeros(a.shape,Float)
+                       else:
+                            a=ones(a.shape,Float)
+                  return a
+
 
     ### JC: maybe density can become an attribute of the TemplatePlot?
     def _re_bound(self,plot_bounding_box,mat,box,density):
@@ -333,7 +368,8 @@ class SHCPlot(TemplatePlot):
     """
 
     def __init__(self,channels,sheet_views,density,
-                 plot_bounding_box,normalize,**params):
+                 plot_bounding_box,normalize,
+                 range_=False,**params):
 	super(SHCPlot,self).__init__(channels,sheet_views,density, 
 				   plot_bounding_box,normalize,**params)
         
@@ -344,14 +380,18 @@ class SHCPlot(TemplatePlot):
 
         # If it is an empty plot: self.bitmap=None
         if (s_mat==None and c_mat==None and h_mat==None):
-	    self.debug('Empty plot.')
+            self.debug('Empty plot.')
 
         # Otherwise, we construct self.bitmap according to what is specified by the channels.
 	else:
 
             shape,box = self._get_shape_and_box()                                 
 
-            hue,sat,val = self.__make_hsv_matrices((s_mat,h_mat,c_mat),shape,normalize)
+            hue,sat,val = self.__make_hsv_matrices((s_mat,h_mat,c_mat),shape,normalize,range_)
+            
+            if range_ is None:
+                 return ##############################
+
 
             if self.plot_bounding_box == None:
                self.plot_bounding_box = box
@@ -365,7 +405,7 @@ class SHCPlot(TemplatePlot):
         self._orig_bitmap=self.bitmap
         
 
-    def __make_hsv_matrices(self,hsc_matrices,shape,normalize):
+    def __make_hsv_matrices(self,hsc_matrices,shape,normalize,range_=False):
 	""" 
 	Sub-function of plot() that return the h,s,v matrices corresponding 
 	to the current matrices in sliced_matrices_dict. The shape of the matrices
@@ -387,9 +427,10 @@ class SHCPlot(TemplatePlot):
 
         # If normalizing, offset the matrix so that the minimum
         # value is 0.0 and then scale to make the maximum 1.0
-        if normalize:
-             s=self._normalize(s)
-             c=self._normalize(c)
+        if normalize!='None':
+             s=self._normalize(s,range_=range_)
+             # CEBALERT: I meant False, right?
+             c=self._normalize(c,range_=False)
             
 
         # This translation from SHC to HSV is valid only for black backgrounds;
@@ -409,7 +450,8 @@ class RGBPlot(TemplatePlot):
   and Blue channels.
   """
   def __init__(self,channels,sheet_views,density,
-                 plot_bounding_box,normalize,**params):
+               plot_bounding_box,normalize,
+               range_=False,**params):
 
        super(RGBPlot,self).__init__(channels,sheet_views,density, 
 				   plot_bounding_box,normalize,**params)
@@ -423,13 +465,16 @@ class RGBPlot(TemplatePlot):
        # If it is an empty plot: self.bitmap=None
        if (r_mat==None and g_mat==None and b_mat==None):
             self.debug('Empty plot.')
-
             # Otherwise, we construct self.bitmap according to what is specified by the channels.
        else:
 
             shape,box = self._get_shape_and_box()                                 
 
-            red,green,blue = self.__make_rgb_matrices((r_mat,g_mat,b_mat),shape,normalize)
+            red,green,blue = self.__make_rgb_matrices((r_mat,g_mat,b_mat),shape,
+                                                      normalize,range_=range_)
+
+            if range_ is None:
+                 return ############################
 
             if self.plot_bounding_box == None:
                self.plot_bounding_box = box
@@ -442,7 +487,7 @@ class RGBPlot(TemplatePlot):
         
        self._orig_bitmap=self.bitmap
 
-  def __make_rgb_matrices(self, rgb_matrices,shape,normalize):
+  def __make_rgb_matrices(self, rgb_matrices,shape,normalize,range_=False):
 	""" 
 	Sub-function of plot() that return the h,s,v matrices
 	corresponding to the current matrices in
@@ -461,10 +506,11 @@ class RGBPlot(TemplatePlot):
 	if g is None: g=zero 
 	if b is None: b=zero 
 
-        if normalize:
-             r = self._normalize(r)
-             g = self._normalize(g)
-             b = self._normalize(b)
+        # CEBALERT: have I checked this works?
+        if normalize!='None':
+             r = self._normalize(r,range_=range_)
+             g = self._normalize(g,range_=range_)
+             b = self._normalize(b,range_=range_)
 
 	return (r,g,b)
    
