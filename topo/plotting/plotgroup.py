@@ -761,7 +761,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
 
     def _generate_labels(self):
-        return ["%s \n(from %s)"%(plot.name,plot.plot_src_name) 
+        return ["%s\n(from %s)"%(plot.name,plot.plot_src_name) 
                 for plot in self.plots]
 
 
