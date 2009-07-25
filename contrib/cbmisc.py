@@ -33,14 +33,13 @@ def add_one_eye_plotgroups():
         topo.guimain.refresh_plots_menu()
 
 
-
 def analysis_function():
     import topo
     from topo.command.analysis import save_plotgroup
-    from topo.command.basic import pattern_present
+    from topo.command.basic import pattern_present,default_analysis_plotgroups
     from topo.base.projection import ProjectionSheet
 
-    for pg in ["Orientation Preference","Activity"]:
+    for pg in default_analysis_plotgroups:
         save_plotgroup(pg,use_cached_results=True)
 
     # Plot projections from each measured map
@@ -48,7 +47,7 @@ def analysis_function():
                        if hasattr(s,'measure_maps') and s.measure_maps]
 
 
-    # CEBALERT: hack to ensure data has been measured
+    # CEBALERT: hack to ensure data has been measured for joint norm.
     for s in measured_sheets:
         for p in s.in_connections:            
             save_plotgroup("Projection",projection=p,normalize='single')
@@ -57,6 +56,8 @@ def analysis_function():
         for p in s.in_connections:
             # (equivalent to normalize='single' for non-jn'd projections)
             save_plotgroup("Projection",projection=p,normalize='joint')
+
+    orcrod_analysis_function()
 
     # Test response to a standardized pattern
     from topo.pattern.basic import Gaussian
@@ -68,9 +69,6 @@ def analysis_function():
 
 def orcrod_analysis_function():
     # + L & R eye OR,CR maps
-
-    analysis_fn()
-
     import topo
     if ('LeftRetina' in topo.sim) and ('RightRetina' in topo.sim):
         from topo.command.analysis import save_plotgroup
