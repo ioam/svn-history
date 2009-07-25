@@ -1096,7 +1096,7 @@ class MeasureResponseCommand(ParameterizedFunction):
         but the results can have systematic biases due to the
         averaging, especially for non-cyclic parameters.""")
 
-    pattern_presenter = param.Callable(default=None,doc="""
+    pattern_presenter = param.Callable(default=None,instantiate=True,doc="""
         Callable object that will present a parameter-controlled pattern to a
         set of Sheets.  Needs to be supplied by a subclass or in the call.
         The attributes duration and apply_output_fns (if non-None) will
