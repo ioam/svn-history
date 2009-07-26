@@ -200,7 +200,7 @@ class TemplatePlot(Plot):
         
 
 	self.channels = channels
-	self.view_dict = sheet_views
+	self.view_dict = copy.copy(sheet_views)
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
 
