@@ -128,7 +128,7 @@ TK_SUPPORTS_DOCK = True
 
 # gets set to the TopoConsole instance created by start.
 console = None
-def start(mainloop=False,banner=True,root=None,console_has_console=False,dock=False):
+def start(mainloop=False,banner=True,root=None,console_has_console=False):
     """
     Start Tk and read in an options_database file (if present), then
     open a TopoConsole.
@@ -215,9 +215,6 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False,dock=Fa
     # <Button-3>.
     topoconsole.event_add('<<right-click>>',*right_click_events)
     topoconsole.event_add('<<right-click-release>>',*right_click_release_events)
-
-    import topo.tkgui.plotgrouppanel
-    topo.tkgui.plotgrouppanel.PlotGroupPanel.dock=dock
 
     # GUI/threads:
     # http://thread.gmane.org/gmane.comp.python.scientific.user/4153

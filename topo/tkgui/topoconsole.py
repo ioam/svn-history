@@ -350,6 +350,9 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
             self.console_frame = Frame(self)
             self.console_frame.pack(expand=1,fill='both')
 
+            import topo.tkgui.plotgrouppanel
+            topo.tkgui.plotgrouppanel.PlotGroupPanel.dock=True
+
             import __main__
             self.console = IPythonInAFrame(self,self._rooot,
                                            user_ns=__main__.__dict__)
