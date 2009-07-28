@@ -721,12 +721,12 @@ class PatternPresenter(param.Parameterized):
             # 'Red' or 'Green' or 'Blue' in its name, then three
             # retinas for color are assumed
 
-            three_retinas = False 
+            rgb_retina = False 
             for name in input_sheet_names:
                 if not ('Red' in name or 'Green' in name or 'Blue' in name):
                     rgb_retina=True
 
-            if three_retinas:
+            if not rgb_retina:
                 for name in inputs.keys():
                     r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
                     if (name.count('Red')):
