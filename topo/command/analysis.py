@@ -643,7 +643,7 @@ pg= create_plotgroup(name='Corner OR Preference',category="Preference Maps",
              normalize='Independent')
 pg.add_plot('Corner Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
-						   ('Confidence','OrientationSelectivity')])
+                                                   ('Confidence','OrientationSelectivity')])
 pg.add_plot('Corner Orientation Selectivity',[('Strength','OrientationSelectivity')])
 
 

@@ -89,7 +89,7 @@ class EditorCanvas(Canvas):
         self.current_object = None
         self.current_connection = None
         self.focus = None
-        # list holding references to all the objects in the canvas	
+        # list holding references to all the objects in the canvas      
         self.object_list = []
         # set the initial mode.
         self.display_mode = 'video'
@@ -165,8 +165,8 @@ class EditorCanvas(Canvas):
         "What is to happen if the left button is pressed."
         
         x,y = self.canvasx(event.x), self.canvasy(event.y)
-        {"ARROW" : self.init_move,	     # case Arrow mode
-         "MAKE" : self.none,		     # case Make mode
+        {"ARROW" : self.init_move,           # case Arrow mode
+         "MAKE" : self.none,                 # case Make mode
          "CONNECTION" : self.init_connection # case Connection mode.
         }[self.mode](x,y)                    # select function depending on mode
     
@@ -175,7 +175,7 @@ class EditorCanvas(Canvas):
         
         x,y = self.canvasx(event.x), self.canvasy(event.y)
         {"ARROW" : self.update_move,              # case Arrow mode
-         "MAKE" : self.none,		       # case Make mode
+         "MAKE" : self.none,                   # case Make mode
          "CONNECTION" : self.update_connection # case Connection mode.
         }[self.mode](x,y)                      # select function depending on mode
         
@@ -184,14 +184,14 @@ class EditorCanvas(Canvas):
         
         x,y = self.canvasx(event.x), self.canvasy(event.y)
         {"ARROW" : self.end_move,            # case Arrow mode
-         "MAKE" : self.create_object,	     # case Make mode
+         "MAKE" : self.create_object,        # case Make mode
          "CONNECTION" : self.end_connection  # case Connection mode.
         }[self.mode](x,y)                    # select function depending on mode
 
     def left_double_click(self, event):
         """
         What is to happen if the left button is double clicked.
-	The same for all modes - show the properties for the clicked item.
+        The same for all modes - show the properties for the clicked item.
         Gets object or connection at this point and gives it the focus.
         """
         focus = self.get_xy(event.x, event.y) 
@@ -221,7 +221,7 @@ class EditorCanvas(Canvas):
         if not char in ('c', 'm', 'a') : return
         # remove the focus from the previous toolbar item
         {"ARROW" : self.arrow_tool.set_focus,     # arrow toolbar item
-         "MAKE" : self.object_tool.set_focus,	     # object toolbar item
+         "MAKE" : self.object_tool.set_focus,        # object toolbar item
          "CONNECTION" : self.connection_tool.set_focus # connection toolbar item
         }[self.mode](False)                  # select function depending on mode
 
@@ -318,7 +318,7 @@ class EditorCanvas(Canvas):
 
     def update_connection(self, x, y):
         "Update connection's position."
-       	self.current_connection.update_position((x, y))
+        self.current_connection.update_position((x, y))
         
     def end_connection(self, x, y):
         "Determine if the connection has been dropped on an object."
@@ -696,8 +696,8 @@ class ArrowTool(Frame):
         # pack in toolbar at top and fill out in X direction; click changes canvas mode
         self.pack(side = TOP, fill = X)
         self.bind('<Button-1>', self.change_mode)
-	
-	
+        
+        
     def change_mode(self, event):
         self.canvas.change_mode('a') # (ARROW)
 
@@ -775,7 +775,7 @@ class NodeTool(Frame):
 
 
     #   Focus Methods
-	
+        
     def change_mode(self, option):
         self.canvas.change_mode('m') # ('MAKE')
 
@@ -1088,7 +1088,7 @@ class EditorNode(EditorObject):
                 self.to_connections = [con] + self.to_connections
             else:
                 self.to_connections = self.to_connections + [con]
-	
+        
     def remove_connection(self, con, from_to) : # remove a connection to or from this node
         if (from_to):
             l = len(self.to_connections)
@@ -1159,7 +1159,7 @@ class EditorEP(EditorNode):
     def set_focus(self, focus):
         for id in self.id:
             self.canvas.delete(id)
-        self.canvas.delete(self.label) # remove label	
+        self.canvas.delete(self.label) # remove label   
         EditorNode.set_focus(self, focus) # call to super's set focus
         col = self.colour[not focus]
         self.init_draw(col, focus) # create new one with correct colour
@@ -1335,7 +1335,7 @@ class EditorSheet(EditorEP):
     def set_focus(self, focus):
         for id in self.id:
             self.canvas.delete(id)
-        self.canvas.delete(self.label) # remove label	
+        self.canvas.delete(self.label) # remove label   
         EditorNode.set_focus(self, focus) # call to super's set focus
         col = self.colour[not focus]
         self.init_draw(col, focus) # create new one with correct colour
@@ -1430,7 +1430,7 @@ class EditorSheet(EditorEP):
         B = (x - w + h, y - h)
         C = B[0] + (2 * w), B[1]
         D = A[0] + (2 * w), A[1]
-        # calculate the line constants 	
+        # calculate the line constants  
         # As the gradient of the lines is 1 the calculation is simple.
         a_AB = A[1] + A[0]
         a_CD = C[1] + C[0]
@@ -1490,7 +1490,7 @@ class EditorConnection(EditorObject):
     #   Update methods
     
     def move(self):
-        # if one of the nodes connected by this connection move, then move by redrawing	
+        # if one of the nodes connected by this connection move, then move by redrawing 
         self.draw() 
 
     def update_position(self, pos) : # update the temporary point
@@ -1527,7 +1527,7 @@ class EditorConnection(EditorObject):
 class EditorEPConnection(EditorConnection):
     """
     Represents any topo EPConnection using a line with an arrow head in the middle.
-    """	
+    """ 
     def __init__(self, name, canvas, from_node):
         EditorConnection.__init__(self, name, canvas, from_node)
         # if more than one connection between nodes, 
@@ -1623,7 +1623,7 @@ class EditorEPConnection(EditorConnection):
         
 
     def move(self):
-        # if one of the nodes connected by this connection move, then move by redrawing	
+        # if one of the nodes connected by this connection move, then move by redrawing 
         self.gradient = self.calculate_gradient()
         self.update_factor()
         self.draw() 
@@ -1802,7 +1802,7 @@ class EditorProjection(EditorEPConnection):
             dY = self.draw_index * 20
             self.label = self.canvas.create_text(middle[0] - dX,
                 middle[1] - dY, fill = text_col, text = self.name, anchor = E)
-	
+        
 
     #   Util methods
     

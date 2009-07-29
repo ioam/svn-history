@@ -69,22 +69,22 @@ class SheetView(param.Parameterized):
         
         (matrix_data, matrix_bbox)
         
-	    This form locks the value of the sheetview to a single matrix.
+            This form locks the value of the sheetview to a single matrix.
             Terminating case of a composite SheetView.
             
         (operation, [tuple_list])
         
-	    'operation' is performed on the matrices collected from
+            'operation' is performed on the matrices collected from
             tuple_list.  See the list of valid operations in
             operations.keys().
              
-	    Each tuple in the tuple_list is one of the following::
+            Each tuple in the tuple_list is one of the following::
             
                 (SheetView, None)
                     Another SheetView may be passed in to create nested plots.
-	        (matrix_data, bounding_box)
+                (matrix_data, bounding_box)
                     Static matrix data complete with bounding box.
-	        (Sheet, sheet_view_name)
+                (Sheet, sheet_view_name)
                     This gets sheet_name.sheet_view(sheet_view_name) each time
                     the current SheetView has its data requested by .view().
 

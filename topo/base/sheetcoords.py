@@ -439,7 +439,7 @@ class Slice(ndarray):
         result in the 'bounds' attribute.
 
         Also stores the input_sheet_slice for access by C.
-	"""
+        """
         # translate to this cf's location
         cf_row,cf_col = sheet_coord_system.sheet2matrixidx(x,y)
 

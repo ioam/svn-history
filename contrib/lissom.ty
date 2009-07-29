@@ -135,7 +135,7 @@ opponent_types=['']                 # rg
 basic_opponent_types=['']           # rg 
 eyes=['']                           # od,dy
 lags=['']                           # dr
-num_lags=0							#dr
+num_lags=0                                                      #dr
 speed=0.0                           # dr
 disparity_bound = 0.0               # dy
 position_bound = 0.75               # dy
@@ -226,7 +226,7 @@ for e in eyes:
                 x=numbergen.UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12+i) + \
                   numbergen.UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150+i)*(-1)**(e=='Left'),
                 y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-                orientation=0 if 'dr' in dims else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56+i),						###
+                orientation=0 if 'dr' in dims else numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56+i),                                             ###
                 size=0.088388*(3**('or' not in dims)) * \
                   numbergen.UniformRandom(lbound=1,ubound=sf_spacing**(sf_channels-1),
                                           seed=23+i)**('sf' in dims), 
@@ -270,13 +270,13 @@ for e in eyes:
         input_period=num_lags
         if 'dr' in dims:
             input_moved=pattern.Translator(
-			    x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
-			    y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
-			    direction=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=99),
-			    generator=pattern.Gaussian(size=0.088388, aspect_ratio=4.66667, scale=1.0,
+                            x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                            y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
+                            direction=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=99),
+                            generator=pattern.Gaussian(size=0.088388, aspect_ratio=4.66667, scale=1.0,
                                bounds=sheet.BoundingBox(radius=0.8)),
-			    reset_period=input_period,
-				speed=0.04)	
+                            reset_period=input_period,
+                                speed=0.04)     
         else: input_moved=input_composite
 
         topo.sim[e+cone+'Retina']=sheet.GeneratorSheet(

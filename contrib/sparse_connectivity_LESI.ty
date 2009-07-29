@@ -94,7 +94,7 @@ off_weights = topo.pattern.basic.Composite(
 #Sheet output functions
 LGN_on_output_fn=HalfRectify()
 LGN_off_output_fn=HalfRectify()
-t  = locals().get('treshold',0.0)	
+t  = locals().get('treshold',0.0)       
 e =  locals().get('exponent',1.0)
 #V1_OF=PiecewiseLinear(lower_bound=0.3,upper_bound=0.7)
 V1_OF = SimpleHomeo(a_init=10,b_init=-4,mu=locals().get('SMU',0.02),eta=0.01,smoothing=0.99,randomized_init=True,noise_magnitued=3.5)

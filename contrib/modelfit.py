@@ -75,12 +75,12 @@ class ModelFit():
     def trainModel(self,inputs,activities,validation_inputs,validation_activities):
         self.calculateInputDC(inputs)
         modelResponses=[]
-	validationModelResponses=[]
+        validationModelResponses=[]
         delta=[]
         self.meanModelResponses=numpy.array(self.calculateModelResponse(inputs,0)).copy()*0.0
         self.modelDC=numpy.array(activities[0]).copy()*0.0
         
-	
+        
         # calculate the model responses and their average to the set of inputs
         for i in xrange(len(inputs)):
             modelResponses.append(numpy.array(self.calculateModelResponse(inputs,i)))
@@ -95,11 +95,11 @@ class ModelFit():
         for i in xrange(0,len(modelResponses)):
             modelResponses[i] = modelResponses[i] - self.meanModelResponses
             
-	# substract the mean from validation responses
-	for i in xrange(0,len(validationModelResponses)):
+        # substract the mean from validation responses
+        for i in xrange(0,len(validationModelResponses)):
             validationModelResponses[i] = validationModelResponses[i] - self.meanModelResponses
         
-	#calculate the initial model DC as the mean of the target activities
+        #calculate the initial model DC as the mean of the target activities
         for a in activities:
             self.modelDC+=a
         
@@ -117,7 +117,7 @@ class ModelFit():
         
         for k in xrange(0,self.epochs):
             mean_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
-	    validation_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
+            validation_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
             tmp_weigths=numpy.mat(numpy.zeros((size(activities,1),size(modelResponses[0],1))))
             for i in xrange(0,len(inputs)):
                 error = ((activities[i].T - self.weigths*modelResponses[i].T - self.modelDC.T))
@@ -125,11 +125,11 @@ class ModelFit():
                 tmp_weigths = tmp_weigths + (error * modelResponses[i])
                 mean_error=mean_error+numpy.power(error,2)
             
-	    for i in xrange(0,len(validation_inputs)):
+            for i in xrange(0,len(validation_inputs)):
                 error = ((validation_activities[i].T - self.weigths*validationModelResponses[i].T - self.modelDC.T))
                 validation_error=validation_error+numpy.power(error,2)
-	
-		
+        
+                
             if k == 0:
                delta = tmp_weigths/numpy.sqrt(numpy.sum(numpy.power(tmp_weigths,2)))
             else:
@@ -139,7 +139,7 @@ class ModelFit():
                    
             self.weigths = self.weigths + self.learning_rate*delta
             err = numpy.sum(mean_error)/len(inputs)/len(mean_error)    
-	    val_err = numpy.sum(validation_error)/len(validation_inputs)/len(validation_error)    
+            val_err = numpy.sum(validation_error)/len(validation_inputs)/len(validation_error)    
             
             if k == 0:
                first_val_error=val_err
@@ -199,8 +199,8 @@ class ModelFit():
             #pylab.figure()            
             #pylab.plot(numpy.array(activities.T[t[self.num_of_units-1-i][0]][0].T))
             #pylab.plot(numpy.array(modelActivities[t[self.num_of_units-1-i][0]][0].T))
-	    #pylab.show._needmain=False
-	    #pylab.show()
+            #pylab.show._needmain=False
+            #pylab.show()
 
     def testModel(self,inputs,activities,target_inputs=None):
         modelActivities=[]
@@ -360,12 +360,12 @@ class BasicBPModelFit(BasicModelFit):
         import libfann
         self.calculateInputDC(inputs)
         modelResponses=[]
-	validationModelResponses=[]
+        validationModelResponses=[]
         delta=[]
         self.meanModelResponses=numpy.array(self.calculateModelResponse(inputs,0)).copy()*0.0
         self.modelDC=numpy.array(activities[0]).copy()*0.0
         
-	
+        
         # calculate the model responses and their average to the set of inputs
         for i in xrange(len(inputs)):
             modelResponses.append(numpy.array(self.calculateModelResponse(inputs,i)))
@@ -380,11 +380,11 @@ class BasicBPModelFit(BasicModelFit):
         for i in xrange(0,len(modelResponses)):
             modelResponses[i] = modelResponses[i] - self.meanModelResponses
             
-	# substract the mean from validation responses
-	for i in xrange(0,len(validationModelResponses)):
+        # substract the mean from validation responses
+        for i in xrange(0,len(validationModelResponses)):
             validationModelResponses[i] = validationModelResponses[i] - self.meanModelResponses
         
-	#calculate the initial model DC as the mean of the target activities
+        #calculate the initial model DC as the mean of the target activities
         for a in activities:
             self.modelDC+=a
         
@@ -476,7 +476,7 @@ def loadRandomizedDataSet(directory,num_rep,num_frames,num_stimuli,n_cells):
     f.close()
     r=[]
     for j in random:
-	r.append(int(float(j)))
+        r.append(int(float(j)))
     random = r
 
     dataset = [([[] for i in xrange(0,num_stimuli)]) for i in xrange(0,n_cells)]
@@ -491,7 +491,7 @@ def loadRandomizedDataSet(directory,num_rep,num_frames,num_stimuli,n_cells):
         for i in xrange(0,num_rep*num_stimuli):
             f = []
             for fr in xrange(0,num_frames):
-			f.append(float(data[i*num_frames+fr][k]))
+                        f.append(float(data[i*num_frames+fr][k]))
             dataset[k][random[i]-1].append(f)
 
     return (numpy.arange(0,num_stimuli),dataset)
@@ -565,7 +565,7 @@ def generateInputs(dataset,directory,image_matching_string,density,LGN=False,LGN
     inputs=[Image(filename=f,size=0.55, x=0,y=0)   for f in image_filenames]
     combined_inputs =contrib.jacommands.SequenceSelector(generators=inputs)
 
-    topo.sim['Retina']=GeneratorSheet(nominal_density=density,	
+    topo.sim['Retina']=GeneratorSheet(nominal_density=density,  
                                   input_generator=SineGrating(),
                                   period=1.0, phase=0.01,
                                   nominal_bounds=BoundingBox(radius=0.5+0.1))
@@ -706,9 +706,9 @@ def showRF(mf,index,density):
 def analyseDataSet(data_set):
 #        for cell in dataset:
         for z in xrange(0,10):
-		pylab.figure()
-		pylab.plot(numpy.arange(0,num_im,1),a[z],'bo')	
-	pylab.show()
+                pylab.figure()
+                pylab.plot(numpy.arange(0,num_im,1),a[z],'bo')  
+        pylab.show()
 
 def set_fann_dataset(td,inputs,outputs):
     import os
@@ -726,4 +726,3 @@ def set_fann_dataset(td,inputs,outputs):
     f.close()
     
     td.read_train_from_file("./tmp.txt")
- 

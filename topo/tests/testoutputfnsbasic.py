@@ -257,7 +257,7 @@ class TestDivisiveLpNormalize(unittest.TestCase):
         for item1,item2 in zip(self.a2.ravel(),fn1_a2.ravel()):
             self.assertAlmostEqual(item1, item2)
 
-	self.a1 = array([[0.3,0.6,0.7],
+        self.a1 = array([[0.3,0.6,0.7],
                         [0.8,0.4,0.2]])
 
         self.a2 = array([[1.0,-1.0,7.0],
@@ -271,7 +271,7 @@ class TestDivisiveLpNormalize(unittest.TestCase):
         for item1,item2 in zip(self.a2.ravel(),fn2_a2.ravel()):
             self.assertAlmostEqual(item1, item2)
 
-	self.a1 = array([[0.3,0.6,0.7],
+        self.a1 = array([[0.3,0.6,0.7],
                         [0.8,0.4,0.2]])
 
         self.a2 = array([[1.0,-1.0,7.0],
@@ -293,7 +293,7 @@ class TestDivisiveLpNormalize(unittest.TestCase):
 
         # The rest of this procedure might be redundant (already covered above)
 
-	self.a1 = array([[0.3,0.6,0.7],
+        self.a1 = array([[0.3,0.6,0.7],
                         [0.8,0.4,0.2]])
 
         self.a2 = array([[1.0,-1.0,7.0],

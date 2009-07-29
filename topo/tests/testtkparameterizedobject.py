@@ -225,7 +225,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         self.f.nu = 0.1
         nu_tkvar.set(0.9999999)
         self.f.update_idletasks()
-	self.f.update() # seems to be required on OS X
+        self.f.update() # seems to be required on OS X
         nu_widget._tag_press_return()
         self.assertEqual(self.f.nu,0.9999999)
 

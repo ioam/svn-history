@@ -32,15 +32,15 @@ class TestSheetView(unittest.TestCase):
 
     def test_init(self):
 
-	sv1 = SheetView((self.s.activity,self.s.bounds),
+        sv1 = SheetView((self.s.activity,self.s.bounds),
                           src_name=self.s.name)
         # s.sheet_view() returns a SheetView
         self.s.sheet_views['sv1']=sv1
-	sv2 = SheetView((self.s.activity,self.s.bounds),
+        sv2 = SheetView((self.s.activity,self.s.bounds),
                                  src_name=self.s.name)
         # s.sheet_view() returns a SheetView
         self.s.sheet_views['sv2']=sv2
-	
+        
         # Define a type 1 SheetView, with matrix and bounding box.
         sv3 = SheetView((self.s.activity, self.s.bounds))
         sv4 = SheetView((self.s2.activity,self.s2.bounds))
@@ -67,7 +67,7 @@ class TestSheetView(unittest.TestCase):
 ##         ImageGenerator.nominal_density = 100
         
 ##         input = ImageGenerator(filename='topo/tests/testsheetview.ppm')
-## 	sv = SheetView((input.activity,input.bounds),
+##      sv = SheetView((input.activity,input.bounds),
 ##                           src_name=input.name)
 ##         input.sheet_views['Activity']=sv
 ##         sv_tuple = sv.view()
@@ -132,14 +132,14 @@ class TestSheetView(unittest.TestCase):
 ##         self.activity = resize(array([x for x in image.getdata()]),
 ##                                  (image.size[1],image.size[0]))
 
-## 	self.verbose("Initialized %s activity from %s" % (NxN(self.activity.shape),self.filename))
+##      self.verbose("Initialized %s activity from %s" % (NxN(self.activity.shape),self.filename))
 ##         max_val = float(max(self.activity.ravel()))
 ##         self.activity = self.activity / max_val
 
 
 ##     def start(self):
-## 	assert self.simulation
-## 	self.simulation.enqueue_event_rel(0,self,self,data=self.activity)
+##      assert self.simulation
+##      self.simulation.enqueue_event_rel(0,self,self,data=self.activity)
 
 ##     def input_event(self,src,src_port,dest_port,data):
 ##         self.send_output(data=self.activity)

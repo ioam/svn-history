@@ -64,7 +64,7 @@ class TestPatternPlotGroup(SheetPlotGroup):
                                                     sheet.xdensity,sheet.bounds,self.normalize,
                                                     name=''))
 
-    	return self._static_plots[:]+dynamic_plots
+        return self._static_plots[:]+dynamic_plots
 
 
 
@@ -93,7 +93,7 @@ class TestPattern(SheetPanel,PatternDrivenAnalysis):
     def __init__(self,master,plotgroup=None,**params):
         plotgroup = plotgroup or TestPatternPlotGroup()
         
-	super(TestPattern,self).__init__(master,plotgroup,**params)
+        super(TestPattern,self).__init__(master,plotgroup,**params)
         
         self.auto_refresh = True
 

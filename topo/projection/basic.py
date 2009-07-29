@@ -46,18 +46,18 @@ class CFPOF_SharedWeight(CFPOutputFn):
 class SharedWeightCF(ConnectionField):
     
     __slots__ = []
-	
+        
     def __init__(self,cf,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),mask=None,min_matrix_radius=1):
         """
         From an existing copy of ConnectionField (CF) that acts as a
-	template, create a new CF that shares weights with the
-	template CF.  Copies all the properties of CF to stay
-	identical except the weights variable that actually contains
-	the data.
-	
-	The only difference from a normal CF is that the weights of
-	the CF are implemented as a numpy view into the single master
-	copy of the weights stored in the CF template.
+        template, create a new CF that shares weights with the
+        template CF.  Copies all the properties of CF to stay
+        identical except the weights variable that actually contains
+        the data.
+        
+        The only difference from a normal CF is that the weights of
+        the CF are implemented as a numpy view into the single master
+        copy of the weights stored in the CF template.
         """
         # CEBALERT: There's no call to super's __init__; see JAHACKALERT
         # below.
@@ -66,18 +66,18 @@ class SharedWeightCF(ConnectionField):
         weights_slice = self._create_input_sheet_slice(input_sheet,x,y,template,min_matrix_radius=min_matrix_radius)
         self.weights = weights_slice.submatrix(cf.weights)
         
-	# JAHACKALERT the TransferFn cannot be applied in SharedWeightCF
-	# - another inconsistency in the class tree design - there
-	# should be nothing in the parent class that is ignored in its
-	# children.  Probably need to extract some functionality of
+        # JAHACKALERT the TransferFn cannot be applied in SharedWeightCF
+        # - another inconsistency in the class tree design - there
+        # should be nothing in the parent class that is ignored in its
+        # children.  Probably need to extract some functionality of
         # ConnectionField into a shared abstract parent class.
-	# We have agreed to make this right by adding a constant property that
-	# will be set true if the learning should be active
-	# The SharedWeightCFProjection class and its anccestors will
-	# have this property set to false which means that the 
-	# learning will be deactivated
+        # We have agreed to make this right by adding a constant property that
+        # will be set true if the learning should be active
+        # The SharedWeightCFProjection class and its anccestors will
+        # have this property set to false which means that the 
+        # learning will be deactivated
 
-	
+        
 
 class SharedWeightCFProjection(CFProjection):
     """

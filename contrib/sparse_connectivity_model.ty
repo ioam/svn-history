@@ -34,19 +34,19 @@ tbound = cs +0.25
 dataset=locals().get('dataset',"Line") #set the input type by choosing the dataset parameter
 
 if dataset=="Line":
-	input= Translator(generator=topo.pattern.basic.Line(   x=UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=1023),   y=UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.4,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
+        input= Translator(generator=topo.pattern.basic.Line(   x=UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=1023),   y=UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.4,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 elif dataset=="Natural":
-	import topo.pattern.image 
-	input_type=topo.pattern.image.Image
-	
-	image_filenames=["images/mcgill_img/foliage/%02d.png"%(i+1) for i in xrange(98)]
-	inputs=[input_type(filename=f,
-				size=10.0,  #size_normalization='original',(size=10.0)
-				x=0,
-				y=0,
-				orientation=0)
-			for f in image_filenames]	
-	input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),jitter_magnitude=locals().get('JM',0.01))
+        import topo.pattern.image 
+        input_type=topo.pattern.image.Image
+        
+        image_filenames=["images/mcgill_img/foliage/%02d.png"%(i+1) for i in xrange(98)]
+        inputs=[input_type(filename=f,
+                                size=10.0,  #size_normalization='original',(size=10.0)
+                                x=0,
+                                y=0,
+                                orientation=0)
+                        for f in image_filenames]       
+        input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),jitter_magnitude=locals().get('JM',0.01))
 
 
 ring=topo.pattern.basic.Ring(x=UniformRandom(lbound=-1.1,ubound=1.1,seed=1023),
@@ -67,9 +67,9 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 bcm = locals().get('BCM',False)
 if bcm:
-	CFProjection.learning_fn=CFPLF_BCMFixed_opt(unit_threshold=locals().get('BCM_Treshold',0.7))
+        CFProjection.learning_fn=CFPLF_BCMFixed_opt(unit_threshold=locals().get('BCM_Treshold',0.7))
 else: 
-	CFProjection.learning_fn=CFPLF_Hebbian_opt()
+        CFProjection.learning_fn=CFPLF_Hebbian_opt()
 
 
 # DoG weights for the LGN
@@ -100,7 +100,7 @@ jitterOff = Jitter(rand =UniformRandom(seed=1023))
 #Sheet output functions
 LGN_on_output_fn=HalfRectify()
 LGN_off_output_fn=HalfRectify()
-t  = locals().get('treshold',0.2)	
+t  = locals().get('treshold',0.2)       
 e =  locals().get('exponent',1.0)
 #V1_OF = HalfRectifyAndPower(e=e,t=t)
 #V1_OF=PiecewiseLinear(lower_bound=0.103)
@@ -208,4 +208,4 @@ if dataset == 'Natural':
     
 #complex = False
 #if complex:
-	                 
+                         

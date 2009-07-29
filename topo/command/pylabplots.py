@@ -483,9 +483,9 @@ class overlaid_plots(PylabPlotCommand):
                     bitmap=plot.bitmap
                     pylab.figure(figsize=(5,5))
                     isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
-                    pylab.ioff()					 # Turn interactive mode off 
+                    pylab.ioff()                                         # Turn interactive mode off 
                                         
-                    pylab.imshow(bitmap.image,origin='lower',interpolation='nearest')				
+                    pylab.imshow(bitmap.image,origin='lower',interpolation='nearest')                           
                     pylab.axis('off')
     
                     for (t,pref,sel,c) in p.overlay:
@@ -494,7 +494,7 @@ class overlaid_plots(PylabPlotCommand):
                         if (t=='contours'):
                             pylab.contour(v,[sel,sel],colors=c,linewidths=2)
                             
-                        if (t=='arrows'):							
+                        if (t=='arrows'):                                                       
                             s = pylab.flipud(sheet.sheet_views[sel].view()[0])
                             scale=int(pylab.ceil(log10(len(v))))
                             X=pylab.array([x for x in xrange(len(v)/scale)])                  
@@ -504,8 +504,8 @@ class overlaid_plots(PylabPlotCommand):
                                 for j in X:
                                     v_sc[i][j]=v[scale*i][scale*j]
                                     s_sc[i][j]=s[scale*i][scale*j]
-                            pylab.quiver(scale*X,scale*X,-cos(2*pi*v_sc)*s_sc,-sin(2*pi*v_sc)*s_sc,color=c,edgecolors=c,minshaft=3,linewidths=1) 						
-    							
+                            pylab.quiver(scale*X,scale*X,-cos(2*pi*v_sc)*s_sc,-sin(2*pi*v_sc)*s_sc,color=c,edgecolors=c,minshaft=3,linewidths=1)                                                
+                                                        
                     p.title='%s overlaid with %s at time %s' %(plot.name,pref,topo.sim.timestr())
                     if isint: pylab.ion()
                     p.filename_suffix="_"+sheet.name                    

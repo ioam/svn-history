@@ -17,154 +17,154 @@ from random import*
 
   
 def generate_MEAs(w_x,w_y,g):
-	"""
-	Generates the Maximally Effective Angles of the input units
-	"""
-	
-	a=linspace(0.0,(2.0*pi)-((2.0*pi)/g**2),g**2)+(pi/g**2)
-   	angs=reshape(repeat(a,w_x*w_y),[g**2,w_x,w_y])
-   	MEAs=zeros([g**2,2,w_x,w_y])*0.0 
-   	MEAs[:,0,:,:]=cos(angs)
-   	MEAs[:,1,:,:]=sin(angs)
-	return [MEAs,angs]
+        """
+        Generates the Maximally Effective Angles of the input units
+        """
+        
+        a=linspace(0.0,(2.0*pi)-((2.0*pi)/g**2),g**2)+(pi/g**2)
+        angs=reshape(repeat(a,w_x*w_y),[g**2,w_x,w_y])
+        MEAs=zeros([g**2,2,w_x,w_y])*0.0 
+        MEAs[:,0,:,:]=cos(angs)
+        MEAs[:,1,:,:]=sin(angs)
+        return [MEAs,angs]
 
 def shuffle_positions(w_x,w_y,g,r_seed):
-	"""
-	Returns matrices of randomly permuted x indices and of y indices
-	which are essentially a look-up table for the assignmnet of firing rates to matrix co-ordinates
-	"""
-	
-	seed(r_seed)
-	x_indices=zeros([g,g,w_x,w_y])	
-	y_indices=zeros([g,g,w_x,w_y])
-	for whisker_x in range(w_x):
-		for whisker_y in range(w_y):
-			for k in range(g):
-			      	a = arange(g)
+        """
+        Returns matrices of randomly permuted x indices and of y indices
+        which are essentially a look-up table for the assignmnet of firing rates to matrix co-ordinates
+        """
+        
+        seed(r_seed)
+        x_indices=zeros([g,g,w_x,w_y])  
+        y_indices=zeros([g,g,w_x,w_y])
+        for whisker_x in range(w_x):
+                for whisker_y in range(w_y):
+                        for k in range(g):
+                                a = arange(g)
                                 shuffle(a)
                                 x_indices[k,:,whisker_x,whisker_y]= a
-				shuffle(a)
-				y_indices[:,k,whisker_x,whisker_y]= a
-				
-	seed(None)
-	return [x_indices,y_indices]
+                                shuffle(a)
+                                y_indices[:,k,whisker_x,whisker_y]= a
+                                
+        seed(None)
+        return [x_indices,y_indices]
 
 
 def deflections(w_x,w_y,g,deflections,t,stimulus_tilt,whisker_length,MEAs):
-	"""
-	Generates firing rates by stimuluating (w_x,w_y) shaped whiskerpad at (defs) angles, in the sequence corresponding to angle t.
-	Stimulus tilt should be specified in range 0 to 1; deflections and t in radians  
-	IMPORTANT: Need to figure out which way to normalize the sequence so as not to be skewing the angle to fit the dimensions of the whiskerpad
-	"""
-	
-   	tilt=stimulus_tilt*(arctan(whisker_length))
-    	whi_x=(w_x-1)/2
-	whi_y=(w_y-1)/2
-	max_whi=max(whi_x,whi_y)
-	
-    	[r,c]=meshgrid(linspace(-whi_y,whi_y,w_y),linspace(-whi_x,whi_x,w_x))
-   	row=cos(t)*-r
-   	col=sin(t)*c
+        """
+        Generates firing rates by stimuluating (w_x,w_y) shaped whiskerpad at (defs) angles, in the sequence corresponding to angle t.
+        Stimulus tilt should be specified in range 0 to 1; deflections and t in radians  
+        IMPORTANT: Need to figure out which way to normalize the sequence so as not to be skewing the angle to fit the dimensions of the whiskerpad
+        """
+        
+        tilt=stimulus_tilt*(arctan(whisker_length))
+        whi_x=(w_x-1)/2
+        whi_y=(w_y-1)/2
+        max_whi=max(whi_x,whi_y)
+        
+        [r,c]=meshgrid(linspace(-whi_y,whi_y,w_y),linspace(-whi_x,whi_x,w_x))
+        row=cos(t)*-r
+        col=sin(t)*c
     
-  	#whiskers = ((((row+col)*tan(tilt)))+(sqrt((whi_x**2)+(whi_y**2)))*whisker_length)/(2*((sqrt((whi_x**2)+(whi_y**2))*whisker_length)))#skews sequence to shape of pad
-    	whiskers = ((((row+col)*tan(tilt)))+(sqrt((max_whi**2)+(max_whi**2)))*whisker_length)/(2*((sqrt((max_whi**2)+(max_whi**2))*whisker_length)))
-    	    	
-   	s=zeros([2,w_x,w_y])*0.0
-   	s[0,:,:]=whiskers*cos(deflections) 
-   	s[1,:,:]=whiskers*sin(deflections) 
-   	
-	stimuli=zeros([g**2,2,w_x,w_y])*0.0
-   	stimuli[:,:,:,:]=s
-	
-	
-   	rates=clip(sum(MEAs*stimuli,1),0,1e7)
-	
-   	return [rates,s,whiskers]
+        #whiskers = ((((row+col)*tan(tilt)))+(sqrt((whi_x**2)+(whi_y**2)))*whisker_length)/(2*((sqrt((whi_x**2)+(whi_y**2))*whisker_length)))#skews sequence to shape of pad
+        whiskers = ((((row+col)*tan(tilt)))+(sqrt((max_whi**2)+(max_whi**2)))*whisker_length)/(2*((sqrt((max_whi**2)+(max_whi**2))*whisker_length)))
+                
+        s=zeros([2,w_x,w_y])*0.0
+        s[0,:,:]=whiskers*cos(deflections) 
+        s[1,:,:]=whiskers*sin(deflections) 
+        
+        stimuli=zeros([g**2,2,w_x,w_y])*0.0
+        stimuli[:,:,:,:]=s
+        
+        
+        rates=clip(sum(MEAs*stimuli,1),0,1e7)
+        
+        return [rates,s,whiskers]
  
 
 def test_deflections(w_x,w_y,g,deflection,active_whisker,MEAs):
-	"""
-	Generates firing rates at deflection magnitude=1 for the active whisker only 
-	"""
+        """
+        Generates firing rates at deflection magnitude=1 for the active whisker only 
+        """
    
-   	s_x=cos(deflection) 
-   	s_y=sin(deflection) 
-   	stimuli=zeros([g**2,2,w_x,w_y])*0.0
-   	stimuli[:,:,floor(active_whisker/w_y),fmod(active_whisker,w_y)]=[s_x,s_y]
+        s_x=cos(deflection) 
+        s_y=sin(deflection) 
+        stimuli=zeros([g**2,2,w_x,w_y])*0.0
+        stimuli[:,:,floor(active_whisker/w_y),fmod(active_whisker,w_y)]=[s_x,s_y]
 
-   	rates=clip(sum(MEAs*stimuli,1),0,1e7)
+        rates=clip(sum(MEAs*stimuli,1),0,1e7)
    
-   	return rates
-	
+        return rates
+        
 
 def generate_input_pattern(w_x,w_y,g,rates,x_indices,y_indices):
-	"""
-	Assign the input unit firing rates to the positions 
-	specified by the index matrices; i.e. their random locations 
-	within a barrelette on the input sheet
-	"""
-	
-	pattern=zeros([w_x*g,w_y*g])*1.0
-	r=reshape(rates,[g,g,w_x,w_y])
-	for i in range(w_x*g):
-		for j in range(w_y*g):
-			pattern[i][j]=r[x_indices[fmod(i,g),fmod(j,g),floor(i/g),floor(j/g)],y_indices[fmod(i,g),fmod(j,g),floor(i/g),floor(j/g)],floor(i/g),floor(j/g)]
-			
-	return pattern
-	
+        """
+        Assign the input unit firing rates to the positions 
+        specified by the index matrices; i.e. their random locations 
+        within a barrelette on the input sheet
+        """
+        
+        pattern=zeros([w_x*g,w_y*g])*1.0
+        r=reshape(rates,[g,g,w_x,w_y])
+        for i in range(w_x*g):
+                for j in range(w_y*g):
+                        pattern[i][j]=r[x_indices[fmod(i,g),fmod(j,g),floor(i/g),floor(j/g)],y_indices[fmod(i,g),fmod(j,g),floor(i/g),floor(j/g)],floor(i/g),floor(j/g)]
+                        
+        return pattern
+        
 
 def ganglion_labels(w_x,w_y,g,angs,x_indices,y_indices):
-	"""
-	Returns the MEA of each unit in the input pattern, as a value between 0 and 1 
-	IMPORTANT: Need to varify that this is working once the simulation is up and running
-	"""
-	
-	MEA_labels=zeros([w_x*g,w_y*g])*1.0
-	a=angs/(2.0*pi)
-	r=reshape(a,[g,g,w_x,w_y])
-	for i in range(w_x*g):
-		for j in range(w_y*g):
-			MEA_labels[i][j]=r[x_indices[fmod(i,g),fmod(j,g),floor(i/g),floor(j/g)],y_indices[fmod(i,g),fmod(j,g),floor(i/g),floor(j/g)],floor(i/g),floor(j/g)]
-	
-	return MEA_labels
-	
-	
+        """
+        Returns the MEA of each unit in the input pattern, as a value between 0 and 1 
+        IMPORTANT: Need to varify that this is working once the simulation is up and running
+        """
+        
+        MEA_labels=zeros([w_x*g,w_y*g])*1.0
+        a=angs/(2.0*pi)
+        r=reshape(a,[g,g,w_x,w_y])
+        for i in range(w_x*g):
+                for j in range(w_y*g):
+                        MEA_labels[i][j]=r[x_indices[fmod(i,g),fmod(j,g),floor(i/g),floor(j/g)],y_indices[fmod(i,g),fmod(j,g),floor(i/g),floor(j/g)],floor(i/g),floor(j/g)]
+        
+        return MEA_labels
+        
+        
 def plot_deflections(w_x,w_y,edge,deflections,mags,stimulus_angle,save_plot,tilt):
-	"""
-	Customised Stimulus & Whisker Deflection Plots
-	"""	
-	pylab.close(1)
-	t=(2.0*pi)-stimulus_angle
-	#a=sqrt(4) *((max(w_x,w_y)-1.0)/2.0) # Remeber that this normalization should reflect that in deflections()
-	a=sqrt(((w_x-1)**2)+((w_y-1)**2))
-	b=100 
-	
-	# Defines three corners of the stimulus 
-	a1=(a*sin(t+(pi/2.0)))-b*cos(t+(pi/2.0))
-	a2=(a*cos(t+(pi/2.0)))+b*sin(t+(pi/2.0))
-	b1=(a*sin(t+(pi/2.0)))+b*cos(t+(pi/2.0))
-   	b2=(a*cos(t+(pi/2.0)))-b*sin(t+(pi/2.0)) 
-	c1=-b*cos(t)
-   	c2= b*sin(t)
-	
-	stim=Polygon([[a1,a2],[b1,b2],[c1,c2]],fc='0.7',ec='white')
-	
-	ax = gca()
-	ax.add_patch(stim)
-	
-	for i in range(size(deflections,2)):
-		for j in range(size(deflections,1)):
-			exec('v=Arrow('+`(i-((w_y/2.0)-0.5))*2`+','+`(j-((w_x/2.0)-0.5))*2`+',deflections[0]['+`size(deflections,1)-1-j`+']['+`i`+'],deflections[1]['+`size(deflections,1)-1-j`+']['+`i`+'],width=mags['+`size(deflections,1)-1-j`+']['+`i`+'],ec="white",fc="k")')
-			ax.add_patch(v)
-	
-	pylab.plot()
-	axis([-max(w_x,w_y)-edge,max(w_x,w_y)+edge,-max(w_x,w_y)-edge,max(w_x,w_y)+edge])
-	xticks
-	if save_plot==True:
-		savefig('sd='+`global_seed`+',conv='+`WhiskerArray.whisker_convergence`+',topy='+`WhiskerArray.anglotopy`+',tilt='+`tilt`+',flip'+`WhiskerArray.flipped_whisker`+`WhiskerArray.flipped_whisker_convergence`+'.svg')
-	
-	pylab.show._needmain = False
-	pylab.show()
+        """
+        Customised Stimulus & Whisker Deflection Plots
+        """     
+        pylab.close(1)
+        t=(2.0*pi)-stimulus_angle
+        #a=sqrt(4) *((max(w_x,w_y)-1.0)/2.0) # Remeber that this normalization should reflect that in deflections()
+        a=sqrt(((w_x-1)**2)+((w_y-1)**2))
+        b=100 
+        
+        # Defines three corners of the stimulus 
+        a1=(a*sin(t+(pi/2.0)))-b*cos(t+(pi/2.0))
+        a2=(a*cos(t+(pi/2.0)))+b*sin(t+(pi/2.0))
+        b1=(a*sin(t+(pi/2.0)))+b*cos(t+(pi/2.0))
+        b2=(a*cos(t+(pi/2.0)))-b*sin(t+(pi/2.0)) 
+        c1=-b*cos(t)
+        c2= b*sin(t)
+        
+        stim=Polygon([[a1,a2],[b1,b2],[c1,c2]],fc='0.7',ec='white')
+        
+        ax = gca()
+        ax.add_patch(stim)
+        
+        for i in range(size(deflections,2)):
+                for j in range(size(deflections,1)):
+                        exec('v=Arrow('+`(i-((w_y/2.0)-0.5))*2`+','+`(j-((w_x/2.0)-0.5))*2`+',deflections[0]['+`size(deflections,1)-1-j`+']['+`i`+'],deflections[1]['+`size(deflections,1)-1-j`+']['+`i`+'],width=mags['+`size(deflections,1)-1-j`+']['+`i`+'],ec="white",fc="k")')
+                        ax.add_patch(v)
+        
+        pylab.plot()
+        axis([-max(w_x,w_y)-edge,max(w_x,w_y)+edge,-max(w_x,w_y)-edge,max(w_x,w_y)+edge])
+        xticks
+        if save_plot==True:
+                savefig('sd='+`global_seed`+',conv='+`WhiskerArray.whisker_convergence`+',topy='+`WhiskerArray.anglotopy`+',tilt='+`tilt`+',flip'+`WhiskerArray.flipped_whisker`+`WhiskerArray.flipped_whisker_convergence`+'.svg')
+        
+        pylab.show._needmain = False
+        pylab.show()
 
 
 ##########################################################################
@@ -192,13 +192,13 @@ plot_deflections_on=param.Boolean(default=False)
 ###############################################################################
 
 class WhiskerArray(PatternGenerator):
-	
+        
     w_x=param.Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc="""
         Number of whisker rows""")
-	
+        
     w_y=param.Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc="""
         Number of whisker columns""")
-	  
+          
     num_ganglion_cells = param.Integer(default=7,doc="""
         Square root of the number of ganglion cells per whisker.""")
 
@@ -212,14 +212,14 @@ class WhiskerArray(PatternGenerator):
     
     edge=param.Number(default=1.0,doc=""" Border of the input vector plots""")
 
-	
+        
     tilt = param.Number(default=0.0, doc="""
         The tilt of the stimulus plane, + = front whiskers get larger deflection.""")
 
     whisker_length = param.Number(default=5)
     
     whisker_convergence = param.Number(default=1e7, doc="""
-    	The convergence of the whisker deflection from the deflection angle""") 
+        The convergence of the whisker deflection from the deflection angle""") 
     
     flipped_whisker=param.Parameter(default=[None,None])
     
@@ -229,42 +229,42 @@ class WhiskerArray(PatternGenerator):
         
     anglotopy = param.Number(default=1e7, doc="""
         Correlation between Angle and Somatotopy, i.e. variance of deflection angle from contact angle""")
-	
+        
         
     def __init__(self,**params):
         super(WhiskerArray,self).__init__(**params)
-	[self.MEAs,self.angs]=generate_MEAs(self.w_x,self.w_y,self.num_ganglion_cells)
-    	[self.x_indices,self.y_indices]=shuffle_positions(self.w_x,self.w_y,self.num_ganglion_cells,self.random_ganglion_seed) 
-	
-	                                                                                    
+        [self.MEAs,self.angs]=generate_MEAs(self.w_x,self.w_y,self.num_ganglion_cells)
+        [self.x_indices,self.y_indices]=shuffle_positions(self.w_x,self.w_y,self.num_ganglion_cells,self.random_ganglion_seed) 
+        
+                                                                                            
     def function(self,params):
         self.sequence_angle = params.get('deflection',self.deflection)
         self.deflection_angles = VonMisesRandom(mu=self.sequence_angle,kappa=params.get('anglotopy',self.anglotopy))
-	self.deflection_angle=self.deflection_angles()
-	
-	self.gens=numpy.ones(shape=(self.w_x,self.w_y),dtype=object)
-	for i in range(self.w_x):
-		for j in range(self.w_y):
-				if [i,j]==params.get('flipped_whisker',self.flipped_whisker):
-					self.gens[i,j]=VonMisesRandom(mu=self.deflection_angle,kappa=params.get('flipped_convergence',self.flipped_whisker_convergence),seed=random_seed_generator())
-				else:
-					self.gens[i,j]=VonMisesRandom(mu=self.deflection_angle,kappa=params.get('convergence',self.whisker_convergence),seed=random_seed_generator())
-	
-	self.whisker_deflections=numpy.ones(shape=(self.w_x,self.w_y))
-	for i in range(self.w_x):
-		for j in range(self.w_y):
-			self.whisker_deflections[i,j]=self.gens[i,j]()
+        self.deflection_angle=self.deflection_angles()
+        
+        self.gens=numpy.ones(shape=(self.w_x,self.w_y),dtype=object)
+        for i in range(self.w_x):
+                for j in range(self.w_y):
+                                if [i,j]==params.get('flipped_whisker',self.flipped_whisker):
+                                        self.gens[i,j]=VonMisesRandom(mu=self.deflection_angle,kappa=params.get('flipped_convergence',self.flipped_whisker_convergence),seed=random_seed_generator())
+                                else:
+                                        self.gens[i,j]=VonMisesRandom(mu=self.deflection_angle,kappa=params.get('convergence',self.whisker_convergence),seed=random_seed_generator())
+        
+        self.whisker_deflections=numpy.ones(shape=(self.w_x,self.w_y))
+        for i in range(self.w_x):
+                for j in range(self.w_y):
+                        self.whisker_deflections[i,j]=self.gens[i,j]()
 
 
-	[self.firing_rates,self.stimuli,self.magnitudes]=deflections(self.w_x,self.w_y,self.num_ganglion_cells,self.whisker_deflections,self.sequence_angle,params.get('tilt',self.tilt),self.whisker_length,self.MEAs)
-	
-    	inputs = generate_input_pattern(self.w_x,self.w_y,self.num_ganglion_cells,self.firing_rates,self.x_indices,self.y_indices)
-	
-	
-	if plot_deflections_on==True:
-		plot_deflections(self.w_x,self.w_y,self.edge,self.stimuli,self.magnitudes,self.sequence_angle,self.save_plot,params.get('tilt',self.tilt))
-	
-	return inputs
+        [self.firing_rates,self.stimuli,self.magnitudes]=deflections(self.w_x,self.w_y,self.num_ganglion_cells,self.whisker_deflections,self.sequence_angle,params.get('tilt',self.tilt),self.whisker_length,self.MEAs)
+        
+        inputs = generate_input_pattern(self.w_x,self.w_y,self.num_ganglion_cells,self.firing_rates,self.x_indices,self.y_indices)
+        
+        
+        if plot_deflections_on==True:
+                plot_deflections(self.w_x,self.w_y,self.edge,self.stimuli,self.magnitudes,self.sequence_angle,self.save_plot,params.get('tilt',self.tilt))
+        
+        return inputs
 
     
 ###############################################################################
@@ -290,20 +290,20 @@ class TestWhiskerArray(PatternGenerator):
     
     whisker = param.Integer(default=0, doc="""
         Which whiskers are to receive inputs; use 0 for all.""")
-	
+        
 
     def __init__(self,**params):
         super(TestWhiskerArray,self).__init__(**params)
-	[self.MEAs,self.angs]=generate_MEAs(w_x,w_y,WhiskerArray.num_ganglion_cells)
-	[self.x_indices,self.y_indices]=shuffle_positions(w_x,w_y,WhiskerArray.num_ganglion_cells,WhiskerArray.random_ganglion_seed)
+        [self.MEAs,self.angs]=generate_MEAs(w_x,w_y,WhiskerArray.num_ganglion_cells)
+        [self.x_indices,self.y_indices]=shuffle_positions(w_x,w_y,WhiskerArray.num_ganglion_cells,WhiskerArray.random_ganglion_seed)
 
     def function(self,params): 
         deflection = params.get('deflection',self.deflection)
-	
-	self.firing_rates=test_deflections(w_x,w_y,WhiskerArray.num_ganglion_cells,self.deflection,self.whisker,self.MEAs)
         
-	inputs=generate_input_pattern(w_x,w_y,WhiskerArray.num_ganglion_cells,self.firing_rates,self.x_indices,self.y_indices)
-	
+        self.firing_rates=test_deflections(w_x,w_y,WhiskerArray.num_ganglion_cells,self.deflection,self.whisker,self.MEAs)
+        
+        inputs=generate_input_pattern(w_x,w_y,WhiskerArray.num_ganglion_cells,self.firing_rates,self.x_indices,self.y_indices)
+        
         return inputs
 
 
@@ -312,17 +312,17 @@ class TestWhiskerArray(PatternGenerator):
 from topo.base.sheetview import SheetView
 
 def color_MEAs():
-	"""
-	Colorize the input units by their maximally effective angles. Finds a matrix of values (ranging 0-1) to represent MEAs (ranging 0-2*pi)
-	"""
-	[MEAs,angs]=generate_MEAs(w_x,w_y,WhiskerArray.num_ganglion_cells)
-    	[x_indices,y_indices]=shuffle_positions(w_x,w_y,WhiskerArray.num_ganglion_cells,WhiskerArray.random_ganglion_seed)  
+        """
+        Colorize the input units by their maximally effective angles. Finds a matrix of values (ranging 0-1) to represent MEAs (ranging 0-2*pi)
+        """
+        [MEAs,angs]=generate_MEAs(w_x,w_y,WhiskerArray.num_ganglion_cells)
+        [x_indices,y_indices]=shuffle_positions(w_x,w_y,WhiskerArray.num_ganglion_cells,WhiskerArray.random_ganglion_seed)  
 
-	for sheet in topo.sim.objects(GeneratorSheet).values():
-		ganglion_preferences=ganglion_labels(w_x,w_y,WhiskerArray.num_ganglion_cells,angs,x_indices,y_indices)
-	
-	new_view = SheetView((ganglion_preferences,sheet.bounds), sheet.name,sheet.precedence)
-	sheet.sheet_views['DeflectionPreference']=new_view 
+        for sheet in topo.sim.objects(GeneratorSheet).values():
+                ganglion_preferences=ganglion_labels(w_x,w_y,WhiskerArray.num_ganglion_cells,angs,x_indices,y_indices)
+        
+        new_view = SheetView((ganglion_preferences,sheet.bounds), sheet.name,sheet.precedence)
+        sheet.sheet_views['DeflectionPreference']=new_view 
 
 ###############################################################################
 
@@ -330,9 +330,9 @@ def color_MEAs():
 # Deflection preference map plotting, based on measure_or_pref in analysis.py
 
 def measure_deflection_pref(num_deflection=50,
-			    scale=0.3,offset=0.0,display=False,weighted_average=False,
-			    pattern_presenter=PatternPresenter(pattern_generator=TestWhiskerArray(),
-							       apply_output_fns=False,duration=0.175)):
+                            scale=0.3,offset=0.0,display=False,weighted_average=False,
+                            pattern_presenter=PatternPresenter(pattern_generator=TestWhiskerArray(),
+                                                               apply_output_fns=False,duration=0.175)):
     """  
     Measure deflection maps, by collating the responses to a set of
     whisker deflections in different directions.
@@ -342,7 +342,7 @@ def measure_deflection_pref(num_deflection=50,
         raise ValueError("num_deflection must be greater than 0")
 
     else:
-	 step_deflection=pi/num_deflection
+         step_deflection=pi/num_deflection
 
     feature_values = [Feature(name="whisker",range=(0, (w_x*w_y)-1
 ),step=1,cyclic=False), Feature(name="deflection",range=(0.0,2*pi),step=step_deflection,cyclic=True)]
@@ -360,7 +360,7 @@ pg= create_plotgroup(name='Deflection Preference',category="Preference Maps",
                      pre_plot_hooks=[measure_deflection_pref])
 pg.add_plot('Deflection Preference',[('Hue','DeflectionPreference')])
 pg.add_plot('Deflection Preference&Selectivity',[('Hue','DeflectionPreference'),
-						   ('Confidence','DeflectionSelectivity')])
+                                                   ('Confidence','DeflectionSelectivity')])
 pg.add_plot('Deflection Selectivity',[('Strength','DeflectionSelectivity')])
 pg.add_plot('Whisker Preference',[('Strength','WhiskerPreference')])
 pg.add_plot('Whisker Selectivity',[('Strength','WhiskerSelectivity')])
@@ -379,7 +379,7 @@ def measure_sweep_pref(num_deflection=50,
         raise ValueError("num_deflection must be greater than 0")
 
     else:
-	 step_deflection=pi/num_deflection
+         step_deflection=pi/num_deflection
 
     feature_values = [Feature(name="deflection",range=(0.0,2*pi),step=step_deflection,cyclic=True)]
         
@@ -405,19 +405,19 @@ class BarrelMapper(CoordinateMapperFn):
     def __call__(self,x,y):
         xd=self.xdensity
         yd=self.ydensity
-	
-	if x>0.0:
-		xquant=int(x+(rem(yd,2)*0.5))+((1-rem(yd,2))*0.5)
-	else:
-		xquant=int(x-(rem(yd,2)*0.5))-((1-rem(yd,2))*0.5)
-	
-	if y>0.0:	
-		yquant=int(y+(rem(xd,2)*0.5))+((1-rem(xd,2))*0.5)
-	else:
-		yquant=int(y-(rem(xd,2)*0.5))-((1-rem(xd,2))*0.5)
-	
-	
-	return  xquant,yquant
+        
+        if x>0.0:
+                xquant=int(x+(rem(yd,2)*0.5))+((1-rem(yd,2))*0.5)
+        else:
+                xquant=int(x-(rem(yd,2)*0.5))-((1-rem(yd,2))*0.5)
+        
+        if y>0.0:       
+                yquant=int(y+(rem(xd,2)*0.5))+((1-rem(xd,2))*0.5)
+        else:
+                yquant=int(y-(rem(xd,2)*0.5))-((1-rem(xd,2))*0.5)
+        
+        
+        return  xquant,yquant
 
 
 
@@ -474,31 +474,31 @@ von_kappa=0.0
 
 topo.sim['Ganglia0']=GeneratorSheet(nominal_density=WhiskerArray.num_ganglion_cells,
                                              input_generator=WhiskerArray(num_ganglion_cells=num_ganglion_cells,
-                                             	deflection=VonMisesRandom(mu=von_mu,kappa=von_kappa,seed=global_seed*76),
-						tilt=locals().get('tilt',UniformRandom(lbound=0.0,ubound=1.0,seed=global_seed*123)),
-						w_x=w_x, w_y=w_y,
-						flipped_whisker_convergence=locals().get('flipped_convergence',1e7),
-						flipped_whisker=locals().get('flipped_whisker',[None,None]),
-						whisker_convergence=locals().get('convergence',1e7),
-						anglotopy=locals().get('anglotopy',1e7)),
+                                                deflection=VonMisesRandom(mu=von_mu,kappa=von_kappa,seed=global_seed*76),
+                                                tilt=locals().get('tilt',UniformRandom(lbound=0.0,ubound=1.0,seed=global_seed*123)),
+                                                w_x=w_x, w_y=w_y,
+                                                flipped_whisker_convergence=locals().get('flipped_convergence',1e7),
+                                                flipped_whisker=locals().get('flipped_whisker',[None,None]),
+                                                whisker_convergence=locals().get('convergence',1e7),
+                                                anglotopy=locals().get('anglotopy',1e7)),
                                              period=1.0, phase=0.05,
                                              nominal_bounds=BoundingBox(points=[(-w_y/2.0,-w_x/2.0),(w_y/2.0,w_x/2.0)]))
-					   
-					     
+                                           
+                                             
 topo.sim['S1'] = LISSOM(nominal_density=locals().get('default_density',21),tsettle=9,
      nominal_bounds=BoundingBox(points=[(-w_y/2.0,-w_x/2.0),(w_y/2.0,w_x/2.0)])) 
 
 topo.sim.connect('Ganglia0','S1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='Afferent0',
                      weights_generator=topo.pattern.random.UniformRandom(), nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=1.0,
-		     coord_mapper=BarrelMapper(xdensity=w_x,ydensity=w_y))
-		  
+                     coord_mapper=BarrelMapper(xdensity=w_x,ydensity=w_y))
+                  
 
 topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=ResizableCFProjection,strength=1.0,
                  weights_generator=topo.pattern.random.UniformRandom(),
                  nominal_bounds_template=BoundingBox(radius=locals().get("ex_radius",0.3)), learning_rate=1.0) #ExponentialDecay(starting_value=1.0, time_constant=1000.0))
-		           
+                           
    
 topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  connection_type=CFProjection,strength=-1.0,

@@ -47,7 +47,7 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
                 if out !=0:
                     rate = learning_rate * out                    
                     cf = cfs[r,c]
-		    X = cf.get_input_matrix(input_activity)
+                    X = cf.get_input_matrix(input_activity)
                     cf.weights += rate * (X - cf.weights)
 
                     # CEBHACKALERT: see ConnectionField.__init__()
@@ -81,11 +81,11 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
 ##        rows,cols = output_activity.shape
 ##
 ##        # JABALERT: Is this correct?
-##	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+##      single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
 ##
 ##        # avoid evaluating these references each time in the loop
 ##        single_cf_fn = self.single_cf_fn
-##	for r in xrange(rows):
+##      for r in xrange(rows):
 ##            for c in xrange(cols):
 ##                cf = cfs[r][c]
 ##                input_act = cf.get_input_matrix(input_activity)
@@ -162,10 +162,10 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         cfs = iterator.proj.cfs
-	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
-	outstar_wsum = zeros(input_activity.shape)
+        outstar_wsum = zeros(input_activity.shape)
         for cf,r,c in iterator():
             single_cf_fn(cf.get_input_matrix(input_activity),
                             output_activity[r,c], cf.weights, single_connection_learning_rate)
@@ -207,23 +207,23 @@ class HomeoSynaptic(CFPLearningFn):
     
     def __init__(self,**params):
         super(HomeoSynaptic,self).__init__(**params)
-	self.temp_hist = []
+        self.temp_hist = []
         self.ave_hist = []
         
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-	"""
+        """
         Update the value of the given weights matrix based on the
         input_activity matrix (of the same size as the weights matrix)
         and the response of this unit (the unit_activity), governed by
         a per-connection learning rate.
-	"""
+        """
         
         cfs = iterator.proj.cfs
         if not hasattr(self,'averages'):
             self.averages = ones(output_activity.shape,Float) * 0.1
-	    
-                       	    
-	    # normalize initial weights to 1.0
+            
+                            
+            # normalize initial weights to 1.0
             for cf,r,c in iterator():
                 current_norm_value = 1.0*Numeric.sum(abs(cf.weights.ravel()))
                 if current_norm_value != 0:
@@ -235,7 +235,7 @@ class HomeoSynaptic(CFPLearningFn):
         activity_norm = 1.0 + self.beta_n * \
            ((self.averages - self.activity_target)/self.activity_target)
 
-	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
 
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
@@ -249,7 +249,7 @@ class HomeoSynaptic(CFPLearningFn):
             # CEBHACKALERT: see ConnectionField.__init__()
             cf.weights *= cf.mask
          
-	# For analysis only; can be removed (in which case also remove the initializations above)
+        # For analysis only; can be removed (in which case also remove the initializations above)
         self.ave_hist.append(self.averages[0][7])
         self.temp_hist.append (Numeric.sum(abs(cfs[0,7].weights.ravel())))
 

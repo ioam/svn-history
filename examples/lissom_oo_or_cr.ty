@@ -125,8 +125,8 @@ for e in eyes:
             for cone in rg_cone_types:
                 topo.sim.connect(e+cone+'Retina'+n,
                                  e+cone+'-'+rg_cone_types[rg_cone_types.index(cone)-1]+' LGN'+l+n, delay=0.05,
-		                 connection_type=projection.SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l),
-		                 nominal_bounds_template=sheet.BoundingBox(radius=0.375), 
+                                 connection_type=projection.SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l),
+                                 nominal_bounds_template=sheet.BoundingBox(radius=0.375), 
                                  name='AfferentCenter', weights_generator=centerg)
 
                 topo.sim.connect(e+cone+'Retina'+n,
@@ -149,17 +149,17 @@ for e in eyes:
             
             for cone in rgb_cone_types: 
                 topo.sim.connect(e+cone+'Retina'+n,
-		                 e+'Luminosity LGN'+l+n, delay=0.05,
-		                 connection_type=projection.SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l)/3,
-		                 nominal_bounds_template=sheet.BoundingBox(radius=0.375),
-		                 name='AfferentCenter'+cone, weights_generator=centerg)
+                                 e+'Luminosity LGN'+l+n, delay=0.05,
+                                 connection_type=projection.SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l)/3,
+                                 nominal_bounds_template=sheet.BoundingBox(radius=0.375),
+                                 name='AfferentCenter'+cone, weights_generator=centerg)
 
                 topo.sim.connect(e+cone+'Retina'+n,
-		                 e+'Luminosity LGN'+l+n, delay=0.05,
-		                 connection_type=projection.SharedWeightCFProjection, strength=4.7*(-1)**(1+center_polarities.index(l))/3,
-		                 nominal_bounds_template=sheet.BoundingBox(radius=0.375),
-		                 name='AfferentSurround'+cone, weights_generator=surroundg)
-		                         
+                                 e+'Luminosity LGN'+l+n, delay=0.05,
+                                 connection_type=projection.SharedWeightCFProjection, strength=4.7*(-1)**(1+center_polarities.index(l))/3,
+                                 nominal_bounds_template=sheet.BoundingBox(radius=0.375),
+                                 name='AfferentSurround'+cone, weights_generator=surroundg)
+                                         
             for opponent in opponent_types:
                 topo.sim.connect(e+opponent+' LGN'+l+n, 'V1', delay=0.05, dest_port=('Activity', 'JointNormalize', 'Afferent'),
                                  connection_type=projection.CFProjection, strength=1.0, name=e+opponent+' LGN'+l+'Afferent'+n,

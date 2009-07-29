@@ -81,7 +81,7 @@ class Sigmoid(TransferFn):
     def __call__(self,x):
         x_orig = copy.copy(x)
         x *= 0.0
-	x += 1.0 / (1.0 + exp(-(self.r*x_orig+self.k)))
+        x += 1.0 / (1.0 + exp(-(self.r*x_orig+self.k)))
 
 
                   
@@ -667,11 +667,11 @@ class AttributeTrackingTF(TransferFnWithState):
         
     def __call__(self,x):
     
-	if self._object==None:
-	    if isinstance(self.object,str):
-		self._object=eval(self.object)
-	    else:
-		self._object=self.object
+        if self._object==None:
+            if isinstance(self.object,str):
+                self._object=eval(self.object)
+            else:
+                self._object=self.object
             
         if self._coordframe == None:
             if isinstance(self.coordframe,str) and isinstance(self._object,SheetCoordinateSystem):
@@ -685,18 +685,18 @@ class AttributeTrackingTF(TransferFnWithState):
                 
 
         #collect values on each appropriate step
-	self.n_step += 1
+        self.n_step += 1
         
-	if self.n_step == self.step:
-	    self.n_step = 0
-	    if self.plastic:
+        if self.n_step == self.step:
+            self.n_step = 0
+            if self.plastic:
                 for p in self.attrib_names:
                     if p=="x":
                         value_matrix=x
                     else:
                         value_matrix= getattr(self._object, p)
                         
-		    for u in self.units:
+                    for u in self.units:
                         mat_u=self._coordframe.sheet2matrixidx(u[0],u[1])
                         self.values[p][u].append((topo.sim.time(),value_matrix[mat_u]))
           
@@ -739,11 +739,11 @@ class ActivityAveragingTF(TransferFnWithState):
 
         # Collect values on each appropriate step
         
-	self.n_step += 1
-	if self.n_step == self.step:
-	    self.n_step = 0
-	    if self.plastic:
-		self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
+        self.n_step += 1
+        if self.n_step == self.step:
+            self.n_step = 0
+            if self.plastic:
+                self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
 
 
 class HomeostaticMaxEnt(TransferFnWithRandomState):
@@ -778,20 +778,20 @@ class HomeostaticMaxEnt(TransferFnWithRandomState):
    
     b_init = param.Parameter(default=None,doc="Additive parameter controlling the exponential.")
 
-    step = param.Number(default=1, doc=""" How often to update the a and b parameters. 	For instance, step=1 means to update it every time this OF is
+    step = param.Number(default=1, doc=""" How often to update the a and b parameters.  For instance, step=1 means to update it every time this OF is
         called; step=2 means to update it every other time.""")
 
     def __init__(self,**params):
         super(HomeostaticMaxEnt,self).__init__(**params)
-	self.first_call = True
-	self.n_step=0
+        self.first_call = True
+        self.n_step=0
         self.__current_state_stack=[]
         self.a=None
         self.b=None
         self.y_avg=None
 
     def __call__(self,x):      
-	if self.first_call:
+        if self.first_call:
             self.first_call = False
             if self.a_init==None:
                 self.a = self.random_generator.uniform(low=10, high=20,size=x.shape)
@@ -801,24 +801,24 @@ class HomeostaticMaxEnt(TransferFnWithRandomState):
                 self.b = self.random_generator.uniform(low=-8.0, high=-4.0,size=x.shape)
             else:
                 self.b = ones(x.shape, x.dtype.char) * self.b_init
-	    self.y_avg = zeros(x.shape, x.dtype.char) 
+            self.y_avg = zeros(x.shape, x.dtype.char) 
 
-	# Apply sigmoid function to x, resulting in what Triesch calls y
+        # Apply sigmoid function to x, resulting in what Triesch calls y
         x_orig = copy.copy(x)
        
         x *= 0.0
         x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
-		
+                
 
-	self.n_step += 1
-	if self.n_step == self.step:
-	    self.n_step = 0
-	    if self.plastic:                
-		self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg #Calculate average for use in debugging only
-		
-		# Update a and b
-		self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
-		self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
+        self.n_step += 1
+        if self.n_step == self.step:
+            self.n_step = 0
+            if self.plastic:                
+                self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg #Calculate average for use in debugging only
+                
+                # Update a and b
+                self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
+                self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
 
 
     def state_push(self):
@@ -871,11 +871,11 @@ class ScalingTF(TransferFnWithState):
 
         # Collect values on each appropriate step
        
-	self.n_step += 1
-	if self.n_step == self.step:
-	    self.n_step = 0
-	    if self.plastic:
-		self.sf *= 0.0
+        self.n_step += 1
+        if self.n_step == self.step:
+            self.n_step = 0
+            if self.plastic:
+                self.sf *= 0.0
                 self.sf += self.target/self.x_avg
                 self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
         

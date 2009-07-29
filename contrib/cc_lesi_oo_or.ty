@@ -45,17 +45,17 @@ dataset=locals().get('dataset',"Natural") #set the input type by choosing the da
 
 
 if dataset=="Natural":
-	import topo.pattern.image 
-	input_type=topo.pattern.image.Image
-	
-	image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-	inputs=[input_type(filename=f,
-				size=10.0,  #size_normalization='original',(size=10.0)
-				x=0,
-				y=0,
-				orientation=0)
-			for f in image_filenames]
-	input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02))
+        import topo.pattern.image 
+        input_type=topo.pattern.image.Image
+        
+        image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+        inputs=[input_type(filename=f,
+                                size=10.0,  #size_normalization='original',(size=10.0)
+                                x=0,
+                                y=0,
+                                orientation=0)
+                        for f in image_filenames]
+        input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02))
 
 disk_scale=locals().get('diskscale',0.35)
 ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-1.1,ubound=1.1,seed=12),
@@ -97,11 +97,11 @@ units=[(0.25,0.25),(-0.25,0.25),
 if locals().get('SOF',"Sigmoid") == "HR":
     V1Simple_OF=HalfRectify(t=locals().get('S_treshold',0.4))
 elif locals().get('SOF',"Sigmoid") == "Homeo":
-	V1Simple_OF = SimpleHomeoSigmoid(a_init=locals().get('a_init',22),b_init=-12,mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
+        V1Simple_OF = SimpleHomeoSigmoid(a_init=locals().get('a_init',22),b_init=-12,mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
 elif locals().get('SOF',"Homeo") == "SimpleHomeo":
     V1Simple_OF = SimpleHomeoLinear(t_init=locals().get('STresh',7),alpha=locals().get('SAlpha',1),mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
 else:
-	V1Simple_OF=Sigmoid(r=22,k=-12)
+        V1Simple_OF=Sigmoid(r=22,k=-12)
 
 
 if locals().get('COF',"Sigmoid") == "HR":
@@ -109,7 +109,7 @@ if locals().get('COF',"Sigmoid") == "HR":
 elif locals().get('COF',"Sigmoid") == "SimpleHomeo":
     V1Complex_OF = SimpleHomeoLinear(t_init=0,mu=locals().get('CMU',0.02),eta=locals().get('CETA',0.02))
 else:
-	V1Complex_OF=Sigmoid(r=locals().get('r_init',14.5),k=locals().get('k_init',-3))
+        V1Complex_OF=Sigmoid(r=locals().get('r_init',14.5),k=locals().get('k_init',-3))
 
 
 
@@ -212,19 +212,19 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
 
 simpleLateral  =  locals().get('SL',False)
 if simpleLateral:
-	topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralExcitatoryL4',
-	                 connection_type=CFProjection,strength=locals().get('SxLatExcStr',0.1),
-	                 weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=locals().get('SxLatExcSize',0.04)),
-	                 nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.04)),
-	                 learning_rate=0.0)
-	
-	topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralInhibitoryL4',
-	                 connection_type=CFProjection,strength=-locals().get('SxLatInhStr',0.1),
-	                 weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
-	                     generators=[Gaussian(aspect_ratio=1.0, size=locals().get('SxLatInhSize',0.22917)),
-	                                topo.pattern.random.UniformRandom()]),
-	                 nominal_bounds_template=BoundingBox(radius=0.22917),
-	                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
+        topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralExcitatoryL4',
+                         connection_type=CFProjection,strength=locals().get('SxLatExcStr',0.1),
+                         weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=locals().get('SxLatExcSize',0.04)),
+                         nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.04)),
+                         learning_rate=0.0)
+        
+        topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralInhibitoryL4',
+                         connection_type=CFProjection,strength=-locals().get('SxLatInhStr',0.1),
+                         weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
+                             generators=[Gaussian(aspect_ratio=1.0, size=locals().get('SxLatInhSize',0.22917)),
+                                        topo.pattern.random.UniformRandom()]),
+                         nominal_bounds_template=BoundingBox(radius=0.22917),
+                         learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
                                ExponentialDecay(starting_value = locals().get('LatInh_lr',0.3),
                                                 time_constant=locals().get('LatInh_tc',16000)))))
 

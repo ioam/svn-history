@@ -88,10 +88,10 @@ class TestPlotGroup(unittest.TestCase):
 #     def test_make_plot_group(self):
 #         sim = topo.base.simulation.Simulation()
 #         pe = topo.plotting.plotengine.PlotEngine(sim)
-# 	filter = lambda s: True
+#       filter = lambda s: True
 #         pg = pe.make_plot_group('Activity',
 #                                 plotgroup_templates['Activity'],
-# 				filter,'BasicPlotGroup')
+#                               filter,'BasicPlotGroup')
 
 #     def test_get_plot_group(self):
 #         sim = topo.base.simulation.Simulation()

@@ -148,11 +148,11 @@ for (int i=0; i<Nhue[0]; ++i) {
         float s=SAT2(i,j);
         float v=VAL2(i,j);
 
-	float r,g,b;
+        float r,g,b;
         
-	if(s==0) 
+        if(s==0) 
             r=g=b=v;
-	else {
+        else {
             int i=(int)floor(h*6.0);
             if(i<0) i=0;
             

@@ -54,7 +54,7 @@ class SineGratingRectangle(PatternGenerator):
        
     def __call__(self,**params_to_override):
         params = ParamOverrides(self,params_to_override)
-      	bounds = params['bounds']
+        bounds = params['bounds']
         xdensity=params['xdensity']
         ydensity=params['ydensity']
         x=params['x']
@@ -868,13 +868,13 @@ def run_lesi_batch(script_file,filename,chunk,sheet,value,endtime,rfs,snapshot,o
     filepath.output_path = normalize_path(os.path.join(output_directory,prefix))
     
     if os.path.isdir(filepath.output_path):
-	print "Batch run: Warning -- directory: " +  \
+        print "Batch run: Warning -- directory: " +  \
               filepath.output_path + \
               " already exists! Run aborted; rename directory or wait one minute before trying again."
         import sys
         sys.exit(-1)
     else:
-	os.mkdir(filepath.output_path)
+        os.mkdir(filepath.output_path)
         print "Batch run output will be in " + filepath.output_path
 
     ##################################
@@ -1000,13 +1000,13 @@ def run_param_batch(script_file,filename,chunk,sheet,value,endtime,output_direct
     filepath.output_path = normalize_path(os.path.join(output_directory,prefix))
     
     if os.path.isdir(filepath.output_path):
-	print "Batch run: Warning -- directory: " +  \
+        print "Batch run: Warning -- directory: " +  \
               filepath.output_path + \
               " already exists! Run aborted; rename directory or wait one minute before trying again."
         import sys
         sys.exit(-1)
     else:
-	os.mkdir(filepath.output_path)
+        os.mkdir(filepath.output_path)
         print "Batch run output will be in " + filepath.output_path
 
     ##################################

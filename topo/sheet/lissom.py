@@ -126,7 +126,7 @@ class LISSOM(JointNormalizingCFSheet):
                 self.activate()
                 self.learn()
                 
-   	    elif self.activation_count == self.tsettle:
+            elif self.activation_count == self.tsettle:
                 # Once we have been activated the required number of times
                 # (determined by tsettle), reset various counters, learn
                 # if appropriate, and avoid further activation until an

@@ -52,12 +52,12 @@ def tmpfile2spikelist(filename,dt):
     spike_time_ = 0
 
     for i_line in range(1,len(lines)):
-	[spike_time , neuron_id] = lines[i_line].split("\t", 1)
+        [spike_time , neuron_id] = lines[i_line].split("\t", 1)
         spike_time = float(spike_time) / dt
-	rel_spike_time = float(spike_time) - spike_time_
-	spike_time_    = float(spike_time)
-	spike_list.append((int(rel_spike_time),int(neuron_id)))
-	
+        rel_spike_time = float(spike_time) - spike_time_
+        spike_time_    = float(spike_time)
+        spike_list.append((int(rel_spike_time),int(neuron_id)))
+        
     return spike_list
 
 

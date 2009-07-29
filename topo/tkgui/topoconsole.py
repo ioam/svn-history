@@ -293,11 +293,11 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         self.some_area = DockManager(self)
         self.some_area.pack(fill="both", expand=1)
 
-	### Balloon, for pop-up help
-	self.balloon = tk.Balloon(self.content)
+        ### Balloon, for pop-up help
+        self.balloon = tk.Balloon(self.content)
 
-	### Top-level (native) menu bar
-	#self.menubar = tk.ControllableMenu(self.content)       
+        ### Top-level (native) menu bar
+        #self.menubar = tk.ControllableMenu(self.content)       
         self.configure(menu=self.menubar)
 
         #self.menu_balloon = Balloon(topo.tkgui.root)

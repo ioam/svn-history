@@ -182,7 +182,7 @@ elif dataset=="Natural":
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
-		for f in image_filenames]
+                for f in image_filenames]
 
     combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 

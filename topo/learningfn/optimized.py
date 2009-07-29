@@ -218,7 +218,7 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
 
         inline(code, ['input_activity', 'output_activity','rows', 'cols',
                       'icols', 'cfs', 'single_connection_learning_rate',
-		      'unit_threshold','cf_type'],
+                      'unit_threshold','cf_type'],
                local_dict=locals(),
                headers=['<structmember.h>'])               
 

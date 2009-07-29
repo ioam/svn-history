@@ -77,7 +77,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
 
         # This learning function does not need to scale the learning
         # rate like some do, so it does not use constant_sum_connection_rate()
-	single_connection_learning_rate = learning_rate
+        single_connection_learning_rate = learning_rate
         
         ### JABALERT: The learning_radius is normally set by
         ### the learn() function of CFSOM, so it doesn't matter
@@ -91,7 +91,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         
         # find out the matrix coordinates of the winner
         #
-	# NOTE: when there are multiple projections, it would be
+        # NOTE: when there are multiple projections, it would be
         # slightly more efficient to calculate the winner coordinates
         # within the Sheet, e.g. by moving winner_coords() to CFSOM
         # and passing in the results here.  However, finding the
@@ -126,10 +126,10 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
                 cwc = c - wc 
                 rwr = r - wr 
                 lattice_dist = L2norm((cwc,rwr))
-		if lattice_dist <= crop_radius:
+                if lattice_dist <= crop_radius:
                     cf = cfs[r][c]
                     rate = single_connection_learning_rate * neighborhood_matrix[rwr+radius_int,cwc+radius_int]
-		    X = cf.get_input_matrix(input_activity)
+                    X = cf.get_input_matrix(input_activity)
                     cf.weights += rate * (X - cf.weights)
 
                     # CEBHACKALERT: see ConnectionField.__init__()

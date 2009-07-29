@@ -432,18 +432,18 @@ class TwoRectangles(Rectangle):
         width = p.aspect_ratio*height
 
         return bitwise_or(
-	       bitwise_and(bitwise_and(
-			(self.pattern_x-p.x1)<=p.x1+width/4.0,
-			(self.pattern_x-p.x1)>=p.x1-width/4.0),
-		      bitwise_and(
-			(self.pattern_y-p.y1)<=p.y1+width/4.0,
-			(self.pattern_y-p.y1)>=p.y1-width/4.0)),
-	       bitwise_and(bitwise_and(
-			(self.pattern_x-p.x2)<=p.x2+width/4.0,
-			(self.pattern_x-p.x2)>=p.x2-width/4.0),
-		      bitwise_and(
-			(self.pattern_y-p.y2)<=p.y2+width/4.0,
-			(self.pattern_y-p.y2)>=p.y2-width/4.0)))
+               bitwise_and(bitwise_and(
+                        (self.pattern_x-p.x1)<=p.x1+width/4.0,
+                        (self.pattern_x-p.x1)>=p.x1-width/4.0),
+                      bitwise_and(
+                        (self.pattern_y-p.y1)<=p.y1+width/4.0,
+                        (self.pattern_y-p.y1)>=p.y1-width/4.0)),
+               bitwise_and(bitwise_and(
+                        (self.pattern_x-p.x2)<=p.x2+width/4.0,
+                        (self.pattern_x-p.x2)>=p.x2-width/4.0),
+                      bitwise_and(
+                        (self.pattern_y-p.y2)<=p.y2+width/4.0,
+                        (self.pattern_y-p.y2)>=p.y2-width/4.0)))
 
 
 class SquareGrating(PatternGenerator):
@@ -729,17 +729,17 @@ class GaussiansCorner(PatternGenerator):
     
     y = param.Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="Y center of the corner")
-		
+                
     size = param.Number(default=0.5,doc="The size of the corner")
     
     
     def __call__(self,**params_to_override):
         p = ParamOverrides(self,params_to_override)
-	
-	input_1=Gaussian()
+        
+        input_1=Gaussian()
         input_2=Gaussian()
 
-	patterns = [input_1(orientation = p.orientation, bounds = p.bounds, xdensity = p.xdensity,
+        patterns = [input_1(orientation = p.orientation, bounds = p.bounds, xdensity = p.xdensity,
                             ydensity = p.ydensity, offset = p.offset, size = p.size,
                             x = p.x + cos(p.orientation) * p.size*0.9,
                             y = p.y + sin(p.orientation) * p.size*0.9),
@@ -747,8 +747,8 @@ class GaussiansCorner(PatternGenerator):
                             ydensity = p.ydensity, offset = p.offset, size = p.size,
                             x = p.x + cos(p.orientation+pi/2) * p.size*0.9,
                             y = p.y + sin(p.orientation+pi/2) * p.size*0.9)]
-	
-	return numpy.maximum(patterns[0],patterns[1])
+        
+        return numpy.maximum(patterns[0],patterns[1])
 
 
 

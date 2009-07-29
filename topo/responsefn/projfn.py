@@ -28,14 +28,14 @@ class CFPRF_EuclideanDistance(CFPResponseFn):
     def __call__(self, iterator, input_activity, activity, strength, **params):
         cfs = iterator.proj.cfs
         rows,cols = activity.shape
-	euclidean_dist_mat = zeros((rows,cols),Float)
+        euclidean_dist_mat = zeros((rows,cols),Float)
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r,c]
                 r1,r2,c1,c2 = cf.input_sheet_slice
                 X = input_activity[r1:r2,c1:c2]
-		diff = ravel(X) - ravel(cf.weights)
-		euclidean_dist_mat[r,c] = L2norm(diff)
+                diff = ravel(X) - ravel(cf.weights)
+                euclidean_dist_mat[r,c] = L2norm(diff)
 
         max_dist = max(euclidean_dist_mat.ravel())
         activity *= 0.0

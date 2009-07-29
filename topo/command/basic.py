@@ -605,7 +605,7 @@ def n_bytes():
 def n_conns():
     """
     Count the number of connections in all ProjectionSheets in the current Simulation.  
-    """	    
+    """     
     return sum([s.n_conns() for s in topo.sim.objects(ProjectionSheet).values()])
 
 

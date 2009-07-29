@@ -141,17 +141,17 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         self.history_index = 0
         self.params_in_history = [] # parameters valid to adjust in history
                                   
-    	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
-	self.zoom_factor = 1.2
+        # Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
+        self.zoom_factor = 1.2
         
         # CEBALERT: rename these frames
         self.control_frame_1 = Frame(master.noscroll)
         self.control_frame_1.pack(side=TOP,expand=NO,fill=X)
 
-	self.control_frame_2 = Frame(master.noscroll)
+        self.control_frame_2 = Frame(master.noscroll)
         self.control_frame_2.pack(side=TOP,expand=NO,fill=X)
 
-	self.plot_frame = Tkinter.LabelFrame(self,text=self.plotgroup.name)
+        self.plot_frame = Tkinter.LabelFrame(self,text=self.plotgroup.name)
         self.plot_frame.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)        
 
         # CB: why did I need a new frame after switching to 8.5?
@@ -188,7 +188,7 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
 
 
         # CEBALERT: replace 
-	self.messageBar = self.parent.status 
+        self.messageBar = self.parent.status 
 
         self.pack_param('pre_plot_hooks',parent=self.updatecommand_frame,
                         expand='yes',fill='x',side='left')
@@ -492,10 +492,10 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
-	plots = self.plotgroup.plots
+        plots = self.plotgroup.plots
         self._determine_layout_of_plots(plots)
         
-	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
+        self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
 
         new_sizes = [(str(zi.width()),
                       str(zi.height()))
@@ -583,7 +583,7 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
         elif self._num_labels != len(self.canvases):
             old_labels = self.plot_labels
             self.plot_labels = [Label(self.plot_container,text=each)
-				 for each in self.plotgroup.labels]
+                                 for each in self.plotgroup.labels]
             for i in range(len(self.plot_labels)):
                 self.plot_labels[i].grid(row=self._rows[i]+1,column=self._cols[i],sticky=NSEW)
             for l in old_labels:

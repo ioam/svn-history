@@ -142,13 +142,13 @@ import plot
 ###    h=0.5
 ###    switch (char)
 ###    case 'R': p=PixelType(1,0,0); break;   case 'r': p=PixelType(h,0,0); break;  /* Red     */
-###    case 'Y': p=PixelType(1,1,0); break;   case 'y': p=PixelType(h,h,0); break;	 /* Yellow  */
-###    case 'G': p=PixelType(0,1,0); break;   case 'g': p=PixelType(0,h,0); break;	 /* Green   */
-###    case 'C': p=PixelType(0,1,1); break;   case 'c': p=PixelType(0,h,h); break;	 /* Cyan    */
-###    case 'B': p=PixelType(0,0,1); break;   case 'b': p=PixelType(0,0,h); break;	 /* Blue    */
-###    case 'M': p=PixelType(1,0,1); break;   case 'm': p=PixelType(h,0,h); break;	 /* Magenta */
-###    case 'W': p=PixelType(1,1,1); break;   case 'w': p=PixelType(h,h,h); break;	 /* White   */
-###    case 'K': p=PixelType(0,0,0); break;   case 'k': p=PixelType(0,0,0); break;	 /* Black   */
+###    case 'Y': p=PixelType(1,1,0); break;   case 'y': p=PixelType(h,h,0); break;       /* Yellow  */
+###    case 'G': p=PixelType(0,1,0); break;   case 'g': p=PixelType(0,h,0); break;       /* Green   */
+###    case 'C': p=PixelType(0,1,1); break;   case 'c': p=PixelType(0,h,h); break;       /* Cyan    */
+###    case 'B': p=PixelType(0,0,1); break;   case 'b': p=PixelType(0,0,h); break;       /* Blue    */
+###    case 'M': p=PixelType(1,0,1); break;   case 'm': p=PixelType(h,0,h); break;       /* Magenta */
+###    case 'W': p=PixelType(1,1,1); break;   case 'w': p=PixelType(h,h,h); break;       /* White   */
+###    case 'K': p=PixelType(0,0,0); break;   case 'k': p=PixelType(0,0,0); break;       /* Black   */
 ###    return p
 
 

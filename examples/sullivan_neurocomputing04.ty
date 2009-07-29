@@ -55,8 +55,8 @@ class XYModulo(coordmapper.CoordinateMapperFn):
         #Distance between 8 cells is 0.165, so offset by half that to align with center of box, not corner
         xmod=fmod(x+0.4875,self.grid_element_width)
         ymod=fmod(y+0.4875,self.grid_element_width)
-	# x: 0.1 offset to align with center of box, not corner
-	# y: offset to align with center of box, not corner
+        # x: 0.1 offset to align with center of box, not corner
+        # y: offset to align with center of box, not corner
         return x-xmod+0.1,y-ymod+0.08125
 
 

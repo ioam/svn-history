@@ -171,10 +171,10 @@ class Bitmap(param.Parameterized):
 
         # Clip any values that are still larger than max_pixel_value
         to_clip = (Numeric.greater(inArray.ravel(),max_pixel_value)).sum()
-	if (to_clip>0):
+        if (to_clip>0):
             self.clipped_pixels = self.clipped_pixels + to_clip
-	    inArray.clip(0,max_pixel_value,out=inArray)
-	    self.verbose("Bitmap: clipped",to_clip,"image pixels that were out of range")
+            inArray.clip(0,max_pixel_value,out=inArray)
+            self.verbose("Bitmap: clipped",to_clip,"image pixels that were out of range")
 
         r,c = inArray.shape
         # The size is (width,height), so we swap r and c:
@@ -208,7 +208,7 @@ class PaletteBitmap(Bitmap):
         ### structure, unless for some reason we want to get rid of
         ### the Palette classes and always use data structures
         ### instead.
-	### JC: not yet properly implemented anyway.
+        ### JC: not yet properly implemented anyway.
         max_pixel_value=255
 
         newImage = self._arrayToImage(inArray)

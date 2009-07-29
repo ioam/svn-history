@@ -266,7 +266,7 @@ pg= create_plotgroup(name='Orientation Preference and Complexity',category="Pref
              pre_plot_hooks=[measure_and_analyze_complexity.instance()])
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
-						   ('Confidence','OrientationSelectivity')])
+                                                   ('Confidence','OrientationSelectivity')])
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pg.add_plot('Modulation Ratio',[('Strength','ComplexSelectivity')])
 pg.add_plot('Phase Preference',[('Hue','PhasePreference')])

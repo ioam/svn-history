@@ -156,7 +156,7 @@ class TemplatePlot(Plot):
     def __init__(self,channels,sheet_views,density,
                  plot_bounding_box,normalize,
                  range_=False,**params):
-	"""
+        """
         Build a plot out of a set of SheetViews as determined by a plot_template.
         
         channels is a plot_template, i.e. a dictionary with keys
@@ -167,17 +167,17 @@ class TemplatePlot(Plot):
         channels that are not used by a particular Plot subclass will
         silently be ignored.
 
-	sheet_views is a dictionary of SheetViews, generally (but
+        sheet_views is a dictionary of SheetViews, generally (but
         not necessarily) belonging to a Sheet object.
 
-	density is the density of the Sheet whose sheet_views was
-	passed.
+        density is the density of the Sheet whose sheet_views was
+        passed.
 
-	plot_bounding_box is the outer bounding_box of the plot to
+        plot_bounding_box is the outer bounding_box of the plot to
         apply if specified.  If not, the bounds of
         the smallest SheetView are used.
 
-	normalize specifies how the Plot should be normalized: any
+        normalize specifies how the Plot should be normalized: any
         value of normalize other than 'None' will result in normalization
         according to the value of the range argument: 
 
@@ -199,10 +199,10 @@ class TemplatePlot(Plot):
         self.bitmap = None
         
 
-	self.channels = channels
-	self.view_dict = copy.copy(sheet_views)
-	# bounds of the situated plotting area 
-	self.plot_bounding_box = plot_bounding_box
+        self.channels = channels
+        self.view_dict = copy.copy(sheet_views)
+        # bounds of the situated plotting area 
+        self.plot_bounding_box = plot_bounding_box
 
 
         ### JCALERT ! The problem of displaying the right plot name is still reviewed
@@ -211,12 +211,12 @@ class TemplatePlot(Plot):
         # set the name of the sheet that provides the SheetViews
         # combined with the self.name parameter when creating the plot (which is generally
         # the name of the plot_template), it provides the necessary information for displaying plot label
-	self._set_plot_src_name()
+        self._set_plot_src_name()
 
         
-	# # Eventually: support other type of plots (e.g vector fields...) using
+        # # Eventually: support other type of plots (e.g vector fields...) using
         # # something like:
-	# def annotated_bitmap(self):  
+        # def annotated_bitmap(self):  
         # enable other construction....
 
 
@@ -224,17 +224,17 @@ class TemplatePlot(Plot):
         """
         Retrieve the matrix view associated with a given key, if any.
 
-	If the key is found in self.channels and the corresponding
+        If the key is found in self.channels and the corresponding
         sheetview is found in self.view_dict, the view's matrix is
         returned; otherwise None is returned (with no error).
         """
         sheet_view_key = self.channels.get(key,None)
-	sv = self.view_dict.get(sheet_view_key, None)
+        sv = self.view_dict.get(sheet_view_key, None)
         if sv == None:
-	    matrix = None
-	else:
-	    view = sv.view()
-	    matrix = view[0]
+            matrix = None
+        else:
+            view = sv.view()
+            matrix = view[0]
 
             # Calculate timestamp for this plot
             timestamp = sv.timestamp
@@ -250,11 +250,11 @@ class TemplatePlot(Plot):
 
 
     def _set_plot_src_name(self):
-	""" Set the Plot plot_src_name. Called when Plot is created"""
-	for key in self.channels:
-	    sheet_view_key = self.channels.get(key,None)
-	    sv = self.view_dict.get(sheet_view_key, None)
-	    if sv != None:
+        """ Set the Plot plot_src_name. Called when Plot is created"""
+        for key in self.channels:
+            sheet_view_key = self.channels.get(key,None)
+            sv = self.view_dict.get(sheet_view_key, None)
+            if sv != None:
                  self.plot_src_name = sv.src_name
                  self.precedence = sv.precedence
                  self.row_precedence = sv.row_precedence
@@ -262,11 +262,11 @@ class TemplatePlot(Plot):
 
     ### JCALERT: This could be inserted in the code of get_matrix
     def _get_shape_and_box(self):
-	"""
-	Sub-function used by plot: get the matrix shape and the bounding box
+        """
+        Sub-function used by plot: get the matrix shape and the bounding box
         of the SheetViews that constitue the TemplatePlot.
-    	"""
-	for name in self.channels.values():
+        """
+        for name in self.channels.values():
                 sv = self.view_dict.get(name,None)
                 if sv != None:
                      shape = sv.view()[0].shape
@@ -370,20 +370,20 @@ class SHCPlot(TemplatePlot):
     def __init__(self,channels,sheet_views,density,
                  plot_bounding_box,normalize,
                  range_=False,**params):
-	super(SHCPlot,self).__init__(channels,sheet_views,density, 
-				   plot_bounding_box,normalize,**params)
+        super(SHCPlot,self).__init__(channels,sheet_views,density, 
+                                   plot_bounding_box,normalize,**params)
         
-	# catching the empty plot exception
-	s_mat = self._get_matrix('Strength')
-	h_mat = self._get_matrix('Hue')
-	c_mat = self._get_matrix('Confidence') 
+        # catching the empty plot exception
+        s_mat = self._get_matrix('Strength')
+        h_mat = self._get_matrix('Hue')
+        c_mat = self._get_matrix('Confidence') 
 
         # If it is an empty plot: self.bitmap=None
         if (s_mat==None and c_mat==None and h_mat==None):
             self.debug('Empty plot.')
 
         # Otherwise, we construct self.bitmap according to what is specified by the channels.
-	else:
+        else:
 
             shape,box = self._get_shape_and_box()                                 
 
@@ -406,24 +406,24 @@ class SHCPlot(TemplatePlot):
         
 
     def __make_hsv_matrices(self,hsc_matrices,shape,normalize,range_=False):
-	""" 
-	Sub-function of plot() that return the h,s,v matrices corresponding 
-	to the current matrices in sliced_matrices_dict. The shape of the matrices
+        """ 
+        Sub-function of plot() that return the h,s,v matrices corresponding 
+        to the current matrices in sliced_matrices_dict. The shape of the matrices
         in the dict is passed, as well as the normalize boolean parameter.
-	The result specified a bitmap in hsv coordinate.
+        The result specified a bitmap in hsv coordinate.
     
         Applies normalizing and cropping if required.
-	"""
-	zero=zeros(shape,Float)
-	one=ones(shape,Float)	
+        """
+        zero=zeros(shape,Float)
+        one=ones(shape,Float)   
 
-	s,h,c = hsc_matrices
-	# Determine appropriate defaults for each matrix
-	if s is None: s=one # Treat as full strength by default
-	if c is None: c=one # Treat as full confidence by default
-	if h is None:       # No color, gray-scale plot.
-	    h=zero
-	    c=zero
+        s,h,c = hsc_matrices
+        # Determine appropriate defaults for each matrix
+        if s is None: s=one # Treat as full strength by default
+        if c is None: c=one # Treat as full confidence by default
+        if h is None:       # No color, gray-scale plot.
+            h=zero
+            c=zero
 
         # If normalizing, offset the matrix so that the minimum
         # value is 0.0 and then scale to make the maximum 1.0
@@ -435,8 +435,8 @@ class SHCPlot(TemplatePlot):
 
         # This translation from SHC to HSV is valid only for black backgrounds;
         # it will need to be extended also to support white backgrounds.
-	hue,sat,val=h,c,s
-	return (hue,sat,val)
+        hue,sat,val=h,c,s
+        return (hue,sat,val)
 
 
 
@@ -454,7 +454,7 @@ class RGBPlot(TemplatePlot):
                range_=False,**params):
 
        super(RGBPlot,self).__init__(channels,sheet_views,density, 
-				   plot_bounding_box,normalize,**params)
+                                   plot_bounding_box,normalize,**params)
 
 
        # catching the empty plot exception
@@ -488,23 +488,23 @@ class RGBPlot(TemplatePlot):
        self._orig_bitmap=self.bitmap
 
   def __make_rgb_matrices(self, rgb_matrices,shape,normalize,range_=False):
-	""" 
-	Sub-function of plot() that return the h,s,v matrices
-	corresponding to the current matrices in
-	sliced_matrices_dict. The shape of the matrices in the dict is
-	passed, as well as the normalize boolean parameter.  The
-	result specified a bitmap in hsv coordinate.
+        """ 
+        Sub-function of plot() that return the h,s,v matrices
+        corresponding to the current matrices in
+        sliced_matrices_dict. The shape of the matrices in the dict is
+        passed, as well as the normalize boolean parameter.  The
+        result specified a bitmap in hsv coordinate.
     
         Applies normalizing and cropping if required.
-	"""
-	zero=zeros(shape,Float)
-	one=ones(shape,Float)	
+        """
+        zero=zeros(shape,Float)
+        one=ones(shape,Float)   
 
-	r,g,b = rgb_matrices
-	# Determine appropriate defaults for each matrix
-	if r is None: r=zero 
-	if g is None: g=zero 
-	if b is None: b=zero 
+        r,g,b = rgb_matrices
+        # Determine appropriate defaults for each matrix
+        if r is None: r=zero 
+        if g is None: g=zero 
+        if b is None: b=zero 
 
         # CEBALERT: have I checked this works?
         if normalize!='None':
@@ -512,7 +512,7 @@ class RGBPlot(TemplatePlot):
              g = self._normalize(g,range_=range_)
              b = self._normalize(b,range_=range_)
 
-	return (r,g,b)
+        return (r,g,b)
    
 
 

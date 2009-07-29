@@ -49,7 +49,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
-		for (int l=0; l<cols; ++l) {
+                for (int l=0; l<cols; ++l) {
                     if((*mask++) == 0.0)
                         *tact = 0;
                     else {
@@ -83,7 +83,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                 }
             }
         """
-	inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','cols','rows','cf_type'], local_dict=locals(), headers=['<structmember.h>'])
+        inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','cols','rows','cf_type'], local_dict=locals(), headers=['<structmember.h>'])
 
 class CFPRF_DotProduct(CFPRF_Plugin):
     """
@@ -114,9 +114,9 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
         cfs = iterator.proj._cfs
 
         code = c_header + """
-	    #include <math.h>
+            #include <math.h>
             npfloat *tact = temp_act;
- 	    double max_dist=0.0;
+            double max_dist=0.0;
     
             for (int r=0; r<rows; ++r) {
                 PyObject* cfsr = PyList_GetItem(cfs,r);
@@ -125,7 +125,7 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                     PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
                     PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
                     
-		    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
+                    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
                     int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
                     
                     int rr1 = *slice++;
@@ -136,24 +136,24 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                     npfloat *xj = X+icols*rr1+cc1;
     
                     // computes the dot product
-		    double tot = 0.0;
+                    double tot = 0.0;
                     for (int i=rr1; i<rr2; ++i) {
                         npfloat *xi = xj;                        
                         float *wi = wj;
                         for (int j=cc1; j<cc2; ++j) {
                             double diff = *wi - *xi;
-			    tot += diff*diff;
+                            tot += diff*diff;
                             ++wi;
                             ++xi;
                         }
                         xj += icols;
-			wj += cc2-cc1;
+                        wj += cc2-cc1;
                     }
-		    
-		    double euclidean_distance = sqrt(tot); 
-		    if (euclidean_distance>max_dist)
-		        max_dist = euclidean_distance;
-		    
+                    
+                    double euclidean_distance = sqrt(tot); 
+                    if (euclidean_distance>max_dist)
+                        max_dist = euclidean_distance;
+                    
                     *tact = euclidean_distance;
                     ++tact;
                     
@@ -162,13 +162,13 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                     Py_DECREF(slice_obj);
                 }
             }
-	    tact = temp_act;
-	    for (int r=0; r<rows; ++r) {
-	        for (int l=0; l<cols; ++l) {
-    		    *tact = strength*(max_dist - *tact);
-		    ++tact;
+            tact = temp_act;
+            for (int r=0; r<rows; ++r) {
+                for (int l=0; l<cols; ++l) {
+                    *tact = strength*(max_dist - *tact);
+                    ++tact;
                 }
-            }	
+            }   
         """
         inline(code, ['X', 'strength', 'icols', 'temp_act','cfs','cols','rows'], local_dict=locals())
 

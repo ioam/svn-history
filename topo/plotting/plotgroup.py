@@ -43,10 +43,10 @@ def _cmp_plot(plot1,plot2):
     It compares the precedence number first and then the src_name and name attributes.
     """
     if plot1.precedence != plot2.precedence:
-	return cmp(plot1.precedence,plot2.precedence)
+        return cmp(plot1.precedence,plot2.precedence)
     else:
-	return cmp((plot1.plot_src_name+plot1.name),
-		   (plot2.plot_src_name+plot2.name))
+        return cmp((plot1.plot_src_name+plot1.name),
+                   (plot2.plot_src_name+plot2.name))
 
 
 class PlotGroup(param.Parameterized):
@@ -95,10 +95,10 @@ class PlotGroup(param.Parameterized):
     ########## interface for users
 
     def make_plots(self,update=True):
-	"""
+        """
         Create and scale the plots, after first executing the PlotGroup's pre_plot_hooks
         (if update is True) and plot_hooks.
-	"""
+        """
         if update:self._exec_pre_plot_hooks()
         self._exec_plot_hooks()
         self._create_images(update)
@@ -123,16 +123,16 @@ class PlotGroup(param.Parameterized):
 
 
     def _sort_plots(self):
-	"""Sort plots according to their precedence, then alphabetically."""
-	self.plots.sort(_cmp_plot)
+        """Sort plots according to their precedence, then alphabetically."""
+        self.plots.sort(_cmp_plot)
 
 
     def __init__(self,**params):
         super(PlotGroup,self).__init__(**params)
         self._static_plots = []
         self.plots = []
-	self.labels = [] 
-	self.time = None
+        self.labels = [] 
+        self.time = None
         self.filesaver = PlotGroupSaver(self)
 
         # In the future, it might be good to be able to specify the
@@ -178,7 +178,7 @@ class PlotGroup(param.Parameterized):
             self.plots=[]
 
         # Take the timestamps from the underlying Plots
-	timestamps = [plot.timestamp for plot in self.plots
+        timestamps = [plot.timestamp for plot in self.plots
                       if plot.timestamp >= 0]
         if len(timestamps)>0:
             self.time = max(timestamps)
@@ -186,8 +186,8 @@ class PlotGroup(param.Parameterized):
                 self.warning("Combining Plots from different times (%s,%s)" %
                              (min(timestamps),max(timestamps)))
 
-	self._sort_plots()	
-	self.labels = self._generate_labels()
+        self._sort_plots()      
+        self.labels = self._generate_labels()
 
 
 
@@ -378,12 +378,12 @@ class SheetPlotGroup(PlotGroup):
             return False
             
         # Scale the images so that each has a size up to the self.maximum_plot_height
-	for plot in resizeable_plots:
-	    if self.sheet_coords:
+        for plot in resizeable_plots:
+            if self.sheet_coords:
                 s = topo.sim.objects(Sheet)[plot.plot_src_name]
-	        scaling_factor=self.maximum_plot_height/float(s.xdensity)/self.max_sheet_height
-	    else:
-	        scaling_factor=self.maximum_plot_height/float(plot._orig_bitmap.height())
+                scaling_factor=self.maximum_plot_height/float(s.xdensity)/self.max_sheet_height
+            else:
+                scaling_factor=self.maximum_plot_height/float(plot._orig_bitmap.height())
             
             if self.integer_scaling:
                 scaling_factor=max(1,int(scaling_factor))
@@ -540,9 +540,9 @@ class TemplatePlotGroup(SheetPlotGroup):
 
 
     def __init__(self,plot_templates=None,static_images=None,**params):
-	super(TemplatePlotGroup,self).__init__(**params)
-	self.plot_templates = KeyedList(plot_templates or [])
-	# Add plots for the static images, if any
+        super(TemplatePlotGroup,self).__init__(**params)
+        self.plot_templates = KeyedList(plot_templates or [])
+        # Add plots for the static images, if any
         for image_name,file_path in static_images or []:
             add_static_image(image_name,file_path)
 
@@ -560,10 +560,10 @@ class TemplatePlotGroup(SheetPlotGroup):
     # plot template.
 
     def add_template(self,name,specification_tuple_list):
-	dict_={}
-	for key,value in specification_tuple_list:
-	    dict_[key]=value
-	self.plot_templates.append((name,dict_))
+        dict_={}
+        for key,value in specification_tuple_list:
+            dict_[key]=value
+        self.plot_templates.append((name,dict_))
 
     add_plot = add_template # CEBALERT: should be removed when callers updated
 
@@ -588,7 +588,7 @@ class TemplatePlotGroup(SheetPlotGroup):
         for plot_template_name,plot_template in self.plot_templates:
             for kw in self._kw_for_make_template_plot(range_):
                 template_plots.append(self._make_template_plot(plot_template_name,plot_template,**kw))
-    	return template_plots
+        return template_plots
 
 
     def _kw_for_make_template_plot(self,range_):
@@ -895,8 +895,8 @@ class GridPlotGroup(ProjectionSheetPlotGroup):
     ########## overridden
 
     def _sort_plots(self):
-	"""Skips plot sorting for to keep the generated order."""
-	pass
+        """Skips plot sorting for to keep the generated order."""
+        pass
 
 
     def _kw_for_make_template_plot(self,range_):
@@ -1174,10 +1174,10 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
         return (self.keyname,self.sheet.name,self.x,self.y)
 
     def _exec_pre_plot_hooks(self,**kw):
-	super(UnitPlotGroup,self)._exec_pre_plot_hooks(coords=[(self.x,self.y)],**kw)
+        super(UnitPlotGroup,self)._exec_pre_plot_hooks(coords=[(self.x,self.y)],**kw)
 
     def _exec_plot_hooks(self,**kw):
-	super(UnitPlotGroup,self)._exec_plot_hooks(coords=[(self.x,self.y)],**kw)
+        super(UnitPlotGroup,self)._exec_plot_hooks(coords=[(self.x,self.y)],**kw)
 
 
 

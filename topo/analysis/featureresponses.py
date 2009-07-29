@@ -448,7 +448,7 @@ class FeatureMaps(FeatureResponses):
         to be increased instead.
         """
         self.measure_responses(pattern_presenter,param_dict,self.features,display)    
-	
+        
         for sheet in self.sheets_to_measure():
             bounding_box = sheet.bounds
             
@@ -521,7 +521,7 @@ class FeatureCurves(FeatureResponses):
         The functions should accept three parameters: FullMatrix, curve label, sheet""")
 
     def __init__(self,features,sheet,x_axis):
-	super(FeatureCurves, self).__init__(features)
+        super(FeatureCurves, self).__init__(features)
         self.sheet=sheet
         self.x_axis=x_axis
         if hasattr(sheet, "curve_dict")==False:
@@ -624,7 +624,7 @@ class PatternPresenter(param.Parameterized):
 
     duration = param.Number(default=1.0,doc="""
         Amount of simulation time for which to present each test pattern.
-	By convention, most Topographica example files are designed to
+        By convention, most Topographica example files are designed to
         have a suitable activity pattern computed by the
         default time, but the duration will need to be changed for
         other models that do not follow that convention or if a
@@ -841,7 +841,7 @@ class PatternPresenter(param.Parameterized):
                     g.scalecenter=2*g.offsetcenter*g.contrastcenter/100.0
 
             
-	
+        
             elif self.contrast_parameter=='weber_contrast':
                 # Weber_contrast is currently only well defined for
                 # the special case where the background offset is equal
@@ -866,7 +866,7 @@ class PatternPresenter(param.Parameterized):
                     g.scalesurround=2*g.offsetsurround*g.contrastsurround/100.0
 
             
-	
+        
             elif self.contrast_parameter=='weber_contrast':
                 # Weber_contrast is currently only well defined for
                 # the special case where the background offset is equal
@@ -891,7 +891,7 @@ class PatternPresenter(param.Parameterized):
                     g.scale=2*g.offset*g.contrast/100.0
 
             
-	
+        
             elif self.contrast_parameter=='weber_contrast':
                 # Weber_contrast is currently only well defined for
                 # the special case where the background offset is equal
@@ -1166,7 +1166,7 @@ class SinusoidalMeasureResponseCommand(MeasureResponseCommand):
         default=PatternPresenter(pattern_generator=SineGrating()),doc="""
         Callable object that will present a parameter-controlled pattern to a
         set of Sheets.  By default, uses a SineGrating presented for a short
-	duration.  By convention, most Topographica example files
+        duration.  By convention, most Topographica example files
         are designed to have a suitable activity pattern computed by
         that time, but the duration will need to be changed for other
         models that do not follow that convention.""")

@@ -856,12 +856,12 @@ class CFSheet(ProjectionSheet):
 
     def update_unit_view(self,x,y,proj_name=''):
         """
-	Creates the list of UnitView objects for a particular unit in this CFSheet.
-	(There is one UnitView for each Projection to this CFSheet).
+        Creates the list of UnitView objects for a particular unit in this CFSheet.
+        (There is one UnitView for each Projection to this CFSheet).
 
-	Each UnitView is then added to the sheet_views of its source sheet.
-	It returns the list of all UnitViews for the given unit.
-	"""     
+        Each UnitView is then added to the sheet_views of its source sheet.
+        It returns the list of all UnitViews for the given unit.
+        """     
         for p in self.in_connections:
             if not isinstance(p,CFProjection):
                 self.debug("Skipping non-CFProjection "+p.name)
@@ -910,7 +910,7 @@ class ResizableCFProjection(CFProjection):
 
         Calls change_bounds() on each ConnectionField.
 
-	Currently only allows reducing the size, but should be
+        Currently only allows reducing the size, but should be
         extended to allow increasing as well.
         """
         slice_template = Slice(copy(nominal_bounds_template),
@@ -953,9 +953,9 @@ class ResizableCFProjection(CFProjection):
     def change_density(self, new_wt_density):
         """
         Rescales the weight matrix in place, interpolating or resampling as needed.
-	
-	Not yet implemented.
-	"""
+        
+        Not yet implemented.
+        """
         raise NotImplementedError
 
 

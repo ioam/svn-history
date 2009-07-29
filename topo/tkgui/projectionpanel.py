@@ -29,9 +29,9 @@ def cmp_projections(p1,p2):
     It compares the precedence number first and then the src_name and name attributes.
     """
     if p1.src.precedence != p2.src.precedence:
-	return cmp(p1.src.precedence,p2.src.precedence)
+        return cmp(p1.src.precedence,p2.src.precedence)
     else:
-	return cmp(p1,p2)
+        return cmp(p1,p2)
 
 
 UNIT_PADDING = 1

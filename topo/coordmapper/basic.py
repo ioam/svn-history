@@ -104,10 +104,10 @@ class Grid(CoordinateMapperFn):
         xd=self.xdensity
         yd=self.ydensity
         
-	xquant=(1.0/xd)*(int(xd*(x+0.5))-(0.5*(xd-1)))
-	yquant=(1.0/yd)*(int(yd*(y+0.5))-(0.5*(yd-1)))
+        xquant=(1.0/xd)*(int(xd*(x+0.5))-(0.5*(xd-1)))
+        yquant=(1.0/yd)*(int(yd*(y+0.5))-(0.5*(yd-1)))
         
-	return  xquant,yquant
+        return  xquant,yquant
 
 
 class Polar2Cartesian(CoordinateMapperFn):

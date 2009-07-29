@@ -75,12 +75,12 @@ class CPCA(LearningFn):
     """
    
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
-	"""
+        """
         Update the value of the given weights matrix based on the
         input_activity matrix (of the same size as the weights matrix),
         the response of this unit (the unit_activity), and the previous weights 
         matrix governed by a per-connection learning rate.
-	"""
+        """
 
         weights += single_connection_learning_rate * unit_activity * (input_activity - weights);
 

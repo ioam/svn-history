@@ -93,27 +93,27 @@ LeakyCFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
 #
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1'] = SLISSOM(tsettle=1,threshold=0.05,noise_rate=0.001,
-	  absolute_refractory=1, threshold_decay_rate=0.1,
-	  trace_coords=[[0.29,0.29],[0.34,0.34],[-0.29,-0.29],[-0.34,-0.34]],trace_n=400)
+          absolute_refractory=1, threshold_decay_rate=0.1,
+          trace_coords=[[0.29,0.29],[0.34,0.34],[-0.29,-0.29],[-0.34,-0.34]],trace_n=400)
 
 V1 = topo.sim['V1']
 
 topo.sim.connect('Retina','V1', delay=0.1,
           connection_type=LeakyCFProjection,strength=1.0,name='Afferent0',
           nominal_bounds_template=BoundingBox(radius=0.05),learning_rate=0.0,
-	  decay_rate=0.2)
+          decay_rate=0.2)
 
 topo.sim.connect('V1','V1', delay=0.1, 
           connection_type=LeakyCFProjection,strength = 0.9, 
-	  name='LateralExcitatory',
+          name='LateralExcitatory',
           nominal_bounds_template=BoundingBox(radius=0.2),learning_rate=0.1,
-	  decay_rate=0.05)
+          decay_rate=0.05)
             
 topo.sim.connect('V1','V1', delay=0.1, 
           connection_type=LeakyCFProjection,strength = -1.1, 
-	  name='LateralInhibitory',
+          name='LateralInhibitory',
           nominal_bounds_template=BoundingBox(radius=1.0),learning_rate=0.1,
-	  decay_rate=0.01)
+          decay_rate=0.01)
 
 
 # CEBHACKALERT: scheduled events are missing. e.g. change_bounds are
