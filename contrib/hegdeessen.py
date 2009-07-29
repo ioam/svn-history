@@ -43,11 +43,11 @@ from topo.misc.patternfn import float_error_ignore,arc_by_radian
 
 class SpiralGrating(PatternGenerator):
     """
-    Archemidean spiral grating. Successive turnings of the spiral have
+    Archimedean spiral grating. Successive turnings of the spiral have
     a constant separation distance.
 
     Spiral is defined by polar equation r=size*angle plotted in gausian
-    plane. Spiral starts at radian 0.0, this can be changed by orientation.
+    plane. Spiral starts at radian 0.0; this can be changed by orientation.
     """
 
     aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
