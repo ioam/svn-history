@@ -11,6 +11,13 @@ releases. The second is to use Subversion (SVN), as described on a
 <A HREF="cvs.html">separate page</A>, for users who want more frequent
 updates, or who need to modify the source code.
 
+<P>If you want to run large simulations (requiring more than about 4
+GB of memory), you should build and run Topographica on a 64-bit
+platform. No change to the installation procedure is necessary when
+when using such a platform. <!--Tested only on 64-bit linux so
+far. When there are binaries, will need to mention about selecting the
+right one-->
+
 <P>The following sections describe how to obtain Topographica and build it (if
 necessary) 
 on <A HREF="#win">Windows</A>, <A HREF="#mac">OS X</A>,
