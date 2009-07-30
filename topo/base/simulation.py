@@ -68,7 +68,8 @@ STOP = "Simulation Stopped"
 # like this? To start with, min(Forever,1) gives
 # FixedPoint('-1.00,2') i.e. Forever.
 # Forever = FixedPoint(-1)
-Forever = -1 
+Forever = -1
+# (Python 2.6 includes support for float('inf') on all platforms?)
 
 # Default path to the current simulation, from main
 # Only to be used by script_repr(), to allow it to generate
