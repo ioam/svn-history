@@ -703,6 +703,69 @@ class Translator(PatternGenerator):
         return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x + t * cos(self.inspect_value("orientation") + pi / 2) * self.speed, y=self.y + t * sin(self.inspect_value("orientation") + pi / 2) * self.speed, orientation=self.inspect_value("orientation"), index=self.inspect_value("index"))#,scale=self.inspect_value("scale"))
 
 
+class Expander(PatternGenerator):
+    """
+    PatternGenerator that moves another PatternGenerator over time.
+    
+    To create a pattern at a new location, asks the underlying
+    PatternGenerator to create a new pattern at a location translated
+    by an amount based on the global time.
+    """
+
+    generator = param.ClassSelector(default=Constant(scale=0.0),
+        class_=PatternGenerator, doc="""Pattern to be translated.""")
+    
+    speed = param.Number(default=1, bounds=(0.0, None), doc="""
+        The speed with which the pattern should move,
+        in sheet coordinates per simulation time unit.""")
+    
+    reset_period = param.Number(default=1, bounds=(0.0, None), doc="""
+        When pattern position should be reset, usually to the value of a dynamic parameter.
+
+        The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
+    
+    last_time = 0.0
+
+
+    def __init__(self, **params):
+        super(Expander, self).__init__(**params)
+        self.size = params.get('size', self.size)
+        self.index = 0
+        
+    def __call__(self, **params):
+        """Construct new pattern out of the underlying one."""
+        generator = params.get('generator', self.generator)
+        xdensity = params.get('xdensity', self.xdensity)
+        ydensity = params.get('ydensity', self.ydensity)
+        bounds = params.get('bounds', self.bounds)
+
+        # CB: are the float() calls required because the comparisons
+        # involving FixedPoint fail otherwise? Or for some other
+        # reason?
+        if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) <= 0.05)):
+            if ((float(topo.sim.time()) <= (self.last_time + self.reset_period + 1.0)) and (float(topo.sim.time()) >= 0.05))    :
+                return Null()(xdensity=xdensity, ydensity=ydensity, bounds=bounds)
+            self.last_time += self.reset_period
+            # time to reset the parameter
+            (self.x, self.y) = (generator.x, generator.y)
+            if isinstance(generator, Selector):
+                self.index = generator.index
+            generator.force_new_dynamic_value('x')
+            generator.force_new_dynamic_value('y')
+
+        (a, b) = (generator.x, generator.y)   
+        # compute how much time elapsed from the last reset
+        t = float(topo.sim.time()) - self.last_time
+
+        ## CEBALERT: mask gets applied twice, both for the underlying
+        ## generator and for this one.  (leads to redundant
+        ## calculations in current lissom_oo_or usage, but will lead
+        ## to problems/limitations in the future).
+        
+        return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x, y=self.y,
+             size=self.size + t * self.speed,index=self.index)
+
+
 class Jitterer(PatternGenerator):
     """
     PatternGenerator that moves another PatternGenerator over time.
