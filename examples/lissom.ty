@@ -154,7 +154,8 @@ p.add(
 
         Each additional dimension increases the realism, but adds
         significant complexity, computation time, and memory
-        requirements."""),
+        requirements.  If an empty list is supplied, all 
+        available dimensions are used."""),
 
     retina_density=param.Number(default=24.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
@@ -184,7 +185,7 @@ p.add(
 
 
 # Convenient shortcut:
-if p.dims=='All':
+if p.dims==[]:
     p.dims=['or','od','dr','dy','cr','sf']
    
 if p.dataset in natural_image_sets or 'dy' in p.dims:
@@ -580,8 +581,9 @@ relative_sizes=(wide_relative_sizes if p.expand_sf_test_range else sf_relative_s
 
 
 # Set up defaults for measure_sine_pref, which is used for or, od, and sf
+from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand
+if 'sf' in p.dims: SinusoidalMeasureResponseCommand.frequencies = [2.4*s for s in relative_sizes]
 from topo.command.analysis import measure_sine_pref
-if 'sf' in p.dims: measure_sine_pref.frequencies = [2.4*s for s in relative_sizes]
 if 'od' in p.dims: measure_sine_pref.num_ocularity=2
 # Including the rest in measure_sine_pref is usually not computationally feasible:
 #if 'dr' in p.dims: measure_sine_pref.num_direction=6
