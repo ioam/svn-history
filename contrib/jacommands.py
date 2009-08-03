@@ -705,10 +705,10 @@ class Translator(PatternGenerator):
 
 class Expander(PatternGenerator):
     """
-    PatternGenerator that moves another PatternGenerator over time.
+    PatternGenerator that expands another PatternGenerator over time.
     
     To create a pattern at a new location, asks the underlying
-    PatternGenerator to create a new pattern at a location translated
+    PatternGenerator to create a new pattern at a location expanded
     by an amount based on the global time.
     """
 
@@ -731,6 +731,7 @@ class Expander(PatternGenerator):
         super(Expander, self).__init__(**params)
         self.size = params.get('size', self.size)
         self.index = 0
+        self.last_time=0.0
         
     def __call__(self, **params):
         """Construct new pattern out of the underlying one."""
@@ -745,7 +746,8 @@ class Expander(PatternGenerator):
         if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) <= 0.05)):
             if ((float(topo.sim.time()) <= (self.last_time + self.reset_period + 1.0)) and (float(topo.sim.time()) >= 0.05))    :
                 return Null()(xdensity=xdensity, ydensity=ydensity, bounds=bounds)
-            self.last_time += self.reset_period
+            if (float(topo.sim.time()) >= 0.05):
+                self.last_time += self.reset_period
             # time to reset the parameter
             (self.x, self.y) = (generator.x, generator.y)
             if isinstance(generator, Selector):
@@ -761,7 +763,6 @@ class Expander(PatternGenerator):
         ## generator and for this one.  (leads to redundant
         ## calculations in current lissom_oo_or usage, but will lead
         ## to problems/limitations in the future).
-        
         return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x, y=self.y,
              size=self.size + t * self.speed,index=self.index)
 
@@ -1017,9 +1018,15 @@ class surround_analysis():
             curve_data[curve_label]["data"]=self.sheet.curve_dict['orientationsurround'][curve_label]
             curve_data[curve_label]["measures"]={}
             orr=numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
-            osi=self.sheet.curve_dict['orientationsurround'][curve_label][orr].view()[0][xindex][yindex]/self.sheet.curve_dict['orientationsurround'][curve_label][orr+numpy.pi/2].view()[0][xindex][yindex]
-            curve_data[curve_label]["measures"]["or_suppression_index"]=osi 
-        
+            pref_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr].view()[0][xindex][yindex]
+            cont_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr+numpy.pi/2].view()[0][xindex][yindex]
+            
+            if pref_or_resp != 0:
+                curve_data[curve_label]["measures"]["or_suppression_index"]=(pref_or_resp-cont_or_resp)/pref_or_resp
+            else: 
+                curve_data[curve_label]["measures"]["or_suppression_index"]=-10
+                
+                
         return curve_data 
         
 
@@ -1212,6 +1219,8 @@ class surround_analysis():
                 f.set_xlabel(str(key))
                 f.set_ylabel(map_feature_name)
                 m,b = numpy.polyfit(raster_plots_lc[key][0],raster_plots_lc[key][1],1)
+                print raster_plots_lc[key][0]
+                print raster_plots_lc[key][1]
                 f.plot(raster_plots_lc[key][0],raster_plots_lc[key][1],'ro')
                 f.plot(raster_plots_lc[key][0],m*numpy.array(raster_plots_lc[key][0])+b,'-k',linewidth=2)
                 release_fig("RasterLC<" + map_feature_name + ","+ key + ">")
