@@ -30,7 +30,7 @@ from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialD
 from topo.pattern.basic import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
 from topo.base.functionfamily import CoordinateMapperFn
-from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeoSigmoid, Jitterer, AddGC, SimpleHomeoLinear
+from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeoSigmoid, Jitterer, AddGC, SimpleHomeoLinear, Expander
 
 
 topo.sim.name = "CCSimple"
@@ -72,16 +72,16 @@ elif dataset=="Natural":
     input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02),seed=5013)
 
 disk_scale=locals().get('diskscale',0.35)
-ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-1.7,ubound=1.7,seed=12),
-                                                            y=UniformRandom(lbound=-1.7,ubound=1.7,seed=36),
-                       generators=[topo.pattern.basic.Ring(size=2, aspect_ratio=1.0, scale=0.25,thickness=locals().get('Thickness',0.01),
+ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-0.8,ubound=0.8,seed=12),
+                                                            y=UniformRandom(lbound=-0.8,ubound=0.8,seed=36),
+                       generators=[topo.pattern.basic.Ring(size=0.3, aspect_ratio=1.0, scale=0.25,thickness=locals().get('Thickness',0.01),
                                                             offset=0.0,
                                                             bounds=BoundingBox(radius=2.125), smoothing=0.03),
                                    topo.pattern.random.UniformRandom(seed=13,offset=locals().get('rand_offset',0), scale=locals().get('rand_scale',0.05))])
 
  
 
-retinal_waves=Translator(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
+retinal_waves=Expander(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
 
 
 zeroInput = topo.pattern.basic.Null();
@@ -135,24 +135,24 @@ NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=locals().
 ###########################################
 # build simulation
 
-topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
+topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
                                 input_generator=input,  
                                 period=1.0, phase=0.05,
-                                nominal_bounds=BoundingBox(radius=core_size+0.25+0.375+0.5))
+                                nominal_bounds=BoundingBox(radius=core_size+0.25+0.375+0.25))
 
-topo.sim['FakeRetina']=GeneratorSheet(nominal_density=24.0,
+topo.sim['FakeRetina']=GeneratorSheet(nominal_density=48.0,
                                   input_generator=retinal_waves,  
                                   period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=core_size+0.25+0.5))
+                                  nominal_bounds=BoundingBox(radius=core_size+0.25+0.25))
 
 
-topo.sim['LGNOn']=LISSOM(nominal_density=24.0,
-                          nominal_bounds=BoundingBox(radius=core_size+0.25+0.5),
+topo.sim['LGNOn']=LISSOM(nominal_density=48.0,
+                          nominal_bounds=BoundingBox(radius=core_size+0.25+0.25),
                           output_fns=[HalfRectify()],tsettle=0,
                           measure_maps=False)
 
-topo.sim['LGNOff']=LISSOM(nominal_density=24.0,
-                           nominal_bounds=BoundingBox(radius=core_size+0.25+0.5),
+topo.sim['LGNOff']=LISSOM(nominal_density=48.0,
+                           nominal_bounds=BoundingBox(radius=core_size+0.25+0.25),
                            output_fns=[HalfRectify()],tsettle=0,
                            measure_maps=False)
 
@@ -244,7 +244,7 @@ if simpleLateral:
                                         topo.pattern.random.UniformRandom(seed=11)]),
                          nominal_bounds_template=BoundingBox(radius=0.22917),
                          learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = locals().get('LatInh_lr',0.3),
+                               ExponentialDecay(starting_value = locals().get('LatInh_lr',0.0),
                                                 time_constant=locals().get('LatInh_tc',16000)))))
 
 
@@ -305,9 +305,10 @@ def secondStage():
     topo.sim['LGNOff'].in_connections[0].strength=0
     randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.1))
     
-from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand
+from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand
 FeatureMaps.num_orientation=16
 MeasureResponseCommand.scale=3.0
+SinusoidalMeasureResponseCommand.frequencies=[3.5]
 FeatureCurveCommand.num_orientation=90
 FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":90}]
 
