@@ -526,6 +526,8 @@ pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps"
     between two input sheets.""",
              pre_plot_hooks=[measure_phasedisparity.instance()],normalize='Independent')
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
+pg.add_plot('PhaseDisparity Preference&Selectivity',
+            [('Hue','PhasedisparityPreference'), ('Confidence','PhasedisparitySelectivity')])
 pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
 pg.add_static_image('Color Key','command/disp_key_white_vert_small.png')
 
