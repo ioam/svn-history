@@ -181,7 +181,7 @@ g2._Dynamic_time_fn = None
 #V1 Simple
 
 topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
-                 connection_type=CFProjection,strength=locals().get('LGNStr',70),name='LGNOnAfferent',
+                 connection_type=CFProjection,strength=locals().get('LGNStr',4.0),name='LGNOnAfferent',
                  weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
                      generators=[g1
                  ,topo.pattern.random.UniformRandom()]),
@@ -193,7 +193,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNorma
 
 
 topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
-                 connection_type=CFProjection,strength=locals().get('LGNStr',70),name='LGNOffAfferent',
+                 connection_type=CFProjection,strength=locals().get('LGNStr',4.0),name='LGNOffAfferent',
                  weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
                      generators=[g2
                  ,topo.pattern.random.UniformRandom()]),
@@ -288,12 +288,12 @@ AddGC()
 def secondStage():
     topo.sim.connect('Retina','LGNOn',delay=0.05,
                     connection_type=SharedWeightCFProjection,strength=2.33,
-                    nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOnAfferent1',
+                    nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOnAfferent3',
                     weights_generator=on_weights)
     
     topo.sim.connect('Retina','LGNOff',delay = 0.05,
                     connection_type=SharedWeightCFProjection,strength=2.33,
-                    nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOffAfferent1',
+                    nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOffAfferent4',
                     weights_generator=off_weights)
     
     topo.sim['FakeRetina'].set_input_generator(zeroInput)
