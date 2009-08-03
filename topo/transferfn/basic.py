@@ -328,7 +328,7 @@ class Threshold(TransferFn):
     """
     Forces all values below a threshold to zero, and leaves others unchanged.
     """
-    threshold = param.Number(default=0.25, doc="Decision point for determining binary value.")
+    threshold = param.Number(default=0.25, doc="Decision point for determining values to clip.")
 
     def __call__(self,x):
         clip_upper(x,self.threshold)
