@@ -308,7 +308,8 @@ def secondStage():
 from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand
 FeatureMaps.num_orientation=16
 MeasureResponseCommand.scale=3.0
-SinusoidalMeasureResponseCommand.frequencies=[4.5]
+MeasureResponseCommand.duration=4.0
+SinusoidalMeasureResponseCommand.frequencies=[4.0]
 FeatureCurveCommand.num_orientation=90
 FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":90}]
 
