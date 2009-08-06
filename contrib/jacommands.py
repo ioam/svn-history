@@ -942,8 +942,17 @@ def run_combinations(func, params):
     """
     run_combinations_counter = 0
     _run_combinations_rec(func, [], params, 0)
-    
 
+
+def reset_cc_lissom():
+    m = numpy.mean(topo.sim["V1Simple"].output_fns[2].t)
+    topo.sim["V1Simple"].output_fns[2].t*=0
+    topo.sim["V1Simple"].output_fns[2].t+=m
+    s = topo.sim["V1Simple"].output_fns[1].generator.scale
+    topo.sim["V1Simple"].output_fns[1].generator.scale=0.0
+    a = topo.sim["V1Complex"].in_connections[0].strength
+    topo.sim["V1Complex"].in_connections[0].strength=0
+    return (s,a)
 
 class surround_analysis():
 
@@ -957,7 +966,7 @@ class surround_analysis():
     high_contrast=100
     
     def __init__(self,sheet_name="V1Complex"):
-        from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand
+        from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand
         import pylab
         self.sheet_name=sheet_name
         self.sheet=topo.sim[sheet_name]
@@ -965,7 +974,9 @@ class surround_analysis():
         self.center_r,self.center_c = self.sheet.sheet2matrixidx(0,0)
         self.center_x,self.center_y = self.sheet.matrixidx2sheet(self.center_r,self.center_c)
         FeatureCurveCommand.curve_parameters=[{"contrast":self.low_contrast},{"contrast":self.high_contrast}]
-        FeatureCurveCommand.num_phase=4
+        FeatureCurveCommand.sheet=topo.sim[sheet_name]
+        SinusoidalMeasureResponseCommand.num_phase=4
+        FeatureCurveCommand.num_orientation=8
 
 
     def analyse(self,steps=1,ns=10,step_size=1):
@@ -1005,11 +1016,10 @@ class surround_analysis():
         
         topo.command.pylabplots.measure_orientation_contrast(sizecenter=hc_curve["measures"]["peak_near_facilitation"],
                                                              sizesurround=2.0,
-                                                             sheet=self.sheet,
                                                              display=True,
                                                              contrastcenter=self.high_contrast,
                                                              thickness=2.0-hc_curve["measures"]["peak_near_facilitation"],
-                                                             num_orientation=8,num_phase=4,
+                                                             num_phase=8,
                                                              curve_parameters=[{"contrastsurround":self.low_contrast},{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
         
         for curve_label in sorted(self.sheet.curve_dict['orientationsurround'].keys()):
@@ -1230,23 +1240,24 @@ class surround_analysis():
         histograms_lc = {} 
         histograms_hc = {}
         for (xcoord,ycoord) in self.data_dict.keys():
-            for measure_name in self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.high_contrast) + "%"]["measures"].keys():
-                if not histograms_hc.has_key(measure_name):
-                   histograms_hc[measure_name]=[]
-                histograms_hc[measure_name].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.high_contrast) + "%"]["measures"][measure_name])
+            for curve_type in self.data_dict[(xcoord,ycoord)].keys():
+                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type]["Contrast = " + str(self.high_contrast) + "%"]["measures"].keys():
+                    if not histograms_hc.has_key(curve_type + "_" + measure_name):
+                        histograms_hc[curve_type + "_" + measure_name]=[]
+                    histograms_hc[curve_type + "_" + measure_name].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.high_contrast) + "%"]["measures"][measure_name])
 
-        for (xcoord,ycoord) in self.data_dict.keys():
-            for measure_name in self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.low_contrast) + "%"]["measures"].keys():
-                if not histograms_lc.has_key(measure_name):
-                   histograms_lc[measure_name]=[]
-                histograms_lc[measure_name].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.low_contrast) + "%"]["measures"][measure_name])
+                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type]["Contrast = " + str(self.low_contrast) + "%"]["measures"].keys():
+                    if not histograms_lc.has_key(curve_type + "_" + measure_name):
+                        histograms_lc[curve_type + "_" + measure_name]=[]
+                    histograms_lc[curve_type + "_" + measure_name].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.low_contrast) + "%"]["measures"][measure_name])
                 
         for key in histograms_lc.keys():
                 fig = pylab.figure()
                 pylab.title(self.sheet_name+ " "+ "LC " + "Mean: " + str(numpy.mean(histograms_lc[key])), fontsize=12)
                 f = fig.add_subplot(111)
                 f.set_xlabel(str(key))
-                f.hist(histograms_lc[key],normed=True)
+                f.set_ylabel('#Cells')
+                f.hist(histograms_lc[key],normed=False)
                 f.axvline(x=numpy.mean(histograms_lc[key]),linewidth=4, color='r')
                 release_fig("HistogramLC<" + key + ">")
                 print key + "LC mean :" + str(numpy.mean(histograms_lc[key]))
@@ -1256,7 +1267,8 @@ class surround_analysis():
                 pylab.title(self.sheet_name+ " "+ "HC " + "Mean: " + str(numpy.mean(histograms_hc[key])), fontsize=12)
                 f = fig.add_subplot(111)
                 f.set_xlabel(str(key))
-                f.hist(histograms_hc[key],normed=True)
+                f.set_ylabel('#Cells')
+                f.hist(histograms_hc[key],normed=False)
                 f.axvline(x=numpy.mean(histograms_hc[key]),linewidth=4, color='r')
                 release_fig("HistogramLC<" + key + ">")
                 print key + "HC mean :" + str(numpy.mean(histograms_hc[key]))
@@ -1290,3 +1302,6 @@ def release_fig(filename=None):
        pylab.savefig(normalize_path(fullname))
     else:
        pylab.show()
+       
+       
+       
