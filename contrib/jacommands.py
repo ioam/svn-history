@@ -975,8 +975,8 @@ class surround_analysis():
         self.center_x,self.center_y = self.sheet.matrixidx2sheet(self.center_r,self.center_c)
         FeatureCurveCommand.curve_parameters=[{"contrast":self.low_contrast},{"contrast":self.high_contrast}]
         FeatureCurveCommand.sheet=topo.sim[sheet_name]
-        SinusoidalMeasureResponseCommand.num_phase=4
-        FeatureCurveCommand.num_orientation=8
+        SinusoidalMeasureResponseCommand.num_phase=8
+        FeatureCurveCommand.num_orientation=16
 
 
     def analyse(self,steps=1,ns=10,step_size=1):
@@ -1014,11 +1014,11 @@ class surround_analysis():
         hc_curve = data["Contrast = " + str(self.high_contrast) + "%" ]
         lc_curve = data["Contrast = " + str(self.low_contrast) + "%" ]
         
-        topo.command.pylabplots.measure_orientation_contrast(sizecenter=hc_curve["measures"]["peak_near_facilitation"],
-                                                             sizesurround=2.0,
+        topo.command.pylabplots.measure_orientation_contrast(sizecenter=lc_curve["measures"]["peak_near_facilitation"],
+                                                             sizesurround=4.0,
                                                              display=True,
                                                              contrastcenter=self.high_contrast,
-                                                             thickness=2.0-hc_curve["measures"]["peak_near_facilitation"],
+                                                             thickness=4.0-lc_curve["measures"]["peak_near_facilitation"]-0.1,
                                                              num_phase=8,
                                                              curve_parameters=[{"contrastsurround":self.low_contrast},{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
         
@@ -1032,9 +1032,9 @@ class surround_analysis():
             cont_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr+numpy.pi/2].view()[0][xindex][yindex]
             
             if pref_or_resp != 0:
-                curve_data[curve_label]["measures"]["or_suppression_index"]=(pref_or_resp-cont_or_resp)/pref_or_resp
+                curve_data[curve_label]["measures"]["or_suppression"]=(pref_or_resp-cont_or_resp)/pref_or_resp
             else: 
-                curve_data[curve_label]["measures"]["or_suppression_index"]=-10
+                curve_data[curve_label]["measures"]["or_suppression"]=-10
                 
                 
         return curve_data 
@@ -1241,15 +1241,21 @@ class surround_analysis():
         histograms_hc = {}
         for (xcoord,ycoord) in self.data_dict.keys():
             for curve_type in self.data_dict[(xcoord,ycoord)].keys():
-                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type]["Contrast = " + str(self.high_contrast) + "%"]["measures"].keys():
+                print curve_type
+                if curve_type == "ST":
+                   curve_label = "Contrast"
+                else:
+                   curve_label = "Contrastsurround"
+                print self.data_dict[(xcoord,ycoord)][curve_type].keys()   
+                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
                     if not histograms_hc.has_key(curve_type + "_" + measure_name):
                         histograms_hc[curve_type + "_" + measure_name]=[]
-                    histograms_hc[curve_type + "_" + measure_name].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.high_contrast) + "%"]["measures"][measure_name])
+                    histograms_hc[curve_type + "_" + measure_name].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"][measure_name])
 
-                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type]["Contrast = " + str(self.low_contrast) + "%"]["measures"].keys():
+                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"].keys():
                     if not histograms_lc.has_key(curve_type + "_" + measure_name):
                         histograms_lc[curve_type + "_" + measure_name]=[]
-                    histograms_lc[curve_type + "_" + measure_name].append(self.data_dict[(xcoord,ycoord)]["ST"]["Contrast = " + str(self.low_contrast) + "%"]["measures"][measure_name])
+                    histograms_lc[curve_type + "_" + measure_name].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"][measure_name])
                 
         for key in histograms_lc.keys():
                 fig = pylab.figure()
