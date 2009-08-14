@@ -962,7 +962,7 @@ class surround_analysis():
     sheet_name = ""
     data_dict = {}
     
-    low_contrast=10
+    low_contrast=30
     high_contrast=100
     
     def __init__(self,sheet_name="V1Complex"):
@@ -1276,7 +1276,7 @@ class surround_analysis():
                 f.set_ylabel('#Cells')
                 f.hist(histograms_hc[key],normed=False)
                 f.axvline(x=numpy.mean(histograms_hc[key]),linewidth=4, color='r')
-                release_fig("HistogramLC<" + key + ">")
+                release_fig("HistogramHC<" + key + ">")
                 print key + "HC mean :" + str(numpy.mean(histograms_hc[key]))
                        
                 
