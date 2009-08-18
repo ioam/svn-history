@@ -962,7 +962,7 @@ class surround_analysis():
     sheet_name = ""
     data_dict = {}
     
-    low_contrast=30
+    low_contrast=20
     high_contrast=100
     
     def __init__(self,sheet_name="V1Complex"):
