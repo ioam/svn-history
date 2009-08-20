@@ -72,11 +72,11 @@ elif dataset=="Natural":
     input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02),seed=5013)
 
 disk_scale=locals().get('diskscale',0.35)
-ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-0.8,ubound=0.8,seed=12),
-                                                            y=UniformRandom(lbound=-0.8,ubound=0.8,seed=36),
-                       generators=[topo.pattern.basic.Ring(size=0.3, aspect_ratio=1.0, scale=0.25,thickness=locals().get('Thickness',0.01),
+ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-1.5,ubound=1.5,seed=12),
+                                                            y=UniformRandom(lbound=-1.5,ubound=1.5,seed=36),
+                       generators=[topo.pattern.basic.Ring(size=0.5, aspect_ratio=1.0, scale=0.25,thickness=locals().get('Thickness',0.01),
                                                             offset=0.0,
-                                                            bounds=BoundingBox(radius=2.125), smoothing=0.03),
+                                                            bounds=BoundingBox(radius=2.125), smoothing=locals().get('Smoothing',0.03)),
                                    topo.pattern.random.UniformRandom(seed=13,offset=locals().get('rand_offset',0), scale=locals().get('rand_scale',0.05))])
 
  
@@ -146,12 +146,12 @@ topo.sim['FakeRetina']=GeneratorSheet(nominal_density=48.0,
                                   nominal_bounds=BoundingBox(radius=core_size+0.25+0.25))
 
 
-topo.sim['LGNOn']=LISSOM(nominal_density=48.0,
+topo.sim['LGNOn']=LISSOM(nominal_density=24.0,
                           nominal_bounds=BoundingBox(radius=core_size+0.25+0.25),
                           output_fns=[HalfRectify()],tsettle=0,
                           measure_maps=False)
 
-topo.sim['LGNOff']=LISSOM(nominal_density=48.0,
+topo.sim['LGNOff']=LISSOM(nominal_density=24.0,
                            nominal_bounds=BoundingBox(radius=core_size+0.25+0.25),
                            output_fns=[HalfRectify()],tsettle=0,
                            measure_maps=False)
