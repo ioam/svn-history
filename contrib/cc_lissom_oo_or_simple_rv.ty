@@ -74,7 +74,7 @@ elif dataset=="Natural":
 disk_scale=locals().get('diskscale',0.35)
 ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-1.5,ubound=1.5,seed=12),
                                                             y=UniformRandom(lbound=-1.5,ubound=1.5,seed=36),
-                       generators=[topo.pattern.basic.Ring(size=0.5, aspect_ratio=1.0, scale=0.25,thickness=locals().get('Thickness',0.01),
+                       generators=[topo.pattern.basic.Ring(size=0.5, aspect_ratio=1.0, scale=locals().get('RingScale',0.25),thickness=locals().get('Thickness',0.01),
                                                             offset=0.0,
                                                             bounds=BoundingBox(radius=2.125), smoothing=locals().get('Smoothing',0.03)),
                                    topo.pattern.random.UniformRandom(seed=13,offset=locals().get('rand_offset',0), scale=locals().get('rand_scale',0.05))])
