@@ -65,7 +65,7 @@ elif dataset=="Natural":
         inputs=[input_type(filename=f,
                         size=10.0,  #size_normalization='original',(size=10.0)
                         x=0,
-                        y=0,
+                        y=0,scale=locals().get('ImageScale',1.0),
                         orientation=0)
                     for f in image_filenames]
 
