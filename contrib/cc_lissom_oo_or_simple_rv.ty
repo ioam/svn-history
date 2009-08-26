@@ -47,7 +47,6 @@ dataset=locals().get('dataset',"Natural") #set the input type by choosing the da
 if dataset=="Line":
         input= Translator(generator=topo.pattern.basic.Line(   x=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=1023),   y=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.04,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
 elif dataset=="Natural":
-    print locals().get('imageset',"Shouval")
     import topo.pattern.image 
     input_type=topo.pattern.image.Image
     if locals().get('imageset',"Shouval") == 'Shouval':
@@ -148,12 +147,12 @@ topo.sim['FakeRetina']=GeneratorSheet(nominal_density=48.0,
 
 topo.sim['LGNOn']=LISSOM(nominal_density=locals().get('lgn_density',24.0),
                           nominal_bounds=BoundingBox(radius=core_size+0.25+0.25),
-                          output_fns=[HalfRectify()],tsettle=0,
+                          output_fns=[HalfRectify(t_init=locals().get('lgn_tresh',0.0))],tsettle=0,
                           measure_maps=False)
 
 topo.sim['LGNOff']=LISSOM(nominal_density=locals().get('lgn_density',24.0),
                            nominal_bounds=BoundingBox(radius=core_size+0.25+0.25),
-                           output_fns=[HalfRectify()],tsettle=0,
+                           output_fns=[HalfRectify(t_init=locals().get('lgn_tresh',0.0))],tsettle=0,
                            measure_maps=False)
 
 #topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
@@ -288,7 +287,9 @@ topo.sim.schedule_command(__main__.__dict__.get('SST',10000),"secondStage()")
 def offset_tf():
         return topo.sim.time()-__main__.__dict__.get('SST',10000)
 
-AddGC()
+if __main__.__dict__.get('GC',True):
+    AddGC()
+
 def secondStage():
     topo.sim.connect('Retina','LGNOn',delay=0.05,
                     connection_type=SharedWeightCFProjection,strength=2.33,
@@ -312,5 +313,4 @@ MeasureResponseCommand.duration=4.0
 SinusoidalMeasureResponseCommand.frequencies=[4.0]
 FeatureCurveCommand.num_orientation=90
 FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":90}]
-
 
