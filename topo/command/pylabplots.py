@@ -468,7 +468,11 @@ class overlaid_plots(PylabPlotCommand):
 
         Any number or combination of contours and arrows may be supplied.""")
 
-    normalize = param.Boolean(default='Individually',doc="Whether to normalize the bitmap plots.")
+    normalize = param.Boolean(default='Individually',doc="""
+        Type of normalization, if any, to use. Options include 'None',
+        'Individually', and 'AllTogether'. See
+        topo.plotting.plotgroup.TemplatePlotGroup.normalize for more
+        details.""")
 
 
     def __call__(self,**params):

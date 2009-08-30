@@ -796,13 +796,6 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         # don't display all projections at once).
         pass
 
-    # CEB: I guess this comment is out of date and should be removed?
-    #
-    # Special case: if the Strength is set to self.keyname, we
-    # request UnitViews (i.e. by changing the Strength key in
-    # the channels). Otherwise, we consider Strength as
-    # specifying an arbitrary SheetView.
-
     # unlikely to be overridden?
     def _channels(self,plotgroup_template,**kw):
         channels = copy.deepcopy(plotgroup_template)
