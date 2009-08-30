@@ -749,24 +749,26 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
 
 
     def __get_status_bar(self,i=2):
-        # Go back through frames until a widget with a status bar is
-        # found, and return it.
-        import sys
-        while True:
-            f = sys._getframe(i)
-            if hasattr(f,'f_locals'):
-                if 'self' in f.f_locals:
-                    o = f.f_locals['self']
-                    # (temporary hack til ScrolledFrame cleaned up)
-                    if o.__class__.__name__!='ScrolledFrame':
-                        if hasattr(o,'messageBar'):
-                            return o.messageBar
-                        elif hasattr(o,'status'):
-                            return o.status
-                i+=1
+        # Hack to find appropriate status bar: Go back through frames
+        # until a widget with a status bar is found, and return it.
+        try:
+            import sys
+            while True:
+                f = sys._getframe(i)
+                if hasattr(f,'f_locals'):
+                    if 'self' in f.f_locals:
+                        o = f.f_locals['self']
+                        # (temporary hack til ScrolledFrame cleaned up)
+                        if o.__class__.__name__!='ScrolledFrame':
+                            if hasattr(o,'messageBar'):
+                                return o.messageBar
+                            elif hasattr(o,'status'):
+                                return o.status
+                    i+=1
+        except:
+            pass
 
-        # CEBALERT: 
-        print "GUI INTERNAL WARNING: failed to determine window on which to display message."
+        #print "GUI INTERNAL WARNING: failed to determine window on which to display message."
         return self.messageBar
 
         
