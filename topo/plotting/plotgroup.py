@@ -496,14 +496,14 @@ class TemplatePlotGroup(SheetPlotGroup):
     # CEBALERT: how to avoid repeating documentation?
     # CB: also, documentation for normalization types needs cleaning up.
     normalize = param.ObjectSelector(default='None',
-                                     objects=['None','Individually','All'],doc="""
+                                     objects=['None','Individually','AllTogether'],doc="""
         
         'Individually': scale each plot so that its maximum value is
         white and its minimum value black.
 
         'None': no scaling (0.0 will be black and 1.0 will be white).
 
-        'All': scale each plot so that the highest maximum value is
+        'AllTogether': scale each plot so that the highest maximum value is
         white, and the lowest minimum value is black.
 
     
@@ -516,7 +516,7 @@ class TemplatePlotGroup(SheetPlotGroup):
 
 
     # Overrides:
-    # _generate_plots() - supports normalize=='All'
+    # _generate_plots() - supports normalize=='AllTogether'
 
     # For users, adds:
     # add_template()
@@ -532,7 +532,7 @@ class TemplatePlotGroup(SheetPlotGroup):
     ########## overridden
 
     def _generate_plots(self):
-        if self.normalize=='All':
+        if self.normalize=='AllTogether':
             range_ = _get_value_range(self._template_plots(range_=None))
         else:
             range_ = False
@@ -645,13 +645,13 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         """The Sheet from which to produce plots.""")
 
     normalize = param.ObjectSelector(default='None',
-                                  objects=['None','Individually','All','Joint'],doc="""
+                                  objects=['None','Individually','AllTogether','Joint'],doc="""
         'Individually': scale each plot so that the peak value will be white
         and the minimum value black.
 
         'None': no scaling - 0.0 will be black and 1.0 will be white.  
 
-        'All': scale each plot so that the peak value of all the plots
+        'AllTogether': scale each plot so that the peak value of all the plots
         is white, and the minimum value of all the plots will be
         black.
 
@@ -879,7 +879,7 @@ class GridPlotGroup(ProjectionSheetPlotGroup):
                      Number of units to plot per 1.0 distance in sheet coordinates""")
 
     normalize = param.ObjectSelector(default='None',
-                                  objects=['None','Individually','All']) # joint is removed
+                                  objects=['None','Individually','AllTogether']) # joint is removed
 
 
     # Adds for subclasses:
@@ -1016,7 +1016,7 @@ class ProjectionPlotGroup(GridPlotGroup):
 
     # ProjectionSheetPlotGroup
     normalize = param.ObjectSelector(default='None',
-                                  objects=['None','Individually','All','Joint'])
+                                  objects=['None','Individually','AllTogether','Joint'])
 
 
     # Overrides:
