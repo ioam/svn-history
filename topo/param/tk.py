@@ -186,6 +186,7 @@ from . import Boolean,String,Number,Selector,ClassSelector,\
      ObjectSelector,Callable,Dynamic,Parameter,List,HookList
 
 
+_last_one_set = None
 
 # CEBALERT: copied from topo.misc.filepath, to make it clear what we
 # need. I guess we should consider how much of topo.misc.filepath
@@ -387,6 +388,8 @@ class Button(Callable):
 
         return image
 
+
+
             
 # Note that TkParameterized extends TkParameterizedBase by adding
 # widget-drawing abilities; documentation for using these classes
@@ -494,7 +497,6 @@ class TkParameterizedBase(Parameterized):
     # must exist *before* an instance is init'd
     # (for __getattribute__)
     _extraPO = None
-
 
     # CEBALERT: Parameterized repr method leads to recursion error.
     def __repr__(self): return object.__repr__(self)    
@@ -748,7 +750,6 @@ class TkParameterizedBase(Parameterized):
         tkvar = self._tkvars[param_name]
         
         if self._tkvar_changed(param_name):
-
             # don't attempt to set if there was a string-to-object translation error
             if self.translators[param_name].last_string2object_failed:
                 return   ### HIDDEN 
@@ -770,6 +771,18 @@ class TkParameterizedBase(Parameterized):
 
         ### call any function associated with GUI set()
         if hasattr(tkvar,'_on_set'):
+
+            # CEBALERT: provide a way of allowing other gui components
+            # to figure out where a callback error might have come
+            # from. Callback instances (the Callback class is defined
+            # in Tkinter.py) store a widget, but often it appears to
+            # be the Tk instance - which is of no use in later
+            # determining where an error might have originated.
+            global _last_one_set
+            if hasattr(self,'master'):
+                _old = _last_one_set
+                _last_one_set = self.master
+
             tkvar._on_set()
 
 
@@ -1284,39 +1297,6 @@ class TkParameterized(TkParameterizedBase):
             super(TkParameterized,self)._update_param_from_tkvar(param_name)
 
 
-            
-    def _tkvar_set(self,param_name,val):
-        """
-        Calls superclass's version, but adds help text for the
-        currently selected item of SelectorParameters.
-        """
-        super(TkParameterized,self)._tkvar_set(param_name,val)
-
-        if isinstance(self.get_parameter_object(param_name),Selector):
-            try:
-                w = self.representations[param_name]['widget']
-                help_text =  getdoc(self._string2object(
-                    param_name,
-                    self._tkvars[param_name]._original_get()))
-
-
-                ######################################################
-                # CEBALERT: for projectionpanel, which currently has
-                # to destroy a widget (because Tkinter.OptionMenu's
-                # list of choices cannot easily be replaced). See ALERT
-                # 'How do you change list [...]' in projectionpanel.py.
-                try:
-                    self.balloon.bind(w,help_text)
-                except T.TclError:
-                    pass
-                ######################################################
-
-            except (KeyError,AttributeError):
-                # could be called before param in _tkvars dict
-                # or before _original_set added to tk var
-                pass
-
-
     def _handle_gui_set(self,p_name,force=False):
         """Override the superclass's method to X and allow status indications."""
         #logging.info("%s._handle_gui_set(%s,force=%s)"%(self,p_name,force))
@@ -1727,17 +1707,22 @@ class TkParameterized(TkParameterizedBase):
                      values=new_range,state='readonly',
                      **widget_options)
 
-        # CEBALERT: somehow Combobox sets textvariable without calling
-        # its set() method! So how can I possibly track that the
-        # variable's been set? So (hack) track the ComboBox event
-        # itself. Shouldn't be necessary, should be checked as tk
-        # versions are upgraded...
-        def f(event,name=name):
+        # Combobox (along with Checkbutton?) somehow sets its
+        # associated textvariable without calling that textvariable's
+        # set() method.  Therefore, to update the Selector's help text
+        # when an item is selected, we bind to the
+        # <<ComboboxSelected>> event.
+        def _combobox_updated(event,name=name):
             v = self._tkvars[name].get()
-            self._tkvar_set(name,v)
-            self._handle_gui_set(name)
+            w = self.representations[name]['widget']
+            help_text =  getdoc(
+                self._string2object(
+                    name,
+                    self._tkvars[name]._original_get()))
 
-        w.bind("<<ComboboxSelected>>",f)
+            self.balloon.bind(w,help_text)
+
+        w.bind("<<ComboboxSelected>>",_combobox_updated)
 
         help_text = getdoc(self._string2object(name,tkvar._original_get()))
         self.balloon.bind(w,help_text)
@@ -1821,6 +1806,8 @@ class TkParameterized(TkParameterizedBase):
 
     def _create_boolean_widget(self,frame,name,widget_options):
         """Return a Tkinter.Checkbutton to represent parameter 'name'."""
+        # CB: might be necessary to pass actions to command option of Checkbutton;
+        # could be cause of test pattern boolean not working?
         return T.Checkbutton(frame,variable=self._tkvars[name],**widget_options)
 
         
@@ -1858,7 +1845,8 @@ class TkParameterized(TkParameterizedBase):
     def _set_widget_status(self,param_name,status):
 
         if param_name in self.representations:
-            if 'widget' in self.representations:
+            if 'widget' in self.representations[param_name]:
+                
                 widget = self.representations[param_name]['widget']
                 states = {'error'   : 'red',
                           'changed' : 'blue',
@@ -1918,7 +1906,7 @@ class Translator(object):
 
     def _pass_out_msg(self,msg):
         if self.msg_handler:
-            self.msg_handler.message(None,msg)
+            self.msg_handler.dynamicinfo(msg)
 
     def __copy__(self):
         """Copy only translator-specific state."""
@@ -2523,6 +2511,7 @@ class ParametersFrameWithApply(ParametersFrame):
         
     
     def _handle_gui_set(self,p_name,force=False):
+        #print "ParametersFrame._handle_gui_set",p_name
         TkParameterized._handle_gui_set(self,p_name,force)
 
         if 'Apply' in self.representations:
@@ -3054,9 +3043,11 @@ class ScrolledFrame(T.Frame):
         self._status = s
     status = property(_getstatus,_setstatus)
     
-    def __init__(self,parent,status=False,**config):
+    def __init__(self,parent,**config):
+        assert 'status' not in config
         T.Frame.__init__(self,parent,**config)
 
+        
         abovetopframe = T.Frame(self)
         topframe = T.Frame(self)
         middleframe = T.Frame(self)
@@ -3086,9 +3077,9 @@ class ScrolledFrame(T.Frame):
 
         self.bind("<<SizeRight>>",self.sizeright)
 
-        self.status = StatusBar(botframe) 
-        if status:
-            self.status.pack(side="bottom",fill="both",expand="yes")
+        #self.status = StatusBar(botframe) 
+        #if status:
+        #    self.status.pack(side="bottom",fill="both",expand="yes")
             
 
     def sizeright(self,event=None):
@@ -3127,24 +3118,402 @@ class ScrolledWindow(T.Toplevel):
         self._scrolledframe.sizeright()
 
 
+# CB: temporary - will later be able to import from Tile
+class Progressbar(T.Widget):
+    def __init__(self, master=None, cnf={}, **kw):
+        T.Widget.__init__(self, master, "ttk::progressbar", cnf, kw)
+        
+    def step(self, amount=1.0):
+        """Increments the -value by amount. amount defaults to 1.0 
+        if omitted. """
+        return self.tk.call(self._w, "step", amount)
+        
+    def start(self):
+        self.tk.call("ttk::progressbar::start", self._w)
+        
+    def stop(self):
+        self.tk.call("ttk::progressbar::stop", self._w)
+
+
+
+class ProgressController(object):
+    def __init__(self,timer=None,sim=None,progress_var=None,status=None):
+
+        self.status=status
+        self.sim=sim
+        self.timer = timer #or topo.sim.timer
+        self.timer.receive_info.append(self.timing_info)
+
+        self.progress_var = progress_var or T.DoubleVar()
+        # trace the variable so that at 100 we can destroy the window
+        self.progress_trace_name = self.progress_var.trace_variable(
+            'w',lambda name,index,mode: self._close_if_complete())
+
+
+    def _close_if_complete(self):
+        """
+        Close the specified progress window if the value of progress_var has reached 100.
+        """
+        if self.progress_var.get()>=100:
+            # delete the variable trace (necessary?)
+            #self.progress_var.trace_vdelete('w',self.progress_trace_name)
+
+            self._close(final_message="Time %s: Finished %s"%(self.sim.timestr(),
+                                                             self.timer.func.__name__))
+            
+
+    def _close(self,final_message=None):
+        self.timer.receive_info.remove(self.timing_info)
+        if final_message:
+            self.status.response(final_message)
+
+    def timing_info(self,time,percent,name,duration,remaining):
+        self.progress_var.set(percent)
+
+    def set_stop(self):
+        """Declare that running should be interrupted."""
+        self.timer.stop=True        
+        final_message = "Time %s: Interrupted %s"%(self.sim.timestr(),
+                                                   self.timer.func.__name__)
+        self._close(final_message)
+
+
+class ProgressWindow(ProgressController,T.Frame):
+    """
+    Graphically displays progress information for a SomeTimer object.
+    
+    ** Currently expects a 0-100 (percent) value ***        
+    """
+    def __init__(self,parent,sim=None,timer=None,progress_var=None,
+                 title=None,status=None,unpack_master_when_done=True):
+        ProgressController.__init__(self,timer=timer,sim=sim,
+                                    progress_var=progress_var,status=status)
+        T.Frame.__init__(self,parent)
+
+        self.balloon = Balloon(self)
+        
+        self._unpack_master=unpack_master_when_done
+
+
+        progress_bar = Progressbar(self,variable=self.progress_var)
+        progress_bar.pack(side='left')
+
+        # CEBALERT: would like time to be displayed inside the bar,
+        # but I don;t know how to do that.
+        self.timeleft=T.Label(self)
+        self.timeleft.pack(side='left')
+
+        stop_button = FocusTakingButton(self,text="X",command=self.set_stop)
+        stop_button.pack(side='right')#side="bottom")
+        self.balloon.bind(stop_button,"""Interrupt a procedure.""")
+#        Stop a running simulation.
+#            
+#        The simulation can be interrupted only on round integer
+#        simulation times, e.g. at 3.0 or 4.0 but not 3.15.  This
+#        ensures that stopping and restarting are safe for any
+#        model set up to be in a consistent state at integer
+#        boundaries, as the example Topographica models are.""")
+            
+        
+    def _close(self,final_message=None):
+        ProgressController._close(self,final_message)
+        # such a hack
+        if self._unpack_master:
+            self.master.pack_forget()
+            self.master.master['width']=1
+        T.Frame.destroy(self)
+
+    def timing_info(self,time,percent,name,duration,remaining):
+        try:
+            ProgressController.timing_info(self,time,percent,name,duration,remaining)
+
+            Z = "%02d:%02d"%(int(remaining/60),int(remaining%60))
+            self.timeleft['text']=Z
+
+            if self.status is not None:
+                self.status.response('Time: %s  Duration: %s'%(time,duration))  
+                self.update()
+                self.update_idletasks()
+        except T.TclError:
+            pass
+
+
+
+
+# CEB: slightly modifed code from http://code.activestate.com/recipes/576688/
+
+# CEBALERT: this seems better than the tooltip provided by
+# tklib. Should probably use this instead of 'Balloon' everywhere. I
+# need to use Tooltip rather than Balloon for the status bar, because
+# Tooltip allows a function to be passed for generating the text. I
+# wish tk included a useful tooltip widget by default.
+from time import time
+class ToolTip( T.Toplevel ):
+    """
+    Provides a ToolTip widget for Tkinter.
+    To apply a ToolTip to any Tkinter widget, simply pass the widget to the
+    ToolTip constructor
+    """ 
+    def __init__( self, wdgt, msg=None, msgFunc=None, delay=1, follow=True ):
+        """
+        Initialize the ToolTip
+        
+        Arguments:
+          wdgt: The widget this ToolTip is assigned to
+          msg:  A static string message assigned to the ToolTip
+          msgFunc: A function that retrieves a string to use as the ToolTip text
+          delay:   The delay in seconds before the ToolTip appears(may be float)
+          follow:  If True, the ToolTip follows motion, otherwise hides
+        """
+        self.wdgt = wdgt
+        self.parent = self.wdgt.master                                          # The parent of the ToolTip is the parent of the ToolTips widget
+        T.Toplevel.__init__( self, self.parent, bg='black', padx=1, pady=1 )      # Initalise the Toplevel
+        self.withdraw()                                                         # Hide initially
+        self.overrideredirect( True )                                           # The ToolTip Toplevel should have no frame or title bar
+        
+        self.msgVar = T.StringVar()                                               # The msgVar will contain the text displayed by the ToolTip        
+        if msg == None:                                                         
+            pass#self.msgVar.set( 'No message provided' )
+        else:
+            self.msgVar.set( msg )
+        self.msgFunc = msgFunc
+        self.delay = delay
+        self.follow = follow
+        self.visible = 0
+        self.lastMotion = 0
+        T.Message( self, textvariable=self.msgVar, bg='#FFFFDD',
+                 aspect=1000 ).grid()                                           # The test of the ToolTip is displayed in a Message widget
+        self.wdgt.bind( '<Enter>', self.spawn, '+' )                            # Add bindings to the widget.  This will NOT override bindings that the widget already has
+        self.wdgt.bind( '<Leave>', self.hide, '+' )
+        self.wdgt.bind( '<Motion>', self.move, '+' )
+        
+    def spawn( self, event=None ):
+        """
+        Spawn the ToolTip.  This simply makes the ToolTip eligible for display.
+        Usually this is caused by entering the widget
+        
+        Arguments:
+          event: The event that called this funciton
+        """
+        self.visible = 1
+        self.after( int( self.delay * 1000 ), self.show )                       # The after function takes a time argument in miliseconds
+        
+    def show( self ):
+        """
+        Displays the ToolTip if the time delay has been long enough
+        """
+        if self.visible == 1 and time() - self.lastMotion > self.delay:
+            self.visible = 2
+        if self.visible == 2 and self.msgVar.get()!='':
+            self.deiconify()
+            
+    def move( self, event ):
+        """
+        Processes motion within the widget.
+        
+        Arguments:
+          event: The event that called this function
+        """
+        self.lastMotion = time()
+        if self.follow == False:                                                # If the follow flag is not set, motion within the widget will make the ToolTip dissapear
+            self.withdraw()
+            self.visible = 1
+        self.geometry( '+%i+%i' % ( event.x_root+10, event.y_root+10 ) )        # Offset the ToolTip 10x10 pixes southwest of the pointer
+        try:
+            self.msgVar.set( self.msgFunc() )                                   # Try to call the message function.  Will not change the message if the message function is None or the message function fails
+        except:
+            pass
+        self.after( int( self.delay * 1000 ), self.show )
+            
+    def hide( self, event=None ):
+        """
+        Hides the ToolTip.  Usually this is caused by leaving the widget
+        
+        Arguments:
+          event: The event that called this function
+        """
+        self.visible = 0
+        self.withdraw()
+
+
+def bind_tooltip(widget,msg):
+    kw = dict(delay=1,follow=False)
+    if callable(msg):
+        kw['msgFunc']=msg
+    else:
+        kw['msg']=msg
+    ToolTip(widget,**kw)
+        
+
 class StatusBar(T.Frame):
 
-    def __init__(self, master):
+    messageframe_pack_options = dict(side='left',expand='yes',fill='x')
+    dynamicinfoframe_pack_options = dict(side='left',expand='yes',fill='x')
+    progressframe_pack_options = dict(side='right')
+
+
+    #####
+    # CEBALERT: hacks until we're using styles.
+    #
+    # This won't look good across platforms. Should get defaults.
+    label_background = '#d9d9d9'
+    label_foreground = '#000000'
+    def _wrn_fmt(self):
+        self.messagelabel.config(background=self.label_background)
+        self.messagelabel.config(foreground='red')
+
+    def _err_fmt(self):
+        self.messagelabel.config(background='red')
+        self.messagelabel.config(foreground='white')
+
+    def _nrm_fmt(self):
+        self.messagelabel.config(background=self.label_background)
+        self.messagelabel.config(foreground=self.label_foreground)
+    #####
+
+
+    def __init__(self,master):
         T.Frame.__init__(self, master)
-        self.label = T.Label(self, borderwidth=1, relief='sunken', anchor='w')
-        self.label.pack(fill='x')
 
-    def message(self,chuck=None,message=None):
-        self.set(message)
+        self.mstack = []
+        self.msformat = []
+        self.mpoint = -1
+        self.pf0 = T.Frame(self)
+        self.pf0.pack(side='right')
+        self.progressframe=T.Frame(self.pf0)
+        
+        self.dynamicinfoframe=T.Frame(self)
+        self.dynamicinfolabel=T.Label(self.dynamicinfoframe,anchor='w')
+        self.dynamicinfolabel.pack(side='left')
+        bind_tooltip(self.dynamicinfolabel,self._get_dynamicinfo)
 
-    def set(self, format, *args):
-        self.label.config(text=format % args)
-        self.label.update_idletasks()
+        self.messageframe=T.Frame(self)
+        self.messageclear=T.Button(self.messageframe,text="X",
+                                   command=lambda *args: self.clear_message())
 
-    def clear(self):
-        self.label.config(text="")
-        self.label.update_idletasks()
+        self.messagefwd=T.Button(self.messageframe,text=">",
+                                 command=lambda *args:self.next_message())
 
+        self.messagebck=T.Button(self.messageframe,text="<",
+                                 command=lambda *args:self.previous_message())
+
+        bind_tooltip(self.messageclear,"Dismiss current message(s)")
+        bind_tooltip(self.messagefwd,"Next message")
+        bind_tooltip(self.messagebck,"Previous message")
+
+        self.messageclear.pack(side='right')
+        self.messagefwd.pack(side='right')
+        self.messagebck.pack(side='right')
+
+        self.messagelabel=T.Label(self.messageframe,anchor='w')
+        self.messagelabel.pack(side='left')
+        bind_tooltip(self.messagelabel,self._get_message)
+
+
+        self._show_dynamicinfoframe()
+
+
+    def open_progress_window(self,timer=None,sim=None):
+        p = ProgressWindow(self.progressframe,sim=sim,timer=timer,status=self)
+        p.pack() 
+        self.progressframe.pack(self.progressframe_pack_options)       
+        return p
+
+
+    def _show_messageframe(self):
+        self.dynamicinfoframe.pack_forget()
+        self.messageframe.pack(**self.messageframe_pack_options)
+
+        
+    def _show_dynamicinfoframe(self):
+        self.messageframe.pack_forget()
+        self.dynamicinfoframe.pack(**self.dynamicinfoframe_pack_options)
+        self.update_idletasks()
+
+        
+    def dynamicinfo(self,text):
+        self.dynamicinfolabel.config(text=text)
+
+
+    def response(self,text):
+        self.dynamicinfo(text)
+
+        # remove previous after()
+        try:
+            self.after_cancel(self.__last_after_id)
+        except:
+            pass
+        
+        self.__last_after_id = self.after(10000,lambda *args: self.clear_dynamicinfo())
+
+    def _display_from_history(self):
+        displayindex=self.mpoint+1
+        self.msformat[self.mpoint]()
+        if displayindex<0:
+            self._display_message("%s: %s"%(displayindex,self.mstack[self.mpoint]))
+        else:
+            self._display_message(self.mstack[self.mpoint])
+        
+    
+    def previous_message(self):
+        self.mpoint=max(-len(self.mstack),self.mpoint-1)
+        self._display_from_history()
+
+    def next_message(self):
+        self.mpoint=min(-1,self.mpoint+1)
+        self._display_from_history()
+
+    def message(self,text):
+        self._nrm_fmt()
+        self.mstack.append(text)
+        self.msformat.append(self._nrm_fmt)
+        self._display_message(text)
+
+        
+    def _display_message(self,text):
+        if text!='':
+            if len(self.mstack)>1:
+                pass#self.mnavframe.pack(side='right')
+            else:
+                pass#self.mnavframe.pack_forget()
+            self.messagelabel.config(text=text)
+            self._show_messageframe()
+
+            
+    def warn(self,text):
+        self._wrn_fmt()
+        self.mstack.append(text)
+        self.msformat.append(self._wrn_fmt)
+        self._display_message(text)
+
+
+    def error(self,text):
+        self._err_fmt()
+        self.mstack.append(text)
+        self.msformat.append(self._err_fmt)
+        self._display_message(text)
+        self.bell()
+        # CEBALERT: would like to lock only the window with the error,
+        # not the whole app, but I don't know how to do that.
+        self.grab_set()
+
+    def clear_message(self):
+        self.mpoint=-1
+        self.mstack=[]
+        self.messagelabel.config(text="")
+        self._nrm_fmt()
+        self._show_dynamicinfoframe()
+        self.grab_release()
+        
+    def clear_dynamicinfo(self):
+        self.dynamicinfolabel.config(text="")
+
+    def _get_message(self):
+        return self.messagelabel.config()['text'][4]
+    def _get_dynamicinfo(self):
+        return self.dynamicinfolabel.config()['text'][4]
+
+        
 
 # CEBALERT: rename
 class AppWindow(ScrolledWindow):

@@ -79,7 +79,6 @@ plotpanel_classes = {}
 
 
 
-
 def open_plotgroup_panel(class_,plotgroup=None,**kw):
 
     if class_.valid_context():
@@ -98,11 +97,10 @@ def open_plotgroup_panel(class_,plotgroup=None,**kw):
         
         #frame.sizeright()
         
-        topo.guimain.messageBar.message('state', 'OK')
+        #topo.guimain.messageBar.message('state', 'OK')
         return panel
     else:
-        topo.guimain.messageBar.message(
-            'state',
+        topo.guimain.messageBar.response(
             'No suitable objects in this simulation for this operation.')
 
 
@@ -227,7 +225,42 @@ if ipythonTk_imported:
 
 
 
+# This is really a hack. There doesn't seem to be any easy way to tie
+# an exception to the window from which it originated. (I couldn't
+# find an example of tkinter software displaying a gui exception on
+# the originating window.)
+def _tkinter_report_exception(widget):
+    import sys
+    exc, val, tb = sys.exc_type, sys.exc_value, sys.exc_traceback
+    msg = "(%s) %s"%(exc.__name__,val)
+    # If the supplied widget has no master, it's probably the Tk
+    # instance. In that case, resort to the 'last-one-set' hack (see
+    # CEBALERT "provide a way of allowing other gui components" in
+    # topo/param/tk.py).
+    if not widget.master:
+        widget = tk._last_one_set
 
+    stat = None
+
+    while (widget is not None and widget.master):
+        # CEBALERT: should rename all status bars to the same thing
+        # (status_bar)
+        if hasattr(widget,'status'):
+            stat = widget.status
+            break
+        elif hasattr(widget,'messageBar'):
+            stat = widget.messageBar
+            break
+        widget = widget.master
+    
+    if stat is not None:
+        stat.error('%s'%msg)
+    else:
+        topo.guimain.messageBar.error('%s'%msg)
+
+
+
+import Tkinter
 
 class TopoConsole(tk.AppWindow,tk.TkParameterized):
     """
@@ -247,6 +280,11 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
 
         tk.AppWindow.__init__(self,root,status=True)
         tk.TkParameterized.__init__(self,root,**params)
+
+        # Instead of displaying tracebacks on the commandline, try to display
+        # them on the originating window.
+        # CEBALERT: on destroy(), ought to revert this
+        Tkinter.Misc._report_exception=_tkinter_report_exception
 
         #CBALERT
         self._rooot=root
@@ -275,6 +313,32 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
             """
             self.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
         ##########
+
+
+####################
+# CEBALERT: should use parameterized methods to get formatting and
+# e.g. warnings as errors.
+        from topo.param.parameterized import Parameterized        
+        self.__orig_P_warning = Parameterized.warning
+        self.__orig_P_message = Parameterized.message
+        type.__setattr__(Parameterized,'warning',self.gui_warning)
+        type.__setattr__(Parameterized,'message',self.gui_message)
+
+    def gui_warning(self,*args):
+        #self.__orig_P_warning(*args)
+        stat = self.__get_status_bar()
+        import string
+        s = string.join(args,' ')
+        stat.warn(s)
+
+    def gui_message(self,*args):
+        #self.__orig_P_message(*args)
+        stat = self.__get_status_bar()
+        import string
+        s = string.join(args,' ')
+        stat.message(s)
+####################
+
 
     def title(self,t=None):
         newtitle = "Topographica"
@@ -493,7 +557,8 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
             if topo.tkgui.system_platform=="linux" and os.getenv('EMACS')!='t':
                 try: os.system("stty sane")
                 except: pass
-                
+
+            # CEBALERT: there was no call to self.master.destroy()
             sys.exit(exit_status)
 
 
@@ -505,16 +570,12 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         """
         script = askopenfilename(filetypes=SCRIPT_FILETYPES)
         if script in ('',(),None): # (representing the various ways no script was selected in the dialog)
-            self.messageBar.message('state', 'Run canceled')
+            self.messageBar.response('Run canceled')
         else:
-            try:
-                execfile(script,__main__.__dict__)
-                self.messageBar.message('state', 'Ran ' + script)
-                sim_name_from_filename(script)
-                self.title(topo.sim.name)
-            except:
-                self.messageBar.message('state', 'Failed to run ' + script)
-                raise # at least display the error somewhere 
+            execfile(script,__main__.__dict__)
+            self.messageBar.response('Ran ' + script)
+            sim_name_from_filename(script)
+            self.title(topo.sim.name)
 
         
 
@@ -525,7 +586,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         
         if script_name:
             topo.command.basic.save_script_repr(script_name)
-            self.messageBar.message('state', 'Script saved to ' + script_name)
+            self.messageBar.response('Script saved to ' + script_name)
             
     
     def load_snapshot(self):
@@ -535,12 +596,12 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         snapshot_name = askopenfilename(filetypes=SAVED_FILETYPES)
 
         if snapshot_name in ('',(),None):
-            self.messageBar.message('state','No snapshot loaded.')
+            self.messageBar.response('No snapshot loaded.')
         else:
-            self.messageBar.message('state', 'Loading snapshot (may take some time)...')
+            self.messageBar.dynamicinfo('Loading snapshot (may take some time)...')
             self.update_idletasks()            
             topo.command.basic.load_snapshot(snapshot_name)
-            self.messageBar.message('state', 'Loaded snapshot ' + snapshot_name)
+            self.messageBar.response('Loaded snapshot ' + snapshot_name)
             self.title(topo.sim.name)
 
         self.auto_refresh()
@@ -557,15 +618,15 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
                                           initialfile=topo.sim.basename()+".typ")
         
         if snapshot_name in ('',(),None):
-            self.messageBar.message('state','No snapshot saved.')
+            self.messageBar.response('No snapshot saved.')
         else:
             if not snapshot_name.endswith('.typ'):
                 snapshot_name = snapshot_name + SAVED_FILE_EXTENSION
                 
-            self.messageBar.message('state', 'Saving snapshot (may take some time)...')
+            self.messageBar.dynamicinfo('Saving snapshot (may take some time)...')
             self.update_idletasks()            
             topo.command.basic.save_snapshot(snapshot_name)
-            self.messageBar.message('state', 'Snapshot saved to ' + snapshot_name)
+            self.messageBar.response('Snapshot saved to ' + snapshot_name)
     
 
     def auto_refresh(self):
@@ -617,7 +678,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         text = Label(win,text=topo.about(display=False),justify=LEFT)
         text.pack(side=LEFT)
         win.deiconify()
-        self.messageBar.message('state', 'OK')
+        #self.messageBar.message('state', 'OK')
             
     def open_location(self, locations):
         """
@@ -639,26 +700,19 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
             
             try:
                 webbrowser.open(location,new=True,autoraise=True)
-                self.messageBar.message('state', 'Opened '+location+' in browser.')
+                self.messageBar.response('Opened '+location+' in browser.')
                 return
             # Since one of the possible exceptions when opening a
             # browser appears to be a 'WindowsError' (at least on the
             # Windows platform), just catch all exceptions.
             except:
-                self.messageBar.message('state', "Couldn't open "+location+" in browser.")
+                self.messageBar.response("Couldn't open "+location+" in browser.")
 
 
     # CEBALERT: need to take care of removing old messages automatically?
     # (Otherwise callers might always have to pass 'ok'.)
     def status_message(self,m):
-        self.messageBar.message('state',m)
-
-
-
-    # CEB: Will add a method to allow other things to access the
-    # timing stuff (e.g. progress bar) in a simple way. (Also
-    # this class will use the method). Probably will add support
-    # for multiple things getting timed.
+        self.messageBar.response(m)
 
     
     def run_simulation(self,event=None): # event=None allows use as callback
@@ -667,13 +721,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         'run for' taggedslider.        
         """
         fduration = self.run_for_var.get()
-
-        # CB: clean up (+ docstring)
-        if fduration>9:
-            ProgressWindow(self)
-        else:
-            ProgressController()
-            
+        self.open_progress_window(timer=topo.sim.timer)
         topo.sim.run_and_time(fduration)
         self.auto_refresh()
 
@@ -700,15 +748,34 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
             self.step_button.config(state=DISABLED)
 
 
+    def __get_status_bar(self,i=2):
+        # Go back through frames until a widget with a status bar is
+        # found, and return it.
+        import sys
+        while True:
+            f = sys._getframe(i)
+            if hasattr(f,'f_locals'):
+                if 'self' in f.f_locals:
+                    o = f.f_locals['self']
+                    # (temporary hack til ScrolledFrame cleaned up)
+                    if o.__class__.__name__!='ScrolledFrame':
+                        if hasattr(o,'messageBar'):
+                            return o.messageBar
+                        elif hasattr(o,'status'):
+                            return o.status
+                i+=1
+
+        # CEBALERT: 
+        print "GUI INTERNAL WARNING: failed to determine window on which to display message."
+        return self.messageBar
+
+        
     def open_progress_window(self,timer,title=None):
         """
         Provide a convenient link to progress bars.
         """
-        return ProgressWindow(self,timer=timer,title=title)
-
-
-
-
+        stat = self.__get_status_bar()
+        return stat.open_progress_window(timer=timer,sim=topo.sim)
 
 
 
@@ -729,148 +796,7 @@ class ControllableMenu(tk.Menu):
         return self.named_commands[name]
 
 
-# CB: temporary - will later be able to import from Tile
-class Progressbar(Widget):
-    def __init__(self, master=None, cnf={}, **kw):
-        Widget.__init__(self, master, "ttk::progressbar", cnf, kw)
-        
-    def step(self, amount=1.0):
-        """Increments the -value by amount. amount defaults to 1.0 
-        if omitted. """
-        return self.tk.call(self._w, "step", amount)
-        
-    def start(self):
-        self.tk.call("ttk::progressbar::start", self._w)
-        
-    def stop(self):
-        self.tk.call("ttk::progressbar::stop", self._w)
 
-
-
-
-######################################################################
-######################################################################
-# CEB: working here - not finished
-# (needs to become tkparameterizedobject, so we can have some parameters
-#  to control formatting etc)
-# Split up to solve a problem on windows for release 0.9.4.
-# Wait until we've decided what to do with SomeTimer before recoding.
-class ProgressController(object):
-    def __init__(self,timer=None,progress_var=None):
-
-        self.timer = timer or topo.sim.timer
-        self.timer.receive_info.append(self.timing_info)
-
-        self.progress_var = progress_var or DoubleVar()
-        # trace the variable so that at 100 we can destroy the window
-        self.progress_trace_name = self.progress_var.trace_variable(
-            'w',lambda name,index,mode: self._close_if_complete())
-
-
-    def _close_if_complete(self):
-        """
-        Close the specified progress window if the value of progress_var has reached 100.
-        """
-        if self.progress_var.get()>=100:
-            # delete the variable trace (necessary?)
-            self.progress_var.trace_vdelete('w',self.progress_trace_name)
-
-            self._close(last_message="Time %s: Finished %s"%(topo.sim.timestr(),
-                                                             self.timer.func.__name__))
-            
-    # CB: should allow interruption of whatever process it's timing
-    def _close(self,last_message=None):
-        self.timer.receive_info.remove(self.timing_info)
-        if last_message: topo.guimain.status_message(last_message)
-
-    def timing_info(self,time,percent,name,duration,remaining):
-        self.progress_var.set(percent)
-
-    # CB: should allow interruption of whatever process it's timing
-    def set_stop(self):
-        """Declare that running should be interrupted."""
-        self.timer.stop=True
-        last_message = "Time %s: Interrupted %s"%(topo.sim.timestr(),
-                                                  self.timer.func.__name__)
-        self._close(last_message)
-
-
-class ProgressWindow(ProgressController,tk.AppWindow):
-    """
-    Graphically displays progress information for a SomeTimer object.
-    
-    ** Currently expects a 0-100 (percent) value ***        
-    """
-
-    def __init__(self,parent,timer=None,progress_var=None,title=None):
-        ProgressController.__init__(self,timer,progress_var)
-        tk.AppWindow.__init__(self,parent)
-
-        self.protocol("WM_DELETE_WINDOW",self.set_stop)
-        name = title or topo.sim.name
-        self.title((name+": " if name else "") + self.timer.func.__name__)
-        
-        self.balloon = tk.Balloon(self)
-
-        progress_bar = Progressbar(self,#type="normal",
-                                   #maximum=100,height=20,width=200,
-                                   variable=self.progress_var)
-        progress_bar.pack(padx=15,pady=15)
-
-        progress_box = Frame(self,border=2,relief="sunken")
-        progress_box.pack()
-
-        Label(progress_box,text="Duration:").grid(row=0,column=0,sticky='w')
-        self.duration = Label(progress_box)
-        self.duration.grid(row=0,column=1,sticky='w')
-
-        Label(progress_box,text="Simulation time:").grid(row=1,column=0,sticky='w')
-        self.sim_time = Label(progress_box)
-        self.sim_time.grid(row=1,column=1,sticky='w')
-
-        # Should say 'at current rate', since the calculation assumes linearity
-        Label(progress_box,text="Remaining time:").grid(row=2,column=0,sticky='w')
-        self.remaining = Label(progress_box)
-        self.remaining.grid(row=2,column=1,sticky='w')
-        
-        
-        stop_button = Button(self,text="Stop",command=self.set_stop)
-        stop_button.pack(side="bottom")
-        self.balloon.bind(stop_button,"""
-        Stop a running simulation.
-            
-        The simulation can be interrupted only on round integer
-        simulation times, e.g. at 3.0 or 4.0 but not 3.15.  This
-        ensures that stopping and restarting are safe for any
-        model set up to be in a consistent state at integer
-        boundaries, as the example Topographica models are.""")
-            
-        
-    def _close(self,last_message=None):
-        ProgressController._close(self,last_message)
-        tk.AppWindow.destroy(self)
-        self.destroyed=True
-
-    def timing_info(self,time,percent,name,duration,remaining):
-        ProgressController.timing_info(self,time,percent,name,duration,remaining)
-        
-        # hack because i'm doing something in the wrong order
-        if not hasattr(self,'destroyed'):
-            self.duration['text'] = str(duration)
-            self.sim_time['text'] = str(time)
-            self.remaining['text'] = "%02d:%02d"%(int(remaining/60),int(remaining%60))
-            self.update()
-######################################################################
-######################################################################
-
-
-
-
-
-
-
-
-        
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
     plotpanel_classes['RF Projection'] = RFProjectionPanel

@@ -356,9 +356,9 @@ Many hooks accept 'display=True' so that the progress can be viewed in an open A
             (r,c),(x,y) = event_info['coords']
             location_string="%s Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(plot.plot_src_name,r,c,x,y)
             # CB: isn't there a nicer way to allow more info to be added?
-            self.messageBar.message('state', self._dynamic_info_string(event_info,location_string))
+            self.messageBar.dynamicinfo(self._dynamic_info_string(event_info,location_string))
         else:
-            self.messageBar.message('state',"")
+            self.messageBar.dynamicinfo('')
 
         
 
