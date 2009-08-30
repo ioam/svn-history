@@ -468,7 +468,7 @@ class overlaid_plots(PylabPlotCommand):
 
         Any number or combination of contours and arrows may be supplied.""")
 
-    normalize = param.Boolean(default='Independent',doc="Whether to normalize the bitmap plots.")
+    normalize = param.Boolean(default='Individually',doc="Whether to normalize the bitmap plots.")
 
 
     def __call__(self,**params):
@@ -828,7 +828,7 @@ pg= create_plotgroup(name='Position Preference',category="Preference Maps",
            doc='Measure preference for the X and Y position of a Gaussian.',
            pre_plot_hooks=[measure_position_pref.instance()],
            plot_hooks=[topographic_grid.instance()],
-           normalize='Independent')
+           normalize='Individually')
 
 pg.add_plot('X Preference',[('Strength','XPreference')])
 pg.add_plot('Y Preference',[('Strength','YPreference')])
@@ -913,7 +913,7 @@ pg= create_plotgroup(name='Center of Gravity',category="Preference Maps",
              doc='Measure the center of gravity of each ConnectionField in a Projection.',
              pre_plot_hooks=[measure_cog.instance()],
              plot_hooks=[topographic_grid.instance(xsheet_view_name="XCoG",ysheet_view_name="YCoG")],
-             normalize='Independent')
+             normalize='Individually')
 pg.add_plot('X CoG',[('Strength','XCoG')])
 pg.add_plot('Y CoG',[('Strength','YCoG')])
 pg.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])

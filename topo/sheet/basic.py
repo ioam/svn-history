@@ -280,7 +280,7 @@ class JointNormalizingCFSheet(CFSheet):
         
         for key,projlist in self._grouped_in_projections('JointNormalize'):
             if key == None:
-                normtype='Independent'
+                normtype='Individually'
             else:
                 normtype='Joint'
                 self.joint_norm_fn(projlist,mask)

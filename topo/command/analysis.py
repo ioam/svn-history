@@ -249,7 +249,7 @@ class update_connectionfields(UnitMeasurementCommand):
 pg= create_plotgroup(name='Connection Fields',category="Basic",
                      doc='Plot the weight strength in each ConnectionField of a specific unit of a Sheet.',
                      pre_plot_hooks=[update_connectionfields],
-                     plot_immediately=True, normalize='Independent', situate=True)
+                     plot_immediately=True, normalize='Individually', situate=True)
 pg.add_plot('Connection Fields',[('Strength','Weights')])
 
 
@@ -261,7 +261,7 @@ class update_projection(UnitMeasurementCommand):
 pg= create_plotgroup(name='Projection',category="Basic",
            doc='Plot the weights of an array of ConnectionFields in a Projection.',
            pre_plot_hooks=[update_projection],
-           plot_immediately=False, normalize='Independent',sheet_coords=True)
+           plot_immediately=False, normalize='Individually',sheet_coords=True)
 pg.add_plot('Projection',[('Strength','Weights')])
 
 
@@ -289,7 +289,7 @@ class update_projectionactivity(ProjectionSheetMeasurementCommand):
 pg =  create_plotgroup(name='Projection Activity',category="Basic",
              doc='Plot the activity in each Projection that connects to a Sheet.',
              pre_plot_hooks=[update_projectionactivity.instance()],
-             plot_immediately=True, normalize='Independent',auto_refresh=True)
+             plot_immediately=True, normalize='Individually',auto_refresh=True)
 pg.add_plot('Projection Activity',[('Strength','ProjectionActivity')])
 
 
@@ -351,7 +351,7 @@ class measure_rfs(SingleInputResponseCommand):
 pg= create_plotgroup(name='RF Projection',category="Other",
     doc='Measure receptive fields.',
     pre_plot_hooks=[measure_rfs.instance()],
-    normalize='Independent')
+    normalize='Individually')
 pg.add_plot('RFs',[('Strength','RFs')])
 
 
@@ -524,7 +524,7 @@ class measure_phasedisparity(SinusoidalMeasureResponseCommand):
 pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",doc="""
     Measure preference for sine gratings at a specific orentation differing in phase
     between two input sheets.""",
-             pre_plot_hooks=[measure_phasedisparity.instance()],normalize='Independent')
+             pre_plot_hooks=[measure_phasedisparity.instance()],normalize='Individually')
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pg.add_plot('PhaseDisparity Preference&Selectivity',
             [('Hue','PhasedisparityPreference'), ('Confidence','PhasedisparitySelectivity')])
@@ -598,7 +598,7 @@ class measure_hue_pref(SinusoidalMeasureResponseCommand):
 
 pg= create_plotgroup(name='Hue Preference',category="Preference Maps",
              doc='Measure preference for colors.',
-             pre_plot_hooks=[measure_hue_pref.instance()],normalize='Independent')
+             pre_plot_hooks=[measure_hue_pref.instance()],normalize='Individually')
 pg.add_plot('Hue Preference',[('Hue','HuePreference')])
 pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence','HueSelectivity')])
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
@@ -642,7 +642,7 @@ class measure_corner_or_pref(PositionMeasurementCommand):
 pg= create_plotgroup(name='Corner OR Preference',category="Preference Maps",
              doc='Measure orientation preference for corner shape (or other complex stimuli that cannot be represented as fullfield patterns).',
              pre_plot_hooks=[measure_corner_or_pref.instance()],
-             normalize='Independent')
+             normalize='Individually')
 pg.add_plot('Corner Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
                                                    ('Confidence','OrientationSelectivity')])

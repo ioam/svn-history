@@ -219,9 +219,9 @@ class SheetPlotGroup(PlotGroup):
     # sp when used outside of a parametersframe, they don't get the
     # help text.
     normalize = param.ObjectSelector(default='None',check_on_set=True,
-                                     objects=['None','Independent'],
+                                     objects=['None','Individually'],
                                   doc="""
-        'Independent': scale each plot so that the peak value will be white
+        'Individually': scale each plot so that the peak value will be white
         and the minimum value black.  
 
         'None': no scaling - 0.0 will be black and 1.0 will be white.  
@@ -496,9 +496,9 @@ class TemplatePlotGroup(SheetPlotGroup):
     # CEBALERT: how to avoid repeating documentation?
     # CB: also, documentation for normalization types needs cleaning up.
     normalize = param.ObjectSelector(default='None',
-                                     objects=['None','Independent','All'],doc="""
+                                     objects=['None','Individually','All'],doc="""
         
-        'Independent': scale each plot so that its maximum value is
+        'Individually': scale each plot so that its maximum value is
         white and its minimum value black.
 
         'None': no scaling (0.0 will be black and 1.0 will be white).
@@ -507,7 +507,7 @@ class TemplatePlotGroup(SheetPlotGroup):
         white, and the lowest minimum value is black.
 
     
-        'Independent' normalization has the advantage of ensuring that
+        Normalizing 'Individually' has the advantage of ensuring that
         any data that is present will be visible, but the disadvantage
         that the absolute scale will be obscured.  Non-normalized
         plots are guaranteed to be on a known scale, but only values
@@ -645,8 +645,8 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         """The Sheet from which to produce plots.""")
 
     normalize = param.ObjectSelector(default='None',
-                                  objects=['None','Independent','All','Joint'],doc="""
-        'Independent': scale each plot so that the peak value will be white
+                                  objects=['None','Individually','All','Joint'],doc="""
+        'Individually': scale each plot so that the peak value will be white
         and the minimum value black.
 
         'None': no scaling - 0.0 will be black and 1.0 will be white.  
@@ -655,7 +655,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         is white, and the minimum value of all the plots will be
         black.
 
-        'Joint': as 'Independent', except that plots produced from
+        'Joint': as 'Individually', except that plots produced from
         projections whose weights are jointly normalized will be
         jointly normalized.
         
@@ -879,7 +879,7 @@ class GridPlotGroup(ProjectionSheetPlotGroup):
                      Number of units to plot per 1.0 distance in sheet coordinates""")
 
     normalize = param.ObjectSelector(default='None',
-                                  objects=['None','Independent','All']) # joint is removed
+                                  objects=['None','Individually','All']) # joint is removed
 
 
     # Adds for subclasses:
@@ -1016,7 +1016,7 @@ class ProjectionPlotGroup(GridPlotGroup):
 
     # ProjectionSheetPlotGroup
     normalize = param.ObjectSelector(default='None',
-                                  objects=['None','Independent','All','Joint'])
+                                  objects=['None','Individually','All','Joint'])
 
 
     # Overrides:
