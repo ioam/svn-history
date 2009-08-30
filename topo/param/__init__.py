@@ -328,9 +328,14 @@ class Number(Dynamic):
             bounded_val = self.crop_to_bounds(val)
         else:
             bounded_val = val
-            
         super(Number,self).__set__(obj,bounded_val)
 
+    
+    # CEBERRORALERT: doesn't take account of exclusive bounds. When
+    # the gui uses set_in_bounds(), expecting to get acceptable
+    # values, it actually gets an out-of-bounds error. When fixed,
+    # should remove hack in
+    # topo.tkgui.projectionpanel.UnitsPanel.sheet_change().
 
     # CEBALERT: in the methods below, should be testing for identity
     # with None, rather than equality

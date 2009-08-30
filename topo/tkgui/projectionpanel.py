@@ -140,8 +140,11 @@ class UnitsPanel(ProjectionSheetPanel):
             self._tkvars[coord].set(self.initial_args.get(coord,0.0))
           
         l,b,r,t = self.sheet.bounds.lbrt()
-        bounds = {'x':(l,r),
-                  'y':(b,t)}
+        # CEBALERT: see "CEBERRORALERT: doesn't take account of
+        # exclusive bounds" in topo/param/__init.__.py.
+        D=0.0000000001
+        bounds = {'x':(l,r-D),
+                  'y':(b,t-D)}
 
         inclusive_bounds = {'x':(True,False),  # GUI knows about exclusive sheet bounds
                             'y':(False,True)}
