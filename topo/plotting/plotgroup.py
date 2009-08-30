@@ -645,7 +645,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         """The Sheet from which to produce plots.""")
 
     normalize = param.ObjectSelector(default='None',
-                                  objects=['None','Individually','AllTogether','Joint'],doc="""
+                                  objects=['None','Individually','AllTogether','JointProjections'],doc="""
         'Individually': scale each plot so that the peak value will be white
         and the minimum value black.
 
@@ -655,7 +655,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         is white, and the minimum value of all the plots will be
         black.
 
-        'Joint': as 'Individually', except that plots produced from
+        'JointProjections': as 'Individually', except that plots produced from
         projections whose weights are jointly normalized will be
         jointly normalized.
         
@@ -719,12 +719,12 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
 
     def _template_plots(self,range_=False):
-        # all the extra processing is for normalize=='Joint'
+        # all the extra processing is for normalize=='JointProjections'
 
         # {name:range_} for the projections
         named_ranges = dict.fromkeys([proj.name for proj in self.projections()],range_)
 
-        if self.normalize=='Joint':
+        if self.normalize=='JointProjections':
             ranges = {}
             for group_key in self.sheet._grouped_in_projections('JointNormalize').keys():
                 if group_key is None:
@@ -1016,7 +1016,7 @@ class ProjectionPlotGroup(GridPlotGroup):
 
     # ProjectionSheetPlotGroup
     normalize = param.ObjectSelector(default='None',
-                                  objects=['None','Individually','AllTogether','Joint'])
+                                  objects=['None','Individually','AllTogether','JointProjections'])
 
 
     # Overrides:
