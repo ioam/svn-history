@@ -82,11 +82,6 @@ class GeneratorSheet(Sheet):
     input_generator = param.ClassSelector(PatternGenerator,default=Constant(),
         doc="""Specifies a particular PatternGenerator type to use when creating patterns.""")
 
-    output_fns = param.HookList(default=[],class_=TransferFn,doc="""
-        Output function to apply (if apply_output_fns is true) to this Sheet's activity.""")
-    
-    apply_output_fns=param.Boolean(default=True,doc="""
-        Whether to apply the output_fns after computing an Activity matrix.""")
     
     def __init__(self,**params):
         super(GeneratorSheet,self).__init__(**params)

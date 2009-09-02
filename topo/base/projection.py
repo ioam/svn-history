@@ -345,28 +345,18 @@ class ProjectionSheet(Sheet):
     The activate() method can be overridden to sum some of the
     projections, multiply that by the sum of other projections, etc.,
     to model modulatory or other more complicated types of connections.
-
-    output_fns are functions that take an activity matrix and produce
-    an identically shaped output matrix. The default is having no
-    output_fns.
     """
 
     dest_ports=['Activity']
     
     src_ports=['Activity']
-    
-    output_fns = param.HookList(default=[],class_=TransferFn,
-        doc="Output function(s) to apply (if apply_output_fns is true) to this Sheet's activity.")
-    
+        
     multiplicative_constant = param.Number(default = 0.0,doc="""
         Constant value added to projection activity before combining multiplicatively.""")   
        
     divisive_constant = param.Number(default = 1.0,doc="""
         Constant value added to projection activity before combining divisively.""")  
 
-    # CEBALERT: rename to fns
-    apply_output_fns=param.Boolean(default=True,
-        doc="Whether to apply the output_fn after computing an Activity matrix.")
         
     # Should be a MaskParameter for safety
     #mask = ClassSelectorParameter(SheetMask,default=SheetMask(),instantiate=True,doc="""

@@ -30,6 +30,7 @@ from .. import param
 from simulation import EventProcessor
 from sheetcoords import SheetCoordinateSystem
 from boundingregion import BoundingBox, BoundingRegionParameter
+from functionfamily import TransferFn
 
 
 activity_type = float64
@@ -41,6 +42,10 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
 
     See SheetCoordinateSystem for how Sheet represents space, and
     EventProcessor for how Sheet handles time.
+
+    output_fns are functions that take an activity matrix and produce
+    an identically shaped output matrix. The default is having no
+    output_fns.
     """
     __abstract = True
 
@@ -85,6 +90,12 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
     layout_location = param.NumericTuple(default = (-1,-1),precedence=-1,doc="""
             Location for this Sheet in an arbitrary pixel-based space
             in which Sheets can be laid out for visualization.""")
+
+    output_fns = param.HookList(default=[],class_=TransferFn,
+        doc="Output function(s) to apply (if apply_output_fns is true) to this Sheet's activity.")
+
+    apply_output_fns=param.Boolean(default=True,
+        doc="Whether to apply the output_fn after computing an Activity matrix.")
 
 
     def _get_density(self):
@@ -172,6 +183,22 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
         return self.row_col_sheetcoords()[1]
 
 
+    # CEBALERT: haven't really thought about what to put in this. The
+    # way it is now, subclasses could make a super.activate() call to
+    # avoid repeating some stuff.
+    def activate(self):
+        """
+        Collect activity from each projection, combine it to calculate
+        the activity for this sheet, and send the result out. 
+
+        Subclasses will need to override this method to whatever it
+        means to calculate activity in that subclass.
+        """        
+        if self.apply_output_fns:
+            for of in self.output_fns:
+                of(self.activity)
+    
+        self.send_output(src_port='Activity',data=self.activity)
 
 
     def state_push(self):
