@@ -253,6 +253,12 @@ def _tkinter_report_exception(widget):
             break
         widget = widget.master
     
+    # CEBALERT: need to log gui errors fully (or do something else to
+    # enable printing of the full traceback, e.g. have a gui debug
+    # mode).
+    #import traceback
+    #traceback.print_exc()
+    
     if stat is not None:
         stat.error('%s'%msg)
     else:
