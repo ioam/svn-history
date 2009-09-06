@@ -34,7 +34,7 @@ class ModelFit():
     def init(self):
         self.reliable_indecies = ones(self.num_of_units)
         num_phase = 4
-        for freq in [32.0]:
+        for freq in [__main__.__dict__.get('freqs',32)]:
         #for freq in [8.0]:
             for xpos in xrange(0,int(freq)):
                 for ypos in xrange(0,int(freq)):
@@ -194,12 +194,12 @@ class ModelFit():
         for i in xrange(0,self.num_of_units*top_percentage/100):   
             self.reliable_indecies[t[self.num_of_units-1-i][0]] = 1
             #print t[self.num_of_units-1-i][0]
-            pylab.figure()
-            pylab.show._needmain=False            
-            pylab.subplot(3,1,1)
-            pylab.plot(numpy.array(activities.T[t[self.num_of_units-1-i][0]][0].T))
-            pylab.plot(numpy.array(modelActivities[t[self.num_of_units-1-i][0]][0].T))
-	    pylab.show()
+            #pylab.figure()
+            #pylab.show._needmain=False            
+            #pylab.subplot(3,1,1)
+            #pylab.plot(numpy.array(activities.T[t[self.num_of_units-1-i][0]][0].T))
+            #pylab.plot(numpy.array(modelActivities[t[self.num_of_units-1-i][0]][0].T))
+	    #pylab.show()
 
     def testModel(self,inputs,activities,target_inputs=None):
         modelActivities=[]
@@ -233,7 +233,7 @@ class ModelFit():
             x = target_inputs[x]
             print (x,i)
             
-            if (i % 30) == 0:
+            if (i % 30) ==1:
                 pylab.show._needmain=False
                 pylab.figure()
                 pylab.subplot(3,1,1)
@@ -705,8 +705,8 @@ def runModelFit():
     dataset = averageRepetitions(dataset)
     print shape(dataset[1])
     
-    (dataset,validation_data_set) = splitDataset(dataset,0.95)
-    (dataset,testing_data_set) = splitDataset(dataset,0.95)
+    (dataset,validation_data_set) = splitDataset(dataset,0.9)
+    (dataset,testing_data_set) = splitDataset(dataset,0.9)
 
     training_set = generateTrainingSet(dataset)
     training_inputs=generateInputs(dataset,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
@@ -736,12 +736,12 @@ def runModelFit():
     #matrixplot(validation_inputs[1])
     #pylab.show()
     
-    mf = BasicBPModelFit()
+    #mf = BasicBPModelFit()
     #mf = BasicModelFit()
-    #mf = ModelFit()
+    mf = ModelFit()
     mf.retina_diameter = 1.2
     mf.density = density
-    mf.learning_rate = __main__.__dict__.get('lr',0.01)
+    mf.learning_rate = __main__.__dict__.get('lr',0.0001)
     mf.epochs=__main__.__dict__.get('epochs',20)
     mf.num_of_units = 58
     mf.init()
@@ -751,14 +751,14 @@ def runModelFit():
     #mf.testModel(testing_inputs,numpy.mat(validation_set))
     mf.testModel(testing_inputs,numpy.mat(testing_set))
     
-    #mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),20)
-    #mf.testModel(testing_inputs,numpy.mat(testing_set))
+    mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),20)
+    mf.testModel(testing_inputs,numpy.mat(testing_set))
     
-    #mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),5)
-    #mf.testModel(testing_inputs,numpy.mat(testing_set))
+    mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),5)
+    mf.testModel(testing_inputs,numpy.mat(testing_set))
     
-    #mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),1)
-    #mf.testModel(testing_inputs,numpy.mat(testing_set))
+    mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),1)
+    mf.testModel(testing_inputs,numpy.mat(testing_set))
     
     #compute_spike_triggered_average_rf(training_inputs,training_set,density,mf)
     
