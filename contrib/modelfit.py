@@ -20,7 +20,7 @@ class ModelFit():
     
     filters = []
     weigths = []
-    retina_diameter=1.0
+    retina_diameter=1.2
     density=24
     epochs = 500
     learning_rate = 0.00001
@@ -33,26 +33,24 @@ class ModelFit():
     
     def init(self):
         self.reliable_indecies = ones(self.num_of_units)
-        for freq in [16.0]:
+        num_phase = 4
+        for freq in [32.0]:
         #for freq in [8.0]:
             for xpos in xrange(0,int(freq)):
                 for ypos in xrange(0,int(freq)):
                     x=xpos*(self.retina_diameter/freq)-self.retina_diameter/2 + self.retina_diameter/freq/2 
                     y=ypos*(self.retina_diameter/freq)-self.retina_diameter/2 + self.retina_diameter/freq/2
                     for orient in xrange(0,8):
-                        g1 = Gabor(bounds=BoundingBox(radius=self.retina_diameter/2),frequency=freq,x=x,y=y,xdensity=self.density,ydensity=self.density,size=1/freq,orientation=numpy.pi/8*orient,phase=0.0)
-                        g2 = Gabor(bounds=BoundingBox(radius=self.retina_diameter/2),frequency=freq,x=x,y=y,xdensity=self.density,ydensity=self.density,size=1/freq,orientation=numpy.pi/8*orient,phase=numpy.pi/2)
-                        self.filters.append((g1(),g2()))  
+                        for p in xrange(0,num_phase):
+                            g1 = Gabor(bounds=BoundingBox(radius=self.retina_diameter/2.0),frequency=freq,x=x,y=y,xdensity=self.density,ydensity=self.density,size=1/freq,orientation=numpy.pi/8*orient,phase=p*numpy.pi/num_phase)
+                            self.filters.append(g1())  
 
     def calculateModelResponse(self,inputs,index):
         res = []
         inn = inputs[index] - self.inputDC
-        for (gabor1,gabor2) in self.filters:
+        for gabor1 in self.filters:
             r1 = numpy.sum(numpy.multiply(gabor1,inn))
-            r2 = numpy.sum(numpy.multiply(gabor2,inn))
-            #res.append(numpy.sqrt(r1*r1+r2*r2))
             res.append(r1)
-            res.append(r2)
         # the constant luminance wavelet
         #res.append(numpy.sum(inn))
         # allow DC substractions (eg threshold in NN) 
@@ -104,6 +102,8 @@ class ModelFit():
             self.modelDC+=a
         
         self.modelDC = self.modelDC/len(activities)    
+        
+        print self.modelDC
             
                     
         self.weigths=numpy.mat(numpy.zeros((size(activities,1),size(modelResponses[0],1))))
@@ -160,10 +160,7 @@ class ModelFit():
         
         # recalculate a new model DC based on what we have learned
         self.modelDC*=0.0
-        #for i in xrange(0,len(inputs)):
-        #    self.modelDC+=(activities[i].T - self.weigths*modelResponses[i].T).T
-        #self.modelDC = self.modelDC/len(inputs)    
-        
+         
         for i in xrange(0,len(validation_inputs)):
             self.modelDC+=(validation_activities[i].T - self.weigths*validationModelResponses[i].T).T
         self.modelDC = self.modelDC/len(validation_inputs)   
@@ -175,6 +172,7 @@ class ModelFit():
             
         for i in xrange(0,len(inputs)):
            a = self.calculateModelOutput(inputs,i)
+           
            if i == 0: 
                modelActivities = a
            else:
@@ -196,11 +194,12 @@ class ModelFit():
         for i in xrange(0,self.num_of_units*top_percentage/100):   
             self.reliable_indecies[t[self.num_of_units-1-i][0]] = 1
             #print t[self.num_of_units-1-i][0]
-            #pylab.figure()            
-            #pylab.plot(numpy.array(activities.T[t[self.num_of_units-1-i][0]][0].T))
-            #pylab.plot(numpy.array(modelActivities[t[self.num_of_units-1-i][0]][0].T))
-            #pylab.show._needmain=False
-            #pylab.show()
+            pylab.figure()
+            pylab.show._needmain=False            
+            pylab.subplot(3,1,1)
+            pylab.plot(numpy.array(activities.T[t[self.num_of_units-1-i][0]][0].T))
+            pylab.plot(numpy.array(modelActivities[t[self.num_of_units-1-i][0]][0].T))
+	    pylab.show()
 
     def testModel(self,inputs,activities,target_inputs=None):
         modelActivities=[]
@@ -212,57 +211,46 @@ class ModelFit():
 
         for index in range(len(inputs)):
             modelActivities.append(self.calculateModelOutput(inputs,index))
-            
-        #for i in xrange(0,len(modelResponses)):
-        #    if self.reliable_indecies[i]==1.0:    
-            
-    
         tmp = []
         correct = 0
-        #pylab.figure()
         
         #print shape(numpy.abs(activities[0].T - modelActivities[0]))
         #print shape(numpy.mat(self.reliable_indecies).T)
         #print numpy.multiply(numpy.abs(activities[0].T - modelActivities[0]),numpy.mat(self.reliable_indecies).T)        
-        #print numpy.sum(numpy.multiply(numpy.abs(activities[0].T - modelActivities[0]),numpy.mat(self.reliable_indecies).T))
+#        print numpy.sum(numpy.multiply(numpy.abs(activities[0].T - modelActivities[0]),numpy.mat(self.reliable_indecies).T))
     
         for i in target_inputs:
             tmp = []
             for j in target_inputs:
                 
-                tmp.append(numpy.sum(
-                                     numpy.multiply(numpy.abs(activities[i].T - modelActivities[j]),numpy.mat(self.reliable_indecies).T)
+                 tmp.append(numpy.sum(
+                                     numpy.multiply(numpy.abs(activities[i].T  - modelActivities[j]),numpy.mat(self.reliable_indecies).T)
                                     ))
+                 #tmp.append(numpy.corrcoef(modelActivities[j].T, activities[i])[0][1])
             x = numpy.argmin(array(tmp))
+            #print tmp
+            #x = numpy.argmax(array(tmp))
             x = target_inputs[x]
             print (x,i)
+            
+            if (i % 30) == 0:
+                pylab.show._needmain=False
+                pylab.figure()
+                pylab.subplot(3,1,1)
+                pylab.plot(numpy.array(activities[i])[0],'o',label='traget')
+                pylab.plot(numpy.array(modelActivities[x].T)[0], 'o',label='predicted model')
+                pylab.plot(numpy.array(modelActivities[i].T)[0], 'o',label='correct model')
+                pylab.legend()
+                pylab.subplot(3,1,2)
+                w =  inputs[i].reshape(self.density*self.retina_diameter,self.density*self.retina_diameter)
+                pylab.imshow(w)
+                pylab.subplot(3,1,3)
+                w =  inputs[x].reshape(self.density*self.retina_diameter,self.density*self.retina_diameter)
+                pylab.imshow(w)
+                pylab.show()
 
-            #print (i, x)#, array(tmp))
-            #print numpy.sum(numpy.multiply(numpy.power(activities[i].T - modelActivities[i],2),self.reliable_indecies.T))/len(activities[0])
-            #print numpy.sum(numpy.multiply(numpy.power(activities[i].T - modelActivities[x],2),self.reliable_indecies.T))/len(activities[0])
             if x == i:
                  correct+=1.0
-            if i%2 == 10:
-                #print "figure"                
-                pylab.subplot(5,15,i/2+1)
-                #the original activities
-                b  = numpy.multiply(activities[i]+self.modelDC,self.reliable_indecies)
-                pylab.imshow(toMatrix(b.T.A,14,13),vmin=-0.1,vmax=0.1)
-                pylab.subplot(5,15,15+i/2+1)
-                # what the model predicts for given stimuli
-                b = numpy.multiply(modelActivities[i].T+self.modelDC,self.reliable_indecies)
-                pylab.imshow(toMatrix(b.T.A,14,13),vmin=-0.1,vmax=0.1)
-                pylab.subplot(5,15,30+i/2+1)
-                # the model activities most similar to the original activities
-                b = numpy.multiply(modelActivities[x].T+self.modelDC,self.reliable_indecies)
-                pylab.imshow(toMatrix(b.T.A,14,13),vmin=-0.1,vmax=0.1)
-                pylab.subplot(5,15,45+i/2+1)
-                # the given stimuly
-                #pylab.imshow(inputs[i],vmin=0,vmax=0.4)
-                pylab.imshow(inputs[i])
-                # the stimuly which would correspons to the most similar model output
-                pylab.subplot(5,15,60+i/2+1)
-                pylab.imshow(inputs[x])
                 
         print correct, " correct out of ", len(target_inputs)                  
         print "Percentage of correct answers:" ,correct/len(target_inputs)*100, "%"
@@ -354,7 +342,7 @@ class BasicBPModelFit(BasicModelFit):
     def calculateModelOutput(self,inputs,index):
         import libfann
         modelResponse = self.calculateModelResponse(inputs,index) - self.meanModelResponses
-        return self.ann.run(numpy.array(modelResponse.T))
+        return numpy.mat(self.ann.run(numpy.array(modelResponse.T))).T+self.modelDC
     
     def trainModel(self,inputs,activities,validation_inputs,validation_activities):
         import libfann
@@ -384,27 +372,30 @@ class BasicBPModelFit(BasicModelFit):
         for i in xrange(0,len(validationModelResponses)):
             validationModelResponses[i] = validationModelResponses[i] - self.meanModelResponses
         
-        #calculate the initial model DC as the mean of the target activities
+        #calculate  the mean of the target activities
         for a in activities:
             self.modelDC+=a
-        
         self.modelDC = self.modelDC/len(activities)
+        
+        for i in xrange(0,len(activities)):
+            activities[i]-=self.modelDC
+        
         print shape(modelResponses)
 
         connection_rate = 1
-        learning_rate = 0.01
+        learning_rate = 0.0000001
         num_input = numpy.size(modelResponses[0],1)
         num_neurons_hidden = numpy.size(activities,1)*2
         num_output = numpy.size(activities,1)
         
         print (num_input,num_neurons_hidden,num_output)
         
-        desired_error = 0.0001
+        desired_error = 0.000001
         max_iterations = 1000
         iterations_between_reports = 1
         self.ann.create_sparse_array(connection_rate, (num_input, num_neurons_hidden, num_output))
         self.ann.set_learning_rate(learning_rate)
-        self.ann.set_activation_function_output(libfann.SIGMOID_SYMMETRIC_STEPWISE)
+        self.ann.set_activation_function_output(libfann.SIGMOID_SYMMETRIC)
         
         print numpy.min(activities)
         print numpy.max(activities)
@@ -412,12 +403,45 @@ class BasicBPModelFit(BasicModelFit):
         train_data  = libfann.training_data()
         test_data = libfann.training_data()
         
+        
         set_fann_dataset(train_data,modelResponses,activities)
         set_fann_dataset(test_data,validationModelResponses,validation_activities)
-        self.ann.train_on_data(train_data, max_iterations, iterations_between_reports, desired_error)
-        print self.ann.test_data(test_data)
         
-        #ann.save("nets/xor_float.net")
+        self.ann.reset_MSE()
+        self.ann.test_data(test_data)
+        print "MSE error on test data: %f" % self.ann.get_MSE()
+        self.ann.reset_MSE()
+        self.ann.test_data(train_data)
+        print "MSE error on train data: %f" % self.ann.get_MSE()
+        self.ann.reset_MSE()
+        
+        #self.ann.train_on_data(train_data, max_iterations, iterations_between_reports, desired_error)
+        
+        errs=[]
+        min_error=1000000
+        for i in range(0,100):
+            e = self.ann.train_epoch(train_data)
+            self.ann.reset_MSE()
+            self.ann.test_data(test_data)
+            print "%d > MSE error on train/test data: %f / %f" % (i,e,self.ann.get_MSE())
+            
+            if i>5:
+               errs.pop(0)
+            
+            if min_error > self.ann.get_MSE(): min_error = self.ann.get_MSE()
+            
+            flag = False
+            #for a in errs:
+            #    if a < min_error: flag = True
+           
+            #if not flag: break
+            errs.append(self.ann.get_MSE())
+                
+        self.ann.reset_MSE()
+        self.ann.test_data(test_data)
+        print "MSE error on test data: %f" % self.ann.get_MSE()
+        self.ann.reset_MSE()
+
 
 def showMotionEnergyPatterns():
 
@@ -463,6 +487,25 @@ def toMatrix(array,x,y):
         return
                
     return tmp
+            
+def loadSimpleDataSet(filename,num_stimuli,n_cells):
+    f = file(filename, "r") 
+    data = [line.split() for line in f]
+    f.close()
+
+    dataset = [([[] for i in xrange(0,num_stimuli)]) for i in xrange(0,n_cells)]
+    print shape(dataset)
+    (num_stimuli,n_cells) = shape(data)
+    
+    for k in xrange(0,n_cells):
+        for i in xrange(0,num_stimuli):
+            f = []
+            for fr in xrange(0,1):
+                        f.append(float(data[i+fr][k]))
+            dataset[k][i].append(f)
+    print shape(dataset)
+    return (numpy.arange(0,num_stimuli),dataset)
+            
 
 def loadRandomizedDataSet(directory,num_rep,num_frames,num_stimuli,n_cells):
     f = file(directory + "/combined_data", "r") 
@@ -504,15 +547,19 @@ def averageRangeFrames(dataset,min,max):
                 stimulus[r]=[numpy.average(stimulus[r][min:max])]
     return (index,data)
 
-def averageRepetitions(dataset):
+def averageRepetitions(dataset,reps=None):
     (index,data) = dataset
     (num_cells,num_stim,num_rep,num_frames) = shape(data)
+
+    if reps==None:
+       reps = numpy.arange(0,num_rep,1)
+
     for cell in data:
         for stimulus in xrange(0,num_stim):
             r = [0 for i in range(0,num_frames)]
-            for rep in xrange(0,num_rep):
+            for rep in reps:
                 for f in xrange(0,num_frames):
-                    r[f]+=cell[stimulus][rep][f]/num_rep
+                    r[f]+=cell[stimulus][rep][f]/len(reps)
             cell[stimulus]=[r]
     return (index,data)
 
@@ -625,35 +672,57 @@ def clump_low_responses(dataset,threshold):
                        repetition[index4]=0
                        
     return (index,data)
+
+def compute_average_input(input_set):
+    avgRF = numpy.zeros(shape(input_set[0]))
+    for i in input_set:
+        avgRF += i
+    avgRF = avgRF/(len(input_set)*1.0)
+    return avgRF
     
+def normalize_input_set(input_set,avgIn):
+    for i in xrange(0,len(input_set)):
+        input_set[i]/=avgIn
+    return input_set
+
 def runModelFit():
     
-    density=__main__.__dict__.get('density', 200)
+    density=__main__.__dict__.get('density', 72)
     
-    dataset = loadRandomizedDataSet("Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL",6,15,125,60)
+    #dataset = loadRandomizedDataSet("Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL",6,15,125,60)
+    dataset = loadSimpleDataSet("Flogl/DataSep2009/testing_01_02_03.dat",375,58)
     
+    #this dataset has images numbered from 1
+    (index,data) = dataset
+    index+=1
+    dataset=(index,data)
      
+    #print shape(dataset[1])
+    #dataset = clump_low_responses(dataset,__main__.__dict__.get('ClumpMag',0.1))
     print shape(dataset[1])
-    dataset = clump_low_responses(dataset,__main__.__dict__.get('ClumpMag',0.1))
-    print shape(dataset[1])
-    dataset = averageRangeFrames(dataset,0,15)
+    dataset = averageRangeFrames(dataset,0,1)
     print shape(dataset[1])
     dataset = averageRepetitions(dataset)
     print shape(dataset[1])
     
-    
-    (dataset,validation_data_set) = splitDataset(dataset,0.9)
-    (dataset,testing_data_set) = splitDataset(dataset,0.9)
+    (dataset,validation_data_set) = splitDataset(dataset,0.95)
+    (dataset,testing_data_set) = splitDataset(dataset,0.95)
 
     training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL","/images/testing01_%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
+    training_inputs=generateInputs(dataset,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
+    
     
     validation_set = generateTrainingSet(validation_data_set)
-    validation_inputs=generateInputs(validation_data_set,"Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL","/images/testing01_%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
+    validation_inputs=generateInputs(validation_data_set,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
     
     testing_set = generateTrainingSet(testing_data_set)
-    testing_inputs=generateInputs(testing_data_set,"Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL","/images/testing01_%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
+    testing_inputs=generateInputs(testing_data_set,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
     
+    
+    if __main__.__dict__.get('NormalizeInputs',True):
+        normalize_input_set(training_inputs,compute_average_input(training_inputs))
+        normalize_input_set(validation_inputs,compute_average_input(training_inputs))
+        normalize_input_set(testing_inputs,compute_average_input(training_inputs))
     
     print shape(training_set)
     print shape(validation_set)
@@ -667,31 +736,31 @@ def runModelFit():
     #matrixplot(validation_inputs[1])
     #pylab.show()
     
-    #mf = BasicBPModelFit()
-    mf = BasicModelFit()
-    mf.retina_diameter = 1.0
+    mf = BasicBPModelFit()
+    #mf = BasicModelFit()
+    #mf = ModelFit()
+    mf.retina_diameter = 1.2
     mf.density = density
-    mf.learning_rate = __main__.__dict__.get('lr',0.00001)
-    mf.epochs=__main__.__dict__.get('epochs',2000)
-    mf.num_of_units = 60
+    mf.learning_rate = __main__.__dict__.get('lr',0.01)
+    mf.epochs=__main__.__dict__.get('epochs',20)
+    mf.num_of_units = 58
     mf.init()
 
     mf.trainModel(training_inputs,numpy.mat(training_set),validation_inputs,numpy.mat(validation_set))
     mf.testModel(training_inputs,numpy.mat(training_set))
+    #mf.testModel(testing_inputs,numpy.mat(validation_set))
     mf.testModel(testing_inputs,numpy.mat(testing_set))
     
-
-    mf.calculateReliabilities(training_inputs,numpy.mat(training_set),50)
-    mf.testModel(testing_inputs,numpy.mat(testing_set))
+    #mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),20)
+    #mf.testModel(testing_inputs,numpy.mat(testing_set))
     
-    mf.calculateReliabilities(training_inputs,numpy.mat(training_set),40)
-    mf.testModel(testing_inputs,numpy.mat(testing_set))
-
-    mf.calculateReliabilities(training_inputs,numpy.mat(training_set),30)
-    mf.testModel(testing_inputs,numpy.mat(testing_set))
-
-    mf.calculateReliabilities(training_inputs,numpy.mat(training_set),10)
-    mf.testModel(testing_inputs,numpy.mat(testing_set))
+    #mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),5)
+    #mf.testModel(testing_inputs,numpy.mat(testing_set))
+    
+    #mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),1)
+    #mf.testModel(testing_inputs,numpy.mat(testing_set))
+    
+    #compute_spike_triggered_average_rf(training_inputs,training_set,density,mf)
     
     return mf
 
@@ -726,3 +795,50 @@ def set_fann_dataset(td,inputs,outputs):
     f.close()
     
     td.read_train_from_file("./tmp.txt")
+
+def compute_spike_triggered_average_rf(inputs,activities,density,mf):
+    (num_inputs,num_activities) = shape(activities)
+    RFs = [numpy.zeros(shape(inputs[0])) for j in xrange(0,num_activities)] 
+    avgRF = numpy.zeros(shape(inputs[0]))
+    for i in xrange(0,num_inputs):
+        for j in xrange(0,num_activities):
+            RFs[j] += activities[i][j]*inputs[i]
+
+    for i in inputs:
+        avgRF += i
+    avgRF = avgRF/(num_inputs*1.0)
+    
+    activity_avg = numpy.zeros((num_activities,1))
+    
+    for z in xrange(0,num_activities):
+        activity_avg[z] = numpy.sum(activities.T[z])
+    
+    activity_avg = activity_avg.T[0]
+    
+    pylab.figure()
+    for j in xrange(0,10):
+        fig = pylab.figure()
+        pylab.show._needmain=False
+        
+        pylab.subplot(1,5,1)
+        RFs[j]/= activity_avg[j]
+        pylab.imshow(RFs[j],vmin=numpy.min(RFs[j]),vmax=numpy.max(RFs[j]))
+        pylab.colorbar()
+        
+        pylab.subplot(1,5,2)
+        pylab.imshow(RFs[j] - avgRF,vmin=numpy.min(RFs[j]- avgRF),vmax=numpy.max(RFs[j]- avgRF))
+        pylab.colorbar()
+        
+        pylab.subplot(1,5,3)
+        pylab.imshow(RFs[j]/avgRF,vmin=numpy.min(RFs[j]/avgRF),vmax=numpy.max(RFs[j]/avgRF))
+        pylab.colorbar()
+
+        pylab.subplot(1,5,4)
+        pylab.imshow(avgRF,vmin=numpy.min(avgRF),vmax=numpy.max(avgRF))
+        pylab.colorbar()
+        
+        w = mf.weigths[j].reshape(density*1.2,density*1.2)
+        pylab.subplot(1,5,5)
+        pylab.imshow(w,vmin=numpy.min(w),vmax=numpy.max(w))
+        pylab.colorbar()                
+        pylab.show()
