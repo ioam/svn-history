@@ -17,119 +17,47 @@ from topo.pattern.image import Image
 import contrib.jacommands
 
 class ModelFit():
-    
-    filters = []
     weigths = []
     retina_diameter=1.2
     density=24
     epochs = 500
     learning_rate = 0.00001
-    inputDC = 0
-    modelDC = 0
-    meanModelResponses=[]
+    DC = 0
     reliable_indecies=[]
     momentum=0.0
     num_of_units=0
     
     def init(self):
         self.reliable_indecies = ones(self.num_of_units)
-        num_phase = 4
-        for freq in [__main__.__dict__.get('freqs',32)]:
-        #for freq in [8.0]:
-            for xpos in xrange(0,int(freq)):
-                for ypos in xrange(0,int(freq)):
-                    x=xpos*(self.retina_diameter/freq)-self.retina_diameter/2 + self.retina_diameter/freq/2 
-                    y=ypos*(self.retina_diameter/freq)-self.retina_diameter/2 + self.retina_diameter/freq/2
-                    for orient in xrange(0,8):
-                        for p in xrange(0,num_phase):
-                            g1 = Gabor(bounds=BoundingBox(radius=self.retina_diameter/2.0),frequency=freq,x=x,y=y,xdensity=self.density,ydensity=self.density,size=1/freq,orientation=numpy.pi/8*orient,phase=p*numpy.pi/num_phase)
-                            self.filters.append(g1())  
 
-    def calculateModelResponse(self,inputs,index):
-        res = []
-        inn = inputs[index] - self.inputDC
-        for gabor1 in self.filters:
-            r1 = numpy.sum(numpy.multiply(gabor1,inn))
-            res.append(r1)
-        # the constant luminance wavelet
-        #res.append(numpy.sum(inn))
-        # allow DC substractions (eg threshold in NN) 
-        #res.append(1.0)
-        return numpy.mat(res)    
-    
-    def calculateInputDC(self,inputs):
-        avg = 0
-        for i in inputs:
-            avg = avg + numpy.sum(i)/(size(i,1)*size(i,0))
-        avg = avg/len(inputs)
-        self.inputDC = avg
-        print avg    
-        
     def calculateModelOutput(self,inputs,index):
-        modelResponse = self.calculateModelResponse(inputs,index) - self.meanModelResponses
-        return self.weigths*modelResponse.T + self.modelDC.T
-        
-    
+        return self.weigths*inputs[index].T
+
     def trainModel(self,inputs,activities,validation_inputs,validation_activities):
-        self.calculateInputDC(inputs)
-        modelResponses=[]
-        validationModelResponses=[]
         delta=[]
-        self.meanModelResponses=numpy.array(self.calculateModelResponse(inputs,0)).copy()*0.0
-        self.modelDC=numpy.array(activities[0]).copy()*0.0
-        
-        
-        # calculate the model responses and their average to the set of inputs
-        for i in xrange(len(inputs)):
-            modelResponses.append(numpy.array(self.calculateModelResponse(inputs,i)))
-            self.meanModelResponses = self.meanModelResponses + modelResponses[len(modelResponses)-1] 
-        self.meanModelResponses = self.meanModelResponses/len(inputs)
-       
-        # calculate modelResponses to validation set
-        for i in xrange(len(validation_inputs)):
-            validationModelResponses.append(numpy.array(self.calculateModelResponse(validation_inputs,i)))
-       
-        # substract the mean from model responses
-        for i in xrange(0,len(modelResponses)):
-            modelResponses[i] = modelResponses[i] - self.meanModelResponses
-            
-        # substract the mean from validation responses
-        for i in xrange(0,len(validationModelResponses)):
-            validationModelResponses[i] = validationModelResponses[i] - self.meanModelResponses
-        
-        #calculate the initial model DC as the mean of the target activities
-        for a in activities:
-            self.modelDC+=a
-        
-        self.modelDC = self.modelDC/len(activities)    
-        
-        print self.modelDC
-            
-                    
-        self.weigths=numpy.mat(numpy.zeros((size(activities,1),size(modelResponses[0],1))))
-        
+        self.DC=numpy.array(activities[0]).copy()*0.0
+        print self.DC
+
+        self.weigths=numpy.mat(numpy.zeros((size(activities,1),size(inputs[0],1))))
+
         mean_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
-        
-        old_error = 10000000 * ones(shape(activities[0]))
-        
         first_val_error=0
         val_err=0
-        
+
         for k in xrange(0,self.epochs):
             mean_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
             validation_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
-            tmp_weigths=numpy.mat(numpy.zeros((size(activities,1),size(modelResponses[0],1))))
+            tmp_weigths=numpy.mat(numpy.zeros((size(activities,1),size(inputs[0],1))))
             for i in xrange(0,len(inputs)):
-                error = ((activities[i].T - self.weigths*modelResponses[i].T - self.modelDC.T))
+                error = ((activities[i].T - self.weigths*inputs[i].T - self.DC.T))
                 
-                tmp_weigths = tmp_weigths + (error * modelResponses[i])
+                tmp_weigths = tmp_weigths + (error * inputs[i])
                 mean_error=mean_error+numpy.power(error,2)
             
             for i in xrange(0,len(validation_inputs)):
-                error = ((validation_activities[i].T - self.weigths*validationModelResponses[i].T - self.modelDC.T))
+                error = ((validation_activities[i].T - self.weigths*validation_inputs[i].T - self.DC.T))
                 validation_error=validation_error+numpy.power(error,2)
         
-                
             if k == 0:
                delta = tmp_weigths/numpy.sqrt(numpy.sum(numpy.power(tmp_weigths,2)))
             else:
@@ -143,27 +71,16 @@ class ModelFit():
             
             if k == 0:
                first_val_error=val_err
-            
-            # adjust learning rates based on new errors
+
             print (k,err,val_err)
-            #print delta[0]
-            #print mean_error[0]/len(inputs)
-            
-            #ii =  (mean_error.T/len(inputs)) > old_error
-            
-            #print shape(ii)
-            #learning_rates -= numpy.multiply((learning_rates/10.0), ii)
-            #old_error=mean_error.T/len(inputs)
-            #print (learning_rates[0][0]) 
-        #print mean_error/len(inputs)
         print "First val error:" + str(first_val_error) + "\nLast val error:" + str(val_err) + "\nImprovement:" + str((first_val_error - val_err)/first_val_error * 100) + "%"
         
         # recalculate a new model DC based on what we have learned
-        self.modelDC*=0.0
+        self.DC*=0.0
          
         for i in xrange(0,len(validation_inputs)):
-            self.modelDC+=(validation_activities[i].T - self.weigths*validationModelResponses[i].T).T
-        self.modelDC = self.modelDC/len(validation_inputs)   
+            self.DC+=(validation_activities[i].T - self.weigths*validation_inputs[i].T).T
+        self.DC = self.DC/len(validation_inputs)   
     
     def calculateReliabilities(self,inputs,activities,top_percentage):
         corr_coef=numpy.zeros(self.num_of_units)
@@ -172,7 +89,6 @@ class ModelFit():
             
         for i in xrange(0,len(inputs)):
            a = self.calculateModelOutput(inputs,i)
-           
            if i == 0: 
                modelActivities = a
            else:
@@ -213,22 +129,16 @@ class ModelFit():
             modelActivities.append(self.calculateModelOutput(inputs,index))
         tmp = []
         correct = 0
-        
-        #print shape(numpy.abs(activities[0].T - modelActivities[0]))
-        #print shape(numpy.mat(self.reliable_indecies).T)
-        #print numpy.multiply(numpy.abs(activities[0].T - modelActivities[0]),numpy.mat(self.reliable_indecies).T)        
-#        print numpy.sum(numpy.multiply(numpy.abs(activities[0].T - modelActivities[0]),numpy.mat(self.reliable_indecies).T))
-    
         for i in target_inputs:
             tmp = []
             for j in target_inputs:
                 
-                 tmp.append(numpy.sum(
-                                     numpy.multiply(numpy.abs(activities[i].T  - modelActivities[j]),numpy.mat(self.reliable_indecies).T)
+                 tmp.append(numpy.sum(numpy.power(
+                                     numpy.multiply(activities[i].T  - modelActivities[j],numpy.mat(self.reliable_indecies).T),2)
                                     ))
                  #tmp.append(numpy.corrcoef(modelActivities[j].T, activities[i])[0][1])
             x = numpy.argmin(array(tmp))
-            #print tmp
+
             #x = numpy.argmax(array(tmp))
             x = target_inputs[x]
             print (x,i)
@@ -241,12 +151,6 @@ class ModelFit():
                 pylab.plot(numpy.array(modelActivities[x].T)[0], 'o',label='predicted model')
                 pylab.plot(numpy.array(modelActivities[i].T)[0], 'o',label='correct model')
                 pylab.legend()
-                pylab.subplot(3,1,2)
-                w =  inputs[i].reshape(self.density*self.retina_diameter,self.density*self.retina_diameter)
-                pylab.imshow(w)
-                pylab.subplot(3,1,3)
-                w =  inputs[x].reshape(self.density*self.retina_diameter,self.density*self.retina_diameter)
-                pylab.imshow(w)
                 pylab.show()
 
             if x == i:
@@ -280,19 +184,6 @@ class MotionModelFit(ModelFit):
                                 g1.append(temporal_gauss*Gabor(bounds=BoundingBox(radius=self.retina_diameter/2),frequency=freq,x=x,y=y,xdensity=self.density,ydensity=self.density,size=1/freq,orientation=2*numpy.pi/8*orient,phase=p*(numpy.pi/(speed)))())
                                 g2.append(temporal_gauss*Gabor(bounds=BoundingBox(radius=self.retina_diameter/2),frequency=freq,x=x,y=y,xdensity=self.density,ydensity=self.density,size=1/freq,orientation=2*numpy.pi/8*orient,phase=p*(numpy.pi/(speed))+numpy.pi/2)())
                             self.filters.append((g1,g2))  
-
-      def calculateInputDC(self,inputs):
-          if self.real_time:
-              ModelFit.calculateInputDC(self,inputs)
-          else:
-              avg = 0
-              length=0
-              for i in inputs:
-                  for j in i:
-                      avg = avg + numpy.sum(j)/(size(j,1)*size(j,0))
-                      length+=1
-              avg = avg/length
-              self.inputDC = avg
   
       def calculateModelResponse(self,inputs,index):
             if self.real_time:
@@ -303,8 +194,8 @@ class MotionModelFit(ModelFit):
                     r=0
                     l = len(gabor1)
                     for i in xrange(0,numpy.min([index+1,l])): 
-                        r1 += numpy.sum(numpy.multiply(gabor1[l-1-i],inputs[index-i]- self.inputDC))
-                        r2 += numpy.sum(numpy.multiply(gabor2[l-1-i],inputs[index-i]- self.inputDC))
+                        r1 += numpy.sum(numpy.multiply(gabor1[l-1-i],inputs[index-i]))
+                        r2 += numpy.sum(numpy.multiply(gabor2[l-1-i],inputs[index-i]))
                     res.append(numpy.sqrt(r1*r1+r2*r2))
                     #res.append(r)
                     #numpy.max([res.append(r1),res.append(r2)])
@@ -317,8 +208,8 @@ class MotionModelFit(ModelFit):
                     li = len(inputs[index])
                     l = len(gabor1)
                     for i in xrange(0,li): 
-                        r1 += numpy.sum(numpy.multiply(gabor1[l-1-numpy.mod(i,l)],inputs[index][li-1-i]- self.inputDC))
-                        r2 += numpy.sum(numpy.multiply(gabor2[l-1-numpy.mod(i,l)],inputs[index][li-1-i]- self.inputDC))
+                        r1 += numpy.sum(numpy.multiply(gabor1[l-1-numpy.mod(i,l)],inputs[index][li-1-i]))
+                        r2 += numpy.sum(numpy.multiply(gabor2[l-1-numpy.mod(i,l)],inputs[index][li-1-i]))
                         #r += numpy.sqrt(r1*r1+r2*r2)
                     res.append(numpy.sqrt(r1*r1+r2*r2))
                     #res.append(r)
@@ -329,8 +220,6 @@ class MotionModelFit(ModelFit):
 class BasicModelFit(ModelFit):
       def init(self):
           self.reliable_indecies = ones(self.num_of_units)
-      def calculateModelResponse(self,inputs,index):
-          return  numpy.mat(inputs[index].flatten().tolist())
       
 class BasicBPModelFit(BasicModelFit):
  
@@ -341,51 +230,15 @@ class BasicBPModelFit(BasicModelFit):
     
     def calculateModelOutput(self,inputs,index):
         import libfann
-        modelResponse = self.calculateModelResponse(inputs,index) - self.meanModelResponses
-        return numpy.mat(self.ann.run(numpy.array(modelResponse.T))).T+self.modelDC
+        return numpy.mat(self.ann.run(numpy.array(inputs[index].T))).T
     
     def trainModel(self,inputs,activities,validation_inputs,validation_activities):
         import libfann
-        self.calculateInputDC(inputs)
-        modelResponses=[]
-        validationModelResponses=[]
         delta=[]
-        self.meanModelResponses=numpy.array(self.calculateModelResponse(inputs,0)).copy()*0.0
-        self.modelDC=numpy.array(activities[0]).copy()*0.0
-        
-        
-        # calculate the model responses and their average to the set of inputs
-        for i in xrange(len(inputs)):
-            modelResponses.append(numpy.array(self.calculateModelResponse(inputs,i)))
-            self.meanModelResponses = self.meanModelResponses + modelResponses[len(modelResponses)-1] 
-        self.meanModelResponses = self.meanModelResponses/len(inputs)
-       
-        # calculate modelResponses to validation set
-        for i in xrange(len(validation_inputs)):
-            validationModelResponses.append(numpy.array(self.calculateModelResponse(validation_inputs,i)))
-       
-        # substract the mean from model responses
-        for i in xrange(0,len(modelResponses)):
-            modelResponses[i] = modelResponses[i] - self.meanModelResponses
-            
-        # substract the mean from validation responses
-        for i in xrange(0,len(validationModelResponses)):
-            validationModelResponses[i] = validationModelResponses[i] - self.meanModelResponses
-        
-        #calculate  the mean of the target activities
-        for a in activities:
-            self.modelDC+=a
-        self.modelDC = self.modelDC/len(activities)
-        
-        for i in xrange(0,len(activities)):
-            activities[i]-=self.modelDC
-        
-        print shape(modelResponses)
 
-        connection_rate = 1
-        learning_rate = 0.0000001
+        connection_rate = 1.0
         num_input = numpy.size(modelResponses[0],1)
-        num_neurons_hidden = numpy.size(activities,1)*2
+        num_neurons_hidden = numpy.size(activities,1)
         num_output = numpy.size(activities,1)
         
         print (num_input,num_neurons_hidden,num_output)
@@ -394,18 +247,13 @@ class BasicBPModelFit(BasicModelFit):
         max_iterations = 1000
         iterations_between_reports = 1
         self.ann.create_sparse_array(connection_rate, (num_input, num_neurons_hidden, num_output))
-        self.ann.set_learning_rate(learning_rate)
+        self.ann.set_learning_rate(self.learning_rate)
         self.ann.set_activation_function_output(libfann.SIGMOID_SYMMETRIC)
-        
-        print numpy.min(activities)
-        print numpy.max(activities)
         
         train_data  = libfann.training_data()
         test_data = libfann.training_data()
-        
-        
-        set_fann_dataset(train_data,modelResponses,activities)
-        set_fann_dataset(test_data,validationModelResponses,validation_activities)
+        set_fann_dataset(train_data,inputs,activities)
+        set_fann_dataset(test_data,validation_inputs,validation_activities)
         
         self.ann.reset_MSE()
         self.ann.test_data(test_data)
@@ -414,29 +262,13 @@ class BasicBPModelFit(BasicModelFit):
         self.ann.test_data(train_data)
         print "MSE error on train data: %f" % self.ann.get_MSE()
         self.ann.reset_MSE()
-        
-        #self.ann.train_on_data(train_data, max_iterations, iterations_between_reports, desired_error)
-        
-        errs=[]
-        min_error=1000000
-        for i in range(0,100):
+
+        for i in range(0,self.epochs):
             e = self.ann.train_epoch(train_data)
             self.ann.reset_MSE()
             self.ann.test_data(test_data)
             print "%d > MSE error on train/test data: %f / %f" % (i,e,self.ann.get_MSE())
-            
-            if i>5:
-               errs.pop(0)
-            
-            if min_error > self.ann.get_MSE(): min_error = self.ann.get_MSE()
-            
-            flag = False
-            #for a in errs:
-            #    if a < min_error: flag = True
-           
-            #if not flag: break
-            errs.append(self.ann.get_MSE())
-                
+        
         self.ann.reset_MSE()
         self.ann.test_data(test_data)
         print "MSE error on test data: %f" % self.ann.get_MSE()
@@ -647,7 +479,41 @@ def generateInputs(dataset,directory,image_matching_string,density,LGN=False,LGN
             for frame in rep:
                 training_inputs.append(inputs[s])
     return inputs
+            
+            
+            
+def generate_pyramid_model(num_or,freqs,num_phase,size):
+    filters=[]
+    for freq in freqs:
+        for orient in xrange(0,num_or):
+            for p in xrange(0,num_phase):
+                g = Gabor(bounds=BoundingBox(radius=1.5),frequency=1.0,x=0.0,y=0.0,xdensity=size/freq,ydensity=size/freq,size=1.0,orientation=numpy.pi/8*orient,phase=p*2*numpy.pi/num_phase)
+                filters.append(g())
+    return filters
 
+    
+
+def apply_filters(inputs, filters, spacing):
+    (sizex,sizey) = numpy.shape(inputs[0])
+    
+    out = []
+    
+    for i in inputs:
+        o  = []
+        for f in filters:
+            (s,trash) =  numpy.shape(f)
+            stepx = int(sizex/(s*spacing))
+            stepy = int(sizey/(s*spacing))
+            x=0
+            y=0
+            while x*stepx + s <= sizex:
+                while y*stepy + s <= sizey:
+                    o.append(numpy.sum(numpy.sum(numpy.multiply(f,i[x*stepx:x*stepx+s,y*stepy:y*stepy+s]))))
+                    x+=1
+                    y+=1 
+        out.append(numpy.array(o))
+    return numpy.array(out)
+                
 def clump_low_responses(dataset,threshold):
     (index,data) = dataset
     
@@ -673,24 +539,38 @@ def clump_low_responses(dataset,threshold):
                        
     return (index,data)
 
-def compute_average_input(input_set):
-    avgRF = numpy.zeros(shape(input_set[0]))
-    for i in input_set:
-        avgRF += i
-    avgRF = avgRF/(len(input_set)*1.0)
-    return avgRF
+def compute_average_min_max(data_set):
+
+    avg = numpy.zeros(shape(data_set[0]))
+    for d in data_set:
+        avg += d
+    avg = avg/(len(data_set)*1.0)
     
-def normalize_input_set(input_set,avgIn):
-    for i in xrange(0,len(input_set)):
-        input_set[i]/=avgIn
-    return input_set
+    mins = numpy.min(data_set,axis=0)
+    maxs = numpy.max(data_set,axis=0)
+    print shape(mins)
+    print shape(data_set)
+    return (avg,mins,maxs)
+    
+def normalize_data_set(data_set,avg,mins,maxs):
+    a = numpy.max([mins,maxs],axis=0)
+    print shape(a)
+    for i in xrange(0,len(data_set)):
+        data_set[i]-=avg
+        data_set[i]=numpy.divide(data_set[i],a) 
+    return data_set
+
+
 
 def runModelFit():
-    
-    density=__main__.__dict__.get('density', 72)
+   
+    density=__main__.__dict__.get('density', 200)
     
     #dataset = loadRandomizedDataSet("Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL",6,15,125,60)
     dataset = loadSimpleDataSet("Flogl/DataSep2009/testing_01_02_03.dat",375,58)
+    
+    
+    
     
     #this dataset has images numbered from 1
     (index,data) = dataset
@@ -711,45 +591,40 @@ def runModelFit():
     training_set = generateTrainingSet(dataset)
     training_inputs=generateInputs(dataset,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
     
-    
     validation_set = generateTrainingSet(validation_data_set)
     validation_inputs=generateInputs(validation_data_set,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
     
     testing_set = generateTrainingSet(testing_data_set)
     testing_inputs=generateInputs(testing_data_set,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
     
+    if __main__.__dict__.get('Gabor',True):
+        #fil = generate_pyramid_model(8,[64,32,16,8,4],4,density)
+        fil = generate_pyramid_model(__main__.__dict__.get('num_or',4),[__main__.__dict__.get('freq',4)],__main__.__dict__.get('num_phase',4),density)
+        training_inputs = apply_filters(training_inputs, fil, __main__.__dict__.get('spacing',0.5))
+        testing_inputs = apply_filters(testing_inputs, fil, __main__.__dict__.get('spacing',0.5))
+        validation_inputs = apply_filters(validation_inputs, fil, __main__.__dict__.get('spacing',0.5))
     
-    if __main__.__dict__.get('NormalizeInputs',True):
-        normalize_input_set(training_inputs,compute_average_input(training_inputs))
-        normalize_input_set(validation_inputs,compute_average_input(training_inputs))
-        normalize_input_set(testing_inputs,compute_average_input(training_inputs))
+    if __main__.__dict__.get('NormalizeActivities',True):
+        (a,mi,ma) = compute_average_min_max(training_set)
+        training_set = normalize_data_set(training_set,a,mi,ma)
+        validation_set = normalize_data_set(validation_set,a,mi,ma)
+        testing_set = normalize_data_set(testing_set,a,mi,ma)
     
-    print shape(training_set)
-    print shape(validation_set)
-    print shape(testing_set)
-    
-    #pylab.plot(numpy.array(numpy.mat(training_set).T)[0])
-    #pylab.plot(numpy.array(numpy.mat(training_set).T)[1])
-    #matrixplot(training_inputs[0])
-    #matrixplot(training_inputs[1])
-    #matrixplot(validation_inputs[0])
-    #matrixplot(validation_inputs[1])
-    #pylab.show()
     
     #mf = BasicBPModelFit()
-    #mf = BasicModelFit()
-    mf = ModelFit()
+    mf = BasicModelFit()
+    #mf = ModelFit()
     mf.retina_diameter = 1.2
     mf.density = density
     mf.learning_rate = __main__.__dict__.get('lr',0.0001)
-    mf.epochs=__main__.__dict__.get('epochs',20)
+    mf.epochs=__main__.__dict__.get('epochs',1000)
     mf.num_of_units = 58
     mf.init()
 
-    mf.trainModel(training_inputs,numpy.mat(training_set),validation_inputs,numpy.mat(validation_set))
-    mf.testModel(training_inputs,numpy.mat(training_set))
-    #mf.testModel(testing_inputs,numpy.mat(validation_set))
-    mf.testModel(testing_inputs,numpy.mat(testing_set))
+    mf.trainModel(mat(training_inputs),numpy.mat(training_set),mat(validation_inputs),numpy.mat(validation_set))
+    mf.testModel(mat(training_inputs),numpy.mat(training_set))
+    mf.testModel(mat(validation_inputs),numpy.mat(validation_set))
+    mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
     
     mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),20)
     mf.testModel(testing_inputs,numpy.mat(testing_set))
