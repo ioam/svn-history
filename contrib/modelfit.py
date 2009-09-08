@@ -31,7 +31,7 @@ class ModelFit():
         self.reliable_indecies = ones(self.num_of_units)
 
     def calculateModelOutput(self,inputs,index):
-        return self.weigths*inputs[index].T
+        return self.weigths*inputs[index].T+self.DC
 
     def trainModel(self,inputs,activities,validation_inputs,validation_activities):
         delta=[]
@@ -88,7 +88,7 @@ class ModelFit():
         modelActivities=[]
             
         for i in xrange(0,len(inputs)):
-           a = self.calculateModelOutput(inputs,i)
+           a = inputs[i]
            if i == 0: 
                modelActivities = a
            else:
@@ -237,7 +237,7 @@ class BasicBPModelFit(BasicModelFit):
         delta=[]
 
         connection_rate = 1.0
-        num_input = numpy.size(modelResponses[0],1)
+        num_input = len(inputs[0])
         num_neurons_hidden = numpy.size(activities,1)
         num_output = numpy.size(activities,1)
         
@@ -252,8 +252,10 @@ class BasicBPModelFit(BasicModelFit):
         
         train_data  = libfann.training_data()
         test_data = libfann.training_data()
-        set_fann_dataset(train_data,inputs,activities)
-        set_fann_dataset(test_data,validation_inputs,validation_activities)
+        print shape(inputs)
+        print shape(activities)
+        train_data.set_train_dataset(numpy.array(inputs),numpy.array(activities))
+        test_data.set_train_dataset(numpy.array(validation_inputs),numpy.array(validation_activities))
         
         self.ann.reset_MSE()
         self.ann.test_data(test_data)
@@ -327,7 +329,7 @@ def loadSimpleDataSet(filename,num_stimuli,n_cells):
 
     dataset = [([[] for i in xrange(0,num_stimuli)]) for i in xrange(0,n_cells)]
     print shape(dataset)
-    (num_stimuli,n_cells) = shape(data)
+    #(num_stimuli,n_cells) = shape(data)
     
     for k in xrange(0,n_cells):
         for i in xrange(0,num_stimuli):
@@ -437,80 +439,56 @@ def generateTrainingSet(dataset):
         training_set.append(cell_set)
     return numpy.array(numpy.matrix(training_set).T)
 
-def generateInputs(dataset,directory,image_matching_string,density,LGN=False,LGN_size=1.0):
+def generateInputs(dataset,directory,image_matching_string,density,aspect):
     (index,data) = dataset
 
+    # ALERT ALERT ALERT We do not handle repetitions yet!!!!!
+    
     image_filenames=[directory+image_matching_string %(i) for i in index]
     inputs=[Image(filename=f,size=0.55, x=0,y=0)   for f in image_filenames]
-    combined_inputs =contrib.jacommands.SequenceSelector(generators=inputs)
-
-    topo.sim['Retina']=GeneratorSheet(nominal_density=density,  
-                                  input_generator=SineGrating(),
-                                  period=1.0, phase=0.01,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.1))
-                                  
-    ## DoG weights for the LGN
-    centerg   = Gaussian(size=0.005*LGN_size,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
-    surroundg = Gaussian(size=0.02*LGN_size,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
-        
-    on_weights = topo.pattern.basic.Composite(
-        generators=[centerg,surroundg],operator=numpy.subtract)
     
-    topo.sim["Retina"].input_generator.index=0
-    topo.sim['LGNOn'] = CFSheet(nominal_density=density/2,nominal_bounds=BoundingBox(radius=0.5),                    output_fns=[HalfRectify()],measure_maps=False)
-
-    topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
-                 connection_type=SharedWeightCFProjection,strength=locals().get('ret_strength',2.33),
-                 nominal_bounds_template=BoundingBox(radius=0.1),name='Afferent',
-                 weights_generator=on_weights)
-
-    inputs=[]
-    topo.sim['Retina'].set_input_generator(combined_inputs)
+    ins=[]
     for j in xrange(0,len(index)):
-        topo.sim.run(1)
-        if LGN:
-            inputs.append(topo.sim["LGNOn"].activity.copy())
-        else: 
-            inputs.append(topo.sim["Retina"].activity.copy())
-    training_inputs=[]
+        inp = inputs[j](xdensity=density,ydensity=density) 
+        (x,y) = shape(inp)
+        z=(x - x / aspect)/2
+        ins.append(inp[z:x-z,:])
+ 
     
-    for s in range(len(data[0])):
-        for rep in data[0][s]:
-            for frame in rep:
-                training_inputs.append(inputs[s])
-    return inputs
-            
-            
-            
+    #training_inputs=[]
+    #for s in range(len(data[0])):
+    #    for rep in data[0][s]:
+    #        for frame in rep:
+    #            training_inputs.append(inputs[s])
+    return ins
+
 def generate_pyramid_model(num_or,freqs,num_phase,size):
     filters=[]
     for freq in freqs:
         for orient in xrange(0,num_or):
             for p in xrange(0,num_phase):
-                g = Gabor(bounds=BoundingBox(radius=1.5),frequency=1.0,x=0.0,y=0.0,xdensity=size/freq,ydensity=size/freq,size=1.0,orientation=numpy.pi/8*orient,phase=p*2*numpy.pi/num_phase)
+                g = Gabor(bounds=BoundingBox(radius=0.5),frequency=1.0,x=0.0,y=0.0,xdensity=size/freq,ydensity=size/freq,size=0.3,orientation=numpy.pi/8*orient,phase=p*2*numpy.pi/num_phase)
                 filters.append(g())
+
     return filters
 
     
 
 def apply_filters(inputs, filters, spacing):
     (sizex,sizey) = numpy.shape(inputs[0])
-    
     out = []
-    
     for i in inputs:
         o  = []
         for f in filters:
-            (s,trash) =  numpy.shape(f)
-            stepx = int(sizex/(s*spacing))
-            stepy = int(sizey/(s*spacing))
+            (s,tresh) = numpy.shape(f)
+            step = int(s*spacing)
             x=0
             y=0
-            while x*stepx + s <= sizex:
-                while y*stepy + s <= sizey:
-                    o.append(numpy.sum(numpy.sum(numpy.multiply(f,i[x*stepx:x*stepx+s,y*stepy:y*stepy+s]))))
-                    x+=1
+            while (x*step + s) < sizex:
+                while (y*step + s) < sizey:
+                    o.append(numpy.sum(numpy.sum(numpy.multiply(f,i[x*step:x*step+s,y*step:y*step+s]))))
                     y+=1 
+                x+=1
         out.append(numpy.array(o))
     return numpy.array(out)
                 
@@ -568,10 +546,7 @@ def runModelFit():
     
     #dataset = loadRandomizedDataSet("Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL",6,15,125,60)
     dataset = loadSimpleDataSet("Flogl/DataSep2009/testing_01_02_03.dat",375,58)
-    
-    
-    
-    
+
     #this dataset has images numbered from 1
     (index,data) = dataset
     index+=1
@@ -589,17 +564,25 @@ def runModelFit():
     (dataset,testing_data_set) = splitDataset(dataset,0.9)
 
     training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
+    training_inputs=generateInputs(dataset,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,1.8)
     
     validation_set = generateTrainingSet(validation_data_set)
-    validation_inputs=generateInputs(validation_data_set,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
+    validation_inputs=generateInputs(validation_data_set,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,1.8)
     
     testing_set = generateTrainingSet(testing_data_set)
-    testing_inputs=generateInputs(testing_data_set,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,LGN=__main__.__dict__.get('LGNOn',False),LGN_size=__main__.__dict__.get('LGNSize',1.0))
+    testing_inputs=generateInputs(testing_data_set,"Flogl/DataSep2009","/testing_01_02_03/testing01_02_030%03d.tif",density,1.8)
+    
+    #print numpy.shape(training_inputs[0])
+    #compute_spike_triggered_average_rf(training_inputs,training_set,density)
+    #pylab.figure()
+    #pylab.imshow(training_inputs[0])
+    #pylab.show()
+    #return
+
     
     if __main__.__dict__.get('Gabor',True):
-        #fil = generate_pyramid_model(8,[64,32,16,8,4],4,density)
-        fil = generate_pyramid_model(__main__.__dict__.get('num_or',4),[__main__.__dict__.get('freq',4)],__main__.__dict__.get('num_phase',4),density)
+        
+        fil = generate_pyramid_model(__main__.__dict__.get('num_or',4),__main__.__dict__.get('freq',[2,4,8]),__main__.__dict__.get('num_phase',4),numpy.min(numpy.shape(training_inputs[0])))
         training_inputs = apply_filters(training_inputs, fil, __main__.__dict__.get('spacing',0.5))
         testing_inputs = apply_filters(testing_inputs, fil, __main__.__dict__.get('spacing',0.5))
         validation_inputs = apply_filters(validation_inputs, fil, __main__.__dict__.get('spacing',0.5))
@@ -610,14 +593,17 @@ def runModelFit():
         validation_set = normalize_data_set(validation_set,a,mi,ma)
         testing_set = normalize_data_set(testing_set,a,mi,ma)
     
+    print shape(training_set)
+    print shape(training_inputs)
+    
     
     #mf = BasicBPModelFit()
-    mf = BasicModelFit()
-    #mf = ModelFit()
+    #mf = BasicModelFit()
+    mf = ModelFit()
     mf.retina_diameter = 1.2
     mf.density = density
-    mf.learning_rate = __main__.__dict__.get('lr',0.0001)
-    mf.epochs=__main__.__dict__.get('epochs',1000)
+    mf.learning_rate = __main__.__dict__.get('lr',0.001)
+    mf.epochs=__main__.__dict__.get('epochs',273)
     mf.num_of_units = 58
     mf.init()
 
@@ -634,9 +620,6 @@ def runModelFit():
     
     mf.calculateReliabilities(validation_inputs,numpy.mat(validation_set),1)
     mf.testModel(testing_inputs,numpy.mat(testing_set))
-    
-    #compute_spike_triggered_average_rf(training_inputs,training_set,density,mf)
-    
     return mf
 
 def showRF(mf,index,density):
@@ -671,7 +654,7 @@ def set_fann_dataset(td,inputs,outputs):
     
     td.read_train_from_file("./tmp.txt")
 
-def compute_spike_triggered_average_rf(inputs,activities,density,mf):
+def compute_spike_triggered_average_rf(inputs,activities,density):
     (num_inputs,num_activities) = shape(activities)
     RFs = [numpy.zeros(shape(inputs[0])) for j in xrange(0,num_activities)] 
     avgRF = numpy.zeros(shape(inputs[0]))
@@ -711,9 +694,9 @@ def compute_spike_triggered_average_rf(inputs,activities,density,mf):
         pylab.subplot(1,5,4)
         pylab.imshow(avgRF,vmin=numpy.min(avgRF),vmax=numpy.max(avgRF))
         pylab.colorbar()
-        
-        w = mf.weigths[j].reshape(density*1.2,density*1.2)
-        pylab.subplot(1,5,5)
-        pylab.imshow(w,vmin=numpy.min(w),vmax=numpy.max(w))
-        pylab.colorbar()                
         pylab.show()
+        #w = mf.weigths[j].reshape(density*1.2,density*1.2)
+        #pylab.subplot(1,5,5)
+        #pylab.imshow(w,vmin=numpy.min(w),vmax=numpy.max(w))
+        #pylab.colorbar()                
+        #
