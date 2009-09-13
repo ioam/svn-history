@@ -277,11 +277,11 @@ class update_projectionactivity(ProjectionSheetMeasurementCommand):
         self.params('sheet').compute_default()        
         s = p.sheet
         if s is not None:
-            for p in s.in_connections:
-                if not isinstance(p,Projection):
-                    topo.sim.debug("Skipping non-Projection "+p.name)
+            for conn in s.in_connections:
+                if not isinstance(conn,Projection):
+                    topo.sim.debug("Skipping non-Projection "+conn.name)
                 else:
-                    v = p.get_projection_view(topo.sim.time())
+                    v = conn.get_projection_view(topo.sim.time())
                     key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
                     v.projection.dest.sheet_views[key] = v
 
