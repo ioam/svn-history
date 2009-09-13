@@ -407,6 +407,30 @@ distdir: FORCE
 dist: doc distdir reference-manual FORCE
 	${CD} ${DIST_DIR}; ${MAKE} distarc
 
+# CEBALERT: should make this use different path? Or sneakily combine
+# with dist somehow? Tradeoff: avoiding interference/surprise vs
+# saving time and hard disks...
+#
+# Create public distribution suitable for python setup.py install, as
+# well as examples and doc archives
+dist-setup.py: doc distdir reference-manual FORCE
+# clean dir but keep setup.py-related files
+	${CD} ${DIST_DIR}; ${MV} setup.py TMPsetup.py
+	${CD} ${DIST_DIR}; ${MV} _setup.py TMP_setup.py
+	${CD} ${DIST_DIR}; make distclean
+	${CD} ${DIST_DIR}; ${MV} TMPsetup.py setup.py
+	${CD} ${DIST_DIR}; ${MV} TMP_setup.py _setup.py
+# won't need to build this copy
+	${RM} ${DIST_DIR}/Makefile 
+	${RM} -r ${DIST_DIR}/external
+# extract examples and doc
+	${MV} ${DIST_DIR}/examples ${DIST_TMPDIR}/${DIST_DIRNAME}-examples
+	${MV} ${DIST_DIR}/doc ${DIST_TMPDIR}/${DIST_DIRNAME}-doc
+# create archives
+	${CD} ${DIST_TMPDIR} ; ${MAKE_ARCHIVE} ${DIST_DIRNAME} | ${COMPRESS_ARCHIVE} > ${DIST_ARCHIVE}
+	${CD} ${DIST_TMPDIR} ; ${MAKE_ARCHIVE} ${DIST_DIRNAME}-examples | ${COMPRESS_ARCHIVE} > ${DIST_DIRNAME}-examples.tar.gz
+	${CD} ${DIST_DIR}/.. ; ${MAKE_ARCHIVE} ${DIST_DIRNAME}-doc | ${COMPRESS_ARCHIVE} > ${DIST_DIRNAME}-doc.tar.gz
+
 # Note that the output needs to be appended to a copy of the old file,
 # to keep old fixes to formatting. The 9000:HEAD can be omitted to get
 # the full list, but this is faster.
