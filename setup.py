@@ -2,8 +2,8 @@
 
 # CB: work in progress
 
-# Install topo package and topographica script, assuming all
-# dependencies are satisfied:
+# To install topo package and topographica script, assuming all
+# dependencies are satisfied (as given in _setup.py):
 # python setup.py install
 
 from distutils.core import setup
