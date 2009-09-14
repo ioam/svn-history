@@ -53,7 +53,7 @@ class surround_analysis():
         FeatureCurveCommand.display=True
         FeatureCurveCommand.sheet=topo.sim[sheet_name]
         SinusoidalMeasureResponseCommand.num_phase=8
-        SinusoidalMeasureResponseCommand.frequencies=[3.0]
+        SinusoidalMeasureResponseCommand.frequencies=[2.6]
         SinusoidalMeasureResponseCommand.scale=1.0
         MeasureResponseCommand.scale=1.0
         FeatureCurveCommand.num_orientation=4
@@ -130,8 +130,8 @@ class surround_analysis():
         orr=numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
         hc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][hc_curve_name_orc][orr].view()[0][xindex][yindex]
         hc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][hc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
-        lc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr].view()[0][xindex][yindex]
-        lc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
+        #lc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr].view()[0][xindex][yindex]
+        #lc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
     
         ar = []
         for o in self.sheet.curve_dict['orientation'][hc_curve_name].keys():
@@ -143,9 +143,9 @@ class surround_analysis():
         curve_data["ORTC"]["data"]=self.sheet.curve_dict['orientation'][hc_curve_name]
         curve_data["ORTC"]["measures"]={}
         curve_data["ORTC"]["measures"]["colinear_hc_suppresion_index"] = (peak_or_response - hc_pref_or_resp) / peak_or_response 
-        curve_data["ORTC"]["measures"]["colinear_lc_suppresion_index"] = (peak_or_response - lc_pref_or_resp) / peak_or_response
+        #curve_data["ORTC"]["measures"]["colinear_lc_suppresion_index"] = (peak_or_response - lc_pref_or_resp) / peak_or_response
         curve_data["ORTC"]["measures"]["orcontrast_hc_suppresion_index"] = (peak_or_response - hc_cont_or_resp) / peak_or_response 
-        curve_data["ORTC"]["measures"]["orcontrast_lc_suppresion_index"] = (peak_or_response - lc_cont_or_resp) / peak_or_response
+        #curve_data["ORTC"]["measures"]["orcontrast_lc_suppresion_index"] = (peak_or_response - lc_cont_or_resp) / peak_or_response
         
         return curve_data 
 
