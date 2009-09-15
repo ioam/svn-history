@@ -78,13 +78,14 @@ class surround_analysis():
                 self.plot_orientation_contrast_tuning_abs(xindex,yindex)
                 
                 
+        
+        self.plot_histograms_of_measures()
         lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,0.5)                
         self.plot_map_feature_to_surround_modulation_feature_correlations(lhi,"Local Homogeneity Index")
         self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationSelectivity'].view()[0],"OrientationSelectivity")
         self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationPreference'].view()[0]*numpy.pi,"OrientationPreference")
-        self.plot_histograms_of_measures()
-        
-        f = open("dict.dat",'wb')
+
+        f = open(normalize_path("dict.dat"),'wb')
         import pickle
         pickle.dump(self.data_dict,f)
         
@@ -259,12 +260,6 @@ class surround_analysis():
             
             print "AAA:",curve_label
             curve =  measurment[curve_label]["data"]
-            
-            #if curve_label == "ORTC":
-            #   continue
-            
-            
-            # center the values around the orientation that the neuron preffers 
             x_values = sorted(curve.keys())
             y_values = []
             for k in x_values:
@@ -272,10 +267,6 @@ class surround_analysis():
                 
             
             
-            #c=x_values[0]
-            #print x_values
-            #print orientation
-            #sxvalues = x_values
             x_values=x_values-orientation
 
             for j in xrange(0,len(x_values)):
@@ -286,33 +277,12 @@ class surround_analysis():
 
             y_values = sorted(y_values, key=lambda x: x_values[numpy.argmax(y_values == x)])
             x_values = sorted(x_values) 
-            #print x_values
-                   
-            #y_values=[]
-            #for j in xrange(0,size(x_values)):
-                
-            #    key=x_values[j]
-                #print key
-            #    if key < c-orientation:
-            #        key +=numpy.pi
-            #    key += orientation
-                #print key
-            #    y_values.append(curve[key].view()[0][xindex, yindex])
-            ### wrap the data around    
             y_values.append(y_values[0])
             x_values.append(x_values[0]+numpy.pi)
             
             f.plot(x_values, y_values, lw=3, color=colors[i])
             i+=1
         
-        #mi = min(sxvalues)
-        #ma = max(sxvalues)
-        #mmi = min(x_values)
-        #mma = max(x_values)
-        
-        #y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
-        #f.plot(x_values, y_values, lw=3, color=colors[i])
-
         release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "]")
         
         fig = pylab.figure()
@@ -343,17 +313,19 @@ class surround_analysis():
                 
                 print self.data_dict[(xcoord,ycoord)][curve_type].keys()
                 
-                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
-                    if not raster_plots_hc.has_key(measure_name):
-                         raster_plots_hc[measure_name]=[[],[]]    
-                    raster_plots_hc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"][measure_name])
-                    raster_plots_hc[measure_name][1].append(map_feature[xcoord,ycoord])        
-
-                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"].keys():
-                    if not raster_plots_lc.has_key(measure_name):
-                         raster_plots_lc[measure_name]=[[],[]]    
-                    raster_plots_lc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = "  + str(self.low_contrast) + "%"]["measures"][measure_name])
-                    raster_plots_lc[measure_name][1].append(map_feature[xcoord,ycoord])        
+                if self.data_dict[(xcoord,ycoord)][curve_type].has_key(curve_label + " = " + str(self.low_contrast) + "%"):
+                    for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
+                        if not raster_plots_hc.has_key(measure_name):
+                            raster_plots_hc[measure_name]=[[],[]]    
+                        raster_plots_hc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"][measure_name])
+                        raster_plots_hc[measure_name][1].append(map_feature[xcoord,ycoord])        
+                
+                if self.data_dict[(xcoord,ycoord)][curve_type].has_key(curve_label + " = " + str(self.low_contrast) + "%"):
+                    for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"].keys():
+                        if not raster_plots_lc.has_key(measure_name):
+                            raster_plots_lc[measure_name]=[[],[]]    
+                        raster_plots_lc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = "  + str(self.low_contrast) + "%"]["measures"][measure_name])
+                        raster_plots_lc[measure_name][1].append(map_feature[xcoord,ycoord])        
 
         for key in raster_plots_hc.keys():
                 fig = pylab.figure()
