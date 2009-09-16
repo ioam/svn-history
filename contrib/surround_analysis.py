@@ -38,8 +38,8 @@ class surround_analysis():
     sheet_name = ""
     data_dict = {}
     
-    low_contrast=20
-    high_contrast=80
+    low_contrast=30
+    high_contrast=60
     
     def __init__(self,sheet_name="V1Complex"):
         from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand
@@ -131,8 +131,8 @@ class surround_analysis():
         orr=numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
         hc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][hc_curve_name_orc][orr].view()[0][xindex][yindex]
         hc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][hc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
-        #lc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr].view()[0][xindex][yindex]
-        #lc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
+        lc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr].view()[0][xindex][yindex]
+        lc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
     
         ar = []
         for o in self.sheet.curve_dict['orientation'][hc_curve_name].keys():
@@ -144,9 +144,9 @@ class surround_analysis():
         curve_data["ORTC"]["data"]=self.sheet.curve_dict['orientation'][hc_curve_name]
         curve_data["ORTC"]["measures"]={}
         curve_data["ORTC"]["measures"]["colinear_hc_suppresion_index"] = (peak_or_response - hc_pref_or_resp) / peak_or_response 
-        #curve_data["ORTC"]["measures"]["colinear_lc_suppresion_index"] = (peak_or_response - lc_pref_or_resp) / peak_or_response
+        curve_data["ORTC"]["measures"]["colinear_lc_suppresion_index"] = (peak_or_response - lc_pref_or_resp) / peak_or_response
         curve_data["ORTC"]["measures"]["orcontrast_hc_suppresion_index"] = (peak_or_response - hc_cont_or_resp) / peak_or_response 
-        #curve_data["ORTC"]["measures"]["orcontrast_lc_suppresion_index"] = (peak_or_response - lc_cont_or_resp) / peak_or_response
+        curve_data["ORTC"]["measures"]["orcontrast_lc_suppresion_index"] = (peak_or_response - lc_cont_or_resp) / peak_or_response
         
         return curve_data 
 
@@ -274,6 +274,13 @@ class surround_analysis():
                    x_values[j] -= numpy.pi 
                 if x_values[j] < -numpy.pi/2.0:
                    x_values[j] += numpy.pi
+
+            for j in xrange(0,len(x_values)):
+                if x_values[j] > numpy.pi/2.0:
+                   x_values[j] -= numpy.pi 
+                if x_values[j] < -numpy.pi/2.0:
+                   x_values[j] += numpy.pi
+
 
             y_values = sorted(y_values, key=lambda x: x_values[numpy.argmax(y_values == x)])
             x_values = sorted(x_values) 
