@@ -423,13 +423,9 @@ dist-setup.py: doc distdir reference-manual FORCE
 # won't need to build this copy
 	${RM} ${DIST_DIR}/Makefile 
 	${RM} -r ${DIST_DIR}/external
-# extract examples and doc
-	${MV} ${DIST_DIR}/examples ${DIST_TMPDIR}/${DIST_DIRNAME}-examples
-	${MV} ${DIST_DIR}/doc ${DIST_TMPDIR}/${DIST_DIRNAME}-doc
 # create archives
 	${CD} ${DIST_TMPDIR} ; ${MAKE_ARCHIVE} ${DIST_DIRNAME} | ${COMPRESS_ARCHIVE} > ${DIST_ARCHIVE}
-	${CD} ${DIST_TMPDIR} ; ${MAKE_ARCHIVE} ${DIST_DIRNAME}-examples | ${COMPRESS_ARCHIVE} > ${DIST_DIRNAME}-examples.tar.gz
-	${CD} ${DIST_DIR}/.. ; ${MAKE_ARCHIVE} ${DIST_DIRNAME}-doc | ${COMPRESS_ARCHIVE} > ${DIST_DIRNAME}-doc.tar.gz
+
 
 # Note that the output needs to be appended to a copy of the old file,
 # to keep old fixes to formatting. The 9000:HEAD can be omitted to get
