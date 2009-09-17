@@ -3495,7 +3495,10 @@ class StatusBar(T.Frame):
         self.bell()
         # CEBALERT: would like to lock only the window with the error,
         # not the whole app, but I don't know how to do that.
-        self.grab_set()
+        try:
+            self.grab_set()
+        except: # get tclerror if another app has grab
+            pass
 
     def clear_message(self):
         self.mpoint=-1
@@ -3503,7 +3506,10 @@ class StatusBar(T.Frame):
         self.messagelabel.config(text="")
         self._nrm_fmt()
         self._show_dynamicinfoframe()
-        self.grab_release()
+        try:
+            self.grab_release()
+        except:
+            pass
         
     def clear_dynamicinfo(self):
         self.dynamicinfolabel.config(text="")
