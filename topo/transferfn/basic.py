@@ -210,7 +210,7 @@ class DivisiveNormalizeLinf(TransferFn):
     norm_value = param.Number(default=1.0)
     
     def __call__(self,x):
-        tot = 1.0*max(abs(x.ravel()))
+        tot = 1.0*(numpy.abs(x)).max()
         if tot != 0:
             factor = (self.norm_value/tot)
             x *= factor
