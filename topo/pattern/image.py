@@ -165,10 +165,11 @@ class PatternSampler(ImageSampler):
         else:
             # CEBALERT: is there a more NumPy way to do this that would be faster?
             rows,cols = pattern_sample.shape
+            contains_exclusive = self.scs.bounds.contains_exclusive
             for i in xrange(rows):
                 for j in xrange(cols):
                     # indexes outside the pattern are left with the background color
-                    if self.scs.bounds.contains_exclusive(x[i,j],y[i,j]):
+                    if contains_exclusive(x[i,j],y[i,j]):
                         pattern_sample[i,j] = self.image[r[i,j],c[i,j]]
 
         return pattern_sample

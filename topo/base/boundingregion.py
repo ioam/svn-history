@@ -144,9 +144,9 @@ class BoundingBox(BoundingRegion):
         bounding box, where the bottom and right boundaries are
         considered exclusive.
         """
-        left,bottom,right,top = self.aarect().lbrt()
+        a=self._aarect
+        left,bottom,right,top = a._left,a._bottom,a._right,a._top
         return (left <= x < right) and (bottom < y <= top)
-
 
 
     def containsbb_exclusive(self,x):
