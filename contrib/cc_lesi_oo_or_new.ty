@@ -58,11 +58,11 @@ if dataset=="Natural":
     input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02))
 
 disk_scale=locals().get('diskscale',0.35)
-ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-1.1,ubound=1.1,seed=12),
-                                                            y=UniformRandom(lbound=-1.1,ubound=1.1,seed=36),
+ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-1.5,ubound=1.5,seed=12),
+                                                            y=UniformRandom(lbound=-1.5,ubound=1.5,seed=36),
                        generators=[topo.pattern.basic.Ring(size=2, aspect_ratio=1.0, scale=0.25,thickness=locals().get('Thickness',0.01),
                                                             offset=0.0,
-                                                            bounds=BoundingBox(radius=1.125), smoothing=0.03),
+                                                            bounds=BoundingBox(radius=1.5), smoothing=0.03),
                                    topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',0), scale=locals().get('rand_scale',0.05))])
 
 retinal_waves=Translator(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
@@ -145,7 +145,7 @@ topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fns=[ActivityHysteresis(time_constant=0.35),V1Complex_OF])
+                        output_fns=[ActivityHysteresis(time_constant=0.35),HalfRectify(t_init=locals().get('V1CExcTresh',0.0))])
 
 topo.sim['V1ComplexInh'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
