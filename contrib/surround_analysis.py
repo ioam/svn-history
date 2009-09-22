@@ -56,7 +56,7 @@ class surround_analysis():
         SinusoidalMeasureResponseCommand.frequencies=[2.6]
         SinusoidalMeasureResponseCommand.scale=1.0
         MeasureResponseCommand.scale=1.0
-        FeatureCurveCommand.num_orientation=4
+        FeatureCurveCommand.num_orientation=8
 
 
     def analyse(self,steps=1,ns=10,step_size=1):
@@ -396,7 +396,7 @@ class surround_analysis():
                     mmax = numpy.max(numpy.max(histograms_lc[key]),numpy.max(histograms_hc[key]))
                     mmin = numpy.min(numpy.min(histograms_lc[key]),numpy.min(histograms_hc[key]))
                     bins = numpy.arange(mmin,mmax+0.01,(mmax-mmin)/10.0)
-                    f.hist([histograms_lc[key],histograms_hc[key]],bins=bins,normed=False,facecolor='green')
+                    f.hist(histograms_hc[key],bins=bins,normed=False,facecolor='green')
                     #f.axvline(x=numpy.mean(histograms_lc[key]),linewidth=4, color='r')
                     release_fig("Histogram<" + key + ">")
                     print key + "LC mean :" + str(numpy.mean(histograms_lc[key]))
