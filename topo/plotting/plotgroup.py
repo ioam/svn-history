@@ -76,7 +76,7 @@ class PlotGroup(param.Parameterized):
         template for this plot, but various arguments can be passed, a
         modified version substituted, etc.""")
 
-    # I guess the interace for users of the class (I just mean methods
+    # I guess the interface for users of the class (I just mean methods
     # likely to be used) is:
     # make_plots()   
     # scale_images()  
@@ -888,7 +888,7 @@ class GridPlotGroup(ProjectionSheetPlotGroup):
     ########## overridden
 
     def _sort_plots(self):
-        """Skips plot sorting for to keep the generated order."""
+        """Skips plot sorting to keep the generated order."""
         pass
 
 
