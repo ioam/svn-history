@@ -221,12 +221,11 @@ pil-uninstall:
 ##############################################################
 # numpy (matrix library)
 #
-NUMPY = numpy-1.1.1
+NUMPY = numpy-1.2.1
 NUMPY_UNINSTALL =  ${PYTHON_LIB}/site-packages/numpy
 
 numpy: ${NUMPY}.tar.gz python
 	tar -xzf ${NUMPY}.tar.gz
-	cd ${NUMPY}; patch -p0 < ../numpy.diff
 	cd ${NUMPY}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
 	touch numpy
 
@@ -290,7 +289,7 @@ weave-uninstall:
 ##############################################################
 # Scipy
 #
-SCIPY = scipy-0.5.2
+SCIPY = scipy-0.7.1
 SCIPY_UNINSTALL = ${PYTHON_LIB}/site-packages/scipy external/scipy
 
 # Forces removal of scipy version used with Numeric
