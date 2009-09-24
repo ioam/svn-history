@@ -268,7 +268,7 @@ matplotlib-uninstall:
 ##############################################################
 # Weave (on its own apart from Scipy)
 #
-WEAVE = scipy-0.5.2
+WEAVE = scipy-0.7.1
 WEAVE_UNINSTALL = ${PYTHON_LIB}/site-packages/weave external/weave
 
 # Forces removal of weave version used with Numeric
