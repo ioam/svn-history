@@ -276,7 +276,7 @@ weave: ${WEAVE}.tar.gz python
 	rm -rf Scipy_core-0.3.0_108.1820
 	rm -f ${PYTHON_LIB}/site-packages/weave external/weave
 	tar -xzf ${WEAVE}.tar.gz
-	cd ${WEAVE}/Lib/weave/; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${WEAVE}/scipy/weave/; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
 	touch weave
 
 weave-clean:
