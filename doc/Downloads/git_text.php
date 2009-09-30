@@ -207,7 +207,18 @@ href="http://www-cs-students.stanford.edu/~blynn/gitmagic/">Git
 Magic</a>). One thing that you will probably want to do as soon as you
 are familiar with basic git-svn operation is to use one branch to
 track the svn repository, and then use a new branch for each
-independent set of changes.
+independent set of changes:
+
+<pre>
+$ git checkout -b testing123
+Switched to a new branch 'testing123'
+# (edit code)
+$ git commit -m "Added x." somefile
+# (more editing)
+$ git commit -m "Added y." anotherfile
+</pre>
+
+At this point, your new changes exist only on the 
 
 
 
