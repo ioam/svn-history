@@ -278,26 +278,43 @@ repository will serve as a backup of your work:
 <pre>
 # This assumes you don't already have your own post-commit hooks;
 # if you do, modify the command below appropriately.
-echo "git push NAME --mirror" > .git/hooks/post-commit && chmod +x .git/hooks/post-commit
+$ echo "git push NAME --mirror" > .git/hooks/post-commit && chmod +x .git/hooks/post-commit
 </pre>
 
-If you are not connected to the network, the post-commit hook will fail, but
-the local commit will still be successful.
+If you are not connected to the network, the post-commit hook will
+fail, but the local commit will still be successful. You can use
+<code>git push NAME --mirror</code> later on to send all your changes
+to the remote repository.
 
+<P>
 If your repository is on SourceForge, it will be visible on the web:
 <pre>
 http://topographica.git.sourceforge.net/git/gitweb.cgi?p=topographica/NAME
 </pre>
 
-Once your feature is complete, you can commit all your work to the
-central SVN repository using <code>git svn dcommit</code> as described
-earlier. After this point, it is highly unlikely that you will be able
-to continue using the repository you have shared on the remote host
-(because svn does not have all the features of git, the "git svn
-dcommit" command necessarily alters the history of your local
-repository in a way that will likely leave it incompatible with that
-of the copy on the remote host). Most likely, you will anyway want to
-have the remote git repository deleted (or otherwise archived).
+Additionally, others can get a copy of your repository using the
+following commands:
+<pre>
+# copies your repository into NAME/
+$ git clone git://topographica.git.sourceforge.net/gitroot/topographica/NAME
+</pre>
+In the future, they can get your latest changes:
+<pre>
+$ cd NAME/
+$ git pull
+</pre>
+
+<P> Finally, once your feature is complete, you can commit all your
+work to the central SVN repository using <code>git svn dcommit</code>
+as described earlier. After this point, it is highly unlikely that you
+will be able to continue using the remote repository (because svn does
+not have all the features of git, the "git svn dcommit" command
+necessarily alters the history of your local repository in a way that
+will likely leave it incompatible with that of the copy on the remote
+host). Anyway, you will most likely want to have the remote git
+repository deleted (or otherwise archived). Your local repository will
+of course remain usable, and you can create a new remote copy if you
+begin working on another extended feature.
 
 <!--CEBALERT can't remember how to do footnotes-->
 * Alternatively, find another host (which could be as simple as a
