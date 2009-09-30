@@ -276,6 +276,8 @@ $ git push NAME --mirror
 You can have your commits pushed automatically; this way, the public
 repository will serve as a backup of your work:
 <pre>
+# This assumes you don't already have your own post-commit hooks;
+# if you do, modify the command below appropriately.
 echo "git push NAME --mirror" > .git/hooks/post-commit && chmod +x .git/hooks/post-commit
 </pre>
 
