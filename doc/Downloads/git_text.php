@@ -281,7 +281,10 @@ repository will serve as a backup of your work:
 echo "git push NAME --mirror" > .git/hooks/post-commit && chmod +x .git/hooks/post-commit
 </pre>
 
-If your repository is on SourceForge, it will be visible on the web:
+If you are not connected to the network, the post-commit hook will fail, but
+the local commit will still be successful.
+
+Finally, if your repository is on SourceForge, it will be visible on the web:
 <pre>
 http://topographica.git.sourceforge.net/git/gitweb.cgi?p=topographica/NAME
 </pre>
