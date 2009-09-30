@@ -204,7 +204,13 @@ use the usual git commands to deal with such merge conflicts.
 above.  There are many useful git tutorials on the web explaining more
 advanced git usage (e.g. <a
 href="http://www-cs-students.stanford.edu/~blynn/gitmagic/">Git
-Magic</a>). Below, we desribe a few particular features.
+Magic</a>). Below, we desribe a few particular features. 
+
+<P>Before using all of Git's capabilities on your git-svn repository,
+note that the <a
+href="http://www.kernel.org/pub/software/scm/git/docs/git-svn.html">official
+git-svn documentation</a> recommends against pulling changes into a
+git-svn repository (see "Caveats" on that page).
 
 
 <H4>Working on multiple independent features</H4>
