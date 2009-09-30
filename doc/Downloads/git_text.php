@@ -198,13 +198,18 @@ process, and the SVN error will be reported. At this point, you can
 use the usual git commands to deal with such merge conflicts.
 
 
-<H3>Taking advantage of more Git features</H3>
+<H3>Taking advantage of more of Git's capabilities</H3>
 
 <P>Git is very flexible, and provides far more than is mentioned
 above.  There are many useful git tutorials on the web explaining more
 advanced git usage (e.g. <a
 href="http://www-cs-students.stanford.edu/~blynn/gitmagic/">Git
-Magic</a>). One thing that you will probably want to do as soon as you
+Magic</a>). Below, we desribe a few particular features.
+
+
+<H4>Working on multiple independent features</H4>
+
+One thing that you will probably want to do as soon as you
 are familiar with basic git-svn operation is to use one branch to
 track the svn repository, and then use a new branch for each
 independent set of changes:
@@ -218,7 +223,74 @@ $ git commit -m "Added x." somefile
 $ git commit -m "Added y." anotherfile
 </pre>
 
-At this point, your new changes exist only on the 
+At this point, your new changes exist only on the testing123
+branch. If you switch back to the master branch, the recent changes
+will not show up:
+
+<pre>
+$ git checkout master
+Switched to branch 'master'
+$ git log
+# recent commits don't show
+</pre>
+
+You could now work on another feature by creating a new branch. Or, if
+you have finished the work on the testing123 branch, you can merge the
+changes into your master branch, and then commit them to the central
+SVN repository:
+
+<pre>
+$ git merge testing123
+# info about merge appears
+$ git svn dcommit
+# info about svn commit appears
+$ git branch -d testing123
+Deleted branch testing123 (was d8d6b8d).
+</pre>
 
 
+<H4>Sharing your work</H4>
 
+<P>If you are working on a complex new feature over a long period of
+time, you might want to share your work before it is finished. To do
+this, ask one of the Topographica admins to create a git repository
+for the feature on SourceForge.net*. The admin will give you a remote
+repository name (e.g. NAME), which you should tell git about:
+
+<pre>
+$ git remote add NAME ssh://username@topographica.git.sourceforge.net/gitroot/topographica/NAME
+</pre> 
+
+Then, you can push your repository to the host:
+
+<pre>
+$ git push --all NAME
+</pre>
+
+You can have your commits pushed automatically; this way, the public
+repository will serve as a backup of your work:
+<pre>
+echo "git push --force --all NAME" > .git/hooks/post-commit && chmod +x .git/hooks/post-commit
+</pre>
+
+If your repository is on SourceForge, it will be visible on the web:
+<pre>
+http://topographica.git.sourceforge.net/git/gitweb.cgi?p=topographica/NAME
+</pre>
+
+
+<!--CEBALERT can't remember how to do footnotes-->
+* Alternatively, find another host (which could be as simple as a
+networked machine).  You can even share directly from your machine,
+but that way you would lose the advantage of having an external
+backup.
+
+<!--
+ssh -t ceball,topographica@shell.sourceforge.net create
+cd /home/scm_git/t/to/topographica
+git --git-dir=ceball_houzi2 init --shared=all --bare
+emacs -nw ceball_houzei2/description
+-->
+
+<!-- based on http://sourceforge.net/apps/trac/sourceforge/wiki/Git, http://www.naildrivin5.com/daveblog5000/?p=102 and
+http://projects.scipy.org/numpy/wiki/GitMirror to some extent -->
