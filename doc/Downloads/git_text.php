@@ -270,13 +270,13 @@ $ git remote add NAME ssh://username@topographica.git.sourceforge.net/gitroot/to
 Then, you can push your repository to the host:
 
 <pre>
-$ git push --all NAME
+$ git push NAME --mirror
 </pre>
 
 You can have your commits pushed automatically; this way, the public
 repository will serve as a backup of your work:
 <pre>
-echo "git push --force --all NAME" > .git/hooks/post-commit && chmod +x .git/hooks/post-commit
+echo "git push NAME --mirror" > .git/hooks/post-commit && chmod +x .git/hooks/post-commit
 </pre>
 
 If your repository is on SourceForge, it will be visible on the web:
