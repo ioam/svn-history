@@ -284,11 +284,20 @@ echo "git push NAME --mirror" > .git/hooks/post-commit && chmod +x .git/hooks/po
 If you are not connected to the network, the post-commit hook will fail, but
 the local commit will still be successful.
 
-Finally, if your repository is on SourceForge, it will be visible on the web:
+If your repository is on SourceForge, it will be visible on the web:
 <pre>
 http://topographica.git.sourceforge.net/git/gitweb.cgi?p=topographica/NAME
 </pre>
 
+Once your feature is complete, you can commit all your work to the
+central SVN repository using <code>git svn dcommit</code> as described
+earlier. After this point, it is highly unlikely that you will be able
+to continue using the repository you have shared on the remote host
+(because svn does not have all the features of git, the "git svn
+dcommit" command necessarily alters the history of your local
+repository in a way that will likely leave it incompatible with that
+of the copy on the remote host). Most likely, you will anyway want to
+have the remote git repository deleted (or otherwise archived).
 
 <!--CEBALERT can't remember how to do footnotes-->
 * Alternatively, find another host (which could be as simple as a
