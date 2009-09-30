@@ -238,7 +238,7 @@ numpy-uninstall:
 ##############################################################
 # MatPlotLib (plotting library)
 #
-MATPLOTLIB = matplotlib-0.91.4
+MATPLOTLIB = matplotlib-0.99.1.1
 MATPLOTLIB_UNINSTALL =  ${PYTHON_LIB}/site-packages/matplotlib
 
 # Workaround to allow MATPLOTLIB to compile on a remote session.
@@ -254,6 +254,10 @@ endif
 
 matplotlib: ${MATPLOTLIB}.tar.gz python
 	tar -xzf ${MATPLOTLIB}.tar.gz
+# mistakenly included in matplotlib distribution?
+	cd ${MATPLOTLIB}; rm setup.cfg
+# otherwise can't find our tk while building tkagg
+	cd ${MATPLOTLIB}; ${PREFIX}/bin/python setup.py build_ext -L${PREFIX}/lib/
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py build
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
 	touch matplotlib

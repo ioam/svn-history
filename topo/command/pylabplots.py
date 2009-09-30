@@ -220,8 +220,8 @@ class matrixplot3d(PylabPlotCommand):
     def __call__(self,mat,type="wireframe",**params):
         p=ParamOverrides(self,params)
     
-        from matplotlib import axes3d
-        
+        from mpl_toolkits.mplot3d import axes3d
+
         fig = pylab.figure()
         ax = axes3d.Axes3D(fig)
     
