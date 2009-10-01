@@ -56,6 +56,30 @@ release = ''
 version = ''
 
 
+# CEBALERT: (about PIL)
+# PIL (i.e. the Imaging package) can be installed so that it's
+# e.g. "from PIL import Image" or just "import Image".
+try:
+    import Image
+except ImportError:
+    from PIL import Image, ImageOps, ImageDraw, ImageFont
+    import sys
+    sys.modules['Image']=Image
+    sys.modules['ImageOps']=ImageOps
+    sys.modules['ImageDraw']=ImageDraw
+    sys.modules['ImageFont']=ImageFont
+
+# ImageTk is completely optional
+try:
+    import ImageTk
+except ImportError:
+    try:
+        from PIL import ImageTk
+        import sys
+        sys.modules['ImageTk']=ImageTk
+    except ImportError:
+        pass
+
 
 # CEBALERT: can we move these pickle support functions elsewhere?
 # In fact, can we just gather all the non-legacy pickle garbage into one
