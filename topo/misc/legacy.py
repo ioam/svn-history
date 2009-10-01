@@ -19,6 +19,12 @@ import sys
 # rather than having (effectively) a list in each.
 
 
+
+# CEBALERT: deal with this
+# Temporary as of 12/2007, for backwards compatibility
+# Image=FileImage
+
+
 def _setstate(inst,state):
     for k,v in state.items():
         setattr(inst,k,v)

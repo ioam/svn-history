@@ -4,8 +4,7 @@ PatternGenerators based on bitmap images stored in files.
 $Id$
 """
 
-# PIL Image is imported as PIL because we have our own Image PatternGenerator
-import Image as PIL
+import Image
 import ImageOps
 import numpy
 import copy
@@ -116,7 +115,7 @@ class PatternSampler(ImageSampler):
 
         The image is assumed to be a NumPy array or other object that
         exports the NumPy buffer interface (i.e. can be converted to a
-        NumPy array by passing it to numpy.array(), e.g. PIL.Image).
+        NumPy array by passing it to numpy.array(), e.g. Image.Image).
         The whole_pattern_output_fns are applied to the image before
         any sampling is done.
 
@@ -232,13 +231,13 @@ class FastImageSampler(ImageSampler):
     aspect ratio of the original picture.
     """
     
-    sampling_method = param.Integer(default=PIL.NEAREST,doc="""
+    sampling_method = param.Integer(default=Image.NEAREST,doc="""
        Python Imaging Library sampling method for resampling an image.
        Defaults to Image.NEAREST.""")
 
     def _set_image(self,image):
-        if not isinstance(image,PIL.Image):
-            self._image = PIL.new('L',image.shape)
+        if not isinstance(image,Image.Image):
+            self._image = Image.new('L',image.shape)
             self._image.putdata(image.ravel())
         else:
             self._image = image
@@ -255,7 +254,7 @@ class FastImageSampler(ImageSampler):
 
 
 
-# Would be best called Image, but that causes confusion with PIL's Image
+# Would be best called Image, but that causes confusion with Image's Image
 class GenericImage(PatternGenerator):
     """
     Generic 2D image generator.
@@ -315,11 +314,11 @@ class GenericImage(PatternGenerator):
 
         return result
 
-    ### support pickling of PIL.Image
+    ### support pickling of Image.Image
 
     # CEBALERT: almost identical code to that in topo.plotting.bitmap.Bitmap.
     # Can we instead patch PIL? (Note that we can't use copy_reg as we do for
-    # e.g. numpy ufuncs because PIL's Image is not a new-style class. So patching
+    # e.g. numpy ufuncs because Image's Image is not a new-style class. So patching
     # PIL is probably the only option to handle this problem in one place.)
     
     # CEB: by converting to string and back, we probably incur some speed
@@ -352,7 +351,7 @@ class GenericImage(PatternGenerator):
         # #2276819).
         if '_image' in state and state['_image'] is not None:
             import StringIO
-            state['_image'] = PIL.open(StringIO.StringIO(state['_image']))
+            state['_image'] = Image.open(StringIO.StringIO(state['_image']))
         super(GenericImage,self).__setstate__(state)
 
 
@@ -362,7 +361,7 @@ class FileImage(GenericImage):
     2D Image generator that reads the image from a file.
     
     The image at the supplied filename is converted to grayscale if it
-    is not already a grayscale image. See PIL's Image class for
+    is not already a grayscale image. See Image's Image class for
     details of supported image file formats.
     """
 
@@ -390,12 +389,9 @@ class FileImage(GenericImage):
         """
         if p.filename!=self.last_filename or self._image is None:
             self.last_filename=p.filename
-            self._image = ImageOps.grayscale(PIL.open(p.filename))
+            self._image = ImageOps.grayscale(Image.open(p.filename))
         return self._image
 
 
-# PICKLEHACK (move to legacy)
-# Temporary as of 12/2007, for backwards compatibility
-Image=FileImage
 
 
