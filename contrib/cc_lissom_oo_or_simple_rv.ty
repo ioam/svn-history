@@ -26,7 +26,7 @@ from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.transferfn.basic import HalfRectify,PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt,AttributeTrackingTF,Sigmoid,PatternCombine, ExpLinear
+from topo.transferfn.basic import HalfRectify,PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt,AttributeTrackingTF,Sigmoid,PatternCombine
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, Choice
 from topo.pattern.basic import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
@@ -129,8 +129,8 @@ elif locals().get('SOF',"Homeo") == "Homeo":
         V1Simple_OF = SimpleHomeoSigmoid(a_init=22,b_init=-12,mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
 elif locals().get('SOF',"Homeo") == "SimpleHomeo":
     V1Simple_OF = SimpleHomeoLinear(t_init=locals().get('STresh',0.9),alpha=locals().get('SAlpha',4),mu=locals().get('SMU',0.01),eta=locals().get('SETA',0.02))
-elif locals().get('SOF',"Homeo") == "ExpLin":
-    V1Simple_OF = ExpLinear(t=locals().get('STresh',0.9),e=locals().get('SExp',1.0))
+#elif locals().get('SOF',"Homeo") == "ExpLin":
+#    V1Simple_OF = ExpLinear(t=locals().get('STresh',0.9),e=locals().get('SExp',1.0))
 else:
         V1Simple_OF=Sigmoid(r=22,k=-12)
 
@@ -249,16 +249,17 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.025,dest_port=('Activity','JointNor
 
 simpleLateral  =  locals().get('SL',False)
 if simpleLateral:
-        topo.sim.connect('V1Simple','V1Simple',delay=0.025,name='LateralExcitatoryL4',
-                         connection_type=CFProjection,strength=locals().get('SxLatExcStr',0.0),
-                         weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.04)),
-                         nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.12)),
-                         learning_rate=0.0)
+    #    topo.sim.connect('V1Simple','V1Simple',delay=0.025,name='LateralExcitatoryL4',
+    #                     connection_type=CFProjection,strength=locals().get('SxLatExcStr',0.0),
+    #                     weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, #size=locals().get('CxLatExcSize',0.04)),
+    #                     nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.12)),
+    #                     learning_rate=0.0)
         
         topo.sim.connect('V1Simple','V1Simple',delay=0.025,name='LateralInhibitoryL4',
-                         connection_type=CFProjection,strength=-locals().get('SxLatInhStr',0.0),
+                         connection_type=CFProjection,strength=-locals().get('SxLatInhStr',0.5),
                          weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
-                             generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',2*0.22917)),
+                             #generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',2*0.22917)),
+                              generators=[Gaussian(aspect_ratio=1.0, size=0.05),
                                         topo.pattern.random.UniformRandom(seed=11)]),
                          nominal_bounds_template=BoundingBox(radius=locals().get('CxLatInhBB',0.22917)),
                          learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
