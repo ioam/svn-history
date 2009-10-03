@@ -462,10 +462,12 @@ ChangeLog.txt: FORCE
 #
 # * Test it builds
 # 
-# -- missing --
-# pbuilder create, build
-# ceball@fiver:~/pkg$ sudo pbuilder build topographica_0.9.6-0ubuntu2.dsc 
-# -------------
+# Not sure, something like this...
+# set up (first time only):
+# $ sudo pbuilder create --distribution jaunty  
+# then for testing:
+# $ sudo pbuilder build topographica_0.9.6-0ubuntu2.dsc
+#
 #
 # * Upload to PPA
 #
