@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 
-# CB: work in progress
+# CB: work in progress.
 
-# To install topo package and topographica script, assuming all
-# dependencies are satisfied (as given in _setup.py):
-# python setup.py install
+# As of 2009/10/03, tested successfully on:
+# Ubuntu 9.04  
+# Mac OS X 10.6 with MacPorts
+
+# See _setup.py for list of dependencies, then:
+# sudo python setup.py install
+# (or alternative, such as "python setup.py install --prefix=...")
 
 from distutils.core import setup
 

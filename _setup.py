@@ -1,18 +1,26 @@
-
-
-## Here's how I set up Topographica on my Ubuntu 9.04 machine...
-
-## I can get all but one of the required dependencies by executing
-## this command:
+## Dependencies for Ubuntu 9.04
+## ============================
+##
 ## $ sudo apt-get install python python-dev python-numpy python-gmpy python-matplotlib python-scipy ipython python-tk python-imaging python-imaging-tk tcllib tklib
 ## 
-## The single remaining dependency (for which there isn't an Ubuntu
-## package) can be installed like this:
+## The single remaining dependency (for which there isn't yet an
+## Ubuntu package) can be installed like this:
 ## $ cd topographica/external/ # topographica/ is an svn source code checkout
 ## $ tar xvf pyscrodget-0.0.2_2.1.tar.gz
 ## $ cd pyscrodget-0.0.2_2.1/
 ## $ sudo python setup.py install
+
+## Dependencies for MacPorts on OS X 10.6
+## ======================================
 ## 
+## $ sudo port install python25 py25-tkinter py25-numpy py25-matplotlib py25-pil py25-scipy py25-ipython
+## $ sudo port install tcllib
+## $ sudo port install python_select
+## $ sudo port python_select python25
+## download tklib 8.5; install using provided "sudo ./install.tcl"
+## install fixedpoint (as per Makefile, but "sudo python setup.py install"
+
+ 
 common = dict(
 
     name='Topographica',

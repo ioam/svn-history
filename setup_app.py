@@ -1,30 +1,52 @@
 """
 py2app build script for Topographica.
 
-Work in progress
-
-Usage:
-    python setup.py py2app
+Work in progress!
 """
 from setuptools import setup
 
-# Currently this script with topographica's python doesn't work
-# because Topographica doesn't build lib/libpython2.5.dylib.  Not sure
-# what to do about that.
-# Turns out nobody else could get the .dylib file. Apparently fixed in
-# python 2.6: http://bugs.python.org/issue4472.
+# Two options: try to build app from OS X Topographica build,
+# or use macports.
 #
-# Using macports, can almost build .app file...
-# $ sudo port install python25 py25-tkinter py25-numpy py25-matplotlib py25-pil py25-scipy
-# $ #py25-ipython won't compile (and can't get ipython's setup.py to install ipython for python to find!)
-# $ #no py25-gmpy (can use fixedpoint)
+#
+# USING TOPOGRAPHICA BUILD
+# ========================
+#
+# $ cd ~/topographica
+# $ mkdir man; mkdir man/man1 # otherwise building libjpeg fails later on!
+# $ cd external/freetype-2.3.9
+# $ ./configure --prefix=/Users/ceball/topographica
+# $ make; make install
+# $ cd ../..
+# (patch as given in https://mail.google.com/mail/#sent/1241b25dfa448c33)
+# $ make
+# $ cd external/setuptools-0.6c9/
+# $ ../../bin/python setup.py install
+# $ cd ../../
+# $ bin/python setup_app.py py2app
+# (fails)
+#
+#
+# USING MACPORTS
+# ==============
+#
+# Dependencies
+# ------------
+#
+# $ sudo port install python25 py25-tkinter py25-numpy py25-matplotlib py25-pil py25-scipy py25-ipython
 # $ sudo port install tcllib
-# sudo port install python_select
-# sudo port python_select python25
-# $ # download tklib, install using provided ./install.tcl
-# $ sudo python setup.py install for fixedpoint
-# $ python setup_app.py py2app -A # builds + tests pass
-# $ python setup_app.py py2app # builds successfully, but topographica.app can't find Image module
+# $ sudo port install python_select
+# $ sudo port python_select python25
+# download tklib 8.5; install using provided "sudo ./install.tcl"
+# no py25-gmpy; use fixedpoint (as per Makefile, but "sudo python setup.py install"
+#
+# Building .app
+# -------------
+#
+# $ cd ~/topographica
+# $ python setup_app.py py2app 
+# (fails)
+
 
 
 #Information about OS X & icons, from Kevin Walzer (www.codebykevin.com)
