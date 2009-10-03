@@ -440,6 +440,13 @@ ChangeLog.txt: FORCE
 #
 # https://wiki.ubuntu.com/PackagingGuide/Complete
 #
+
+# $ export DEBFULLNAME='C. E. Ball'
+# $ export DEBEMAIL='ceball@gmail.com'
+# set up GPG key, sign various ubuntu agreements on launchpad, ...
+# $ export GPGKEY=4275E3C7
+#
+#
 # ceball@fiver:~/pkg$ ls
 # topographica-0.9.6  topographica_0.9.6.orig.tar.gz
 #
