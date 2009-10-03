@@ -436,3 +436,42 @@ ChangeLog.txt: FORCE
 
 
 
+# CREATING .DEB FOR UBUNTU
+#
+# https://wiki.ubuntu.com/PackagingGuide/Complete
+#
+# ceball@fiver:~/pkg$ ls
+# topographica-0.9.6  topographica_0.9.6.orig.tar.gz
+#
+# ceball@fiver:~/pkg/topographica-0.9.6$ ls
+# ChangeLog.txt  debian  images      _setup.py  topo
+# COPYING.txt    etc     README.txt  setup.py   topographica
+#
+# ceball@fiver:~/pkg/topographica-0.9.6$ ls debian/
+# changelog  python-scrodget.debhelper.log
+# compat     python-scrodget.postinst.debhelper
+# control    python-scrodget.preinst.debhelper
+# copyright  python-scrodget.prerm.debhelper
+# docs       python-scrodget.substvars
+# pycompat   rules
+# 
+# # ceball@fiver:~/pkg/topographica-0.9.6$ debuild -S -sa
+#
+# * Test it builds
+# 
+# -- missing --
+# pbuilder create, build
+# ceball@fiver:~/pkg$ sudo pbuilder build topographica_0.9.6-0ubuntu2.dsc 
+# -------------
+#
+# * Upload to PPA
+#
+# ceball@fiver:~/pkg$ cat ~/.dput.cf
+# [topographica-unstable]
+# fqdn = ppa.launchpad.net
+# method = ftp
+# incoming = ~ceball/topographica-unstable/ubuntu/
+# login = anonymous
+# allow_unsigned_uploads = 0
+# 
+# ceball@fiver:~/pkg$ dput topographica-unstable topographica_0.9.6-0ubuntu2_source.changes

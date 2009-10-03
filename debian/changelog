@@ -1,0 +1,11 @@
+topographica (0.9.6-0ubuntu2) jaunty; urgency=low
+
+  * Removed stray files.
+
+ -- C. E. Ball <ceball@gmail.com>  Thu, 01 Oct 2009 20:28:41 +0100
+
+topographica (0.9.6-0ubuntu1) jaunty; urgency=low
+
+  * Initial release
+
+ -- Krzysztof Gorgolewski <krzysztof.gorgolewski@gmail.com>  Mon, 21 Sep 2009 17:21:17 +0100
