@@ -502,6 +502,8 @@ class ParameterizedMetaclass(type):
         mcs.__param_inheritance(param_name,param)
     
 
+    # CBENHANCEMENT: Python 2.6 has abstract base classes.
+    # http://docs.python.org/whatsnew/2.6.html
     def __is_abstract(mcs):
         """
         Return True if the class has an attribute __abstract set to True.  
@@ -1624,6 +1626,10 @@ class PicklableClassAttributes(object):
 
 
 
+# Note that with Python 2.6, a fn's **args no longer has to be a
+# dictionary. This might allow us to use a decorator to simplify using
+# ParamOverrides (if that does indeed make them simpler to use).
+# http://docs.python.org/whatsnew/2.6.html
 class ParamOverrides(dict):
     """
     A dictionary that returns the attribute of a specified object if
@@ -1831,6 +1837,12 @@ class OptionalSingleton(object):
 
 
 
+# CBENHANCEMENT: should be able to remove overridable_property when we
+# switch to Python 2.6:
+# "Properties now have three attributes, getter, setter and deleter,
+# that are decorators providing useful shortcuts for adding a getter,
+# setter or deleter function to an existing property."
+# http://docs.python.org/whatsnew/2.6.html
 
 # Renamed & documented version of OProperty from
 # infinitesque.net/articles/2005/enhancing%20Python's%20property.xhtml

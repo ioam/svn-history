@@ -111,6 +111,10 @@ def _numpy_ufunc_pickle_support():
 _numpy_ufunc_pickle_support()
 
 
+# CBENHANCEMENT: should investigate Python 2.6's fraction module (at
+# least to replace the FixedPoint fallback).
+# http://docs.python.org/whatsnew/2.6.html
+
 def _mpq_pickle_support():
     """Allow instances of gmpy.mpq to pickle."""
     from gmpy import mpq

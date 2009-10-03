@@ -565,7 +565,8 @@ class Slice(ndarray):
 
         l_idx = int(ceil(l_m-0.5))
         t_idx = int(ceil(t_m-0.5))
-        r_idx = int(floor(r_m+0.5))
+        # CBENHANCEMENT: Python 2.6's math.trunc()?
+        r_idx = int(floor(r_m+0.5)) 
         b_idx = int(floor(b_m+0.5))
 
         return t_idx,b_idx,l_idx,r_idx

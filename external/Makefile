@@ -77,11 +77,19 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 python: ${PYTHON}.tgz tk blt readline
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
+
 # 32-bit/64-bit snapshot patch: topo SF.net #2119256
+# (Patch won't be necessary on 2.6: "The random module’s Random
+# objects can now be pickled on a 32-bit system and unpickled on a
+# 64-bit system, and vice versa. Unfortunately, this change also means
+# that Python 2.6’s Random objects can’t be unpickled correctly on
+# earlier versions of Python. (Contributed by Shawn Ligocki; issue
+# 1727780.)" http://docs.python.org/whatsnew/2.6.html)
 	patch -p0 < Python_64bit_pickle.diff
 # Tkinter: support None in BooleanVar
 	patch -p0 < Tkinter_bool_none.diff
 # IDLE: work with tk 8.5 (see http://bugs.python.org/issue2693).
+# (Patch shouldn't be necessary on 2.6)
 	patch -p0 < idle_tk8.5.patch
 # Configure for specific operating system versions
 ifeq ("$(shell uname -s)","Darwin")
