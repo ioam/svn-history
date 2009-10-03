@@ -470,16 +470,8 @@ ChangeLog.txt: FORCE
 #
 #
 # * Upload to PPA
-#
-# ceball@fiver:~/pkg$ cat ~/.dput.cf
-# [topographica-unstable]
-# fqdn = ppa.launchpad.net
-# method = ftp
-# incoming = ~ceball/topographica-unstable/ubuntu/
-# login = anonymous
-# allow_unsigned_uploads = 0
 # 
-# ceball@fiver:~/pkg$ dput topographica-unstable topographica_0.9.6-0ubuntu2_source.changes
-
+# ceball@fiver:~/pkg$ dput ppa:ceball/ppa topographica_0.9.6-0ubuntu3_source.changes
+#
 # missing: .desktop
 
