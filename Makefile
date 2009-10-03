@@ -455,7 +455,10 @@ ChangeLog.txt: FORCE
 # docs       python-scrodget.substvars
 # pycompat   rules
 # 
-# # ceball@fiver:~/pkg/topographica-0.9.6$ debuild -S -sa
+#
+# ceball@fiver:~/pkg/topographica-0.9.6$ dch -i
+#
+# ceball@fiver:~/pkg/topographica-0.9.6$ debuild -S -sa
 #
 # * Test it builds
 # 
@@ -475,3 +478,6 @@ ChangeLog.txt: FORCE
 # allow_unsigned_uploads = 0
 # 
 # ceball@fiver:~/pkg$ dput topographica-unstable topographica_0.9.6-0ubuntu2_source.changes
+
+# missing: .desktop
+

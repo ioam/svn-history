@@ -1,3 +1,9 @@
+topographica (0.9.6-0ubuntu3) jaunty; urgency=low
+
+  * Added Topographica's documentation and examples.
+
+ -- C. E. Ball <ceball@gmail.com>  Sat, 03 Oct 2009 23:24:34 +0100
+
 topographica (0.9.6-0ubuntu2) jaunty; urgency=low
 
   * Removed stray files.
