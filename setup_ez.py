@@ -18,7 +18,7 @@ or
 #
 # Optional:
 # 
-# * GUI: tcl8.5,tcl8.5-dev,tk8.5,tk8.5-dev,tcllib,tklib,python-tk
+# * GUI: tcl8.5,tcl8.5-dev,tk8.5,tk8.5-dev,tcllib,tklib,python-tk,scrodget
 
 
 
@@ -32,11 +32,8 @@ setup(
       #parsed in reverse order?
       install_requires=[
                         "weave==0.4.9",
-                        "pyscrodget==0.0.2_2.1",
                         "gmpy==1.04",
                         "matplotlib>=0.99",
-# CEBALERT: need to do something about weave
-#                        "scipy >= 0.3.0",
                         "ipython>=0.8",
                         "numpy >= 1.2.0",
                         "PIL == 1.1.6", # error unless done before numpy!
