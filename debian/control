@@ -10,7 +10,7 @@ Homepage: http://www.topographica.org
 
 Package: topographica
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-tk, python-scrodget, python-numpy, python-gmpy, python-matplotlib, python-scipy, ipython, python-imaging, python-imaging-tk, tcllib, tklib
+Depends: ${misc:Depends}, ${python:Depends}, python-tk, python-numpy, python-gmpy, python-matplotlib, python-scipy, ipython, python-imaging, python-imaging-tk, tcllib, tklib, scrodget
 XB-Python-Version: ${python:Versions}
 Description: Software package for computational modeling of neural maps.
  Topographica is a software package for computational modeling of neural maps, 
