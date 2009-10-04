@@ -441,7 +441,10 @@ ChangeLog.txt: FORCE
 #
 # https://wiki.ubuntu.com/PackagingGuide/Complete
 #
-
+# - need to add steps at beginning to get suitable dir
+# - need to change upload location to a topographica ppa
+# - need to add .desktop
+#
 # $ export DEBFULLNAME='C. E. Ball'
 # $ export DEBEMAIL='ceball@gmail.com'
 # set up GPG key, sign various ubuntu agreements on launchpad, ...
@@ -480,6 +483,29 @@ ChangeLog.txt: FORCE
 # * Upload to PPA
 # 
 # ceball@fiver:~/pkg$ dput ppa:ceball/ppa topographica_0.9.6-0ubuntu3_source.changes
-#
-# missing: .desktop
 
+
+
+# .deb of svn 
+# 
+# ceball@fiver:~/working/topographica3$ nice make dist-setup.py
+# ceball@fiver:~/working/topographica3$ cd ../distributions/
+# ceball@fiver:~/working/distributions$ ls
+# topographica-0.9.6  topographica-0.9.6.tar.gz
+# ceball@fiver:~/working/distributions$ mv topographica-0.9.6.tar.gz topographica_0.9.6+r10621.orig.tar.gz 
+# ceball@fiver:~/working/distributions$ mv topographica-0.9.6/ topographica_0.9.6+r10621
+# ceball@fiver:~/working/distributions$ cp -R ../topographica3/debian topographica_0.9.6+r10621/debian
+# ceball@fiver:~/working/distributions$ cd topographica-0.9.6+r10621/
+# ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ rm debian/changelog
+# ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ dch --create
+# ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ dch -i
+# ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ debuild -S -sa
+# ceball@fiver:~/working/distributions$ ls
+# topographica-0.9.6+r10621
+# topographica_0.9.6+r10621-0ubuntu1.diff.gz
+# topographica_0.9.6+r10621-0ubuntu1.dsc
+# topographica_0.9.6+r10621-0ubuntu1_source.build
+# topographica_0.9.6+r10621-0ubuntu1_source.changes
+# topographica_0.9.6+r10621.orig.tar.gz
+# ceball@fiver:~/working/distributions$ sudo pbuilder build topographica_0.9.6+r10621-0ubuntu1.dsc 
+# ceball@fiver:~/working/distributions$ dput ppa:ceball/ppa topographica_0.9.6+r10621-0ubuntu1_source.changes
