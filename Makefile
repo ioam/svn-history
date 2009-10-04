@@ -493,8 +493,9 @@ ChangeLog.txt: FORCE
 # ceball@fiver:~/working/distributions$ ls
 # topographica-0.9.6  topographica-0.9.6.tar.gz
 # ceball@fiver:~/working/distributions$ mv topographica-0.9.6.tar.gz topographica_0.9.6+r10621.orig.tar.gz 
-# ceball@fiver:~/working/distributions$ mv topographica-0.9.6/ topographica_0.9.6+r10621
+# ceball@fiver:~/working/distributions$ mv topographica-0.9.6/ topographica-0.9.6+r10621
 # ceball@fiver:~/working/distributions$ cp -R ../topographica3/debian topographica_0.9.6+r10621/debian
+# ceball@fiver:~/working/distributions$ rm -rf topographica-0.9.6+r10621/debian/.svn
 # ceball@fiver:~/working/distributions$ cd topographica-0.9.6+r10621/
 # ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ rm debian/changelog
 # ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ dch --create
