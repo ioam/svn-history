@@ -175,7 +175,6 @@ import Tkinter as T
 from inspect import getdoc
 
 from tkMessageBox import _show,QUESTION,YESNO
-from scrodget import Scrodget
 
 from parameterized import Parameterized,ParameterizedMetaclass,\
      classlist
@@ -334,6 +333,33 @@ def askyesno(title=None, message=None, **options):
     "Ask a question; return true if the answer is yes"
     s = _show(title, message, QUESTION, YESNO, **options)
     return str(s) == "yes"
+
+
+
+#################################################################
+# Very basic wrapper for scrodget
+
+# CEBALERT: could have been installed to /usr/local/share or /usr/share?
+scrodget_tcl_paths = [os.path.join(sys.prefix, "share", "scrodget"),
+                      os.path.join(sys.prefix, "local", "share", "scrodget")]
+
+class ScrodgetWidget:
+    def _require(self, master):
+        auto_path = master.tk.call("set", "auto_path")
+        for path in scrodget_tcl_paths:
+            if path not in auto_path:
+                master.tk.call("lappend", "auto_path", path)            
+        master.tk.call("package", "require", "scrodget") 
+
+    def __init__(self, master, cnf={}, **kw):
+        self._require(master)
+        T.Widget.__init__(self, master, 'scrodget', cnf, kw)
+
+
+class Scrodget(ScrodgetWidget, T.Widget):
+    def associate(self,widget=None,*args):
+        return self.tk.call(self._w,"associate",widget)
+#################################################################
 
 
 

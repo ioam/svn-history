@@ -537,15 +537,15 @@ mlabwrap-uninstall:
 
 ##############################################################
 # SCRODGET  (provides decent scrollbars)
-#
-SCRODGET = pyscrodget-0.0.2_2.1
+# http://www.flightlab.com/~joe/gutter/packages/scrodget.html
+SCRODGET = scrodget-2.1
 
-SCRODGET_UNINSTALL += share/pyscrodget
-SCRODGET_UNINSTALL += ${PYTHON_LIB}/site-packages/pyscrodget
+SCRODGET_UNINSTALL += share/scrodget
 
-scrodget: ${SCRODGET}.tar.gz python snit
+scrodget: ${SCRODGET}.tar.gz snit
 	tar -xzf ${SCRODGET}.tar.gz
-	cd ${SCRODGET}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	mkdir -p ${PREFIX}/share; mkdir -p ${PREFIX}/share/scrodget
+	cp -R ${SCRODGET}/*.tcl ${PREFIX}/share/scrodget
 	touch scrodget
 
 scrodget-clean:
