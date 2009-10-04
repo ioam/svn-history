@@ -510,3 +510,6 @@ ChangeLog.txt: FORCE
 # topographica_0.9.6+r10621.orig.tar.gz
 # ceball@fiver:~/working/distributions$ sudo pbuilder build topographica_0.9.6+r10621-0ubuntu1.dsc 
 # ceball@fiver:~/working/distributions$ dput ppa:ceball/ppa topographica_0.9.6+r10621-0ubuntu1_source.changes
+
+# after debuild to get deb, can get rpm by doing 
+# $ sudo alien -r topographica_0.9.6+r10624-0ubuntu1_all.deb
