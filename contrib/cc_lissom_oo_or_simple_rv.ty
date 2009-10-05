@@ -49,7 +49,7 @@ if dataset=="Line":
         input= Translator(generator=topo.pattern.basic.Line(   x=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=1023),   y=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.04,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
 elif dataset=="Natural":
     import topo.pattern.image 
-    input_type=topo.pattern.image.Image
+    input_type=topo.pattern.image.FileImage
     if locals().get('imageset',"Shouval") == 'Shouval':
             image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
             inputs=[input_type(filename=f,
