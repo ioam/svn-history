@@ -18,7 +18,7 @@ or
 #
 # Optional:
 # 
-# * GUI: tcl8.5,tcl8.5-dev,tk8.5,tk8.5-dev,tcllib,tklib,python-tk,scrodget
+# * GUI: tcl8.5,tcl8.5-dev,tk8.5,tk8.5-dev,python-tk
 
 
 

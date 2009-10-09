@@ -1,21 +1,18 @@
 ## Dependencies for Ubuntu 9.04
 ## ============================
 ##
-## $ sudo apt-get install python python-dev python-numpy python-gmpy python-matplotlib python-scipy ipython python-tk python-imaging python-imaging-tk tcllib tklib
+## $ sudo apt-get install python python-dev python-numpy python-gmpy python-matplotlib python-scipy ipython python-tk python-imaging python-imaging-tk
 ## 
-## scrodget from https://launchpad.net/~krzysztof-gorgolewski/+archive/ppa
-##
 ##
 ## Dependencies for MacPorts on OS X 10.6
 ## ======================================
 ## 
 ## $ sudo port install python25 py25-tkinter py25-numpy py25-matplotlib py25-pil py25-scipy py25-ipython
-## $ sudo port install tcllib
 ## $ sudo port install python_select
 ## $ sudo port python_select python25
-## download tklib 8.5; install using provided "sudo ./install.tcl"
-## install fixedpoint (as per Makefile, but "sudo python setup.py install"
-## scrodget
+
+_topographica_devs='Topographica Developers'
+_topographica_devs_email='developers[at]topographica[dot]org'
  
 common = dict(
 
@@ -23,13 +20,31 @@ common = dict(
 
     version='0.9.6' ,
 
-    description='Topographica is a general-purpose neural simulator focusing on topographic maps.',
+    description='[NOTE: PACKAGING UNDER DEVELOPEMT] A general-purpose neural simulator focusing on topographic maps.',
 
-    maintainer='Topographica Developers',
+    long_description="Topographica is a software package for computational modeling of neural maps. The goal is to help researchers understand brain function at the level of the topographic maps that make up sensory and motor systems.",
 
-    maintainer_email='developers[at]topographica[dot]org',
+    author= _topographica_devs,
+    author_email= _topographica_devs_email,
+    maintainer= _topographica_devs,
+    maintainer_email= _topographica_devs_email,
 
     url='http://topographica.org/',
+
+    classifiers = [
+        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "Development Status :: 4 - Beta",
+        "Programming Language :: Python",
+        "Operating System :: MacOS",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX",
+        "Operating System :: OS Independent"],
+
+    requires = ["PIL",         # Can't seem to specify versions. This is like 
+                "numpy",       # install_requires for setuptools 
+                "matplotlib",  # But they all seem to be ignored!
+                "ipython",
+                "scipy"],
 
     # CEBALERT: do I have to list these? if I do, can I generate the list automatically?
     packages=['topo',
@@ -51,12 +66,19 @@ common = dict(
               'topo.tests',
               'topo.tkgui'],
 
-    package_data={'topo.tkgui': ['icons/*.*'],
-                  'topo.command':['*.png','*.pdf'],
-                  'topo.tests':['*.txt','*.jpg','*.pgm']},
+    package_data={
+        # These things are not data. I'm not sure how else to do
+        # this - I couldn't find documentation.
+        'topo.param': ['externaltk/snit-2.2.1/*.tcl',
+                       'externaltk/scrodget-2.1/*.tcl',
+                       'externaltk/tooltip-1.4/*.tcl'],
+
+        'topo.tkgui': ['icons/*.*'],
+        'topo.command':['*.png','*.pdf'],
+        'topo.tests':['*.txt','*.jpg','*.pgm']},
 
     scripts = ['topographica']
-
+    
     )
 
 

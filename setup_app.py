@@ -33,12 +33,9 @@ from setuptools import setup
 # Dependencies
 # ------------
 #
-# $ sudo port install python25 py25-tkinter py25-numpy py25-matplotlib py25-pil py25-scipy py25-ipython
-# $ sudo port install tcllib
-# $ sudo port install python_select
-# $ sudo port python_select python25
-# download tklib 8.5; install using provided "sudo ./install.tcl"
-# no py25-gmpy; use fixedpoint (as per Makefile, but "sudo python setup.py install"
+# (1) see those listed in _setup.py
+# (2) no py25-gmpy so use fixedpoint (as per Makefile, but "sudo
+# python setup.py install"
 #
 # Building .app
 # -------------
