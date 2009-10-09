@@ -17,3 +17,7 @@ import _setup
 _setup.create_topographica_script()
 setup(**_setup.common)
 
+
+# python setup.py register
+# http://pypi.python.org/pypi/Topographica/0.9.6
+
