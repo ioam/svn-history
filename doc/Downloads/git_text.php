@@ -204,7 +204,7 @@ use the usual git commands to deal with such merge conflicts.
 above.  There are many useful git tutorials on the web explaining more
 advanced git usage (e.g. <a
 href="http://www-cs-students.stanford.edu/~blynn/gitmagic/">Git
-Magic</a>). Below, we desribe a few particular features. 
+Magic</a>). Below, we describe a few particular features. 
 
 <P>Before using all of Git's capabilities on your git-svn repository,
 note that the <a
@@ -317,10 +317,11 @@ of course remain usable, and you can create a new remote copy if you
 begin working on another extended feature.
 
 <!--CEBALERT can't remember how to do footnotes-->
+<P><small>
 * Alternatively, find another host (which could be as simple as a
 networked machine).  You can even share directly from your machine,
 but that way you would lose the advantage of having an external
-backup.
+backup.</small>
 
 <!--
 ssh -t ceball,topographica@shell.sourceforge.net create
