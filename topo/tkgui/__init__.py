@@ -147,37 +147,12 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
     # quit this function before starting another Tk instance, etc)
     if console is not None: return
 
-    if banner: print 'Launching GUI'
-
-    # Creating an initial Tk() instance and then withdrawing the
-    # window is a common technique. Instead of doing this, having
-    # TopoConsole itself be a subclass of Tk would make sense - since
-    # it is the main application window - but then we could not have a
-    # hierarchy in which all windows are given some common properties.
     if root is None:
-        root = Tkinter.Tk()
-    root.withdraw()
+        # root should be a required argument
+        import topo.param.tk
+        root = topo.param.tk.root
 
-    if Tkinter.TkVersion < 8.5:
-        root.tk.call("package","require","tile")
-
-    # allow tcl/tk to find extras on special platforms
-    import topo.misc.filepath
-    if system_platform=='mac':
-        pack_path = os.path.join(topo.misc.filepath.application_path,
-                                 "lib")
-        root.tk.call("lappend","auto_path",pack_path)
-    elif system_platform=='win':
-        # for win/msys; win/bin has packages put in its tcl dir
-        pack_paths = [os.path.join(topo.misc.filepath.application_path,
-                                   "Lib"),
-                      os.path.join(topo.misc.filepath.application_path,
-                                   "share")]
-
-        for path in pack_paths:
-            root.tk.call("lappend","auto_path",path)
-        
-        
+    if banner: print 'Launching GUI'
 
     # tcl equivalent of 'if not hasattr(wm,forget)' would be better
     if system_platform=='mac' or Tkinter.TkVersion<8.5:

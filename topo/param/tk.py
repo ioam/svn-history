@@ -323,32 +323,27 @@ def is_button(widget):
     return button
 
 
-# CEB: workaround for tkinter lagging behind tk (tk must have changed
-# the type of a returned value).  This is copied almost exactly from
-# tkMessageBox. If there are other things like this, we could have the
-# gui load some 'dynamic patches' to tkinter on startup, which could
-# then be removed when tkinter is updated (they'd all be in one place,
-# and no tkgui code would have to change).
-def askyesno(title=None, message=None, **options):
-    "Ask a question; return true if the answer is yes"
-    s = _show(title, message, QUESTION, YESNO, **options)
-    return str(s) == "yes"
+# Creating an initial Tk() instance and then withdrawing the
+# window is a common technique. 
+root = T.Tk()
+root.withdraw()
 
+
+#################################################################
+# Until tklib, tcllib, and scrodget become more commonly
+# available, we include them in tkgui.
+externaltk_path = os.path.join(package_path,
+                             # CB: along with other things, will need
+                             # updating for standalone package.
+                             "param","externaltk")
+root.tk.call("lappend","auto_path",externaltk_path)
+#################################################################
 
 
 #################################################################
 # Very basic wrapper for scrodget
-
-# CEBALERT: could have been installed to /usr/local/share or /usr/share?
-scrodget_tcl_paths = [os.path.join(sys.prefix, "share", "scrodget"),
-                      os.path.join(sys.prefix, "local", "share", "scrodget")]
-
 class ScrodgetWidget:
     def _require(self, master):
-        auto_path = master.tk.call("set", "auto_path")
-        for path in scrodget_tcl_paths:
-            if path not in auto_path:
-                master.tk.call("lappend", "auto_path", path)            
         master.tk.call("package", "require", "scrodget") 
 
     def __init__(self, master, cnf={}, **kw):
@@ -360,6 +355,19 @@ class Scrodget(ScrodgetWidget, T.Widget):
     def associate(self,widget=None,*args):
         return self.tk.call(self._w,"associate",widget)
 #################################################################
+
+
+
+# CEB: workaround for tkinter lagging behind tk (tk must have changed
+# the type of a returned value).  This is copied almost exactly from
+# tkMessageBox. If there are other things like this, we could have the
+# gui load some 'dynamic patches' to tkinter on startup, which could
+# then be removed when tkinter is updated (they'd all be in one place,
+# and no tkgui code would have to change).
+def askyesno(title=None, message=None, **options):
+    "Ask a question; return true if the answer is yes"
+    s = _show(title, message, QUESTION, YESNO, **options)
+    return str(s) == "yes"
 
 
 

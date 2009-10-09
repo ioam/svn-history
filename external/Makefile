@@ -6,7 +6,7 @@ CC = gcc
 # own Python, e.g. on Windows.)
 PYSETUP_OPT = --prefix=${PREFIX}
 
-default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy scrodget tooltip
+default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy 
 
 # uses touch -a to avoid changing modification dates
 platform-skip:
@@ -532,66 +532,6 @@ mlabwrap-clean:
 	rm -rf ${MLABWRAP} 
 mlabwrap-uninstall:
 	rm -rf mlabwrap ${MLABWRAP} $(foreach f, ${MLABWRAP_UNINSTALL}, ${PREFIX}/${f})
-
-
-
-##############################################################
-# SCRODGET  (provides decent scrollbars)
-# http://www.flightlab.com/~joe/gutter/packages/scrodget.html
-SCRODGET = scrodget-2.1
-
-SCRODGET_UNINSTALL += share/scrodget
-
-scrodget: ${SCRODGET}.tar.gz snit
-	tar -xzf ${SCRODGET}.tar.gz
-	mkdir -p ${PREFIX}/share; mkdir -p ${PREFIX}/share/scrodget
-	cp -R ${SCRODGET}/*.tcl ${PREFIX}/share/scrodget
-	touch scrodget
-
-scrodget-clean:
-	rm -rf  ${SCRODGET} 
-scrodget-uninstall:
-	rm -rf scrodget ${foreach f,${SCRODGET_UNINSTALL}, ${PREFIX}/${f}}
-
-
-
-##############################################################
-# SNIT (module from tklib; used by scrodget)
-#
-SNIT = snit-2.2.1
-
-SNIT_UNINSTALL += lib/${SNIT}
-
-snit: ${SNIT}.tar.gz
-	tar -xzf ${SNIT}.tar.gz
-	cp -R ${SNIT} ${PREFIX}/lib/${SNIT}
-	touch snit
-
-snit-clean:
-	rm -rf  ${SNIT} 
-snit-uninstall:
-	rm -rf snit ${foreach f,${SNIT_UNINSTALL}, ${PREFIX}/${f}}
-
-
-
-##############################################################
-# TOOLTIP (module from tcllib; used for help balloons)
-#
-TOOLTIP = tooltip-1.4
-
-TOOLTIP_UNINSTALL += lib/${TOOLTIP}
-
-tooltip: ${TOOLTIP}.tar.gz 
-	tar -xzf ${TOOLTIP}.tar.gz
-	cp -R ${TOOLTIP} ${PREFIX}/lib/${TOOLTIP}
-	touch tooltip
-
-tooltip-clean:
-	rm -rf  ${TOOLTIP} 
-tooltip-uninstall:
-	rm -rf tooltip ${foreach f,${TOOLTIP_UNINSTALL}, ${PREFIX}/${f}}
-
-
 
 
 
