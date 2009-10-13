@@ -38,13 +38,14 @@ class surround_analysis():
     sheet_name = ""
     data_dict = {}
     
-    low_contrast=10
+    low_contrast=30
     high_contrast=80
     
     def __init__(self,sheet_name="V1Complex"):
         from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand
         import pylab
-        self.sheet_name=sheet_name
+        self.sheet_name=sheet_name#
+        import topo
         self.sheet=topo.sim[sheet_name]
         # Center mask to matrixidx center
         self.center_r,self.center_c = self.sheet.sheet2matrixidx(0,0)
@@ -52,7 +53,7 @@ class surround_analysis():
         FeatureCurveCommand.curve_parameters=[{"contrast":self.low_contrast},{"contrast":self.high_contrast}]
         FeatureCurveCommand.display=True
         FeatureCurveCommand.sheet=topo.sim[sheet_name]
-        SinusoidalMeasureResponseCommand.num_phase=8
+        SinusoidalMeasureResponseCommand.num_phase=4
         SinusoidalMeasureResponseCommand.frequencies=[2.6]
         SinusoidalMeasureResponseCommand.scale=1.0
         MeasureResponseCommand.scale=1.0
@@ -290,7 +291,7 @@ class surround_analysis():
             y_values.append(y_values[0])
             x_values.append(x_values[0]+numpy.pi)
             
-            f.plot(x_values, y_values, lw=3, color=colors[i])
+            f.plot(x_values, y_values, lw=3, color=colors[i],label=curve_label)
             i+=1
         
         release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "]")
