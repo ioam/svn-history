@@ -7,7 +7,7 @@ import copy
 import pdb
 
 from topo import param
-
+import topo
 import topo.pattern.basic
 import topo.command.analysis
 from math import pi, sqrt, exp, pow
@@ -38,8 +38,8 @@ class surround_analysis():
     sheet_name = ""
     data_dict = {}
     
-    low_contrast=30
-    high_contrast=60
+    low_contrast=10
+    high_contrast=80
     
     def __init__(self,sheet_name="V1Complex"):
         from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand
@@ -57,6 +57,10 @@ class surround_analysis():
         SinusoidalMeasureResponseCommand.scale=1.0
         MeasureResponseCommand.scale=1.0
         FeatureCurveCommand.num_orientation=8
+        PatternPresenter.duration=4.0
+        import topo.command.pylabplots
+        reload(topo.command.pylabplots)
+        
 
 
     def analyse(self,steps=1,ns=10,step_size=1):
@@ -95,14 +99,13 @@ class surround_analysis():
         hc_curve = data["Contrast = " + str(self.high_contrast) + "%" ]
         lc_curve = data["Contrast = " + str(self.low_contrast) + "%" ]
         
-        print "BBB",lc_curve["measures"]["peak_near_facilitation"],self.high_contrast
-        topo.command.pylabplots.measure_or_tuning(size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.high_contrast}],display=True,coords=[(xcoor,ycoor)])
+        topo.command.pylabplots.measure_or_tuning(size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.low_contrast}],display=True,coords=[(xcoor,ycoor)])
         topo.command.pylabplots.cyclic_tuning_curve.instance(x_axis="orientation",coords=[(xcoor,ycoor)])
         topo.command.pylabplots.measure_orientation_contrast(sizecenter=lc_curve["measures"]["peak_near_facilitation"],
                                                              sizesurround=4.0,
                                                              size=0.0,
                                                              display=True,
-                                                             contrastcenter=self.high_contrast,
+                                                             contrastcenter=self.low_contrast,
                                                              thickness=4.0-lc_curve["measures"]["peak_near_facilitation"]-0.1,
                                                              num_phase=8,
                                                              curve_parameters=[{"contrastsurround":self.low_contrast},{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
@@ -414,12 +417,12 @@ def compute_local_homogeneity_index(or_map,sigma):
             lhi_current=[0,0]
             for tx in xrange(0,xsize):
                 for ty in xrange(0,ysize):
-                    lhi_current[0]+=numpy.exp(-((sx-tx)*(sx-tx)+(sy-ty)*(sy-ty))/(2*sigma*sigma))*numpy.cos(2*or_map[tx,ty]*numpy.pi)
-                    lhi_current[1]+=numpy.exp(-((sx-tx)*(sx-tx)+(sy-ty)*(sy-ty))/(2*sigma*sigma))*numpy.sin(2*or_map[tx,ty]*numpy.pi)
+                    lhi_current[0]+=numpy.exp(-((sx-tx)*(sx-tx)+(sy-ty)*(sy-ty))/(2*sigma*sigma))*numpy.cos(2*or_map[tx,ty])
+                    lhi_current[1]+=numpy.exp(-((sx-tx)*(sx-tx)+(sy-ty)*(sy-ty))/(2*sigma*sigma))*numpy.sin(2*or_map[tx,ty])
            # print sx,sy
            # print lhi.shape
            # print lhi_current        
-            lhi[sx,sy]= numpy.sqrt(lhi_current[0]*lhi_current[0] + lhi_current[1]*lhi_current[1])
+            lhi[sx,sy]= numpy.sqrt(lhi_current[0]*lhi_current[0] + lhi_current[1]*lhi_current[1])/(2*numpy.pi*sigma*sigma)
                     
     return lhi       
 
