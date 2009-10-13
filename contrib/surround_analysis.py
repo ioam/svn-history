@@ -42,7 +42,7 @@ class surround_analysis():
     high_contrast=80
     
     def __init__(self,sheet_name="V1Complex"):
-        from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand
+        from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter
         import pylab
         self.sheet_name=sheet_name#
         import topo
