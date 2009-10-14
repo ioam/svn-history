@@ -44,7 +44,7 @@ class surround_analysis():
     def __init__(self,sheet_name="V1Complex"):
         from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter
         import pylab
-        self.sheet_name=sheet_name#
+        self.sheet_name=sheet_name
         import topo
         self.sheet=topo.sim[sheet_name]
         # Center mask to matrixidx center
@@ -58,14 +58,17 @@ class surround_analysis():
         SinusoidalMeasureResponseCommand.scale=1.0
         MeasureResponseCommand.scale=1.0
         FeatureCurveCommand.num_orientation=8
-        PatternPresenter.duration=4.0
-        import topo.command.pylabplots
-        reload(topo.command.pylabplots)
         
 
 
     def analyse(self,steps=1,ns=10,step_size=1):
+        
         save_plotgroup("Orientation Preference and Complexity")
+        from topo.analysis.featureresponses import PatternPresenter
+        PatternPresenter.duration=4.0
+        import topo.command.pylabplots
+        reload(topo.command.pylabplots)
+
         #save_plotgroup("Position Preference")
         for x in xrange(0,steps*2+1):
             for y in xrange(0,steps*2+1):
@@ -127,7 +130,7 @@ class surround_analysis():
             else: 
                 curve_data[curve_label]["measures"]["or_suppression"]=-10
         
-        hc_curve_name = "Contrast = " + str(self.high_contrast) + "%";
+        curve_name_ort = "Contrast = " + str(self.low_contrast) + "%";
         hc_curve_name_orc = "Contrastsurround = " + str(self.high_contrast) + "%";
         lc_curve_name_orc = "Contrastsurround = " + str(self.low_contrast) + "%";
         
@@ -139,13 +142,13 @@ class surround_analysis():
         lc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
     
         ar = []
-        for o in self.sheet.curve_dict['orientation'][hc_curve_name].keys():
-            ar.append(self.sheet.curve_dict['orientation'][hc_curve_name][o].view()[0][xindex][yindex])
+        for o in self.sheet.curve_dict['orientation'][curve_name_ort].keys():
+            ar.append(self.sheet.curve_dict['orientation'][curve_name_ort][o].view()[0][xindex][yindex])
             
         peak_or_response = max(ar)
 
         curve_data["ORTC"]={}
-        curve_data["ORTC"]["data"]=self.sheet.curve_dict['orientation'][hc_curve_name]
+        curve_data["ORTC"]["data"]=self.sheet.curve_dict['orientation'][curve_name_ort]
         curve_data["ORTC"]["measures"]={}
         curve_data["ORTC"]["measures"]["colinear_hc_suppresion_index"] = (peak_or_response - hc_pref_or_resp) / peak_or_response 
         curve_data["ORTC"]["measures"]["colinear_lc_suppresion_index"] = (peak_or_response - lc_pref_or_resp) / peak_or_response
