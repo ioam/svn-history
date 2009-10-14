@@ -13,7 +13,7 @@ import topo
 from topo.command.pylabplots import matrixplot
 from topo.sheet import GeneratorSheet 
 from topo.base.boundingregion import BoundingBox
-from topo.pattern.image import Image
+from topo.pattern.image import FileImage
 import contrib.jacommands
 
 class ModelFit():
@@ -501,7 +501,7 @@ def generateInputs(dataset,directory,image_matching_string,density,aspect,offset
     # ALERT ALERT ALERT We do not handle repetitions yet!!!!!
     
     image_filenames=[directory+image_matching_string %(i+offset) for i in index]
-    inputs=[Image(filename=f,size=0.55, x=0,y=0)   for f in image_filenames]
+    inputs=[FileImage(filename=f,size=0.55, x=0,y=0)   for f in image_filenames]
     
     ins=[]
     for j in xrange(0,len(index)):
