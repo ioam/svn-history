@@ -65,7 +65,7 @@ class surround_analysis():
         
         save_plotgroup("Orientation Preference and Complexity")
         from topo.analysis.featureresponses import PatternPresenter
-        PatternPresenter.duration=4.0
+        PatternPresenter.duration=1.0
         import topo.command.pylabplots
         reload(topo.command.pylabplots)
 
@@ -75,7 +75,7 @@ class surround_analysis():
                 xindex = self.center_r+(x-steps)*step_size
                 yindex = self.center_c+(y-steps)*step_size
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
-                topo.command.pylabplots.measure_size_response.instance(sheet=self.sheet,num_sizes=ns,max_size=3.0,coords=[(xcoor,ycoor)])(coords=[(xcoor,ycoor)])        
+                topo.command.pylabplots.measure_size_response.instance(sheet=self.sheet,num_phase=4,num_sizes=ns,max_size=3.0,coords=[(xcoor,ycoor)])(coords=[(xcoor,ycoor)])        
                 
                 self.data_dict[(xindex,yindex)] = {}
                 self.data_dict[(xindex,yindex)]["ST"] = self.calculate_RF_sizes(xindex, yindex)
@@ -103,7 +103,7 @@ class surround_analysis():
         hc_curve = data["Contrast = " + str(self.high_contrast) + "%" ]
         lc_curve = data["Contrast = " + str(self.low_contrast) + "%" ]
         
-        topo.command.pylabplots.measure_or_tuning(size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.low_contrast}],display=True,coords=[(xcoor,ycoor)])
+        topo.command.pylabplots.measure_or_tuning(num_phase=4,num_orientation=size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.low_contrast}],display=True,coords=[(xcoor,ycoor)])
         topo.command.pylabplots.cyclic_tuning_curve.instance(x_axis="orientation",coords=[(xcoor,ycoor)])
         topo.command.pylabplots.measure_orientation_contrast(sizecenter=lc_curve["measures"]["peak_near_facilitation"],
                                                              sizesurround=4.0,
@@ -404,7 +404,7 @@ class surround_analysis():
                     mmax = numpy.max(numpy.max(histograms_lc[key]),numpy.max(histograms_hc[key]))
                     mmin = numpy.min(numpy.min(histograms_lc[key]),numpy.min(histograms_hc[key]))
                     bins = numpy.arange(mmin,mmax+0.01,(mmax-mmin)/10.0)
-                    f.hist([histograms_lc[key],histograms_hc[key]],bins=bins,normed=False)
+                    f.hist(histograms_hc[key],bins=bins,normed=False)
                     #f.axvline(x=numpy.mean(histograms_lc[key]),linewidth=4, color='r')
                     release_fig("Histogram<" + key + ">")
                     print key + "LC mean :" + str(numpy.mean(histograms_lc[key]))
