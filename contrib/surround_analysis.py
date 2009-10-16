@@ -297,6 +297,7 @@ class surround_analysis():
             f.plot(x_values, y_values, lw=3, color=colors[i],label=curve_label)
             i+=1
         
+        pylab.legend()
         release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "]")
         
         fig = pylab.figure()
