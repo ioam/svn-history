@@ -291,25 +291,25 @@ topo.sim.connect('V1Complex','V1Simple',delay=0.025,
                  nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.3)/2),learning_rate=0)
 
 
-topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LocalEE',
+topo.sim.connect('V1Complex','V1Complex',delay=0.025,name='LocalEE',
                  connection_type=CFProjection,strength=locals().get('LocalEEStr',1.5),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('LocalEESize',0.12)),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('LocalEEBB',0.04)),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('LocalEEBB',0.12)),
                  learning_rate=0.0)
 
-topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LongEE',
+topo.sim.connect('V1Complex','V1Complex',delay=0.025,name='LongEE',
                  connection_type=CFProjection,strength=locals().get('LongEEStr',0.1),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('LongEESize',2*0.22917)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('LongEEBB',0.229)),
                  learning_rate=locals().get('lat_exc_lr',0.0))
 
-topo.sim.connect('V1Complex','V1ComplexInh',delay=0.05,name='LocalEI',
+topo.sim.connect('V1Complex','V1ComplexInh',delay=0.025,name='LocalEI',
                  connection_type=CFProjection,strength=locals().get('LocalEIStr',1.5),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('LocalEISize',0.12)),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('LocalEIBB',0.04)),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('LocalEIBB',0.12)),
                  learning_rate=0.0)
 
-topo.sim.connect('V1Complex','V1ComplexInh',delay=0.05,name='LongEI',
+topo.sim.connect('V1Complex','V1ComplexInh',delay=0.025,name='LongEI',
                  connection_type=CFProjection,strength=locals().get('LongEIStr',1.0),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('LongEISize',2*0.22917)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('LongEIBB',0.229)),
@@ -317,16 +317,16 @@ topo.sim.connect('V1Complex','V1ComplexInh',delay=0.05,name='LongEI',
 
 
 
-topo.sim.connect('V1ComplexInh','V1Complex',delay=0.05,name='LocalIE',
+topo.sim.connect('V1ComplexInh','V1Complex',delay=0.025,name='LocalIE',
                  connection_type=CFProjection,strength=-locals().get('LocalIEStr',0.9),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('LocalIESize',0.12)),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('LocalIEBB',0.04)),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('LocalIEBB',0.12)),
                  learning_rate=0.0)
 
-topo.sim.connect('V1ComplexInh','V1ComplexInh',delay=0.05,name='LocalII',
+topo.sim.connect('V1ComplexInh','V1ComplexInh',delay=0.025,name='LocalII',
                  connection_type=CFProjection,strength=-locals().get('LocalIIStr',0.9),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('LocalIISize',0.12)),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('LocalIIBB',0.04)),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('LocalIIBB',0.12)),
                  learning_rate=0.0)
 
 
