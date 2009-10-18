@@ -54,20 +54,21 @@ class surround_analysis():
         FeatureCurveCommand.display=True
         FeatureCurveCommand.sheet=topo.sim[sheet_name]
         SinusoidalMeasureResponseCommand.num_phase=4
-        SinusoidalMeasureResponseCommand.frequencies=[2.6]
+        SinusoidalMeasureResponseCommand.frequencies=[3.0]
         SinusoidalMeasureResponseCommand.scale=1.0
         MeasureResponseCommand.scale=1.0
         FeatureCurveCommand.num_orientation=8
+        
+        from topo.analysis.featureresponses import PatternPresenter            
+        PatternPresenter.duration=2.0
+        import topo.command.pylabplots
+        reload(topo.command.pylabplots)
         
 
 
     def analyse(self,steps=1,ns=10,step_size=1):
         
         save_plotgroup("Orientation Preference and Complexity")
-        from topo.analysis.featureresponses import PatternPresenter
-        PatternPresenter.duration=1.0
-        import topo.command.pylabplots
-        reload(topo.command.pylabplots)
 
         #save_plotgroup("Position Preference")
         for x in xrange(0,steps*2+1):
@@ -193,7 +194,7 @@ class surround_analysis():
 
     def plot_size_tunning(self, xindex, yindex):
         fig = pylab.figure()
-        f = fig.add_subplot(111, autoscale_on=False, xlim=(-0.1, 2.2), ylim=(-0.1, 0.7))
+        f = fig.add_subplot(111, autoscale_on=False, xlim=(-0.1, 3.0), ylim=(-0.1, 4.0))
         pylab.title(self.sheet_name, fontsize=12)
         colors=['red','blue','green','purple','orange','black','yellow']
         
