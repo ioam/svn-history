@@ -496,9 +496,9 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
      
 def run_dynamics_analysis(x,y):
     
-    (xx,yy) = topo.sim[sheetname].sheet2matrixidx(x,y)
+    (xx,yy) = topo.sim["V1Complex"].sheet2matrixidx(x,y)
     
-    orr=numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][yy][xx]
+    orr=numpy.pi*topo.sim["V1Complex"].sheet_views["OrientationPreference"].view()[0][yy][xx]
     
     pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=0.5,sizesurround=2.0,thickness=1.5,scalecenter=0.5,scalesurround=0.5)
     
