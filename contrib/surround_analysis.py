@@ -460,8 +460,9 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
         data[key] = {}
         for i in topo.sim[key].projections().keys():
             data[key][i]=[]
+        data[key]["act"]=[]
 
-    for i in xrange(0,40):
+    for i in xrange(0,80):
         pp = PatternPresenter(pattern_generator=pattern_generator,duration=i*0.05,contrast_parameter="weber_contrast")
         
         for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
@@ -478,7 +479,7 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
         for key in sheet_names:
             for i in topo.sim[key].projections().keys():
                 data[key][i].append(topo.sim[key].projections()[i].activity.copy())
-     
+            data[key]["act"].append(topo.sim[key].activity.copy())
 
     for n in neurons:
        (sheetname, (x,y)) = n
