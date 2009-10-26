@@ -462,7 +462,7 @@ def plot_neural_dynamics(sheet_names,neurons):
             data[key][i]=[]
 
     for i in xrange(0,40):
-        pp = PatternPresenter(pattern_generator=OrientationContrast(),duration=i*0.05,contrast_parameter="weber_contrast")
+        pp = PatternPresenter(pattern_generator=OrientationContrast(orientationcenter=0.3*numpy.pi,orientationsurround=0.3*numpy.pi,sizecenter=0.5,sizesurround=2.0,thickness=1.5),duration=i*0.05,contrast_parameter="weber_contrast")
         
         for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
         topo.sim.state_push()
