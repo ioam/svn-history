@@ -472,14 +472,15 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
         pp({},{})
         topo.guimain.refresh_activity_windows()
         
-        for f in PatternDrivenAnalysis.post_presentation_hooks: f()
-        topo.sim.state_pop()
-        for f in PatternDrivenAnalysis.post_analysis_session_hooks: f()
-        
         for key in sheet_names:
             for i in topo.sim[key].projections().keys():
                 data[key][i].append(topo.sim[key].projections()[i].activity.copy())
             data[key]["act"].append(topo.sim[key].activity.copy())
+
+        for f in PatternDrivenAnalysis.post_presentation_hooks: f()
+        topo.sim.state_pop()
+        for f in PatternDrivenAnalysis.post_analysis_session_hooks: f()
+        
 
     for n in neurons:
        (sheetname, (x,y)) = n
