@@ -440,6 +440,56 @@ def release_fig(filename=None):
        pylab.savefig(normalize_path(fullname))
     else:
        pylab.show()
-       
-       
-       
+
+
+
+def plot_neural_dynamics(sheet_names,neurons):
+    """
+    call example : contrib.surround_analysis.plot_neural_dynamics(["V1"],[("V1",(0.0,0.0)),("V1",(0.1,0.1))])
+    """
+    
+    from topo.command.basic import pattern_present
+    from topo.base.functionfamily import PatternDrivenAnalysis
+    from topo.pattern.basic import OrientationContrast
+    from topo.analysis.featureresponses import PatternPresenter
+    from topo.base.sheet import Sheet
+    
+    data={}
+    
+    for key in sheet_names:
+        data[key] = {}
+        for i in topo.sim[key].projections().keys():
+            data[key][i]=[]
+
+    for i in xrange(0,40):
+        pp = PatternPresenter(pattern_generator=OrientationContrast(),duration=i*0.05,contrast_parameter="weber_contrast")
+        
+        for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
+        topo.sim.state_push()
+        for f in PatternDrivenAnalysis.pre_presentation_hooks: f()
+        
+        pp({},{})
+        topo.guimain.refresh_activity_windows()
+        
+        for f in PatternDrivenAnalysis.post_presentation_hooks: f()
+        topo.sim.state_pop()
+        for f in PatternDrivenAnalysis.post_analysis_session_hooks: f()
+        
+        for key in sheet_names:
+            for i in topo.sim[key].projections().keys():
+                data[key][i].append(topo.sim[key].projections()[i].activity.copy())
+     
+
+    for n in neurons:
+       (sheetname, (x,y)) = n
+       (x,y) = topo.sim[sheetname].sheet2matrixidx(x,y)
+       pylab.figure()
+       for projname in data[sheetname].keys():
+           a = []
+           for act in data[sheetname][projname]:
+               a.append(act[x,y])
+           pylab.plot(a,label=projname)
+       pylab.legend()
+    pylab.show._needmain=False
+    pylab.show()
+     
