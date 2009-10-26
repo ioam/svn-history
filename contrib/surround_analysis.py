@@ -495,6 +495,7 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
     pylab.show()
      
 def run_dynamics_analysis(x,y):
+    from topo.pattern.basic import OrientationContrast
     
     (xx,yy) = topo.sim["V1Complex"].sheet2matrixidx(x,y)
     
