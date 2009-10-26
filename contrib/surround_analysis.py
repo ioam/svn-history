@@ -443,7 +443,7 @@ def release_fig(filename=None):
 
 
 
-def plot_neural_dynamics(sheet_names,neurons):
+def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
     """
     call example : contrib.surround_analysis.plot_neural_dynamics(["V1"],[("V1",(0.0,0.0)),("V1",(0.1,0.1))])
     """
@@ -462,7 +462,7 @@ def plot_neural_dynamics(sheet_names,neurons):
             data[key][i]=[]
 
     for i in xrange(0,40):
-        pp = PatternPresenter(pattern_generator=OrientationContrast(orientationcenter=0.3*numpy.pi,orientationsurround=0.3*numpy.pi,sizecenter=0.5,sizesurround=2.0,thickness=1.5),duration=i*0.05,contrast_parameter="weber_contrast")
+        pp = PatternPresenter(pattern_generator=pattern_generator,duration=i*0.05,contrast_parameter="weber_contrast")
         
         for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
         topo.sim.state_push()
@@ -482,14 +482,30 @@ def plot_neural_dynamics(sheet_names,neurons):
 
     for n in neurons:
        (sheetname, (x,y)) = n
-       (x,y) = topo.sim[sheetname].sheet2matrixidx(x,y)
+       (xx,yy) = topo.sim[sheetname].sheet2matrixidx(x,y)
        pylab.figure()
+       pylab.title(sheetname+" [" + str(x) + "," +str(y) + "]")
        for projname in data[sheetname].keys():
            a = []
            for act in data[sheetname][projname]:
-               a.append(act[x,y])
+               a.append(act[xx,yy])
            pylab.plot(a,label=projname)
        pylab.legend()
     pylab.show._needmain=False
     pylab.show()
      
+def run_dynamics_analysis(x,y):
+    
+    (xx,yy) = topo.sim[sheetname].sheet2matrixidx(x,y)
+    
+    orr=numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][yy][xx]
+    
+    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=0.5,sizesurround=2.0,thickness=1.5,scalecenter=0.5,scalesurround=0.5)
+    
+    plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y))],pg)
+    
+    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr+nump.pi/2,sizecenter=0.5,sizesurround=2.0,thickness=1.5,scalecenter=0.5,scalesurround=0.5)
+    
+    plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y))],pg)
+    
+    
