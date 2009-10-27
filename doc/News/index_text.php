@@ -44,7 +44,7 @@
   <div class="i2">- new options to  
   <?php classref('topo.command.basic','run_batch')?> and better progress messages</div>
   <div class="i2">- replaced most commands with
-  <?php classref('topo.param.parameterized','ParameterizedFunction')?>s,
+  <?php classref('param.parameterized','ParameterizedFunction')?>s,
   which have documented, type and bound-checked arguments and allow
   inheritance of shared functionality</div>
   <div class="i2">- replaced map measurement commands in
@@ -108,7 +108,7 @@
   <div class="i2">- LearningFns: 
   <?php classref('topo.learningfn.optimized','CFPLF_BCMFixed_opt')?>,
   <?php classref('topo.learningfn.optimized','CFPLF_Scaled_opt')?></div>
-  <div class="i2">- Added <?php classref('topo.param','HookList')?>
+  <div class="i2">- Added <?php classref('param','HookList')?>
   parameters to
   <?php classref('topo.analysis.featureresponses','FeatureResponses')?> and
   <?php classref('topo.sheet.lissom','LISSOM')?> to make it easier to

@@ -9,7 +9,9 @@ __version__='$Revision: 10115 $'
 from math import pi, sqrt
 import numpy
 
-from topo import learningfn,numbergen,transferfn,param,pattern,projection,responsefn,sheet
+import param
+
+from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet
 
 import topo.learningfn.projfn 
 import topo.learningfn.optimized

@@ -9,7 +9,7 @@ import numpy
 from numpy import exp,zeros,ones,concatenate,median, abs,array,where, ravel
 from pylab import save
 import copy
-from topo import param
+import param
 
 from math import pi, sqrt
 from matplotlib.figure import Figure
@@ -22,7 +22,7 @@ import numpy.oldnumeric as Numeric
 from topo.misc.filepath import normalize_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.cf import CFPOutputFn
-from topo import param
+import param
 from topo.base.functionfamily import TransferFn, IdentityTF
 from topo.transferfn.basic import IdentityTF, BinaryThreshold, Threshold
 from topo.pattern.random import RandomGenerator, UniformRandom

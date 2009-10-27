@@ -4,7 +4,7 @@
 # any Dynamic parameter to contain an expression (and so expressions
 # would obey any time_fn).
 
-from topo import param
+import param
 from topo.param.parameterized import ParamOverrides
 import types
 import inspect

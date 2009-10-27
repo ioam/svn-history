@@ -48,30 +48,30 @@ Collie or a Terrier as well, plus any user-defined object of type Dog.
 <H3>Parameterized objects and Parameters</H3>
 
 <ul>
-<li><?php classref('topo.param.parameterized','Parameterized')?>
-<li><?php classref('topo.param.parameterized','Parameter')?>
+<li><?php classref('param.parameterized','Parameterized')?>
+<li><?php classref('param.parameterized','Parameter')?>
     <ul>
-    <li><?php classref('topo.param','Number')?>
+    <li><?php classref('param','Number')?>
         <ul>
-	<li><?php classref('topo.param','Integer')?>
+	<li><?php classref('param','Integer')?>
         </ul>
-    <li><?php classref('topo.param','Boolean')?>
-    <li><?php classref('topo.param','Callable')?>
-    <li><?php classref('topo.param','ClassSelector')?>
+    <li><?php classref('param','Boolean')?>
+    <li><?php classref('param','Callable')?>
+    <li><?php classref('param','ClassSelector')?>
     </ul>
 </ul>
 
 <P>In Python, any object can have <i>attributes</i>, which consist of
 a name and a value (of any type).  Topographica provides an extended
 version of attributes called <?php
-classref('topo.param.parameterized','Parameter')?>s, which have their
+classref('param.parameterized','Parameter')?>s, which have their
 own documentation, range and type error checking, and mechanisms for
 inheritance of default values.  These features are provided for any
-<?php classref('topo.param.parameterized','Parameterized')?> object,
+<?php classref('param.parameterized','Parameterized')?> object,
 which is a Python object extended to support <?php
-classref('topo.param.parameterized','Parameter')?>s.  Most
+classref('param.parameterized','Parameter')?>s.  Most
 Topographica objects are <?php
-classref('topo.param.parameterized','Parameterized')?>.  <A
+classref('param.parameterized','Parameterized')?>.  <A
 HREF="parameters.html">Parameters</A> are discussed in more detail on
 <A HREF="parameters.html">a separate page</A>.
 

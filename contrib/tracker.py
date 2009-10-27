@@ -10,7 +10,7 @@ __version__='$Revision: 8706 $'
 # tests do.
 
 
-from topo import param
+import param
 
 
 def value_printer(**kw):

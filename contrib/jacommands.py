@@ -6,7 +6,7 @@ import os
 import copy
 import pdb
 
-from topo import param
+import param
 
 import topo.pattern.basic
 import topo.command.analysis

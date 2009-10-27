@@ -10,7 +10,7 @@ from math import pi, sqrt
 
 import topo.pattern.basic
 import topo.pattern.random
-from topo import param
+import param
 from topo.sheet.lissom import LISSOM,JointNormalizingCFSheet_Continuous
 from topo.sheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection

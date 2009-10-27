@@ -96,8 +96,9 @@ similar to the following:
 <pre>
 from math import exp, sqrt
 import numpy
+import param
 
-from topo import learningfn,numbergen,transferfn,param,pattern,\
+from topo import learningfn,numbergen,transferfn,pattern,\
                  projection,responsefn,sheet
 </pre>
 

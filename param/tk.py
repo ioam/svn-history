@@ -192,7 +192,10 @@ _last_one_set = None
 # we might want in topo/param...
 ########################################
 import topo
+# CEBALERT: needs to be cleaned up now param is separate
 package_path = os.path.split(topo.__file__)[0]
+import param
+param_package_path = os.path.split(param.__file__)[0]
 application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 
 def resolve_path(path,search_paths=[]):
@@ -332,10 +335,10 @@ root.withdraw()
 #################################################################
 # Until tklib, tcllib, and scrodget become more commonly
 # available, we include them in tkgui.
-externaltk_path = os.path.join(package_path,
+externaltk_path = os.path.join(param_package_path,
                              # CB: along with other things, will need
                              # updating for standalone package.
-                             "param","externaltk")
+                             "externaltk")
 root.tk.call("lappend","auto_path",externaltk_path)
 #################################################################
 

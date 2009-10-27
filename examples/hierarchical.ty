@@ -11,7 +11,9 @@ __version__='$Revision$'
 
 from math import pi
 
-from topo import learningfn,numbergen,transferfn,param,pattern,projection,responsefn,sheet
+import param
+
+from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet
 
 import topo.learningfn.optimized 
 import topo.pattern.random

@@ -86,7 +86,8 @@ import copy
 
 from colorsys import hsv_to_rgb
 
-from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet,param
+import param
+from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet
 
 import topo.learningfn.optimized
 import topo.learningfn.projfn 

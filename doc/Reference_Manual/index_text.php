@@ -24,7 +24,7 @@ essential of these are:
 <P><DL COMPACT>
 <P><DT><A href="topo.base-module.html"><strong>base</strong></A></DT>
 <DD>Core Topographica-specific functions and classes</DD>
-<P><DT><A href="topo.param-module.html"><strong>param</strong></A></DT>
+<P><DT><A href="param-module.html"><strong>param</strong></A></DT>
 <DD>Support for objects with user-controllable attributes</DD>
 <P><DT><A href="topo.plotting-module.html"><strong>plotting</strong></A></DT>
 <DD>Visualization functions and classes</DD>

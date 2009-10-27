@@ -18,11 +18,10 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy
-
 from math import sqrt, pi
 
-from topo import param
+import numpy
+import param
 
 import topo
 

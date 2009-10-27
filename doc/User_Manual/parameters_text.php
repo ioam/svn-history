@@ -4,14 +4,14 @@
 
 <P>The behavior of most of the objects making up a Topographica
 simulation can be controlled by variables called Parameters. A 
-<?php classref('topo.param.parameterized','Parameter')?> 
+<?php classref('param.parameterized','Parameter')?> 
 is a special type of Python attribute extended to have
 features such as type and range checking, dynamically generated
 values, documentation strings, default values, etc., each of which
 is inherited from parent classes if not specified in a subclass.
 
 <P>Objects that can contain Parameters are called
-<?php classref('topo.param.parameterized','Parameterized')?> objects.
+<?php classref('param.parameterized','Parameterized')?> objects.
 For instance, Sheets, Projections, and
 PatternGenerators are all Parameterized.  The Parameters of a
 Sheet include its <code>nominal_density</code> and <code>nominal_bounds</code>, and
@@ -46,19 +46,19 @@ been declared as a <code>Number</code> Parameter with bounds
 '(0,None)' (i.e. a minimum value of 0.0, and no maximum value). 
 
 <P>To provide reasonable checking for parameters of different types, a large number of
-<A HREF="../Reference_Manual/topo.param-module.html">other
+<A HREF="../Reference_Manual/param-module.html">other
 Parameter types</A> are provided besides
-<?php classref('topo.param','Number')?>,
+<?php classref('param','Number')?>,
 such as
-<?php classref('topo.param','Integer')?>,
-<?php classref('topo.param','Filename')?>,
-<?php classref('topo.param','Enumeration')?>,
+<?php classref('param','Integer')?>,
+<?php classref('param','Filename')?>,
+<?php classref('param','Enumeration')?>,
 and
-<?php classref('topo.param','Boolean')?>.
+<?php classref('param','Boolean')?>.
 Each of these types can be declared to be constant, in which case the
 value cannot be changed after the Parameterized object that owns the
 Parameter has been created.  Some classes, such as
-<?php classref('topo.param','Number')?>,
+<?php classref('param','Number')?>,
 allow the parameter values to be generated from a sequence or random
 distribution, such as for generating random input patterns; in this
 case the random number will be updated at most once for each unique
@@ -169,7 +169,7 @@ The same general rules apply to Parameters declared at the class
 level:
 
 <pre>
-from topo import param
+import param
 
 class ExampleP(param.Parameterized):
     a = param.Parameter(default=10)
@@ -226,7 +226,7 @@ In this case, each instance of CFSheet will have its own instance of
 Oja, independent of other <code>CFSheet</code>s' <code>Oja()</code>
 instances.  In fact, learning_fn parameters (like others taking
 mutable objects) are typically declared not as Parameter but as <?php
-classref('topo.param','ClassSelector')?>, which sets
+classref('param','ClassSelector')?>, which sets
 <code>instantiate=True</code> automatically.  Thus in most cases users
 can use Parameters without worrying about the details of inheritance
 and instantiation, but the details have been included here because the

@@ -52,7 +52,7 @@ work around these issues.
 
 <pre>
 Parameterized53371: Warning: ManagedRandomComposite (type <class 
-'topo.param.parameterized.ParameterizedMetaclass'>) has 
+'param.parameterized.ParameterizedMetaclass'>) has 
 source in __main__; it will only be found on unpickling if the class is 
 explicitly defined (e.g. by running the same script first) before 
 unpickling.

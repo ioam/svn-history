@@ -13,9 +13,11 @@ __version__='$Revision$'
 
 
 from math import pi, sqrt
-import numpy
 
-from topo import learningfn,numbergen,transferfn,param,pattern,projection,responsefn,sheet 
+import numpy
+import param
+
+from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet 
 
 import topo.learningfn.optimized
 import topo.learningfn.projfn 

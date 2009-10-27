@@ -7,10 +7,10 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy
-
 from math import pi, sqrt
 
+import numpy
+import param
 
 import topo.pattern.basic
 import topo.pattern.random

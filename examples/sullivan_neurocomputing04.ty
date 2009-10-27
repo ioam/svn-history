@@ -17,7 +17,9 @@ __version__='$Revision$'
 
 from math import exp,sqrt,fmod,pi,radians,sin,cos
 
-from topo import coordmapper,learningfn,numbergen,transferfn,param,pattern,projection,responsefn,sheet
+import param
+
+from topo import coordmapper,learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet
 from topo.misc import patternfn
 
 import topo.learningfn.projfn 

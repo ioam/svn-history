@@ -1,6 +1,6 @@
 # Adding support for RGB images (work in progress)
 import topo
-from topo import param
+import param
 
 # CB: it's like a NumberGenerator, but it isn't one, so
 # I'm not sure where it should go.

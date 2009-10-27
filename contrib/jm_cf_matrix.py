@@ -1,5 +1,5 @@
 import numpy
-from topo import param, pattern
+import param, pattern
 from topo.projection.basic import CFProjection, MaskedCFIter
 from topo.base.patterngenerator import PatternGenerator
 

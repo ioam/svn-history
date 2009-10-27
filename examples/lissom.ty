@@ -81,14 +81,15 @@ __version__='$Revision: 8706 $'
 
 
 from math import pi, sqrt
-import numpy
+from colorsys import hsv_to_rgb
 import copy
 
-from colorsys import hsv_to_rgb
+import numpy
+import param
 
 from topo.misc.util import linearly_interpolate
 
-from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet,param
+from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet
 
 import topo.learningfn.optimized
 import topo.learningfn.projfn 

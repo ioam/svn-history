@@ -157,7 +157,7 @@ def get_activity(**data):
     return data['Activity']
 
 import numpy
-from topo import param
+import param
 
 class DataAnalyser(param.Parameterized):
     """

@@ -34,7 +34,7 @@ from numpy.oldnumeric import maximum, minimum, sqrt, divide, greater_equal
 from numpy.oldnumeric import bitwise_xor, exp, fmod, absolute, arctan2
 from numpy import seterr
 
-from topo import param
+import param
 from topo.pattern.basic import *
 from topo.base.patterngenerator import PatternGenerator
 from topo.misc.patternfn import float_error_ignore,arc_by_radian

@@ -117,7 +117,8 @@ Photoreceptor Sheet (<TT>Photoreceptors</TT>), a connection to PyNN
 <P>
 <pre>
           import numpy
-          from topo import sheet,numbergen,pattern,param,projection
+          import param
+          from topo import sheet,numbergen,pattern,projection
           from topo.base.simulation import EventProcessor
 (1)       <B>import perrinet_retina_pynest as pynr</B>
            

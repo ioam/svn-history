@@ -411,13 +411,13 @@ CommandPrompt.format = CommandPrompt.ansi_format
 
 If you want to study exactly how Topographica is operating, e.g. to
 extend it or control it from the command line, you can consider
-changing the <code>topo.param.parameterized.min_print_level</code>
+changing the <code>param.parameterized.min_print_level</code>
 parameter so that messages will be printed whenever Topographica
 performs an action.  For instance, you can enable verbose messaging
 by starting Topographica as:
 
 <pre>
-  ./topographica -c "from topo import param" \
+  ./topographica -c "import param" \
   -c "param.parameterized.min_print_level=param.parameterized.VERBOSE" ...
 </pre>
 
@@ -534,7 +534,7 @@ parameter name to use from the command line or in a script, you can
 turn off the parameter name reformatting:
 
 <pre>
-  from topo.param.tk import TkParameterized
+  from param.tk import TkParameterized
   TkParameterized.pretty_parameters=False
 </pre>
 
@@ -544,7 +544,7 @@ to the end of it...-->
 <P>One can also open a GUI window to inspect or edit any Parameterized object: 
 
 <pre>
- from topo.param.tk import edit_parameters
+ from param.tk import edit_parameters
  edit_parameters(topo.sim['V1']) 
 </pre>
 

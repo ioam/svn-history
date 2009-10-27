@@ -164,7 +164,7 @@ def ganglion_labels(w_x,w_y,g,angs,x_indices,y_indices):
 # Generating input patterns, and testing & plotting responses
 ##########################################################################
 
-from topo import param
+import param
 from topo.base.patterngenerator import PatternGenerator
 from topo.command.analysis import PatternPresenter, Subplotting
 from topo.base.functionfamily import CoordinateMapperFn

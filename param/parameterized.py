@@ -119,9 +119,9 @@ class ParameterMetaclass(type):
         # store the class's docstring in __classdoc
         if '__doc__' in classdict:
             classdict['__classdoc']=classdict['__doc__']
-        # when asking for help on Parameter *object*, return the doc
-        # slot
-        classdict['__doc__']=property(attrgetter('doc'))
+        # when asking for help on Parameter *object*, return 
+        # the parameter object's repr
+        classdict['__doc__']=property(lambda obj: repr(obj)) 
 
         # To get the benefit of slots, subclasses must themselves define
         # __slots__, whether or not they define attributes not present in
@@ -297,7 +297,7 @@ class Parameter(object):
     # Parameterized class owns it. If a Parameter subclass needs
     # to know the owning class, it can declare an 'objtype' slot
     # (which will be filled in by ParameterizedMetaclass)
-                                                   
+          
     def __init__(self,default=None,doc=None,precedence=None,  # pylint: disable-msg=R0913
                  instantiate=False,constant=False,readonly=False): 
         """
@@ -324,7 +324,24 @@ class Parameter(object):
         self.readonly = readonly
         self._set_instantiate(instantiate)
 
+    
+    def __repr__(self):
+        # CEBALERT: assumes param.X
+        module_name = type(self).__module__ 
+        class_name = type(self).__name__
+        name = module_name+'.'+class_name
 
+        # simplify this!
+        r = "("
+        for a in get_all_slots(type(self)):
+            if not a.startswith('_') and a!='doc':
+                r+="%s=%s,"%(a,getattr(self,a))
+        
+        r+="doc=\"\"\"%s\"\"\")"%self.doc
+
+        return name+r
+
+    
     def _set_instantiate(self,instantiate):
         """Constant parameters must be instantiated."""
         # CB: instantiate doesn't actually matter for read-only
@@ -1474,24 +1491,7 @@ def print_all_param_defaults():
 
 
 
-# Support for changing parameter names
-# CEBALERT: doesn't support things like changing output_fn to output_fns,
-# where we also need to do output_fn=x -> output_fns=[x].
-# Should implement fuller support in legacy, and remove this from here.
-_param_name_changes = {}
-# e.g. you change topo.pattern.basic.Gaussian.aspect_ratio to aspect_ration
-# _param_name_changes['topo.pattern.basic.Gaussian']={'aspect_ratio':'aspect_ration'}
-#
-# (not yet finished - do we need to add information about version numbers?)
 
-# classes that aren't parameterized any more (same ALERT about being in legacy
-# as above)
-do_not_restore = ['topo.base.boundingregion.BoundingRegion',
-                  'topo.base.boundingregion.BoundingBox',
-                  'topo.base.boundingregion.BoundingCircle',
-                  'topo.base.boundingregion.BoundingEllipse',
-                  'topo.base.cf.ConnectionField',
-                  'topo.projection.basic.SharedWeightCF']
 
 # CEBALERT: Can't this stuff move to the ParameterizedMetaclass?
 class PicklableClassAttributes(object):
@@ -1502,6 +1502,22 @@ class PicklableClassAttributes(object):
     and any given startup_commands. On unpickling, executes the startup
     commands and sets the class attributes.
     """
+
+    # classes that aren't parameterized any more
+    do_not_restore = []
+
+
+    # Support for changing parameter names
+    # CEBALERT: doesn't support things like changing output_fn to output_fns,
+    # where we also need to do output_fn=x -> output_fns=[x].
+    # Should implement fuller support in legacy, and remove this from here.
+    param_name_changes = {}
+    # e.g. you change topo.pattern.basic.Gaussian.aspect_ratio to aspect_ration
+    # _param_name_changes['topo.pattern.basic.Gaussian']={'aspect_ratio':'aspect_ration'}
+    #
+    # (not yet finished - do we need to add information about version numbers?)
+
+
     # pylint: disable-msg=R0903
     
     # CB: might have mixed up module and package in the docs.
@@ -1541,7 +1557,7 @@ class PicklableClassAttributes(object):
         for class_path,state in state['class_attributes'].items():
             # from e.g. "topo.base.parameter.Parameter", we want "topo.base.parameter"
 
-            if class_path in do_not_restore:
+            if class_path in self.do_not_restore:
                 #print "Did not restore:",class_path
                 break
 
@@ -1559,9 +1575,9 @@ class PicklableClassAttributes(object):
             # now restore class Parameter values
             for p_name,p_obj in state.items():
 
-                if class_path in _param_name_changes:
-                    if p_name in _param_name_changes[class_path]:
-                        new_p_name = _param_name_changes[class_path][p_name]
+                if class_path in self.param_name_changes:
+                    if p_name in self.param_name_changes[class_path]:
+                        new_p_name = self.param_name_changes[class_path][p_name]
                         Parameterized().message("%s's %s parameter has been renamed to %s."%(class_path,p_name,new_p_name))
                         p_name = new_p_name
 

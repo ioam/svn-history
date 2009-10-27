@@ -67,8 +67,8 @@ is required to keep track of variables and display components
 ('widgets') ).-->
 
 <P>The
-classes <a href="../Reference_Manual/topo.param.tk.TkParameterized-class.html">TkParameterized</a>
-and <a href="../Reference_Manual/topo.param.tk.ParametersFrame-class.html">ParametersFrame</a>
+classes <a href="../Reference_Manual/param.tk.TkParameterized-class.html">TkParameterized</a>
+and <a href="../Reference_Manual/param.tk.ParametersFrame-class.html">ParametersFrame</a>
 are the ones most often used for creating a new GUI representation of
 some Topographica component. Which to use depends on how much you wish
 to customize the display: a ParametersFrame displays all of a
@@ -90,7 +90,7 @@ Tkinter.Frame):
 
 <pre>
 from topo import pattern
-from topo.param import tk
+from param import tk
 
 # existing component and existing window
 g = pattern.Gaussian()
@@ -103,8 +103,8 @@ f = tk.ParametersFrame(w,g)
 <P>All the non-hidden Parameters of <code>p</code> will be displayed
 in a new Frame in <code>w</code>. Changing the Parameter's value in
 the GUI immediately changes the actual Parameter value; the class
-<A href="../Reference_Manual/topo.param.tk.ParametersFrameWithApply-class.html">
-topo.param.tk.ParametersFrameWithApply</A> is a version of
+<A href="../Reference_Manual/param.tk.ParametersFrameWithApply-class.html">
+param.tk.ParametersFrameWithApply</A> is a version of
 ParametersFrame that does not immediately apply changes, instead
 waiting for confirmation via an Apply button.
 
@@ -123,7 +123,7 @@ could do the following:
 
 <pre>
 from topo import pattern
-from topo.param import tk
+from param import tk
 
 # existing component and existing window
 g = pattern.Gaussian()
