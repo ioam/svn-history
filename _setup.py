@@ -48,6 +48,7 @@ common = dict(
 
     # CEBALERT: do I have to list these? if I do, can I generate the list automatically?
     packages=['topo',
+              'param',
               'topo.analysis',
               'topo.base',
               'topo.command',
@@ -57,7 +58,6 @@ common = dict(
               'topo.misc',
               'topo.numbergen',
               'topo.transferfn',
-              'topo.param',
               'topo.pattern',
               'topo.plotting',
               'topo.projection',
@@ -69,9 +69,9 @@ common = dict(
     package_data={
         # These things are not data. I'm not sure how else to do
         # this - I couldn't find documentation.
-        'topo.param': ['externaltk/snit-2.2.1/*.tcl',
-                       'externaltk/scrodget-2.1/*.tcl',
-                       'externaltk/tooltip-1.4/*.tcl'],
+        'param': ['externaltk/snit-2.2.1/*.tcl',
+                  'externaltk/scrodget-2.1/*.tcl',
+                  'externaltk/tooltip-1.4/*.tcl'],
 
         'topo.tkgui': ['icons/*.*'],
         'topo.command':['*.png','*.pdf'],
