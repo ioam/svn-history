@@ -434,14 +434,14 @@ class TwoRectangles(Rectangle):
                         (self.pattern_x-p.x1)<=p.x1+width/4.0,
                         (self.pattern_x-p.x1)>=p.x1-width/4.0),
                       bitwise_and(
-                        (self.pattern_y-p.y1)<=p.y1+width/4.0,
-                        (self.pattern_y-p.y1)>=p.y1-width/4.0)),
+                        (self.pattern_y-p.y1)<=p.y1+height/4.0,
+                        (self.pattern_y-p.y1)>=p.y1-height/4.0)),
                bitwise_and(bitwise_and(
                         (self.pattern_x-p.x2)<=p.x2+width/4.0,
                         (self.pattern_x-p.x2)>=p.x2-width/4.0),
                       bitwise_and(
-                        (self.pattern_y-p.y2)<=p.y2+width/4.0,
-                        (self.pattern_y-p.y2)>=p.y2-width/4.0)))
+                        (self.pattern_y-p.y2)<=p.y2+height/4.0,
+                        (self.pattern_y-p.y2)>=p.y2-height/4.0)))
 
 
 class SquareGrating(PatternGenerator):
