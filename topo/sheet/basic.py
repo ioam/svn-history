@@ -317,8 +317,8 @@ class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
                #self.activate()
                if (self.plastic):
                    self.learn()
-           else:
-               self.activate()
+           #else:
+           self.activate()
 
 
 
