@@ -304,7 +304,7 @@ clean-weave:
 	rm -rf ~/.python2*_compiled/ | cat
 
 clean-pyc:
-	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc contrib/*.pyc
+	rm -f *.pyc param/*.pyc topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc contrib/*.pyc
 
 clean-doc:
 	make -C doc clean
@@ -450,6 +450,7 @@ ChangeLog.txt: FORCE
 # set up GPG key, sign various ubuntu agreements on launchpad, ...
 # $ export GPGKEY=4275E3C7
 #
+# ceball@fiver:~/working/topographica3$ make dist-setup.py
 #
 # ceball@fiver:~/pkg$ ls
 # topographica-0.9.6  topographica_0.9.6.orig.tar.gz
