@@ -462,7 +462,7 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
             data[key][i]=[]
         data[key]["act"]=[]
 
-    for i in xrange(0,80):
+    for i in xrange(0,120):
         pp = PatternPresenter(pattern_generator=pattern_generator,duration=i*0.05,contrast_parameter="weber_contrast")
         
         for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
