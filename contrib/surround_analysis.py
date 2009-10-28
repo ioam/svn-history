@@ -494,7 +494,8 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
            pylab.plot(a,label=projname)
        pylab.legend(loc='upper left')
     pylab.show._needmain=False
-    pylab.show()
+    release_fig()
+    release_fig("settling")
      
      
      
