@@ -10,7 +10,7 @@ from math import ceil
 
 from numpy.oldnumeric import exp, argmax
 
-from .. import param
+import param
 
 from topo.base.arrayutil import L2norm, array_argmax
 from topo.base.boundingregion import BoundingBox

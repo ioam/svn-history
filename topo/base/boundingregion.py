@@ -12,8 +12,8 @@ from numpy import inf
 ### matrix notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
-from .. import param
-from ..param.parameterized import get_all_slots
+import param
+from param.parameterized import get_all_slots
 
 class BoundingRegion(object):
     """

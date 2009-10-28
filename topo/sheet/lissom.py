@@ -10,7 +10,7 @@ import numpy
 from numpy import abs,zeros,ones
 import copy
 
-from .. import param
+import param
 
 import topo
 from topo.base.boundingregion import BoundingBox

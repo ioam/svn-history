@@ -20,9 +20,9 @@ from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIR
 from tkFileDialog import asksaveasfilename
 
 
-from .. import param
-from ..param import tk,parameterized
-from ..param.external import Combobox
+import param
+from param import tk,parameterized
+from param.external import Combobox
 
 import topo
 from topo.command.analysis import update_activity

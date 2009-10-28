@@ -172,6 +172,15 @@ class DuplicateCheckingList(list):
         list.append(self,item)
 
 
+# put this somewhere...
+import param
+param.parameterized.PicklableClassAttributes.do_not_restore+=[
+    'topo.base.boundingregion.BoundingRegion',
+    'topo.base.boundingregion.BoundingBox',
+    'topo.base.boundingregion.BoundingCircle',
+    'topo.base.boundingregion.BoundingEllipse',
+    'topo.base.cf.ConnectionField',
+    'topo.projection.basic.SharedWeightCF']
 
 
 class SnapshotSupport(object):
@@ -184,7 +193,7 @@ class SnapshotSupport(object):
         # suitable way e.g. dictionary.
         # Haven't yet thought about whether or not it's actually possible
         # to get the version number before unpickling...
-        from topo import param
+        import param
         global supporters
         for f in supporters:
             param.Parameterized(name='SnapshotSupport').debug("calling %s"%f.__name__)
@@ -230,6 +239,14 @@ def install_legacy_support():
 
 S=supporters=DuplicateCheckingList()
 # in general, newest changes should go at the start of the list.
+
+def bye_bye_param():
+    import param
+    import topo
+    package_redirect('param',topo,param)
+
+S.append(bye_bye_param)
+
 
 def renamed_output_fn_to_output_fns():
     ## rXXXX output_fn=X changed to output_fns=[x] in multiple classes
@@ -796,7 +813,7 @@ S.append(moved_homeostatic)
 def renamed_cfproj_weights_shape():
     # rXXXX renamed CFProjection.weights_shape to CFProjection.cf_shape
     from topo import param
-    param.parameterized._param_name_changes['topo.base.cf.CFProjection']={'weights_shape':'cf_shape'}
+    param.parameterized.PicklableClassAttributes.param_name_changes['topo.base.cf.CFProjection']={'weights_shape':'cf_shape'}
 
 S.append(renamed_cfproj_weights_shape)
 
@@ -906,4 +923,7 @@ def cf_not_parameterized():
     preprocess_state(ConnectionField,_cf_not_parameterized)
 
 S.append(cf_not_parameterized)
+
+
+
 

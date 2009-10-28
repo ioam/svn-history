@@ -40,7 +40,7 @@ class PickleMain(object):
         self.pickler.dispatch[new.module] = save_module
         self.pickler.dispatch[type] = save_type
         # CB: maybe this should be registered from elsewhere
-        from topo import param
+        import param
         self.pickler.dispatch[param.parameterized.ParameterizedMetaclass] = save_type
 
 

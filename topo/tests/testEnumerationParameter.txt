@@ -1,4 +1,4 @@
->>> from topo import param
+>>> import param
 
 >>> class P(param.Parameterized):
 ...     e = param.Enumeration(default=5,available=[5,6,7])

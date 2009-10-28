@@ -14,7 +14,7 @@ from optparse import OptionParser
 import sys, __main__, math, os, re
 
 import topo
-from topo.param.parameterized import Parameterized,OptionalSingleton
+from param.parameterized import Parameterized,OptionalSingleton
 
 matplotlib_imported=False
 try:
@@ -290,8 +290,8 @@ topo_parser.add_option("-i","--interactive",action="callback",callback=i_action,
 
 def v_action(option,opt_str,value,parser):
     """Callback function for the -v option."""
-    import topo.param.parameterized
-    topo.param.parameterized.min_print_level=topo.param.parameterized.VERBOSE
+    import param.parameterized
+    param.parameterized.min_print_level=param.parameterized.VERBOSE
     print "Enabling verbose message output."
     
 topo_parser.add_option("-v","--verbose",action="callback",callback=v_action,dest="verbose",default=False,help="""\
@@ -300,8 +300,8 @@ enable verbose messaging output.""")
 
 def d_action(option,opt_str,value,parser):
     """Callback function for the -d option."""
-    import topo.param.parameterized
-    topo.param.parameterized.min_print_level=topo.param.parameterized.DEBUG
+    import param.parameterized
+    param.parameterized.min_print_level=param.parameterized.DEBUG
     print "Enabling debugging message output."
     
 topo_parser.add_option("-d","--debug",action="callback",callback=d_action,dest="debug",default=False,help="""\

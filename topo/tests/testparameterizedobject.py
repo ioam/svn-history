@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 import unittest
 
-from .. import param
+import param
 
 # CEBALERT: not anything like a complete test of Parameterized!
 
@@ -150,7 +150,7 @@ class TestParameterized(unittest.TestCase):
 
 
 
-from topo.param import parameterized
+from param import parameterized
 
 class some_fn(param.ParameterizedFunction):
    num_phase = param.Number(18)

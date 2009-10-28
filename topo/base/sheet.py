@@ -25,7 +25,7 @@ __version__ = '$Revision$'
 from numpy import zeros,array,arange,meshgrid
 from numpy import float64
 
-from .. import param
+import param
 
 from simulation import EventProcessor
 from sheetcoords import SheetCoordinateSystem

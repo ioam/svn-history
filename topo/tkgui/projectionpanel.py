@@ -12,7 +12,7 @@ from itertools import chain
 from Tkinter import Canvas, Label
 from numpy import sometrue
 
-from .. import param
+import param
 
 import topo
 from topo.base.cf import CFProjection

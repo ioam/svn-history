@@ -1,4 +1,4 @@
->>> from topo import param
+>>> import param
 
 # initialize a class with a compound parameter
 >>> class A(param.Parameterized):

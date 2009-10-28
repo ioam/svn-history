@@ -15,8 +15,8 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas, Checkbutton, BooleanVar, DISABLED, NORMAL,NO
 from tkFileDialog import asksaveasfilename
 
-from .. import param
-from ..param import tk
+import param
+from param import tk
 
 import topo.command.pylabplots
 from topo.misc.filepath import normalize_path

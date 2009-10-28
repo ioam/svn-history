@@ -12,8 +12,8 @@ __version__='$Revision$'
 import copy
 import Image
 
-from .. import param
-from topo.param.parameterized import ParamOverrides
+import param
+from param.parameterized import ParamOverrides
 
 import topo
 

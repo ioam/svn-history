@@ -19,9 +19,9 @@ except ImportError:
     pass
 
 
-from .. import param
-from ..param.parameterized import PicklableClassAttributes, ParameterizedFunction
-from ..param.parameterized import ParamOverrides
+import param
+from param.parameterized import PicklableClassAttributes, ParameterizedFunction
+from param.parameterized import ParamOverrides
 
 import topo
 from topo.base.functionfamily import TransferFn
@@ -174,7 +174,7 @@ def save_snapshot(snapshot_name=None,xml=False):
     with the notable exception of class attributes. Python does not
     pickle class attributes, but this function stores class attributes
     of any Parameterized class that is declared within the topo
-    package. See the topo.param.parameterized.PicklableClassAttributes
+    package. See the param.parameterized.PicklableClassAttributes
     class for more information.
     """
     if not snapshot_name:

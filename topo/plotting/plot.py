@@ -11,7 +11,7 @@ import copy
 
 from numpy.oldnumeric import zeros, ones, Float, divide,ravel,clip,array
 
-from .. import param
+import param
 
 from topo.base.sheetcoords import SheetCoordinateSystem,Slice
 

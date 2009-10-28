@@ -26,7 +26,7 @@ from copy import copy
 from numpy import abs,array,zeros,where
 from numpy.oldnumeric import Float,Float32
 
-from .. import param
+import param
 
 import patterngenerator
 from patterngenerator import PatternGenerator

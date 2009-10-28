@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from .. import param
+import param
 
 from topo.base.functionfamily import TransferFn, IdentityTF
 from topo.base.projection import Projection, NeighborhoodMask

@@ -139,7 +139,7 @@ all_doctest = sorted(fnmatch.filter(os.listdir(__path__[0]),'test*.txt'))
 
 import gmpy
 if gmpy.__file__ is None:
-    from topo import param
+    import param
     param.Parameterized().warning('no gmpy module: testgmpynumber.txt skipped')
     all_doctest.remove('testgmpynumber.txt')
 

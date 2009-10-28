@@ -15,7 +15,7 @@ try:
 except ImportError:
     print "Warning: pyaudiolab must be built to use audio.py"
 
-from topo import param
+import param
 
 from topo.misc.filepath import Filename
 

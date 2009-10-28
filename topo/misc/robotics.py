@@ -20,7 +20,7 @@ import time
 import Image,ImageOps
 from math import pi,cos,sin
 
-from .. import param
+import param
 
 from topo.base.simulation import Simulation,EventProcessor
 from topo.pattern.image import GenericImage

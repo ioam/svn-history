@@ -26,7 +26,7 @@ def ufunc_script_repr(f,imports,prefix=None,settings=None):
     imports.append('import numpy')
     return 'numpy.'+f.__name__
 
-from ..param import parameterized
+from param import parameterized
 parameterized.script_repr_reg[ufunc]=ufunc_script_repr
 
 

@@ -10,8 +10,8 @@ import __main__
 import unittest
 import Tkinter
 
-from .. import param
-from ..param import tk
+import param
+from param import tk
 
 from topo.base.patterngenerator import PatternGenerator
 

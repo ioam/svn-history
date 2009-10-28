@@ -11,8 +11,8 @@ import copy
 
 from numpy.oldnumeric import array, Float, sum, ravel, ones
 
-from .. import param
-from topo.param.parameterized import ParamOverrides,overridable_property
+import param
+from param.parameterized import ParamOverrides,overridable_property
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator

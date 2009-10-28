@@ -10,7 +10,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from .. import param
+import param
 
 from topo.base.simulation import EventProcessor,EPConnectionEvent
 

@@ -7,7 +7,7 @@ __version__ = "$Revision$"
 
 from numpy.oldnumeric import ones,Float32
 
-from .. import param
+import param
 
 from topo.base.functionfamily import LearningFn
 # Imported here so that all learning functions will be in the same package

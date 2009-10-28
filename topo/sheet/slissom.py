@@ -10,7 +10,7 @@ from math import exp
 import numpy.oldnumeric as Numeric
 import numpy.oldnumeric.random_array as RandomArray
 
-from .. import param
+import param
 
 from topo.command.pylabplots import vectorplot, matrixplot
 

@@ -414,7 +414,7 @@ class gmpyFaker(ModuleFaker):
 """
 from __future__ import division
 import fixedpoint
-from topo import param
+import param
 class mpq(object):
     def __new__(self,*args,**kw):
         n = fixedpoint.FixedPoint(eval(str(args[0])),precision=4)
@@ -428,7 +428,7 @@ class gmpyImporter(ModuleImporter):
 
     def find_module(self, fullname, path=None):
         if fullname == 'gmpy' or fullname.startswith('gmpy.'):
-            from topo import param
+            import param
             param.Parameterized().warning('Module "gmpy" is not available. gmpy.mpq is provided by using fixedpoint.FixedPoint.')
             g = gmpyFaker()
             g.path = path

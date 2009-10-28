@@ -13,7 +13,7 @@ __version__='$Revision$'
 
 import numpy
 
-from .. import param
+import param
 
 
 class TransferFn(param.Parameterized):

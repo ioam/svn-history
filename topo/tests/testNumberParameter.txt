@@ -1,4 +1,4 @@
->>> from topo import param
+>>> import param
 >>> from topo.misc.numbergenerator import UniformRandom
 
 >>> class TestPO1(param.Parameterized):

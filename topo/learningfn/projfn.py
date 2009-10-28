@@ -14,7 +14,7 @@ from numpy import ones,zeros
 import numpy.oldnumeric as Numeric
 from numpy.oldnumeric import Float,Float32
 
-from .. import param
+import param
 
 from topo.base.cf import CFPLearningFn
 from topo.base.sheet import activity_type

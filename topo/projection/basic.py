@@ -11,7 +11,7 @@ from copy import copy
 
 from numpy import exp,ones,zeros,array,nonzero
 
-from .. import param
+import param
 
 # So all Projections are present in this package
 from topo.base.projection import Projection

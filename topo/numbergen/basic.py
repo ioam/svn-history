@@ -11,7 +11,7 @@ import operator
 
 from math import e,pi
 
-from .. import param
+import param
 
 
 

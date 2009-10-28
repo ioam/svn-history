@@ -21,9 +21,9 @@ from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      Scrollbar, Y, VERTICAL, HORIZONTAL, END, NO, NONE,Scrollbar,Canvas, \
      TclError
 
-from .. import param
+import param
 # CEB: maybe bad, since people reading code will probably assume tk is Tkinter
-from ..param import tk
+from param import tk
 
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet

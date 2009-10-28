@@ -30,7 +30,7 @@ from colorsys import hsv_to_rgb
 import numpy.oldnumeric as Numeric
 import numpy
 
-from .. import param
+import param
 
 from topo.misc.filepath import resolve_path
 

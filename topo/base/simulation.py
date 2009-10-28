@@ -54,8 +54,8 @@ $Id$
 """
 __version__='$Revision$'
 
-from .. import param
-from ..param.parameterized import as_uninitialized,OptionalSingleton
+import param
+from param.parameterized import as_uninitialized,OptionalSingleton
 
 from copy import copy, deepcopy
 
@@ -247,7 +247,7 @@ class EventProcessorParameter(param.Parameter):
             super(EventProcessorParameter,self).__set__(obj,val)
 
 
-from ..param import parameterized
+from param import parameterized
 
 class EPConnection(param.Parameterized):
     """

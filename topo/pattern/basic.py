@@ -12,8 +12,8 @@ import numpy
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
-from .. import param
-from ..param.parameterized import ParamOverrides
+import param
+from param.parameterized import ParamOverrides
 
 import topo
 # Imported here so that all PatternGenerators will be in the same package

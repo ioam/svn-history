@@ -7,7 +7,7 @@ Requires the weave package; without it unoptimized versions are used.
 
 from numpy.oldnumeric import sum
 
-from .. import param
+import param
 
 from topo.base.cf import CFPOutputFn,CFPOF_Plugin
 from topo.base.functionfamily import TransferFn, IdentityTF

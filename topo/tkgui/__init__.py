@@ -123,7 +123,7 @@ TK_SUPPORTS_DOCK = True
 
 
 # CEBALERT: this function needs some cleaning up.
-# Some stuff should be moved out to topo.param.tk,
+# Some stuff should be moved out to param.tk,
 # which could also make this file much simpler.
 
 # gets set to the TopoConsole instance created by start.
@@ -149,8 +149,8 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
 
     if root is None:
         # root should be a required argument
-        import topo.param.tk
-        root = topo.param.tk.root
+        import param.tk
+        root = param.tk.root
 
     if banner: print 'Launching GUI'
 

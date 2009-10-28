@@ -10,7 +10,7 @@ __version__ = "$Revision$"
 
 from numpy import zeros, ones
 
-from .. import param
+import param
 
 from topo.base.sheet import activity_type
 from topo.base.cf import CFPLearningFn,CFPLF_Plugin

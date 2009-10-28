@@ -105,7 +105,7 @@ def generate(plotgroup_names):
 
 def test(plotgroup_names):
     import topo
-    from topo import param
+    import param
     assert topo.sim.name==sim_name
     assert topo.sim['V1'].nominal_density==8
     assert topo.sim.time()==100

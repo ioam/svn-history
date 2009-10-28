@@ -19,8 +19,8 @@ import numpy
 from numpy import zeros, array, empty, object_, size, vectorize, fromfunction
 from numpy.oldnumeric import Float
 
-from .. import param
-from ..param.parameterized import ParameterizedFunction, ParamOverrides
+import param
+from param.parameterized import ParameterizedFunction, ParamOverrides
 
 import topo
 import topo.base.sheetcoords

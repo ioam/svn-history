@@ -13,8 +13,8 @@ import __main__
 import unittest
 from Tkinter import Frame,Toplevel
 
-from .. import param
-from ..param import tk
+import param
+from param import tk
 
 from topo.base.simulation import Simulation
 from topo.base.patterngenerator import PatternGenerator

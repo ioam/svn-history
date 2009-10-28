@@ -1,6 +1,6 @@
 # probably shouldn't be in a file on its own!
 
->>> from topo.param.parameterized import ParamOverrides,Parameterized
+>>> from param.parameterized import ParamOverrides,Parameterized
 
 >>> po = Parameterized(name='A',print_level=0)
 >>> po.name

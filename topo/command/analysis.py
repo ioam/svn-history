@@ -32,9 +32,9 @@ import copy
 from colorsys import hsv_to_rgb
 from numpy.oldnumeric import array, maximum
 
-from .. import param
-from ..param.parameterized import PicklableClassAttributes, ParameterizedFunction
-from ..param.parameterized import ParamOverrides
+import param
+from param.parameterized import PicklableClassAttributes, ParameterizedFunction
+from param.parameterized import ParamOverrides
 
 import topo
 from topo.base.cf import CFSheet, CFProjection, Projection

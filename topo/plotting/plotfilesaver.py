@@ -12,7 +12,7 @@ import Image
 import ImageOps
 import numpy
 
-from .. import param
+import param
 
 from topo.misc.filepath import normalize_path
 import topo

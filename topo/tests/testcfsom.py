@@ -11,7 +11,7 @@ import random
 from pprint import pprint
 from math import pi
 
-from .. import param
+import param
 
 import topo.pattern.basic
 from topo.plotting import plot

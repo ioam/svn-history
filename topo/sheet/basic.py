@@ -15,7 +15,7 @@ import numpy
 
 import topo
 
-from topo import param
+import param
 
 from topo.base.cf import CFSheet, CFPOutputFn
 from topo.base.functionfamily import TransferFn

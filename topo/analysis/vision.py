@@ -17,7 +17,7 @@ try:
 except ImportError:
     print "Warning: Could not import matplotlib; pylab plots will not work."
 
-from .. import param
+import param
 
 import topo
 from topo.base.cf import CFSheet

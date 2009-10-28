@@ -7,8 +7,8 @@ __version__='$Revision$'
 
 import numpy
 
-from .. import param
-from ..param.parameterized import ParamOverrides
+import param
+from param.parameterized import ParamOverrides
 
 from topo.base.patterngenerator import PatternGenerator
 from topo.pattern import Composite, Gaussian

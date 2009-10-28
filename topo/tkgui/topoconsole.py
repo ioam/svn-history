@@ -24,9 +24,9 @@ from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      NORMAL, Scrollbar, Y, DoubleVar, Widget,Toplevel
 from tkFileDialog import asksaveasfilename,askopenfilename
 
-from .. import param
-from ..param import tk
-from ..param.external import Notebook
+import param
+from param import tk
+from param.external import Notebook
 
 import topo
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
@@ -324,7 +324,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
 ####################
 # CEBALERT: should use parameterized methods to get formatting and
 # e.g. warnings as errors.
-        from topo.param.parameterized import Parameterized        
+        from param.parameterized import Parameterized        
         self.__orig_P_warning = Parameterized.warning
         self.__orig_P_message = Parameterized.message
         type.__setattr__(Parameterized,'warning',self.gui_warning)

@@ -17,7 +17,7 @@ __version__='$Revision$'
 import os.path
 import sys
 
-from .. import param
+import param
 
 
 # copied from scipy/weave/catalog.py (scipy svn 5552)

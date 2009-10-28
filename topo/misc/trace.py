@@ -18,7 +18,7 @@ from itertools import izip
 from numpy import array,asarray
 import ImageDraw
 
-from .. import param
+import param
 
 from topo.base.simulation import EventProcessor
 from topo.plotting.bitmap import RGBBitmap, MontageBitmap, TITLE_FONT

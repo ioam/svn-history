@@ -10,8 +10,8 @@ from math import pi
 
 from numpy import add,subtract,cos,sin
 
-from .. import param
-from ..param.parameterized import ParamOverrides
+import param
+from param.parameterized import ParamOverrides
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 from sheetcoords import SheetCoordinateSystem

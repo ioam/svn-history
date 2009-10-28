@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from .. import param
+import param
 
 import plot
 

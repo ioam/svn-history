@@ -45,9 +45,9 @@ from topo.misc.filepath import normalize_path
 from topo.misc.util import frange
 import topo.analysis.vision
 from topo.plotting.plot import make_template_plot, Plot
-from topo import param
-from topo.param import ParameterizedFunction
-from topo.param.parameterized import ParamOverrides
+import param
+from param import ParameterizedFunction
+from param.parameterized import ParamOverrides
 from topo.pattern.basic import SineGrating, RawRectangle, OrientationContrast
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.base.cf import CFSheet

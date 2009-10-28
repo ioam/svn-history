@@ -25,7 +25,7 @@ from topo.base.sheetview import SheetView
 import numpy.oldnumeric.mlab as MLab
 import numpy.oldnumeric.random_array as RandomArray
 
-from topo import param
+import param
 
 from random import random
 

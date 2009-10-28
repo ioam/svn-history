@@ -8,8 +8,8 @@ __version__='$Revision$'
 import numpy
 from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 
-from .. import param
-from topo.param.parameterized import overridable_property
+import param
+from param.parameterized import overridable_property
 
 from topo.misc.keyedlist import KeyedList # CEBALERT: not in base
 

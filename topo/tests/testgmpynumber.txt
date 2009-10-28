@@ -1,4 +1,4 @@
->>> from topo import param
+>>> import param
 >>> from topo.misc.numbergenerator import UniformRandom
 >>> from gmpy import mpq
 

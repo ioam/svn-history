@@ -15,7 +15,7 @@ __version__='$Revision$'
 from math import ceil
 import copy
 
-from .. import param
+import param
 
 import numpy, numpy.random
 import numpy.oldnumeric as Numeric
