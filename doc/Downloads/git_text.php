@@ -304,6 +304,23 @@ $ cd NAME/
 $ git pull
 </pre>
 
+<!-- Keeping up to date with svn requires rebase; this will make your
+local repository incompatible with the remote one. Can fix this problem
+by putting the following into the remote's config file:
+
+[receive]
+        denyNonFastforwards = false
+
+You should NOT do this if others are also actively developing on the
+remote, because the remote's history will be rewritten and they will
+get very confused.
+
+http://stackoverflow.com/questions/559917/git-rebase-and-git-push-non-fast-forward-why-use
+http://stackoverflow.com/questions/253055/how-do-i-push-amended-commit-to-the-remote-git-repo
+
+-->
+
+
 <P> Finally, once your feature is complete, you can commit all your
 work to the central SVN repository using <code>git svn dcommit</code>
 as described earlier. After this point, it is highly unlikely that you
@@ -327,7 +344,8 @@ backup.</small>
 ssh -t ceball,topographica@shell.sourceforge.net create
 cd /home/scm_git/t/to/topographica
 git --git-dir=ceball_houzi2 init --shared=all --bare
-emacs -nw ceball_houzei2/description
+emacs -nw ceball_houzi2/description
+emacs -nw ceball_houzi2/config # allow fastforwards - see above
 -->
 
 <!-- based on http://sourceforge.net/apps/trac/sourceforge/wiki/Git, http://www.naildrivin5.com/daveblog5000/?p=102 and
