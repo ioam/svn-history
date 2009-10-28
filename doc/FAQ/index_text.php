@@ -1,14 +1,9 @@
 <H1>Frequently Asked Questions about Topographica</H1>
 
 <P>Here we collect together some answers to <A HREF="#general">general
-questions</A> about Topographica, followed
-by <A HREF="#plat">platform-specific questions</A> about using or
-installing Topographica. 
-
-<P>If you have a problem that isn't answered
-below, please feel free to ask us (either in one of
-our <A HREF="../Forums/index.html">forums</A>, or by
-email). <!-- address?-->
+questions</A> about Topographica. If you have a problem that isn't
+answered below, please feel free to ask us (either in one of our <A
+HREF="../Forums/index.html">forums</A>, or by email). <!-- address?-->
 
 <H3><A NAME='general'>General Questions</A></H3>
 <OL>
@@ -45,6 +40,8 @@ legacy support to be able to load it.  In the long run we plan to set
 up an archival storage format, probably based on XML and/or HDF5, to
 work around these issues.
   
+
+<!--CEBALERT: this is out of date, isn't it? -->
   
 <!----------------------------------------------------------------------------->
 <LI><B>Q:</B> <i>When I try to save a snapshot of my network, I get
@@ -163,35 +160,3 @@ problems with Topographica</a>.
 </OL>
 
 
-<H3><A NAME='plat'>Platform-specific Questions</A></H3>
-
-<OL>
-
-<!----------------------------------------------------------------------------->
-<LI><B>Q:</B> <i>While using the Topographica commandline on OS X, sometimes Topographica quits when I press the up or down arrows on my keyboard. (Related: On OS X 10.5 Leopard I can't access previously entered commands by pressing up on the keyboard.) What can I do about this?</i>
-
-<P><B>A:</B> 
-IPython and/or Python can have trouble finding the correct library to support this action at the commandline; more information is available on the <A HREF="http://ipython.scipy.org/moin/InstallationOSXLeopard">IPython site</A>. 
-
-<P>To fix the problem on OS X 10.5, you can install the latest version of readline, as suggested by one of our users:
-<blockquote>
-<ol>
-
-<li>First, <A HREF="http://peak.telecommunity.com/dist/ez_setup.py">download</A>
-"Easy Install" to your <code>topographica/</code> directory. Then,
-from a Terminal window, change to your <code>topographica/</code>
-directory and type <code>bin/python ez_setup.py</code>. Note that you
-must have an Internet connection at this point.</li>
-
-<li><A HREF="http://pypi.python.org/packages/2.5/r/readline/">Download</A> the latest version of Python's readline appropriate for your system (again, download to your <code>topographica/</code> directory).</li>
-
-<li>Assuming you
-downloaded <code>readline-2.5.1-py2.5-macosx-10.5-i386.egg</code>,
-execute the following command at the Terminal: <code>bin/easy_install
-readline-2.5.1-py2.5-macosx-10.5-i386.egg</code> (alter the command to
-match the version of readline you downloaded).
-</blockquote>
-  
-<!----------------------------------------------------------------------------->
-
-</OL>
