@@ -537,7 +537,6 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
     rows, cols = lgn_on_proj.cfs.shape
     for r in xrange(rows):
         for c in xrange(cols):
-            print r, c
             cf_on = lgn_on_proj.cfs[r, c]
             cf_off = lgn_off_proj.cfs[r, c]
             
@@ -566,8 +565,8 @@ def _divide_with_constant(x, y):
     x = numpy.clip(x, 0, 10000)
     return numpy.divide(x, y + 0.11)
 
-
 def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
+#def add_gc(sheet_name, surround_gaussian_size=0.3, strength=0.15):
     """
     Add divisive normalization to topo.sim[sheet_name], providing
     contrast gain control and contrast-invariant tuning.  Should
@@ -589,7 +588,7 @@ def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
     topo.sim[sheet_name].strict_tsettle = 1
 
 
-def AddGC():
+AddGC(strength=__main__.__dict__.get('LatLGNStr',0.63)):
     add_gc('LGNOn')
     add_gc('LGNOff')
 
@@ -943,6 +942,26 @@ def run_combinations(func, params):
     run_combinations_counter = 0
     _run_combinations_rec(func, [], params, 0)
 
+def investigate_neuron(coordx,coordy):
+    
+    import pylab
+    x,y = topo.sim["V1Simple"].sheet2matrixidx(coordx,coordy)
+    
+    CF1 = topo.sim["V1Simple"].in_connections[0]._cfs[x][y]
+    CF2 = topo.sim["V1Simple"].in_connections[1]._cfs[x][y]
+    
+    fig = pylab.figure()
+    pylab.title("activation:" + str(topo.sim["V1Simple"].activity[x][y]))
+    f = fig.add_subplot(221)
+    f.imshow(CF1.weights)
+    f = fig.add_subplot(223)
+    f.imshow(CF2.weights)
+    f = fig.add_subplot(222)
+    f.imshow(CF1.get_input_matrix(topo.sim["LGNOn"].activity))
+    f = fig.add_subplot(224)
+    f.imshow(CF1.get_input_matrix(topo.sim["LGNOff"].activity))
+    pylab.show()
+
 
 def reset_cc_lissom():
     m = numpy.mean(topo.sim["V1Simple"].output_fns[2].t)
@@ -954,360 +973,19 @@ def reset_cc_lissom():
     topo.sim["V1Complex"].in_connections[0].strength=0
     return (s,a)
 
-class surround_analysis():
-
-    peak_near_facilitation_hist = []
-    peak_supression_hist  = []   
-    peak_far_facilitation_hist  = []
-    sheet_name = ""
-    data_dict = {}
+def measure_map_position_and_MR_correlations():
+    a =1.0
     
-    low_contrast=20
-    high_contrast=100
-    
-    def __init__(self,sheet_name="V1Complex"):
-        from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand
-        import pylab
-        self.sheet_name=sheet_name
-        self.sheet=topo.sim[sheet_name]
-        # Center mask to matrixidx center
-        self.center_r,self.center_c = self.sheet.sheet2matrixidx(0,0)
-        self.center_x,self.center_y = self.sheet.matrixidx2sheet(self.center_r,self.center_c)
-        FeatureCurveCommand.curve_parameters=[{"contrast":self.low_contrast},{"contrast":self.high_contrast}]
-        FeatureCurveCommand.sheet=topo.sim[sheet_name]
-        SinusoidalMeasureResponseCommand.num_phase=8
-        FeatureCurveCommand.num_orientation=16
-
-
-    def analyse(self,steps=1,ns=10,step_size=1):
-        save_plotgroup("Orientation Preference and Complexity")
-        #save_plotgroup("Position Preference")
-        for x in xrange(0,steps*2+1):
-            for y in xrange(0,steps*2+1):
-                xindex = self.center_r+(x-steps)*step_size
-                yindex = self.center_c+(y-steps)*step_size
-                xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
-                topo.command.pylabplots.measure_size_response.instance(sheet=self.sheet,num_sizes=ns,max_size=2.0,coords=[(xcoor,ycoor)])(coords=[(xcoor,ycoor)])        
-                
-                self.data_dict[(xindex,yindex)] = {}
-                self.data_dict[(xindex,yindex)]["ST"] = self.calculate_RF_sizes(xindex, yindex)
-                self.plot_size_tunning(xindex,yindex)
-                
-                self.data_dict[(xindex,yindex)]["OCT"] = self.perform_orientation_contrast_analysis(self.data_dict[(xindex,yindex)]["ST"],xcoor,ycoor,xindex,yindex)
-                self.plot_orientation_contrast_tuning(xindex,yindex)
-                self.plot_orientation_contrast_tuning_abs(xindex,yindex)
-                
-                
-        lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,0.5)                
-        self.plot_map_feature_to_surround_modulation_feature_correlations(lhi,"Local Homogeneity Index")
-        self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationSelectivity'].view()[0],"OrientationSelectivity")
-        self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationPreference'].view()[0]*numpy.pi,"OrientationPreference")
-        self.plot_histograms_of_measures()
-        
-        f = open("dict.dat",'wb')
-        import pickle
-        pickle.dump(self.data_dict,f)
-        
-
-    def perform_orientation_contrast_analysis(self,data,xcoor,ycoor,xindex,yindex):
-        curve_data={}
-        hc_curve = data["Contrast = " + str(self.high_contrast) + "%" ]
-        lc_curve = data["Contrast = " + str(self.low_contrast) + "%" ]
-        
-        topo.command.pylabplots.measure_orientation_contrast(sizecenter=lc_curve["measures"]["peak_near_facilitation"],
-                                                             sizesurround=4.0,
-                                                             display=True,
-                                                             contrastcenter=self.high_contrast,
-                                                             thickness=4.0-lc_curve["measures"]["peak_near_facilitation"]-0.1,
-                                                             num_phase=8,
-                                                             curve_parameters=[{"contrastsurround":self.low_contrast},{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
-        
-        for curve_label in sorted(self.sheet.curve_dict['orientationsurround'].keys()):
-            print curve_label
-            curve_data[curve_label]={}
-            curve_data[curve_label]["data"]=self.sheet.curve_dict['orientationsurround'][curve_label]
-            curve_data[curve_label]["measures"]={}
-            orr=numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
-            pref_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr].view()[0][xindex][yindex]
-            cont_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr+numpy.pi/2].view()[0][xindex][yindex]
-            
-            if pref_or_resp != 0:
-                curve_data[curve_label]["measures"]["or_suppression"]=(pref_or_resp-cont_or_resp)/pref_or_resp
-            else: 
-                curve_data[curve_label]["measures"]["or_suppression"]=-10
-                
-                
-        return curve_data 
-        
-
-    def calculate_RF_sizes(self,xindex, yindex):
-        curve_data = {}
-        hc_curve_name = "Contrast = " + str(self.high_contrast) + "%";
-        lc_curve_name = "Contrast = " + str(self.low_contrast) + "%";
-        for curve_label in [hc_curve_name,lc_curve_name]:
-            curve = self.sheet.curve_dict['size'][curve_label]
-            curve_data[curve_label] = {}
-            curve_data[curve_label]["data"] = curve  
-            
-            x_values = sorted(curve.keys())
-            y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
-
-            #compute critical indexes in the size tuning curves
-            curve_data[curve_label]["measures"]={}
-            curve_data[curve_label]["measures"]["peak_near_facilitation_index"] = numpy.argmax(y_values)
-            curve_data[curve_label]["measures"]["peak_near_facilitation"] = x_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
-
-            if(curve_data[curve_label]["measures"]["peak_near_facilitation"] < (len(y_values) - 1)):
-                curve_data[curve_label]["measures"]["peak_supression_index"] = curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + numpy.argmin(y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + 1:]) + 1
-                curve_data[curve_label]["measures"]["peak_supression"] = x_values[curve_data[curve_label]["measures"]["peak_supression_index"]]
-                curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]  
-                
-            if(curve_data[curve_label]["measures"].has_key("peak_supression_index") and (curve_data[curve_label]["measures"]["peak_supression_index"] < (len(y_values) - 1))):
-                curve_data[curve_label]["measures"]["peak_far_facilitation_index"] = curve_data[curve_label]["measures"]["peak_supression_index"] + numpy.argmax(y_values[curve_data[curve_label]["measures"]["peak_supression_index"] + 1:]) + 1
-                curve_data[curve_label]["measures"]["peak_far_facilitation"] = x_values[curve_data[curve_label]["measures"]["peak_far_facilitation_index"]]
-                curve_data[curve_label]["measures"]["counter_suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_far_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
-                
-                
-        curve_data[hc_curve_name]["measures"]["contrast_dependent_shift"]=curve_data[lc_curve_name]["measures"]["peak_near_facilitation"]/curve_data[hc_curve_name]["measures"]["peak_near_facilitation"]                 
-        curve_data[lc_curve_name]["measures"]["contrast_dependent_shift"]=curve_data[lc_curve_name]["measures"]["peak_near_facilitation"]/curve_data[hc_curve_name]["measures"]["peak_near_facilitation"]
-        return curve_data   
-       
-
-    def plot_size_tunning(self, xindex, yindex):
-        fig = pylab.figure()
-        f = fig.add_subplot(111, autoscale_on=False, xlim=(-0.1, 2.2), ylim=(-0.1, 0.7))
-        pylab.title(self.sheet_name, fontsize=12)
-        colors=['red','blue','green','purple','orange','black','yellow']
-        
-        measurment = self.data_dict[(xindex,yindex)]["ST"]
-        i = 0
-        for curve_label in measurment.keys():
-            curve =  measurment[curve_label]["data"]
-            x_values = sorted(curve.keys())
-            y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
-            
-            f.plot(x_values, y_values, lw=3, color=colors[i])
-            
-                
-            f.annotate('', xy=(measurment[curve_label]["measures"]["peak_near_facilitation"], y_values[measurment[curve_label]["measures"]["peak_near_facilitation_index"]]), xycoords='data',
-            xytext=(-1, 20), textcoords='offset points', arrowprops=dict(facecolor='green', shrink=0.05))
-    
-    
-            if measurment[curve_label]["measures"].has_key("peak_supression"):
-                f.annotate('', xy=(measurment[curve_label]["measures"]["peak_supression"], y_values[measurment[curve_label]["measures"]["peak_supression_index"]]), xycoords='data',
-                           xytext=(-1, 20), textcoords='offset points', arrowprops=dict(facecolor='red', shrink=0.05))
-            
-            if measurment[curve_label]["measures"].has_key("peak_far_facilitation"):
-                f.annotate('', xy=(measurment[curve_label]["measures"]["peak_far_facilitation"], y_values[measurment[curve_label]["measures"]["peak_far_facilitation_index"]]), xycoords='data',
-                           xytext=(-1, 20), textcoords='offset points', arrowprops=dict(facecolor='blue', shrink=0.05))
-            i+=1
-            
-        release_fig("STC[" + str(xindex) + "," + str(yindex) + "]")
-
-
-    def plot_orientation_contrast_tuning_abs(self, xindex, yindex):
-        fig = pylab.figure()
-        f = fig.add_subplot(111, autoscale_on=True)
-        pylab.title(self.sheet_name, fontsize=12)
-        colors=['red','blue','green','purple','orange','black','yellow']
-        
-        orientation = numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
-        print orientation
-        measurment = self.data_dict[(xindex,yindex)]["OCT"]
-        i = 0
-        for curve_label in measurment.keys():
-            curve =  measurment[curve_label]["data"]
-            
-            
-            # center the values around the orientation that the neuron preffers 
-            x_values = sorted(curve.keys())
-            print x_values
-            y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
-            ### wrap the data around    
-            #y_values.append(curve[key].view()[0][xindex, yindex])
-            #x_values.append(x_values[0]+numpy.pi)
-
-            f.plot(x_values, y_values, lw=3, color=colors[i])
-            f.axvline(x=orientation,linewidth=4, color='r')
-            i+=1
-        
-        release_fig("AbsOCTC[" + str(xindex) + "," + str(yindex) + "]")
-
-    def plot_orientation_contrast_tuning(self, xindex, yindex):
-        fig = pylab.figure()
-        f = fig.add_subplot(111, autoscale_on=True)
-        pylab.title(self.sheet_name, fontsize=12)
-        colors=['red','blue','green','purple','orange','black','yellow']
-        
-        orientation = numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
-        
-        measurment = self.data_dict[(xindex,yindex)]["OCT"]
-        i = 0
-        for curve_label in measurment.keys():
-            curve =  measurment[curve_label]["data"]
-            
-            
-            # center the values around the orientation that the neuron preffers 
-            x_values = sorted(curve.keys())
-            #print x_values
-            #print orientation
-            c=x_values[0]
-            x_values=x_values-orientation
-
-            for j in xrange(0,size(x_values)):
-                if x_values[j] > numpy.pi/2.0:
-                   x_values[j] -= numpy.pi 
-
-            x_values = sorted(x_values)
-            #print x_values
-                   
-            y_values=[]
-            for j in xrange(0,size(x_values)):
-                
-                key=x_values[j]
-                #print key
-                if key < c-orientation:
-                    key +=numpy.pi
-                key += orientation
-                #print key
-                y_values.append(curve[key].view()[0][xindex, yindex])
-            ### wrap the data around    
-            y_values.append(curve[key].view()[0][xindex, yindex])
-            x_values.append(x_values[0]+numpy.pi)
-            
-            f.plot(x_values, y_values, lw=3, color=colors[i])
-            i+=1
-        
-        release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "]")
-
-        
-
-    def plot_map_feature_to_surround_modulation_feature_correlations(self,map_feature,map_feature_name):
-        
-        from numpy import polyfit
-        
-        raster_plots_lc={}
-        raster_plots_hc={}
-        for (xcoord,ycoord) in self.data_dict.keys():
-            for curve_type in self.data_dict[(xcoord,ycoord)].keys():
-                print curve_type
-                if curve_type == "ST":
-                   curve_label = "Contrast"
-                else:
-                   curve_label = "Contrastsurround" 
-                
-                print self.data_dict[(xcoord,ycoord)][curve_type].keys()
-                
-                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
-                    if not raster_plots_hc.has_key(measure_name):
-                         raster_plots_hc[measure_name]=[[],[]]    
-                    raster_plots_hc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"][measure_name])
-                    raster_plots_hc[measure_name][1].append(map_feature[xcoord,ycoord])        
-
-                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"].keys():
-                    if not raster_plots_lc.has_key(measure_name):
-                         raster_plots_lc[measure_name]=[[],[]]    
-                    raster_plots_lc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = "  + str(self.low_contrast) + "%"]["measures"][measure_name])
-                    raster_plots_lc[measure_name][1].append(map_feature[xcoord,ycoord])        
-
-        for key in raster_plots_hc.keys():
-                fig = pylab.figure()
-                f = fig.add_subplot(111)
-                f.set_xlabel(str(key))
-                f.set_ylabel(map_feature_name)
-                
-                m,b = numpy.polyfit(raster_plots_hc[key][0],raster_plots_hc[key][1],1)
-
-                f.plot(raster_plots_hc[key][0],raster_plots_hc[key][1],'ro')
-                f.plot(raster_plots_hc[key][0],m*numpy.array(raster_plots_hc[key][0])+b,'-k',linewidth=2)
-                release_fig("RasterHC<" + map_feature_name + ","+ key + ">")
-                
-
-        for key in raster_plots_lc.keys():
-                fig = pylab.figure()
-                f = fig.add_subplot(111)
-                f.set_xlabel(str(key))
-                f.set_ylabel(map_feature_name)
-                m,b = numpy.polyfit(raster_plots_lc[key][0],raster_plots_lc[key][1],1)
-                print raster_plots_lc[key][0]
-                print raster_plots_lc[key][1]
-                f.plot(raster_plots_lc[key][0],raster_plots_lc[key][1],'ro')
-                f.plot(raster_plots_lc[key][0],m*numpy.array(raster_plots_lc[key][0])+b,'-k',linewidth=2)
-                release_fig("RasterLC<" + map_feature_name + ","+ key + ">")
-
-            
-    def plot_histograms_of_measures(self):
-        histograms_lc = {} 
-        histograms_hc = {}
-        for (xcoord,ycoord) in self.data_dict.keys():
-            for curve_type in self.data_dict[(xcoord,ycoord)].keys():
-                print curve_type
-                if curve_type == "ST":
-                   curve_label = "Contrast"
-                else:
-                   curve_label = "Contrastsurround"
-                print self.data_dict[(xcoord,ycoord)][curve_type].keys()   
-                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
-                    if not histograms_hc.has_key(curve_type + "_" + measure_name):
-                        histograms_hc[curve_type + "_" + measure_name]=[]
-                    histograms_hc[curve_type + "_" + measure_name].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"][measure_name])
-
-                for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"].keys():
-                    if not histograms_lc.has_key(curve_type + "_" + measure_name):
-                        histograms_lc[curve_type + "_" + measure_name]=[]
-                    histograms_lc[curve_type + "_" + measure_name].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"][measure_name])
-                
-        for key in histograms_lc.keys():
-                fig = pylab.figure()
-                pylab.title(self.sheet_name+ " "+ "LC " + "Mean: " + str(numpy.mean(histograms_lc[key])), fontsize=12)
-                f = fig.add_subplot(111)
-                f.set_xlabel(str(key))
-                f.set_ylabel('#Cells')
-                f.hist(histograms_lc[key],normed=False)
-                f.axvline(x=numpy.mean(histograms_lc[key]),linewidth=4, color='r')
-                release_fig("HistogramLC<" + key + ">")
-                print key + "LC mean :" + str(numpy.mean(histograms_lc[key]))
-                
-        for key in histograms_hc.keys():
-                fig = pylab.figure()
-                pylab.title(self.sheet_name+ " "+ "HC " + "Mean: " + str(numpy.mean(histograms_hc[key])), fontsize=12)
-                f = fig.add_subplot(111)
-                f.set_xlabel(str(key))
-                f.set_ylabel('#Cells')
-                f.hist(histograms_hc[key],normed=False)
-                f.axvline(x=numpy.mean(histograms_hc[key]),linewidth=4, color='r')
-                release_fig("HistogramHC<" + key + ">")
-                print key + "HC mean :" + str(numpy.mean(histograms_hc[key]))
-                       
-                
-                    
-def compute_local_homogeneity_index(or_map,sigma):
-    (xsize,ysize) = or_map.shape 
-    
-    lhi = numpy.zeros(or_map.shape) 
-    
-    for sx in xrange(0,xsize):
-        for sy in xrange(0,ysize):
-            lhi_current=[0,0]
-            for tx in xrange(0,xsize):
-                for ty in xrange(0,ysize):
-                    lhi_current[0]+=numpy.exp(-((sx-tx)*(sx-tx)+(sy-ty)*(sy-ty))/(2*sigma*sigma))*numpy.cos(2*or_map[tx,ty]*numpy.pi)
-                    lhi_current[1]+=numpy.exp(-((sx-tx)*(sx-tx)+(sy-ty)*(sy-ty))/(2*sigma*sigma))*numpy.sin(2*or_map[tx,ty]*numpy.pi)
-           # print sx,sy
-           # print lhi.shape
-           # print lhi_current        
-            lhi[sx,sy]= numpy.sqrt(lhi_current[0]*lhi_current[0] + lhi_current[1]*lhi_current[1])
-                    
-    return lhi       
-
-def release_fig(filename=None):
-    import pylab        
-    pylab.show._needmain=False
-    if filename is not None:
-       fullname=filename+str(topo.sim.time())+".png"
-       pylab.savefig(normalize_path(fullname))
-    else:
-       pylab.show()
-       
-       
-       
+def weighted_local_average(x,y,s):
+    z = []
+    for a in x:
+        tmp = 0
+        num = 0
+        for i in xrange(0,len(x)):
+            # 1/(numpy.sqrt(2*numpy.pi*s*s))  
+            #c = 1/(numpy.sqrt(2*numpy.pi*s*s)) * numpy.exp(-numpy.abs(x[i]-a)/(2*s*s))
+            if numpy.abs(x[i]-a) < s:
+                tmp+=y[i]
+                num+=1
+        z.append(tmp/num)
+    return z
