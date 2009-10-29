@@ -588,7 +588,7 @@ def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
     topo.sim[sheet_name].strict_tsettle = 1
 
 
-AddGC(strength=__main__.__dict__.get('LatLGNStr',0.63)):
+def AddGC(strength=__main__.__dict__.get('LatLGNStr',0.63)):
     add_gc('LGNOn')
     add_gc('LGNOff')
 
