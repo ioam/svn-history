@@ -443,7 +443,7 @@ def release_fig(filename=None):
 
 
 
-def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
+def plot_neural_dynamics(sheet_names,neurons,pattern_generator,prefix):
     """
     call example : contrib.surround_analysis.plot_neural_dynamics(["V1"],[("V1",(0.0,0.0)),("V1",(0.1,0.1))])
     """
@@ -493,9 +493,10 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
                a.append(act[xx,yy])
            pylab.plot(a,label=projname)
        pylab.legend(loc='upper left')
+       release_fig(prefix+"_"+sheetname+"_settling")
     pylab.show._needmain=False
-    release_fig()
-    release_fig("settling")
+    #release_fig()
+    pylab.show()
      
      
      
@@ -509,8 +510,8 @@ def run_dynamics_analysis(x,y,cs,scale):
     
     pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
     
-    plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg)
+    plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg,"colinear")
     
     pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr+numpy.pi/2,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
     
-    plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg)
+    plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg,"ortogonal")
