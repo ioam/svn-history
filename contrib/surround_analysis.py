@@ -500,17 +500,17 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator):
      
      
      
-def run_dynamics_analysis(x,y,cs):
+def run_dynamics_analysis(x,y,cs,scale):
     from topo.pattern.basic import OrientationContrast
     
     (xx,yy) = topo.sim["V1Complex"].sheet2matrixidx(x,y)
     
     orr=numpy.pi*topo.sim["V1Complex"].sheet_views["OrientationPreference"].view()[0][xx][yy]
     
-    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=0.5,scalesurround=0.5,x=x,y=y,frequency=3.0)
+    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
     
     plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg)
     
-    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr+numpy.pi/2,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=0.5,scalesurround=0.5,x=x,y=y,frequency=3.0)
+    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr+numpy.pi/2,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
     
     plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg)
