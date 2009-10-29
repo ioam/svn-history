@@ -278,13 +278,13 @@ topo.sim.connect('V1Simple','V1Complex',delay=0.05,
                  weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.05)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('StoCBB',0.15)/2),learning_rate=locals().get('FF_lr',0.0))
                 
-topo.sim.connect('V1Complex','V1Simple',delay=0.05,
+topo.sim.connect('V1Complex','V1Simple',delay=locals().get('FDelay',0.05),
                  connection_type=CFProjection,strength=locals().get('FStrExc',0.1),name='V1SimpleFeedbackExc1',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('FExcBB',18)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.005)/2),
                  learning_rate=0)
 
-topo.sim.connect('V1Complex','V1Simple',delay=0.05,
+topo.sim.connect('V1Complex','V1Simple',delay=locals().get('FDelay',0.05),
                  connection_type=CFProjection,strength=locals().get('FStrInh',-0.65),name='V1SimpleFeedbackInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('FInhBB',2.5)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.3)/2),learning_rate=0)
