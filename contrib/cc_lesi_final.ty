@@ -165,22 +165,21 @@ topo.sim['LGNOn']=LISSOM(nominal_density=locals().get('lgn_density',24.0),
 
 topo.sim['LGNOff']=LISSOM(nominal_density=locals().get('lgn_density',24.0),
                            nominal_bounds=BoundingBox(radius=core_size+0.25+0.25),
-                           output_fns=[HalfRectify(t_init=locals().get('lgn_tresh',0.0))],tsettle=0,
-                           measure_maps=False)
+                           output_fns=[HalfRectify(t_init=locals().get('lgn_tresh',0.0))],tsettle=0,measure_maps=False)
 
 
 topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fns=[ActivityHysteresis(time_constant=locals().get('TC',0.3)),NN,V1Simple_OF])
+                        output_fns=[ActivityHysteresis(time_constant=locals().get('STC',0.3)),NN,V1Simple_OF])
 
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fns=[ActivityHysteresis(time_constant=locals().get('TC',0.3)),V1Complex_OF])
+                        output_fns=[ActivityHysteresis(time_constant=locals().get('CTC',0.3)),NN,V1Complex_OF])
 
 topo.sim['V1ComplexInh'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fns=[ActivityHysteresis(time_constant=locals().get('TC',0.3)),HalfRectify(t_init=locals().get('V1CInhTresh',0.0))])
+                        output_fns=[ActivityHysteresis(time_constant=locals().get('CTC',0.3)),HalfRectify(t_init=locals().get('V1CInhTresh',0.0))])
 
 
 # DoG weights for the LGN
