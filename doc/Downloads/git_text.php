@@ -350,3 +350,17 @@ emacs -nw ceball_houzi2/config # allow fastforwards - see above
 
 <!-- based on http://sourceforge.net/apps/trac/sourceforge/wiki/Git, http://www.naildrivin5.com/daveblog5000/?p=102 and
 http://projects.scipy.org/numpy/wiki/GitMirror to some extent -->
+
+
+<!-- with all the manipulations git can do, "git reflog" comes in handy
+to tell you what you've been doing -->
+
+<!--
+gitk readable fonts
+
+[ -r ~/.gitk ] || cat > ~/.gitk << EOF
+set mainfont {Arial 10}
+set textfont { Courier 10}
+set uifont {Arial 10 bold}
+EOF
+-->
