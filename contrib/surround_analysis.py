@@ -486,7 +486,7 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator,prefix):
        (sheetname, (x,y)) = n
        (xx,yy) = topo.sim[sheetname].sheet2matrixidx(x,y)
        pylab.figure()
-       pylab.title(sheetname+" [" + str(x) + "," +str(y) + "]")
+       pylab.title(prefix+sheetname+" [" + str(x) + "," +str(y) + "]")
        for projname in data[sheetname].keys():
            a = []
            for act in data[sheetname][projname]:
