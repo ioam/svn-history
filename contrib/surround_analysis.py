@@ -38,8 +38,8 @@ class surround_analysis():
     sheet_name = ""
     data_dict = {}
     
-    low_contrast=30
-    high_contrast=20
+    low_contrast=20
+    high_contrast=30
     
     def __init__(self,sheet_name="V1Complex"):
         from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter
@@ -508,10 +508,10 @@ def run_dynamics_analysis(x,y,cs,scale):
     
     orr=numpy.pi*topo.sim["V1Complex"].sheet_views["OrientationPreference"].view()[0][xx][yy]
     
-    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
+    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs-0.2,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
     
     plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg,"colinear")
     
-    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr+numpy.pi/2,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
+    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr+numpy.pi/2,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs-0.2,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
     
     plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg,"ortogonal")
