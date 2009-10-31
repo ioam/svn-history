@@ -757,7 +757,7 @@ def save_map(sheet):
     save(normalize_path("Map"+str(topo.sim.time())),map,fmt='%.6f', delimiter=',')
     save(normalize_path("Map_select"+str(topo.sim.time())),map_select,fmt='%.6f', delimiter=',')
         
-from topo.param.parameterized import ParamOverrides
+from param.parameterized import ParamOverrides
 from topo.command.pylabplots import PylabPlotCommand
 
 class two_photon_plot(PylabPlotCommand):

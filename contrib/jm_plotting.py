@@ -16,7 +16,7 @@ from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.command.pylabplots import PylabPlotCommand
 from topo.base.sheetview import SheetView
 from topo.base.projection import ProjectionSheet
-from topo.param.parameterized import ParamOverrides
+from param.parameterized import ParamOverrides
 from topo.misc.util import frange
 
 from contrib.jm_analysis import *

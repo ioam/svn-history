@@ -5,7 +5,7 @@
 # would obey any time_fn).
 
 import param
-from topo.param.parameterized import ParamOverrides
+from param.parameterized import ParamOverrides
 import types
 import inspect
 

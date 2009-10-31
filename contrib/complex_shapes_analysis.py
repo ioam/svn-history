@@ -20,7 +20,7 @@ except ImportError:
 import topo
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.command.pylabplots import PylabPlotCommand
-from topo.param.parameterized import ParamOverrides
+from param.parameterized import ParamOverrides
 from topo.base.boundingregion import BoundingBox
 
 def measure_responses(stimuli_subclasses, sheet_to_measure='V1', neurons_to_measure=360, rf_size=0.5, rf_jitter = 0.125):

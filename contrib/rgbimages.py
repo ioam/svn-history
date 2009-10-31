@@ -82,7 +82,7 @@ class ColorImageSheet(GeneratorSheet):
 
 
 import copy
-from topo.param.parameterized import ParamOverrides
+from param.parameterized import ParamOverrides
 class ExtendToRGB(PatternGenerator):
     """
     Wrapper for any PatternGenerator to support red, green, and blue
