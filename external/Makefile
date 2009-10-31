@@ -30,9 +30,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean svn2cl-clean readline-clean termcap-clean guppy-clean ipythontk-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean svn2cl-clean readline-clean termcap-clean guppy-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall ipythontk-clean
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall
 
 
 
@@ -926,24 +926,6 @@ guppy-uninstall:
 	rm -rf guppy $(foreach f, ${GUPPY_UNINSTALL}, ${PREFIX}/${f})
 
 
-#############################################################
-# ipythontk: provides IPython console in Tkinter
-IPYTHONTK = ipythonTk
-
-IPYTHONTK_UNINSTALL += ${PYTHON_LIB}/site-packages/ipythonTk*.egg*
-IPYTHONTK_UNINSTALL += ${PYTHON_LIB}/site-packages/ipythonTk
-
-ipythontk: ${IPYTHONTK}.tar.gz python
-	tar -xzf ${IPYTHONTK}.tar.gz
-	cd ${IPYTHONTK}; patch -p0 ipythonTk/ipythonTk.py < ../ipythonTk.diff
-	cd ${IPYTHONTK}; patch -p0 ipythonTk/ipython_view.py < ../ipython_view.diff
-	cd ${IPYTHONTK}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
-	touch ipythontk
-
-ipythontk-clean: 
-	rm -rf ${IPYTHONTK} 
-ipythontk-uninstall:
-	rm -rf ipythontk $(foreach f, ${IPYTHONTK_UNINSTALL}, ${PREFIX}/${f})
 
 
 #############################################################################

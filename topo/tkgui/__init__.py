@@ -15,6 +15,8 @@ import os
 import platform
 import Tkinter
 
+import param.tk
+
 import topo
 
 from topoconsole import TopoConsole,ControllableMenu
@@ -128,7 +130,7 @@ TK_SUPPORTS_DOCK = True
 
 # gets set to the TopoConsole instance created by start.
 console = None
-def start(mainloop=False,banner=True,root=None,console_has_console=False):
+def start(mainloop=False,banner=True):
     """
     Start Tk and read in an options_database file (if present), then
     open a TopoConsole.
@@ -147,11 +149,6 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
     # quit this function before starting another Tk instance, etc)
     if console is not None: return
 
-    if root is None:
-        # root should be a required argument
-        import param.tk
-        root = param.tk.root
-
     if banner: print 'Launching GUI'
 
     # tcl equivalent of 'if not hasattr(wm,forget)' would be better
@@ -159,25 +156,23 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
         global TK_SUPPORTS_DOCK
         TK_SUPPORTS_DOCK=False
 
-    root.menubar = ControllableMenu(root)
-    root.configure(menu=root.menubar)
+    param.tk.root.menubar = ControllableMenu(param.tk.root)
+    param.tk.root.configure(menu=param.tk.root.menubar)
     
     # default,clam,alt,classic
-    root.tk.call("ttk::style","theme","use","classic")  
+    param.tk.root.tk.call("ttk::style","theme","use","classic")  
 
     # Try to read in options from an options_database file
     # (see http://www.itworld.com/AppDev/1243/UIR000616regex/
     # or p. 49 Grayson)
     try:
         options_database = os.path.join(sys.path[0],"topo","tkgui","options_database")
-        root.option_readfile(options_database)
+        param.tk.root.option_readfile(options_database)
         print "Read options database from",options_database
     except Tkinter.TclError:
         pass
 
-    # CEBALERT: console_has_console is a temporary hack
-    topoconsole = TopoConsole(root,console=console_has_console)
-    console = topoconsole
+    console = TopoConsole(param.tk.root)
 
     # Provide a way for other code to access the GUI when necessary
     # CEBALERT: why is this import necessary? Need to cleanup this method.
@@ -188,8 +183,8 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
     # This alows context menus to work on the Mac.  Widget code should bind
     # contextual menus to the virtual event <<right-click>>, not
     # <Button-3>.
-    topoconsole.event_add('<<right-click>>',*right_click_events)
-    topoconsole.event_add('<<right-click-release>>',*right_click_release_events)
+    console.event_add('<<right-click>>',*right_click_events)
+    console.event_add('<<right-click-release>>',*right_click_release_events)
 
     # GUI/threads:
     # http://thread.gmane.org/gmane.comp.python.scientific.user/4153
@@ -198,9 +193,9 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.
-    if mainloop: root.mainloop()
+    if mainloop: param.tk.root.mainloop()
 
-    return root
+
 
 
 

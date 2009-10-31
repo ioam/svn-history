@@ -331,23 +331,6 @@ def gui(start=True):
         topo.tkgui.start()
 
 
-###### CB: TESTING (Jun 2008)
-def start_gui_from_ide_newthread():
-    # e.g. from IDLE
-    auto_import_commands()
-    from threading import Thread
-    from topo.tkgui import start
-    t = Thread(target=start,kwargs={'mainloop':True})
-    t.start()
-
-def start_gui_from_ide(root=None):
-    # e.g. from IPython in Tkinter
-    auto_import_commands()
-    from topo.tkgui import start
-    start(mainloop=True,root=root)
-######    
-    
-
 # Topographica stays open if an error occurs after -g
 # (see comment by i_action)
 def g_action(option,opt_str,value,parser):
@@ -361,20 +344,6 @@ topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gu
 launch an interactive graphical user interface; \
 equivalent to -c 'from topo.misc.commandline import gui ; gui()'. \
 Implies -a.""")
-
-
-
-def G_action(option,opt_str,value,parser):
-    """Callback function for the -mg option."""
-    boolean_option_action(option,opt_str,value,parser)
-    interactive()
-    gui(start=False)
-
-
-topo_parser.add_option("-G","--more_gui",action="callback",callback=G_action,dest="more_gui",default=False,help="""\
-EXPERIMENTAL: launch a more interactive graphical user interface...; \
-Implies -a.""")
-
 
 
 # Keeps track of whether something has been performed, when deciding whether to assume -i
@@ -515,22 +484,7 @@ def process_argv(argv):
 
     ## INTERACTIVE SESSION BEGINS HERE (i.e. can't have anything but
     ## some kind of cleanup code afterwards)
-    if option.more_gui:
-        from topo.tkgui import start
-
-        # CB: also need to redirect messages from the standard console
-        # to the graphical console
-        
-        # Stop IPython namespace hack?
-        # http://www.nabble.com/__main__-vs-__main__-td14606612.html
-        __main__.__name__="__mynamespace__"
-
-        root = start(console_has_console=True)
-        topo.guimain.title(topo.sim.name)
-        root.mainloop()
-
-
-    elif os.environ.get('PYTHONINSPECT'):
+    if os.environ.get('PYTHONINSPECT'):
         print BANNER    
         # CB: should probably allow a way for users to pass things to
         # IPython? Or at least set up some kind of topographica ipython

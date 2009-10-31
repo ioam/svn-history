@@ -201,30 +201,6 @@ class DockManager(Notebook):
 
 
 
-
-try:
-    import ipythonTk
-    ipythonTk_imported = True
-except:
-    ipythonTk_imported = False
-
-if ipythonTk_imported:
-    from ipythonTk.ipythonTk import IPythonView
-    class IPythonInAFrame(Frame):
-        def __init__(self, root, banner=None, user_ns=None,**kw):
-            Frame.__init__(self,root)
-
-            yscroll = Scrollbar(self)
-            yscroll.pack(side='right',fill='y')
-
-            console = IPythonView(self,user_ns=user_ns)
-            console.pack(fill='both',expand=1)
-
-            console.config(yscrollcommand=yscroll.set)
-            yscroll.config(command=console.yview)
-
-
-
 # This is really a hack. There doesn't seem to be any easy way to tie
 # an exception to the window from which it originated. (I couldn't
 # find an example of tkinter software displaying a gui exception on
@@ -282,8 +258,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         """Allow dictionary-style access to the menu bar."""
         return self.menubar[menu_name]
 
-    def __init__(self,root,console=False,**params):
-
+    def __init__(self,root,**params):
         tk.AppWindow.__init__(self,root,status=True)
         tk.TkParameterized.__init__(self,root,**params)
 
@@ -292,11 +267,8 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         # CEBALERT: on destroy(), ought to revert this
         Tkinter.Misc._report_exception=_tkinter_report_exception
 
-        #CBALERT
-        self._rooot=root
-
         self.auto_refresh_panels = []
-        self._init_widgets(console)
+        self._init_widgets()
         self.title(topo.sim.name) # If -g passed *before* scripts on commandline, this is useless.
                                   # So topo.misc.commandline sets the title as its last action (if -g)
 
@@ -352,7 +324,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         tk.AppWindow.title(self,newtitle)
         
 
-    def _init_widgets(self,console):
+    def _init_widgets(self):
         
         ## CEBALERT: now we can have multiple operations at the same time,
         ## status bar could be improved to show all tasks?
@@ -414,20 +386,6 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         self.step_button = Button(run_frame,text="Step",command=self.run_step)
         self.balloon.bind(self.step_button,"Run the simulation through the time at which the next events are processed.")
         self.step_button.pack(side=LEFT)
-
-        # CEBALERT: total hack
-        if console and ipythonTk_imported:
-            self.console_frame = Frame(self)
-            self.console_frame.pack(expand=1,fill='both')
-
-            import topo.tkgui.plotgrouppanel
-            topo.tkgui.plotgrouppanel.PlotGroupPanel.dock=True
-
-            import __main__
-            self.console = IPythonInAFrame(self,self._rooot,
-                                           user_ns=__main__.__dict__)
-            self.console.pack(expand=1,fill='both')
-
         
         self.sizeright()
 
