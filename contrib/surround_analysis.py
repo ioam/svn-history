@@ -194,7 +194,8 @@ class surround_analysis():
 
     def plot_size_tunning(self, xindex, yindex):
         fig = pylab.figure()
-        f = fig.add_subplot(111, autoscale_on=False, xlim=(-0.1, 3.0), ylim=(-0.1, 4.0))
+        #f = fig.add_subplot(111, autoscale_on=False, xlim=(-0.1, 3.0), ylim=(-0.1, 4.0))
+        f = fig.add_subplot(111)
         pylab.title(self.sheet_name, fontsize=12)
         colors=['red','blue','green','purple','orange','black','yellow']
         
