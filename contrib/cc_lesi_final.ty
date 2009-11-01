@@ -417,9 +417,9 @@ def check_activity(a,b,c,d,e,f,g,h,i,j):
     topo.sim["V1Simple"].plastic = V1Splastic 
     topo.sim["V1Complex"].plastic = V1Cplastic
     
-from topo.command.basic import wipe_out_activity, clear_event_queue
-topo.sim.run(1.0)
-wipe_out_activity()
-clear_event_queue()
+#from topo.command.basic import wipe_out_activity, clear_event_queue
+#topo.sim.run(1.0)
+#wipe_out_activity()
+#clear_event_queue()
 
-contrib.jacommands.run_combinations(check_activity,[[0],[0],[0],[0.1,0.2,0.3],[2.0,3.0,4.0,5.0],[-1.6,-1.4,-1.2,-1.8],[-1.2,-1.4,-1.6,-1.8],[0],[2.3,2.5,2.1],[2.3,2.5,2.1]])
+#contrib.jacommands.run_combinations(check_activity,[[0],[0],[0],[0.1,0.2,0.3],[2.0,3.0,4.0,5.0],[-1.6,-1.4,-1.2,-1.8],[-1.2,-1.4,-1.6,-1.8],[0],[2.3,2.5,2.1],[2.3,2.5,2.1]])
