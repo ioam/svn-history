@@ -156,6 +156,7 @@ def start(mainloop=False,banner=True):
         global TK_SUPPORTS_DOCK
         TK_SUPPORTS_DOCK=False
 
+    param.tk.initialize()
     param.tk.root.menubar = ControllableMenu(param.tk.root)
     param.tk.root.configure(menu=param.tk.root.menubar)
     

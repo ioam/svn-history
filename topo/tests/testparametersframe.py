@@ -17,9 +17,9 @@ from topo.base.patterngenerator import PatternGenerator
 
 
 
-# CEBALERT: will be removed eventually when param.tk
-# doesn't depend on anything from tkgui.__init__
-# (plus this test will move to the param package...)
+# CEBALERT: will be replaced with call to param.tk.initialize() when
+# param.tk doesn't depend on anything from tkgui.__init__ (plus this
+# test will move to the param package...)
 import os
 if os.getenv("DISPLAY"):
     import topo.tkgui

@@ -179,6 +179,8 @@ from tkMessageBox import _show,QUESTION,YESNO
 from parameterized import Parameterized,ParameterizedMetaclass,\
      classlist
 
+import param
+
 from external import Combobox,OrderedDict
 
 from . import Boolean,String,Number,Selector,ClassSelector,\
@@ -187,17 +189,42 @@ from . import Boolean,String,Number,Selector,ClassSelector,\
 
 _last_one_set = None
 
-# CEBALERT: copied from topo.misc.filepath, to make it clear what we
-# need. I guess we should consider how much of topo.misc.filepath
-# we might want in topo/param...
-########################################
-import topo
-# CEBALERT: needs to be cleaned up now param is separate
-package_path = os.path.split(topo.__file__)[0]
-import param
-param_package_path = os.path.split(param.__file__)[0]
-application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 
+
+# Until tklib, tcllib, and scrodget become more commonly
+# available, we include them in tkgui.
+externaltk_path = os.path.join(os.path.split(param.__file__)[0],"externaltk")
+
+# CEBALERT: need to document this; allows param.tk to be used with
+# existing Tk instance. (And allows param.tk to be imported
+# even if there is no DISPLAY.)
+root = None
+def initialize(external_root=None):
+    global root
+
+    if root is not None:
+        print "param.tk already initialized; ignorning call to param.tk.initialize()"
+        return
+    
+    # Creating an initial Tk() instance and then withdrawing the
+    # window is a common technique. 
+    if external_root is None:
+        root = T.Tk()
+        root.withdraw()
+    else:
+        root = external_root
+    
+    root.tk.call("lappend","auto_path",externaltk_path)
+
+
+########################################
+# CEBALERT: copied from topo.misc.filepath, to make it clear what we
+# need. I guess we should consider how much of topo.misc.filepath we
+# might want in topo/param. Needs to be cleaned up now param is
+# separate.
+import topo
+package_path = os.path.split(topo.__file__)[0]
+application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 def resolve_path(path,search_paths=[]):
     """
     Find the path to an existing file, searching in the specified
@@ -227,7 +254,6 @@ def resolve_path(path,search_paths=[]):
         paths_tried.append(try_path)
 
     raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
-
 ########################################
 
 
@@ -324,23 +350,6 @@ def is_button(widget):
     except T.TclError:
         button = False
     return button
-
-
-# Creating an initial Tk() instance and then withdrawing the
-# window is a common technique. 
-root = T.Tk()
-root.withdraw()
-
-
-#################################################################
-# Until tklib, tcllib, and scrodget become more commonly
-# available, we include them in tkgui.
-externaltk_path = os.path.join(param_package_path,
-                             # CB: along with other things, will need
-                             # updating for standalone package.
-                             "externaltk")
-root.tk.call("lappend","auto_path",externaltk_path)
-#################################################################
 
 
 #################################################################
