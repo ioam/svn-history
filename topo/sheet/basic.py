@@ -277,10 +277,10 @@ class JointNormalizingCFSheet(CFSheet):
             if key == None:
                 normtype='Individually'
             else:
-                normtype='Joint'
+                normtype='Jointly'
                 self.joint_norm_fn(projlist,mask)
 
-            self.debug(normtype + "ly normalizing:")
+            self.debug(normtype + " normalizing:")
 
             for p in projlist:
                 p.apply_learn_output_fns(mask)
