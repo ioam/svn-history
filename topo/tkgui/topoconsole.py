@@ -228,18 +228,15 @@ def _tkinter_report_exception(widget):
             stat = widget.messageBar
             break
         widget = widget.master
-    
-    # CEBALERT: need to log gui errors fully (or do something else to
-    # enable printing of the full traceback, e.g. have a gui debug
-    # mode).
-    #import traceback
-    #traceback.print_exc()
-    
+
     if stat is not None:
         stat.error('%s'%msg)
     else:
         topo.guimain.messageBar.error('%s'%msg)
 
+    if param.parameterized.min_print_level>=param.parameterized.DEBUG:
+        import traceback
+        traceback.print_exc()
 
 
 import Tkinter
