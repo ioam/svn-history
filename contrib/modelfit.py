@@ -4,7 +4,7 @@ import numpy
 import pylab
 from numpy import array, size, mat, shape, ones, arange
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.base.functionfamily import IdentityTF
+#from topo.base.functionfamily import IdentityTF
 from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, AttributeTrackingTF,PatternCombine,Sigmoid, HalfRectify
 from topo.base.cf import CFSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
@@ -15,6 +15,7 @@ from topo.sheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
 from topo.pattern.image import FileImage
 import contrib.jacommands
+from topo.misc.filepath import normalize_path, application_path
 
 class ModelFit():
     weigths = []
@@ -98,7 +99,8 @@ class ModelFit():
             for i in xrange(0,len(min_val_err_array)):
                 if min_val_err_array[i] > numpy.array(validation_error)[i][0]:
                    min_val_err_array[i] = numpy.array(validation_error)[i][0]
-                   best_weights[i,:] = self.weigths[i,:]
+                #!!!!!!!!!!!!!
+                best_weights[i,:] = self.weigths[i,:]
                 
             if k == 0:
                first_val_error=val_err
@@ -522,9 +524,12 @@ def generate_pyramid_model(num_or,freqs,num_phase,size):
     filters=[]
     for freq in freqs:
         for orient in xrange(0,num_or):
-            for p in xrange(0,num_phase):
-                g = Gabor(bounds=BoundingBox(radius=0.5),frequency=1.0,x=0.0,y=0.0,xdensity=size/freq,ydensity=size/freq,size=0.3,orientation=numpy.pi/8*orient,phase=p*2*numpy.pi/num_phase)
-                filters.append(g())
+            g1 = Gabor(bounds=BoundingBox(radius=0.5),frequency=1.0,x=0.0,y=0.0,xdensity=size/freq,ydensity=size/freq,size=0.3,orientation=numpy.pi/8*orient,phase=numpy.pi)
+            g2 = Gabor(bounds=BoundingBox(radius=0.5),frequency=1.0,x=0.0,y=0.0,xdensity=size/freq,ydensity=size/freq,size=0.3,orientation=numpy.pi/8*orient,phase=0)
+            filters.append((g1(),g2()))
+            #for p in xrange(0,num_phase):
+            #    g = Gabor(bounds=BoundingBox(radius=0.5),frequency=1.0,x=0.0,y=0.0,xdensity=size/freq,ydensity=size/freq,size=0.3,orientation=numpy.pi/8*orient,phase=p*2*numpy.pi/num_phase)
+            #    filters.append(g())
 
     return filters
 
@@ -540,13 +545,16 @@ def apply_filters(inputs, filters, spacing):
     for i in inputs:
         o  = []
         for f in filters:
-            (s,tresh) = numpy.shape(f)
+            (f1,f2) = f
+            (s,tresh) = numpy.shape(f1)
             step = int(s*spacing)
             x=0
             y=0
             while (x*step + s) < sizex:
                 while (y*step + s) < sizey:
-                    o.append(numpy.sum(numpy.sum(numpy.multiply(f,i[x*step:x*step+s,y*step:y*step+s]))))
+                    a = numpy.sum(numpy.sum(numpy.multiply(f1,i[x*step:x*step+s,y*step:y*step+s])))
+                    b = numpy.sum(numpy.sum(numpy.multiply(f2,i[x*step:x*step+s,y*step:y*step+s])))
+                    o.append(numpy.sqrt(a*a+b*b))
                     y+=step 
                 x+=step
         print len(o)
@@ -676,12 +684,12 @@ def runModelFit():
     print sizex,sizey
     
     if __main__.__dict__.get('Gabor',True):
-        fil = generate_pyramid_model(__main__.__dict__.get('num_or',8),__main__.__dict__.get('freq',[10]),__main__.__dict__.get('num_phase',4),numpy.min(numpy.shape(training_inputs[0])))
+        fil = generate_pyramid_model(__main__.__dict__.get('num_or',8),__main__.__dict__.get('freq',[1,2,4]),__main__.__dict__.get('num_phase',8),numpy.min(numpy.shape(training_inputs[0])))
         
         print len(fil)
-        training_inputs = apply_filters(training_inputs, fil, __main__.__dict__.get('spacing',0.3))
-        testing_inputs = apply_filters(testing_inputs, fil, __main__.__dict__.get('spacing',0.3))
-        validation_inputs = apply_filters(validation_inputs, fil, __main__.__dict__.get('spacing',0.3))
+        training_inputs = apply_filters(training_inputs, fil, __main__.__dict__.get('spacing',0.1))
+        testing_inputs = apply_filters(testing_inputs, fil, __main__.__dict__.get('spacing',0.1))
+        validation_inputs = apply_filters(validation_inputs, fil, __main__.__dict__.get('spacing',0.1))
     else:
         training_inputs = generate_raw_training_set(training_inputs)
         testing_inputs = generate_raw_training_set(testing_inputs)
@@ -787,7 +795,7 @@ def set_fann_dataset(td,inputs,outputs):
     td.read_train_from_file("./tmp.txt")
     
 
-def ridge_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validation_inputs,validation_activities,display=False,size=0.2):
+def ridge_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validation_inputs,validation_activities,display=False,size=0.2,ni=100):
     
     p = len(inputs[0])
     np = len(activities[0])
@@ -834,7 +842,7 @@ def ridge_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validati
     ma = numpy.max(numpy.max(Z))
     mi = numpy.min(numpy.min(Z))
     m = max([abs(ma),abs(mi)])
-
+    RFs=[]
     if display:
         av=[]
         pylab.figure()
@@ -843,11 +851,24 @@ def ridge_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validati
             av.append(numpy.sum(numpy.power(Z[i],2)))
             pylab.subplot(7,8,i+1)
             w = numpy.array(Z[i]).reshape(sizex,sizey)
+            RFs.append(w)
             pylab.show._needmain=False
             pylab.imshow(w,vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
-        print "AV:", av        
+        pylab.savefig(normalize_path("RFs_"+str(ni)+"_normalized"))
+        print "AV:", av
         pylab.figure()
         pylab.hist(av)
+        
+        pylab.figure()
+        pylab.title(str(delta), fontsize=16)
+        for i in xrange(0,50):
+            pylab.subplot(7,8,i+1)
+            w = numpy.array(Z[i]).reshape(sizex,sizey)
+            pylab.show._needmain=False
+            m = numpy.max([abs(numpy.min(numpy.min(w))),abs(numpy.max(numpy.max(w)))])
+            pylab.imshow(w,vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
+        pylab.savefig(normalize_path("RFs_"+str(ni)))
+            
             
     error = numpy.sum(numpy.sqrt(numpy.sum(numpy.power(validation_activities - validation_inputs*Z.T,2),axis=1)))
     
@@ -860,7 +881,7 @@ def ridge_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validati
             tmp.append(numpy.sqrt(numpy.sum(numpy.power(validation_activities[i]-predicted_activities[j],2))))
         x = numpy.argmin(tmp)
         if (x == i): correct+=1 
-    return (error,correct) 
+    return (error,correct,RFs) 
 
 
 def lasso_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validation_inputs,validation_activities,display=False,size=0.2):
@@ -995,14 +1016,16 @@ def runRFPositionPrediction(sf,stepsize):
 def runRFinference():
     density=__main__.__dict__.get('density', 20)
     #dataset = loadSimpleDataSet("Flogl/DataSep2009/testing_01_02_03.dat",375,58)
-    dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
+    #dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
+    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_off_response",2700,50)
     (index,data) = dataset
     index+=1
-    dataset=(index,data)
+    dataset = (index,data)
     dataset = averageRangeFrames(dataset,0,1)
     dataset = averageRepetitions(dataset)
     
     (dataset,validation_data_set) = splitDataset(dataset,0.9)
+    #(dataset,rubish) = splitDataset(dataset,0.25)
 
     training_set = generateTrainingSet(dataset)
     training_inputs=generateInputs(dataset,"Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
@@ -1019,16 +1042,17 @@ def runRFinference():
         training_set = normalize_data_set(training_set,a,v)
         validation_set = normalize_data_set(validation_set,a,v)
     
-    print numpy.shape(training_inputs[0])
-    (x,y)= numpy.shape(training_inputs[0])
-    training_inputs = cut_out_images_set(training_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
-    validation_inputs = cut_out_images_set(validation_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
-    print numpy.shape(training_inputs[0])
+    if False:
+        print numpy.shape(training_inputs[0])
+        (x,y)= numpy.shape(training_inputs[0])
+        training_inputs = cut_out_images_set(training_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
+        print numpy.shape(training_inputs[0])
+        (sizex,sizey) = numpy.shape(training_inputs[0])
+    
     (sizex,sizey) = numpy.shape(training_inputs[0])
-
     training_inputs = generate_raw_training_set(training_inputs)
     validation_inputs = generate_raw_training_set(validation_inputs)
-    
 
 
     
@@ -1036,9 +1060,11 @@ def runRFinference():
     
     #return
     
-    print ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,480,0.0,validation_inputs,validation_set,True,0.28)    
+    return ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,25,0.0,validation_inputs,validation_set,True,0.28,666)    
     
-    if True:
+    
+    
+    if False:
         e = []
         c = []
         b = []
@@ -1150,8 +1176,105 @@ def induce_rf_postion(num_of_cells,):
         print array_argmax(a)
         pylab.imshow(a)
     pylab.show()
+
+
+
+def analyze_rf_possition(w,level):
+    import matplotlib
+    from matplotlib.patches import Circle
+    a= pylab.figure().gca()
+    
+    (sx,sy) = numpy.shape(w[0])
+    
+    X = numpy.zeros((sx,sy))
+    Y = numpy.zeros((sx,sy))
+        
+    for x in xrange(0,sx):
+        for y in xrange(0,sy):
+            X[x][y] = x
+            Y[x][y] = y
+    
+    cgs = []
+    
+    for i in xrange(0,len(w)):
+            pylab.subplot(7,8,i+1)
+            mi=numpy.min(numpy.min(w[i]))
+            ma=numpy.max(numpy.max(w[i]))
+            z = ((w[i]<=(mi-mi*level))*1.0) * w[i] + ((w[i]>=(ma-ma*level))*1.0) * w[i] 
+            
+            cgx = numpy.sum(numpy.sum(numpy.multiply(X,numpy.power(z,2))))/numpy.sum(numpy.sum(numpy.power(z,2)))
+            cgy = numpy.sum(numpy.sum(numpy.multiply(Y,numpy.power(z,2))))/numpy.sum(numpy.sum(numpy.power(z,2)))
+            
+            print cgx/sx,cgy/sy
+            cgs.append((cgx/sx,cgy/sy))
+            r = numpy.max([numpy.abs(numpy.min(numpy.min(z))),numpy.abs(numpy.max(numpy.max(z)))])
+            cir = Circle( (cgy,cgx), radius=3)
+            pylab.gca().add_patch(cir)
+            
+            pylab.show._needmain=False
+            pylab.imshow(z,vmin=-r,vmax=r,cmap=pylab.cm.RdBu)
+    pylab.show()
+    return cgs
+
+
+def fitGabor(weights):
+    from scipy.optimize import leastsq,fmin,fmin_tnc,anneal
     
     
+    
+    #gab([0.15,0.25,0.1,0.0,6.0,0.0],weights)
+    #return
+    pylab.subplot(2,1,1)
+    pylab.show._needmain=False
+    pylab.show()
+
+    
+    #(x,b,c) = fmin_tnc(gab,[0.07,0.25,0.1,0.0,2.0,0.0],bounds=[(0.05,0.2),(0.1,0.2),(0.07,0.2),(0.0,numpy.pi),(4.0,5.0),(0.0,numpy.pi/2)],args=[weights], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0],maxCGit=100, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
+    (x,b) = anneal(gab,[0.07,0.25,0.12,1.0,4.0,1.0],args=[weights],schedule='boltzmann',learn_rate=0.0001,T0=20.0,maxiter=1000)
+    #fmin(gab,[0.15,0.25,0.1,0.0,6.0,0.0],args=[weights], xtol=0.0000000001, ftol=0.0000000001,maxfun=10000)
+    print x
+    gab(x,weights,True)
+    
+    
+    
+def gab(z,w,display=False):
+    print z
+    (x,y,sigma,angle,f,p) = tuple(z)
+    # w = w[0]
+    
+    if x < 0.05 or x > 0.2: return abs(x-0.15)*1000
+    if y < 0.1 or y > 0.3: return abs(y-0.15)*1000
+    if sigma < 0.07 or sigma > 0.2:  return abs(sigma-0.15)*100
+    if angle < 0.0 or angle > numpy.pi: return abs(angle-numpy.pi/2)*100
+    if f < 1.0 or f > 8.0: return abs(f-5)*100
+    if p < 0.0 or p > numpy.pi: return abs(p-numpy.pi/2)*100  
+    
+    a = numpy.zeros(numpy.shape(w))
+    (dx,dy) = numpy.shape(w)
+    
+    den = numpy.max([dx,dy])
+    
+    g = Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=x,y=y,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)()/10
+    
+    if display:
+        pylab.subplot(2,1,1)
+        
+        m = numpy.max([-numpy.min(g[0:dx,0:dy]),numpy.max(g[0:dx,0:dy])])
+        pylab.imshow(g[0:dx,0:dy],vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
+        pylab.colorbar()
+        pylab.subplot(2,1,2)
+        m = numpy.max([-numpy.min(w),numpy.max(w)])
+        pylab.imshow(w,vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
+        pylab.show._needmain=False
+        pylab.colorbar()
+        pylab.show()
+
+    print numpy.sum(numpy.power(g[0:dx,0:dy] - w,2))
+    
+    return numpy.sum(numpy.power(g[0:dx,0:dy] - w,2)) 
+    
+    
+
 a = [0.00137082653607, 0.00182895527071 ,0.00181135799599, 3.5435925749e-05, 0.000144160006719, 0.0, 0.0, 0.00348023934679, 6.70175838793e-05, 0.0,  0.00173714387885, 0.00193135633565, 0.00163630797405, 0.00112693256527,  0.000661424536234, 0.00149518433895, 0.000938723224875, 0.000332773373304, 0.0, 
  5.09344999726e-05, 0.000445207246688, 0.000537446000901, 0.000321498724794,  0.00124250934254, 0.000596555360703, 0.000387619331503, 0.00308363126102, 0.0,  4.01028777578e-05, 0.000722014498786, 0.00059858695878, 0.000623078888309,
  0.000589253722266, 0.000117033006803, 7.99327037411e-05, 0.000505943635116,  0.00073384726746, 0.000125638127049, 0.000945368572261, 0.000157851119455,  0.000440040571417, 0.000634590457135, 0.0, 0.00142820266303, 0.000381813630509,  0.00112394946212, 0.000119775687935, 0.00156286733292, 0.000383453260188, 0.0]    
