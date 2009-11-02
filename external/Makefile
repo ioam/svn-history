@@ -928,6 +928,58 @@ guppy-uninstall:
 
 
 
+
+
+#############################################################
+# OpenMPI
+OPENMPI = openmpi-1.3.3
+
+# CEBALERT: uninstall info not complete!
+OPENMPI_UNINSTALL += lib/libopenmpi*
+OPENMPI_UNINSTALL += lib/mpi.mod
+OPENMPI_UNINSTALL += bin/mpi*
+
+openmpi: ${OPENMPI}.tar.gz
+	tar -xzf ${OPENMPI}.tar.gz
+	cd ${OPENMPI}; ./configure --prefix=${PREFIX} 
+	cd ${OPENMPI}; make all install
+	touch openmpi
+
+openmpi-clean: 
+	rm -rf ${OPENMPI} 
+openmpi-uninstall:
+	rm -rf openmpi $(foreach f, ${OPENMPI_UNINSTALL}, ${PREFIX}/${f})
+
+
+#############################################################
+# mpi4py
+MPI4PY = mpi4py-1.1.0
+
+MPI4PY_UNINSTALL += ${PYTHON_LIB}/site-packages/mpi4py
+MPI4PY_UNINSTALL += ${PYTHON_LIB}/site-packages/mpi4py*.egg*
+
+mpi4py: ${MPI4PY}.tar.gz python
+	tar -xzf ${MPI4PY}.tar.gz
+	echo "[mpi]" > ${MPI4PY}/mpi.cfg
+	echo "[topo-openmpi]" >> ${MPI4PY}/mpi.cfg
+	echo "mpi_dir              = ${PREFIX}" >> ${MPI4PY}/mpi.cfg
+	echo "mpicc                = %(mpi_dir)s/bin/mpicc" >> ${MPI4PY}/mpi.cfg
+	echo "mpicxx               = %(mpi_dir)s/bin/mpicxx" >> ${MPI4PY}/mpi.cfg
+	echo "library_dirs         = %(mpi_dir)s/lib:%(mpi_dir)s/lib/openmpi" >> ${MPI4PY}/mpi.cfg
+	echo "runtime_library_dirs = %(library_dirs)s" >> ${MPI4PY}/mpi.cfg
+	cd ${MPI4PY}; ${PREFIX}/bin/python setup.py build --mpi=topo-openmpi
+	cd ${MPI4PY}; ${PREFIX}/bin/python setup.py install
+	touch mpi4py
+
+mpi4py-clean: 
+	rm -rf ${MPI4PY} 
+mpi4py-uninstall:
+	rm -rf mpi4py $(foreach f, ${MPI4PY_UNINSTALL}, ${PREFIX}/${f})
+
+mpi4py-test: mpi4py
+	${PREFIX}/bin/mpiexec -n 2 ${PREFIX}/bin/python ${PREFIX}/external/mpi4py-1.1.0/test/runalltest.py
+
+
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
