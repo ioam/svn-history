@@ -1015,8 +1015,8 @@ def runRFPositionPrediction(sf,stepsize):
 
 def runRFinference():
     density=__main__.__dict__.get('density', 20)
-    dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
-    #dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_off_response",2700,50)
+    #dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
+    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_on_&_off_response",2700,50)
     (index,data) = dataset
     index+=1
     dataset = (index,data)
@@ -1229,7 +1229,7 @@ def fitGabor(weights):
 
     
     #(x,b,c) = fmin_tnc(gab,[0.07,0.25,0.1,0.0,2.0,0.0],bounds=[(0.05,0.2),(0.1,0.2),(0.07,0.2),(0.0,numpy.pi),(4.0,5.0),(0.0,numpy.pi/2)],args=[weights], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0],maxCGit=100, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
-    (x,b) = anneal(gab,[0.07,0.25,0.12,1.0,4.0,1.0,0.1],args=[weights],schedule='boltzmann',learn_rate=0.00005,T0=100.0,maxiter=1000)
+    (x,b) = anneal(gab,[0.07,0.25,0.12,1.0,4.0,1.0,0.1],args=[weights],schedule='boltzmann',learn_rate=0.0005,T0=1.0,maxiter=1000)
     #fmin(gab,[0.15,0.25,0.1,0.0,6.0,0.0],args=[weights], xtol=0.0000000001, ftol=0.0000000001,maxfun=10000)
     print x
     gab(x,weights,True)
@@ -1243,10 +1243,10 @@ def gab(z,w,display=False):
     
     if x < 0.05 or x > 0.2: return abs(x-0.15)*1000
     if y < 0.1 or y > 0.3: return abs(y-0.15)*1000
-    if sigma < 0.07 or sigma > 0.2:  return abs(sigma-0.15)*100
-    if angle < 0.0 or angle > numpy.pi: return abs(angle-numpy.pi/2)*100
-    if f < 1.0 or f > 8.0: return abs(f-5)*100
-    if p < 0.0 or p > numpy.pi: return abs(p-numpy.pi/2)*100  
+    if sigma < 0.07 or sigma > 0.2:  return abs(sigma-0.15)*1000
+    if angle < 0.0 or angle > numpy.pi: return abs(angle-numpy.pi/2)*1000
+    if f < 1.0 or f > 8.0: return abs(f-5)*1000
+    if p < 0.0 or p > numpy.pi: return abs(p-numpy.pi/2)*1000  
     
     a = numpy.zeros(numpy.shape(w))
     (dx,dy) = numpy.shape(w)
