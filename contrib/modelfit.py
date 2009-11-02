@@ -1015,9 +1015,8 @@ def runRFPositionPrediction(sf,stepsize):
 
 def runRFinference():
     density=__main__.__dict__.get('density', 20)
-    #dataset = loadSimpleDataSet("Flogl/DataSep2009/testing_01_02_03.dat",375,58)
-    #dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
-    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_off_response",2700,50)
+    dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
+    #dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_off_response",2700,50)
     (index,data) = dataset
     index+=1
     dataset = (index,data)
@@ -1060,7 +1059,7 @@ def runRFinference():
     
     #return
     
-    return ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,25,0.0,validation_inputs,validation_set,True,0.28,666)    
+    return ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,25,0.0,validation_inputs,validation_set,True,0.28,"original")    
     
     
     
@@ -1230,7 +1229,7 @@ def fitGabor(weights):
 
     
     #(x,b,c) = fmin_tnc(gab,[0.07,0.25,0.1,0.0,2.0,0.0],bounds=[(0.05,0.2),(0.1,0.2),(0.07,0.2),(0.0,numpy.pi),(4.0,5.0),(0.0,numpy.pi/2)],args=[weights], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0],maxCGit=100, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
-    (x,b) = anneal(gab,[0.07,0.25,0.12,1.0,4.0,1.0],args=[weights],schedule='boltzmann',learn_rate=0.0001,T0=20.0,maxiter=1000)
+    (x,b) = anneal(gab,[0.07,0.25,0.12,1.0,4.0,1.0,0.1],args=[weights],schedule='boltzmann',learn_rate=0.00005,T0=100.0,maxiter=1000)
     #fmin(gab,[0.15,0.25,0.1,0.0,6.0,0.0],args=[weights], xtol=0.0000000001, ftol=0.0000000001,maxfun=10000)
     print x
     gab(x,weights,True)
@@ -1239,7 +1238,7 @@ def fitGabor(weights):
     
 def gab(z,w,display=False):
     print z
-    (x,y,sigma,angle,f,p) = tuple(z)
+    (x,y,sigma,angle,f,p,alpha) = tuple(z)
     # w = w[0]
     
     if x < 0.05 or x > 0.2: return abs(x-0.15)*1000
@@ -1254,7 +1253,7 @@ def gab(z,w,display=False):
     
     den = numpy.max([dx,dy])
     
-    g = Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=x,y=y,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)()/10
+    g =  Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=x,y=y,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)() * alpha
     
     if display:
         pylab.subplot(2,1,1)
