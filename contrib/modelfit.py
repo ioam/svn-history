@@ -1016,7 +1016,7 @@ def runRFPositionPrediction(sf,stepsize):
 def runRFinference():
     density=__main__.__dict__.get('density', 20)
     #dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
-    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_spikes_off_response",2700,50)
+    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_spikes_on_&_off_response",2700,50)
     (index,data) = dataset
     index+=1
     dataset = (index,data)
@@ -1059,7 +1059,7 @@ def runRFinference():
     
     #return
     
-    return ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,25,0.0,validation_inputs,validation_set,True,0.28,"Off_spikes")    
+    return ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,25,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
     
     
     
