@@ -989,6 +989,10 @@ mpi4py-test: mpi4py
 # 2009/11/03: On eddie.ecdf, works fine as it is (just 'make -C
 # external mpi4py_systemmpi'; 'make mpi4py_systemmpi-test' shows most
 # tests passing).
+# Note that on eddie, it's necessary to do the following before building
+# or using mpi4py:
+# $ module load openmpi/ethernet/gcc/latest
+#
 # 2009/11/03: On my Ubuntu 9.10 machine (with OpenMPI installed from
 # Synaptic), builds ok but segfaults when running.
 
