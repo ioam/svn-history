@@ -748,7 +748,19 @@ def runModelFit():
     print "50: " , mf.reliable_indecies
     mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
     
-    mf.reliable_indecies=(stop!=0.0)*1.0
+    mf.calculateReliabilities(mat(testing_inputs),numpy.mat(testing_set),40)
+    print "40: " , mf.reliable_indecies
+    mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
+
+    mf.calculateReliabilities(mat(testing_inputs),numpy.mat(testing_set),30)
+    print "30: " , mf.reliable_indecies
+    mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
+
+    mf.calculateReliabilities(mat(testing_inputs),numpy.mat(testing_set),20)
+    print "20: " , mf.reliable_indecies
+    mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
+    
+    mf.reliable_indecies=(stop<100.0)*1.0
     print mf.reliable_indecies
     mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
 
