@@ -965,7 +965,7 @@ mpi4py: ${MPI4PY}.tar.gz python openmpi
 	echo "library_dirs         = %(mpi_dir)s/lib:%(mpi_dir)s/lib/openmpi" >> ${MPI4PY}/mpi.cfg
 	echo "runtime_library_dirs = %(library_dirs)s" >> ${MPI4PY}/mpi.cfg
 # without MPILD, finds system linker first
-	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc ${PREFIX}/bin/python setup.py build --mpi=topo-mpi
+	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc ${PREFIX}/bin/python setup.py build --mpi=topo-openmpi
 # without MPILD, MPICC, and MPICXX, finds system versions first
 	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc MPICC=${PREFIX}/bin/mpicc MPICXX=${PREFIX}/bin/mpicxx ${PREFIX}/bin/python setup.py install
 	touch mpi4py
