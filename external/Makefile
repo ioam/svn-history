@@ -980,7 +980,13 @@ mpi4py-test: mpi4py
 
 
 #############################################################
-# mpi4py using system mpi: set e.g. SYSTEM_MPI=lam, and you might need to edit mpi.cfg
+# mpi4py using system mpi: optionally set SYSTEM_MPI
+# (e.g. SYSTEM_MPI=lam); you might also need to edit mpi.cfg. 
+#
+# 2009/11/03: On eddie.ecdf, works fine as it is (just 'make -C
+# external mpi4py_systemmpi'; 'make mpi4py_systemmpi-test' shows most
+# tests passing).
+
 MPI4PY_SYSTEMMPI = mpi4py-1.1.0
 
 MPI4PY_SYSTEMMPI_UNINSTALL += ${PYTHON_LIB}/site-packages/mpi4py
@@ -990,13 +996,13 @@ mpi4py_systemmpi: ${MPI4PY_SYSTEMMPI}.tar.gz python
 	tar -xzf ${MPI4PY_SYSTEMMPI}.tar.gz
 	cd ${MPI4PY_SYSTEMMPI}; ${PREFIX}/bin/python setup.py build --mpi=${SYSTEMMPI_MPI}
 	cd ${MPI4PY_SYSTEMMPI}; ${PREFIX}/bin/python setup.py install
-	touch mpi4py
+	touch mpi4py_systemmpi
 
 mpi4py_systemmpi-clean: mpi4py-clean
 
 mpi4py_systemmpi-uninstall: mpi4py-uninstall
 
-mpi4py_systemmpi-test: mpi4py
+mpi4py_systemmpi-test: mpi4py_systemmpi
 	mpiexec -n 2 ${PREFIX}/bin/python ${PREFIX}/external/mpi4py-1.1.0/test/runalltest.py
 
 #############################################################################
