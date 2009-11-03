@@ -195,7 +195,7 @@ class ModelFit():
         for i in target_inputs:
             tmp = []
             for j in target_inputs:
-                 tmp.append(numpy.sum(numpy.power(                                    numpy.multiply(activities[i].T  - modelActivities[j],numpy.mat(self.reliable_indecies).T),2)                                    ))
+                 tmp.append(numpy.sum(numpy.power(numpy.multiply(activities[i].T-modelActivities[j],numpy.mat(self.reliable_indecies).T),2)))
                  
                  #tmp.append(numpy.sum(numpy.abs(                                    numpy.multiply(activities[i].T  - modelActivities[j],numpy.mat(self.reliable_indecies).T))                                    ))
                  #tmp.append(numpy.corrcoef(modelActivities[j].T, activities[i])[0][1])
@@ -626,7 +626,7 @@ def runModelFit():
     density=__main__.__dict__.get('density', 20)
     
     #dataset = loadRandomizedDataSet("Flogl/JAN1/20090707__retinotopy_region1_stationary_testing01_1rep_125stim_ALL",6,15,125,60)
-    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_spikes_on_&_off_response",2700,50)
+    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_on_&_off_response",2700,50)
 
     #this dataset has images numbered from 1
     (index,data) = dataset
