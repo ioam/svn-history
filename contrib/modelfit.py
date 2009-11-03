@@ -222,6 +222,35 @@ class ModelFit():
         print "Percentage of correct answers:" ,correct/len(target_inputs)*100, "%"
 
 
+    def testModelBiased(self,inputs,activities,t):
+        modelActivities=[]
+        modelResponses=[]
+        error = 0
+
+        for index in range(len(inputs)):
+            modelActivities.append(self.calculateModelOutput(inputs,index))
+
+        m = numpy.mean(activities,1)
+        
+        
+
+        tmp = []
+        correct = 0
+        for i in xrange(0,len(inputs)):
+            tmp = []
+            significant_neurons=numpy.zeros(numpy.shape(activities[0]))       
+            for z in xrange(0,len(activities[i])):
+                if activities[i][z] >= m[z]: significant_neurons[z]=1.0
+
+            for j in xrange(0,len(inputs)):
+                 tmp.append(numpy.sum(numpy.power(numpy.multiply(,numpy.multiply(activities[i].T-modelActivities[j],numpy.mat(self.reliable_indecies),numpy.mat(significant_neurons)).T),2))) / numpy.sum(significant_neurons)
+            
+            x = numpy.argmin(array(tmp))
+            if x == i: correct+=1.0
+                
+        print correct, " correct out of ", len(target_inputs)                  
+        print "Percentage of correct answers:" ,correct/len(target_inputs)*100, "%"
+
 
 class MotionModelFit(ModelFit):
     
@@ -760,7 +789,7 @@ def runModelFit():
     print "20: " , mf.reliable_indecies
     mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
     
-    mf.reliable_indecies=(stop<100.0)*1.0
+    mf.reliable_indecies=(stop>=100.0)*1.0
     print mf.reliable_indecies
     mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
 
@@ -768,7 +797,7 @@ def runModelFit():
     lookForCorrelations(mf, numpy.mat(validation_set),numpy.mat(validation_inputs))
     
     pylab.show()
-    return mf
+    return (mf,mat(testing_inputs),mat(testing_set))
 
 def showRF(mf,indexes,x,y):
     pylab.figure()
