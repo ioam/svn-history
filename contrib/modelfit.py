@@ -633,8 +633,8 @@ def runModelFit():
     index+=1
     dataset=(index,data)
      
-    print shape(dataset[1])
-    dataset = clump_low_responses(dataset,__main__.__dict__.get('ClumpMag',0.0))
+    #print shape(dataset[1])
+    #dataset = clump_low_responses(dataset,__main__.__dict__.get('ClumpMag',0.0))
     print shape(dataset[1])
     dataset = averageRangeFrames(dataset,0,1)
     print shape(dataset[1])
@@ -714,7 +714,7 @@ def runModelFit():
     mf.num_of_units = 50
     mf.init()
     
-
+    pylab.hist(training_set.flatten())
 
     (err,stop,min_errors) = mf.trainModel(mat(training_inputs),numpy.mat(training_set),mat(validation_inputs),numpy.mat(validation_set))
     print "\nStop criterions", stop
@@ -733,6 +733,8 @@ def runModelFit():
     
     #print "Model test on training inputs"
     #mf.testModel(mat(training_inputs),mat(training_set))
+    
+    
     
     mf.calculateReliabilities(mat(testing_inputs),numpy.mat(testing_set),95)
     print "95: " , mf.reliable_indecies
@@ -1149,7 +1151,7 @@ def lookForCorrelations(model, validation_activities,validation_inputs):
     print numpy.shape(bR)
     pylab.figure()
     pylab.subplot(7,8,1)
-    for i in xrange(0,49):
+    for i in xrange(0,50):
         pylab.subplot(7,8,i+1)
         pylab.scatter(numpy.array(mR[i])[0],numpy.array(bR[i])[0])
         pylab.show._needmain=False
@@ -1253,7 +1255,14 @@ def gab(z,w,display=False):
     
     den = numpy.max([dx,dy])
     
-    g =  Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=x,y=y,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)() * alpha
+    xxx = 0.44157151640998238
+    yyy = 0.56732774188510204
+        
+    yyy = yyy-0.5 
+    xxx = 0.5-dx/dy*xxx
+    print xxx,yyy
+        
+    g =  Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=xxx,y=yyy,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)() * alpha
     
     if display:
         pylab.subplot(2,1,1)
