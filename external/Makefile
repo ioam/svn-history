@@ -927,9 +927,6 @@ guppy-uninstall:
 
 
 
-
-
-
 #############################################################
 # OpenMPI
 OPENMPI = openmpi-1.3.3
@@ -952,23 +949,25 @@ openmpi-uninstall:
 
 
 #############################################################
-# mpi4py
+# mpi4py using Topographica's openmpi
 MPI4PY = mpi4py-1.1.0
 
 MPI4PY_UNINSTALL += ${PYTHON_LIB}/site-packages/mpi4py
 MPI4PY_UNINSTALL += ${PYTHON_LIB}/site-packages/mpi4py*.egg*
 
-mpi4py: ${MPI4PY}.tar.gz python
+mpi4py: ${MPI4PY}.tar.gz python openmpi
 	tar -xzf ${MPI4PY}.tar.gz
-	echo "[mpi]" > ${MPI4PY}/mpi.cfg
+# specify topographica's copy of OpenMPI
 	echo "[topo-openmpi]" >> ${MPI4PY}/mpi.cfg
 	echo "mpi_dir              = ${PREFIX}" >> ${MPI4PY}/mpi.cfg
 	echo "mpicc                = %(mpi_dir)s/bin/mpicc" >> ${MPI4PY}/mpi.cfg
 	echo "mpicxx               = %(mpi_dir)s/bin/mpicxx" >> ${MPI4PY}/mpi.cfg
 	echo "library_dirs         = %(mpi_dir)s/lib:%(mpi_dir)s/lib/openmpi" >> ${MPI4PY}/mpi.cfg
 	echo "runtime_library_dirs = %(library_dirs)s" >> ${MPI4PY}/mpi.cfg
-	cd ${MPI4PY}; ${PREFIX}/bin/python setup.py build --mpi=topo-openmpi
-	cd ${MPI4PY}; ${PREFIX}/bin/python setup.py install
+# without MPILD, finds system linker first
+	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc ${PREFIX}/bin/python setup.py build --mpi=topo-mpi
+# without MPILD, MPICC, and MPICXX, finds system versions first
+	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc MPICC=${PREFIX}/bin/mpicc MPICXX=${PREFIX}/bin/mpicxx ${PREFIX}/bin/python setup.py install
 	touch mpi4py
 
 mpi4py-clean: 
@@ -979,6 +978,26 @@ mpi4py-uninstall:
 mpi4py-test: mpi4py
 	${PREFIX}/bin/mpiexec -n 2 ${PREFIX}/bin/python ${PREFIX}/external/mpi4py-1.1.0/test/runalltest.py
 
+
+#############################################################
+# mpi4py using system mpi: set e.g. SYSTEM_MPI=lam, and you might need to edit mpi.cfg
+MPI4PY_SYSTEMMPI = mpi4py-1.1.0
+
+MPI4PY_SYSTEMMPI_UNINSTALL += ${PYTHON_LIB}/site-packages/mpi4py
+MPI4PY_SYSTEMMPI_UNINSTALL += ${PYTHON_LIB}/site-packages/mpi4py*.egg*
+
+mpi4py_systemmpi: ${MPI4PY_SYSTEMMPI}.tar.gz python 
+	tar -xzf ${MPI4PY_SYSTEMMPI}.tar.gz
+	cd ${MPI4PY_SYSTEMMPI}; ${PREFIX}/bin/python setup.py build --mpi=${SYSTEMMPI_MPI}
+	cd ${MPI4PY_SYSTEMMPI}; ${PREFIX}/bin/python setup.py install
+	touch mpi4py
+
+mpi4py_systemmpi-clean: mpi4py-clean
+
+mpi4py_systemmpi-uninstall: mpi4py-uninstall
+
+mpi4py_systemmpi-test: mpi4py
+	mpiexec -n 2 ${PREFIX}/bin/python ${PREFIX}/external/mpi4py-1.1.0/test/runalltest.py
 
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
