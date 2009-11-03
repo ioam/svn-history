@@ -240,16 +240,18 @@ class ModelFit():
             tmp = []
             significant_neurons=numpy.zeros(numpy.shape(activities[0]))       
             for z in xrange(0,len(activities[i])):
-                if activities[i][z] >= m[z]: significant_neurons[z]=1.0
+                if activities[i,z] >= m[0,z]*t: significant_neurons[z]=1.0
 
             for j in xrange(0,len(inputs)):
-                 tmp.append(numpy.sum(numpy.power(numpy.multiply(,numpy.multiply(activities[i].T-modelActivities[j],numpy.mat(self.reliable_indecies),numpy.mat(significant_neurons)).T),2))) / numpy.sum(significant_neurons)
+ 
+                
+                 tmp.append(numpy.sum(numpy.power(numpy.multiply(numpy.multiply(activities[i].T-modelActivities[j],numpy.mat(self.reliable_indecies)),numpy.mat(significant_neurons).T),2))/ numpy.sum(significant_neurons))
             
             x = numpy.argmin(array(tmp))
             if x == i: correct+=1.0
                 
-        print correct, " correct out of ", len(target_inputs)                  
-        print "Percentage of correct answers:" ,correct/len(target_inputs)*100, "%"
+        print correct, " correct out of ", len(activities[0])                  
+        print "Percentage of correct answers:" ,correct/len(activities[0])*100, "%"
 
 
 class MotionModelFit(ModelFit):
@@ -752,6 +754,11 @@ def runModelFit():
     
     print "Model test with all neurons"
     mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
+    mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),0.1)
+    mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),0.3)
+    mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),0.6)
+    mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),1.0)
+    
     print "Model test with double weights"
     mf.weigths*=2.0
     mf.testModel(mat(testing_inputs),numpy.mat(testing_set))
