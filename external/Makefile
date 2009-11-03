@@ -30,9 +30,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean svn2cl-clean readline-clean termcap-clean guppy-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean svn2cl-clean readline-clean termcap-clean guppy-clean pyopenssl-clean foolscap-clean zope_interface-clean twisted-clean mpi4py-clean openmpi-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall pyopenssl-uninstall foolscap-uninstall zope_interface-uninstall twisted-uninstall mpi4py-uninstall openmpi-uninstall
 
 
 
@@ -157,7 +157,7 @@ tk-uninstall:
 ##############################################################
 # ipython (improved interactive prompt)
 #
-IPYTHON = ipython-0.8.4
+IPYTHON = ipython-0.10
 IPYTHON_UNINSTALL =  ${PYTHON_LIB}/site-packages/IPython
 
 ipython: ${IPYTHON}.tar.gz python 
@@ -952,7 +952,7 @@ openmpi-uninstall:
 # mpi4py using Topographica's openmpi
 #
 # 2009/11/03: Works on DICE ("make mpi4py-test" shows most tests passing)
-
+# 2009/11/03: Works on my Ubuntu 9.10 machine (tests pass similarly to above)
 MPI4PY = mpi4py-1.1.0
 
 MPI4PY_UNINSTALL += ${PYTHON_LIB}/site-packages/mpi4py
@@ -969,7 +969,8 @@ mpi4py: ${MPI4PY}.tar.gz python openmpi
 	echo "runtime_library_dirs = %(library_dirs)s" >> ${MPI4PY}/mpi.cfg
 # without MPILD, finds system linker first
 	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc ${PREFIX}/bin/python setup.py build --mpi=topo-openmpi
-	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc ${PREFIX}/bin/python setup.py install
+# without MPILD, MPICC, and MPICXX, finds system versions first
+	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc MPICC=${PREFIX}/bin/mpicc MPICXX=${PREFIX}/bin/mpicxx ${PREFIX}/bin/python setup.py install
 	touch mpi4py
 
 mpi4py-clean: 
@@ -988,6 +989,8 @@ mpi4py-test: mpi4py
 # 2009/11/03: On eddie.ecdf, works fine as it is (just 'make -C
 # external mpi4py_systemmpi'; 'make mpi4py_systemmpi-test' shows most
 # tests passing).
+# 2009/11/03: On my Ubuntu 9.10 machine (with OpenMPI installed from
+# Synaptic), builds ok but segfaults when running.
 
 MPI4PY_SYSTEMMPI = mpi4py-1.1.0
 
@@ -1006,6 +1009,109 @@ mpi4py_systemmpi-uninstall: mpi4py-uninstall
 
 mpi4py_systemmpi-test: mpi4py_systemmpi
 	mpiexec -n 2 ${PREFIX}/bin/python ${PREFIX}/external/mpi4py-1.1.0/test/runalltest.py
+
+
+
+#############################################################
+# twisted: for parallel computing features in IPython
+TWISTED = Twisted-8.2.0
+
+# CEBALERT: probably not complete
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/ckeygen
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/trial
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/tap2deb
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/twistd
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/tkconch
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/cftp
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/mailmail
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/lore
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/conch
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/pyhtmlizer
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/mktap
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/manhole
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/tap2rpm
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/im
+TWISTED_UNINSTALL += ${PYTHON_LIB}/bin/tapconvert
+
+TWISTED_UNINSTALL += ${PYTHON_LIB}/site-packages/twisted
+TWISTED_UNINSTALL += ${PYTHON_LIB}/site-packages/twisted*.egg*
+
+twisted: ${TWISTED}.tar.gz python
+	tar -xzf ${TWISTED}.tar.gz
+	cd ${TWISTED}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	touch twisted
+
+twisted-clean: 
+	rm -rf ${TWISTED} 
+twisted-uninstall:
+	rm -rf twisted $(foreach f, ${TWISTED_UNINSTALL}, ${PREFIX}/${f})
+
+
+#############################################################
+# zope_interface: for parallel computing features in IPython
+ZOPE_INTERFACE = zope.interface-3.3.0
+
+ZOPE_INTERFACE_UNINSTALL += ${PYTHON_LIB}/site-packages/zope*
+
+zope_interface: ${ZOPE_INTERFACE}.tar.gz python
+	tar -xzf ${ZOPE_INTERFACE}.tar.gz
+	cd ${ZOPE_INTERFACE}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	touch zope_interface
+
+zope_interface-clean: 
+	rm -rf ${ZOPE_INTERFACE} 
+zope_interface-uninstall:
+	rm -rf zope_interface $(foreach f, ${ZOPE_INTERFACE_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+#############################################################
+# foolscap: for parallel computing features in IPython
+FOOLSCAP = foolscap-0.4.2
+
+FOOLSCAP_UNINSTALL += ${PYTHON_LIB}/site-packages/foolscap*
+
+foolscap: ${FOOLSCAP}.tar.gz python pyopenssl
+	tar -xzf ${FOOLSCAP}.tar.gz
+	cd ${FOOLSCAP}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	touch foolscap
+
+foolscap-clean: 
+	rm -rf ${FOOLSCAP} 
+foolscap-uninstall:
+	rm -rf foolscap $(foreach f, ${FOOLSCAP_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+#############################################################
+# pyopenssl: required by foolscap
+# (requires e.g. ssl-dev package)
+
+PYOPENSSL = pyOpenSSL-0.9
+
+PYOPENSSL_UNINSTALL += ${PYTHON_LIB}/site-packages/pyopenssl*
+
+pyopenssl: ${PYOPENSSL}.tar.gz python 
+	tar -xzf ${PYOPENSSL}.tar.gz
+	cd ${PYOPENSSL}; ${PREFIX}/bin/python setup.py build
+	cd ${PYOPENSSL}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	touch pyopenssl
+
+pyopenssl-clean: 
+	rm -rf ${PYOPENSSL} 
+pyopenssl-uninstall:
+	rm -rf pyopenssl $(foreach f, ${PYOPENSSL_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+
+#############################################################
+# IPython with parallel computing features
+
+parallel_ipython: zope_interface twisted foolscap ipython
+
+
+
 
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
