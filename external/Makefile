@@ -950,6 +950,9 @@ openmpi-uninstall:
 
 #############################################################
 # mpi4py using Topographica's openmpi
+#
+# 2009/11/03: Works on DICE
+
 MPI4PY = mpi4py-1.1.0
 
 MPI4PY_UNINSTALL += ${PYTHON_LIB}/site-packages/mpi4py
@@ -967,7 +970,7 @@ mpi4py: ${MPI4PY}.tar.gz python openmpi
 # without MPILD, finds system linker first
 	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc ${PREFIX}/bin/python setup.py build --mpi=topo-openmpi
 # without MPILD, MPICC, and MPICXX, finds system versions first
-	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc MPICC=${PREFIX}/bin/mpicc MPICXX=${PREFIX}/bin/mpicxx ${PREFIX}/bin/python setup.py install
+	cd ${MPI4PY}; env MPILD=${PREFIX}/bin/mpicc ${PREFIX}/bin/python setup.py install
 	touch mpi4py
 
 mpi4py-clean: 
