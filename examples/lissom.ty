@@ -260,6 +260,9 @@ elif p.dataset in natural_image_sets:
         
 
 # helper fns for synthesizing a specified hue
+
+# CEBALERT: generating r,g,b from h,1,v means one of r,g,b will always
+# be 0 (s should also be varied).
 def h_to_r(h): return hsv_to_rgb(h,1.0,1.0)[0]
 def h_to_g(h): return hsv_to_rgb(h,1.0,1.0)[1]
 def h_to_b(h): return hsv_to_rgb(h,1.0,1.0)[2]
@@ -307,6 +310,11 @@ for e in eyes:
                                      for i in xrange(1,26)]
                 elif p.dataset=="Nature":
                     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+
+                # CEBALERT: (for all input types) In the case of OD
+                # and CR, 'left eye' RGB is (x,y,z) but 'right eye'
+                # RGB is (2-x,2-y,2-z), i.e. a different hue.  (Not a
+                # problem in RGB retina model.)
 
                 # 5n distinct random seeds (for n images, each of which has 5 random streams)
                 inputs=[input_type(
