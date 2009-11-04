@@ -1094,7 +1094,7 @@ def runRFinference():
         training_set = normalize_data_set(training_set,a,v)
         validation_set = normalize_data_set(validation_set,a,v)
     
-    if False:
+    if True:
         print numpy.shape(training_inputs[0])
         (x,y)= numpy.shape(training_inputs[0])
         training_inputs = cut_out_images_set(training_inputs,int(y*0.49),(int(x*0.1),int(y*0.4)))
@@ -1116,15 +1116,15 @@ def runRFinference():
     
     
     
-    if False:
+    if True:
         e = []
         c = []
         b = []
         x = 0.2
-        for i in xrange(0,30):
+        for i in xrange(0,20):
             print i
-            x =  10 + i
-            (e1,c1) = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,x,0.0,validation_inputs,validation_set,False,0.28)
+            x =  x*2
+            (e1,c1,RFs) = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,x,0.0,validation_inputs,validation_set,False,0.28)
             e.append(e1)
             c.append(c1)
             b.append(x)
