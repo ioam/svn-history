@@ -1069,7 +1069,7 @@ def runRFPositionPrediction(sf,stepsize):
 def runRFinference():
     density=__main__.__dict__.get('density', 20)
     #dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
-    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_spikes_on_&_off_response",2700,50)
+    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_on_&_off_response",2700,50)
     (index,data) = dataset
     index+=1
     dataset = (index,data)
@@ -1097,8 +1097,8 @@ def runRFinference():
     if False:
         print numpy.shape(training_inputs[0])
         (x,y)= numpy.shape(training_inputs[0])
-        training_inputs = cut_out_images_set(training_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
-        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
+        training_inputs = cut_out_images_set(training_inputs,int(y*0.49),(int(x*0.1),int(y*0.4)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.49),(int(x*0.1),int(y*0.4)))
         print numpy.shape(training_inputs[0])
         (sizex,sizey) = numpy.shape(training_inputs[0])
     
@@ -1112,7 +1112,7 @@ def runRFinference():
     
     #return
     
-    return ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,25,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
+    a = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,22,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
     
     
     
@@ -1121,9 +1121,9 @@ def runRFinference():
         c = []
         b = []
         x = 0.2
-        for i in xrange(0,10):
+        for i in xrange(0,30):
             print i
-            x =  0+i*100.0
+            x =  10 + i
             (e1,c1) = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,x,0.0,validation_inputs,validation_set,False,0.28)
             e.append(e1)
             c.append(c1)
@@ -1138,6 +1138,7 @@ def runRFinference():
         pylab.show()
     
     pylab.show()
+    return a
 
     
 
@@ -1235,7 +1236,6 @@ def analyze_rf_possition(w,level):
     import matplotlib
     from matplotlib.patches import Circle
     a= pylab.figure().gca()
-    
     (sx,sy) = numpy.shape(w[0])
     
     X = numpy.zeros((sx,sy))
@@ -1247,13 +1247,14 @@ def analyze_rf_possition(w,level):
             Y[x][y] = y
     
     cgs = []
+    RFs=[]
     
     for i in xrange(0,len(w)):
             pylab.subplot(7,8,i+1)
             mi=numpy.min(numpy.min(w[i]))
             ma=numpy.max(numpy.max(w[i]))
             z = ((w[i]<=(mi-mi*level))*1.0) * w[i] + ((w[i]>=(ma-ma*level))*1.0) * w[i] 
-            
+            RFs.append(z)  
             cgx = numpy.sum(numpy.sum(numpy.multiply(X,numpy.power(z,2))))/numpy.sum(numpy.sum(numpy.power(z,2)))
             cgy = numpy.sum(numpy.sum(numpy.multiply(Y,numpy.power(z,2))))/numpy.sum(numpy.sum(numpy.power(z,2)))
             
@@ -1266,89 +1267,94 @@ def analyze_rf_possition(w,level):
             pylab.show._needmain=False
             pylab.imshow(z,vmin=-r,vmax=r,cmap=pylab.cm.RdBu)
     pylab.show()
-    return cgs
+    return (cgs,RFs)
 
 
 def fitGabor(weights):
+    from matplotlib.patches import Circle
     from scipy.optimize import leastsq,fmin,fmin_tnc,anneal
     from topo.base.arrayutil import array_argmax
     
     (x,y) = numpy.shape(weights[0])
-    weights  = cut_out_images_set(weights,int(y*0.4),(int(x*0.1),int(y*0.4)))
-    
-    centers = analyze_rf_possition(weights,0.4)
+    weights  = cut_out_images_set(weights,int(y*0.49),(int(x*0.1),int(y*0.4)))
+    (denx,deny) = numpy.shape(weights[0])
+    centers,RFs = analyze_rf_possition(weights,0.4)
     
     # determine frequency
     
     freqor = []
-    for w in weights:
-        ff = pylab.fft2(w)
-        (x,y) = array_argmax(ff)
+    for w in RFs:
+        ff = pylab.fftshift(pylab.fft2(w))
+        (x,y) = array_argmax(numpy.abs(ff))
         (n,rubish) = shape(ff)
+        print x,y,n
         freq = numpy.sqrt((x - n/2)*(x - n/2) + (y - n/2)*(y - n/2))
-        orr = numpy.arccos((y - n/2)/(x - n/2))
-        freqor.append((freq,orr))
+        phase = numpy.arctan(ff[x,y].imag/ff[x,y].real)
         
+        if (x - n/2) != 0:
+            print (y - n/2)/(x - n/2)
+            
+            orr = numpy.arctan((y - n/2)/(x - n/2))
+        else:
+            orr = numpy.pi/2
+        
+        if phase < 0:
+           phase = phase+numpy.pi
+        if orr < 0:
+           orr = orr+numpy.pi
+        print orr    
+            
+        freqor.append((freq,orr,phase))
     
-    gab([centers[47][0],centers[47][1],0.1,freqor[47][0],freqor[47][0],0.0],weights[47])
-    return
+    parameters=[]
     
-    #gab([0.15,0.25,0.1,0.0,6.0,0.0],weights)
-    #return
-    pylab.subplot(2,1,1)
-    pylab.show._needmain=False
-    pylab.show()
-
+    for j in xrange(0,len(RFs)):
+        (x,b,c) = fmin_tnc(gab,[centers[j][0],centers[j][1],0.10,freqor[j][1],freqor[j][0],freqor[j][2],1.0],bounds=[(centers[j][0]*0.9,centers[j][0]*1.1),(centers[j][0]*0.9,centers[j][0]*1.1),(0.01,0.2),(0.0,numpy.pi),(freqor[j][0]-1,freqor[j][0]+1),(0.0,numpy.pi/2),(0.1,1.0)],args=[weights[j]], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0,0.5],maxCGit=1000, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
+        parameters.append(x)
     
-    #(x,b,c) = fmin_tnc(gab,[0.07,0.25,0.1,0.0,2.0,0.0],bounds=[(0.05,0.2),(0.1,0.2),(0.07,0.2),(0.0,numpy.pi),(4.0,5.0),(0.0,numpy.pi/2)],args=[weights], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0],maxCGit=100, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
-    (x,b) = anneal(gab,[0.07,0.25,0.12,1.0,4.0,1.0,0.1],args=[weights],schedule='boltzmann',learn_rate=0.001,T0=10.0,maxiter=1000)
-    #fmin(gab,[0.15,0.25,0.1,0.0,6.0,0.0],args=[weights], xtol=0.0000000001, ftol=0.0000000001,maxfun=10000)
-    print x
-    gab(x,weights,True)
+    pylab.figure()
+    for i in xrange(0,len(parameters)):
+            pylab.subplot(7,8,i+1)
+            (x,y,sigma,angle,f,p,alpha) = tuple(parameters[i])
+            
+            g = Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=y-0.5,y=0.5-x,xdensity=denx,ydensity=deny,size=sigma,orientation=angle,phase=p)() * alpha
+            m = numpy.max([-numpy.min(g),numpy.max(g)])
+            pylab.show._needmain=False
+            pylab.imshow(g,vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
     
+    pylab.imshow()
+    return parameters
     
     
 def gab(z,w,display=False):
+    from matplotlib.patches import Circle
     print z
     (x,y,sigma,angle,f,p,alpha) = tuple(z)
-    # w = w[0]
-    
-    if x < 0.05 or x > 0.2: return abs(x-0.15)*1000
-    if y < 0.1 or y > 0.3: return abs(y-0.15)*1000
-    if sigma < 0.07 or sigma > 0.2:  return abs(sigma-0.15)*1000
-    if angle < 0.0 or angle > numpy.pi: return abs(angle-numpy.pi/2)*1000
-    if f < 1.0 or f > 8.0: return abs(f-5)*1000
-    if p < 0.0 or p > numpy.pi: return abs(p-numpy.pi/2)*1000  
     
     a = numpy.zeros(numpy.shape(w))
     (dx,dy) = numpy.shape(w)
-    
     den = numpy.max([dx,dy])
-    xxx =x
-    yyy =y
-    #xxx = 0.44157151640998238
-    #yyy = 0.56732774188510204
-        
-    #yyy = yyy-0.5 
-    #xxx = 0.5-dx/dy*xxx
-    #print xxx,yyy
-        
-    g =  Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=xxx,y=yyy,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)() * alpha
+    
+    g =  Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=y-0.5,y=0.5-x,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)() * alpha
     
     if display:
         pylab.subplot(2,1,1)
         
         m = numpy.max([-numpy.min(g[0:dx,0:dy]),numpy.max(g[0:dx,0:dy])])
+        cir = Circle( (y*dy,x*dx), radius=1)
+        pylab.gca().add_patch(cir)
         pylab.imshow(g[0:dx,0:dy],vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
         pylab.colorbar()
         pylab.subplot(2,1,2)
         m = numpy.max([-numpy.min(w),numpy.max(w)])
+        cir = Circle( (y*dy,x*dx), radius=1)
+        pylab.gca().add_patch(cir)
         pylab.imshow(w,vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
         pylab.show._needmain=False
         pylab.colorbar()
         pylab.show()
 
-    print numpy.sum(numpy.power(g[0:dx,0:dy] - w,2))
+    #print numpy.sum(numpy.power(g[0:dx,0:dy] - w,2))
     
     return numpy.sum(numpy.power(g[0:dx,0:dy] - w,2)) 
     
