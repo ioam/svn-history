@@ -347,8 +347,8 @@ fixedpoint-uninstall:
 ##############################################################
 # pyflakes (optional source code checker)
 #
-PYFLAKES = pyflakes-0.3.0
-PYFLAKES_UNINSTALL = ${PYTHON_LIB}/site-packages/pyflakes
+PYFLAKES = PyFlakes-divmod_r17780
+PYFLAKES_UNINSTALL = ${PYTHON_LIB}/site-packages/pyflakes*
 PYFLAKES_UNINSTALL = ${PREFIX}/bin/pyflakes
 
 pyflakes: ${PYFLAKES}.tar.gz python
