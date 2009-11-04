@@ -227,31 +227,34 @@ class ModelFit():
         modelResponses=[]
         error = 0
 
-        for index in range(len(inputs)):
+        (num_inputs,act_len)= numpy.shape(activities)
+        print (num_inputs,act_len)
+
+        for index in range(num_inputs):
             modelActivities.append(self.calculateModelOutput(inputs,index))
 
-        m = numpy.mean(activities,1)
+        m = numpy.mean(activities,0)
         
-        
-
         tmp = []
         correct = 0
-        for i in xrange(0,len(inputs)):
+        for i in xrange(0,num_inputs):
             tmp = []
             significant_neurons=numpy.zeros(numpy.shape(activities[0]))       
-            for z in xrange(0,len(activities[i])):
-                if activities[i,z] >= m[0,z]*t: significant_neurons[z]=1.0
+            for z in xrange(0,act_len):
+                print numpy.shape(activities)
+                print numpy.shape(m)
+                print numpy.shape(significant_neurons)
+                if activities[i,z] >= m[0,z]*t: significant_neurons[0,z]=1.0
 
-            for j in xrange(0,len(inputs)):
- 
-                
+            for j in xrange(0,num_inputs):
+
                  tmp.append(numpy.sum(numpy.power(numpy.multiply(numpy.multiply(activities[i].T-modelActivities[j],numpy.mat(self.reliable_indecies)),numpy.mat(significant_neurons).T),2))/ numpy.sum(significant_neurons))
             
             x = numpy.argmin(array(tmp))
             if x == i: correct+=1.0
                 
-        print correct, " correct out of ", len(activities[0])                  
-        print "Percentage of correct answers:" ,correct/len(activities[0])*100, "%"
+        print correct, " correct out of ", num_inputs                  
+        print "Percentage of correct answers:" ,correct/num_inputs*100, "%"
 
 
 class MotionModelFit(ModelFit):
@@ -678,13 +681,13 @@ def runModelFit():
 
 
     training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    training_inputs=generateInputs(dataset,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
     
     validation_set = generateTrainingSet(validation_data_set)
-    validation_inputs=generateInputs(validation_data_set,"Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    validation_inputs=generateInputs(validation_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
     
     testing_set = generateTrainingSet(testing_data_set)
-    testing_inputs=generateInputs(testing_data_set,"Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    testing_inputs=generateInputs(testing_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
     
 
     
@@ -1018,9 +1021,9 @@ def runRFPositionPrediction(sf,stepsize):
     (dataset,validation_data_set) = splitDataset(dataset,0.9)
 
     training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    training_inputs=generateInputs(dataset,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
     validation_set = generateTrainingSet(validation_data_set)
-    validation_inputs=generateInputs(validation_data_set,"Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000) 
+    validation_inputs=generateInputs(validation_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000) 
     (sizex,sizey) = numpy.shape(training_inputs[0])
     size=int(density*sf)
     
@@ -1077,9 +1080,9 @@ def runRFinference():
     #(dataset,rubish) = splitDataset(dataset,0.25)
 
     training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    training_inputs=generateInputs(dataset,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
     validation_set = generateTrainingSet(validation_data_set)
-    validation_inputs=generateInputs(validation_data_set,"Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    validation_inputs=generateInputs(validation_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
     
     if __main__.__dict__.get('NormalizeInputs',False):
        avgRF = compute_average_input(training_inputs)
