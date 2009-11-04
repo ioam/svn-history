@@ -241,9 +241,6 @@ class ModelFit():
             tmp = []
             significant_neurons=numpy.zeros(numpy.shape(activities[0]))       
             for z in xrange(0,act_len):
-                print numpy.shape(activities)
-                print numpy.shape(m)
-                print numpy.shape(significant_neurons)
                 if activities[i,z] >= m[0,z]*t: significant_neurons[0,z]=1.0
 
             for j in xrange(0,num_inputs):
@@ -1260,7 +1257,7 @@ def analyze_rf_possition(w,level):
             print cgx/sx,cgy/sy
             cgs.append((cgx/sx,cgy/sy))
             r = numpy.max([numpy.abs(numpy.min(numpy.min(z))),numpy.abs(numpy.max(numpy.max(z)))])
-            cir = Circle( (cgy,cgx), radius=3)
+            cir = Circle( (cgy,cgx), radius=1)
             pylab.gca().add_patch(cir)
             
             pylab.show._needmain=False
@@ -1272,6 +1269,10 @@ def analyze_rf_possition(w,level):
 def fitGabor(weights):
     from scipy.optimize import leastsq,fmin,fmin_tnc,anneal
     
+    (x,y) = numpy.shape(weights[0])
+    weights  = cut_out_images_set(weights,int(y*0.4),(int(x*0.1),int(y*0.4)))
+    
+    centers = analyze_rf_possition(weights,0.4)
     
     
     #gab([0.15,0.25,0.1,0.0,6.0,0.0],weights)
