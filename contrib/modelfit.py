@@ -242,7 +242,7 @@ class ModelFit():
             significant_neurons=numpy.zeros(numpy.shape(activities[0]))       
             for z in xrange(0,act_len):
                 if activities[i,z] >= m[0,z]*t: significant_neurons[0,z]=1.0
-            print numpy.sum(significant_neurons)
+            
             for j in xrange(0,num_inputs):
 
                  tmp.append(numpy.sum(numpy.power(numpy.multiply(numpy.multiply(activities[i].T-modelActivities[j],numpy.mat(self.reliable_indecies)),numpy.mat(significant_neurons).T),2))/ numpy.sum(significant_neurons))
@@ -758,6 +758,9 @@ def runModelFit():
     mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),0.3)
     mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),0.6)
     mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),1.0)
+    mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),2.0)
+    mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),3.0)
+    mf.testModelBiased(mat(testing_inputs),numpy.mat(testing_set),4.0)
     
     print "Model test with double weights"
     mf.weigths*=2.0
@@ -1277,17 +1280,18 @@ def fitGabor(weights):
     
     # determine frequency
     
-    ffts = []
+    freqor = []
     for w in weights:
         ff = pylab.fft2(w)
         (x,y) = array_argmax(ff)
-        
-        
-        
-        ffts.append(pylab.fft2(w))
+        (n,rubish) = shape(ff)
+        freq = numpy.sqrt((x - n/2)*(x - n/2) + (y - n/2)*(y - n/2))
+        orr = numpy.arccos((y - n/2)/(x - n/2))
+        freqor.append((freq,orr))
         
     
-    array_argmax
+    gab([centers[47][0],centers[47][1],0.1,freqor[47][0],freqor[47][0],0.0],weights[47])
+    return
     
     #gab([0.15,0.25,0.1,0.0,6.0,0.0],weights)
     #return
@@ -1320,13 +1324,14 @@ def gab(z,w,display=False):
     (dx,dy) = numpy.shape(w)
     
     den = numpy.max([dx,dy])
-    
-    xxx = 0.44157151640998238
-    yyy = 0.56732774188510204
+    xxx =x
+    yyy =y
+    #xxx = 0.44157151640998238
+    #yyy = 0.56732774188510204
         
-    yyy = yyy-0.5 
-    xxx = 0.5-dx/dy*xxx
-    print xxx,yyy
+    #yyy = yyy-0.5 
+    #xxx = 0.5-dx/dy*xxx
+    #print xxx,yyy
         
     g =  Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=xxx,y=yyy,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)() * alpha
     
