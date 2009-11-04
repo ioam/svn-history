@@ -950,7 +950,8 @@ guppy-uninstall:
 OPENMPI = openmpi-1.3.3
 
 # CEBALERT: uninstall info not complete!
-OPENMPI_UNINSTALL += lib/libopenmpi*
+OPENMPI_UNINSTALL += lib/libmpi*
+OPENMPI_UNINSTALL += lib/openmpi
 OPENMPI_UNINSTALL += lib/mpi.mod
 OPENMPI_UNINSTALL += bin/mpi*
 
@@ -1013,6 +1014,10 @@ mpi4py-test: mpi4py
 #
 # 2009/11/03: On my Ubuntu 9.10 machine (with OpenMPI installed from
 # Synaptic), builds ok but segfaults when running.
+# 2009/11/04: Works on DICE ("make -C external mpi4py_systemmpi") as
+# long as /usr/lib/openmpi/1.2.7-gcc/bin (or
+# /usr/lib64/openmpi/1.2.7-gcc/bin) is in PATH before /usr/bin
+# (e.g. type "export PATH=/usr/lib/openmpi/1.2.7-gcc/bin:$PATH").
 
 MPI4PY_SYSTEMMPI = mpi4py-1.1.0
 
