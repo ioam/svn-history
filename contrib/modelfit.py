@@ -1309,7 +1309,8 @@ def fitGabor(weights):
     parameters=[]
     
     for j in xrange(0,len(RFs)):
-        (x,b,c) = fmin_tnc(gab,[centers[j][0],centers[j][1],0.10,freqor[j][1],freqor[j][0],freqor[j][2],1.0],bounds=[(centers[j][0]*0.9,centers[j][0]*1.1),(centers[j][0]*0.9,centers[j][0]*1.1),(0.01,0.2),(0.0,numpy.pi),(freqor[j][0]-1,freqor[j][0]+1),(0.0,numpy.pi/2),(0.1,1.0)],args=[weights[j]], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0,0.5],maxCGit=1000, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
+        minf = numpy.max([freqor[j][0]-2,0])
+        (x,b,c) = fmin_tnc(gab,[centers[j][0],centers[j][1],0.10,freqor[j][1],freqor[j][0],freqor[j][2],0.1],bounds=[(centers[j][0]*0.9,centers[j][0]*1.1),(centers[j][0]*0.9,centers[j][0]*1.1),(0.01,0.2),(0.0,numpy.pi),(minf,freqor[j][0]+2),(0.0,numpy.pi/2),(0.1,1.0)],args=[weights[j]], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0,0.5],maxCGit=1000, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
         parameters.append(x)
     
     pylab.figure()
@@ -1322,7 +1323,10 @@ def fitGabor(weights):
             pylab.show._needmain=False
             pylab.imshow(g,vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
     
-    pylab.imshow()
+    
+    
+    analyze_rf_possition(weights,1.0)
+    pylab.show()
     return parameters
     
     
@@ -1357,14 +1361,94 @@ def gab(z,w,display=False):
     #print numpy.sum(numpy.power(g[0:dx,0:dy] - w,2))
     
     return numpy.sum(numpy.power(g[0:dx,0:dy] - w,2)) 
+
+
+def runSTC():
+    density=__main__.__dict__.get('density', 20)
+    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_on_&_off_response",2700,50)
+    (index,data) = dataset
+    index+=1
+    dataset = (index,data)
+    dataset = averageRangeFrames(dataset,0,1)
+    dataset = averageRepetitions(dataset)
+    
+    (dataset,validation_data_set) = splitDataset(dataset,0.9)
+
+    training_set = generateTrainingSet(dataset)
+    training_inputs=generateInputs(dataset,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    validation_set = generateTrainingSet(validation_data_set)
+    validation_inputs=generateInputs(validation_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    
+    if __main__.__dict__.get('NormalizeInputs',False):
+       avgRF = compute_average_input(training_inputs)
+       training_inputs = normalize_image_inputs(training_inputs,avgRF)
+       validation_inputs = normalize_image_inputs(validation_inputs,avgRF)
+    
+    if __main__.__dict__.get('NormalizeActivities',True):
+        (a,v) = compute_average_min_max(numpy.concatenate((training_set,validation_set),axis=0))
+        training_set = normalize_data_set(training_set,a,v)
+        validation_set = normalize_data_set(validation_set,a,v)
+    
+    if True:
+        print numpy.shape(training_inputs[0])
+        (x,y)= numpy.shape(training_inputs[0])
+        training_inputs = cut_out_images_set(training_inputs,int(y*0.49),(int(x*0.1),int(y*0.4)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.49),(int(x*0.1),int(y*0.4)))
+        print numpy.shape(training_inputs[0])
+        (sizex,sizey) = numpy.shape(training_inputs[0])
+    
+    (sizex,sizey) = numpy.shape(training_inputs[0])
+    training_inputs = generate_raw_training_set(training_inputs)
+    validation_inputs = generate_raw_training_set(validation_inputs)
+    
+    return STC(training_inputs,training_set,validation_inputs,validation_set)
+
+def STC(inputs,activities,validation_inputs,validation_activities,display=False):
+    from scipy import linalg
+    
+    
+    (num_in,input_len) = numpy.shape(inputs)
+    (num_in,act_len) = numpy.shape(activities)
+    
+    
+    CC = numpy.zeros((input_len,input_len))
+    U  = numpy.zeros((input_len,input_len))
+    
+    for i in xrange(0,num_in):
+            CC += inputs[i].T * inputs[i] 
+
+    v,la = linalg.eig(CC)
+    
+    for i in xrange(0,input_len):
+        U[:,i] = la[:,i].T / numpy.sqrt(v[i])
+        
+    SW = numpy.matrix(inputs) * numpy.matrix(U) 
+    
+    act_len=1
+    C= []
+    for a in xrange(0,act_len):
+        C.append(numpy.zeros((input_len,input_len)))
+    
+    
+    for i in xrange(0,num_in):
+        for j in xrange(0,act_len):
+            C[j] += activities[i,j] * SW[i].T * SW[i] 
     
     
 
-a = [0.00137082653607, 0.00182895527071 ,0.00181135799599, 3.5435925749e-05, 0.000144160006719, 0.0, 0.0, 0.00348023934679, 6.70175838793e-05, 0.0,  0.00173714387885, 0.00193135633565, 0.00163630797405, 0.00112693256527,  0.000661424536234, 0.00149518433895, 0.000938723224875, 0.000332773373304, 0.0, 
- 5.09344999726e-05, 0.000445207246688, 0.000537446000901, 0.000321498724794,  0.00124250934254, 0.000596555360703, 0.000387619331503, 0.00308363126102, 0.0,  4.01028777578e-05, 0.000722014498786, 0.00059858695878, 0.000623078888309,
- 0.000589253722266, 0.000117033006803, 7.99327037411e-05, 0.000505943635116,  0.00073384726746, 0.000125638127049, 0.000945368572261, 0.000157851119455,  0.000440040571417, 0.000634590457135, 0.0, 0.00142820266303, 0.000381813630509,  0.00112394946212, 0.000119775687935, 0.00156286733292, 0.000383453260188, 0.0]    
- 
-b = [0.00158495856227, 0.00189444662222, 0.0042845273862, 0.00726005683942,  0.000569059636905, 0.000646680849723, 0.000616274678648, 0.0026784004417,  0.000340068282753, 0.000546634416145, 0.000101115615398, 0.00533203556333,
- 0.00561420184237, 0.00533827006435, 0.00104453174981, 5.67856943031e-05,  0.00516055255536, 0.000240989804192, 0.00055580555386, 0.00247618840826,  0.00184726706478, 0.00746338264186, 0.000117720478023, 0.00431847211535,
- 0.00112043189329, 0.00131410271541, 0.00585380678624, 0.000343936062333, 0.0,  0.00207228250331, 0.00391469363663, 0.00117520724467, 0.00157303643848,  0.00236908905905, 0.000454074442913, 0.000199520763817, 5.02972255083e-05,
- 0.000248199996884, 0.000789375089686, 0.000205646283823, 0.00614660872901,  0.00307593568997, 0.000202047035027, 0.00417401242882, 0.000439982164079,  0.00474204278519, 0.0, 0.00233668472186, 0.000413480025167, 0.000849441691989] 
+    for j in xrange(0,act_len):
+        C[j] = C[j] / num_in 
+
+    ei = []
+    for j in xrange(0,act_len):
+        vv,ei = linalg.eig(C[j])
+        print shape(ei)
+        print shape(vv)
+        ei=ei.T
+        for k in xrange(0,input_len):
+            ei[:,k] = ei[:,k] * v[k]
+        
+        ei*linalg.inv(U)
+        ei.append(ei,vv)
+    
+    return ei
