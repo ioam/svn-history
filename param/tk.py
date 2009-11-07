@@ -3539,12 +3539,12 @@ class StatusBar(T.Frame):
         self.msformat.append(self._err_fmt)
         self._display_message(text)
         self.bell()
-        # CEBALERT: would like to lock only the window with the error,
-        # not the whole app, but I don't know how to do that.
-        try:
-            self.grab_set()
-        except: # get tclerror if another app has grab
-            pass
+#        # CEBALERT: would like to lock only the window with the error,
+#        # not the whole app, but I don't know how to do that.
+#        try:
+#            self.grab_set()
+#        except: # get tclerror if another app has grab
+#            pass
 
     def clear_message(self):
         self.mpoint=-1
@@ -3552,10 +3552,10 @@ class StatusBar(T.Frame):
         self.messagelabel.config(text="")
         self._nrm_fmt()
         self._show_dynamicinfoframe()
-        try:
-            self.grab_release()
-        except:
-            pass
+#        try:
+#            self.grab_release()
+#        except:
+#            pass
         
     def clear_dynamicinfo(self):
         self.dynamicinfolabel.config(text="")
