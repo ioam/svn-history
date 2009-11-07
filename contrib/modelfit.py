@@ -1097,8 +1097,8 @@ def runRFinference():
     if True:
         print numpy.shape(training_inputs[0])
         (x,y)= numpy.shape(training_inputs[0])
-        training_inputs = cut_out_images_set(training_inputs,int(y*0.49),(int(x*0.1),int(y*0.4)))
-        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.49),(int(x*0.1),int(y*0.4)))
+        training_inputs = cut_out_images_set(training_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
         print numpy.shape(training_inputs[0])
         (sizex,sizey) = numpy.shape(training_inputs[0])
     
@@ -1392,8 +1392,8 @@ def runSTC():
     if True:
         print numpy.shape(training_inputs[0])
         (x,y)= numpy.shape(training_inputs[0])
-        training_inputs = cut_out_images_set(training_inputs,int(y*0.49),(int(x*0.1),int(y*0.4)))
-        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.49),(int(x*0.1),int(y*0.4)))
+        training_inputs = cut_out_images_set(training_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
         print numpy.shape(training_inputs[0])
         (sizex,sizey) = numpy.shape(training_inputs[0])
     
@@ -1401,9 +1401,25 @@ def runSTC():
     training_inputs = generate_raw_training_set(training_inputs)
     validation_inputs = generate_raw_training_set(validation_inputs)
     
-    return STC(training_inputs,training_set,validation_inputs,validation_set)
+    a = STC(training_inputs,training_set,validation_inputs,validation_set)
+    
+    pylab.plot(a[0][1],'ro')
+    
+    
+    pylab.figure()
+    for i in xrange(0,144):
+        pylab.subplot(12,12,i+1)
+        pylab.imshow(numpy.abs(a[0][0][:,i]).reshape(12,12),interpolation='nearest')
+        
+    pylab.figure()
+    for i in xrange(0,144):
+        pylab.subplot(12,12,i+1)
+        pylab.imshow(numpy.abs(a[0][0][i,:]).reshape(12,12),interpolation='nearest')
+         
+    pylab.show()
+    return a
 
-def STC(inputs,activities,validation_inputs,validation_activities,display=False):
+def STC(inputs,activities,validation_inputs,validation_activities,cutoff=35,display=False):
     from scipy import linalg
     
     
@@ -1416,39 +1432,43 @@ def STC(inputs,activities,validation_inputs,validation_activities,display=False)
     
     for i in xrange(0,num_in):
             CC += inputs[i].T * inputs[i] 
-
+    CC = CC / num_in
+    
     v,la = linalg.eig(CC)
     
+    
+    #ind = numpy.argsort(numpy.abs(v))
+    #for j in xrange(0,input_len*(100-cutoff)/100):
+    #    v[ind[j]]=1.0
+    
     for i in xrange(0,input_len):
-        U[:,i] = la[:,i].T / numpy.sqrt(v[i])
-        
-    SW = numpy.matrix(inputs) * numpy.matrix(U) 
+        U[:,i] = la[:,i] / numpy.sqrt(v[i])
+    U = numpy.matrix(U)
+    SW = numpy.matrix(inputs) * U 
     
     act_len=1
     C= []
     for a in xrange(0,act_len):
         C.append(numpy.zeros((input_len,input_len)))
-    
+   
     
     for i in xrange(0,num_in):
         for j in xrange(0,act_len):
             C[j] += activities[i,j] * SW[i].T * SW[i] 
     
-    
-
     for j in xrange(0,act_len):
-        C[j] = C[j] / num_in 
+        C[j] = C[j] / num_in
 
-    ei = []
+    eis = []
     for j in xrange(0,act_len):
         vv,ei = linalg.eig(C[j])
-        print shape(ei)
-        print shape(vv)
         ei=ei.T
         for k in xrange(0,input_len):
-            ei[:,k] = ei[:,k] * v[k]
+            ei[:,k] = ei[:,k] / numpy.sqrt(v[k])
         
-        ei*linalg.inv(U)
-        ei.append(ei,vv)
+        #print U
+        #ei*linalg.inv(U)
+        ei = ei*linalg.inv(la)
+        eis.append((ei,vv))
     
-    return ei
+    return eis
