@@ -282,6 +282,15 @@ class update_projectionactivity(ProjectionSheetMeasurementCommand):
                     topo.sim.debug("Skipping non-Projection "+conn.name)
                 else:
                     v = conn.get_projection_view(topo.sim.time())
+######################################################################
+## CEBALERT: when a TemplatePlot tp is created from a ProjectionView
+## pv, tp.plot_src_name comes ultimately from pv.projection.src.name,
+## but tp.plot_bounding_box comes from pv.projection.dest.bounds. So,
+## we get a plot with mismatched src_name and bounds. Fixing that here
+## is not the correct solution, but it allows the Projection Activity
+## GUI window to work.
+                    v.src_name = v.projection.dest.name
+######################################################################
                     key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
                     v.projection.dest.sheet_views[key] = v
 
