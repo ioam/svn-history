@@ -310,23 +310,41 @@ def save_script_repr(script_name=None):
     script_file.write(script)
 
 
+# decorator that changes to filepath.application_path for duration of fn
+def in_application_path(fn):
+    import os
+    def temporarily_change_to_application_path(*args,**kw):
+        orig_path = os.getcwd()
+        os.chdir(filepath.application_path)
+        try:
+            result = fn(*args,**kw)
+        finally:
+            # ensure dir put back even if there's an error calling fn
+            os.chdir(orig_path)
+        return result
+    return temporarily_change_to_application_path
 
+
+@in_application_path
+def _get_vc_type():
+    # return name of version control system (None if no vc could be
+    # detected)
+    import os.path
+    vc_types = ['git','bzr','svn']
+    for vc_type in vc_types:
+        if os.path.exists(".%s"%vc_type):
+            return vc_type
+
+@in_application_path
 def _print_vc_info(filename):
     """Save the version control status of the current code to the specified file."""
-
     try:
-        import os,subprocess
-        
-        orig_path=os.getcwd()
-        os.chdir(filepath.application_path)
+        import subprocess
         file = open(normalize_path(filename),'w')
         file.write("Differences from Topographica version %s:\n" % topo.version)
-        p=subprocess.Popen(["svn","diff"],stdout=file,stderr=subprocess.STDOUT)
-        os.chdir(orig_path)
-        
+        p=subprocess.Popen([_get_vc_type(),"diff"],stdout=file,stderr=subprocess.STDOUT)
     except:
         print "Unable to retrieve version control information."
-
 
 
 # Used only by default_analysis_function
