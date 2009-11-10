@@ -1112,7 +1112,7 @@ def runRFinference():
     
     #return
     
-    a = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,22,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
+    a = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,3000,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
     
     
     
@@ -1121,9 +1121,9 @@ def runRFinference():
         c = []
         b = []
         x = 0.2
-        for i in xrange(0,20):
+        for i in xrange(0,10):
             print i
-            x =  x*2
+            x = (i+3)*400  
             (e1,c1,RFs) = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,x,0.0,validation_inputs,validation_set,False,0.28)
             e.append(e1)
             c.append(c1)
@@ -1371,8 +1371,10 @@ def runSTC():
     dataset = (index,data)
     dataset = averageRangeFrames(dataset,0,1)
     dataset = averageRepetitions(dataset)
+    dataset = clump_low_responses(dataset,__main__.__dict__.get('ClumpMag',0.1))
     
-    (dataset,validation_data_set) = splitDataset(dataset,0.9)
+    
+    (dataset,validation_data_set) = splitDataset(dataset,0.99)
 
     training_set = generateTrainingSet(dataset)
     training_inputs=generateInputs(dataset,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
@@ -1392,8 +1394,8 @@ def runSTC():
     if True:
         print numpy.shape(training_inputs[0])
         (x,y)= numpy.shape(training_inputs[0])
-        training_inputs = cut_out_images_set(training_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
-        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
+        training_inputs = cut_out_images_set(training_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
         print numpy.shape(training_inputs[0])
         (sizex,sizey) = numpy.shape(training_inputs[0])
     
@@ -1402,73 +1404,85 @@ def runSTC():
     validation_inputs = generate_raw_training_set(validation_inputs)
     
     a = STC(training_inputs,training_set,validation_inputs,validation_set)
+
+    pylab.subplot(10,10,1)
+    j=0
     
-    pylab.plot(a[0][1],'ro')
+    m = []    
+    for (ei,vv) in a:
+        ind = numpy.argsort(numpy.abs(vv))
+        w = numpy.array(ei[ind[len(ind)-1],:].real)
+        m.append(numpy.max([-numpy.min(w),numpy.max(w)]))
     
-    
-    pylab.figure()
-    for i in xrange(0,144):
-        pylab.subplot(12,12,i+1)
-        pylab.imshow(numpy.abs(a[0][0][:,i]).reshape(12,12),interpolation='nearest')
+    m = numpy.max(m)
         
-    pylab.figure()
-    for i in xrange(0,144):
-        pylab.subplot(12,12,i+1)
-        pylab.imshow(numpy.abs(a[0][0][i,:]).reshape(12,12),interpolation='nearest')
-         
+    for (ei,vv) in a:
+        ind = numpy.argsort(numpy.abs(vv))
+        
+        pylab.subplot(10,10,j+1) 
+        w = numpy.array(ei[ind[len(ind)-1],:].real).reshape(20,20)
+        #m = numpy.max([-numpy.min(w),numpy.max(w)])
+        pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+        
+        pylab.subplot(10,10,j+2)
+        w = numpy.array(ei[ind[len(ind)-2],:].real).reshape(20,20)
+        #m = numpy.max([-numpy.min(w),numpy.max(w)])
+        pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+        j = j+2
+        
     pylab.show()
     return a
 
-def STC(inputs,activities,validation_inputs,validation_activities,cutoff=35,display=False):
+def STC(inputs,activities,validation_inputs,validation_activities,cutoff=95,display=False):
     from scipy import linalg
-    
+    print "input size:",numpy.shape(inputs)
     
     (num_in,input_len) = numpy.shape(inputs)
     (num_in,act_len) = numpy.shape(activities)
     
-    
-    CC = numpy.zeros((input_len,input_len))
-    U  = numpy.zeros((input_len,input_len))
-    
     for i in xrange(0,num_in):
-            CC += inputs[i].T * inputs[i] 
+        inputs[i]-=1.0
+    
+    CC = numpy.mat(numpy.zeros((input_len,input_len)))
+    U  = numpy.mat(numpy.zeros((input_len,input_len)))
+    N  = numpy.mat(numpy.zeros((input_len,input_len)))
+       
+    for i in xrange(0,num_in):
+            CC = CC + numpy.mat(inputs[i,:]).T * numpy.mat(inputs[i,:]) 
     CC = CC / num_in
     
     v,la = linalg.eig(CC)
-    
-    
-    #ind = numpy.argsort(numpy.abs(v))
-    #for j in xrange(0,input_len*(100-cutoff)/100):
-    #    v[ind[j]]=1.0
+    la = numpy.mat(la)
+    ind = numpy.argsort(numpy.abs(v))
+    for j in xrange(0,input_len*cutoff/100):
+        v[ind[j]]=1.0
     
     for i in xrange(0,input_len):
-        U[:,i] = la[:,i] / numpy.sqrt(v[i])
-    U = numpy.matrix(U)
-    SW = numpy.matrix(inputs) * U 
+        N[i,i] = 1/numpy.sqrt(v[i])
+        
+    U = la * N
+    SW = numpy.matrix(inputs) * U
     
-    act_len=1
+    act_len=50
     C= []
     for a in xrange(0,act_len):
         C.append(numpy.zeros((input_len,input_len)))
    
-    
     for i in xrange(0,num_in):
         for j in xrange(0,act_len):
-            C[j] += activities[i,j] * SW[i].T * SW[i] 
+            C[j] += (numpy.mat(SW[i,:]).T * numpy.mat(SW[i,:])) * activities[i,j] 
     
     for j in xrange(0,act_len):
         C[j] = C[j] / num_in
 
+    pylab.figure()
+    pylab.imshow(C[0])
+
     eis = []
     for j in xrange(0,act_len):
         vv,ei = linalg.eig(C[j])
-        ei=ei.T
-        for k in xrange(0,input_len):
-            ei[:,k] = ei[:,k] / numpy.sqrt(v[k])
-        
-        #print U
-        #ei*linalg.inv(U)
-        ei = ei*linalg.inv(la)
+        ei=numpy.mat(ei).T
+        ei = ei*N*linalg.inv(la)
         eis.append((ei,vv))
     
     return eis
