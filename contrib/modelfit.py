@@ -1097,8 +1097,8 @@ def runRFinference():
     if True:
         print numpy.shape(training_inputs[0])
         (x,y)= numpy.shape(training_inputs[0])
-        training_inputs = cut_out_images_set(training_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
-        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.4),(int(x*0.1),int(y*0.4)))
+        training_inputs = cut_out_images_set(training_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
         print numpy.shape(training_inputs[0])
         (sizex,sizey) = numpy.shape(training_inputs[0])
     
@@ -1112,7 +1112,7 @@ def runRFinference():
     
     #return
     
-    a = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,3000,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
+    a = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,2000,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
     
     
     
@@ -1123,7 +1123,7 @@ def runRFinference():
         x = 0.2
         for i in xrange(0,10):
             print i
-            x = (i+3)*400  
+            x = 1500 + i*100  
             (e1,c1,RFs) = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,x,0.0,validation_inputs,validation_set,False,0.28)
             e.append(e1)
             c.append(c1)
@@ -1420,13 +1420,13 @@ def runSTC():
         ind = numpy.argsort(numpy.abs(vv))
         
         pylab.subplot(10,10,j+1) 
-        w = numpy.array(ei[ind[len(ind)-1],:].real).reshape(20,20)
-        #m = numpy.max([-numpy.min(w),numpy.max(w)])
+        w = numpy.array(ei[ind[len(ind)-1],:].real).reshape(38,38)
+        m = numpy.max([-numpy.min(w),numpy.max(w)])
         pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
         
         pylab.subplot(10,10,j+2)
-        w = numpy.array(ei[ind[len(ind)-2],:].real).reshape(20,20)
-        #m = numpy.max([-numpy.min(w),numpy.max(w)])
+        w = numpy.array(ei[ind[len(ind)-2],:].real).reshape(38,38)
+        m = numpy.max([-numpy.min(w),numpy.max(w)])
         pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
         j = j+2
         
