@@ -326,14 +326,16 @@ def in_application_path(fn):
 
 
 @in_application_path
-def _get_vc_type():
+def _get_vc_commands():
     # return name of version control system (None if no vc could be
     # detected)
     import os.path
-    vc_types = ['git','bzr','svn']
-    for vc_type in vc_types:
+    vc_types = {'git':["status","diff"],
+                'svn':["info","status","diff"],
+                'bzr':['info','status','diff']}
+    for vc_type,commands in vc_types.items():
         if os.path.exists(".%s"%vc_type):
-            return vc_type
+            return vc_type,commands
 
 @in_application_path
 def _print_vc_info(filename):
@@ -343,9 +345,13 @@ def _print_vc_info(filename):
         file = open(normalize_path(filename),'w')
         file.write("Differences from Topographica version %s:\n" % topo.version)
         file.flush()
-        p=subprocess.Popen([_get_vc_type(),"diff"],stdout=file,stderr=subprocess.STDOUT)
+        vctype,commands = _get_vc_commands()
+        for c in commands:
+            p=subprocess.Popen([vctype,c],stdout=file,stderr=subprocess.STDOUT)
     except:
         print "Unable to retrieve version control information."
+    finally:
+        file.close()
 
 
 # Used only by default_analysis_function
