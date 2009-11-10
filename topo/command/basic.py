@@ -342,6 +342,7 @@ def _print_vc_info(filename):
         import subprocess
         file = open(normalize_path(filename),'w')
         file.write("Differences from Topographica version %s:\n" % topo.version)
+        file.flush()
         p=subprocess.Popen([_get_vc_type(),"diff"],stdout=file,stderr=subprocess.STDOUT)
     except:
         print "Unable to retrieve version control information."
