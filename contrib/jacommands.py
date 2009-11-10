@@ -281,12 +281,12 @@ def AddV2():
 #global parameter holding the activities
 activity_history = numpy.array([])
 def collect_activity_statistics():
-    topo.mycommands.activity_history = numpy.concatenate((topo.mycommands.activity_history, topo.sim["V1"].activity.flatten()), axis=1)
+    contrib.jacommands.activity_history = numpy.concatenate((contrib.jacommands.activity_history, topo.sim["V1"].activity.flatten()), axis=1)
 
-    if(topo.sim.time() == 5000): 
+    if(int(topo.sim.time()) == 10000): 
         pylab.figure()
-        pylab.hist(topo.mycommands.activity_history, (numpy.arange(20.0) / 20.0))
-        pylab.savefig("./Output/" + str(topo.sim.time()) + 'activity_histogram.png')
+        pylab.hist(contrib.jacommands.activity_history, (numpy.arange(20.0) / 20.0))
+        pylab.savefig(str(topo.sim.time()) + 'activity_histogram.png')
     #    measure_or_tuning_fullfield()
     #    cyclic_tuning_curve_batch(filename="OrientationTC:V1:[0,0]",sheet=topo.sim["V1"],coords=[(0,0)],x_axis="orientation")
         save_plotgroup('Activity')
@@ -459,19 +459,28 @@ def measure_histogram(iterations=1000, sheet_name="V1"):
     pylab.figure()
     pylab.subplot(111, yscale='log')
     #pylab.subplot(111)
-    mu = sum(concat_activities) / size(concat_activities)
-    (bins, a, b) = pylab.hist(concat_activities, (numpy.arange(40.0) / 40.0) * 2, visible=False)
-    bins_axis = numpy.arange(40.0) / 40.0 * 2
-    bins = bins * 1.0 / sum(bins)
-    exponential = numpy.arange(40, dtype='float32') / 40.0 * 2
-    # compute the mean of the actual distribution
+    print shape(concat_activities)
+    mu = sum(concat_activities) / len(concat_activities)
     print mu
+    (bins, a, b) = pylab.hist(concat_activities, (numpy.arange(40.0) / 40.0) , visible=True)
+    bins_axis = numpy.arange(39.0) / 40.0 +0.0125
+    bins = bins * 1.0 / sum(bins)
+    print sum(bins)
+    exponential = numpy.arange(39, dtype='float32') / 40.0 + 0.0125
+    # compute the mean of the actual distribution
+    #mu=0.024
+    pylab.figure()
+    pylab.subplot(111, yscale='log')
+    print len(bins_axis)
+    print len(bins)
+    print bins_axis
+    print bins
     exponential = numpy.exp(- (1 / mu) * exponential) / mu
-    pylab.plot(bins_axis, bins / 0.05)
-    pylab.plot(bins_axis, bins / 0.05, 'ro')
-    pylab.plot(bins_axis, exponential)
-    pylab.plot(bins_axis, exponential, 'go')
-    pylab.axis(ymin=0.000001, ymax=1)
+    pylab.plot(bins_axis, bins)
+    pylab.plot(bins_axis, bins, 'ro')
+    pylab.plot(bins_axis, exponential*0.025)
+    pylab.plot(bins_axis, exponential*0.025, 'go')
+    pylab.axis(ymin=0.0000000001, ymax=100)
     #pylab.axis("tight")
     pylab.show()
       
@@ -589,8 +598,8 @@ def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
 
 
 def AddGC(strength=__main__.__dict__.get('LatLGNStr',0.63)):
-    add_gc('LGNOn')
-    add_gc('LGNOff')
+    add_gc('LGNOn',0.5,strength)
+    add_gc('LGNOff',0.5,strength)
 
 
 
