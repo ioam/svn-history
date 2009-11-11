@@ -106,7 +106,23 @@ class surround_analysis():
         
         topo.command.pylabplots.measure_or_tuning(num_phase=4,num_orientation=12,size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.low_contrast}],display=True,coords=[(xcoor,ycoor)])
         topo.command.pylabplots.cyclic_tuning_curve.instance(x_axis="orientation",coords=[(xcoor,ycoor)])
+        
+        curve_name_ort = "Contrast = " + str(self.low_contrast) + "%";
+        
+        ar = []
+        ors = []
+        for o in self.sheet.curve_dict['orientation'][curve_name_ort].keys():
+            ar.append(self.sheet.curve_dict['orientation'][curve_name_ort][o].view()[0][xindex][yindex])
+            ors.append(o)
+            
+        peak_or_response = max(ar)
+        orr=ors[numpy.argmax(ar)]
+        
+        curve_data["ORTC"]["info"]={}
+        curve_data["ORTC"]["info"]["pref_or"]=orr
+        
         topo.command.pylabplots.measure_orientation_contrast(sizecenter=lc_curve["measures"]["peak_near_facilitation"],
+                                                             orientation_center=orr,
                                                              sizesurround=4.0,
                                                              size=0.0,
                                                              display=True,
@@ -126,27 +142,20 @@ class surround_analysis():
             
             cont_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr+(numpy.pi/2.0)].view()[0][xindex][yindex]
             
+            
             if pref_or_resp != 0:
                 curve_data[curve_label]["measures"]["or_suppression"]=(pref_or_resp-cont_or_resp)/pref_or_resp
             else: 
                 curve_data[curve_label]["measures"]["or_suppression"]=-10
         
-        curve_name_ort = "Contrast = " + str(self.low_contrast) + "%";
+        
         hc_curve_name_orc = "Contrastsurround = " + str(self.high_contrast) + "%";
         lc_curve_name_orc = "Contrastsurround = " + str(self.low_contrast) + "%";
         
-        
-        orr=numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
         hc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][hc_curve_name_orc][orr].view()[0][xindex][yindex]
         hc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][hc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
         lc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr].view()[0][xindex][yindex]
         lc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
-    
-        ar = []
-        for o in self.sheet.curve_dict['orientation'][curve_name_ort].keys():
-            ar.append(self.sheet.curve_dict['orientation'][curve_name_ort][o].view()[0][xindex][yindex])
-            
-        peak_or_response = max(ar)
 
         curve_data["ORTC"]={}
         curve_data["ORTC"]["data"]=self.sheet.curve_dict['orientation'][curve_name_ort]
@@ -230,8 +239,8 @@ class surround_analysis():
         f = fig.add_subplot(111, autoscale_on=True)
         pylab.title(self.sheet_name, fontsize=12)
         colors=['red','blue','green','purple','orange','black','yellow']
+        orientation = self.data_dict["ORTC"]["info"]["pref_or"]
         
-        orientation = numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
         print orientation
         measurment = self.data_dict[(xindex,yindex)]["OCT"]
         i = 0
@@ -259,7 +268,7 @@ class surround_analysis():
         pylab.title(self.sheet_name, fontsize=12)
         colors=['red','blue','green','purple','orange','black','yellow']
         
-        orientation = numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
+        orientation = self.data_dict["ORTC"]["info"]["pref_or"]
         
         measurment = self.data_dict[(xindex,yindex)]["OCT"]
         i = 0
