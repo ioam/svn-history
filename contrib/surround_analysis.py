@@ -286,7 +286,7 @@ class surround_analysis():
                 
             
             
-            x_values=x_values-orientation
+            x_values=numpy.array(x_values)-orientation
 
             for j in xrange(0,len(x_values)):
                 if x_values[j] > numpy.pi/2.0:
