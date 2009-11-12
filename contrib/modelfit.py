@@ -1421,7 +1421,8 @@ def runSTC():
     print numpy.min(numpy.min(training_set))
     
     a = STC(training_inputs,training_set,validation_inputs,validation_set)
-    return a
+    #return a
+    pylab.figure()
     pylab.subplot(10,10,1)
     j=0
     
@@ -1432,7 +1433,7 @@ def runSTC():
         m.append(numpy.max([-numpy.min(w),numpy.max(w)]))
     
     m = numpy.max(m)
-        
+    
     for (ei,vv) in a:
         ind = numpy.argsort(numpy.abs(vv))
         
@@ -1492,12 +1493,16 @@ def STC(inputs,activities,validation_inputs,validation_activities,cutoff=80,disp
     for i in xrange(0,num_in):
         F += abs(pylab.fftshift(pylab.fft2(SW[i,:].reshape(19,19))))
     
+    
+    
     pylab.figure()
     pylab.imshow(F.A)
     #pylab.show()
     #return
+    print "A"
+    print numpy.shape(SW)
     
-    act_len=50
+    act_len=5
     C= []
     for a in xrange(0,act_len):
         C.append(numpy.zeros((input_len,input_len)))
