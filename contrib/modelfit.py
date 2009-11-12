@@ -1112,7 +1112,7 @@ def runRFinference():
     
     #return
     
-    a = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,2000,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
+    a = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,2500,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
     
     
     
@@ -1123,7 +1123,7 @@ def runRFinference():
         x = 0.2
         for i in xrange(0,10):
             print i
-            x = 1500 + i*100  
+            x = 2500 + i*400  
             (e1,c1,RFs) = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,x,0.0,validation_inputs,validation_set,False,0.28)
             e.append(e1)
             c.append(c1)
@@ -1310,7 +1310,11 @@ def fitGabor(weights):
     
     for j in xrange(0,len(RFs)):
         minf = numpy.max([freqor[j][0]-2,0])
-        (x,b,c) = fmin_tnc(gab,[centers[j][0],centers[j][1],0.10,freqor[j][1],freqor[j][0],freqor[j][2],0.1],bounds=[(centers[j][0]*0.9,centers[j][0]*1.1),(centers[j][0]*0.9,centers[j][0]*1.1),(0.01,0.2),(0.0,numpy.pi),(minf,freqor[j][0]+2),(0.0,numpy.pi/2),(0.1,1.0)],args=[weights[j]], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0,0.5],maxCGit=1000, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
+        
+        xshift =
+        yshift = centers[j][0],centers[j][1]
+        
+        (x,b,c) = fmin_tnc(gab,[xshift,yshift,0.10,freqor[j][1],freqor[j][0],freqor[j][2],0.1],bounds=[(centers[j][0]*0.9,centers[j][0]*1.1),(centers[j][0]*0.8,centers[j][0]*1.2),(0.01,0.2),(0.0,numpy.pi),(minf,freqor[j][0]+2),(0.0,numpy.pi/2),(0.1,1.0)],args=[weights[j]], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0,0.5],maxCGit=1000, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
         parameters.append(x)
     
     pylab.figure()
@@ -1333,13 +1337,23 @@ def fitGabor(weights):
 def gab(z,w,display=False):
     from matplotlib.patches import Circle
     print z
-    (x,y,sigma,angle,f,p,alpha) = tuple(z)
+    (xshift,yshift,sigma,angle,f,p,alpha) = tuple(z)
     
     a = numpy.zeros(numpy.shape(w))
     (dx,dy) = numpy.shape(w)
-    den = numpy.max([dx,dy])
     
-    g =  Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=y-0.5,y=0.5-x,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)() * alpha
+    g = numpy.zeros((dx,dy))
+    
+    for x in xrange(0,dx):
+        for y in xrange(0,dy):
+            X = x*numpy.cos(angle) + y*numpy.sine(angle) 
+            Y = -x*numpy.sin(angle) + y*numpy.cos(angle)
+            
+            g[x,y] = numpy.exp(((X-xshift)* (X-xshift) + (Y-yshift)* (Y-yshift))/2*sigma) * numpy.cos(2*numpy.pi*(X-xshift)/f +p)
+        
+    
+
+    #g =  Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=y-0.5,y=0.5-x,xdensity=den,ydensity=den,size=sigma,orientation=angle,phase=p)() * alpha
     
     if display:
         pylab.subplot(2,1,1)
@@ -1373,7 +1387,7 @@ def runSTC():
     dataset = averageRepetitions(dataset)
     dataset = clump_low_responses(dataset,__main__.__dict__.get('ClumpMag',0.1))
     
-    
+        
     (dataset,validation_data_set) = splitDataset(dataset,0.99)
 
     training_set = generateTrainingSet(dataset)
@@ -1403,8 +1417,11 @@ def runSTC():
     training_inputs = generate_raw_training_set(training_inputs)
     validation_inputs = generate_raw_training_set(validation_inputs)
     
+    print training_set
+    print numpy.min(numpy.min(training_set))
+    
     a = STC(training_inputs,training_set,validation_inputs,validation_set)
-
+    return a
     pylab.subplot(10,10,1)
     j=0
     
@@ -1420,12 +1437,12 @@ def runSTC():
         ind = numpy.argsort(numpy.abs(vv))
         
         pylab.subplot(10,10,j+1) 
-        w = numpy.array(ei[ind[len(ind)-1],:].real).reshape(38,38)
+        w = numpy.array(ei[ind[len(ind)-1],:].real).reshape(19,19)
         m = numpy.max([-numpy.min(w),numpy.max(w)])
         pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
         
         pylab.subplot(10,10,j+2)
-        w = numpy.array(ei[ind[len(ind)-2],:].real).reshape(38,38)
+        w = numpy.array(ei[ind[len(ind)-2],:].real).reshape(19,19)
         m = numpy.max([-numpy.min(w),numpy.max(w)])
         pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
         j = j+2
@@ -1433,7 +1450,7 @@ def runSTC():
     pylab.show()
     return a
 
-def STC(inputs,activities,validation_inputs,validation_activities,cutoff=95,display=False):
+def STC(inputs,activities,validation_inputs,validation_activities,cutoff=80,display=False):
     from scipy import linalg
     print "input size:",numpy.shape(inputs)
     
@@ -1454,14 +1471,31 @@ def STC(inputs,activities,validation_inputs,validation_activities,cutoff=95,disp
     v,la = linalg.eig(CC)
     la = numpy.mat(la)
     ind = numpy.argsort(numpy.abs(v))
-    for j in xrange(0,input_len*cutoff/100):
-        v[ind[j]]=1.0
+    for j in xrange(0,int(input_len*(cutoff/100.0))):
+        v[ind[j]]=0.0
     
     for i in xrange(0,input_len):
         N[i,i] = 1/numpy.sqrt(v[i])
         
     U = la * N
     SW = numpy.matrix(inputs) * U
+    
+    F = numpy.mat(numpy.zeros((19,19)))
+    for i in xrange(0,num_in):
+        F += abs(pylab.fftshift(pylab.fft2(inputs[i,:].reshape(19,19))))
+    
+    pylab.figure()
+    pylab.imshow(F.A)
+    
+
+    F = numpy.mat(numpy.zeros((19,19)))
+    for i in xrange(0,num_in):
+        F += abs(pylab.fftshift(pylab.fft2(SW[i,:].reshape(19,19))))
+    
+    pylab.figure()
+    pylab.imshow(F.A)
+    #pylab.show()
+    #return
     
     act_len=50
     C= []
