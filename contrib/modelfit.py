@@ -1311,8 +1311,8 @@ def fitGabor(weights):
     for j in xrange(0,len(RFs)):
         minf = numpy.max([freqor[j][0]-2,0])
         
-        xshift =
-        yshift = centers[j][0],centers[j][1]
+        #xshift =
+       #yshift = centers[j][0],centers[j][1]
         
         (x,b,c) = fmin_tnc(gab,[xshift,yshift,0.10,freqor[j][1],freqor[j][0],freqor[j][2],0.1],bounds=[(centers[j][0]*0.9,centers[j][0]*1.1),(centers[j][0]*0.8,centers[j][0]*1.2),(0.01,0.2),(0.0,numpy.pi),(minf,freqor[j][0]+2),(0.0,numpy.pi/2),(0.1,1.0)],args=[weights[j]], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0,0.5],maxCGit=1000, ftol=0.0000000001,approx_grad=True,maxfun=100000,eta=0.01)
         parameters.append(x)
