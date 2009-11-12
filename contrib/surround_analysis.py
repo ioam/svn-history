@@ -118,6 +118,7 @@ class surround_analysis():
         peak_or_response = max(ar)
         orr=ors[numpy.argmax(ar)]
         
+        curve_data["ORTC"]={}
         curve_data["ORTC"]["info"]={}
         curve_data["ORTC"]["info"]["pref_or"]=orr
         
@@ -157,7 +158,7 @@ class surround_analysis():
         lc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr].view()[0][xindex][yindex]
         lc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
 
-        curve_data["ORTC"]={}
+        
         curve_data["ORTC"]["data"]=self.sheet.curve_dict['orientation'][curve_name_ort]
         curve_data["ORTC"]["measures"]={}
         curve_data["ORTC"]["measures"]["colinear_hc_suppresion_index"] = (peak_or_response - hc_pref_or_resp) / peak_or_response 
