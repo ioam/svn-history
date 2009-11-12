@@ -290,6 +290,9 @@ class update_projectionactivity(ProjectionSheetMeasurementCommand):
 ## is not the correct solution, but it allows the Projection Activity
 ## GUI window to work.
                     v.src_name = v.projection.dest.name
+## JABALERT: Similarly, probably not the right thing to do, but makes
+## the name of the src available for the plot to be labelled.
+                    v.proj_src_name = v.projection.src.name
 ######################################################################
                     key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
                     v.projection.dest.sheet_views[key] = v

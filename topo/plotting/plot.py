@@ -258,7 +258,9 @@ class TemplatePlot(Plot):
                  self.plot_src_name = sv.src_name
                  self.precedence = sv.precedence
                  self.row_precedence = sv.row_precedence
-        
+                 if hasattr(sv,'proj_src_name'):
+                      self.proj_src_name=sv.proj_src_name
+
 
     ### JCALERT: This could be inserted in the code of get_matrix
     def _get_shape_and_box(self):

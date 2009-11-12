@@ -761,8 +761,10 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
 
     def _generate_labels(self):
-        return ["%s\n(from %s)"%(plot.name,plot.plot_src_name) 
-                for plot in self.plots]
+        return ["%s%s"%(plot.name,
+                        (("\n(from %s)" % plot.proj_src_name)
+                         if hasattr(plot,"proj_src_name") else ""))
+                 for plot in self.plots]
 
 
     ##############################

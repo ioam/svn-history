@@ -869,6 +869,7 @@ class CFSheet(ProjectionSheet):
                 v = p.get_view(x,y,self.simulation.time())
                 src = v.projection.src
                 key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
+                v.proj_src_name = v.projection.src.name
                 src.sheet_views[key] = v
 
 
