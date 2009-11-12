@@ -9,6 +9,7 @@ import unittest
 import os
 import tempfile
 import shutil
+import glob
 
 from topo.base.simulation import Simulation
 from topo.base.cf import CFSheet, CFProjection
@@ -30,7 +31,10 @@ exec "from topo.command.analysis import *" in __main__.__dict__
 class TestPlotGroupSaverBase(unittest.TestCase):
 
     def exists(self,name):
-        self.assert_(os.path.exists(os.path.join(topo.misc.filepath.output_path,name)))
+        target = os.path.join(topo.misc.filepath.output_path,name)
+        files = glob.glob(os.path.join(topo.misc.filepath.output_path,"*"))
+        self.assert_(os.path.exists(target),
+                     "'%s' not among '%s'"%(target,files))
 
     def setUp(self):
         self.original_output_path = topo.misc.filepath.output_path
