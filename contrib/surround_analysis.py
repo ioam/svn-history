@@ -240,7 +240,7 @@ class surround_analysis():
         f = fig.add_subplot(111, autoscale_on=True)
         pylab.title(self.sheet_name, fontsize=12)
         colors=['red','blue','green','purple','orange','black','yellow']
-        orientation = self.data_dict[(xindex,yindex)]["ORTC"]["info"]["pref_or"]
+        orientation = self.data_dict[(xindex,yindex)]["OCT"]["ORTC"]["info"]["pref_or"]
         
         print orientation
         measurment = self.data_dict[(xindex,yindex)]["OCT"]
@@ -269,7 +269,7 @@ class surround_analysis():
         pylab.title(self.sheet_name, fontsize=12)
         colors=['red','blue','green','purple','orange','black','yellow']
         
-        orientation = self.data_dict[(xindex,yindex)]["ORTC"]["info"]["pref_or"]
+        orientation = self.data_dict[(xindex,yindex)]["OCT"]["ORTC"]["info"]["pref_or"]
         
         measurment = self.data_dict[(xindex,yindex)]["OCT"]
         i = 0
