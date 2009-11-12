@@ -34,7 +34,8 @@ class TestPlotGroupSaverBase(unittest.TestCase):
         target = os.path.join(topo.misc.filepath.output_path,name)
         files = glob.glob(os.path.join(topo.misc.filepath.output_path,"*"))
         self.assert_(os.path.exists(target),
-                     "'%s' not among '%s'"%(target,files))
+                     "'%s' not among '%s'"%(os.path.basename(target),
+                                            [os.path.basename(f) for f in files]))
 
     def setUp(self):
         self.original_output_path = topo.misc.filepath.output_path
