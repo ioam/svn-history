@@ -575,14 +575,13 @@ def _divide_with_constant(x, y):
     return numpy.divide(x, y + 0.11)
 
 def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
-#def add_gc(sheet_name, surround_gaussian_size=0.3, strength=0.15):
     """
     Add divisive normalization to topo.sim[sheet_name], providing
     contrast gain control and contrast-invariant tuning.  Should
     be used with an LGN sheet of type LISSOM, so that it will
     respect the tsettle and strict_tsettle parameters.
     """
-    
+    print surround_gaussian_size
     lgn_surroundg = Gaussian(size=surround_gaussian_size,
                              aspect_ratio=1.0,
                              output_fns=[DivisiveNormalizeL1()])
@@ -591,15 +590,15 @@ def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
                      dest_port=('Activity'), activity_group=(0.6, _divide_with_constant),
                      connection_type=SharedWeightCFProjection,
                      strength=strength, weights_generator=lgn_surroundg,
-                     nominal_bounds_template=BoundingBox(radius=0.5))
+                     nominal_bounds_template=BoundingBox(radius=surround_gaussian_size))
                          
     topo.sim[sheet_name].tsettle = 2
     topo.sim[sheet_name].strict_tsettle = 1
 
 
-def AddGC(strength=__main__.__dict__.get('LatLGNStr',0.63)):
-    add_gc('LGNOn',0.5,strength)
-    add_gc('LGNOff',0.5,strength)
+def AddGC(surround_gaussian_size=__main__.__dict__.get('SurrSize',0.5), strength=__main__.__dict__.get('LatLGNStr',1.0)):
+    add_gc('LGNOn',surround_gaussian_size,strength)
+    add_gc('LGNOff',surround_gaussian_size,strength)
 
 
 
