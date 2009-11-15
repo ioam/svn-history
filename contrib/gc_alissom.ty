@@ -152,7 +152,7 @@ if locals().get('Adaptation',"Relative") == 'Relative':
 elif locals().get('Adaptation',"Relative") == 'Absolute':
     HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.0185),t_init=0.0,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
 elif locals().get('Adaptation',"Relative") == 'Fixed':
-    HE=HalfRectify(t_init=0.0,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
+    HE=HalfRectify(t_init=locals().get('ti',0.0),randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
     Attrib_Tracker=IdentityTF()
     V1_Tracker=IdentityTF()    
 else: 
@@ -187,7 +187,11 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 # DoG weights for the LGN
 centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
 surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
-    
+
+#centerg   = Gaussian(size=0.1,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
+#surroundg = Gaussian(size=0.3,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
+
+
 on_weights = topo.pattern.basic.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
 
@@ -260,17 +264,17 @@ topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','J
                  strength=locals().get('aff_str',0.75),name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
-         learning_rate=locals().get('aff_lr',0.1))
+                 learning_rate=locals().get('aff_lr',0.1))
                      
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
-         connection_type=CFProjection,
+                 connection_type=CFProjection,
                  learning_fn=CFPLF_Scaled_opt(),
                  strength=locals().get('aff_str',0.75),name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=locals().get('V1_aff_BB',0.27083)),
-         learning_rate=locals().get('aff_lr',0.1))
+                 learning_rate=locals().get('aff_lr',0.1))
 
-# BACHAAAAAAAAAAAAAAAAAAAAAAAAA
+
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=CFProjection,
                  strength=1.0*locals().get('exc_strength',2.0),
@@ -281,7 +285,8 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  connection_type=CFProjection,
                  strength=-1.0*locals().get('inh_strength',1.6),
                  #inh_strength should be increased for more distributed datasets i.e. when the frequency parameter is higher
-                 weights_generator=gauss_rand(size=0.15), #!!! put 2* back
+                 #weights_generator=gauss_rand(size=2*0.22917), 
+                 weights_generator=gauss_rand(size=0.15),
                  nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_inh_lr',0.3))
 
 
