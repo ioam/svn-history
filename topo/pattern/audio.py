@@ -122,17 +122,17 @@ class Audio(OneDPowerSpectrum):
         """
         Read the audio file into an array.
         """
-        self._source = pyaudiolab.sndfile(params.get('filename',self.filename),'read')
-        n_frames = self._source.get_nframes()        
-        sig =  self._source.read_frames(n_frames,dtype=numpy.float32)
-        spacing = 1.0/self._source.get_samplerate()
+        self._source = pyaudiolab.Sndfile(params.get('filename',self.filename),'r')
+        sig =  self._source.read_frames(self._source.nframes,dtype=numpy.float32)
+        spacing = 1.0/self._source.samplerate
 
         super(Audio,self).__init__(signal=sig,sample_spacing=spacing,**params)
                 
 
 
 if __name__=="__main__" or __name__=="__mynamespace__":
-    print "testing topo.pattern.audio"
+    print "testing topo.pattern.audio..."
     a = Audio()
     out = a()
+    print "...finished."
 
