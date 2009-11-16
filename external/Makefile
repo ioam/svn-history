@@ -30,9 +30,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean svn2cl-clean readline-clean termcap-clean guppy-clean pyopenssl-clean foolscap-clean zope_interface-clean twisted-clean mpi4py-clean openmpi-clean pyflakes-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean svn2cl-clean readline-clean termcap-clean guppy-clean pyopenssl-clean foolscap-clean zope_interface-clean twisted-clean mpi4py-clean openmpi-clean pyflakes-clean setuptools-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall pyopenssl-uninstall foolscap-uninstall zope_interface-uninstall twisted-uninstall mpi4py-uninstall openmpi-uninstall pyflakes-clean
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall pyopenssl-uninstall foolscap-uninstall zope_interface-uninstall twisted-uninstall mpi4py-uninstall openmpi-uninstall pyflakes-clean setuptools-clean
 
 
 
@@ -496,7 +496,7 @@ gnosis-uninstall:
 ##############################################################
 # libsndfile (used by pyaudiolab)
 #
-LIBSNDFILE = libsndfile-1.0.17
+LIBSNDFILE = libsndfile-1.0.20
 
 LIBSNDFILE_UNINSTALL += bin/sndfile-* 
 LIBSNDFILE_UNINSTALL += lib/libsndfile.*
@@ -514,16 +514,33 @@ libsndfile-uninstall:
 	rm -rf libsndfile ${foreach f,${LIBSNDFILE_UNINSTALL}, ${PREFIX}/${f}}
 
 
+##############################################################
+# setuptools (required by audiolab)
+#
+SETUPTOOLS = setuptools-0.6c11
+SETUPTOOLS_UNINSTALL = ${PYTHON_LIB}/site-packages/setuptools*
+
+setuptools: ${SETUPTOOLS}.tar.gz python
+	tar -xzf ${SETUPTOOLS}.tar.gz
+	cd ${SETUPTOOLS}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	touch setuptools
+
+setuptools-clean:
+	rm -rf ${SETUPTOOLS} 
+setuptools-uninstall:
+	rm -rf setuptools ${SETUPTOOLS} $(foreach f, ${SETUPTOOLS_UNINSTALL}, ${PREFIX}/${f})
+
 
 ##############################################################
 # pyaudiolab (sound file reading)
 #
-PYAUDIOLAB = pyaudiolab-0.6.6
-PYAUDIOLAB_UNINSTALL =  ${PYTHON_LIB}/site-packages/pyaudiolab
+# optionally sudo apt-get install libasound2-dev
+PYAUDIOLAB = scikits.audiolab-0.10.2
+PYAUDIOLAB_UNINSTALL = ${PYTHON_LIB}/scikits.audiolab*egg
 
-pyaudiolab: ${PYAUDIOLAB}.tar.gz python libsndfile 
+pyaudiolab: ${PYAUDIOLAB}.tar.gz python libsndfile setuptools 
 	tar -xzf ${PYAUDIOLAB}.tar.gz
-	cd ${PYAUDIOLAB}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PYAUDIOLAB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
 	touch pyaudiolab
 
 pyaudiolab-clean:

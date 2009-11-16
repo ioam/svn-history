@@ -11,7 +11,7 @@ import numpy
 # CEBALERT: you need to build pyaudiolab to use this file.
 # (Not tested it on Windows or OS X.)
 try:
-    import pyaudiolab
+    import scikits.audiolab as pyaudiolab
 except ImportError:
     print "Warning: pyaudiolab must be built to use audio.py"
 
@@ -108,7 +108,7 @@ class Audio(OneDPowerSpectrum):
     # there's no signal in it for the first hundred or so frames).
     # Use a wav file.
     filename = Filename(
-        default='lib/python2.4/site-packages/pyaudiolab/test_data/test.flac',
+        default='test.wav',
         precedence=0.9,doc=
         """
         File path (can be relative to Topographica's base path) to an audio file.
@@ -130,4 +130,9 @@ class Audio(OneDPowerSpectrum):
         super(Audio,self).__init__(signal=sig,sample_spacing=spacing,**params)
                 
 
+
+if __name__=="__main__" or __name__=="__mynamespace__":
+    print "testing topo.pattern.audio"
+    a = Audio()
+    out = a()
 
