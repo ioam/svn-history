@@ -22,14 +22,7 @@ else
 	TIMER = time 
 endif
 
-
-have_xvfb := $(wildcard /usr/bin/xvfb-run) 
-ifeq ($(strip $(have_xvfb)),) 
-	XVFB = @echo "Warning: no xvfb-run found; any GUI components that are run will display windows\n";
-else 
-	XVFB = /usr/bin/xvfb-run -a
-endif 
-
+XVFB = ${shell which xvfb-run}
 
 # Commands needed to build a public distribution
 
