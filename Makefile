@@ -23,6 +23,9 @@ else
 endif
 
 XVFB = ${shell which xvfb-run}
+ifeq ("${XVFB}","")
+	XVFB = @echo "Warning: xvfb-run not found; any GUI components that are run will display windows";
+endif
 
 # Commands needed to build a public distribution
 
