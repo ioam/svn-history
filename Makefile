@@ -24,7 +24,9 @@ endif
 
 XVFB = ${shell which xvfb-run}
 ifeq ("${XVFB}","")
-	XVFB = @echo "Warning: xvfb-run not found; any GUI components that are run will display windows";
+	XVFBRUN = @echo "Warning: xvfb-run not found; any GUI components that are run will display windows";
+else
+	XVFBRUN = ${XVFB} -a
 endif
 
 # Commands needed to build a public distribution
@@ -117,7 +119,7 @@ FORCE:
 # To get more information about which tests are being run, do:
 # make TEST_VERBOSITY=2 tests
 tests: FORCE
-	${XVFB} ./topographica -c "import topo.tests; t=topo.tests.run(verbosity=${TEST_VERBOSITY}); import sys; sys.exit(len(t.failures+t.errors))"
+	${XVFBRUN} ./topographica -c "import topo.tests; t=topo.tests.run(verbosity=${TEST_VERBOSITY}); import sys; sys.exit(len(t.failures+t.errors))"
 
 examples: FORCE
 	make -C examples
@@ -296,10 +298,10 @@ script-repr-tests:
 gui-tests: basic-gui-tests detailed-gui-tests
 
 basic-gui-tests:
-	${XVFB} ./topographica -g -c "from topo.tests.gui_tests import run_basic; nerr=run_basic(); topo.guimain.quit_topographica(check=False,exit_status=nerr)"
+	${XVFBRUN} ./topographica -g -c "from topo.tests.gui_tests import run_basic; nerr=run_basic(); topo.guimain.quit_topographica(check=False,exit_status=nerr)"
 
 detailed-gui-tests:
-	${XVFB} ./topographica -g -c "from topo.tests.gui_tests import run_detailed; nerr=run_detailed(); topo.guimain.quit_topographica(check=False,exit_status=nerr)"
+	${XVFBRUN} ./topographica -g -c "from topo.tests.gui_tests import run_detailed; nerr=run_detailed(); topo.guimain.quit_topographica(check=False,exit_status=nerr)"
 
 
 clean-compiled: clean-weave clean-pyc
