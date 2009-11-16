@@ -537,7 +537,7 @@ setuptools-uninstall:
 # optionally sudo apt-get install libasound2-dev
 # (or for Mac, get the CoreAudio framework from Apple)
 PYAUDIOLAB = scikits.audiolab-0.10.2
-PYAUDIOLAB_UNINSTALL = ${PYTHON_LIB}/scikits.audiolab*egg
+PYAUDIOLAB_UNINSTALL = ${PYTHON_LIB}/site-packages/scikits.audiolab*egg
 
 pyaudiolab: ${PYAUDIOLAB}.tar.gz python libsndfile setuptools 
 	tar -xzf ${PYAUDIOLAB}.tar.gz

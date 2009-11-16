@@ -146,7 +146,13 @@ if gmpy.__file__ is None:
 # CEBALERT: we need to rename these/reorganize the tests
 __all__.remove('test_script')
 __all__.remove('test_map_measurement')   
-                                
+
+try:
+    import scikits.audiolab
+except ImportError:
+    import param
+    param.Parameterized().message("no scikits.audiolab: testaudio.py skipped")
+    __all__.remove('testaudio')
 
 __all__.sort()
 

@@ -7,22 +7,15 @@ $Id$
 __version__='$Revision$'
 
 import numpy
+import param
 
-# CEBALERT: you need to build pyaudiolab to use this file.
-# (Not tested it on Windows or OS X.)
 try:
     import scikits.audiolab as pyaudiolab
 except ImportError:
-    print "Warning: pyaudiolab must be built to use audio.py"
-
-import param
+    param.Parameterized().warning("scikits.audiolab (pyaudiolab) must be available to use audio.py")
 
 from topo.misc.filepath import Filename
-
 from topo.pattern.basic import PatternGenerator
-
-
-
 
 
 # CEBALERT: should be in pattern.basic, but then it would appear in
@@ -104,11 +97,8 @@ class Audio(OneDPowerSpectrum):
     """
     ** Untested: currently being written. ** 
     """
-    # CB: find an example sound (I haven't listened to this one;
-    # there's no signal in it for the first hundred or so frames).
-    # Use a wav file.
     filename = Filename(
-        default='test.wav',
+        default='sounds/test.wav',
         precedence=0.9,doc=
         """
         File path (can be relative to Topographica's base path) to an audio file.
@@ -122,17 +112,16 @@ class Audio(OneDPowerSpectrum):
         """
         Read the audio file into an array.
         """
-        self._source = pyaudiolab.Sndfile(params.get('filename',self.filename),'r')
+        # CEBALERT: need to clean up when the superclass can be called
+        if 'filename' in params:
+            filename = params['filename']
+        else:
+            filename = self.filename
+
+        self._source = pyaudiolab.Sndfile(filename,'r')
         sig =  self._source.read_frames(self._source.nframes,dtype=numpy.float32)
         spacing = 1.0/self._source.samplerate
 
         super(Audio,self).__init__(signal=sig,sample_spacing=spacing,**params)
                 
-
-
-if __name__=="__main__" or __name__=="__mynamespace__":
-    print "testing topo.pattern.audio..."
-    a = Audio()
-    out = a()
-    print "...finished."
 
