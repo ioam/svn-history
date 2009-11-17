@@ -364,6 +364,21 @@ def _print_vc_info(filename):
     finally:
         file.close()
 
+@in_application_path
+def _save_parameters(filename):
+    from topo.misc.commandline import global_params
+    g = {'global_params_specified':dict(global_params.get_param_values(onlychanged=True)),
+         'global_params_all':dict(global_params.get_param_values())}
+
+    # CEBALERT: global_params should do something about these.
+    for d in g.values():
+        if 'name' in d:
+            del d['name']
+        if 'print_level' in d:
+            del d['print_level']
+
+    pickle.dump(g,open(normalize_path(filename),'w'))
+     
 
 # Used only by default_analysis_function
 # Should be in order they are needed; e.g. Activity after map measurement,
@@ -481,7 +496,12 @@ class run_batch(ParameterizedFunction):
         documentation for codes.
         
         E.g. Adding '%S' to the default would include seconds.""")
-                                       
+
+    save_global_params = param.Boolean(default=True,doc="""
+        Whether to save the script's global_parameters to a pickle in
+        the output_directory after the script has been loaded (for
+        e.g. future inspection of the experiment).""")
+
 
     def _truncate(self,p,s):
         """
@@ -587,6 +607,8 @@ class run_batch(ParameterizedFunction):
         try:
             execfile(script_file,__main__.__dict__) #global_params.context
             global_params.check_for_unused_names()
+            if p.save_global_params:
+                _save_parameters(simname+".global_params.pickle")
             print_sizes()
             topo.sim.name=simname
     
