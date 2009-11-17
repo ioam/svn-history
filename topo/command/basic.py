@@ -330,7 +330,7 @@ def _get_vc_commands():
     # return name of version control system (None if no vc could be
     # detected)
     import os.path
-    vc_types = {'git':["status","diff"],
+    vc_types = {'git':["status","diff",["log","-n1"],["svn","log","--limit=1"]],
                 'svn':["info","status","diff"],
                 'bzr':['info','status','diff']}
     for vc_type,commands in vc_types.items():
@@ -343,11 +343,22 @@ def _print_vc_info(filename):
     try:
         import subprocess
         file = open(normalize_path(filename),'w')
-        file.write("Differences from Topographica version %s:\n" % topo.version)
+        file.write("Information about working copy used for batch run\n\n")
+        file.write("topo.version=%s\n"% topo.version)
         file.flush()
         vctype,commands = _get_vc_commands()
-        for c in commands:
-            p=subprocess.Popen([vctype,c],stdout=file,stderr=subprocess.STDOUT)
+        for cmd in commands:
+            fullcmd = [vctype,cmd] if isinstance(cmd,str) else [vctype]+cmd
+        
+            # Note that we do not wait for the process below to finish
+            # (by calling e.g. wait() on the Popen object). Although
+            # this was probably done unintentionally, for a slow svn
+            # connection, it's an advantage. But it does mean the
+            # output of each command can appear in the file at any
+            # time (i.e. the command outputs appear in the order of
+            # finishing, rather than in the order of starting, making
+            # it impossible to label the commands).
+            subprocess.Popen(fullcmd,stdout=file,stderr=subprocess.STDOUT)
     except:
         print "Unable to retrieve version control information."
     finally:
