@@ -8,7 +8,7 @@ import cPickle as pickle
 
 from xml.parsers.expat import ExpatError
 
-import os,sys,re,string,time
+import os,sys,re,string,time,platform
 
 import __main__
 
@@ -528,6 +528,7 @@ class run_batch(ParameterizedFunction):
         if p['vc_info']:
             _print_vc_info(simname+".diffs")
     
+        hostinfo = "Host: " + " ".join(platform.uname())
         starttime=time.time()
         startnote = "Batch run started at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
                                                                time.gmtime())
@@ -540,6 +541,7 @@ class run_batch(ParameterizedFunction):
         sys.stdout = MultiFile(batch_output,sys.stdout)
     
         print startnote
+        print hostinfo
     
         from topo.misc.commandline import auto_import_commands
         auto_import_commands()
