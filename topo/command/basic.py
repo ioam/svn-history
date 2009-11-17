@@ -529,6 +529,10 @@ class run_batch(ParameterizedFunction):
             _print_vc_info(simname+".diffs")
     
         hostinfo = "Host: " + " ".join(platform.uname())
+        topographicalocation = "Topographica: " + os.path.abspath(sys.argv[0])
+        topolocation = "topo package: " + os.path.abspath(topo.__file__)
+        scriptlocation = "script: " + os.path.abspath(script_file)
+
         starttime=time.time()
         startnote = "Batch run started at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
                                                                time.gmtime())
@@ -540,8 +544,13 @@ class run_batch(ParameterizedFunction):
         batch_output.write(command_used_to_start+"\n")
         sys.stdout = MultiFile(batch_output,sys.stdout)
     
-        print startnote
+        print
         print hostinfo
+        print topographicalocation
+        print topolocation
+        print scriptlocation
+        print
+        print startnote
     
         from topo.misc.commandline import auto_import_commands
         auto_import_commands()
