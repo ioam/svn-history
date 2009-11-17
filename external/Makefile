@@ -965,7 +965,7 @@ guppy-uninstall:
 
 #############################################################
 # OpenMPI
-OPENMPI = openmpi-1.3.3
+OPENMPI = openmpi-1.3.2
 
 # CEBALERT: uninstall info not complete!
 OPENMPI_UNINSTALL += lib/libmpi*

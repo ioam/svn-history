@@ -1,4 +1,4 @@
-"""
+ """
 Example of a LISSOM-based orientation map (with ON/OFF channels).
 
 Intended to be a close (but approximate) match to the orientation map
@@ -75,7 +75,7 @@ p.add(
 ### Specify weight initialization, response function, and learning function
 projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
-projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
+projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
 projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()]
 projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()

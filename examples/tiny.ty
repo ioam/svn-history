@@ -66,7 +66,7 @@ class SampleHebbian(LearningFn):
 # Input pattern
 gaussian_generator = pattern.Gaussian(
     x=numbergen.UniformRandom(lbound=-0.8,ubound=0.8,seed=12),
-    y=numbergen.UniformRandom(lbound=-0.8,ubound=0.8,seed=34),
+    y=numbergen.UniformRandom(lbound=-0.8,ubound=0.8,seed=34),  
     orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),
     size = 2*0.3*1.5/7.0,
     aspect_ratio = 7.0/1.5,
@@ -86,7 +86,7 @@ topo.sim.connect(
     connection_type=projection.CFProjection, 
     weights_generator=pattern.random.UniformRandom(),
     nominal_bounds_template=sheet.BoundingBox(radius=0.2),
-    response_fn=responsefn.optimized.CFPRF_DotProduct_opt(),
+    response_fn=responsefn.optimized.CFPRF_DotProduct(),
     learning_fn=learningfn.projfn.CFPLF_Plugin(single_cf_fn=SampleHebbian(sample_param=0.5)),
     weights_output_fns=[transferfn.projfn.CFPOF_Plugin(single_cf_fn=transferfn.DivisiveNormalizeL1())],
     learning_rate=200.0)
