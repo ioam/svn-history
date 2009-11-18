@@ -942,7 +942,9 @@ class TkParameterizedBase(Parameterized):
             if hasattr(extraPO,name):
                 return getattr(extraPO,name) # HIDDEN!
 
-            raise AttributeError(self._attr_err_msg(name,[self,extraPO]))
+            _attr_err_msg = object.__getattribute__(self,'_attr_err_msg')
+                
+            raise AttributeError(_attr_err_msg(name,[self,extraPO]))
                     
 
     def __setattr__(self,name,val):
@@ -1039,10 +1041,10 @@ class TkParameterizedBase(Parameterized):
         """
         if not hasattr(objects,'__len__'):objects=[objects]
 
-        error_string = "'%s' not in %s"%(attr_name,str(objects.pop(0)))
+        error_string = "'%s' not in %s"%(attr_name,objects.pop(0))
 
         for o in objects:
-            error_string+=" or %s"%str(o)
+            error_string+=" or %s"%o
             
         return error_string
 
@@ -3579,10 +3581,8 @@ class AppWindow(ScrolledWindow):
     window_icon_path = None
 
     def __init__(self,parent,status=False,**config):
-
         ScrolledWindow.__init__(self,parent)
         self.content.title = self.title
-
         self.renew()
         ### Universal right-click menu
         # CB: not currently used by anything but the plotgrouppanels
