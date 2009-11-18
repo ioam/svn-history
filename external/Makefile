@@ -290,6 +290,9 @@ weave: ${WEAVE}.tar.gz python
 	tar -xzf ${WEAVE}.tar.gz
 # we make weave not depend on scipy
 	patch -p0 < weave.diff
+# CEBALERT: Remove next time scipy is updated
+# http://projects.scipy.org/scipy/ticket/855
+	patch -p0 < weave_keyerror.patch
 	cp ${WEAVE}/scipy/io/dumb_shelve.py ${WEAVE}/scipy/weave/
 	cp ${WEAVE}/scipy/io/dumbdbm_patched.py ${WEAVE}/scipy/weave
 	cd ${WEAVE}/scipy/weave/; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
