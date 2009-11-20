@@ -10,8 +10,8 @@ Usage:
 from distutils.core import setup
 import py2exe
 
-import _setup
-_setup.create_topographica_script()
+import create_topographica_script
+create_topographica_script.write()
 
 
 setup(console=['topographica'])

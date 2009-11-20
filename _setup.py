@@ -81,24 +81,3 @@ common = dict(
     
     )
 
-
-# CEBALERT: duplicates Makefile. Could we have a python script to do
-# this, called by both Makefile and setup.py? 
-def create_topographica_script(python_bin='/usr/bin/python',release=None,version=None):
-
-    script = """#!%s
-# Startup script for Topographica
-
-import topo
-topo.release='%s'
-topo.version='%s'
-
-# Process the command-line arguments
-from sys import argv
-from topo.misc.commandline import process_argv
-process_argv(argv[1:])
-"""%(python_bin,release,version)
-    f = open('topographica','w')
-    f.write(script)
-    f.close()
-

@@ -13,8 +13,9 @@
 from distutils.core import setup
 
 import _setup
+import create_topographica_script
 
-_setup.create_topographica_script()
+create_topographica_script.write()
 setup(**_setup.common)
 
 

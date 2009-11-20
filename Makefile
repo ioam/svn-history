@@ -15,6 +15,9 @@ IMPORT_WEAVE = 1
 # (must match across platforms & for optimized vs unoptimized)
 TESTDP = 7
 
+# see topographica-other-python target
+OTHER_PYTHON = "/usr/bin/env python"
+
 # CEBALERT: tied to exact windows version!
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
 	TIMER = 
@@ -135,19 +138,12 @@ clean-ext-packages:
 # Build the Python startup script.  Rebuilt whenever a file changes in
 # topo/ or examples, to make sure that topo.version is up to date.
 topographica: external Makefile topo/*/*.py examples/*.ty
-	echo "#!${PREFIX}bin/python" > topographica
-	echo "# Startup script for Topographica" >> topographica
-	echo "" >> topographica
-	echo "import topo" >> topographica
-	echo "topo.release='${RELEASE}'" >> topographica
-	echo "topo.version='${shell svnversion}'" >> topographica
-	echo "" >> topographica
-	echo "# Process the command-line arguments" >> topographica
-	echo "from sys import argv" >> topographica
-	echo "from topo.misc.commandline import process_argv" >> topographica
-	echo "process_argv(argv[1:])" >> topographica
-	echo "" >> topographica
-	chmod a+x ${PREFIX}topographica
+	${PREFIX}/create_topographica_script.py ${PREFIX}bin/python ${RELEASE} ${shell svnversion}
+
+
+topographica-other-python:
+	${PREFIX}/create_topographica_script.py ${OTHER_PYTHON} ${RELEASE} ${shell svnversion}
+
 
 # CB: experimental
 topographicagui: 
