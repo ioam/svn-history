@@ -327,16 +327,16 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LongEE',
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('LongEESize',2*0.22917)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('LongEEBB',0.229)),
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                                    ExponentialDecay(starting_value = locals().get('lat_lr',0.0),
-                                                        time_constant=locals().get('lat_tc',1600)))))
+                                    ExponentialDecay(starting_value = locals().get('lat_lr',0.3),
+                                                        time_constant=locals().get('lat_tc',1600000)))))
 
 topo.sim.connect('V1Complex','V1ComplexInh',delay=0.05,name='LongEI',
                  connection_type=CFProjection,strength=locals().get('LongEIStr',1.0),
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('LongEISize',2*0.22917)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('LongEIBB',0.229)),
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                                    ExponentialDecay(starting_value = locals().get('lat_lr',0.0),
-                                                        time_constant=locals().get('lat_tc',1600)))))
+                                    ExponentialDecay(starting_value = locals().get('lat_lr',0.3),
+                                                        time_constant=locals().get('lat_tc',1600000)))))
 
 
 topo.sim.schedule_command(__main__.__dict__.get('SST',10000),"secondStage()")
