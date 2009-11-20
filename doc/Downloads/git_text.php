@@ -36,7 +36,7 @@ Ubuntu Linux, just do 'apt-get install git git-svn git-doc'; for
 others you can get installation packages from
 <a href="http://git.or.cz/">git.or.cz</a>.  The git-svn package allows
 git to connect to Topographica's SVN repository. Note that you should
-try to get Git version 1.5.3 (used while writing this document) or
+try to get Git version 1.6.5.3 (used while writing this document) or
 later. If you are building from source, you can skip git-doc, which
 can be difficult to compile, and is anyway <a href="http://www.kernel.org/pub/software/scm/git/docs/">available online</a>.
 
@@ -59,8 +59,8 @@ $ mkdir topographica; cd topographica
 $ git svn init $TOPOROOT/trunk/topographica
 
 # retrieve the SVN files and history
-# (you can choose a value for r)
-$ git svn fetch -r7986; git svn rebase
+# (you can choose a value for r - choose a recent svn revision)
+$ git svn fetch -r10782; git svn rebase
 </pre>
 
 (substituting values appropriate for what you wish to do; e.g. you can
@@ -182,10 +182,7 @@ appears you made each of those changes one after the other in a
 batch. 
 
 <P>If you want to see exactly what is going to happen without making
-any actual changes, you might wish to try a 'dry run' first:
-<pre>
-git svn dcommit -n
-</pre>
+any actual changes, you might wish to try a 'dry run' first by specifying <code>-n</code>:
 
 <P>As with SVN, before committing to the central repository you should
 first check that you have updated and tested your code with changes
@@ -254,6 +251,13 @@ $ git branch -d testing123
 Deleted branch testing123 (was d8d6b8d).
 </pre>
 
+To keep a long-term branch up to date with svn:
+<pre>
+$ git checkout master
+$ git svn rebase
+$ git checkout testing123
+$ git rebase master 
+</pre>
 
 <H4>Sharing your work</H4>
 
@@ -364,3 +368,62 @@ set textfont { Courier 10}
 set uifont {Arial 10 bold}
 EOF
 -->
+
+<H4>Sharing research code between machines</H4>
+
+<P>If you are doing modeling work and want to use your version of
+Topographica on multiple machines, you can use git to keep multiple
+copies of a repository in sync. Of course, you could just use svn to
+keep separate Topographica installations in sync, but this has the
+disadvantage that you will also get other people's changes (i.e. you
+will have to use the latest svn version of Topographica), and your
+code will be publicly visible. You could use an svn branch to solve
+the first problem (though not the second), but it can be difficult
+later on to merge svn branches (i.e. to recombine your work with other
+people's work in svn).
+
+<P>Assuming your work is already in a git repository (as described
+earlier in this document), you can use <code>git clone</code> on any
+other machine where you'd like to get a copy of your repository. The
+git documentation covers cloning, but here is an example over ssh:
+<pre>
+git clone ssh://user@machine/path/to/repository
+</pre>
+
+<P>While working on your code on the 'master' copy, take advantage of
+git (as described earlier: git commits are local, not broadcast to
+others, and can easily be changed/undone later). When you have
+committed changes that you'd like to appear on the other machine, do
+the following on that machine's copy of the repository: <code>git
+rebase origin </code>.
+
+If you only ever make changes to the master copy, =git rebase= will be
+a simple operation and will only ever need to happen 'one way' (from
+the master copy to the other machine). Note, however, that git is very
+flexible, and it is easy to make changes to multiple copies while
+keeping them all in sync (use branches; see git documentation for
+<code>pull</code> and <code>rebase</code>). Additionally, you can use
+git to track modifications that should remain local to one
+machine. For instance, perhaps one copy is on a machine that needs
+special modifications to the code in order to run (e.g. a job
+submission command). You don't want to share such modifications, but
+it is still useful to have them committed under version control:
+
+<pre>
+[oddmachine]$ git checkout -b oddbranch
+[oddmachine]$ # make oddmachine-specific modifications
+[oddmachine]$ git commit -m "Special modifications for oddmachine." 
+
+[normalmachine]$ # make modifications to be shared
+[normalmachine]$ git commit -m "Did something." 
+
+# get changes made on normalmachine
+[oddmachine]$ git checkout master
+[oddmachine]$ git rebase origin
+
+# get changes from master branch into oddbranch
+[oddmachine]$ git checkout oddbranch
+[oddmachine]$ git rebase master
+
+[oddmachine]$ # run simulations (from oddbranch)
+</pre>
