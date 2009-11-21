@@ -271,6 +271,26 @@ class HalfRectifyAndPower(TransferFn):
         x*=0
         x+=a
 
+class ExpLinear(TransferFn):
+    """
+    Transfer function that is exponential until t from which point it is linear.
+    """
+    e = param.Number(default=1.0,doc="""
+        The exponent of the exponetial part of the curve""")
+    t1 = param.Number(default=0.5,doc="""
+        The threshold level where function becomes non-zero""")
+    t2 = param.Number(default=1.0,doc="""
+        The threshold level at which curve becomes linear""")
+        
+    a = param.Number(default=1.0,doc="""
+        The overall scaling of the function""")
+    
+    def __call__(self,x):
+        x-=self.t1
+        clip_lower(x,0)
+        z = (x>=self.t2)*(1.0*exp(self.e*(-self.t2))+(x-self.t2)) + (x<self.t2)*(exp(self.e*(x-self.t2))-exp(self.e*(-self.t2)))
+        x*=0
+        x+=self.a*z
 
 
 class HalfRectify(TransferFn):
@@ -278,6 +298,9 @@ class HalfRectify(TransferFn):
     Transfer function that applies a half-wave rectification (clips at zero)
     """
     t_init = param.Number(default=0.0,doc="""The initial value of threshold at which output becomes non-zero..""")
+    
+    
+    gain = param.Number(default=1.0,doc="""The neuronal gain""")
     
     randomized_init = param.Boolean(False,doc="""
         Whether to randomize the initial t parameter.""")
@@ -301,6 +324,7 @@ class HalfRectify(TransferFn):
         
         x -= self.t
         clip_lower(x,0)
+        x *= gain
 
 
 
