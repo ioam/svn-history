@@ -324,7 +324,7 @@ class HalfRectify(TransferFn):
         
         x -= self.t
         clip_lower(x,0)
-        x *= gain
+        x *= self.gain
 
 
 
