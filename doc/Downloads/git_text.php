@@ -394,20 +394,27 @@ git clone ssh://user@machine/path/to/repository
 git (as described earlier: git commits are local, not broadcast to
 others, and can easily be changed/undone later). When you have
 committed changes that you'd like to appear on the other machine, do
-the following on that machine's copy of the repository: <code>git
-rebase origin </code>.
+the following on that machine's copy of the repository: 
+<pre>
+$ git fetch origin
+$ git rebase origin
+</pre>
 
+<P>
 If you only ever make changes to the master copy, =git rebase= will be
 a simple operation and will only ever need to happen 'one way' (from
 the master copy to the other machine). Note, however, that git is very
 flexible, and it is easy to make changes to multiple copies while
 keeping them all in sync (use branches; see git documentation for
-<code>pull</code> and <code>rebase</code>). Additionally, you can use
+<code>pull</code> or <code>fetch</code>+<code>rebase</code>). 
+
+<P>
+Additionally, you can use
 git to track modifications that should remain local to one
 machine. For instance, perhaps one copy is on a machine that needs
 special modifications to the code in order to run (e.g. a job
 submission command). You don't want to share such modifications, but
-it is still useful to have them committed under version control:
+it is still useful to have them under version control:
 
 <pre>
 [oddmachine]$ git checkout -b oddbranch
@@ -419,6 +426,7 @@ it is still useful to have them committed under version control:
 
 # get changes made on normalmachine
 [oddmachine]$ git checkout master
+[oddmachine]$ git fetch origin
 [oddmachine]$ git rebase origin
 
 # get changes from master branch into oddbranch
