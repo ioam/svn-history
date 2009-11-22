@@ -572,7 +572,7 @@ SimpleHomeoLinearRelative = topo.transferfn.basic.HomeostaticResponse
 def _divide_with_constant(x, y):
     y = numpy.clip(y, 0, 10000)
     x = numpy.clip(x, 0, 10000)
-    return numpy.divide(x, y + 0.11)
+    return numpy.divide(x, y + __main__.__dict__.get('LGNGain',0.11))
 
 def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
     """
@@ -596,10 +596,10 @@ def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
     topo.sim[sheet_name].strict_tsettle = 1
 
 
-def AddGC(surround_gaussian_size=__main__.__dict__.get('SurrSize',0.5), strength=__main__.__dict__.get('LatLGNStr',1.0)):
+
+def AddGC(surround_gaussian_size=__main__.__dict__.get('SurrSize',0.5), strength=__main__.__dict__.get('LatLGNStr',0.63)):
     add_gc('LGNOn',surround_gaussian_size,strength)
     add_gc('LGNOff',surround_gaussian_size,strength)
-
 
 
 #class Habituation(TransferFnWithState):
