@@ -24,33 +24,36 @@ class OneDPowerSpectrum(PatternGenerator):
     """
     ** This class has not been tested, and is still being written **
     
-    Returns the spectral density of a rolling window of the input signal
-    each time it is called. Over time, outputs a spectrogram.
+    Returns the spectral density of a rolling window of the input
+    signal each time it is called. Over time, outputs a spectrogram.
     """
-    window_length = param.Integer(constant=True,default=2,doc="""
-    The interval of the signal on which to perform the Fourier transform.
-    
-    The Fourier transform algorithm is most efficient if this is a power of 2
-    (or can be decomposed into small prime factors - see numpy.fft).""")
 
+    window_length = param.Integer(constant=True,default=2,doc="""
+        The interval of the signal on which to perform the Fourier
+        transform.
     
+        The Fourier transform algorithm is most efficient if this is a
+        power of 2 (or can be decomposed into small prime factors -
+        see numpy.fft).""")
+
     # CEBALERT: this should be constant, but setting it so gives an error
     windowing_function = param.Parameter(default=numpy.hanning,doc="""
-    This function is multiplied with the interval of signal before performing the
-    Fourier transform (i.e. it is used to shape the interval). 
+        This function is multiplied with the interval of signal before
+        performing the Fourier transform (i.e. it is used to shape the
+        interval).
 
-    The function chosen here dictates the tradeoff between resolving comparable
-    signal strengths with similar frequencies, and resolving disparate signal
-    strengths with dissimilar frequencies.
+        The function chosen here dictates the tradeoff between
+        resolving comparable signal strengths with similar
+        frequencies, and resolving disparate signal strengths with
+        dissimilar frequencies.
 
-    See  http://en.wikipedia.org/wiki/Window_function
-    """)
+        See http://en.wikipedia.org/wiki/Window_function""")
 
-    window_overlap = param.Integer(default=0,doc="""Amount of overlap between each window of
-    the signal.""")
+    window_overlap = param.Integer(default=0,doc="""
+        Amount of overlap between each window of the signal.""")
     
     sample_spacing = param.Number(constant=True,default=1.0,doc="""
-    ...1/samplerate,relate to time, etc...""")
+        ...1/samplerate,relate to time, etc...""")
     
     
     def __init__(self,signal=[1,1,1,1],start_location=0,**params):
@@ -78,8 +81,8 @@ class OneDPowerSpectrum(PatternGenerator):
 
     def __call__(self):
         """
-        Perform a DFT (FFT) of the current sample from the signal multiplied
-        by the smoothing window.
+        Perform a DFT (FFT) of the current sample from the signal
+        multiplied by the smoothing window.
 
         See numpy.fft for information about the Fourier transform.
         """
@@ -97,16 +100,14 @@ class Audio(OneDPowerSpectrum):
     """
     ** Untested: currently being written. ** 
     """
-    filename = Filename(
-        default='sounds/test.wav',
-        precedence=0.9,doc=
-        """
-        File path (can be relative to Topographica's base path) to an audio file.
-        The audio can be in any format accepted by pyaudiolab, e.g. WAV, AIFF, or FLAC.
-        """)
 
-    # CEBHACKALERT: make Audio's parameters window_length,overlap be independent of
-    # the sampling rate.
+    filename = Filename(default='sounds/test.wav',precedence=0.9,doc="""
+        File path (can be relative to Topographica's base path) to an
+        audio file.  The audio can be in any format accepted by
+        pyaudiolab, e.g. WAV, AIFF, or FLAC.""")
+
+    # CEBHACKALERT: make Audio's parameters window_length,overlap be
+    # independent of the sampling rate.
 
     def __init__(self,**params):
         """
