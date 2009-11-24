@@ -25,7 +25,7 @@ from topo.base.functionfamily import CoordinateMapperFn,IdentityMF
 from topo.misc.util import rowcol2idx
 from topo.transferfn.basic import TransferFn,IdentityTF
 from topo.learningfn.basic import LearningFn,IdentityLF
-
+from topo.base import patterngenerator
 
 class CFPOF_SharedWeight(CFPOutputFn):
     """
@@ -41,13 +41,15 @@ class CFPOF_SharedWeight(CFPOutputFn):
             cf = cfs[0][0]
             self.single_cf_fn(cf.weights)
 
-
+from topo.base.cf import _create_mask
 
 class SharedWeightCF(ConnectionField):
     
     __slots__ = []
         
-    def __init__(self,cf,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),mask=None,min_matrix_radius=1):
+    def __init__(self,cf,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),
+                 mask=patterngenerator.Constant(),
+                 min_matrix_radius=1):
         """
         From an existing copy of ConnectionField (CF) that acts as a
         template, create a new CF that shares weights with the
@@ -61,6 +63,20 @@ class SharedWeightCF(ConnectionField):
         """
         # CEBALERT: There's no call to super's __init__; see JAHACKALERT
         # below.
+        template = copy(template)
+
+        if not isinstance(template,Slice):
+            template = Slice(template,input_sheet,force_odd=True,
+                             min_matrix_radius=min_matrix_radius)
+
+        # Note: if passed in, mask is shared between CFs (but not if created here)
+        if not hasattr(mask,'view'):
+            mask = _create_mask(patterngenerator.Constant(),
+                               template.compute_bounds(input_sheet),
+                               input_sheet,True,0.5) 
+
+
+
         self._has_norm_total=False
         self.mask=mask 
         weights_slice = self._create_input_sheet_slice(input_sheet,x,y,template,min_matrix_radius=min_matrix_radius)

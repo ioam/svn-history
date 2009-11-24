@@ -164,10 +164,17 @@ class ConnectionField(object):
     def get_bounds(self,input_sheet):
         return self.input_sheet_slice.compute_bounds(input_sheet)
 
+    # CEBALERT:
+    # template and mask: usually created ONCE by CFProjection and
+    # specified as a Slice and array (respectively). Otherwise,
+    # can be specified as BoundingBox and patterngenerator.
 
-    # CEBALERT: do something for mask_template=None
+    # Note that BoundingBox() is ok for a default even though it's
+    # mutable because we copy it inside init.  Constant() is ok too
+    # because mask and weights_generator are not modified.
     def __init__(self,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),
-                 weights_generator=patterngenerator.Constant(),mask=None,
+                 weights_generator=patterngenerator.Constant(),
+                 mask=patterngenerator.Constant(),
                  output_fns=None,min_matrix_radius=1):
         """
         Create weights at the specified (x,y) location on the
@@ -198,6 +205,21 @@ class ConnectionField(object):
         """
         #print "Create CF",input_sheet.name,x,y,"template=",template,"wg=",weights_generator,"m=",mask,"ofs=",output_fns,"min r=",min_matrix_radius
 
+        template = copy(template)
+
+        if not isinstance(template,Slice):
+            template = Slice(template,input_sheet,force_odd=True,
+                             min_matrix_radius=min_matrix_radius)
+
+        # Note: if passed in, mask is shared between CFs (but not if created here)
+        if not hasattr(mask,'view'):
+            mask = _create_mask(mask,template.compute_bounds(input_sheet),
+        # CEBALERT: it's not really worth adding more ALERTs on this
+        # topic, but...there's no way for the CF to control autosize
+        # and threshold.
+                               input_sheet,True,0.5) 
+
+
         # CB: has to be set for C code. Can't be initialized at the
         # class level, or it would become a read-only class attribute
         # (because it's a slot:
@@ -212,11 +234,6 @@ class ConnectionField(object):
         # CEBALERT: now even more confusing; weights_slice is
         # different from input_sheet_slice. At least need to rename.
         weights_slice = self._create_input_sheet_slice(input_sheet,x,y,template,min_matrix_radius)
-
-        # CBALERT: need to deal with mask is None
-##         if mask is None:
-##             # Note that if passed in, mask shared between CFs (but not if created here)
-##             mask = self.create_mask(patterngenerator.Constant(),self.template.bounds,input_sheet,True) 
 
         # CBNOTE: this would be clearer (but not perfect, and probably slower)
         # m = mask_template[self.weights_slice()]
@@ -262,15 +279,8 @@ class ConnectionField(object):
         Also creates the weights_slice, which provides the Slice for
         this weights matrix (in case it must be cropped at an edge).
         """
-        # (copy template because it gets modified)
-        if not isinstance(template,Slice):
-            template = Slice(copy(template),input_sheet,force_odd=True,
-                              min_matrix_radius=min_matrix_radius)
-        else:
-            template = copy(template)
-
-
-        # copy required because the template gets modified
+        # copy required because the template gets modified here but
+        # needs to be used again
         input_sheet_slice = copy(template)
         input_sheet_slice.positionedcrop(x,y,input_sheet)
         input_sheet_slice.crop_to_sheet(input_sheet)
@@ -282,7 +292,6 @@ class ConnectionField(object):
             raise NullCFError(x,y,input_sheet,nrows,ncols)
 
         self.input_sheet_slice = input_sheet_slice
-
 
         # not copied because we don't use again
         template.positionlesscrop(x,y,input_sheet)
@@ -581,8 +590,9 @@ class CFProjection(Projection):
 
         self.bounds_template = self._slice_template.compute_bounds(self.src)
         
-        self.mask_template = self.create_mask(self.cf_shape,self.bounds_template,
-                                              self.src)
+        self.mask_template = _create_mask(self.cf_shape,self.bounds_template,
+                                         self.src,self.autosize_mask,
+                                         self.mask_threshold)
         
         if initialize_cfs:
             self._create_cfs()
@@ -627,10 +637,12 @@ class CFProjection(Projection):
             else:
                 ofs = []
 
-            if not self.same_cf_shape_for_all_cfs:
-                mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
-            else:
+            if self.same_cf_shape_for_all_cfs:
                 mask_template = self.mask_template
+            else:
+                mask_template = _create_mask(self.cf_shape,self.bounds_template,
+                                            self.src,self.autosize_mask,
+                                            self.mask_threshold)
 
             CF = self.cf_type(self.src,x=x,y=y,
                               template=self._slice_template,
@@ -645,36 +657,6 @@ class CFProjection(Projection):
                 raise
         
         return CF
-
-
-        
-
-    # CEB: have not yet decided proper location for this method
-    # JAB: should it be in PatternGenerator?
-    def create_mask(self,shape,bounds_template,sheet):
-        """
-        Create the mask (see ConnectionField.__init__()).
-        """
-        # Calculate the size & aspect_ratio of the mask if appropriate;
-        # mask size set to be that of the weights matrix
-        if hasattr(shape, 'size') and self.autosize_mask:
-            l,b,r,t = bounds_template.lbrt()
-            shape.size = t-b
-            shape.aspect_ratio = (r-l)/shape.size
-
-        # Center mask to matrixidx center
-        center_r,center_c = sheet.sheet2matrixidx(0,0)
-        center_x,center_y = sheet.matrixidx2sheet(center_r,center_c)
-
-        mask = shape(x=center_x,y=center_y,
-                     bounds=bounds_template,
-                     xdensity=sheet.xdensity,
-                     ydensity=sheet.ydensity)
-
-        mask = where(mask>=self.mask_threshold,mask,0.0)
-
-        # CB: unnecessary copy (same as for weights)
-        return mask.astype(weight_type)
 
 
 
@@ -773,6 +755,34 @@ class CFProjection(Projection):
         rows,cols=self.cfs.shape
         return sum([len((cf.mask if cf.mask is not None else cf.weights).ravel().nonzero()[0])
                     for cf,r,c in MaskedCFIter(self)()])
+
+
+# CEB: have not yet decided proper location for this method
+# JAB: should it be in PatternGenerator?
+def _create_mask(shape,bounds_template,sheet,autosize=True,threshold=0.5):
+    """
+    Create the mask (see ConnectionField.__init__()).
+    """
+    # Calculate the size & aspect_ratio of the mask if appropriate;
+    # mask size set to be that of the weights matrix
+    if hasattr(shape, 'size') and autosize:
+        l,b,r,t = bounds_template.lbrt()
+        shape.size = t-b
+        shape.aspect_ratio = (r-l)/shape.size
+
+    # Center mask to matrixidx center
+    center_r,center_c = sheet.sheet2matrixidx(0,0)
+    center_x,center_y = sheet.matrixidx2sheet(center_r,center_c)
+
+    mask = shape(x=center_x,y=center_y,
+                 bounds=bounds_template,
+                 xdensity=sheet.xdensity,
+                 ydensity=sheet.ydensity)
+
+    mask = where(mask>=threshold,mask,0.0)
+
+    # CB: unnecessary copy (same as for weights)
+    return mask.astype(weight_type)
 
 
 
@@ -928,7 +938,8 @@ class ResizableCFProjection(CFProjection):
             return
 
         # it's ok so we can store the bounds and resize the weights
-        mask_template = self.create_mask(self.cf_shape,bounds_template,self.src)
+        mask_template = _create_mask(self.cf_shape,bounds_template,self.src,
+                                    self.autosize_mask,self.mask_threshold)
 
         self.nominal_bounds_template = nominal_bounds_template
 
