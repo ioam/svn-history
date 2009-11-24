@@ -45,7 +45,7 @@ if dataset=="Gaussian":
     
 elif dataset=="Natural":
     import topo.pattern.image 
-    input_type=topo.pattern.image.Image
+    input_type=topo.pattern.image.FileImage
     if locals().get('imageset',"Shouval") == 'Shouval':
             image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
             inputs=[input_type(filename=f,
@@ -148,9 +148,9 @@ AH = ActivityHysteresis(time_constant=0.5)
 Attrib_Tracker=AttributeTrackingTF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
 
 if locals().get('Adaptation',"Relative") == 'Relative':
-    HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=0.0)
+    HE=SimpleHomeoLinearRelative(smoothing=V1_smoothing,eta=locals().get('eta',0.001), input_output_ratio=io_ratio,t_init=locals().get('ti',0.0))
 elif locals().get('Adaptation',"Relative") == 'Absolute':
-    HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.0185),t_init=0.0,randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
+    HE=SimpleHomeoLinear(smoothing=V1_smoothing,eta=locals().get('eta',0.001), mu=locals().get('MU',0.0185),t_init=locals().get('ti',0.0),randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
 elif locals().get('Adaptation',"Relative") == 'Fixed':
     HE=HalfRectify(t_init=locals().get('ti',0.0),randomized_init=locals().get('ri',False),noise_magnitude=locals().get('nm',0.1))
     Attrib_Tracker=IdentityTF()
