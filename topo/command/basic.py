@@ -382,15 +382,32 @@ def _save_parameters(filename):
     pickle.dump(g,open(normalize_path(filename),'w'))
      
 
-def order_params_by_name(params):
-    result = ""
-    for param_name in sorted(params):
-        val = params[param_name]
-        # Special case to give reasonable filenames for lists
-        valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
-                 else str(val))
-        result += "," + param_name + "=" + valstr
-    return result
+# I'd expect your personal name_replacements to be set in some file
+# you use to create batch runs, but it can alsp be set on the
+# commandline. Before calling run_batch(), include something like the
+# following:
+# run_batch.dirname_params_filter.name_replacements={"cortex_density":"cd"}
+class order_params_by_name(ParameterizedFunction):
+
+    # CEBALERT: should I have made this a parameter at the run_batch
+    # level?
+    name_replacements = param.Dict(default={},doc="""
+        Optional dictionary of alternative names to use for
+        parameters.
+
+        Use to shorten common parameter names
+        e.g. {'cortex_density':'cd'}.
+        """)
+
+    def __call__(self,params):
+        result = ""
+        for pname,val in sorted([(self.name_replacements.get(pname,pname),val) 
+                                 for pname,val in params.items()]):
+            # Special case to give reasonable filenames for lists
+            valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
+                     else str(val))
+            result += "," + pname + "=" + valstr
+        return result
 
 # Used only by default_analysis_function
 # Should be in order they are needed; e.g. Activity after map measurement,
@@ -514,7 +531,7 @@ class run_batch(ParameterizedFunction):
         the output_directory after the script has been loaded (for
         e.g. future inspection of the experiment).""")
 
-    dirname_params_filter = param.Callable(order_params_by_name,doc="""
+    dirname_params_filter = param.Callable(order_params_by_name.instance(),doc="""
         Function to control how the parameter names will appear in the
         output_directory's name.""")
 
@@ -529,7 +546,6 @@ class run_batch(ParameterizedFunction):
                 
     def __call__(self,script_file,**params_to_override):
         p=ParamOverrides(self,params_to_override,allow_extra_keywords=True)
-        import __main__; __main__.__dict__['ppp']=p
 
         import sys # CEBALERT: why do I have to import this again? (Also done elsewhere below.)
         import os
