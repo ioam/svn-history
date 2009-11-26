@@ -382,6 +382,16 @@ def _save_parameters(filename):
     pickle.dump(g,open(normalize_path(filename),'w'))
      
 
+def order_params_by_name(params):
+    # not yet doing any ordering
+    result = ""
+    for a,val in params.items():
+        # Special case to give reasonable filenames for lists
+        valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
+                 else str(val))
+        result += "," + a + "=" + valstr
+    return result
+
 # Used only by default_analysis_function
 # Should be in order they are needed; e.g. Activity after map measurement,
 # in case Activity plot includes map subplots
@@ -504,6 +514,10 @@ class run_batch(ParameterizedFunction):
         the output_directory after the script has been loaded (for
         e.g. future inspection of the experiment).""")
 
+    dirname_params_filter = param.Callable(order_params_by_name,doc="""
+        Function to control how the parameter names will appear in the
+        output_directory's name.""")
+
 
     def _truncate(self,p,s):
         """
@@ -534,11 +548,7 @@ class run_batch(ParameterizedFunction):
         # allow the function to be overridden).
         # And sort by name by default? Skip ones that aren't different
         # from default, or at least put them at the end?
-        for a,val in p.extra_keywords().items():
-            # Special case to give reasonable filenames for lists
-            valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
-                     else str(val))
-            prefix += "," + a + "=" + valstr
+        prefix += p.dirname_params_filter(p.extra_keywords())
 
         # Set provided parameter values in main namespace
         from topo.misc.commandline import global_params
