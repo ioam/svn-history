@@ -365,14 +365,12 @@ def _print_vc_info(filename):
         file.close()
 
 @in_application_path
-def _save_parameters(filename):
+def _save_parameters(p,filename):
     from topo.misc.commandline import global_params
-    g = {'global_params_specified':dict(global_params.get_param_values(onlychanged=True)),
+    
+    g = {'global_params_specified':p,
          'global_params_all':dict(global_params.get_param_values())}
 
-    # CEBALERT: global_params should do something about these.
-    # And shouldn't this fn have been passed p so that it could get
-    # the extra_keywords() only?
     for d in g.values():
         if 'name' in d:
             del d['name']
@@ -642,7 +640,7 @@ class run_batch(ParameterizedFunction):
             execfile(script_file,__main__.__dict__) #global_params.context
             global_params.check_for_unused_names()
             if p.save_global_params:
-                _save_parameters(simname+".global_params.pickle")
+                _save_parameters(p.extra_keywords(),simname+".global_params.pickle")
             print_sizes()
             topo.sim.name=simname
     
