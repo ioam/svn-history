@@ -383,13 +383,13 @@ def _save_parameters(filename):
      
 
 def order_params_by_name(params):
-    # not yet doing any ordering
     result = ""
-    for a,val in params.items():
+    for param_name in sorted(params):
+        val = params[param_name]
         # Special case to give reasonable filenames for lists
         valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
                  else str(val))
-        result += "," + a + "=" + valstr
+        result += "," + param_name + "=" + valstr
     return result
 
 # Used only by default_analysis_function
