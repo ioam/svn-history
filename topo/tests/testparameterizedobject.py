@@ -165,12 +165,9 @@ class some_fn(param.ParameterizedFunction):
        return scale,num_phase,frequencies
 
 
+instance = some_fn.instance() 
 
 class TestParameterizedFunction(unittest.TestCase):
-
-    def __init__(self,*args,**kw):
-        super(TestParameterizedFunction,self).__init__(*args,**kw)
-        self.instance = some_fn.instance()
 
     def _basic_tests(self,fn):
         self.assertEqual(fn(),(0.3,18,[99]))
@@ -185,7 +182,14 @@ class TestParameterizedFunction(unittest.TestCase):
         self._basic_tests(some_fn)
 
     def test_parameterized_function_instance(self):
-        self._basic_tests(self.instance)
+        self._basic_tests(instance)
+
+    def test_pickle_instance(self):
+        import pickle
+        s = pickle.dumps(instance)
+        instance.scale=0.8
+        i = pickle.loads(s)
+        self.assertEqual(i(),(0.3,18,[10,20,30]))
 
         
 suite = unittest.TestSuite()

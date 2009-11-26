@@ -1724,6 +1724,8 @@ class ParamOverrides(dict):
         return extra_keywords
 
 
+def _new_parameterized(*a,**k):
+    return Parameterized.__new__(*a,**k)
 
 class ParameterizedFunction(Parameterized):
     """
@@ -1757,7 +1759,11 @@ class ParameterizedFunction(Parameterized):
         # Control reconstruction (during unpickling and copying):
         # ensure that ParameterizedFunction.__new__ is skipped
         state = ParameterizedFunction.__getstate__(self)
-        return (Parameterized.__new__,(self.__class__,),state)
+        # CB: here it's necessary to use a function defined at the
+        # module level rather than Parameterized.__new__ directly
+        # because otherwise pickle will find .__new__'s module to be
+        # __main__. Pretty obscure aspect of pickle.py, or a bug?
+        return (_new_parameterized,(self.__class__,),state)
 
     def script_repr(self,imports=[],prefix="    "):
         """
