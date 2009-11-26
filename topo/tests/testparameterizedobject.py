@@ -168,15 +168,18 @@ class some_fn(param.ParameterizedFunction):
 
 class TestParameterizedFunction(unittest.TestCase):
 
+    def setUp(self):
+        self.some_fn = some_fn
+
     def test_parameterized_function(self):
 
-        self.assertEqual(some_fn(),(0.3,18,[99]))
-        self.assertEqual(some_fn(frequencies=[1,2,3]),(0.3,18,[1,2,3]))
-        self.assertEqual(some_fn(),(0.3,18,[99]))
+        self.assertEqual(self.some_fn(),(0.3,18,[99]))
+        self.assertEqual(self.some_fn(frequencies=[1,2,3]),(0.3,18,[1,2,3]))
+        self.assertEqual(self.some_fn(),(0.3,18,[99]))
         
         some_fn.frequencies=[10,20,30]
-        self.assertEqual(some_fn(frequencies=[1,2,3]),(0.3,18,[1,2,3]))
-        self.assertEqual(some_fn(),(0.3,18,[10,20,30]))
+        self.assertEqual(self.some_fn(frequencies=[1,2,3]),(0.3,18,[1,2,3]))
+        self.assertEqual(self.some_fn(),(0.3,18,[10,20,30]))
 
 
         
