@@ -371,6 +371,8 @@ def _save_parameters(filename):
          'global_params_all':dict(global_params.get_param_values())}
 
     # CEBALERT: global_params should do something about these.
+    # And shouldn't this fn have been passed p so that it could get
+    # the extra_keywords() only?
     for d in g.values():
         if 'name' in d:
             del d['name']
@@ -513,6 +515,7 @@ class run_batch(ParameterizedFunction):
                 
     def __call__(self,script_file,**params_to_override):
         p=ParamOverrides(self,params_to_override,allow_extra_keywords=True)
+        import __main__; __main__.__dict__['ppp']=p
 
         import sys # CEBALERT: why do I have to import this again? (Also done elsewhere below.)
         import os
@@ -524,8 +527,13 @@ class run_batch(ParameterizedFunction):
         prefix += time.strftime(p.name_time_format)
         prefix += "_" + scriptbase
         simname = prefix
-    
+
         # Construct parameter-value portion of filename; should do more filtering
+        # CBENHANCEMENT: should provide chance for user to specify a
+        # function (i.e. make this a function, and have a parameter to
+        # allow the function to be overridden).
+        # And sort by name by default? Skip ones that aren't different
+        # from default, or at least put them at the end?
         for a,val in p.extra_keywords().items():
             # Special case to give reasonable filenames for lists
             valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
