@@ -990,7 +990,7 @@ class ResizableCFProjection(CFProjection):
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = cf.input_sheet_slice
 
-        weights_slice = cf._create_input_sheet_slice(input_sheet,x,y,template,min_matrix_radius)
+        weights_slice = cf._create_input_sheet_slice(input_sheet,x,y,copy(template),min_matrix_radius)
                     
         r1,r2,c1,c2 = cf.input_sheet_slice
 
