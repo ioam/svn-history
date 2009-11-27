@@ -350,6 +350,27 @@ cd /home/scm_git/t/to/topographica
 git --git-dir=ceball_houzi2 init --shared=all --bare
 emacs -nw ceball_houzi2/description
 emacs -nw ceball_houzi2/config # allow fastforwards - see above
+
+# Backups:
+rsync -av topographica.git.sourceforge.net::gitroot/topographica/* date-topographica-git
+ 
+
+# emails:
+
+create hook email file in hooks directory (copy from another repo on there
+or get ://git.kernel.org/?p=git/git.git;a=blob_plain;f=contrib/hooks/post-receive-email
+chmod a+x post-receive
+
+in git config,
+
+[hooks]
+        mailinglist = "name@address"
+        announcelist =
+        envelopesender =
+        emailprefix = "SF.net Git: "
+        showrev =
+
+
 -->
 
 <!-- based on http://sourceforge.net/apps/trac/sourceforge/wiki/Git, http://www.naildrivin5.com/daveblog5000/?p=102 and
