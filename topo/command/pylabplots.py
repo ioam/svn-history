@@ -797,18 +797,22 @@ class plot_modulation_ratio(PylabPlotCommand):
         from topo.analysis.vision import complexity
 
         if (topo.sim.objects().has_key(simple_sheet_name) and topo.sim.objects().has_key(complex_sheet_name)):
-            v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]])
-            v1ct = complexity(fullmatrix[topo.sim[complex_sheet_name]])
-            # double the number of complex cells to reflect large width of layer 2/3
-            v1c = numpy.concatenate((array(v1ct),array(v1ct)),axis=1)
+            v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]]).flatten()
+            v1c = complexity(fullmatrix[topo.sim[complex_sheet_name]]).flatten()
+            
+            #double the number of complex cells to reflect large width of layer 2/3
+            v1c = numpy.concatenate((array(v1c),array(v1c)),axis=1)
+            print bins
+            print v1s
             pylab.figure()
-            pylab.subplot(311)
+            n = pylab.subplot(311)
+            print v1s
             pylab.hist(v1s,bins)
             pylab.axis([0,2.0,0,3500])
-            pylab.subplot(312)
+            n = pylab.subplot(312)
             pylab.hist(v1c,bins)
             pylab.axis([0,2.0,0,3500])
-            pylab.subplot(313)
+            n = pylab.subplot(313)
             pylab.hist(numpy.concatenate((array(v1s),array(v1c)),axis=1),bins)
             pylab.axis([0,2.0,0,3500])
     
@@ -1024,7 +1028,7 @@ class measure_size_response(UnitCurveCommand):
     num_sizes = param.Integer(default=10,bounds=(1,None),softbounds=(1,50),
                               doc="Number of different sizes to test.")
 
-    max_size = param.Number(default=1.0,bounds=(1,None),softbounds=(1,50),
+    max_size = param.Number(default=1.0,bounds=(0.1,None),softbounds=(1,50),
                               doc="Maximum extent of the grating")
 
     x_axis = param.String(default='size',constant=True)
@@ -1047,8 +1051,8 @@ class measure_size_response(UnitCurveCommand):
     # Why not vary frequency too?  Usually it's just one number, but it could be otherwise.
     def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
-               #Feature(name="frequency",values=p.frequencies),
-                Feature(name="size",range=(0.1,self.max_size),step=1.0/p.num_sizes,cyclic=False)]
+                Feature(name="frequency",values=p.frequencies),
+                Feature(name="size",range=(0.0,self.max_size),step=1.0/p.num_sizes,cyclic=False)]
 
 
 create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
@@ -1148,6 +1152,9 @@ class measure_orientation_contrast(UnitCurveCommand):
     contrastcenter=param.Number(default=100,bounds=(0,100),doc="""Contrast of the center.""")
     
     x_axis = param.String(default='orientationsurround',constant=True)
+    
+    orientation_center = param.Number(default=pi/2,softbounds=(0.0,numpy.pi),doc="""
+        Orientation of the center grating patch""")
 
     units = param.String(default="%")
 
@@ -1164,8 +1171,9 @@ class measure_orientation_contrast(UnitCurveCommand):
         sheet=p.sheet
         for coord in p.coords:
             self.or_surrounds=[]
-            orientation=pi*self._sheetview_unit(sheet,coord,'OrientationPreference')
+            orientation=orientation_center
             self.orientationcenter=orientation
+            print self.num_orientation
             for i in xrange(0,self.num_orientation):
                 self.or_surrounds.append(numpy.mod(orientation+i*pi/self.num_orientation,numpy.pi*2))    
             self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
