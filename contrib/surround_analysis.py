@@ -38,8 +38,8 @@ class surround_analysis():
     sheet_name = ""
     data_dict = {}
     
-    low_contrast=40
-    high_contrast=50
+    low_contrast=100
+    high_contrast=200
     
     def __init__(self,sheet_name="V1Complex"):
         from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter
@@ -117,6 +117,7 @@ class surround_analysis():
             
         peak_or_response = max(ar)
         orr=ors[numpy.argmax(ar)]
+        orr_ort = orr + (numpy.pi/2.0)
         
         curve_data["ORTC"]={}
         curve_data["ORTC"]["info"]={}
@@ -137,26 +138,25 @@ class surround_analysis():
             curve_data[curve_label]={}
             curve_data[curve_label]["data"]=self.sheet.curve_dict['orientationsurround'][curve_label]
             curve_data[curve_label]["measures"]={}
-            orr=numpy.pi*self.sheet.sheet_views["OrientationPreference"].view()[0][xindex][yindex]
             pref_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr].view()[0][xindex][yindex]
-            print self.sheet.curve_dict['orientationsurround'][curve_label].keys() , "\nAAA" , str(orr+(numpy.pi/2.0))
+            print self.sheet.curve_dict['orientationsurround'][curve_label].keys() , "\nAAA" , orr_ort
             
-            cont_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr+(numpy.pi/2.0)].view()[0][xindex][yindex]
+            cont_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr_ort].view()[0][xindex][yindex]
             
             
             if pref_or_resp != 0:
                 curve_data[curve_label]["measures"]["or_suppression"]=(pref_or_resp-cont_or_resp)/pref_or_resp
             else: 
-                curve_data[curve_label]["measures"]["or_suppression"]=-10
+                curve_data[curve_label]["measures"]["or_suppression"]=-1
         
         
         hc_curve_name_orc = "Contrastsurround = " + str(self.high_contrast) + "%";
         lc_curve_name_orc = "Contrastsurround = " + str(self.low_contrast) + "%";
         
         hc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][hc_curve_name_orc][orr].view()[0][xindex][yindex]
-        hc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][hc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
+        hc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][hc_curve_name_orc][orr_ort].view()[0][xindex][yindex]
         lc_pref_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr].view()[0][xindex][yindex]
-        lc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr+numpy.pi/2.0].view()[0][xindex][yindex]
+        lc_cont_or_resp=self.sheet.curve_dict['orientationsurround'][lc_curve_name_orc][orr_ort].view()[0][xindex][yindex]
 
         
         curve_data["ORTC"]["data"]=self.sheet.curve_dict['orientation'][curve_name_ort]
@@ -247,15 +247,9 @@ class surround_analysis():
         i = 0
         for curve_label in measurment.keys():
             curve =  measurment[curve_label]["data"]
-            
-            
-            # center the values around the orientation that the neuron preffers 
             x_values = sorted(curve.keys())
             print x_values
             y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
-            ### wrap the data around    
-            #y_values.append(curve[key].view()[0][xindex, yindex])
-            #x_values.append(x_values[0]+numpy.pi)
 
             f.plot(x_values, y_values, lw=3, color=colors[i])
             f.axvline(x=orientation,linewidth=4, color='r')
