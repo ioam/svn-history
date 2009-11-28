@@ -1153,7 +1153,7 @@ class measure_orientation_contrast(UnitCurveCommand):
     
     x_axis = param.String(default='orientationsurround',constant=True)
     
-    orientation_center = param.Number(default=pi/2,softbounds=(0.0,numpy.pi),doc="""
+    orientation_center = param.Number(default=0.0,softbounds=(0.0,numpy.pi),doc="""
         Orientation of the center grating patch""")
 
     units = param.String(default="%")
@@ -1171,11 +1171,12 @@ class measure_orientation_contrast(UnitCurveCommand):
         sheet=p.sheet
         for coord in p.coords:
             self.or_surrounds=[]
-            orientation=self.orientation_center
+            orientation=p.orientation_center
             self.orientationcenter=orientation
-            print self.num_orientation
+            print orientation
             for i in xrange(0,self.num_orientation):
                 self.or_surrounds.append(orientation+i*pi/self.num_orientation)    
+            print self.or_surrounds
             self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
             self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
             
