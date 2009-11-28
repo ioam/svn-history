@@ -1171,7 +1171,7 @@ class measure_orientation_contrast(UnitCurveCommand):
         sheet=p.sheet
         for coord in p.coords:
             self.or_surrounds=[]
-            orientation=orientation_center
+            orientation=self.orientation_center
             self.orientationcenter=orientation
             print self.num_orientation
             for i in xrange(0,self.num_orientation):
