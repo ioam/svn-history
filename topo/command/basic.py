@@ -22,6 +22,7 @@ except ImportError:
 import param
 from param.parameterized import PicklableClassAttributes, ParameterizedFunction
 from param.parameterized import ParamOverrides
+from param.external import OrderedDict
 
 import topo
 from topo.base.functionfamily import TransferFn
@@ -384,28 +385,33 @@ def _save_parameters(p,filename):
 # you use to create batch runs, but it can alsp be set on the
 # commandline. Before calling run_batch(), include something like the
 # following:
-# run_batch.dirname_params_filter.name_replacements={"cortex_density":"cd"}
-class order_params_by_name(ParameterizedFunction):
+# run_batch.dirname_params_filter.map=OrderedDict(("cortex_density","cd"))
+
+class param_formatter(ParameterizedFunction):
 
     # CEBALERT: should I have made this a parameter at the run_batch
-    # level?
-    name_replacements = param.Dict(default={},doc="""
-        Optional dictionary of alternative names to use for
-        parameters.
+    # level? And I don't know what to call it.
+    map = param.Dict(default=OrderedDict(),doc="""
+        Optional ordered dictionary of alternative names to use for
+        parameters, parameter_name:alternative_name
 
-        Use to shorten common parameter names
-        e.g. {'cortex_density':'cd'}.
-        """)
+        Use to shorten common parameter names (directory names are
+        limited in length on most file systems), and to specify an
+        order.
+
+        Names not specified here will be sorted alphabetically.""")
 
     def __call__(self,params):
-        result = ""
-        for pname,val in sorted([(self.name_replacements.get(pname,pname),val) 
-                                 for pname,val in params.items()]):
+        result = ""        
+        unspecified_in_map = sorted(set(params).difference(set(self.map)))
+        for pname in self.map.keys()+unspecified_in_map:
+            val = params[pname]
             # Special case to give reasonable filenames for lists
             valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
                      else str(val))
-            result += "," + pname + "=" + valstr
+            result += "," + self.map.get(pname,pname) + "=" + valstr
         return result
+
 
 # Used only by default_analysis_function
 # Should be in order they are needed; e.g. Activity after map measurement,
@@ -529,7 +535,7 @@ class run_batch(ParameterizedFunction):
         the output_directory after the script has been loaded (for
         e.g. future inspection of the experiment).""")
 
-    dirname_params_filter = param.Callable(order_params_by_name.instance(),doc="""
+    dirname_params_filter = param.Callable(param_formatter.instance(),doc="""
         Function to control how the parameter names will appear in the
         output_directory's name.""")
 
