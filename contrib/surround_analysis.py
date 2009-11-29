@@ -138,8 +138,9 @@ class surround_analysis():
             curve_data[curve_label]={}
             curve_data[curve_label]["data"]=self.sheet.curve_dict['orientationsurround'][curve_label]
             curve_data[curve_label]["measures"]={}
+            print self.sheet.curve_dict['orientationsurround'][curve_label].keys() , "\nAAA" , orr_ort," ", orr
             pref_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr].view()[0][xindex][yindex]
-            print self.sheet.curve_dict['orientationsurround'][curve_label].keys() , "\nAAA" , orr_ort
+            
             
             cont_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr_ort].view()[0][xindex][yindex]
             
