@@ -173,7 +173,7 @@ before <code>make</code> will succeed.  On some systems the
 sometimes specific versions must be specified (e.g.
 <code>libpng12-dev</code>,
 <code>libfreetype6-dev</code>).  Example for Ubuntu 7.0 or 8.04.1:
-<blockquote><code>sudo apt-get install  libfreetype6 libfreetype6-dev libpng12-0 libpng12-dev libx11-dev libxft-dev zlib1g</code></blockquote>
+<blockquote><code>sudo apt-get install  libfreetype6 libfreetype6-dev libpng12-0 libpng12-dev libx11-dev libxft-dev zlib1g m4</code></blockquote>
 
 <P>Once these libraries are installed, you can proceed to
 the <A HREF="#common-obtain">common instructions</A> for all
