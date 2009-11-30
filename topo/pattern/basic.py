@@ -955,7 +955,7 @@ class OneDPowerSpectrum(PatternGenerator):
     def _generate_frequency_indices(self,mini,maxi,length):
         # linear selection
         return numpy.linspace(mini,maxi,num=length,endpoint=True).astype(int)
-
+    # CEBALERT: space function should probably be a parameter
 
     def __call__(self,**params_to_override):
         """
