@@ -947,7 +947,7 @@ class OneDPowerSpectrum(PatternGenerator):
 
         # How many times to repeat the 1d output for the specified 2d bounds.
         # Probably a better alternative would be to treat the second
-        # dimension as a stack or temporal buffer.
+        # dimension as a rolling queue, i.e. a temporal buffer.
         self._column_repeat = shape[1]#col
         if self._column_repeat > 1:
             self.warning("Shape mismatch: 1D output will be repeated to fill the array.")
@@ -982,7 +982,7 @@ class OneDPowerSpectrum(PatternGenerator):
             # common use case of having a directory full of auditory
             # samples from which to choose in a random order, with
             # each one having a different length.  In that case one
-            # will want to have some indication of when a sample as
+            # will want to have some indication of when a sample has
             # run out, in order to move on to the next one.  Maybe
             # there needs to be a special AudioComposite generator to
             # do that, and eventually that would allow mixing of
