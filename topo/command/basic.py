@@ -405,9 +405,13 @@ class param_formatter(ParameterizedFunction):
         Names not specified here will be sorted alphabetically.""")
 
     def __call__(self,params):
-        result = ""        
+        result = ""
+        # present in params but not in map
         unspecified_in_map = sorted(set(params).difference(set(self.map)))
-        for pname in self.map.keys()+unspecified_in_map:
+        # present in params and in map, preserving order of map
+        specified_in_map = [n for n in self.map.keys() if n in params]
+
+        for pname in specified_in_map+unspecified_in_map:
             val = params[pname]
             # Special case to give reasonable filenames for lists
             valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
