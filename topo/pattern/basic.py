@@ -857,8 +857,6 @@ class Translator(PatternGenerator):
 # how much preprocessing to offer? E.g. Offer to remove DC? Etc.
 class OneDPowerSpectrum(PatternGenerator):
     """
-    ** This class has not been tested, and is still being written **
-    
     Returns the spectral density of a rolling window of the input
     signal each time it is called. Over time, outputs a spectrogram.
     """
