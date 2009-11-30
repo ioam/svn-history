@@ -258,6 +258,9 @@ def load_snapshot(snapshot_name):
             p.message("snapshot loaded successfully with legacy support")
         except: # what?
             
+            # CEBALERT: should store original exception so it can be
+            # displayed here.
+    
             m = """
             Snapshot could not be loaded.
 
