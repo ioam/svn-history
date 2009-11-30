@@ -49,12 +49,13 @@ class PickleMain(object):
         
         bytecode = {}
         for name,obj in __main__.__dict__.items():
-            if isinstance(obj,types.FunctionType) or isinstance(obj,type):
-                # (could be extended to other types, I guess
-                if obj.__module__ == "__main__":
-                    #CB: how do I print out info via Parameterized?
-                    print "%s is defined in __main__: saving bytecode."%name
-                    bytecode[name] = obj
+            if not name.startswith('_'):
+                if isinstance(obj,types.FunctionType) or isinstance(obj,type):
+                    # (could be extended to other types, I guess
+                    if obj.__module__ == "__main__":
+                        #CB: how do I print out info via Parameterized?
+                        print "%s is defined in __main__: saving bytecode."%name
+                        bytecode[name] = obj
 
         self.pickler.dump(bytecode)
         return {'pickled_bytecode':self.pickled_bytecode}
