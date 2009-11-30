@@ -452,10 +452,12 @@ def slice_setstate_selector():
     #
     # CB: info could be recovered if required.
     def _slice_setstate_selector(state):
+        
         if isinstance(state,dict):
             return None
         else:
-            return ndarray.__setstate__
+            import numpy
+            return numpy.ndarray.__setstate__
 
     from topo.base.sheetcoords import Slice                
     select_setstate(Slice,_slice_setstate_selector,post_super=False)
