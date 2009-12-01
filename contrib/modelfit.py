@@ -141,6 +141,17 @@ class ModelFit():
 
         return (min_val_err,numpy.argmin(b.T,axis=0),min_val_err_array/len(validation_inputs))
     
+    def returnPredictedActivities(self,inputs):
+        for i in xrange(0,len(inputs)):
+           if i == 0: 
+               modelActivities = self.calculateModelOutput(inputs,i)
+           else:
+               a = self.calculateModelOutput(inputs,i)
+               modelActivities = numpy.concatenate((modelActivities,a),axis=1)
+           
+        return numpy.mat(modelActivities).T
+        
+    
     def calculateReliabilities(self,inputs,activities,top_percentage):
         err=numpy.zeros(self.num_of_units)
         modelResponses=[]
@@ -737,8 +748,9 @@ def runModelFit():
     
     
     #mf = BasicBPModelFit()
-    mf = ModelFit()
+    
     #mf.retina_diameter = 1.2
+    mf = ModelFit()
     mf.density = density
     mf.learning_rate = __main__.__dict__.get('lr',0.1)
     mf.epochs=__main__.__dict__.get('epochs',1000)
@@ -848,20 +860,18 @@ def set_fann_dataset(td,inputs,outputs):
     td.read_train_from_file("./tmp.txt")
     
 
-def ridge_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validation_inputs,validation_activities,display=False,size=0.2,ni=100):
-    
+def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs,validation_activities,display=False,ni=100):
     p = len(inputs[0])
     np = len(activities[0])
     inputs = numpy.mat(inputs)
     activities = numpy.mat(activities)
     validation_inputs = numpy.mat(validation_inputs)
     validation_activities = numpy.mat(validation_activities)
-    S = inputs
+    S = numpy.mat(inputs).copy()
     
     for x in xrange(0,sizex):
         for y in xrange(0,sizey):
             norm = numpy.mat(numpy.zeros((sizex,sizey)))
-            locality = numpy.mat(numpy.zeros((sizex,sizey)))
             norm[x,y]=4
             if x > 0:
                norm[x-1,y]=-1
@@ -872,70 +882,266 @@ def ridge_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validati
             if y < sizey-1:
                norm[x,y+1]=-1
             S = numpy.concatenate((S,alpha*norm.flatten()),axis=0)
-    
-    #for x in xrange(0,sizex):
-    #    for y in xrange(0,sizey):
-    #        locality = numpy.mat(numpy.zeros((sizex,sizey)))
-    #        for xx in xrange(0,sizex):
-    #            for yy in xrange(0,sizey):
-    #                if numpy.sqrt((x-xx)*(x-xx) + (y-yy)*(y-yy)) < sizex*size:
-    #                    locality[xx,yy] = -1
-    #                else:
-    #                    locality[xx,yy] = 1 
-    #        S = numpy.concatenate((S,theta*locality.flatten()),axis=0)
 
-    
-    activities = numpy.concatenate((activities,numpy.mat(numpy.zeros((sizey*sizex,np)))),axis=0)
-    #activities = numpy.concatenate((activities,numpy.mat(-1*numpy.zeros((sizey*sizex,np)))),axis=0)
-    #A = S.T * S + delta*numpy.mat(numpy.eye(p))
-    #X = numpy.linalg.pinv(A)
-    #Z = X*S.T*activities
-    Z = numpy.linalg.pinv(S)*activities
+    activities_padded = numpy.concatenate((activities,numpy.mat(numpy.zeros((sizey*sizex,np)))),axis=0)
+    Z = numpy.linalg.pinv(S)*activities_padded
     Z=Z.T
     ma = numpy.max(numpy.max(Z))
     mi = numpy.min(numpy.min(Z))
     m = max([abs(ma),abs(mi)])
     RFs=[]
+    of = run_nonlinearity_detection(activities,inputs*Z.T,10,display)
+     
+    predicted_activities = inputs*Z.T
+    validation_predicted_activities = validation_inputs*Z.T
+    
+    tf_predicted_activities = apply_output_function(predicted_activities,of)
+    tf_validation_predicted_activities = apply_output_function(validation_predicted_activities,of)
+    
+    errors = numpy.sqrt(numpy.sum(numpy.power(validation_activities - validation_predicted_activities,2),axis=0))
+    tf_errors = numpy.sqrt(numpy.sum(numpy.power(validation_activities - tf_validation_predicted_activities,2),axis=0))
+    #print "Errors", errors
+    #print "Activity magnitueds", numpy.sqrt(numpy.sum(numpy.power(validation_activities,2),axis=0)).T
+    mean_mat = numpy.mat([numpy.array(numpy.mean(validation_activities,axis=0))[0] for i in xrange(0,len(validation_inputs))])
+    
+    act_var = numpy.sqrt(numpy.sum(numpy.power(validation_activities-mean_mat,2),axis=0))
+    normalized_errors = numpy.array(errors / act_var)[0]
+    tf_normalized_errors = numpy.array(tf_errors / act_var)[0]
+    error = numpy.mean(errors)
+    normalized_error = numpy.mean(normalized_errors)
+
     if display:
         av=[]
         pylab.figure()
-        pylab.title(str(delta), fontsize=16)
+        pylab.title(str(alpha), fontsize=16)
         for i in xrange(0,50):
-            av.append(numpy.sum(numpy.power(Z[i],2)))
+            av.append(numpy.sqrt(numpy.sum(numpy.power(Z[i],2))))
             pylab.subplot(7,8,i+1)
             w = numpy.array(Z[i]).reshape(sizex,sizey)
             RFs.append(w)
             pylab.show._needmain=False
-            pylab.imshow(w,vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
+            pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+            
+        pylab.figure()
+        pylab.title("relationship", fontsize=16)    
+        for i in xrange(0,50):
+            pylab.subplot(7,8,i+1)
+            pylab.plot(validation_predicted_activities.T[i],validation_activities.T[i],'ro')
+            
+        pylab.figure()
+        pylab.title("relationship_tf", fontsize=16)    
+        for i in xrange(0,50):
+            pylab.subplot(7,8,i+1)
+            pylab.plot(numpy.mat(tf_validation_predicted_activities).T[i],validation_activities.T[i],'ro')
+            
+            
+                
         pylab.savefig(normalize_path("RFs_"+str(ni)+"_normalized"))
-        print "AV:", av
         pylab.figure()
         pylab.hist(av)
+        pylab.xlabel("rf_magnitued")
         
         pylab.figure()
-        pylab.title(str(delta), fontsize=16)
+        print shape(av)
+        print shape(normalized_errors)
+        pylab.plot(av,normalized_errors,'ro')
+        pylab.xlabel("rf_magnitued")
+        pylab.ylabel("normalized error")
+        
+        pylab.figure()
+        pylab.plot(av,tf_normalized_errors,'ro')
+        pylab.xlabel("rf_magnitued")
+        pylab.ylabel("tf_normalized error")
+        
+        
+        pylab.figure()
+        pylab.title(str(alpha), fontsize=16)
         for i in xrange(0,50):
             pylab.subplot(7,8,i+1)
             w = numpy.array(Z[i]).reshape(sizex,sizey)
             pylab.show._needmain=False
             m = numpy.max([abs(numpy.min(numpy.min(w))),abs(numpy.max(numpy.max(w)))])
-            pylab.imshow(w,vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
+            pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
         pylab.savefig(normalize_path("RFs_"+str(ni)))
-            
-            
-    error = numpy.sum(numpy.sqrt(numpy.sum(numpy.power(validation_activities - validation_inputs*Z.T,2),axis=1)))
+    
+        pylab.figure()
+        pylab.hist(normalized_errors)
+        pylab.xlabel("normalized_errors")
+        
+        pylab.figure()
+        pylab.hist(tf_normalized_errors)
+        pylab.xlabel("tf_normalized_errors")
     
     # prediction
-    predicted_activities = validation_inputs*Z.T
+    
     correct=0
     for i in xrange(0,len(validation_inputs)):
         tmp = []
         for j in xrange(0,len(validation_inputs)):
-            tmp.append(numpy.sqrt(numpy.sum(numpy.power(validation_activities[i]-predicted_activities[j],2))))
+            tmp.append(numpy.sqrt(numpy.sum(numpy.power(validation_activities[i]-validation_predicted_activities[j],2))))
         x = numpy.argmin(tmp)
-        if (x == i): correct+=1 
-    return (error,correct,RFs) 
+        if (x == i): correct+=1
+         
+    tf_correct=0
+    for i in xrange(0,len(validation_inputs)):
+        tmp = []
+        for j in xrange(0,len(validation_inputs)):
+            tmp.append(numpy.sqrt(numpy.sum(numpy.power(validation_activities[i]-tf_validation_predicted_activities[j],2))))
+        x = numpy.argmin(tmp)
+        if (x == i): tf_correct+=1
+         
+         
+    print "Correct:", correct ," out of ", len(validation_inputs), " percentage:", correct*1.0 / len(validation_inputs)* 100 ,"%"
+    print "TFCorrect:", tf_correct, " out of ", len(validation_inputs), " percentage:", tf_correct*1.0 / len(validation_inputs) *100 ,"%"
+    print "Normalized_error:", normalized_error
+    return (normalized_errors,correct,RFs,tf_predicted_activities,tf_validation_predicted_activities) 
 
+def run_nonlinearity_detection(activities,predicted_activities,num_bins=20,display=False):
+            (num_act,num_neurons) = numpy.shape(activities)
+            
+            os = []
+            if display:
+               pylab.figure()
+            for i in xrange(0,num_neurons):
+                min_pact = numpy.min(predicted_activities[:,i])
+                max_pact = numpy.max(predicted_activities[:,i])
+                bins = numpy.arange(0,num_bins+1,1)/(num_bins*1.0)*(max_pact-min_pact) + min_pact
+                bins[-1]+=0.000001
+                ps = numpy.zeros(num_bins)
+                pss = numpy.zeros(num_bins)
+                    
+                for j in xrange(0,num_act):
+                    bin = numpy.nonzero(bins>=predicted_activities[j,i])[0][0]-1
+                    ps[bin]+=1
+                    pss[bin]+=activities[j,i] 
+                    idx = numpy.nonzero(ps==0)
+                    ps[idx]=1.0
+                    tf = pss/ps
+                    tf[idx]=0.0
+                
+                if display:
+                   pylab.subplot(7,8,i+1)
+                   pylab.plot(bins[0:-1],ps)
+                   pylab.plot(bins[0:-1],pss)
+                   
+                   pylab.plot(bins[0:-1],tf*1000)
+                
+                os.append((bins,tf))
+            return os
+
+def apply_output_function(activities,of):
+    (x,y) = numpy.shape(activities)
+    acts = numpy.zeros(numpy.shape(activities))
+    for i in xrange(0,x):
+        for j in xrange(0,y):
+            (bins,tf) = of[j]
+            
+            if activities[i,j] >= numpy.max(bins):
+                acts[i,j] = tf[-1]
+            elif activities[i,j] <= numpy.min(bins):
+                 acts[i,j] = tf[0]
+            else:
+                bin = numpy.nonzero(bins>=activities[i,j])[0][0]-1
+                # do linear interpolation
+                a = bins[bin]
+                b = bins[bin+1]
+                alpha = (activities[i,j]-a)/(b-a)
+                
+                if bin!=0:
+                   c = (tf[bin]+tf[bin-1])/2
+                else:
+                   c = tf[bin]
+                
+                if bin!=len(tf)-1:
+                   d = (tf[bin]+tf[bin+1])/2
+                else:
+                   d = tf[bin]
+                
+                acts[i,j] = c + (d-c)* alpha
+    
+    return acts
+
+def later_interaction_prediction(activities,predicted_activities,validation_activities,validation_predicted_activities,display=True):
+    
+    (num_pres,num_neurons) = numpy.shape(activities)
+    
+    cor_orig = numpy.zeros((num_neurons,num_neurons))
+    cor = numpy.zeros((num_neurons,num_neurons))
+    
+    residues = activities - predicted_activities
+    
+    for i in xrange(0,num_neurons):
+        for j in xrange(0,num_neurons):
+            cor[i,j] = numpy.corrcoef(residues[i],residues[j])[0][1]
+    
+    pylab.figure()
+    pylab.imshow(cor,interpolation='nearest')
+    pylab.colorbar()
+    
+    for i in xrange(0,num_neurons):
+        for j in xrange(0,num_neurons):
+            cor_orig[i,j] = numpy.corrcoef(activities[i],activities[j])[0][1]
+    
+    pylab.figure()
+    pylab.imshow(cor_orig,interpolation='nearest')
+    pylab.colorbar()
+    
+    
+    mf = ModelFit()
+    mf.learning_rate = __main__.__dict__.get('lr',0.1)
+    mf.epochs=__main__.__dict__.get('epochs',1000)
+    mf.num_of_units = num_neurons
+    mf.init()
+    
+    (err,stop,min_errors) = mf.trainModel(mat(predicted_activities),numpy.mat(activities),mat(validation_predicted_activities),numpy.mat(validation_activities))
+    print "\nStop criterions", stop
+    print "\nNon-zero stop criterions",numpy.nonzero(stop)
+    print "\nMinimal errors per cell",numpy.nonzero(min_errors)
+    
+    print "Model test with all neurons"
+    mf.testModel(mat(validation_predicted_activities),numpy.mat(validation_activities))
+    
+    model_predicted_activities = mf.returnPredictedActivities(mat(predicted_activities))
+    model_validation_predicted_activities = mf.returnPredictedActivities(mat(validation_predicted_activities))
+    print numpy.shape(activities)
+    print numpy.shape(model_predicted_activities)
+    of = run_nonlinearity_detection(numpy.mat(activities),model_predicted_activities,10,display)
+    
+    tf_model_predicted_activities = apply_output_function(model_predicted_activities,of)
+    tf_model_validation_predicted_activities = apply_output_function(model_validation_predicted_activities,of)
+
+    if display:
+        pylab.figure()
+        pylab.title("model_relationship", fontsize=16)    
+        for i in xrange(0,50):
+            pylab.subplot(7,8,i+1)
+            pylab.plot(model_validation_predicted_activities.T[i],numpy.mat(validation_activities).T[i],'ro')
+            
+        pylab.figure()
+        pylab.title("model_relationship_tf", fontsize=16)    
+        for i in xrange(0,50):
+            pylab.subplot(7,8,i+1)
+            pylab.plot(numpy.mat(tf_model_validation_predicted_activities).T[i],numpy.mat(validation_activities).T[i],'ro')
+
+    correct=0
+    for i in xrange(0,len(validation_activities)):
+        tmp = []
+        for j in xrange(0,len(validation_activities)):
+            tmp.append(numpy.sqrt(numpy.sum(numpy.power(numpy.mat(validation_activities)[i]-model_validation_predicted_activities[j],2))))
+        x = numpy.argmin(tmp)
+        if (x == i): correct+=1
+         
+    tf_correct=0
+    for i in xrange(0,len(validation_activities)):
+        tmp = []
+        for j in xrange(0,len(validation_activities)):
+            tmp.append(numpy.sqrt(numpy.sum(numpy.power(numpy.mat(validation_activities)[i]-tf_model_validation_predicted_activities[j],2))))
+        x = numpy.argmin(tmp)
+        if (x == i): tf_correct+=1
+         
+         
+    print "Correct:", correct ," out of ", len(validation_activities), " percentage:", correct*1.0 / len(validation_activities)* 100 ,"%"
+    print "TFCorrect:", tf_correct, " out of ", len(validation_activities), " percentage:", tf_correct*1.0 / len(validation_activities) *100 ,"%"
 
 def lasso_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validation_inputs,validation_activities,display=False,size=0.2):
     
@@ -1069,14 +1275,14 @@ def runRFPositionPrediction(sf,stepsize):
 def runRFinference():
     density=__main__.__dict__.get('density', 20)
     #dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
-    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_on_&_off_response",2700,50)
+    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_spikes_on_&_off_response",2700,50)
     (index,data) = dataset
     index+=1
     dataset = (index,data)
     dataset = averageRangeFrames(dataset,0,1)
     dataset = averageRepetitions(dataset)
     
-    (dataset,validation_data_set) = splitDataset(dataset,0.9)
+    (dataset,validation_data_set) = splitDataset(dataset,0.98)
     #(dataset,rubish) = splitDataset(dataset,0.25)
 
     training_set = generateTrainingSet(dataset)
@@ -1090,57 +1296,53 @@ def runRFinference():
        validation_inputs = normalize_image_inputs(validation_inputs,avgRF)
     
     if __main__.__dict__.get('NormalizeActivities',True):
-        (a,v) = compute_average_min_max(numpy.concatenate((training_set,validation_set),axis=0))
+        #(a,v) = compute_average_min_max(numpy.concatenate((training_set,validation_set),axis=0))
+        (a,v) = compute_average_min_max(training_set)
         training_set = normalize_data_set(training_set,a,v)
         validation_set = normalize_data_set(validation_set,a,v)
     
     if True:
-        print numpy.shape(training_inputs[0])
         (x,y)= numpy.shape(training_inputs[0])
         training_inputs = cut_out_images_set(training_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
         validation_inputs = cut_out_images_set(validation_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
-        print numpy.shape(training_inputs[0])
         (sizex,sizey) = numpy.shape(training_inputs[0])
     
     (sizex,sizey) = numpy.shape(training_inputs[0])
     training_inputs = generate_raw_training_set(training_inputs)
     validation_inputs = generate_raw_training_set(validation_inputs)
+ 
+    #(e,c,RFs,pa,pva) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,20,validation_inputs,validation_set,True,"OnOff_spikes")     
 
+    #later_interaction_prediction(training_set,pa,validation_set,pva)
 
-    
-    #lasso_regression_rf(training_inputs,training_set,sizex,sizey,0,20,2.21,validation_inputs,validation_set,True,0.28)
-    
-    #return
-    
-    a = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,2700,0.0,validation_inputs,validation_set,True,0.28,"OnOff_spikes")    
-    
-    
-    
-    if True:
-        e = []
-        c = []
-        b = []
+    e = []
+    c = []
+    b = []
+    if False:
         x = 0.2
-        for i in xrange(0,10):
+        for i in xrange(0,30):
             print i
-            x = 2500 + i*100  
-            (e1,c1,RFs) = ridge_regression_rf(training_inputs,training_set,sizex,sizey,0,x,0.0,validation_inputs,validation_set,False,0.28)
+            x = i*10
+            (e1,c1,RFs,pa,pva) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,x,validation_inputs,validation_set,False)
             e.append(e1)
             c.append(c1)
             b.append(x)
             #x = x*2
         pylab.figure()
         #pylab.semilogx(b,e)
-        pylab.plot(b,e)
+        pylab.plot(b,numpy.mat(e))
         pylab.figure()
         #pylab.semilogx(b,c)
         pylab.plot(b,c)
-        pylab.show()
+        
+    #return e
+
+    (e,c,RFs,pa,pva) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,25,validation_inputs,validation_set,True,"OnOff_spikes")
+    later_interaction_prediction(training_set,pa,validation_set,pva)
     
     pylab.show()
-    return a
+    return e
 
-    
 
 def compute_spike_triggered_average_rf(inputs,activities,density):
     (num_inputs,num_activities) = shape(activities)
@@ -1459,7 +1661,7 @@ def runSTC():
     pylab.show()
     return a
 
-def STC(inputs,activities,validation_inputs,validation_activities,cutoff=95,display=False):
+def STC(inputs,activities,validation_inputs,validation_activities,cutoff=90,display=False):
     from scipy import linalg
     print "input size:",numpy.shape(inputs)
     
@@ -1481,6 +1683,7 @@ def STC(inputs,activities,validation_inputs,validation_activities,cutoff=95,disp
     v,la = linalg.eig(CC)
     la = numpy.mat(la)
     ind = numpy.argsort(numpy.abs(v))
+    print int(input_len*(cutoff/100.0))
     for j in xrange(0,int(input_len*(cutoff/100.0))):
         v[ind[j]]=1.0
     
@@ -1537,7 +1740,11 @@ def STC(inputs,activities,validation_inputs,validation_activities,cutoff=95,disp
     for j in xrange(0,act_len):
         vv,ei = linalg.eig(C[j])
         ei=numpy.mat(ei).T
-        ei = ei*Ninv*linalg.inv(la)
+        ei = ei*(Ninv*linalg.inv(la))
         eis.append((ei,vv))
     
     return eis
+    
+    
+# The minimum alphas for different neurons at density 80 with On_Off raw data    
+#c=[120, 290,  50, 240, 290, 260, 120, 100, 290, 130, 290, 290, 230,170, 120, 190, 290, 100, 140, 290, 290,  60, 290, 290,  80, 210,50, 250, 170, 290, 290, 290,  60, 290, 290,  60, 260, 290, 290,290,  60,  90, 290, 120, 290,  80, 270, 120, 290, 290]
