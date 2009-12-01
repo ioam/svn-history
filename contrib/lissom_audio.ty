@@ -13,7 +13,7 @@ import param
 
 from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet
 
-#import topo.pattern.audio
+import topo.pattern.audio
 import topo.learningfn.optimized
 import topo.learningfn.projfn 
 import topo.transferfn.optimized 
@@ -32,7 +32,7 @@ p.add(
         Linear size of cortical area to simulate.
         2.0 gives a 2.0x2.0 Sheet area in V1."""),
 		
-    cochlea_density=param.Number(default=48.0,bounds=(0,None),
+    cochlea_density=param.Number(default=24.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
         The nominal_density to use for the retina."""),
 
@@ -58,12 +58,12 @@ projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveN
 
 
 ### Input patterns
-#input=pattern.audio.Audio()
+input_pattern=pattern.audio.Audio(min_frequency=20, max_frequency=20000, filename="square/sqr-1kHz.wav", sample_window=0.3,seconds_per_timestep=0.1)
 
 cochlea_mgn_connection_radius = 0.5#375
 
-cochlea_half_length = p.area/2.0 + cochlea_mgn_connection_radius
-cochlea_half_width = cochlea_half_length * p.cochlea_aspect_ratio
+cochlea_half_width = p.area/2.0 + cochlea_mgn_connection_radius
+cochlea_half_length = cochlea_half_width * p.cochlea_aspect_ratio
 
 
 
@@ -72,8 +72,8 @@ topo.sim['Cochlea']=sheet.GeneratorSheet(
 	nominal_density=p.cochlea_density,
 	# p.area, 0.25
     nominal_bounds=sheet.BoundingBox(points=((-cochlea_half_length,-cochlea_half_width),
-                                     (cochlea_half_length,cochlea_half_width))))#,
-	#input_generator=input, period=1.0, phase=0.05)
+                                     (cochlea_half_length,cochlea_half_width))),
+	input_generator=input_pattern, period=1.0, phase=0.05)
     
 topo.sim['MGN']=sheet.CFSheet(
 	nominal_density=p.mgn_density,
