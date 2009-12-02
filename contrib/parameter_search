@@ -228,4 +228,4 @@ os.system('chmod +x %s'%submitter)
 
 
 
-print "Running '%s' will submit your %i specified parameter combinations (using '%s' to start the topographica jobs)."%(submitter,len(combinations),selector)
+print "Running '%s' will submit your %i specified parameter combinations (using '%s' to start the topographica jobs). Output directories will be in '%s'."%(submitter,len(combinations),selector,output_path)
