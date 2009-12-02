@@ -143,10 +143,12 @@ f.write(string.join(sys.argv))
 f.close()
 
 
+substitutions = {'combonumber':'$i',
+                 'comboname':os.path.basename(combinations_file)}
 
-substitutions = {'job':'./%s $i'%options['selector'],
-                 'combonumber':'$i'}
+selector = options['selector_template'].substitute(substitutions)
 
+substitutions['job'] = './%s $i'%selector
 
 import copy
 def _generate_command(parameters,i):
@@ -191,7 +193,7 @@ for line in lines[1::]:
 
 
 ## Generate script that will run any one of the parameter combinations.
-fout = open(options['selector'],'w')
+fout = open(selector,'w')
 fout.write('#!/bin/bash -i\n')
 
 for i,params in zip(range(len(combinations)),combinations):
@@ -205,11 +207,12 @@ fi
     fout.write(nscript)
 
 fout.close()
-os.system('chmod +x %s'%options['selector'])
+os.system('chmod +x %s'%selector)
 
 
 ## Generate script that will submit all combinations
-f = open(options['submitter'],'w')
+submitter = options['submitter_template'].substitute(substitutions)
+f = open(submitter,'w')
 submitcmd = options['job_submit_template'].substitute(substitutions)
 
 nscript = """#!/bin/bash
@@ -221,8 +224,8 @@ done
 
 f.write(nscript)
 f.close()
-os.system('chmod +x %s'%options['submitter'])
+os.system('chmod +x %s'%submitter)
 
 
 
-print "Running '%s' will submit your %i specified parameter combinations (using '%s' to start the topographica jobs)."%(options['submitter'],len(combinations),options['selector'])
+print "Running '%s' will submit your %i specified parameter combinations (using '%s' to start the topographica jobs)."%(submitter,len(combinations),selector)
