@@ -324,7 +324,14 @@ def linearly_interpolate(table,value):
        lookup=table[len(table)-1]
 
     # Over upper bound -- return largest value and print warning
-    # JABALERT: Printing a warning message is not necessarily the most useful behavior
+    # JABALERT: Printing a warning message is not necessarily the most
+    # useful behavior. Should at least provide some identification of
+    # where the warning is coming from. Should add bounds_error and/or
+    # bounds_warn options. (Could turn into a ParameterizedFunction so
+    # that any message includes an identification, and so that
+    # warnings-as-errors will work.) Would be nice if we could use the
+    # equivalent function from scipy, but we can't yet depend on scipy
+    # being available.
     else:
        lookup=table[len(table)-1]
        print "Warning -- value %f out of range; returning maximum of %f" % (value,lookup)
