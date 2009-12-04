@@ -234,36 +234,37 @@ try:
 
     ############# find params that differ
     if options['display_only_varying_params']:
-        # and display common params on a title page!
-        # and warn if the same params aren't in each experiment!
-
         SAME = experiments[0]['params'].keys()
+        REMOVED = []
         for e in experiments[1::]:
             for pname,pval in experiments[0]['params'].items():
                 try:
                     pval2 = e['params'][pname]
-                except KeyError:
-                    logger.warn("'display_only_varying_params=True was specified, but experiments do not all have the same parameters; continuing as if display_only_varying_params is False.")
-                    SAME = []
-                    continue
 
-                if pval2!=pval:
-                    SAME.remove(pname)
+                    if pval2!=pval:
+                        if pname not in SAME:
+                            assert pname in REMOVED
+                        else:
+                            SAME.remove(pname)
+                            REMOVED.append(pname)
+
+                except KeyError:
+                    logger.debug("'display_only_varying_params=True was specified, but experiments do not all have the same parameters.")
+
+                    if pname not in SAME:
+                        assert pname in REMOVED
+                    else:
+                        SAME.remove(pname)
+                        REMOVED.append(pname)
+
     else:
         SAME = []
                     
-
-
     images = []
-
     matches = 0
-
     timesdata = dict.fromkeys(outputs['times'],False)
     interestsdata = dict.fromkeys(outputs['interests'],False)
-
-
     multiple_matches = []
-
 
     for e in experiments:
         directory = e['name']
@@ -275,10 +276,11 @@ try:
             for i in outputs['interests']:
                 found_match = False 
                 for f in glob.glob(directory+'/*%s*'%t+options['image_extension']):
-                    if re.search(i,f):
+                    basename = os.path.basename(f)
+                    if re.search(i,basename):
                         if found_match is True:
                             multiple_matches.append(i)
-                            logger.debug("Multiple matches: ignoring '%s'"%f)
+                            logger.debug("Multiple matches: ignoring '%s'"%basename)
                         else:
                             row[t][i] = f
                             matches+=1
@@ -287,8 +289,10 @@ try:
                             found_match = True
         images.append(row)
 
-    for i in set(multiple_matches):
-        logger.warn("Multiple matches for interest '%s'; arbitrary match will be displayed"%i)
+    multiple_matches = set(multiple_matches)
+    if len(multiple_matches)>0:
+        eyes = [" ".join(multiple_matches)]
+        raise ValueError("Multiple matches for interests %s; specify each listed interest more precisely, to allow it to be distinguished."%eyes)
 
 
     for t,d in timesdata.items():
@@ -307,7 +311,8 @@ try:
 
     # hack: calc imwidth for no of images in row
     # hack: height 2.2 - if gets too big, can't get two figs/page
-    imwidth = min(25.0/len(outputs['times']),2.0)
+    imwidth = min(25.0/len(outputs['times']),
+                  options.get('max_figure_width',10.0))
 
     linkcount = 0
 
@@ -316,6 +321,7 @@ try:
 
     intrests = ["%i- %s"%(i,intr) for i,intr in enumerate(outputs['interests'])]
 
+    
     output = \
     r"""
     \documentclass[landscape,10pt,a4paper]{article}  
@@ -374,8 +380,8 @@ try:
             caption = "%s"%E['name'].lstrip(data_dir)
         else:
             caption = "%s/%s"%(E['subdir'],E['title'])
-        if options['print_params']:
-            caption+= " - %s"%dict([(pname,pval) for pname,pval in E['params'].items() if pname not in SAME])
+#        if options['print_params']:
+        caption+= " - %s"%dict([(pname,pval) for pname,pval in E['params'].items() if pname not in SAME])
 
         output+=string.join(outputs['times'],"&")+r"\\"
         output+=\
@@ -384,9 +390,6 @@ try:
     \caption{%s}
     \end{figure}
     """%(F(caption))
-
-        if (figcount+1)%options['figures_per_page']==0 and figcount>0:
-            output+="\n\clearpage\n"
 
         figcount+=1
 
