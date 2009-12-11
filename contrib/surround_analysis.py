@@ -50,20 +50,24 @@ class surround_analysis():
         # Center mask to matrixidx center
         self.center_r,self.center_c = self.sheet.sheet2matrixidx(0,0)
         self.center_x,self.center_y = self.sheet.matrixidx2sheet(self.center_r,self.center_c)
-        FeatureCurveCommand.curve_parameters=[{"contrast":self.low_contrast},{"contrast":self.high_contrast}]
-        FeatureCurveCommand.display=True
-        FeatureCurveCommand.sheet=topo.sim[sheet_name]
-        SinusoidalMeasureResponseCommand.num_phase=4
-        SinusoidalMeasureResponseCommand.frequencies=[3.0]
-        SinusoidalMeasureResponseCommand.scale=1.0
-        MeasureResponseCommand.scale=1.0
-        FeatureCurveCommand.num_orientation=8
-        
+	
+	
         from topo.analysis.featureresponses import PatternPresenter            
         PatternPresenter.duration=2.0
         import topo.command.pylabplots
         reload(topo.command.pylabplots)
+
+	
+        FeatureCurveCommand.curve_parameters=[{"contrast":self.low_contrast},{"contrast":self.high_contrast}]
+        FeatureCurveCommand.display=True
+        FeatureCurveCommand.sheet=topo.sim[sheet_name]
+        SinusoidalMeasureResponseCommand.num_phase=8
+        SinusoidalMeasureResponseCommand.frequencies=[3.0]
+        SinusoidalMeasureResponseCommand.scale=1.0
+        MeasureResponseCommand.scale=1.0
+        FeatureCurveCommand.num_orientation=12
         
+       
 
 
     def analyse(self,steps=1,ns=10,step_size=1):
@@ -76,7 +80,7 @@ class surround_analysis():
                 xindex = self.center_r+(x-steps)*step_size
                 yindex = self.center_c+(y-steps)*step_size
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
-                topo.command.pylabplots.measure_size_response.instance(sheet=self.sheet,num_phase=4,num_sizes=ns,max_size=3.0,coords=[(xcoor,ycoor)])(coords=[(xcoor,ycoor)])        
+                topo.command.pylabplots.measure_size_response.instance(sheet=self.sheet,num_phase=4,num_sizes=ns,max_size=3.0,coords=[(xcoor,ycoor)])(coords=[(xcoor,ycoor)],frequencies=[3.0])        
                 
                 self.data_dict[(xindex,yindex)] = {}
                 self.data_dict[(xindex,yindex)]["ST"] = self.calculate_RF_sizes(xindex, yindex)
@@ -104,7 +108,7 @@ class surround_analysis():
         hc_curve = data["Contrast = " + str(self.high_contrast) + "%" ]
         lc_curve = data["Contrast = " + str(self.low_contrast) + "%" ]
         
-        topo.command.pylabplots.measure_or_tuning(num_phase=4,num_orientation=12,size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.low_contrast}],display=True,coords=[(xcoor,ycoor)])
+        topo.command.pylabplots.measure_or_tuning(num_phase=4,num_orientation=12,size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.low_contrast}],display=True,coords=[(xcoor,ycoor)],frequencies=[3.0])
         topo.command.pylabplots.cyclic_tuning_curve.instance(x_axis="orientation",coords=[(xcoor,ycoor)])
         
         curve_name_ort = "Contrast = " + str(self.low_contrast) + "%";
@@ -122,15 +126,16 @@ class surround_analysis():
         curve_data["ORTC"]={}
         curve_data["ORTC"]["info"]={}
         curve_data["ORTC"]["info"]["pref_or"]=orr
-        
+        print "ORIENTATION:", orr 
         topo.command.pylabplots.measure_orientation_contrast(sizecenter=lc_curve["measures"]["peak_near_facilitation"],
                                                              orientation_center=orr,
                                                              sizesurround=4.0,
                                                              size=0.0,
                                                              display=True,
                                                              contrastcenter=self.low_contrast,
-                                                             thickness=4.0-lc_curve["measures"]["peak_near_facilitation"]-0.1,
-                                                             num_phase=8,
+                                                             thickness=4.0-lc_curve["measures"]["peak_near_facilitation"]-0.2,
+                                                             num_phase=12,
+							     frequencies=[3.0],
                                                              curve_parameters=[{"contrastsurround":self.low_contrast},{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
         
         for curve_label in sorted(self.sheet.curve_dict['orientationsurround'].keys()):
@@ -297,6 +302,7 @@ class surround_analysis():
 
 
             y_values = sorted(y_values, key=lambda x: x_values[numpy.argmax(y_values == x)])
+	    
             x_values = sorted(x_values) 
             y_values.append(y_values[0])
             x_values.append(x_values[0]+numpy.pi)
@@ -304,7 +310,7 @@ class surround_analysis():
             f.plot(x_values, y_values, lw=3, color=colors[i],label=curve_label)
             i+=1
         
-        pylab.legend()
+	pylab.legend(loc='lower left')
         release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "]")
         
         fig = pylab.figure()
