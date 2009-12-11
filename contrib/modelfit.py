@@ -17,6 +17,12 @@ from topo.pattern.image import FileImage
 import contrib.jacommands
 from topo.misc.filepath import normalize_path, application_path
 
+import contrib.dd
+
+dd = contrib.dd.DB()
+dd.load_db("modelfitDB.dat")
+
+
 class ModelFit():
     weigths = []
     retina_diameter=1.2
@@ -42,7 +48,8 @@ class ModelFit():
         delta=[]
         self.DC=numpy.array(activities[0]).copy()*0.0
 
-        self.weigths=numpy.mat(numpy.zeros((size(activities,1),size(inputs[0],1))))
+        #self.weigths=numpy.mat(numpy.zeros((size(activities,1),size(inputs[0],1))))
+	self.weigths=numpy.mat(numpy.identity(size(inputs[0],1)))
         best_weights = self.weigths.copy()
 
         mean_error=numpy.mat(numpy.zeros(shape(activities[0].T)))
@@ -426,10 +433,11 @@ def loadSimpleDataSet(filename,num_stimuli,n_cells):
     f = file(filename, "r") 
     data = [line.split() for line in f]
     f.close()
+    print "Dataset shape:", shape(data)
 
     dataset = [([[] for i in xrange(0,num_stimuli)]) for i in xrange(0,n_cells)]
     print shape(dataset)
-    #(num_stimuli,n_cells) = shape(data)
+    
     
     for k in xrange(0,n_cells):
         for i in xrange(0,num_stimuli):
@@ -507,8 +515,13 @@ def splitDataset(dataset,ratio):
     index1=[]
     index2=[]
 
+    if ratio<=1.0:
+    	tresh = num_stim*ratio
+    else:
+	tresh = ratio
+
     for i in xrange(0,num_stim):
-        if i < numpy.floor(num_stim*ratio):
+        if i < numpy.floor(tresh):
             index1.append(index[i])
         else:    
             index2.append(index[i])
@@ -517,7 +530,7 @@ def splitDataset(dataset,ratio):
         d1=[]
         d2=[]
         for i in xrange(0,num_stim):
-            if i < numpy.floor(num_stim*ratio):
+            if i < numpy.floor(tresh):
                d1.append(cell[i])
             else:    
                d2.append(cell[i])
@@ -549,7 +562,8 @@ def generateInputs(dataset,directory,image_matching_string,density,aspect,offset
     
     ins=[]
     for j in xrange(0,len(index)):
-        inp = inputs[j](xdensity=density,ydensity=density) 
+        inputs[j].pattern_sampler.whole_pattern_output_fns=[]
+        inp = inputs[j](xdensity=density,ydensity=density) /255.0
         (x,y) = shape(inp)
         z=(x - x / aspect)/2
         ins.append(inp[z:x-z,:])
@@ -689,13 +703,13 @@ def runModelFit():
 
 
     training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    training_inputs=generateInputs(dataset,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
     
     validation_set = generateTrainingSet(validation_data_set)
-    validation_inputs=generateInputs(validation_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    validation_inputs=generateInputs(validation_data_set,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
     
     testing_set = generateTrainingSet(testing_data_set)
-    testing_inputs=generateInputs(testing_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    testing_inputs=generateInputs(testing_data_set,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
     
 
     
@@ -860,7 +874,7 @@ def set_fann_dataset(td,inputs,outputs):
     td.read_train_from_file("./tmp.txt")
     
 
-def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs,validation_activities,display=False,ni=100):
+def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs,validation_activities,params,display=False):
     p = len(inputs[0])
     np = len(activities[0])
     inputs = numpy.mat(inputs)
@@ -882,7 +896,7 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
             if y < sizey-1:
                norm[x,y+1]=-1
             S = numpy.concatenate((S,alpha*norm.flatten()),axis=0)
-
+	    
     activities_padded = numpy.concatenate((activities,numpy.mat(numpy.zeros((sizey*sizex,np)))),axis=0)
     Z = numpy.linalg.pinv(S)*activities_padded
     Z=Z.T
@@ -900,9 +914,13 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
     
     errors = numpy.sqrt(numpy.sum(numpy.power(validation_activities - validation_predicted_activities,2),axis=0))
     tf_errors = numpy.sqrt(numpy.sum(numpy.power(validation_activities - tf_validation_predicted_activities,2),axis=0))
-    #print "Errors", errors
-    #print "Activity magnitueds", numpy.sqrt(numpy.sum(numpy.power(validation_activities,2),axis=0)).T
     mean_mat = numpy.mat([numpy.array(numpy.mean(validation_activities,axis=0))[0] for i in xrange(0,len(validation_inputs))])
+    
+    corr_coef=[]
+    corr_coef_tf=[]
+    for i in xrange(0,np):
+            corr_coef.append(numpy.corrcoef(validation_activities[:,i].T, validation_predicted_activities[:,i].T)[0][1])
+	    corr_coef_tf.append(numpy.corrcoef(validation_activities[:,i].T, tf_validation_predicted_activities[:,i].T)[0][1])
     
     act_var = numpy.sqrt(numpy.sum(numpy.power(validation_activities-mean_mat,2),axis=0))
     normalized_errors = numpy.array(errors / act_var)[0]
@@ -910,34 +928,35 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
     error = numpy.mean(errors)
     normalized_error = numpy.mean(normalized_errors)
 
+
+    for i in xrange(0,np):
+        RFs.append(numpy.array(Z[i]).reshape(sizex,sizey))
+	    
     if display:
         av=[]
         pylab.figure()
         pylab.title(str(alpha), fontsize=16)
-        for i in xrange(0,50):
+        for i in xrange(0,np):
             av.append(numpy.sqrt(numpy.sum(numpy.power(Z[i],2))))
-            pylab.subplot(7,8,i+1)
+            pylab.subplot(10,11,i+1)
             w = numpy.array(Z[i]).reshape(sizex,sizey)
-            RFs.append(w)
             pylab.show._needmain=False
             pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	    pylab.axis('off')
             
         pylab.figure()
         pylab.title("relationship", fontsize=16)    
-        for i in xrange(0,50):
-            pylab.subplot(7,8,i+1)
+        for i in xrange(0,np):
+            pylab.subplot(10,11,i+1)
             pylab.plot(validation_predicted_activities.T[i],validation_activities.T[i],'ro')
             
         pylab.figure()
         pylab.title("relationship_tf", fontsize=16)    
-        for i in xrange(0,50):
-            pylab.subplot(7,8,i+1)
+        for i in xrange(0,np):
+            pylab.subplot(10,11,i+1)
             pylab.plot(numpy.mat(tf_validation_predicted_activities).T[i],validation_activities.T[i],'ro')
-            
-            
-                
-        pylab.savefig(normalize_path("RFs_"+str(ni)+"_normalized"))
-        pylab.figure()
+        
+	pylab.figure()
         pylab.hist(av)
         pylab.xlabel("rf_magnitued")
         
@@ -953,16 +972,19 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
         pylab.xlabel("rf_magnitued")
         pylab.ylabel("tf_normalized error")
         
+	
+	
+	
         
         pylab.figure()
         pylab.title(str(alpha), fontsize=16)
-        for i in xrange(0,50):
-            pylab.subplot(7,8,i+1)
+        for i in xrange(0,np):
+            pylab.subplot(10,11,i+1)
             w = numpy.array(Z[i]).reshape(sizex,sizey)
             pylab.show._needmain=False
             m = numpy.max([abs(numpy.min(numpy.min(w))),abs(numpy.max(numpy.max(w)))])
             pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
-        pylab.savefig(normalize_path("RFs_"+str(ni)))
+            pylab.axis('off')
     
         pylab.figure()
         pylab.hist(normalized_errors)
@@ -971,6 +993,15 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
         pylab.figure()
         pylab.hist(tf_normalized_errors)
         pylab.xlabel("tf_normalized_errors")
+    
+        pylab.figure()
+        pylab.hist(corr_coef)
+        pylab.xlabel("Correlation coefficient")
+	
+	pylab.figure()
+        pylab.hist(corr_coef_tf)
+        pylab.xlabel("Correlation coefficient with transfer function")
+    
     
     # prediction
     
@@ -989,12 +1020,30 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
             tmp.append(numpy.sqrt(numpy.sum(numpy.power(validation_activities[i]-tf_validation_predicted_activities[j],2))))
         x = numpy.argmin(tmp)
         if (x == i): tf_correct+=1
-         
-         
+    
+    
+    #saving section
+    dd.add(params,"ReversCorrelationRFs",RFs)
+    dd.add(params,"ReversCorrelationCorrectPercentage",correct*1.0 / len(validation_inputs)* 100)
+    dd.add(params,"ReversCorrelationTFCorrectPercentage",tf_correct*1.0 / len(validation_inputs) *100)
+    dd.add(params,"ReversCorrelationPredictedActivities",predicted_activities)
+    dd.add(params,"ReversCorrelationPredictedActivities+TF",tf_predicted_activities)
+    dd.add(params,"ReversCorrelationPredictedValidationActivities",validation_predicted_activities)
+    dd.add(params,"ReversCorrelationPredictedValidationActivities+TF",tf_validation_predicted_activities)
+    dd.add(params,"ReversCorrelationNormalizedErrors",normalized_errors)
+    dd.add(params,"ReversCorrelationNormalizedErrors+TF",tf_normalized_errors)
+    dd.add(params,"ReversCorrelationCorrCoefs",corr_coef)
+    dd.add(params,"ReversCorrelationCorrCoefs+TF",corr_coef_tf)
+    dd.add(params,"ReversCorrelationTransferFunction",of)
+    dd.add(params,"ReversCorrelationRFMagnitude",av)
+    
+    
+    
+    
     print "Correct:", correct ," out of ", len(validation_inputs), " percentage:", correct*1.0 / len(validation_inputs)* 100 ,"%"
     print "TFCorrect:", tf_correct, " out of ", len(validation_inputs), " percentage:", tf_correct*1.0 / len(validation_inputs) *100 ,"%"
     print "Normalized_error:", normalized_error
-    return (normalized_errors,correct,RFs,tf_predicted_activities,tf_validation_predicted_activities) 
+    return (normalized_errors,tf_normalized_errors,correct,tf_correct,RFs,tf_predicted_activities,tf_validation_predicted_activities) 
 
 def run_nonlinearity_detection(activities,predicted_activities,num_bins=20,display=False):
             (num_act,num_neurons) = numpy.shape(activities)
@@ -1020,7 +1069,7 @@ def run_nonlinearity_detection(activities,predicted_activities,num_bins=20,displ
                     tf[idx]=0.0
                 
                 if display:
-                   pylab.subplot(7,8,i+1)
+                   pylab.subplot(13,13,i+1)
                    pylab.plot(bins[0:-1],ps)
                    pylab.plot(bins[0:-1],pss)
                    
@@ -1072,7 +1121,7 @@ def later_interaction_prediction(activities,predicted_activities,validation_acti
     
     for i in xrange(0,num_neurons):
         for j in xrange(0,num_neurons):
-            cor[i,j] = numpy.corrcoef(residues[i],residues[j])[0][1]
+            cor[i,j] = numpy.corrcoef(residues[:,i].T,residues[:,j].T)[0][1]
     
     pylab.figure()
     pylab.imshow(cor,interpolation='nearest')
@@ -1080,7 +1129,7 @@ def later_interaction_prediction(activities,predicted_activities,validation_acti
     
     for i in xrange(0,num_neurons):
         for j in xrange(0,num_neurons):
-            cor_orig[i,j] = numpy.corrcoef(activities[i],activities[j])[0][1]
+            cor_orig[i,j] = numpy.corrcoef(activities[:,i],activities[:,j].T)[0][1]
     
     pylab.figure()
     pylab.imshow(cor_orig,interpolation='nearest')
@@ -1088,16 +1137,13 @@ def later_interaction_prediction(activities,predicted_activities,validation_acti
     
     
     mf = ModelFit()
-    mf.learning_rate = __main__.__dict__.get('lr',0.1)
-    mf.epochs=__main__.__dict__.get('epochs',1000)
+    mf.learning_rate = __main__.__dict__.get('lr',0.01)
+    mf.epochs=__main__.__dict__.get('epochs',100)
     mf.num_of_units = num_neurons
     mf.init()
     
     (err,stop,min_errors) = mf.trainModel(mat(predicted_activities),numpy.mat(activities),mat(validation_predicted_activities),numpy.mat(validation_activities))
     print "\nStop criterions", stop
-    print "\nNon-zero stop criterions",numpy.nonzero(stop)
-    print "\nMinimal errors per cell",numpy.nonzero(min_errors)
-    
     print "Model test with all neurons"
     mf.testModel(mat(validation_predicted_activities),numpy.mat(validation_activities))
     
@@ -1113,14 +1159,14 @@ def later_interaction_prediction(activities,predicted_activities,validation_acti
     if display:
         pylab.figure()
         pylab.title("model_relationship", fontsize=16)    
-        for i in xrange(0,50):
-            pylab.subplot(7,8,i+1)
+        for i in xrange(0,num_neurons):
+            pylab.subplot(13,13,i+1)
             pylab.plot(model_validation_predicted_activities.T[i],numpy.mat(validation_activities).T[i],'ro')
             
         pylab.figure()
         pylab.title("model_relationship_tf", fontsize=16)    
-        for i in xrange(0,50):
-            pylab.subplot(7,8,i+1)
+        for i in xrange(0,num_neurons):
+            pylab.subplot(13,13,i+1)
             pylab.plot(numpy.mat(tf_model_validation_predicted_activities).T[i],numpy.mat(validation_activities).T[i],'ro')
 
     correct=0
@@ -1174,8 +1220,8 @@ def lasso_regression_rf(inputs,activities,sizex,sizey,delta,alpha,theta,validati
     if display:
         pylab.figure()
         pylab.title(str(delta), fontsize=16)
-        for i in xrange(0,49):
-            pylab.subplot(7,7,i+1)
+        for i in xrange(0,num_neurons):
+            pylab.subplot(10,11,i+1)
             w = numpy.array(Z[i]).reshape(sizex,sizey)
             pylab.show._needmain=False
             pylab.imshow(w,vmin=numpy.min(w),vmax=numpy.max(w),cmap=pylab.cm.RdBu)
@@ -1215,93 +1261,56 @@ def cut_out_images_set(inputs,size,pos):
     
     
 
-def runRFPositionPrediction(sf,stepsize):
-    density=__main__.__dict__.get('density', 50)
-    dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
-    (index,data) = dataset
-    index+=1
-    dataset=(index,data)
-    dataset = averageRangeFrames(dataset,0,1)
-    dataset = averageRepetitions(dataset)
-    
-    (dataset,validation_data_set) = splitDataset(dataset,0.9)
-
-    training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
-    validation_set = generateTrainingSet(validation_data_set)
-    validation_inputs=generateInputs(validation_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000) 
-    (sizex,sizey) = numpy.shape(training_inputs[0])
-    size=int(density*sf)
-    
-    m = numpy.zeros((int((sizex-size)/(size*stepsize)+1),int((sizey-size)/(size*stepsize)+1)))
-    print "BBBB",numpy.shape(m)
-    if __main__.__dict__.get('NormalizeActivities',True):
-        (a,mi,ma) = compute_average_min_max(training_set)
-        training_set = normalize_data_set(training_set,a,mi,ma)
-        validation_set = normalize_data_set(validation_set,a,mi,ma)
-        
-    for neuron in xrange(0,len(training_set[0])):
-        x=0
-        y=0
-        while x  < (sizex-size): 
-            y=0
-            while y  < (sizey-size):
-                tr_in = cut_out_images_set(training_inputs,size,(x,y))
-                val_in = cut_out_images_set(validation_inputs,size,(x,y))
-                if __main__.__dict__.get('NormalizeInputs',True):
-                    avgRF = compute_average_input(tr_in)
-                    tr_in = normalize_image_inputs(tr_in,avgRF)
-                    val_in = normalize_image_inputs(val_in,avgRF)
-                tr_in = generate_raw_training_set(tr_in)
-                val_in = generate_raw_training_set(val_in)
-                mf = ModelFit()
-                mf.learning_rate = __main__.__dict__.get('lr',0.00001)
-                mf.epochs=__main__.__dict__.get('epochs',1000)
-                mf.init()
-                m[x/int(size*stepsize),y/int(size*stepsize)]=          mf.trainModel(mat(tr_in),numpy.mat(training_set)[:,neuron:neuron+1],mat(val_in),numpy.mat(validation_set)[:,neuron:neuron+1])
-                y+=int(size*stepsize)
-            x+=int(size*stepsize)
-        
-        pylab.show._needmain=False
-        pylab.figure()
-        pylab.imshow(m)
-        pylab.colorbar()
-        from topo.misc.filepath import normalize_path, application_path
-        pylab.savefig(normalize_path("Flogl/DataSep2009/Neuron:"+str(neuron)+"RFlocation.png"))
-        numpy.save("Flogl/DataSep2009/Neuron:"+str(neuron)+"RFlocation.dat", m)
 
     
 
 def runRFinference():
+    	
+    params = {}
+    params["density"] = __main__.__dict__.get('density', 20) 
+    #params["dataset"] = "Mice/20091110_19_16_53/(20091110_19_16_53)-_retinotopy_region4_stationary_180_15fr_66cells_on_response_spikes_DELTA"
+    params["dataset"] = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes"
+    #params["dataset"] = "Mice/20090925_14_36_01/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_on_&_off_response"
+    
+    params["num_cells"] = 103
+    params["clump_mag"] = __main__.__dict__.get('ClumpMag',0.1)
+    params["normalize_inputs"] = __main__.__dict__.get('NormalizeInputs',False)
+    params["normalize_activities"] = __main__.__dict__.get('NormalizeActivities',True)
+    params["cut_out"] = __main__.__dict__.get('CutOut',False)
+    params["validation_set_fraction"] = 40
+    params["alpha"] = __main__.__dict__.get('Alpha',50)
+    
+    
     density=__main__.__dict__.get('density', 20)
-    #dataset = loadSimpleDataSet("Flogl/DataOct2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images",2700,50)
-    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_spikes_on_&_off_response",2700,50)
+    
+    dataset = loadSimpleDataSet(params["dataset"],1800,params["num_cells"])
     (index,data) = dataset
     index+=1
     dataset = (index,data)
     dataset = averageRangeFrames(dataset,0,1)
     dataset = averageRepetitions(dataset)
-    
-    (dataset,validation_data_set) = splitDataset(dataset,0.98)
-    #(dataset,rubish) = splitDataset(dataset,0.25)
 
-    training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
-    validation_set = generateTrainingSet(validation_data_set)
-    validation_inputs=generateInputs(validation_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    (validation_data_set,dataset) = splitDataset(dataset,params["validation_set_fraction"])
     
-    if __main__.__dict__.get('NormalizeInputs',False):
+    training_set = generateTrainingSet(dataset)
+    training_inputs=generateInputs(dataset,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",params["density"],1.8,offset=1000)
+
+    
+    validation_set = generateTrainingSet(validation_data_set)
+    validation_inputs=generateInputs(validation_data_set,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",params["density"],1.8,offset=1000)
+    
+    if params["normalize_inputs"]:
        avgRF = compute_average_input(training_inputs)
        training_inputs = normalize_image_inputs(training_inputs,avgRF)
        validation_inputs = normalize_image_inputs(validation_inputs,avgRF)
     
-    if __main__.__dict__.get('NormalizeActivities',True):
+    if params["normalize_activities"]:
         #(a,v) = compute_average_min_max(numpy.concatenate((training_set,validation_set),axis=0))
         (a,v) = compute_average_min_max(training_set)
         training_set = normalize_data_set(training_set,a,v)
         validation_set = normalize_data_set(validation_set,a,v)
     
-    if True:
+    if params["cut_out"]:
         (x,y)= numpy.shape(training_inputs[0])
         training_inputs = cut_out_images_set(training_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
         validation_inputs = cut_out_images_set(validation_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
@@ -1311,19 +1320,15 @@ def runRFinference():
     training_inputs = generate_raw_training_set(training_inputs)
     validation_inputs = generate_raw_training_set(validation_inputs)
  
-    #(e,c,RFs,pa,pva) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,20,validation_inputs,validation_set,True,"OnOff_spikes")     
-
-    #later_interaction_prediction(training_set,pa,validation_set,pva)
-
     e = []
     c = []
     b = []
     if False:
         x = 0.2
-        for i in xrange(0,30):
+        for i in xrange(0,20):
             print i
-            x = i*10
-            (e1,c1,RFs,pa,pva) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,x,validation_inputs,validation_set,False)
+            x = i*20
+            (e1,te1,c1,tc1,RFs,pa,pva) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,x,validation_inputs,validation_set,params,False)
             e.append(e1)
             c.append(c1)
             b.append(x)
@@ -1334,14 +1339,54 @@ def runRFinference():
         pylab.figure()
         #pylab.semilogx(b,c)
         pylab.plot(b,c)
-        
-    #return e
-
-    (e,c,RFs,pa,pva) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,25,validation_inputs,validation_set,True,"OnOff_spikes")
+    	
+    #return (e,c,b)
+    
+    if False:
+        alphas=[120, 290,  50, 240, 290, 260, 120, 100, 290, 130, 290, 290, 230,170, 120, 190, 290, 100, 140, 290, 290,  60, 290, 290,  80, 210,50, 250, 170, 290, 290, 290,  60, 290, 290,  60, 260, 290, 290,290,  60,  90, 290, 120, 290,  80, 270, 120, 290, 290]
+    	 
+	RFs = []
+        e = []
+	c = []
+	te = []
+	tc = []
+	pa = []
+	pva = []
+	for i in xrange(0,len(alphas)):
+	      print numpy.shape(training_set)
+	      print numpy.shape(training_set[:,i:i+1])
+	      (e1,te1,c1,tc1,RF,pa1,pva1) = regulerized_inverse_rf(training_inputs,training_set[:,i:i+1],sizex,sizey,alphas[i],validation_inputs,validation_set[:,i:i+1],False)
+	      
+	      print numpy.shape(RF)
+	      RFs.append(RF[0])
+	      e.append(e1)
+	      c.append(c1)
+     	      te.append(te1)
+	      tc.append(tc1)
+	      pa.append(pa1)
+	      pva.append(pva1)
+	 
+	pylab.figure()
+	pylab.hist(e)
+	pylab.figure()
+	pylab.hist(c)
+	pylab.figure()
+	pylab.hist(te)
+	pylab.figure()
+	pylab.hist(tc)
+	      
+	      
+    	return (e,te,c,tc,RFs,pa,pva)
+	      
+    (e,te,c,tc,RFs,pa,pva) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,params["alpha"],validation_inputs,validation_set,params,True)
     later_interaction_prediction(training_set,pa,validation_set,pva)
     
+    
+    
     pylab.show()
-    return e
+    
+    dd.save_db("modelfitDB.dat")
+    return (training_set,pa,validation_set,pva)
 
 
 def compute_spike_triggered_average_rf(inputs,activities,density):
@@ -1391,49 +1436,6 @@ def compute_spike_triggered_average_rf(inputs,activities,density):
         #pylab.colorbar()                
         #
 
-def lookForCorrelations(model, validation_activities,validation_inputs):
-    modelResponses = model.calculateModelOutput(validation_inputs,0).T
-    print numpy.shape(modelResponses)
-    
-    for index in range(1,len(validation_inputs)):
-           modelResponses =  numpy.concatenate((modelResponses,model.calculateModelOutput(validation_inputs,index).T),axis=0)
-    print numpy.shape(modelResponses)
-    mR = numpy.matrix(modelResponses).T
-    bR = numpy.matrix(validation_activities).T
-    
-    print numpy.shape(mR)
-    print numpy.shape(bR)
-    pylab.figure()
-    pylab.subplot(7,8,1)
-    for i in xrange(0,50):
-        pylab.subplot(7,8,i+1)
-        pylab.scatter(numpy.array(mR[i])[0],numpy.array(bR[i])[0])
-        pylab.show._needmain=False
-
-    pylab.figure()    
-    avg = numpy.zeros(numpy.shape(numpy.array(bR[0])[0]))
-    for i in xrange(0,50):        
-        pylab.hold(True)
-        pylab.plot(numpy.array(bR[i])[0])
-        avg = avg + numpy.array(bR[i])[0]
-    
-    pylab.plot(avg/58.0,lw=5)
-    
-    pylab.show()     
-    
-
-def induce_rf_postion(num_of_cells,):
-    image_filenames=["Flogl/DataSep2009/Neuron:%dRFlocation.dat.npy" %(i) for i in xrange(0,num_of_cells)]
-    from topo.base.arrayutil import array_argmax
-    for file in image_filenames:
-        a= numpy.load(file)
-        pylab.figure()
-        print array_argmax(a)
-        pylab.imshow(a)
-    pylab.show()
-
-
-
 def analyze_rf_possition(w,level):
     import matplotlib
     from matplotlib.patches import Circle
@@ -1452,7 +1454,7 @@ def analyze_rf_possition(w,level):
     RFs=[]
     
     for i in xrange(0,len(w)):
-            pylab.subplot(7,8,i+1)
+            pylab.subplot(10,11,i+1)
             mi=numpy.min(numpy.min(w[i]))
             ma=numpy.max(numpy.max(w[i]))
             z = ((w[i]<=(mi-mi*level))*1.0) * w[i] + ((w[i]>=(ma-ma*level))*1.0) * w[i] 
@@ -1588,52 +1590,60 @@ def gab(z,w,display=False):
 
 
 def runSTC():
-    density=__main__.__dict__.get('density', 20)
-    dataset = loadSimpleDataSet("Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_on_&_off_response",2700,50)
+    params = {}
+    params["density"] = __main__.__dict__.get('density', 20) 
+    params["dataset"] = "Flogl/DataNov2009/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_on_&_off_response"
+    params["num_cells"] = 50
+    params["clump_mag"] = __main__.__dict__.get('ClumpMag',0.1)
+    params["normalize_inputs"] = __main__.__dict__.get('NormalizeInputs',False)
+    params["normalize_activities"] = __main__.__dict__.get('NormalizeActivities',True)
+    params["cut_out"] = __main__.__dict__.get('CutOut',False)
+    
+    
+    
+    dataset = loadSimpleDataSet(params["dataset"],1800,params["num_cells"])
+
     (index,data) = dataset
     index+=1
     dataset = (index,data)
     dataset = averageRangeFrames(dataset,0,1)
     dataset = averageRepetitions(dataset)
-    dataset = clump_low_responses(dataset,__main__.__dict__.get('ClumpMag',0.1))
+    dataset = clump_low_responses(dataset,params["clump_mag"])
     
         
     (dataset,validation_data_set) = splitDataset(dataset,0.99)
 
     training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
-    validation_set = generateTrainingSet(validation_data_set)
-    validation_inputs=generateInputs(validation_data_set,"/afs/inf.ed.ac.uk/user/s05/s0570140/workspace/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",density,1.8,offset=1000)
+    training_inputs=generateInputs(dataset,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",params["density"],1.8,offset=1000)
     
-    if __main__.__dict__.get('NormalizeInputs',False):
+    
+    validation_set = generateTrainingSet(validation_data_set)
+    validation_inputs=generateInputs(validation_data_set,"/home/antolikjan/topographica/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",params["density"],1.8,offset=1000)
+    
+    if params["normalize_inputs"]:
        avgRF = compute_average_input(training_inputs)
        training_inputs = normalize_image_inputs(training_inputs,avgRF)
        validation_inputs = normalize_image_inputs(validation_inputs,avgRF)
     
-    if __main__.__dict__.get('NormalizeActivities',True):
+    if params["normalize_activities"]:
         (a,v) = compute_average_min_max(numpy.concatenate((training_set,validation_set),axis=0))
         training_set = normalize_data_set(training_set,a,v)
         validation_set = normalize_data_set(validation_set,a,v)
     
-    if True:
-        print numpy.shape(training_inputs[0])
+    if params["cut_out"]:
         (x,y)= numpy.shape(training_inputs[0])
         training_inputs = cut_out_images_set(training_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
         validation_inputs = cut_out_images_set(validation_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
-        print numpy.shape(training_inputs[0])
         (sizex,sizey) = numpy.shape(training_inputs[0])
     
     (sizex,sizey) = numpy.shape(training_inputs[0])
     training_inputs = generate_raw_training_set(training_inputs)
     validation_inputs = generate_raw_training_set(validation_inputs)
     
-    print training_set
-    print numpy.min(numpy.min(training_set))
-    
     a = STC(training_inputs,training_set,validation_inputs,validation_set)
     #return a
     pylab.figure()
-    pylab.subplot(10,10,1)
+    pylab.subplot(10,11,1)
     j=0
     
     m = []    
@@ -1647,12 +1657,12 @@ def runSTC():
     for (ei,vv) in a:
         ind = numpy.argsort(numpy.abs(vv))
         
-        pylab.subplot(10,10,j+1) 
+        pylab.subplot(10,11,j+1) 
         w = numpy.array(ei[ind[len(ind)-1],:].real).reshape(19,19)
         m = numpy.max([-numpy.min(w),numpy.max(w)])
         pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
         
-        pylab.subplot(10,10,j+2)
+        pylab.subplot(10,11,j+2)
         w = numpy.array(ei[ind[len(ind)-2],:].real).reshape(19,19)
         m = numpy.max([-numpy.min(w),numpy.max(w)])
         pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
@@ -1744,7 +1754,41 @@ def STC(inputs,activities,validation_inputs,validation_activities,cutoff=90,disp
         eis.append((ei,vv))
     
     return eis
+
+def fitting():
+    corr_coef = dd.db[106][2]
+    rfs = dd.db[96][2]
     
     
+    new_rfs = []
+    discarded_rfs = [] 
+    for i in xrange(0,len(corr_coef)):
+	if corr_coef[i] > 0.3:
+	   new_rfs.append(rfs[i]) 
+	else:
+	   discarded_rfs.append(rfs[i])
+    (x,y) = numpy.shape(new_rfs[0])
+    
+
+    m = numpy.max(numpy.abs(numpy.min(new_rfs)),numpy.abs(numpy.max(new_rfs)))
+    
+    pylab.figure()
+    for i in xrange(0,len(new_rfs)):
+        pylab.subplot(15,15,i+1)
+        w = numpy.array(new_rfs[i]).reshape(x,y)
+        pylab.show._needmain=False
+        pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	pylab.axis('off')
+    pylab.figure()
+    for i in xrange(0,len(discarded_rfs)):
+        pylab.subplot(15,15,i+1)
+        w = numpy.array(discarded_rfs[i]).reshape(x,y)
+        pylab.show._needmain=False
+        pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	pylab.axis('off')
+
+    
+
+
 # The minimum alphas for different neurons at density 80 with On_Off raw data    
 #c=[120, 290,  50, 240, 290, 260, 120, 100, 290, 130, 290, 290, 230,170, 120, 190, 290, 100, 140, 290, 290,  60, 290, 290,  80, 210,50, 250, 170, 290, 290, 290,  60, 290, 290,  60, 260, 290, 290,290,  60,  90, 290, 120, 290,  80, 270, 120, 290, 290]
