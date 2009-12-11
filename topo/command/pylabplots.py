@@ -802,11 +802,8 @@ class plot_modulation_ratio(PylabPlotCommand):
             
             #double the number of complex cells to reflect large width of layer 2/3
             v1c = numpy.concatenate((array(v1c),array(v1c)),axis=1)
-            print bins
-            print v1s
             pylab.figure()
             n = pylab.subplot(311)
-            print v1s
             pylab.hist(v1s,bins)
             pylab.axis([0,2.0,0,3500])
             n = pylab.subplot(312)
@@ -1184,6 +1181,7 @@ class measure_orientation_contrast(UnitCurveCommand):
 
     def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
+    	 	Feature(name="frequency",values=p.frequencies),
                 Feature(name="orientationsurround",values=self.or_surrounds,cyclic=True)]
 
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
