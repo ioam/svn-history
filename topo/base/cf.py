@@ -347,9 +347,9 @@ class CFPRF_Plugin(CFPResponseFn):
     
     def __call__(self, iterator, input_activity, activity, strength):
         single_cf_fn = self.single_cf_fn
-        for cf,r,c in iterator():
+        for cf,i in iterator():
             X = cf.input_sheet_slice.submatrix(input_activity)
-            activity[r,c] = single_cf_fn(X,cf.weights)
+            activity.flat[i] = single_cf_fn(X,cf.weights)
         activity *= strength
 
 
@@ -404,10 +404,10 @@ class CFPLF_Plugin(CFPLearningFn):
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
 
-        
-        for cf,r,c in iterator():
+        for cf,i in iterator():
             single_cf_fn(cf.get_input_matrix(input_activity),
-                         output_activity[r,c], cf.weights, single_connection_learning_rate)
+                         output_activity.flat[i], cf.weights, 
+                         single_connection_learning_rate)
             cf.weights *= cf.mask                
 
 
@@ -437,7 +437,7 @@ class CFPOF_Plugin(CFPOutputFn):
         if type(self.single_cf_fn) is not IdentityTF:
             single_cf_fn = self.single_cf_fn
 
-            for cf,r,c in iterator():
+            for cf,i in iterator():
                 single_cf_fn(cf.weights)
                 del cf.norm_total
 
@@ -611,9 +611,7 @@ class CFProjection(Projection):
     def _create_cfs(self):
         vectorized_create_cf = simple_vectorize(self._create_cf)
         self.cfs = vectorized_create_cf(*self._generate_coords())
-        # CB: this is supposed to be accessed by weave functions
-        # only, and should disappear one day
-        self._cfs = self.cfs.tolist()
+        self.flatcfs = list(self.cfs.flat)
 
         
     def _create_cf(self,x,y):
@@ -705,8 +703,7 @@ class CFProjection(Projection):
 
 
     # CEBALERT: should add active_units_mask to match
-    # apply_learn_output_fns.  (Note that e.g. CFPOF_Hebbian_opt
-    # already skips inactive_units.)
+    # apply_learn_output_fns.  
     def learn(self):
         """
         For a CFProjection, learn consists of calling the learning_fn.
@@ -720,6 +717,11 @@ class CFProjection(Projection):
     # CEBALERT: called 'learn' output fns here, but called 'weights' output fns
     # elsewhere (mostly). Change all to 'learn'?
     def apply_learn_output_fns(self,active_units_mask=True):
+        """
+        Apply the weights_output_fns to each unit.
+
+        If active_units_mask is True, inactive units will be skipped.
+        """
         for of in self.weights_output_fns:
             of(MaskedCFIter(self,active_units_mask=active_units_mask))
 
@@ -781,23 +783,37 @@ def _create_mask(shape,bounds_template,sheet,autosize=True,threshold=0.5):
     return mask.astype(weight_type)
 
 
-# CEBALERT: redoc
+
 import numpy
 class CFIter(object):
     """
     Iterator to walk through all ConnectionFields of all neurons in
     the destination Sheet of the given CFProjection.  Each iteration
-    yields the tuple (cf,row,col) where cf is the ConnectionField at
-    position (row,col).
+    yields the tuple (cf,i) where cf is the ConnectionField at
+    position i in the projection's flatcfs list. 
+
+    If active_units_mask is True, inactive units will be skipped. If
+    ignore_sheet_mask is True, even units excluded by the sheet mask
+    will be included.
     """
+    # CB: as noted elsewhere, rename active_units_mask (to e.g.
+    # ignore_inactive_units).
     def __init__(self,cfprojection,active_units_mask=False,ignore_sheet_mask=False):
         self.proj = cfprojection
         self.active_units_mask = active_units_mask
         self.ignore_sheet_mask = ignore_sheet_mask
 
+    # CB: if there were a method on proj to access "dest.activity",
+    # then for MultiprocessorCFProjection, that method would be
+    # overridden to return the appropriate array.  Similarly, a method
+    # on proj to access "dest.mask" would be overridden to return the
+    # appropriate array (the mask having been distributed).
+
     def __nomask(self):
-        # probably not necessary to specify dtype, since C functions
-        # don't use this.
+        # return an array indicating all units should be processed 
+        
+        # dtype for C functions. 
+        # could just be flat.
         return numpy.ones(self.proj.dest.shape,dtype=self.proj.dest.activity.dtype)
 
     # CEBALERT: make _
@@ -807,14 +823,19 @@ class CFIter(object):
         else: 
             return self.__nomask()
 
-    # CEBALERT: make _
+    # CEBALERT: make _ (and probably drop '_mask').
     def get_active_units_mask(self):
         if self.proj.dest.allow_skip_non_responding_units and self.active_units_mask:
             return self.proj.dest.activity
         else:
             return self.__nomask()
 
+    # CEBALERT: rename to something like 
     def get_overall_mask(self):
+        """
+        Return an array indicating whether or not each unit should be
+        processed.
+        """
         # JPHACKALERT: Should really check for the existence of the
         # mask, rather than checking its type. This is a hack to
         # support higher-order projections whose dest is a CF, instead
@@ -822,31 +843,31 @@ class CFIter(object):
         # masks and  SheetMasks are subclasses of an abstract Mask
         # type so that they support the same interfaces.
         #
-        # CB: put back when supporting the neighborhood mask (though
-        # preferably do what Jeff suggests instead)
+        # CEBALERT: put back when supporting neighborhood masking
+        # (though preferably do what Jeff suggests instead)
 #        if isinstance(self.proj.dest.mask,SheetMask):
 #            return get_active_units_mask()
 #        else:
-         sheet_mask = self.get_sheet_mask()
-         active_units_mask = self.get_active_units_mask()
-         return numpy.logical_and(sheet_mask,active_units_mask)
+
+        # CB: note that it's faster for our optimized C functions to
+        # combine the masks themselves, rather than using this method.
+        sheet_mask = self.get_sheet_mask()
+        active_units_mask = self.get_active_units_mask()
+        return numpy.logical_and(sheet_mask,active_units_mask)
     
-    
+    # CB: should probably remove this; I don't know if I actually used
+    # it.
     def get_shape(self):
         return self.proj.dest.shape
 
     def __call__(self):
         mask = self.get_overall_mask()
-        rows,cols = self.proj.cfs.shape
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cf = self.proj.cfs[r,c]
-                if cf is not None:
-                    if mask[r,c]:
-                        yield cf,r,c
+        for i,cf in enumerate(self.proj.flatcfs):
+            if cf is not None:
+                if mask.flat[i]:
+                    yield cf,i
 
-
-
+# CEBALERT: remove this once MaskedCFIter has been replaced elsewhere.
 MaskedCFIter = CFIter
 
 

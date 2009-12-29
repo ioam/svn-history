@@ -24,46 +24,47 @@ def compute_joint_norm_totals_opt(projlist,active_units_mask):
     length = len(projlist)
     assert length>=1
 
-    iterator = MaskedCFIter(projlist[0],active_units_mask=active_units_mask)
-    rows,cols = iterator.get_shape()
+    proj = projlist[0]
+    iterator = MaskedCFIter(proj,active_units_mask=active_units_mask)
+    num_cfs = len(proj.flatcfs)
     active_units_mask = iterator.get_active_units_mask()
     sheet_mask = iterator.get_sheet_mask()
 
     code = c_header + """
         npfloat *x = active_units_mask;
         npfloat *m = sheet_mask;
-        for (int r=0; r<rows; ++r) {
-            for (int l=0; l<cols; ++l) {
-                double load = *x++;
-                double msk = *m++;
-                if (msk!=0 && load != 0) {
-                    double nt = 0;
+        for (int r=0; r<num_cfs; ++r) {
+            double load = *x++;
+            double msk = *m++;
+            if (msk!=0 && load != 0) {
+                double nt = 0;
 
-                    for(int p=0; p<length; p++) {
-                        PyObject *proj = PyList_GetItem(projlist,p);
-                        PyObject *cfs = PyObject_GetAttrString(proj,"_cfs");
-                        PyObject *cf = PyList_GetItem(PyList_GetItem(cfs,r),l);
-                        PyObject *o = PyObject_GetAttrString(cf,"norm_total");
-                        nt += PyFloat_AsDouble(o);
-                        Py_DECREF(cfs);
-                        Py_DECREF(o);
-                    }
+                for(int p=0; p<length; p++) {
+                    PyObject *proj = PyList_GetItem(projlist,p);
+                    PyObject *cfs = PyObject_GetAttrString(proj,"flatcfs");
+                    PyObject *cf = PyList_GetItem(cfs,r);
+                    PyObject *o = PyObject_GetAttrString(cf,"norm_total");
+                    nt += PyFloat_AsDouble(o);
+                    Py_DECREF(cfs);
+                    Py_DECREF(o);
+                }
 
-                    for(int p=0; p<length; p++) {
-                        PyObject *proj = PyList_GetItem(projlist,p);
-                        PyObject *cfs = PyObject_GetAttrString(proj,"_cfs");
-                        PyObject *cf = PyList_GetItem(PyList_GetItem(cfs,r),l);
-                        PyObject *total_obj = PyFloat_FromDouble(nt);  //(new ref)
-                        PyObject_SetAttrString(cf,"_norm_total",total_obj);
-                        PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
-                        Py_DECREF(cfs);
-                        Py_DECREF(total_obj);
-                    }
+                for(int p=0; p<length; p++) {
+                    PyObject *proj = PyList_GetItem(projlist,p);
+                    PyObject *cfs = PyObject_GetAttrString(proj,"flatcfs");
+                    PyObject *cf = PyList_GetItem(cfs,r);
+                    PyObject *total_obj = PyFloat_FromDouble(nt);  //(new ref)
+                    PyObject_SetAttrString(cf,"_norm_total",total_obj);
+                    PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
+                    Py_DECREF(cfs);
+                    Py_DECREF(total_obj);
                 }
             }
+
         }
     """    
-    inline(code, ['projlist','active_units_mask','sheet_mask','rows','cols','length'], local_dict=locals())
+    inline(code, ['projlist','active_units_mask','sheet_mask','num_cfs','length'], 
+           local_dict=locals())
 
 provide_unoptimized_equivalent("compute_joint_norm_totals_opt",
                                "compute_joint_norm_totals",locals())

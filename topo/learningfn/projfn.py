@@ -34,7 +34,8 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
     SOM algorithm, the activity should be the neighborhood kernel
     centered around the winning unit, as implemented by KernelMax.
     """
-
+    # CEBALERT: why isn't this using the iterator? Presumably this means
+    # it's ignoring the sheet mask.
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         # This learning function does not need to scale the learning
         # rate like some do, so it does not use constant_sum_connection_rate()
@@ -131,13 +132,13 @@ class CFPLF_Trace(CFPLearningFn):
         ##Initialise traces to zero if they don't already exist
         if not hasattr(self,'traces'):
             self.traces=zeros(output_activity.shape,activity_type)
-        for cf,r,c in iterator():                       
-            unit_activity = output_activity[r,c]
+        for cf,i in iterator():                       
+            unit_activity = output_activity.flat[i]
             #   print "unit activity is",unit_activity
         #    print "self trace is",self.traces[r,c]
-            new_trace = (self.trace_strength*unit_activity)+((1-self.trace_strength)*self.traces[r,c])
+            new_trace = (self.trace_strength*unit_activity)+((1-self.trace_strength)*self.traces.flat[i])
         #     print "and is now",new_trace
-            self.traces[r,c] = new_trace
+            self.traces.flat[i] = new_trace
             cf.weights += single_connection_learning_rate * new_trace * \
                               (cf.get_input_matrix(input_activity) - cf.weights)
                 
@@ -166,9 +167,9 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
         outstar_wsum = zeros(input_activity.shape)
-        for cf,r,c in iterator():
+        for cf,i in iterator():
             single_cf_fn(cf.get_input_matrix(input_activity),
-                            output_activity[r,c], cf.weights, single_connection_learning_rate)
+                         output_activity.flat[i], cf.weights, single_connection_learning_rate)
             # Outstar normalization
             wrows,wcols = cf.weights.shape
             for wr in xrange(wrows):
@@ -224,7 +225,7 @@ class HomeoSynaptic(CFPLearningFn):
             
                             
             # normalize initial weights to 1.0
-            for cf,r,c in iterator():
+            for cf,i in iterator():
                 current_norm_value = 1.0*Numeric.sum(abs(cf.weights.ravel()))
                 if current_norm_value != 0:
                     factor = (1.0/current_norm_value)
@@ -239,12 +240,12 @@ class HomeoSynaptic(CFPLearningFn):
 
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
-        for cf,r,c in iterator():
+        for cf,i in iterator():
             single_cf_fn(cf.get_input_matrix(input_activity),
-                            output_activity[r,c], cf.weights, single_connection_learning_rate)
+                         output_activity.flat[i], cf.weights, single_connection_learning_rate)
 
             # homeostatic normalization
-            cf.weights /= activity_norm[r][c]
+            cf.weights /= activity_norm.flat[i]
 
             # CEBHACKALERT: see ConnectionField.__init__()
             cf.weights *= cf.mask
@@ -280,10 +281,10 @@ class CFPLF_PluginScaled(CFPLearningFn):
         single_cf_fn = self.single_cf_fn
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         
-        for cf,r,c in iterator():
-            sc_learning_rate = self.learning_rate_scaling_factor[r,c] * single_connection_learning_rate 
+        for cf,i in iterator():
+            sc_learning_rate = self.learning_rate_scaling_factor.flat[i] * single_connection_learning_rate 
             single_cf_fn(cf.get_input_matrix(input_activity),
-                         output_activity[r,c], cf.weights, sc_learning_rate)
+                         output_activity.flat[i], cf.weights, sc_learning_rate)
             # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
             cf.weights *= cf.mask   
       

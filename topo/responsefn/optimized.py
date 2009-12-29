@@ -33,10 +33,10 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     def __call__(self, iterator, input_activity, activity, strength, **params):
        
         temp_act = activity
-        rows,cols = activity.shape
         irows,icols = input_activity.shape
         X = input_activity.ravel()
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.flatcfs
+        num_cfs = len(cfs)
         mask = iterator.proj.dest.mask.data
 
         cf_type = iterator.proj.cf_type
@@ -47,43 +47,41 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 
             npfloat *tact = temp_act;
 
-            for (int r=0; r<rows; ++r) {
-                PyObject *cfsr = PyList_GetItem(cfs,r);
-                for (int l=0; l<cols; ++l) {
-                    if((*mask++) == 0.0)
-                        *tact = 0;
-                    else {
-                        PyObject *cf = PyList_GetItem(cfsr,l);
+            for (int r=0; r<num_cfs; ++r) {
+                if((*mask++) == 0.0)
+                    *tact = 0;
+                else {
+                    PyObject *cf = PyList_GetItem(cfs,r);
 
-                        CONTIGUOUS_ARRAY_FROM_SLOT_OFFSET(float,weights,cf)
-                        LOOKUP_FROM_SLOT_OFFSET(int,input_sheet_slice,cf);
-                        
-                        UNPACK_FOUR_TUPLE(int,rr1,rr2,cc1,cc2,input_sheet_slice);
-                        
-                        double tot = 0.0;
-                        npfloat *xj = X+icols*rr1+cc1;
-    
-                        // computes the dot product
-                        for (int i=rr1; i<rr2; ++i) {
-                            npfloat *xi = xj;
-                            float *wi = weights;                       
-                            for (int j=cc1; j<cc2; ++j) {
-                                tot += *wi * *xi;
-                                ++wi;
-                                ++xi;
-                            }
-                            xj += icols;
-                            weights += cc2-cc1;
-                        }  
-                        *tact = tot*strength;
+                    CONTIGUOUS_ARRAY_FROM_SLOT_OFFSET(float,weights,cf)
+                    LOOKUP_FROM_SLOT_OFFSET(int,input_sheet_slice,cf);
 
-                        DECREF_CONTIGUOUS_ARRAY(weights);
-                    }
-                    ++tact;    
+                    UNPACK_FOUR_TUPLE(int,rr1,rr2,cc1,cc2,input_sheet_slice);
+
+                    double tot = 0.0;
+                    npfloat *xj = X+icols*rr1+cc1;
+
+                    // computes the dot product
+                    for (int i=rr1; i<rr2; ++i) {
+                        npfloat *xi = xj;
+                        float *wi = weights;                       
+                        for (int j=cc1; j<cc2; ++j) {
+                            tot += *wi * *xi;
+                            ++wi;
+                            ++xi;
+                        }
+                        xj += icols;
+                        weights += cc2-cc1;
+                    }  
+                    *tact = tot*strength;
+
+                    DECREF_CONTIGUOUS_ARRAY(weights);
                 }
+                ++tact;    
             }
         """
-        inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','cols','rows','cf_type'], local_dict=locals(), headers=['<structmember.h>'])
+        inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','num_cfs','cf_type'], 
+               local_dict=locals(), headers=['<structmember.h>'])
 
 class CFPRF_DotProduct(CFPRF_Plugin):
     """
@@ -111,7 +109,7 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
         rows,cols = activity.shape
         irows,icols = input_activity.shape
         X = input_activity.ravel()
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs.tolist() # CEBALERT: adjust to use flatcfs
 
         code = c_header + """
             #include <math.h>

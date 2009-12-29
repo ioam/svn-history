@@ -927,5 +927,19 @@ def cf_not_parameterized():
 S.append(cf_not_parameterized)
 
 
+def cfproj_add_flatcfs():
+    # flatcfs attribute added 
+    from topo.base.cf import CFProjection
+    def _cfproj_add_flatcfs(instance,state):
+        if 'flatcfs' not in state:
+            try:
+                state['flatcfs'] = list(state['cfs'].flat)
+            except KeyError:
+                from topo.misc.util import flatten
+                state['flatcfs'] = flatten(state['_cfs'])
+            
+    preprocess_state(CFProjection,_cfproj_add_flatcfs)
+
+S.append(cfproj_add_flatcfs)
 
 

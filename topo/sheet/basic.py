@@ -203,7 +203,6 @@ class SequenceGeneratorSheet(GeneratorSheet):
         self.simulation.enqueue_event(self.event)
 
 
-# CEBALERT: active_units_mask should be False by default
 def compute_joint_norm_totals(projlist,active_units_mask=True):
     """
     Compute norm_total for each CF in each projection from a group to
@@ -213,11 +212,11 @@ def compute_joint_norm_totals(projlist,active_units_mask=True):
     assert len(projlist)>=1
     iterator = MaskedCFIter(projlist[0],active_units_mask=active_units_mask)
 
-    for cf,r,c in iterator():
-        sums = [p.cfs[r,c].norm_total for p in projlist]
+    for junk,i in iterator():
+        sums = [p.flatcfs[i].norm_total for p in projlist]
         joint_sum = numpy.add.reduce(sums)
         for p in projlist:
-            p.cfs[r,c].norm_total=joint_sum
+            p.flatcfs[i].norm_total=joint_sum
 
 
 class JointNormalizingCFSheet(CFSheet):

@@ -367,9 +367,14 @@ class ProjectionSheet(Sheet):
         lesions, etc.""")
 
     # CEBALERT: not sure what to call this, and the default should
-    # actually be False. True to match previous behavior.
-    # (same comment as mask; why not parameter of sheet?)
-    allow_skip_non_responding_units = param.Boolean(default=True)
+    # actually be False. True to match existing behavior.
+    # (Plus same comment as mask: why not parameter of sheet?)
+    allow_skip_non_responding_units = param.Boolean(default=True,doc="""
+        If true, then units that are inactive after the response
+        function has been called can be skipped in subsequent
+        processing. Whether or not the units will actually be skipped
+        depends on the implementation of learning and learning output
+        functions.""")
 
     
     def __init__(self,**params):

@@ -5,7 +5,9 @@ from topo.base.simulation import Simulation
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFIter,MaskedCFIter,ResizableCFProjection,CFSheet
 
-class TestIter(unittest.TestCase):
+class TestCFIter(unittest.TestCase):
+
+    iter_type = CFIter
 
     def setUp(self):
 
@@ -25,11 +27,13 @@ class TestIter(unittest.TestCase):
         total = 0
         dest = self.sim['Dest']
         proj = dest.projections()['SrcToDest']
-        for cf,r,c in self.iter_type(proj)():
+        rows,cols = dest.shape
+        iterator = self.iter_type(proj)
+        for cf,i in iterator():
             total += 1
-            self.failUnless(0 <= r < 10, "CFIter generated bogus CF row index")
-            self.failUnless(0 <= c < 10, "CFIter generated bogus CF col index")
-            cfxy = (proj.X_cf[r,c],proj.Y_cf[r,c])
+            self.failUnless(0 <= i < 100, "CFIter generated bogus CF index")
+            cfxy = (proj.X_cf.flat[i],proj.Y_cf.flat[i])
+            r,c = i/cols,i%cols
             self.failUnlessEqual(cfxy,dest.matrixidx2sheet(r,c))
         self.failUnlessEqual(total,100)
 
@@ -41,19 +45,12 @@ class TestIter(unittest.TestCase):
         dest = self.sim['Dest']
         proj = dest.projections()['SrcToDest']
         total = 0
-        proj.cfs[5,5] = None
-        for cf,r,c in self.iter_type(proj)():
+        proj.flatcfs[24] = None
+        for cf,i in self.iter_type(proj)():
             total += 1
-            self.failIfEqual((r,c),(5,5))
+            self.failIfEqual(i,24)
         self.failUnlessEqual(total,99)
 
-class TestCFIter(TestIter):
-
-    iter_type = CFIter
-
-class TestMaskedCFIter(TestIter):
-
-    iter_type = MaskedCFIter
 
     def test_iterate_masked(self):
         """
@@ -63,17 +60,17 @@ class TestMaskedCFIter(TestIter):
         dest = self.sim['Dest']
         proj = dest.projections()['SrcToDest']
         dest.mask.data = numpy.zeros(dest.activity.shape)
-        dest.mask.data[5,5] = 1
-        for cf,r,c in self.iter_type(proj)():
+        dest.mask.data.flat[24] = 1
+        for cf,i in self.iter_type(proj)():
             total += 1
-            self.failUnlessEqual((r,c),(5,5))
-            self.failUnless(cf is proj.cfs[5,5])
+            self.failUnlessEqual(i,24)
+            self.failUnless(cf is proj.flatcfs[24])
         self.failUnlessEqual(total,1)
         
 
 
 ####
-cases = [TestCFIter, TestMaskedCFIter]
+cases = [TestCFIter]
 
 suite = unittest.TestSuite()
 suite.addTests([unittest.makeSuite(case) for case in cases])

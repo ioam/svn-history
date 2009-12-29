@@ -29,7 +29,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     CF-aware Hebbian learning rule.
 
     Implemented in C for speed.  Should be equivalent to
-    CFPLF_Plugin(single_cf_fn=Hebbian), except faster.  
+    CFPLF_Plugin(single_cf_fn=Hebbian), except faster.
 
     As a side effect, sets the norm_total attribute on any cf whose
     weights are updated during learning, to speed up later operations
@@ -45,10 +45,19 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
         if single_connection_learning_rate==0:
             return
 
-        rows,cols = output_activity.shape
-        cfs = iterator.proj._cfs        
+        cfs = iterator.proj.flatcfs
+        num_cfs = len(cfs)
         irows,icols = input_activity.shape
         cf_type = iterator.proj.cf_type
+
+        # CEBALERT: this function *always* skips inactive units,
+        # because it uses the output_activity directly rather than
+        # going through the iterator. That's ok since we know this
+        # function can always skip inactive units. But the unoptimized
+        # equivalent should be made to do the same, because right now
+        # it respects the iterator.  (Just a case of setting the
+        # iterator's active_units_mask to be True before calling the
+        # iterator in the unoptimized version.)
 
         sheet_mask = iterator.get_sheet_mask()
 
@@ -60,53 +69,50 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
             npfloat *x = output_activity;
             npfloat *m = sheet_mask;
 
-            for (int r=0; r<rows; ++r) {
-                PyObject *cfsr = PyList_GetItem(cfs,r);
-                for (int l=0; l<cols; ++l) {
-                    double load = *x++;
-                    double msk = *m++;
-                    if (load != 0 && msk != 0) {
-                        load *= single_connection_learning_rate;
+            for (int r=0; r<num_cfs; ++r) {
+                double load = *x++;
+                double msk = *m++;
+                if (load != 0 && msk != 0) {
+                    load *= single_connection_learning_rate;
 
-                        PyObject *cf = PyList_GetItem(cfsr,l);
-                        
-                        LOOKUP_FROM_SLOT_OFFSET(float,weights,cf);
-                        LOOKUP_FROM_SLOT_OFFSET(int,input_sheet_slice,cf);
-                        LOOKUP_FROM_SLOT_OFFSET(float,mask,cf);
-                        
-                        UNPACK_FOUR_TUPLE(int,rr1,rr2,cc1,cc2,input_sheet_slice);
-                        
-                        double total = 0.0;
-                        
-                        // modify non-masked weights
-                        npfloat *inpj = input_activity+icols*rr1+cc1;
-                        for (int i=rr1; i<rr2; ++i) {
-                            npfloat *inpi = inpj;
-                            for (int j=cc1; j<cc2; ++j) {
-                                // The mask is floating point, so we have to 
-                                // use a robust comparison instead of testing 
-                                // against exactly 0.0.
-                                if (*(mask++) >= 0.000001) {
-                                    *weights += load * *inpi;
-                                    total += fabs(*weights);
-                                }
-                                ++weights;
-                                ++inpi;
+                    PyObject *cf = PyList_GetItem(cfs,r);
+
+                    LOOKUP_FROM_SLOT_OFFSET(float,weights,cf);
+                    LOOKUP_FROM_SLOT_OFFSET(int,input_sheet_slice,cf);
+                    LOOKUP_FROM_SLOT_OFFSET(float,mask,cf);
+
+                    UNPACK_FOUR_TUPLE(int,rr1,rr2,cc1,cc2,input_sheet_slice);
+
+                    double total = 0.0;
+
+                    // modify non-masked weights
+                    npfloat *inpj = input_activity+icols*rr1+cc1;
+                    for (int i=rr1; i<rr2; ++i) {
+                        npfloat *inpi = inpj;
+                        for (int j=cc1; j<cc2; ++j) {
+                            // The mask is floating point, so we have to 
+                            // use a robust comparison instead of testing 
+                            // against exactly 0.0.
+                            if (*(mask++) >= 0.000001) {
+                                *weights += load * *inpi;
+                                total += fabs(*weights);
                             }
-                            inpj += icols;
+                            ++weights;
+                            ++inpi;
                         }
-                        
-                        // store the sum of the cf's weights
-                        PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
-                        PyObject_SetAttrString(cf,"_norm_total",total_obj);
-                        PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
-                        Py_DECREF(total_obj);
+                        inpj += icols;
                     }
+
+                    // store the sum of the cf's weights
+                    PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
+                    PyObject_SetAttrString(cf,"_norm_total",total_obj);
+                    PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
+                    Py_DECREF(total_obj);
                 }
             }
         """
 
-        inline(code, ['input_activity', 'output_activity','rows', 'cols','sheet_mask',
+        inline(code, ['input_activity', 'output_activity','sheet_mask','num_cfs',
                       'icols', 'cfs', 'single_connection_learning_rate','cf_type'],
                local_dict=locals(),
                headers=['<structmember.h>'])               
@@ -116,7 +122,6 @@ class CFPLF_Hebbian(CFPLF_Plugin):
     """Same as CFPLF_Plugin(single_cf_fn=Hebbian()); just for non-optimized fallback."""
     single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),readonly=True)
 provide_unoptimized_equivalent("CFPLF_Hebbian_opt","CFPLF_Hebbian",locals())
-
 
 
 # CBERRORALERT: classes from here on probably ignore the sheet mask 
@@ -141,7 +146,7 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
     
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         if single_connection_learning_rate==0:
             return
@@ -259,7 +264,7 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
         learning_rate_scaling_factor = self.learning_rate_scaling_factor
 
         rows,cols = output_activity.shape
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         if single_connection_learning_rate==0:
             return
@@ -350,7 +355,7 @@ class CFPLF_Trace_opt(CFPLearningFn):
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         irows,icols = input_activity.shape
         

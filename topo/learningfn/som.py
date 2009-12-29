@@ -72,7 +72,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
     
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
         rows,cols = output_activity.shape
 
         # This learning function does not need to scale the learning

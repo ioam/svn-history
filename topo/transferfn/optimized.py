@@ -20,7 +20,7 @@ from basic import DivisiveNormalizeL1
 # For backwards compatibility when loading pickled files; can be deleted
 DivisiveNormalizeL1_opt=DivisiveNormalizeL1
 
-# CEBALERT: ignores sheet mask
+
 class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     """
     Performs divisive normalization of the weights of all cfs.
@@ -32,13 +32,12 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     
     def __call__(self, iterator, **params):
         proj = iterator.proj
-        rows,cols = iterator.get_shape()
         cf_type=proj.cf_type
-        cfs = proj._cfs
+        cfs = proj.flatcfs
+        num_cfs = len(proj.flatcfs)
         
-        # CEBALERT: for performance, it is better to process the
-        # two masks separately, in the C code.
-        # mask = iterator.get_overall_mask()
+        # CB: for performance, it is better to process the masks in
+        # the C code (rather than combining them before).
         active_units_mask = iterator.get_active_units_mask()
         sheet_mask = iterator.get_sheet_mask()
 
@@ -61,49 +60,45 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
             npfloat *x = active_units_mask;
             npfloat *m = sheet_mask;
 
-            for (int r=0; r<rows; ++r) {
-                PyObject *cfsr = PyList_GetItem(cfs,r);
-                for (int l=0; l<cols; ++l) {
-                    double load = *x++;
-                    double msk = *m++;
-                    if (load != 0 && msk != 0)
-                    {
-                        PyObject *cf = PyList_GetItem(cfsr,l);
+            for (int r=0; r<num_cfs; ++r) {
+                double load = *x++;
+                double msk = *m++;
+                if (load != 0 && msk != 0) {
+                    PyObject *cf = PyList_GetItem(cfs,r);
 
-                        PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
-                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
+                    PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
+                    PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
 
-                        PyObject *sum_obj     = PyObject_GetAttrString(cf,"norm_total");
-                        
-                        float *wi = (float *)(weights_obj->data);
-                        int *slice = (int *)(slice_obj->data);
-                        
+                    PyObject *sum_obj     = PyObject_GetAttrString(cf,"norm_total");
 
+                    float *wi = (float *)(weights_obj->data);
+                    int *slice = (int *)(slice_obj->data);
 
-                        double total = PyFloat_AsDouble(sum_obj); // sum of the cf's weights
+                    double total = PyFloat_AsDouble(sum_obj); // sum of the cf's weights
 
-                        int rr1 = *slice++;
-                        int rr2 = *slice++;
-                        int cc1 = *slice++;
-                        int cc2 = *slice;
+                    int rr1 = *slice++;
+                    int rr2 = *slice++;
+                    int cc1 = *slice++;
+                    int cc2 = *slice;
 
-                        // normalize the weights
-                        double factor = 1.0/total;
-                        int rc = (rr2-rr1)*(cc2-cc1);
-                        for (int i=0; i<rc; ++i) {
-                            *(wi++) *= factor;
-                        }
-
-                        // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                        Py_DECREF(sum_obj);
-
-                        // Indicate that norm_total is stale
-                        PyObject_SetAttrString(cf,"_has_norm_total",Py_False);
+                    // normalize the weights
+                    double factor = 1.0/total;
+                    int rc = (rr2-rr1)*(cc2-cc1);
+                    for (int i=0; i<rc; ++i) {
+                        *(wi++) *= factor;
                     }
+
+                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                    Py_DECREF(sum_obj);
+
+                    // Indicate that norm_total is stale
+                    PyObject_SetAttrString(cf,"_has_norm_total",Py_False);
                 }
+                
             }
         """    
-        inline(code, ['sheet_mask','active_units_mask','rows','cols','cfs','cf_type'], local_dict=locals(),
+        inline(code, ['sheet_mask','active_units_mask','cfs','cf_type','num_cfs'], 
+               local_dict=locals(),
                headers=['<structmember.h>'])
 
 
@@ -126,10 +121,11 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
         normalization.  After use, cf.norm_total is deleted because
         the value it would have has been changed.
         """
+        # CEBALERT: fix this here and elsewhere
         if type(self.single_cf_fn) is not IdentityTF:
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
-            for cf,r,c in iterator():
+            for cf,i in iterator():
                 current_sum=cf.norm_total
                 factor = norm_value/current_sum
                 cf.weights *= factor
@@ -137,7 +133,6 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
 
 
 provide_unoptimized_equivalent("CFPOF_DivisiveNormalizeL1_opt","CFPOF_DivisiveNormalizeL1",locals())
-
 
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and
