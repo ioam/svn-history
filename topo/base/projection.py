@@ -369,7 +369,7 @@ class ProjectionSheet(Sheet):
     # CEBALERT: not sure what to call this, and the default should
     # actually be False. True to match previous behavior.
     # (same comment as mask; why not parameter of sheet?)
-    skip_non_responding_units = param.Boolean(default=True)
+    allow_skip_non_responding_units = param.Boolean(default=True)
 
     
     def __init__(self,**params):

@@ -742,7 +742,7 @@ class CFProjection(Projection):
         return super(CFProjection,self).n_bytes() + \
                sum([cf.weights.nbytes + 
                     cf.mask.nbytes
-                    for cf,r,c in CFIter(self)()])
+                    for cf,r,c in CFIter(self,ignore_sheet_mask=True)()])
 
 
     def n_conns(self):
@@ -781,9 +781,6 @@ def _create_mask(shape,bounds_template,sheet,autosize=True,threshold=0.5):
     return mask.astype(weight_type)
 
 
-# The only use I can see for this is internal stuff. Can we hide it?
-# Everyone should be respecting the mask without having to think about
-# it.
 # CEBALERT: redoc
 import numpy
 class CFIter(object):
@@ -793,79 +790,64 @@ class CFIter(object):
     yields the tuple (cf,row,col) where cf is the ConnectionField at
     position (row,col).
     """
-    def __init__(self,cfprojection,active_units_mask=False):
+    def __init__(self,cfprojection,active_units_mask=False,ignore_sheet_mask=False):
         self.proj = cfprojection
         self.active_units_mask = active_units_mask
+        self.ignore_sheet_mask = ignore_sheet_mask
 
-    
+    def __nomask(self):
+        # probably not necessary to specify dtype, since C functions
+        # don't use this.
+        return numpy.ones(self.proj.dest.shape,dtype=self.proj.dest.activity.dtype)
+
+    # CEBALERT: make _
     def get_sheet_mask(self):
-        return self.proj.dest.mask.data
+        if not self.ignore_sheet_mask:
+            return self.proj.dest.mask.data
+        else: 
+            return self.__nomask()
 
+    # CEBALERT: make _
     def get_active_units_mask(self):
-        if self.active_units_mask:
+        if self.proj.dest.allow_skip_non_responding_units and self.active_units_mask:
             return self.proj.dest.activity
         else:
-            return numpy.ones(self.proj.dest.shape,dtype=self.proj.dest.activity.dtype)
+            return self.__nomask()
 
-
-# CB: this is slower than doing the combination in our c code.
-#    # assuming always numpy array for mask data
-#    def get_overall_mask(self):
-#        dest = self.proj.dest
-#        sheet_mask = dest.mask.data
-#        active_units_mask = self.get_active_units_mask()
-#        # astype for compatibility with existing C
-#        # code. Might want to change to boolean.
-#        return numpy.logical_and(sheet_mask,active_units_mask).astype(dest.activity.dtype)
-    
-    def get_shape(self):
-        return self.proj.dest.shape
-
-    def _unit_checks(self,r,c):
-        process_unit = True
-
-        # CEBALERT: change to use get_overall_mask()
-        if self.proj.dest.skip_non_responding_units:
-            if self.active_units_mask is True:
-                if self.proj.dest.activity[r,c]==0:
-                    process_unit = False
-
-        return process_unit
-
-
-    def __call__(self):
-        rows,cols = self.proj.cfs.shape
-        for r in xrange(rows):
-            for c in xrange(cols):
-                if self._unit_checks(r,c):
-                    cf = self.proj.cfs[r,c]
-                    if cf is not None:
-                        yield cf,r,c
-
-
-
-# CEBALERT: redoc
-class MaskedCFIter(CFIter):
-    """
-    Iterator to walk through the ConnectionFields of all active (i.e.,
-    non-masked) neurons in the destination Sheet of the given CFProjection.
-    """
-    def _unit_checks(self,r,c):
-        process_unit = True
-
+    def get_overall_mask(self):
         # JPHACKALERT: Should really check for the existence of the
         # mask, rather than checking its type. This is a hack to
         # support higher-order projections whose dest is a CF, instead
         # of a sheet.  The right thing to do is refactor so that CF
         # masks and  SheetMasks are subclasses of an abstract Mask
         # type so that they support the same interfaces.
-        mask = self.proj.dest.mask.data[r,c] if isinstance(self.proj.dest.mask,SheetMask) else True
+        #
+        # CB: put back when supporting the neighborhood mask (though
+        # preferably do what Jeff suggests instead)
+#        if isinstance(self.proj.dest.mask,SheetMask):
+#            return get_active_units_mask()
+#        else:
+         sheet_mask = self.get_sheet_mask()
+         active_units_mask = self.get_active_units_mask()
+         return numpy.logical_and(sheet_mask,active_units_mask)
+    
+    
+    def get_shape(self):
+        return self.proj.dest.shape
 
-        if mask:
-            process_unit = super(MaskedCFIter,self)._unit_checks(r,c)
+    def __call__(self):
+        mask = self.get_overall_mask()
+        rows,cols = self.proj.cfs.shape
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = self.proj.cfs[r,c]
+                if cf is not None:
+                    if mask[r,c]:
+                        yield cf,r,c
 
-        return process_unit
 
+
+MaskedCFIter = CFIter
 
 
 ### We don't really need this class; its methods could probably be
