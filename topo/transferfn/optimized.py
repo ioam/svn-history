@@ -20,6 +20,7 @@ from basic import DivisiveNormalizeL1
 # For backwards compatibility when loading pickled files; can be deleted
 DivisiveNormalizeL1_opt=DivisiveNormalizeL1
 
+# CEBALERT: ignores sheet mask
 class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     """
     Performs divisive normalization of the weights of all cfs.
@@ -29,8 +30,8 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     single_cf_fn = param.ClassSelector(
         TransferFn,DivisiveNormalizeL1(norm_value=1.0),readonly=True)
     
-    def __call__(self, iterator, mask, **params):
-        rows,cols = mask.shape
+    def __call__(self, iterator, active_units_mask, **params):
+        rows,cols = active_units_mask.shape
 
         cf_type=iterator.proj.cf_type
 
@@ -54,7 +55,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
             // CB: I doubt norm_total can be a property and a slot, but maybe
             // it could be, or maybe we could use the actual attribute...
             
-            npfloat *x = mask;
+            npfloat *x = active_units_mask;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
@@ -96,7 +97,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                 }
             }
         """    
-        inline(code, ['mask','rows','cols','cfs','cf_type'], local_dict=locals(),
+        inline(code, ['active_units_mask','rows','cols','cfs','cf_type'], local_dict=locals(),
                headers=['<structmember.h>'])
 
 
@@ -112,7 +113,7 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
     single_cf_fn = param.ClassSelector(
         TransferFn,default=DivisiveNormalizeL1(norm_value=1.0),constant=True)
 
-    def __call__(self, iterator, mask, **params):
+    def __call__(self, iterator, active_units_mask, **params):
         """
         Uses the cf.norm_total attribute to allow optimization
         by computing the sum separately, and to allow joint
@@ -120,11 +121,11 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
         the value it would have has been changed.
         """
         if type(self.single_cf_fn) is not IdentityTF:
-            rows,cols = mask.shape
+            rows,cols = active_units_mask.shape
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
             for cf,r,c in iterator():
-                if (mask[r][c] != 0):
+                if (active_units_mask[r][c] != 0):
                     current_sum=cf.norm_total
                     factor = norm_value/current_sum
                     cf.weights *= factor

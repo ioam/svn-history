@@ -13,7 +13,7 @@ from topo.misc.inlinec import inline,provide_unoptimized_equivalent,c_header
 from topo.sheet.lissom import LISSOM, JointScaling
 from topo.sheet.basic import compute_joint_norm_totals
 
-
+# CEBALERT: does not respect sheet mask
 def compute_joint_norm_totals_opt(projlist,mask):
     """
     Compute norm_total for each CF in each projections from a

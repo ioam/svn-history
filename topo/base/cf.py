@@ -424,7 +424,7 @@ class CFPOutputFn(param.Parameterized):
     # we can pass in a masked iterator?  A NeighborhoodMask iterator
     # might not be the best choice, but it would be trivial to have one
     # masking out all inactive neurons directly.
-    def __call__(self, iterator, mask, **params):
+    def __call__(self, iterator, active_units_mask, **params):
         """Operate on each CF for which the mask is nonzero."""
         raise NotImplementedError
 
@@ -437,15 +437,15 @@ class CFPOF_Plugin(CFPOutputFn):
     single_cf_fn = param.ClassSelector(TransferFn,default=IdentityTF(),
         doc="Accepts a TransferFn that will be applied to each CF individually.")
     
-    def __call__(self, iterator, mask, **params):
+    def __call__(self, iterator, active_units_mask, **params):
         """
-        Apply the single_cf_fn to each CF for which the mask is nonzero.
+        Apply the single_cf_fn to each CF for which the active_units_mask is nonzero.
         """
         if type(self.single_cf_fn) is not IdentityTF:
             single_cf_fn = self.single_cf_fn
 
             for cf,r,c in iterator():
-                if (mask[r][c] != 0):
+                if (active_units_mask[r][c] != 0):
                     single_cf_fn(cf.weights)
                     del cf.norm_total
 
@@ -459,7 +459,7 @@ class CFPOF_Identity(CFPOutputFn):
     """
     single_cf_fn = param.ClassSelector(TransferFn,default=IdentityTF(),constant=True)
     
-    def __call__(self, iterator, mask, **params):
+    def __call__(self, iterator, active_units_mask, **params):
         pass
 
 
@@ -723,9 +723,9 @@ class CFProjection(Projection):
             self.learning_fn(MaskedCFIter(self),self.input_buffer,self.dest.activity,self.learning_rate)
        
 
-    def apply_learn_output_fns(self,mask):
+    def apply_learn_output_fns(self,active_units_mask):
         for of in self.weights_output_fns:
-            of(MaskedCFIter(self),mask)
+            of(MaskedCFIter(self),active_units_mask)
 
 
     # CEBALERT: see gc alert in simulation.__new__

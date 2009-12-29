@@ -22,7 +22,8 @@ from topo.learningfn.basic import BCMFixed
 from projfn import CFPLF_Trace
 
 
-
+# CEBALERT: ignores sheet mask (probably applies to all classes in
+# this file.
 class CFPLF_Hebbian_opt(CFPLearningFn):
     """
     CF-aware Hebbian learning rule.

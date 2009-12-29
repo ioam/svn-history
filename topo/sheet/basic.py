@@ -203,11 +203,13 @@ class SequenceGeneratorSheet(GeneratorSheet):
         self.simulation.enqueue_event(self.event)
 
 
-
-def compute_joint_norm_totals(projlist,mask):
+# CEBALERT: ignores sheet mask
+def compute_joint_norm_totals(projlist,active_units_mask):
     """
     Compute norm_total for each CF in each projection from a group to
     be normalized jointly.
+
+    Only active units specified by active_units_mask!=0 are processed.
     """
     # Assumes that all Projections in the list have the same r,c size
     assert len(projlist)>=1
@@ -216,7 +218,7 @@ def compute_joint_norm_totals(projlist,mask):
 
     for r in range(rows):
         for c in range(cols):
-            if(mask[r,c] != 0):
+            if active_units_mask[r,c] != 0:
                 sums = [p.cfs[r,c].norm_total for p in projlist]
                 joint_sum = numpy.add.reduce(sums)
                 for p in projlist:
@@ -262,28 +264,30 @@ class JointNormalizingCFSheet(CFSheet):
     def start(self):
         self._normalize_weights()        
 
-
-    def _normalize_weights(self,mask = None):
+    # CEBALERT: ignores sheet mask
+    def _normalize_weights(self,active_units_mask=None):
         """
         Apply the weights_output_fns for every group of Projections.
         
-        The mask is telling which neurons need to be normalized.
+        Only active units as specified by active_units_mask!=0 will
+        have their weights normalized (unless active_units_mask is
+        None, in which case all units will be processed).
         """
         
-        if(mask == None):
-            mask = numpy.ones(self.shape,activity_type)
+        if active_units_mask is None:
+            active_units_mask = numpy.ones(self.shape,activity_type)
         
         for key,projlist in self._grouped_in_projections('JointNormalize'):
             if key == None:
                 normtype='Individually'
             else:
                 normtype='Jointly'
-                self.joint_norm_fn(projlist,mask)
+                self.joint_norm_fn(projlist,active_units_mask)
 
             self.debug(normtype + " normalizing:")
 
             for p in projlist:
-                p.apply_learn_output_fns(mask)
+                p.apply_learn_output_fns(active_units_mask)
                 self.debug('  ',p.name)
 
 
