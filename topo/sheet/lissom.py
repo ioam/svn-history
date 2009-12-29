@@ -83,7 +83,7 @@ class LISSOM(JointNormalizingCFSheet):
 
 
     def start(self):
-        self._normalize_weights()
+        self._normalize_weights(active_units_mask=False)
         if len(self.post_initialization_weights_output_fns)>0:
             for proj in self.in_connections:
                 if not isinstance(proj,Projection):

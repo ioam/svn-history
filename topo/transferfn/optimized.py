@@ -6,6 +6,7 @@ Requires the weave package; without it unoptimized versions are used.
 """
 
 from numpy.oldnumeric import sum
+import numpy
 
 import param
 
@@ -14,7 +15,6 @@ from topo.base.functionfamily import TransferFn, IdentityTF
 from topo.misc.inlinec import inline,provide_unoptimized_equivalent,c_header
 
 from basic import DivisiveNormalizeL1
-
 
 
 # For backwards compatibility when loading pickled files; can be deleted
@@ -30,15 +30,14 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     single_cf_fn = param.ClassSelector(
         TransferFn,DivisiveNormalizeL1(norm_value=1.0),readonly=True)
     
-    def __call__(self, iterator, active_units_mask, **params):
-        rows,cols = active_units_mask.shape
+    def __call__(self, iterator, **params):
+        proj = iterator.proj
+        rows,cols = iterator.get_shape()
+        cf_type=proj.cf_type
+        cfs = proj._cfs
+        
+        active_units_mask = iterator.get_active_units_mask()
 
-        cf_type=iterator.proj.cf_type
-
-        cfs = iterator.proj._cfs
-        # The original code normalized only the CFs for units that were
-        # activated; it might be possible to restore that extra optimization
-        # if some way is found to override that for the first iteration.
         code = c_header + """
             // CEBALERT: should provide a macro for getting offset
 
@@ -113,7 +112,7 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
     single_cf_fn = param.ClassSelector(
         TransferFn,default=DivisiveNormalizeL1(norm_value=1.0),constant=True)
 
-    def __call__(self, iterator, active_units_mask, **params):
+    def __call__(self, iterator, **params):
         """
         Uses the cf.norm_total attribute to allow optimization
         by computing the sum separately, and to allow joint
@@ -121,15 +120,13 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
         the value it would have has been changed.
         """
         if type(self.single_cf_fn) is not IdentityTF:
-            rows,cols = active_units_mask.shape
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
             for cf,r,c in iterator():
-                if (active_units_mask[r][c] != 0):
-                    current_sum=cf.norm_total
-                    factor = norm_value/current_sum
-                    cf.weights *= factor
-                    del cf.norm_total
+                current_sum=cf.norm_total
+                factor = norm_value/current_sum
+                cf.weights *= factor
+                del cf.norm_total
 
 
 provide_unoptimized_equivalent("CFPOF_DivisiveNormalizeL1_opt","CFPOF_DivisiveNormalizeL1",locals())

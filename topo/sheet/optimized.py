@@ -7,6 +7,7 @@ __version__='$Revision$'
 
 import param
 
+from topo.base.cf import MaskedCFIter
 from topo.base.functionfamily import TransferFn, IdentityTF
 from topo.base.projection import Projection, NeighborhoodMask
 from topo.misc.inlinec import inline,provide_unoptimized_equivalent,c_header
@@ -14,20 +15,22 @@ from topo.sheet.lissom import LISSOM, JointScaling
 from topo.sheet.basic import compute_joint_norm_totals
 
 # CEBALERT: does not respect sheet mask
-def compute_joint_norm_totals_opt(projlist,mask):
+def compute_joint_norm_totals_opt(projlist,active_units_mask):
     """
     Compute norm_total for each CF in each projections from a
     group to be normalized jointly.  The same assumptions are
     made as in the original function.
     """
-
     # Assumes that all Projections in the list have the same r,c size
-    assert len(projlist)>=1
-    rows,cols = projlist[0].cfs.shape
     length = len(projlist)
+    assert length>=1
+
+    iterator = MaskedCFIter(projlist[0],active_units_mask=active_units_mask)
+    rows,cols = iterator.get_shape()
+    active_units_mask = iterator.get_active_units_mask()
 
     code = c_header + """
-        npfloat *x = mask;
+        npfloat *x = active_units_mask;
         for (int r=0; r<rows; ++r) {
             for (int l=0; l<cols; ++l) {
                 double load = *x++;
@@ -58,7 +61,7 @@ def compute_joint_norm_totals_opt(projlist,mask):
             }
         }
     """    
-    inline(code, ['projlist','mask','rows','cols','length'], local_dict=locals())
+    inline(code, ['projlist','active_units_mask','rows','cols','length'], local_dict=locals())
 
 provide_unoptimized_equivalent("compute_joint_norm_totals_opt",
                                "compute_joint_norm_totals",locals())

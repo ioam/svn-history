@@ -225,17 +225,14 @@ class Projection(EPConnection):
         pass
 
 
-    def apply_learn_output_fns(self,mask):
+    def apply_learn_output_fns(self,active_units_mask=True):
         """
         Sub-classes can implement this function if they wish to
         perform an operation after learning has completed, such as
         normalizing weight values across different projections.
 
-        The mask argument determines which units should have their
-        output_fn applied; units that are nonzero in the mask must
-        have the function applied, while those that are zero may or
-        may not have the function applied (depending on various
-        optimizations).
+        The active_units_mask argument determines whether or not to
+        apply the output_fn to non-responding units.
         """
         pass
 
@@ -357,7 +354,7 @@ class ProjectionSheet(Sheet):
     divisive_constant = param.Number(default = 1.0,doc="""
         Constant value added to projection activity before combining divisively.""")  
 
-        
+    # CEBALERT: why isn't this a parameter of Sheet?
     # Should be a MaskParameter for safety
     #mask = ClassSelectorParameter(SheetMask,default=SheetMask(),instantiate=True,doc="""
     mask = param.Parameter(default=SheetMask(),instantiate=True,doc="""
@@ -368,6 +365,11 @@ class ProjectionSheet(Sheet):
         disables all masking, but subclasses can use this mask to
         implement optimizations, non-rectangular Sheet shapes,
         lesions, etc.""")
+
+    # CEBALERT: not sure what to call this, and the default should
+    # actually be False. True to match previous behavior.
+    # (same comment as mask; why not parameter of sheet?)
+    skip_non_responding_units = param.Boolean(default=True)
 
     
     def __init__(self,**params):
@@ -513,7 +515,7 @@ class ProjectionSheet(Sheet):
                 self.debug("Skipping non-Projection "+proj.name)
             else:
                 proj.learn()
-                proj.apply_learn_output_fns(self.activity)
+                proj.apply_learn_output_fns()
 
 
     def present_input(self,input_activity,conn):

@@ -17,7 +17,7 @@ import topo
 
 import param
 
-from topo.base.cf import CFSheet, CFPOutputFn
+from topo.base.cf import CFSheet, CFPOutputFn, MaskedCFIter
 from topo.base.functionfamily import TransferFn
 from topo.base.patterngenerator import PatternGenerator, Constant
 from topo.base.projection import Projection
@@ -203,26 +203,21 @@ class SequenceGeneratorSheet(GeneratorSheet):
         self.simulation.enqueue_event(self.event)
 
 
-# CEBALERT: ignores sheet mask
-def compute_joint_norm_totals(projlist,active_units_mask):
+# CEBALERT: active_units_mask should be False by default
+def compute_joint_norm_totals(projlist,active_units_mask=True):
     """
     Compute norm_total for each CF in each projection from a group to
     be normalized jointly.
-
-    Only active units specified by active_units_mask!=0 are processed.
     """
     # Assumes that all Projections in the list have the same r,c size
     assert len(projlist)>=1
-    proj  = projlist[0]
-    rows,cols = proj.cfs.shape
+    iterator = MaskedCFIter(projlist[0],active_units_mask=active_units_mask)
 
-    for r in range(rows):
-        for c in range(cols):
-            if active_units_mask[r,c] != 0:
-                sums = [p.cfs[r,c].norm_total for p in projlist]
-                joint_sum = numpy.add.reduce(sums)
-                for p in projlist:
-                    p.cfs[r,c].norm_total=joint_sum
+    for cf,r,c in iterator():
+        sums = [p.cfs[r,c].norm_total for p in projlist]
+        joint_sum = numpy.add.reduce(sums)
+        for p in projlist:
+            p.cfs[r,c].norm_total=joint_sum
 
 
 class JointNormalizingCFSheet(CFSheet):
@@ -262,21 +257,17 @@ class JointNormalizingCFSheet(CFSheet):
     # JABALERT: Should check that whenever a connection is added to a
     # group, it has the same no of cfs as the existing connections.
     def start(self):
-        self._normalize_weights()        
+        self._normalize_weights(active_units_mask=False)        
 
-    # CEBALERT: ignores sheet mask
-    def _normalize_weights(self,active_units_mask=None):
+
+    # CEBALERT: rename active_units_mask and default to False
+    def _normalize_weights(self,active_units_mask=True):
         """
         Apply the weights_output_fns for every group of Projections.
         
-        Only active units as specified by active_units_mask!=0 will
-        have their weights normalized (unless active_units_mask is
-        None, in which case all units will be processed).
-        """
-        
-        if active_units_mask is None:
-            active_units_mask = numpy.ones(self.shape,activity_type)
-        
+        If active_units_mask is True, only active units will have
+        their weights normalized.
+        """    
         for key,projlist in self._grouped_in_projections('JointNormalize'):
             if key == None:
                 normtype='Individually'
@@ -287,7 +278,7 @@ class JointNormalizingCFSheet(CFSheet):
             self.debug(normtype + " normalizing:")
 
             for p in projlist:
-                p.apply_learn_output_fns(active_units_mask)
+                p.apply_learn_output_fns(active_units_mask=active_units_mask)
                 self.debug('  ',p.name)
 
 
@@ -304,7 +295,7 @@ class JointNormalizingCFSheet(CFSheet):
                 proj.learn()
 
         # Apply output function in groups determined by dest_port
-        self._normalize_weights(self.activity)
+        self._normalize_weights()
 
         
 

@@ -420,11 +420,7 @@ class CFPOutputFn(param.Parameterized):
     """
     __abstract = True
 
-    # JABALERT: Shouldn't the mask parameter be dropped now that
-    # we can pass in a masked iterator?  A NeighborhoodMask iterator
-    # might not be the best choice, but it would be trivial to have one
-    # masking out all inactive neurons directly.
-    def __call__(self, iterator, active_units_mask, **params):
+    def __call__(self, iterator, **params):
         """Operate on each CF for which the mask is nonzero."""
         raise NotImplementedError
 
@@ -437,17 +433,13 @@ class CFPOF_Plugin(CFPOutputFn):
     single_cf_fn = param.ClassSelector(TransferFn,default=IdentityTF(),
         doc="Accepts a TransferFn that will be applied to each CF individually.")
     
-    def __call__(self, iterator, active_units_mask, **params):
-        """
-        Apply the single_cf_fn to each CF for which the active_units_mask is nonzero.
-        """
+    def __call__(self, iterator, **params):
         if type(self.single_cf_fn) is not IdentityTF:
             single_cf_fn = self.single_cf_fn
 
             for cf,r,c in iterator():
-                if (active_units_mask[r][c] != 0):
-                    single_cf_fn(cf.weights)
-                    del cf.norm_total
+                single_cf_fn(cf.weights)
+                del cf.norm_total
 
 
 class CFPOF_Identity(CFPOutputFn):
@@ -459,7 +451,7 @@ class CFPOF_Identity(CFPOutputFn):
     """
     single_cf_fn = param.ClassSelector(TransferFn,default=IdentityTF(),constant=True)
     
-    def __call__(self, iterator, active_units_mask, **params):
+    def __call__(self, iterator, **params):
         pass
 
 
@@ -720,12 +712,18 @@ class CFProjection(Projection):
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
         if self.input_buffer != None:
-            self.learning_fn(MaskedCFIter(self),self.input_buffer,self.dest.activity,self.learning_rate)
+            # CEBALERT: should also be 'activity masked'. Leaving off
+            # to match previous state. (Note that e.g. opt hebbian
+            # does already skip inactive units.)
+            self.learning_fn(MaskedCFIter(self),#,active_units_mask=self.dest.activity),
+                             self.input_buffer,self.dest.activity,self.learning_rate)
        
 
-    def apply_learn_output_fns(self,active_units_mask):
+    # CEBALERT: called 'learn' output fns here, but called 'weights' output fns
+    # elsewhere (mostly). Change all to 'learn'?
+    def apply_learn_output_fns(self,active_units_mask=True):
         for of in self.weights_output_fns:
-            of(MaskedCFIter(self),active_units_mask)
+            of(MaskedCFIter(self,active_units_mask=active_units_mask))
 
 
     # CEBALERT: see gc alert in simulation.__new__
@@ -785,8 +783,11 @@ def _create_mask(shape,bounds_template,sheet,autosize=True,threshold=0.5):
     return mask.astype(weight_type)
 
 
-
-
+# The only use I can see for this is internal stuff. Can we hide it?
+# Everyone should be respecting the mask without having to think about
+# it.
+# CEBALERT: redoc
+import numpy
 class CFIter(object):
     """
     Iterator to walk through all ConnectionFields of all neurons in
@@ -794,30 +795,56 @@ class CFIter(object):
     yields the tuple (cf,row,col) where cf is the ConnectionField at
     position (row,col).
     """
-    def __init__(self,cfprojection):
-        self.proj = cfprojection    
+    def __init__(self,cfprojection,active_units_mask=False):
+        self.proj = cfprojection
+        self.active_units_mask = active_units_mask
+
+    
+    def get_active_units_mask(self):
+        if self.active_units_mask:
+            return self.proj.dest.activity
+        else:
+            return numpy.ones(self.proj.dest.shape,dtype=self.proj.dest.activity.dtype)
+
+    
+    def get_shape(self):
+        return self.proj.dest.shape
+
+
+    def _unit_checks(self,r,c):
+        process_unit = True
+
+        # CEBALERT: change to use get_mask()
+        if self.proj.dest.skip_non_responding_units:
+            if self.active_units_mask is True:
+                if self.proj.dest.activity[r,c]==0:
+                    process_unit = False
+            elif self.active_units_mask is not False:
+                if self.active_units_mask[r,c]==0:
+                    process_unit = False
+
+        return process_unit
+
 
     def __call__(self):
         rows,cols = self.proj.cfs.shape
         for r in xrange(rows):
             for c in xrange(cols):
-                cf = self.proj.cfs[r,c]
-                if cf is not None:
-                    yield cf,r,c
+                if self._unit_checks(r,c):
+                    cf = self.proj.cfs[r,c]
+                    if cf is not None:
+                        yield cf,r,c
 
 
 
+# CEBALERT: redoc
 class MaskedCFIter(CFIter):
     """
     Iterator to walk through the ConnectionFields of all active (i.e.,
     non-masked) neurons in the destination Sheet of the given CFProjection.
     """
-
-    def __init__(self,cfprojection):
-        super(MaskedCFIter,self).__init__(cfprojection)
-    
-    def __call__(self):
-        rows,cols = self.proj.cfs.shape
+    def _unit_checks(self,r,c):
+        process_unit = True
 
         # JPHACKALERT: Should really check for the existence of the
         # mask, rather than checking its type. This is a hack to
@@ -825,20 +852,13 @@ class MaskedCFIter(CFIter):
         # of a sheet.  The right thing to do is refactor so that CF
         # masks and  SheetMasks are subclasses of an abstract Mask
         # type so that they support the same interfaces.
-        if isinstance(self.proj.dest.mask,SheetMask):
-            mask = self.proj.dest.mask.data
-            for r in xrange(rows):
-                for c in xrange(cols):
-                    cf = self.proj.cfs[r,c]
-                    if (cf is not None) and mask[r,c]:
-                        yield cf,r,c
-        else:
-            for r in xrange(rows):
-                for c in xrange(cols):
-                    cf = self.proj.cfs[r,c]
-                    if cf is not None:
-                        yield cf,r,c
-            
+        mask = self.proj.dest.mask.data[r,c] if isinstance(self.proj.dest.mask,SheetMask) else True
+
+        if mask:
+            process_unit = super(MaskedCFIter,self)._unit_checks(r,c)
+
+        return process_unit
+
 
 
 ### We don't really need this class; its methods could probably be

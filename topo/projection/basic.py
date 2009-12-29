@@ -36,10 +36,10 @@ class CFPOF_SharedWeight(CFPOutputFn):
     single_cf_fn = param.ClassSelector(TransferFn,default=IdentityTF())
     
     # CEBALERT: remove norm_values?
-    def __call__(self, cfs, active_units_mask, norm_values=None, **params):
+    def __call__(self, cfs, norm_values=None, **params):
         """Apply the specified single_cf_fn to every CF."""
         if type(self.single_cf_fn) is not IdentityTF:
-            cf = cfs[0][0]
+            cf = cfs[0,0]
             self.single_cf_fn(cf.weights)
 
 from topo.base.cf import _create_mask
@@ -161,7 +161,7 @@ class SharedWeightCFProjection(CFProjection):
         pass
     
     
-    def apply_learn_output_fns(self,active_units_mask):
+    def apply_learn_output_fns(self,active_units_mask=True):
         """
         Because of how output functions are applied, it is not currently
         possible to use learning functions and learning output functions for
