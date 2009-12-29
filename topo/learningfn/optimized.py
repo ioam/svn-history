@@ -22,8 +22,8 @@ from topo.learningfn.basic import BCMFixed
 from projfn import CFPLF_Trace
 
 
-# CEBALERT: ignores sheet mask (probably applies to all classes in
-# this file.
+
+
 class CFPLF_Hebbian_opt(CFPLearningFn):
     """
     CF-aware Hebbian learning rule.
@@ -41,25 +41,31 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),readonly=True)
     
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-        rows,cols = output_activity.shape
-        cfs = iterator.proj._cfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         if single_connection_learning_rate==0:
             return
-        
+
+        rows,cols = output_activity.shape
+        cfs = iterator.proj._cfs        
         irows,icols = input_activity.shape
         cf_type = iterator.proj.cf_type
+
+        sheet_mask = iterator.get_sheet_mask()
+
         code = c_header + """
             DECLARE_SLOT_OFFSET(weights,cf_type);
             DECLARE_SLOT_OFFSET(input_sheet_slice,cf_type);
             DECLARE_SLOT_OFFSET(mask,cf_type);
 
             npfloat *x = output_activity;
+            npfloat *m = sheet_mask;
+
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
                     double load = *x++;
-                    if (load != 0) {
+                    double msk = *m++;
+                    if (load != 0 && msk != 0) {
                         load *= single_connection_learning_rate;
 
                         PyObject *cf = PyList_GetItem(cfsr,l);
@@ -100,7 +106,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
             }
         """
 
-        inline(code, ['input_activity', 'output_activity','rows', 'cols',
+        inline(code, ['input_activity', 'output_activity','rows', 'cols','sheet_mask',
                       'icols', 'cfs', 'single_connection_learning_rate','cf_type'],
                local_dict=locals(),
                headers=['<structmember.h>'])               
@@ -113,6 +119,7 @@ provide_unoptimized_equivalent("CFPLF_Hebbian_opt","CFPLF_Hebbian",locals())
 
 
 
+# CBERRORALERT: classes from here on probably ignore the sheet mask 
 
 # JABALERT: Is this really a fixed-threshold BCM rule?  If so, is that really useful?
 class CFPLF_BCMFixed_opt(CFPLearningFn):

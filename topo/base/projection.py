@@ -625,7 +625,7 @@ class ProjectionSheet(Sheet):
                     if isinstance(p,Projection)])
 
 
-
+# CEBALERT: untested
 class NeighborhoodMask(SheetMask):
     """
     A SheetMask where the mask includes a neighborhood around active neurons.

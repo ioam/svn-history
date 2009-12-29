@@ -14,7 +14,6 @@ from topo.misc.inlinec import inline,provide_unoptimized_equivalent,c_header
 from topo.sheet.lissom import LISSOM, JointScaling
 from topo.sheet.basic import compute_joint_norm_totals
 
-# CEBALERT: does not respect sheet mask
 def compute_joint_norm_totals_opt(projlist,active_units_mask):
     """
     Compute norm_total for each CF in each projections from a
@@ -28,13 +27,16 @@ def compute_joint_norm_totals_opt(projlist,active_units_mask):
     iterator = MaskedCFIter(projlist[0],active_units_mask=active_units_mask)
     rows,cols = iterator.get_shape()
     active_units_mask = iterator.get_active_units_mask()
+    sheet_mask = iterator.get_sheet_mask()
 
     code = c_header + """
         npfloat *x = active_units_mask;
+        npfloat *m = sheet_mask;
         for (int r=0; r<rows; ++r) {
             for (int l=0; l<cols; ++l) {
                 double load = *x++;
-                if (load != 0) {
+                double msk = *m++;
+                if (msk!=0 && load != 0) {
                     double nt = 0;
 
                     for(int p=0; p<length; p++) {
@@ -61,12 +63,12 @@ def compute_joint_norm_totals_opt(projlist,active_units_mask):
             }
         }
     """    
-    inline(code, ['projlist','active_units_mask','rows','cols','length'], local_dict=locals())
+    inline(code, ['projlist','active_units_mask','sheet_mask','rows','cols','length'], local_dict=locals())
 
 provide_unoptimized_equivalent("compute_joint_norm_totals_opt",
                                "compute_joint_norm_totals",locals())
 
-
+# CEBALERT: not tested
 class LISSOM_Opt(LISSOM):
     """
     Faster but potentially unsafe optimized version of LISSOM.
@@ -91,6 +93,7 @@ class LISSOM_Opt(LISSOM):
 
     def __init__(self,**params):
         super(LISSOM_Opt,self).__init__(**params)
+        # CEBALERT: this wipes out any user-specified sheet mask.
         self.mask = NeighborhoodMask_Opt(threshold = 0.00001,radius = 0.05,sheet = self)
 
 provide_unoptimized_equivalent("LISSOM_Opt","LISSOM",locals())

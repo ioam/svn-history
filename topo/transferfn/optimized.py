@@ -36,7 +36,11 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
         cf_type=proj.cf_type
         cfs = proj._cfs
         
+        # CEBALERT: for performance, it is better to process the
+        # two masks separately, in the C code.
+        # mask = iterator.get_overall_mask()
         active_units_mask = iterator.get_active_units_mask()
+        sheet_mask = iterator.get_sheet_mask()
 
         code = c_header + """
             // CEBALERT: should provide a macro for getting offset
@@ -55,11 +59,14 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
             // it could be, or maybe we could use the actual attribute...
             
             npfloat *x = active_units_mask;
+            npfloat *m = sheet_mask;
+
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
                     double load = *x++;
-                    if (load != 0)
+                    double msk = *m++;
+                    if (load != 0 && msk != 0)
                     {
                         PyObject *cf = PyList_GetItem(cfsr,l);
 
@@ -96,7 +103,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                 }
             }
         """    
-        inline(code, ['active_units_mask','rows','cols','cfs','cf_type'], local_dict=locals(),
+        inline(code, ['sheet_mask','active_units_mask','rows','cols','cfs','cf_type'], local_dict=locals(),
                headers=['<structmember.h>'])
 
 

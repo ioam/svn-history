@@ -695,7 +695,6 @@ class CFProjection(Projection):
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,timestamp)
 
 
-
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
@@ -704,7 +703,10 @@ class CFProjection(Projection):
         for of in self.output_fns:
             of(self.activity)
 
-    
+
+    # CEBALERT: should add active_units_mask to match
+    # apply_learn_output_fns.  (Note that e.g. CFPOF_Hebbian_opt
+    # already skips inactive_units.)
     def learn(self):
         """
         For a CFProjection, learn consists of calling the learning_fn.
@@ -712,11 +714,7 @@ class CFProjection(Projection):
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
         if self.input_buffer != None:
-            # CEBALERT: should also be 'activity masked'. Leaving off
-            # to match previous state. (Note that e.g. opt hebbian
-            # does already skip inactive units.)
-            self.learning_fn(MaskedCFIter(self),#,active_units_mask=self.dest.activity),
-                             self.input_buffer,self.dest.activity,self.learning_rate)
+            self.learning_fn(MaskedCFIter(self),self.input_buffer,self.dest.activity,self.learning_rate)
        
 
     # CEBALERT: called 'learn' output fns here, but called 'weights' output fns
@@ -800,27 +798,36 @@ class CFIter(object):
         self.active_units_mask = active_units_mask
 
     
+    def get_sheet_mask(self):
+        return self.proj.dest.mask.data
+
     def get_active_units_mask(self):
         if self.active_units_mask:
             return self.proj.dest.activity
         else:
             return numpy.ones(self.proj.dest.shape,dtype=self.proj.dest.activity.dtype)
 
+
+# CB: this is slower than doing the combination in our c code.
+#    # assuming always numpy array for mask data
+#    def get_overall_mask(self):
+#        dest = self.proj.dest
+#        sheet_mask = dest.mask.data
+#        active_units_mask = self.get_active_units_mask()
+#        # astype for compatibility with existing C
+#        # code. Might want to change to boolean.
+#        return numpy.logical_and(sheet_mask,active_units_mask).astype(dest.activity.dtype)
     
     def get_shape(self):
         return self.proj.dest.shape
 
-
     def _unit_checks(self,r,c):
         process_unit = True
 
-        # CEBALERT: change to use get_mask()
+        # CEBALERT: change to use get_overall_mask()
         if self.proj.dest.skip_non_responding_units:
             if self.active_units_mask is True:
                 if self.proj.dest.activity[r,c]==0:
-                    process_unit = False
-            elif self.active_units_mask is not False:
-                if self.active_units_mask[r,c]==0:
                     process_unit = False
 
         return process_unit
