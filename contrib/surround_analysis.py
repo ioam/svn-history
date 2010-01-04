@@ -153,7 +153,7 @@ class surround_analysis():
             if pref_or_resp != 0:
                 curve_data[curve_label]["measures"]["or_suppression"]=(pref_or_resp-cont_or_resp)/pref_or_resp
             else: 
-                curve_data[curve_label]["measures"]["or_suppression"]=-1
+                curve_data[curve_label]["measures"]["or_suppression"]=-1.0
         
         
         hc_curve_name_orc = "Contrastsurround = " + str(self.high_contrast) + "%";
@@ -287,23 +287,26 @@ class surround_analysis():
             
             
             x_values=numpy.array(x_values)-orientation
-
-            for j in xrange(0,len(x_values)):
-                if x_values[j] > numpy.pi/2.0:
-                   x_values[j] -= numpy.pi 
-                if x_values[j] < -numpy.pi/2.0:
-                   x_values[j] += numpy.pi
-
-            for j in xrange(0,len(x_values)):
-                if x_values[j] > numpy.pi/2.0:
-                   x_values[j] -= numpy.pi 
-                if x_values[j] < -numpy.pi/2.0:
-                   x_values[j] += numpy.pi
-
-
-            y_values = sorted(y_values, key=lambda x: x_values[numpy.argmax(y_values == x)])
 	    
-            x_values = sorted(x_values) 
+	    print x_values
+
+            for j in xrange(0,len(x_values)):
+                if x_values[j] > numpy.pi/2.0:
+                   x_values[j] -= numpy.pi 
+                if x_values[j] < -numpy.pi/2.0:
+                   x_values[j] += numpy.pi
+
+            for j in xrange(0,len(x_values)):
+                if x_values[j] > numpy.pi/2.0:
+                   x_values[j] -= numpy.pi 
+                if x_values[j] < -numpy.pi/2.0:
+                   x_values[j] += numpy.pi
+
+
+            inds = numpy.argsort(x_values)
+	    y_values = numpy.take(y_values, inds)
+            x_values = sorted(x_values)
+
             y_values.append(y_values[0])
             x_values.append(x_values[0]+numpy.pi)
             
@@ -414,12 +417,13 @@ class surround_analysis():
                     f = fig.add_subplot(111)
                     f.set_xlabel(str(key))
                     f.set_ylabel('#Cells')
-                    mmax = numpy.max(numpy.max(histograms_lc[key]),numpy.max(histograms_hc[key]))
-                    mmin = numpy.min(numpy.min(histograms_lc[key]),numpy.min(histograms_hc[key]))
-                    bins = numpy.arange(mmin,mmax+0.01,(mmax-mmin)/10.0)
-                    f.hist(histograms_hc[key],bins=bins,normed=False)
+                    mmax = numpy.max(numpy.max(histograms_lc[key]),numpy.max(histograms_lc[key]))
+                    mmin = numpy.min(numpy.min(histograms_lc[key]),numpy.min(histograms_lc[key]))
+                    bins = numpy.arange(mmin-0.01,mmax+0.01,(mmax-mmin)/10.0)
+                    f.hist(histograms_lc[key],bins=bins,normed=False)
                     #f.axvline(x=numpy.mean(histograms_lc[key]),linewidth=4, color='r')
                     release_fig("Histogram<" + key + ">")
+                    print len(histograms_lc[key])
                     print key + "LC mean :" + str(numpy.mean(histograms_lc[key]))
                     print key + "HC mean :" + str(numpy.mean(histograms_hc[key]))
                 else:
