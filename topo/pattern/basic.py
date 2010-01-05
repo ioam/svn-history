@@ -722,7 +722,8 @@ class Selector(PatternGenerator):
 ### is just a specialized version of Composite, and should be
 ### implementable directly using what is already in Composite.    
 class GaussiansCorner(PatternGenerator):
-    """Two Gaussian pattern generators arranged into a corner shape."""
+    """Two Gaussian pattern generators arranged into a cross, with variable
+    intersection point, that can appear also as a corner shape."""
     
     x = param.Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="X center of the corner")
@@ -730,26 +731,37 @@ class GaussiansCorner(PatternGenerator):
     y = param.Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="Y center of the corner")
                 
-    size = param.Number(default=0.5,doc="The size of the corner")
+    size = param.Number(default=0.5,bounds=(0,None), softbounds=(0.1,1),
+                doc="The size of the corner")
     
+    aspect_ratio = param.Number(default=1/0.31, bounds=(0,None), softbounds=(1,10),
+                doc="Ratio of the width to the height for both Gaussians")
+                
+    angle = param.Number(default=0.5*pi,bounds=(0,pi), softbounds=(0.01*pi,0.99*pi),
+                doc="The angle of the corner")
+                
+    cross = param.Number(default=0.4, bounds=(0,1), softbounds=(0,1),
+                doc="Where the two Gaussians cross, as fraction over their half length")
     
+
     def __call__(self,**params_to_override):
         p = ParamOverrides(self,params_to_override)
         
-        input_1=Gaussian()
-        input_2=Gaussian()
-
-        patterns = [input_1(orientation = p.orientation, bounds = p.bounds, xdensity = p.xdensity,
-                            ydensity = p.ydensity, offset = p.offset, size = p.size,
-                            x = p.x + cos(p.orientation) * p.size*0.9,
-                            y = p.y + sin(p.orientation) * p.size*0.9),
-                    input_2(orientation = p.orientation+pi/2, bounds = p.bounds, xdensity = p.xdensity,
-                            ydensity = p.ydensity, offset = p.offset, size = p.size,
-                            x = p.x + cos(p.orientation+pi/2) * p.size*0.9,
-                            y = p.y + sin(p.orientation+pi/2) * p.size*0.9)]
+        g_1 = Gaussian()
+        g_2 = Gaussian()
         
-        return numpy.maximum(patterns[0],patterns[1])
-
+        x_1 = g_1(orientation = p.orientation, bounds = p.bounds, xdensity = p.xdensity,
+                            ydensity = p.ydensity, offset = p.offset, size = p.size,
+                            aspect_ratio = p.aspect_ratio,
+                            x = p.x + 0.7 * cos(p.orientation) * p.cross * p.size * p.aspect_ratio,
+                            y = p.y + 0.7 * sin(p.orientation) * p.cross * p.size * p.aspect_ratio)
+        x_2 = g_2(orientation = p.orientation+p.angle, bounds = p.bounds, xdensity = p.xdensity,
+                            ydensity = p.ydensity, offset = p.offset, size = p.size,
+                            aspect_ratio = p.aspect_ratio,
+                            x = p.x + 0.7 * cos(p.orientation+p.angle) * p.cross * p.size * p.aspect_ratio,
+                            y = p.y + 0.7 * sin(p.orientation+p.angle) * p.cross * p.size * p.aspect_ratio)
+        
+        return numpy.maximum( x_1, x_2 )
 
 
 
