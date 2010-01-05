@@ -419,7 +419,7 @@ class surround_analysis():
                     f.set_ylabel('#Cells')
                     mmax = numpy.max(numpy.max(histograms_lc[key]),numpy.max(histograms_lc[key]))
                     mmin = numpy.min(numpy.min(histograms_lc[key]),numpy.min(histograms_lc[key]))
-                    bins = numpy.arange(mmin-0.01,mmax+0.01,(mmax-mmin)/10.0)
+                    bins = numpy.arange(mmin-0.01,mmax+0.01,(mmax+0.01-(mmin-0.01))/10.0)
                     f.hist(histograms_lc[key],bins=bins,normed=False)
                     #f.axvline(x=numpy.mean(histograms_lc[key]),linewidth=4, color='r')
                     release_fig("Histogram<" + key + ">")
