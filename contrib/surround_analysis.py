@@ -307,8 +307,8 @@ class surround_analysis():
 	    y_values = numpy.take(y_values, inds)
             x_values = sorted(x_values)
 
-            y_values.append(y_values[0])
-            x_values.append(x_values[0]+numpy.pi)
+            numpy.append(y_values,y_values[0])
+            numpy.append(x_values,x_values[0]+numpy.pi)
             
             f.plot(x_values, y_values, lw=3, color=colors[i],label=curve_label)
             i+=1
