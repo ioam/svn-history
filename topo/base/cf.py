@@ -744,7 +744,7 @@ class CFProjection(Projection):
         return super(CFProjection,self).n_bytes() + \
                sum([cf.weights.nbytes + 
                     cf.mask.nbytes
-                    for cf,r,c in CFIter(self,ignore_sheet_mask=True)()])
+                    for cf,i in CFIter(self,ignore_sheet_mask=True)()])
 
 
     def n_conns(self):
@@ -752,7 +752,7 @@ class CFProjection(Projection):
         # weights as connections if nonzero
         rows,cols=self.cfs.shape
         return sum([len((cf.mask if cf.mask is not None else cf.weights).ravel().nonzero()[0])
-                    for cf,r,c in MaskedCFIter(self)()])
+                    for cf,i in MaskedCFIter(self)()])
 
 
 # CEB: have not yet decided proper location for this method
