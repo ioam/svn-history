@@ -62,7 +62,7 @@ class surround_analysis():
         FeatureCurveCommand.display=True
         FeatureCurveCommand.sheet=topo.sim[sheet_name]
         SinusoidalMeasureResponseCommand.num_phase=8
-        SinusoidalMeasureResponseCommand.frequencies=[3.0]
+        SinusoidalMeasureResponseCommand.frequencies=[__main__.__dict__.get('FREQ',2.4)]
         SinusoidalMeasureResponseCommand.scale=1.0
         MeasureResponseCommand.scale=1.0
         FeatureCurveCommand.num_orientation=12
@@ -80,7 +80,7 @@ class surround_analysis():
                 xindex = self.center_r+(x-steps)*step_size
                 yindex = self.center_c+(y-steps)*step_size
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
-                topo.command.pylabplots.measure_size_response.instance(sheet=self.sheet,num_phase=4,num_sizes=ns,max_size=3.0,coords=[(xcoor,ycoor)])(coords=[(xcoor,ycoor)],frequencies=[3.0])        
+                topo.command.pylabplots.measure_size_response.instance(sheet=self.sheet,num_phase=4,num_sizes=ns,max_size=3.0,coords=[(xcoor,ycoor)])(coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)])        
                 
                 self.data_dict[(xindex,yindex)] = {}
                 self.data_dict[(xindex,yindex)]["ST"] = self.calculate_RF_sizes(xindex, yindex)
@@ -108,7 +108,7 @@ class surround_analysis():
         hc_curve = data["Contrast = " + str(self.high_contrast) + "%" ]
         lc_curve = data["Contrast = " + str(self.low_contrast) + "%" ]
         
-        topo.command.pylabplots.measure_or_tuning(num_phase=4,num_orientation=12,size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.low_contrast}],display=True,coords=[(xcoor,ycoor)],frequencies=[3.0])
+        topo.command.pylabplots.measure_or_tuning(num_phase=4,num_orientation=12,size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.low_contrast}],display=True,coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)])
         topo.command.pylabplots.cyclic_tuning_curve.instance(x_axis="orientation",coords=[(xcoor,ycoor)])
         
         curve_name_ort = "Contrast = " + str(self.low_contrast) + "%";
@@ -135,7 +135,7 @@ class surround_analysis():
                                                              contrastcenter=self.low_contrast,
                                                              thickness=4.0-lc_curve["measures"]["peak_near_facilitation"]-0.2,
                                                              num_phase=12,
-							     frequencies=[3.0],
+							     frequencies=[__main__.__dict__.get('FREQ',2.4)],
                                                              curve_parameters=[{"contrastsurround":self.low_contrast},{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
         
         for curve_label in sorted(self.sheet.curve_dict['orientationsurround'].keys()):
@@ -524,10 +524,9 @@ def run_dynamics_analysis(x,y,cs,scale):
     
     orr=numpy.pi*topo.sim["V1Complex"].sheet_views["OrientationPreference"].view()[0][xx][yy]
     
-    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs-0.2,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
-    
+    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs-0.2,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
     plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg,"colinear")
     
-    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr+numpy.pi/2,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs-0.2,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=3.0)
+    pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr+numpy.pi/2,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs-0.2,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
     
     plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg,"ortogonal")
