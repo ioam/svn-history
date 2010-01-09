@@ -11,7 +11,7 @@ from math import pi, sqrt
 import numpy
 import param
 
-from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet
+from topo import learningfn, numbergen, transferfn, pattern, projection, responsefn, sheet
 
 import topo.pattern.audio
 import topo.learningfn.optimized
@@ -25,61 +25,119 @@ import topo.sheet.optimized
 
 # Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
-p.add(
 
-    area=param.Number(default=1.0,bounds=(0,None),
-        inclusive_bounds=(False,True),doc="""
-        Linear size of cortical area to simulate.
-        2.0 gives a 2.0x2.0 Sheet area in V1."""),
-		
-    cochlea_density=param.Number(default=24.0,bounds=(0,None),
-        inclusive_bounds=(False,True),doc="""
-        The nominal_density to use for the retina."""),
+p.add (
 
-    # TODO: what should this be!
-	cochlea_aspect_ratio=param.Number(default=0.1,bounds=(0,None),
-		doc="""ratio of width to length"""),
+	# Notes to self as im getting to grips with topo architecture.
+	# area is a topo parameter, of type number
+	# by area we mean AI cortical area?
+    area = param.Number
+			(
+				default = 1.0, 
+				bounds = (0, None),
+				inclusive_bounds = (False, True), 
+				doc = """Linear size of cortical area to simulate.
+				2.0 gives a 2.0x2.0 Sheet area in A1."""
+			),
+	# Average Basilar membrane length = 32mm
+	# Basilar membrane widest (0.42 - 0.65mm) at apex,
+	# and narrowest (0.08 - 0.16mm) at base
+	# Av apex width = (0.42 + 0.65) / 2 = 0.535
+	# Av base width = (0.08 + 0.16) / 2 - 0.12
+	# Approximating uniform width = (0.535 + 0.12) / 2 = 0.3275mm
+	# Ratio(width, length) =  0.3275 / 32 = 0.010234375
+	cochlea_aspect_ratio = param.Number
+			(
+				default = 0.01, 
+				bounds = (0, None),
+				doc = """ratio of cochlea width to its length"""
+			),
+					
+	# not too sure what densities are atm
+    cochlea_density = param.Number
+			(
+				default = 24.0, 
+				bounds = (0, None),
+				inclusive_bounds = (False, True),
+				doc = """The nominal_density to use for the cochlea."""
+			),
 
-    mgn_density=param.Number(default=24.0,bounds=(0,None),
-        inclusive_bounds=(False,True),doc="""
-        The nominal_density to use for the LGN."""),
+    mgn_density = param.Number
+			(
+				default = 24.0, 
+				bounds = (0, None),
+				inclusive_bounds = (False, True),
+				doc = """The nominal_density to use for the MGN."""
+			),
 
-    cortex_density=param.Number(default=48.0,bounds=(0,None),
-        inclusive_bounds=(False,True),doc="""
-        The nominal_density to use for V1."""))
+    cortex_density = param.Number
+			(
+				default = 48.0,
+				bounds = (0, None),
+				inclusive_bounds = (False, True),
+				doc = """The nominal_density to use for A1."""
+			)
+
+) # Close p (parameters)
 
 
-### Specify weight initialization, response function, and learning function
-projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
-projection.CFProjection.weights_generator=pattern.Constant()
-projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
-projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
-projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()]
+projection.CFProjection.cf_shape = pattern.Disk(smoothing = 0.0)
+
+# Weights initialisation
+projection.CFProjection.weights_generator = pattern.Constant()
+projection.CFProjection.weights_output_fns = [transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()]
+
+# Response function
+projection.CFProjection.response_fn = responsefn.optimized.CFPRF_DotProduct_opt()
+
+# Learning function
+projection.CFProjection.learning_fn = learningfn.optimized.CFPLF_Hebbian_opt()
 
 
-### Input patterns
-input_pattern=pattern.audio.Audio(min_frequency=20, max_frequency=20000, filename="square/sqr-1kHz.wav", sample_window=0.3,seconds_per_timestep=0.1)
 
-cochlea_mgn_connection_radius = 0.5#375
-
-cochlea_half_width = p.area/2.0 + cochlea_mgn_connection_radius
-cochlea_half_length = cochlea_half_width * p.cochlea_aspect_ratio
+### Audio Input patterns
+input_pattern = pattern.audio.Audio (
+										min_frequency = 20, 
+										max_frequency = 20000, 
+										filename = "square/sqr-1kHz.wav", 
+										sample_window = 0.3,
+										seconds_per_timestep = 0.1
+									)
 
 
 
 ### Sheets
-topo.sim['Cochlea']=sheet.GeneratorSheet(
-	nominal_density=p.cochlea_density,
-	# p.area, 0.25
-    nominal_bounds=sheet.BoundingBox(points=((-cochlea_half_length,-cochlea_half_width),
-                                     (cochlea_half_length,cochlea_half_width))),
-	input_generator=input_pattern, period=1.0, phase=0.05)
-    
-topo.sim['MGN']=sheet.CFSheet(
-	nominal_density=p.mgn_density,
-    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0))
-#    output_fns=[transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)],
- 
+
+# useful parameters
+cochlea_mgn_connection_radius = 1.0 #375
+
+cochlea_half_length = p.area / 2.0 + cochlea_mgn_connection_radius
+cochlea_half_width = cochlea_half_length * p.cochlea_aspect_ratio
+
+print cochlea_half_width
+print cochlea_half_length
+
+# Cochlea Sheet
+topo.sim['Cochlea'] = sheet.GeneratorSheet (
+												nominal_density = p.cochlea_density,
+												# p.area, 0.25
+												nominal_bounds = sheet.BoundingBox 
+													(
+														points = ( (-cochlea_half_length, -cochlea_half_width),
+																   (cochlea_half_length, cochlea_half_width) )
+													),
+												input_generator = input_pattern, 
+												period = 1.0, 
+												phase = 0.05
+											)
+
+# MGN Sheet    
+topo.sim['MGN'] = sheet.CFSheet (
+									nominal_density = p.mgn_density,
+									nominal_bounds = sheet.BoundingBox(radius = p.area / 2.0)
+									#output_fns = [transferfn.PiecewiseLinear(lower_bound=0.0, upper_bound=1.0)],
+								)
+			
 #topo.sim['LGNOff']=sheet.CFSheet(nominal_density=p.lgn_density,
 #    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25),
 #    output_fns=[transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)],
@@ -95,11 +153,16 @@ topo.sim['MGN']=sheet.CFSheet(
 ### Connections
 
 # TODO: how to model mgn simply?
-topo.sim.connect(
-    'Cochlea','MGN',delay=0.05,strength=2.33,name='Afferent',
-    connection_type=projection.CFProjection,
-    nominal_bounds_template=sheet.BoundingBox(radius=cochlea_mgn_connection_radius),
-    weights_generator=pattern.Constant())
+topo.sim.connect (
+					'Cochlea',
+					'MGN',
+					delay = 0.05,
+					strength = 2.33,
+					name = 'Afferent',
+					connection_type = projection.CFProjection,
+					nominal_bounds_template = sheet.BoundingBox(radius = cochlea_mgn_connection_radius),
+					weights_generator = pattern.Constant()
+				 )
 
 #topo.sim.connect(
 #    'Retina','LGNOff',delay=0.05,strength=2.33,name='Afferent',
@@ -140,9 +203,14 @@ topo.sim.connect(
 
 
 ### Default locations for model editor
-topo.sim.grid_layout([#[None,    'V1',     None],
-                      [None,   'MGN',     None],
-                      [None,   'Cochlea', None]], xstart=150)
+topo.sim.grid_layout (
+						[
+							#[None,    'A1',     None],
+							[None,   'MGN',     None],
+							[None,   'Cochlea', None]
+						],
+						xstart = 150
+					 )
 
 
 ### Set up appropriate defaults for analysis
@@ -150,5 +218,5 @@ topo.sim.grid_layout([#[None,    'V1',     None],
 # Measure feature maps based on unthresholded initial response for
 # speed and reliability
 from topo.analysis.featureresponses import MeasureResponseCommand
-MeasureResponseCommand.duration=0.175
-MeasureResponseCommand.apply_output_fns=False
+MeasureResponseCommand.duration = 0.175
+MeasureResponseCommand.apply_output_fns = False
