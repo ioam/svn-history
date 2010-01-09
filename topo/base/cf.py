@@ -259,7 +259,7 @@ class ConnectionField(object):
         # be too painful.)
         self.weights = w.astype(weight_type)
 
-        # CEBALERT: the system of masking through multiplication
+        # CEBHACKALERT: the system of masking through multiplication
         # by 0 works for now, while the output_fns are all
         # multiplicative.  But in the long run we need a better way to
         # apply the mask.  The same applies anywhere the mask is used,
