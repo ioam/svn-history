@@ -1,7 +1,7 @@
 """
 Bilal work in progress
 
-$Id: lissom_oo_or.ty 10778 2009-11-17 23:33:16Z KKudryavtsev $
+$Id: lissom_audio.ty 10778 2009-11-17 23:33:16Z KKudryavtsev $
 """
 __version__='$Revision: 10778 $'
 
@@ -114,9 +114,6 @@ cochlea_mgn_connection_radius = 1.0 #375
 cochlea_half_length = p.area / 2.0 + cochlea_mgn_connection_radius
 cochlea_half_width = cochlea_half_length * p.cochlea_aspect_ratio
 
-print cochlea_half_width
-print cochlea_half_length
-
 # Cochlea Sheet
 topo.sim['Cochlea'] = sheet.GeneratorSheet (
 												nominal_density = p.cochlea_density,
@@ -135,18 +132,17 @@ topo.sim['Cochlea'] = sheet.GeneratorSheet (
 topo.sim['MGN'] = sheet.CFSheet (
 									nominal_density = p.mgn_density,
 									nominal_bounds = sheet.BoundingBox(radius = p.area / 2.0)
-									#output_fns = [transferfn.PiecewiseLinear(lower_bound=0.0, upper_bound=1.0)],
+									#output_fns = [transferfn.PiecewiseLinear(lower_bound = 0.0, upper_bound = 1.0)],
 								)
-			
-#topo.sim['LGNOff']=sheet.CFSheet(nominal_density=p.lgn_density,
-#    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25),
-#    output_fns=[transferfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)],
-#    measure_maps=False)
 
-#topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=p.cortex_density,
-#    nominal_bounds=sheet.BoundingBox(radius=p.area/2.0),tsettle=9,
-#    output_fns=[transferfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633)],
-#    joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt)
+# A1 Sheet
+#topo.sim['A1'] = sheet.lissom.LISSOM (
+#										nominal_density = p.cortex_density,
+#										nominal_bounds = sheet.BoundingBox(radius = p.area / 2.0),
+#										tsettle = 9,
+#										output_fns=[transferfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633)],
+#										joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt
+#									 )
 
 
 
@@ -164,45 +160,53 @@ topo.sim.connect (
 					weights_generator = pattern.Constant()
 				 )
 
-#topo.sim.connect(
-#    'Retina','LGNOff',delay=0.05,strength=2.33,name='Afferent',
-#    connection_type=projection.SharedWeightCFProjection,
-#    nominal_bounds_template=sheet.BoundingBox(radius=0.375),
-#    weights_generator=off_weights)
+#topo.sim.connect (
+#					'MGN',
+#					'A1',
+#					delay = 0.05,
+#					strength = 1.0,
+#					name = 'LGNOnAfferent',
+#					dest_port = ('Activity', 'JointNormalize', 'Afferent'),
+#					connection_type = projection.CFProjection,
+#					learning_rate = 0.9590/2,
+#					nominal_bounds_template = sheet.BoundingBox(radius = 0.27083),
+#					weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.27083)
+#				 )
 
-#topo.sim.connect(
-#    'LGNOn','V1',delay=0.05,strength=1.0,name='LGNOnAfferent',
-#    dest_port=('Activity','JointNormalize','Afferent'),
-#    connection_type=projection.CFProjection,learning_rate=0.9590/2,
-#    nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
-#    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
-
-#topo.sim.connect(
-#    'LGNOff','V1',delay=0.05,strength=1.0,name='LGNOffAfferent',
-#    dest_port=('Activity','JointNormalize','Afferent'),
-#    connection_type=projection.CFProjection,learning_rate=0.9590/2,
-#    nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
-#    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
-
-#topo.sim.connect(
-#    'V1','V1',delay=0.05,strength=0.9,name='LateralExcitatory',
-#    connection_type=projection.ResizableCFProjection,learning_rate=2.55528,
-#    nominal_bounds_template=sheet.BoundingBox(radius=0.10417),
-#    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.10417))
+#topo.sim.connect (
+#					'A1',
+#					'A1',
+#					delay = 0.05,
+#					strength = 0.9,
+#					name = 'LateralExcitatory',
+#					connection_type = projection.ResizableCFProjection,
+#					learning_rate = 2.55528,
+#					nominal_bounds_template = sheet.BoundingBox(radius = 0.10417),
+#					weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.10417)
+#				  )
             
-#topo.sim.connect(
-#    'V1','V1',delay=0.05,strength=-0.9,name='LateralInhibitory',
-#    connection_type=projection.CFProjection,learning_rate=1.80873,
-#    nominal_bounds_template=sheet.BoundingBox(radius=0.22917),
-#    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.22917))
+#topo.sim.connect (
+#					'A1',
+#					'A1',
+#					delay = 0.05,
+#					strength = -0.9,
+#					name = 'LateralInhibitory',
+#					connection_type = projection.CFProjection,
+#					learning_rate = 1.80873,
+#					nominal_bounds_template = sheet.BoundingBox(radius = 0.22917),
+#					weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.22917)
+#				 )
 
 
 
 ### Actions scheduled to occur as the simulation proceeds.
-#sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/p.num_inputs,aff_name="Afferent")
+
+#sheet.lissom.schedule_events("topo.sim['V1']", st = 1.0 / p.num_inputs, aff_name = "Afferent")
+
 
 
 ### Default locations for model editor
+
 topo.sim.grid_layout (
 						[
 							#[None,    'A1',     None],
@@ -213,10 +217,12 @@ topo.sim.grid_layout (
 					 )
 
 
-### Set up appropriate defaults for analysis
 
-# Measure feature maps based on unthresholded initial response for
-# speed and reliability
+### Analysis
+
+# Measure feature maps based on unthresholded initial response for speed and reliability
 from topo.analysis.featureresponses import MeasureResponseCommand
+
+# Set up appropriate defaults
 MeasureResponseCommand.duration = 0.175
 MeasureResponseCommand.apply_output_fns = False
