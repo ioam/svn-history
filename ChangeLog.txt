@@ -1,3 +1,2789 @@
+2009-12-11  antolikjan
+
+	* [r10833] contrib/modelfit.py:
+	  many many changes
+
+	* [r10832] contrib/surround_analysis.py:
+	  numerouse modifications
+
+	* [r10831] topo/command/pylabplots.py:
+	  added frequency to features of orientation contrast measurement
+
+2009-12-04  ceball
+
+	* [r10830] topo/misc/util.py:
+	  Added to comment.
+
+	* [r10829] contrib/parameter_analysis,
+	  contrib/parameter_analysis.cfg:
+	  Bug fixes, cleaning, and simplification.
+
+	* [r10828] contrib/lissom_oo_dr.ty:
+	  Updated to use global_params, and for changes to Topographica's
+	  code (e.g. output_fn -> output_fns).
+
+2009-12-03  ceball
+
+	* [r10827] contrib/parameter_analysis,
+	  contrib/parameter_analysis.cfg,
+	  doc/User_Manual/batch_text.php:
+	  Added 'parameter_analysis' script for generating simple reports
+	  from collections of batch runs.
+
+2009-12-02  ceball
+
+	* [r10826] contrib/parameter_search:
+	  parameter_search prints where output will go.
+
+	* [r10825] contrib/parameter_search,
+	  contrib/parameter_search.cfg:
+	  Updated parameter_search to allow it to be used simultaneously
+	  from the same directory by different machines (by distinguishing
+	  the names of generated scripts; this makes it clearer anyway).
+
+2009-12-01  bilalkhancnsg
+
+	* [r10824] contrib/lissom_audio.ty:
+	  Added audio pattern generator.
+
+2009-12-01  antolikjan
+
+	* [r10823] contrib/modelfit.py:
+	  load of changes
+
+2009-11-30  ceball
+
+	* [r10822] topo/command/basic.py:
+	  Silently ignore parameter names in param_formatter.map that are
+	  not present among the actual params.
+
+	* [r10821] topo/command/basic.py:
+	  Added ALERT.
+
+	* [r10820] topo/misc/picklemain.py:
+	  When pickling main, skip items beginning with an underscore.
+	  Unlikely to have any effect on existing code.
+
+	* [r10819] topo/misc/legacy.py:
+	  Added missing import.
+
+2009-11-30  jbednar
+
+	* [r10818] doc/Downloads/index_text.php:
+	  Added m4 to ubuntu prerequisites
+
+	* [r10817] topo/pattern/basic.py:
+	  Minor fixes to comments
+
+2009-11-30  ceball
+
+	* [r10816] topo/pattern/basic.py:
+	  Added comment.
+
+	* [r10815] topo/pattern/audio.py,
+	  topo/pattern/basic.py:
+	  Removed warnings.
+
+	* [r10814] topo/pattern/audio.py,
+	  topo/pattern/basic.py:
+	  Moved OneDPowerSpectrum into topo/pattern/basic.py.
+
+	* [r10813] topo/pattern/audio.py:
+	  Finished implementing Audio and OneDPowerSpectrum pattern
+	  generators.
+
+2009-11-29  ceball
+
+	* [r10812] topo/command/basic.py:
+	  Allow specification of order for params in run_batch's directory
+	  name.
+
+2009-11-29  antolikjan
+
+	* [r10811] contrib/surround_analysis.py:
+	  updatez
+
+2009-11-28  antolikjan
+
+	* [r10810] topo/command/pylabplots.py:
+	  bug correction in orientation contrast
+
+	* [r10809] topo/command/pylabplots.py:
+	  bug correction in orientation contrast
+
+	* [r10808] contrib/surround_analysis.py:
+	  bug correction
+
+	* [r10807] topo/command/pylabplots.py:
+	  minor changes to orientation contrast analysis
+
+	* [r10806] topo/command/pylabplots.py:
+	  made orientation center an explicit parameter in orientation
+	  contrast analysis
+
+2009-11-27  ceball
+
+	* [r10805] doc/Downloads/git_text.php:
+	  Added git admin info for sf.net.
+
+2009-11-26  ceball
+
+	* [r10804] topo/base/cf.py:
+	  Fixed bug in change_bounds() introduced in r10792.
+
+	* [r10803] topo/command/basic.py:
+	  Fixed saving of script parameters that were specified to
+	  run_batch().
+
+	* [r10802] topo/command/basic.py:
+	  Allow run_batch's directory name to use abbreviated parameter
+	  names.
+
+	* [r10801] topo/command/basic.py:
+	  Made order_params_by_name() actually sort the names.
+
+	* [r10800] topo/command/basic.py:
+	  Added dirname_params_filter to run_batch(), allowing control over
+	  how parameters will appear in the output directory name.
+
+	* [r10799] topo/command/basic.py:
+	  Added notes.
+
+	* [r10798] param/parameterized.py,
+	  topo/tests/testparameterizedobject.py:
+	  Allow ParameterizedFunction.instance()s to pickle.
+
+	* [r10797]
+	  topo/tests/testparameterizedobject.py:
+	  Repeat ParameterizedFunction tests on an instance (previously,
+	  only the class was tested).
+
+	* [r10796]
+	  topo/tests/testparameterizedobject.py:
+	  Minor alteration to test to make it easier to subclass.
+
+2009-11-24  bilalkhancnsg
+
+	* [r10795] contrib/lissom_audio.ty:
+	  Initial version.
+
+2009-11-24  ceball
+
+	* [r10794] topo/pattern/audio.py:
+	  Cleaned up formatting (no other change).
+
+2009-11-24  antolikjan
+
+	* [r10793] contrib/gc_alissom.ty:
+	  made t_init external parameter in Relative HF
+
+2009-11-24  ceball
+
+	* [r10792] topo/base/cf.py,
+	  topo/projection/basic.py:
+	  Allow ConnectionFields to be instantiated easily by fixing
+	  default arguments to __init__.
+
+2009-11-22  antolikjan
+
+	* [r10791] contrib/jacommands.py:
+	  added lgn gain param
+
+2009-11-21  antolikjan
+
+	* [r10790] topo/transferfn/basic.py:
+	  corrected bug in HalfRectify
+
+	* [r10789] topo/transferfn/basic.py:
+	  added gain to HalfRectify
+
+	* [r10788] contrib/cc_lesi_final.ty:
+	  added V1 Inh gain
+
+2009-11-21  ceball
+
+	* [r10787] doc/Downloads/git_text.php:
+	  Added missing 'fetch' command and some formatting to git
+	  documentation.
+
+2009-11-20  ceball
+
+	* [r10786] Makefile,
+	  _setup.py,
+	  create_topographica_script.py,
+	  setup.py, setup_exe.py,
+	  setup_ez.py:
+	  Made a python script to create the topographica script. Now there
+	  is only one routine to create the topographica script (except
+	  that topographica-win also needs to be adjusted to use the new
+	  script). Added 'topographica-other-python' target to Makefile,
+	  for creating the topographica script when using some external
+	  python interpreter.
+
+	* [r10785] doc/Downloads/git_text.php:
+	  Added more git documentation.
+
+2009-11-20  antolikjan
+
+	* [r10784] contrib/cc_lesi_final.ty:
+	  lateral learning rate modification
+
+2009-11-18  antolikjan
+
+	* [r10783] contrib/cc_lesi_final.ty:
+	  lateral learning rate modification
+
+2009-11-18  ceball
+
+	* [r10782] external/Makefile,
+	  external/weave_keyerror.patch:
+	  Fix KeyError problem with weave and Python 2.6
+	  (http://projects.scipy.org/scipy/ticket/855).
+
+	* [r10781] param/tk.py:
+	  Fixed multiple 'ignored' Exception RuntimeErrors when starting
+	  the gui with Python 2.6.
+
+2009-11-18  KKudryavtsev
+
+	* [r10780] /branches/kkudryavtsev_branch/topographica/mpidemo*:
+	  Created branch for MPI work
+
+2009-11-17  KKudryavtsev
+
+	* [r10779] /branches/kkudryavtsev_branch:
+	  
+
+	* [r10778]
+	  contrib/cc_lissom_oo_or_simple_rv.ty,
+	  contrib/gc_lissom_oo_or_homeostatic_new.ty,
+	  contrib/lgn_lateral.ty,
+	  contrib/sparse_connectivity_model.ty,
+	  examples/lissom_oo_or.ty,
+	  examples/tiny.ty,
+	  external/Makefile,
+	  mpidemo, setup_ez.py:
+	  
+
+	* [r10777] examples/lissom_oo_or.ty,
+	  examples/tiny.ty,
+	  external/Makefile,
+	  mpidemo*:
+	  Mistakenly added files to trunk instead of branch
+
+2009-11-17  antolikjan
+
+	* [r10776] contrib/surround_analysis.py:
+	  bug correction
+
+2009-11-17  ceball
+
+	* [r10775] topo/command/basic.py:
+	  Added option to run_batch() for saving global_params to a pickle
+	  for future inspection.
+
+	* [r10774] topo/command/basic.py:
+	  Added more info for git vc info in run_batch().
+
+	* [r10773] topo/command/basic.py:
+	  Added more information about the version of Topographica used for
+	  batch runs.
+
+	* [r10772] topo/command/basic.py:
+	  Added information about host to batch output.
+
+2009-11-16  ceball
+
+	* [r10771] Makefile:
+	  Restored xvfb-run's -a option, accidentally removed in a previous
+	  commit.
+
+	* [r10770] Makefile:
+	  Restored warning if xvfb-run not found.
+
+	* [r10769] Makefile:
+	  Tried to simplify detection of xvfb-run.
+
+	* [r10768] external:
+	  Updated ignore list.
+
+	* [r10767] external/libsndfile-1.0.20.tar.gz,
+	  external/scikits.audiolab-0.10.2.tar.gz,
+	  external/setuptools-0.6c11.tar.gz,
+	  sounds/test.wav:
+	  Fixed svn:mime-type on recently added files.
+
+	* [r10766] Makefile:
+	  Try to use xvfb-run for tests.
+
+	* [r10765] external/Makefile,
+	  sounds, sounds/test.wav,
+	  topo/pattern/audio.py,
+	  topo/tests/__init__.py,
+	  topo/tests/testaudio.py:
+	  Added sounds/ directory, and test sound from scikits.audiolab.
+	  Added test file for audio.py.
+
+	* [r10764] external/Makefile,
+	  topo/pattern/audio.py:
+	  Updated to new API for scikits.audiolab.
+
+	* [r10763] external/Makefile,
+	  external/libsndfile-1.0.17.tar.gz,
+	  external/libsndfile-1.0.20.tar.gz,
+	  external/pyaudiolab-0.6.6.tar.gz,
+	  external/scikits.audiolab-0.10.2.tar.gz,
+	  external/setuptools-0.6c11.tar.gz,
+	  topo/pattern/audio.py:
+	  Updated topo.pattern.audio and its dependencies to the stage that
+	  at least the Audio PatternGenerator can be called without error.
+
+2009-11-15  antolikjan
+
+	* [r10762] contrib/gc_alissom.ty:
+	  changes
+
+2009-11-14  antolikjan
+
+	* [r10761] contrib/modelfit.py:
+	  parameter changes
+
+2009-11-13  judelaw
+
+	* [r10760] contrib/jacommands.py:
+	  added surround size parameter to AddGC
+
+2009-11-12  antolikjan
+
+	* [r10759] contrib/surround_analysis.py:
+	  bug correction
+
+	* [r10758] contrib/surround_analysis.py:
+	  bug correction
+
+	* [r10757] contrib/modelfit.py:
+	  parameter changes
+
+2009-11-12  jbednar
+
+	* [r10756] topo/base/cf.py,
+	  topo/command/analysis.py,
+	  topo/plotting/plot.py,
+	  topo/plotting/plotgroup.py:
+	  Fix Projection Activity plots to show the correct label for the
+	  source of the projection
+
+2009-11-12  antolikjan
+
+	* [r10755] contrib/modelfit.py:
+	  parameter changes
+
+	* [r10754] contrib/modelfit.py:
+	  parameter changes
+
+	* [r10753] contrib/surround_analysis.py:
+	  bug correction
+
+2009-11-12  ceball
+
+	* [r10752] topo/tests/testplotfilesaver.py:
+	  Minor change to error message.
+
+	* [r10751] topo/tests/testplotfilesaver.py:
+	  Improved error message.
+
+2009-11-12  antolikjan
+
+	* [r10750] contrib/surround_analysis.py:
+	  bug correction
+
+2009-11-11  antolikjan
+
+	* [r10749] contrib/surround_analysis.py:
+	  changed the orientation contrast preffered orientation
+	  computation
+
+2009-11-10  antolikjan
+
+	* [r10748] contrib/modelfit.py:
+	  parameter changes
+
+2009-11-10  ceball
+
+	* [r10747] topo/command/basic.py:
+	  Extended VC info to include 'svn info' and 'svn status' (or
+	  equivalents).
+
+	* [r10746] topo/command/basic.py:
+	  Fixed longstanding bug where 'Differences from' prefix could be
+	  printed at the end of the diff file.
+
+	* [r10745] topo/command/basic.py:
+	  Added support for git and bzr version control systems when
+	  recording diffs.
+
+2009-11-10  antolikjan
+
+	* [r10744] contrib/jacommands.py:
+	  parameter changes
+
+	* [r10743] contrib/modelfit.py:
+	  parameter changes
+
+2009-11-07  antolikjan
+
+	* [r10742] contrib/modelfit.py:
+	  added complex cell analysis stuff
+
+2009-11-07  ceball
+
+	* [r10741] param/tk.py:
+	  GUI does not suspend when there is an error.
+
+	* [r10740] topo/command/analysis.py:
+	  Fix for SF.net #2872925: no more 'Projection Activity errors for
+	  mousing'.
+
+2009-11-06  antolikjan
+
+	* [r10739] contrib/modelfit.py:
+	  added complex cell analysis stuff
+
+2009-11-04  kkudryavtsev
+
+	* [r10738]
+	  doc/Developer_Manual/optimization_text.php:
+	  New version of optimisation page from Developers Manual
+
+2009-11-04  ceball
+
+	* [r10737] examples/lissom.ty:
+	  Added notes about some known problems with the CR model in this
+	  file (fixed in other versions).
+
+2009-11-04  antolikjan
+
+	* [r10736] contrib/modelfit.py:
+	  changes
+
+	* [r10735] contrib/modelfit.py:
+	  changes
+
+2009-11-04  ceball
+
+	* [r10734] external/Makefile:
+	  Updated note about MPI on DICE, and updated OpenMPI uninstall.
+
+	* [r10733] param:
+	  Added files to ignore.
+
+	* [r10732] external:
+	  More to ignore.
+
+	* [r10731]
+	  external/PyFlakes-divmod_r17780.tar.gz:
+	  Fixed error in directory name.
+
+	* [r10730] external/Makefile,
+	  external/PyFlakes-divmod_r17780.tar.gz,
+	  external/pyflakes-0.3.0.tar.gz:
+	  Updated PyFlakes to a recent SVN version.
+
+2009-11-04  antolikjan
+
+	* [r10729] contrib/modelfit.py:
+	  changes
+
+	* [r10728] contrib/modelfit.py:
+	  changes
+
+	* [r10727] contrib/modelfit.py:
+	  bug correction
+
+	* [r10726] contrib/modelfit.py:
+	  change of dataset#
+
+2009-11-03  ceball
+
+	* [r10725] external/Makefile,
+	  external/pyflakes-0.3.0.tar.gz:
+	  Added pyflakes (another tool like Lint).
+
+	* [r10724] external/Makefile:
+	  Added to comment about MPI on Eddie.
+
+	* [r10723] external/Makefile,
+	  external/Twisted-8.2.0.tar.gz,
+	  external/foolscap-0.4.2.tar.gz,
+	  external/ipython-0.10.tar.gz,
+	  external/ipython-0.8.4.tar.gz,
+	  external/pyOpenSSL-0.9.tar.gz,
+	  external/zope.interface-3.3.0.tar.gz:
+	  Upgraded to IPython 0.10. Added optional dependencies for
+	  parallel IPython. Reverted r10721 (environment variables removed
+	  in that commit are required under Ubuntu, at least). Added
+	  various missing items from the 'clean' and 'uninstall' lists.
+
+	* [r10722] external/Makefile:
+	  Minor alterations to comments.
+
+	* [r10721] external/Makefile:
+	  Minor simplification.
+
+	* [r10720] external/Makefile:
+	  Fixed typo.
+
+2009-11-03  antolikjan
+
+	* [r10719] contrib/surround_analysis.py:
+	  changed default contrasts
+
+	* [r10718] contrib/modelfit.py:
+	  change of dataset#
+
+2009-11-03  ceball
+
+	* [r10717] external/Makefile:
+	  Fixed system MPI build of mpi4py, and added notes.
+
+2009-11-03  antolikjan
+
+	* [r10716] contrib/modelfit.py:
+	  change of dataset#
+
+2009-11-03  ceball
+
+	* [r10715] external/Makefile,
+	  external/mpi4py-1.1.0.tar.gz,
+	  external/openmpi-1.3.3.tar.gz:
+	  'make -C external mpi4py' seems to work on DICE and Ubuntu. Also
+	  added a second mpi4py section, for using the system MPI (which I
+	  couldn't get to work on DICE).
+
+2009-11-03  antolikjan
+
+	* [r10714] contrib/modelfit.py:
+	  change of dataset#
+
+	* [r10713] contrib/modelfit.py:
+	  change of dataset#
+
+	* [r10712] contrib/modelfit.py:
+	  changes
+
+	* [r10711] contrib/modelfit.py:
+	  changes
+
+2009-11-02  ceball
+
+	* [r10710] external/Makefile:
+	  Added sections for OpenMPI and mpi4py (but haven't uploaded
+	  binaries).
+
+2009-11-02  antolikjan
+
+	* [r10709] contrib/modelfit.py:
+	  change of datasets
+
+	* [r10708] contrib/modelfit.py:
+	  change of datasets
+
+	* [r10707] contrib/modelfit.py:
+	  change of datasets
+
+	* [r10706] contrib/modelfit.py:
+	  change of datasets
+
+	* [r10705] contrib/modelfit.py:
+	  change of datasets
+
+	* [r10704] contrib/modelfit.py:
+	  change of datasets
+
+	* [r10703] contrib/modelfit.py:
+	  change of datasets
+
+2009-11-01  jbednar
+
+	* [r10702] topo/sheet/basic.py:
+	  Fixed typo in debug message
+
+2009-11-01  ceball
+
+	* [r10701] doc/buildbot/master.cfg:
+	  Buildslave 'sunny' upgraded to latest Ubuntu (9.10).
+
+	* [r10700] topo/tkgui/topoconsole.py:
+	  Allow printing of full traceback from errors that occur during
+	  gui callbacks.
+
+2009-11-01  antolikjan
+
+	* [r10699] contrib/cc_lesi_final_new.ty:
+	  cclesi with inhibitory neurons in L4C
+
+2009-11-01  ceball
+
+	* [r10698] param/tk.py,
+	  topo/tests/testparametersframe.py,
+	  topo/tests/testtkparameterizedobject.py,
+	  topo/tkgui/__init__.py:
+	  Allow param.tk to work with an external Tkinter.Tk instance.
+
+2009-11-01  antolikjan
+
+	* [r10697] contrib/cc_lesi_final.ty:
+	  added treshold to V1Complex
+
+	* [r10696] contrib/cc_lesi_final.ty:
+	  bug correction
+
+	* [r10695] contrib/cc_lesi_final.ty:
+	  switched off noise in V1Complex
+
+2009-10-31  ceball
+
+	* [r10694] external/Makefile,
+	  external/ipythonTk.diff,
+	  external/ipythonTk.tar.gz,
+	  external/ipython_view.diff,
+	  topo/misc/commandline.py,
+	  topo/tkgui/__init__.py,
+	  topo/tkgui/topoconsole.py:
+	  Removed IPythonTk-related code (which was all experimental: there
+	  is too much to do to make it complete).
+
+	* [r10693] contrib/complex_shapes_analysis.py,
+	  contrib/expressionparam.py,
+	  contrib/jm_plotting.py,
+	  contrib/jsldefs.py,
+	  contrib/rgbimages.py:
+	  Changes in contrib/ missed when moving topo.param to param.
+
+2009-10-31  antolikjan
+
+	* [r10692] contrib/surround_analysis.py:
+	  change title in neural dynamics figure
+
+2009-10-30  antolikjan
+
+	* [r10691] contrib/surround_analysis.py:
+	  change title in neural dynamics figure
+
+	* [r10690] contrib/surround_analysis.py:
+	  change of parameters
+
+2009-10-29  antolikjan
+
+	* [r10689] contrib/jacommands.py:
+	  bug correction
+
+	* [r10688] contrib/jacommands.py:
+	  change of parameters
+
+2009-10-29  ceball
+
+	* [r10687] doc/Future_Work/current_text.php:
+	  Cleaned up by moving some tasks to trackers and reorganizing some
+	  of the comments. Added my non-phd-related Topographica tasks
+	  (commented out, until they find a better home).
+
+	* [r10686] doc/Downloads/git_text.php,
+	  doc/Future_Work/current_text.php:
+	  Moved some git notes to the git document; deleted obsolete notes.
+
+	* [r10685] doc/Forums/index_text.php:
+	  Replaced tracker links with ones that show only open items, and
+	  have the items ordered by priority.
+
+2009-10-29  antolikjan
+
+	* [r10684] contrib/surround_analysis.py:
+	  change of parameters
+
+	* [r10683] contrib/surround_analysis.py:
+	  change of parameters
+
+	* [r10682] contrib/surround_analysis.py:
+	  change of parameters
+
+	* [r10681] contrib/surround_analysis.py:
+	  change of parameters
+
+	* [r10680] contrib/surround_analysis.py:
+	  change of parameters
+
+	* [r10679] contrib/cc_lesi_final.ty:
+	  made feedback delay external parameter
+
+	* [r10678] contrib/cc_lesi_final.ty:
+	  made smoothening external parameter
+
+2009-10-28  antolikjan
+
+	* [r10677] contrib/surround_analysis.py:
+	  added saving of settling figure
+
+	* [r10676] contrib/cc_lesi_final.ty:
+	  made time constant external parameter
+
+2009-10-28  ceball
+
+	* [r10675] doc/Downloads/git_text.php:
+	  Documented how to handle rebasing when the remote repository is
+	  shared.
+
+	* [r10674] doc/FAQ/index_text.php:
+	  Removed platform-specific FAQ. Only contained one entry (for
+	  Mac), and that was out of date.
+
+	* [r10673] Makefile:
+	  Added to notes.
+
+	* [r10672] topo/__init__.py,
+	  topo/analysis/featureresponses.py,
+	  topo/analysis/vision.py,
+	  topo/base/__init__.py,
+	  topo/base/arrayutil.py,
+	  topo/base/boundingregion.py,
+	  topo/base/cf.py,
+	  topo/base/functionfamily.py,
+	  topo/base/patterngenerator.py,
+	  topo/base/projection.py,
+	  topo/base/sheet.py,
+	  topo/base/sheetview.py,
+	  topo/base/simulation.py,
+	  topo/command/analysis.py,
+	  topo/command/basic.py,
+	  topo/command/pylabplots.py,
+	  topo/coordmapper/basic.py,
+	  topo/ep/basic.py,
+	  topo/learningfn/basic.py,
+	  topo/learningfn/optimized.py,
+	  topo/learningfn/projfn.py,
+	  topo/learningfn/som.py,
+	  topo/misc/commandline.py,
+	  topo/misc/filepath.py,
+	  topo/misc/legacy.py,
+	  topo/misc/picklemain.py,
+	  topo/misc/robotics.py,
+	  topo/misc/trace.py,
+	  topo/misc/util.py,
+	  topo/numbergen/basic.py,
+	  topo/pattern/audio.py,
+	  topo/pattern/basic.py,
+	  topo/pattern/image.py,
+	  topo/pattern/random.py,
+	  topo/pattern/rds.py,
+	  topo/plotting/bitmap.py,
+	  topo/plotting/palette.py,
+	  topo/plotting/plot.py,
+	  topo/plotting/plotfilesaver.py,
+	  topo/plotting/plotgroup.py,
+	  topo/projection/basic.py,
+	  topo/responsefn/optimized.py,
+	  topo/responsefn/projfn.py,
+	  topo/sheet/basic.py,
+	  topo/sheet/lissom.py,
+	  topo/sheet/optimized.py,
+	  topo/sheet/saccade.py,
+	  topo/sheet/slissom.py,
+	  topo/tests/__init__.py,
+	  topo/tests/testCompositeParameter.txt,
+	  topo/tests/testDynamicParameter.txt,
+	  topo/tests/testEnumerationParameter.txt,
+	  topo/tests/testNumberParameter.txt,
+	  topo/tests/testParamOverrides.txt,
+	  topo/tests/test_map_measurement.py,
+	  topo/tests/testcfsom.py,
+	  topo/tests/testgmpynumber.txt,
+	  topo/tests/testparameterizedobject.py,
+	  topo/tests/testparametersframe.py,
+	  topo/tests/testplot.py,
+	  topo/tests/testsheetview.py,
+	  topo/tests/testtkparameterizedobject.py,
+	  topo/tkgui/__init__.py,
+	  topo/tkgui/editor.py,
+	  topo/tkgui/plotgrouppanel.py,
+	  topo/tkgui/projectionpanel.py,
+	  topo/tkgui/templateplotgrouppanel.py,
+	  topo/tkgui/testpattern.py,
+	  topo/tkgui/topoconsole.py,
+	  topo/transferfn/basic.py,
+	  topo/transferfn/optimized.py:
+	  Whole directory missed from r10668. Subversion appears to have
+	  trouble tracking directory moves!
+
+2009-10-27  ceball
+
+	* [r10671] Makefile:
+	  make clean-pyc now removes pyc files from main directory.
+
+	* [r10670] _setup.py:
+	  Updated setup.py code for separate param package.
+
+	* [r10669] param/parameterized.py:
+	  Revert an unrelated change accidentally included in the previous
+	  checkin.
+
+	* [r10668] contrib/cbmisc.py,
+	  contrib/cc_lesi_final.ty,
+	  contrib/cc_lesi_oo_or.ty,
+	  contrib/cc_lesi_oo_or_new.ty,
+	  contrib/cc_lissom_oo_or_simple_rv.ty,
+	  contrib/expressionparam.py,
+	  contrib/hegdeessen.py,
+	  contrib/jacommands.py,
+	  contrib/jj_tiny.ty,
+	  contrib/jm_cc_lissom.ty,
+	  contrib/jm_cf_matrix.py,
+	  contrib/jsldefs.py,
+	  contrib/lesi_whisker_barrels.ty,
+	  contrib/lissom_happyface.ty,
+	  contrib/lissom_or_noshrinking_latswitch.ty,
+	  contrib/lissom_rgb.ty,
+	  contrib/rgbimages.py,
+	  contrib/sparse_connectivity_LESI.ty,
+	  contrib/sparse_connectivity_model.ty,
+	  contrib/surround_analysis.py,
+	  contrib/tracker.py,
+	  doc/Developer_Manual/gui_text.php,
+	  doc/FAQ/index_text.php,
+	  doc/News/index_text.php,
+	  doc/Reference_Manual/index_text.php,
+	  doc/User_Manual/commandline_text.php,
+	  doc/User_Manual/interfacing_text.php,
+	  doc/User_Manual/overview_text.php,
+	  doc/User_Manual/parameters_text.php,
+	  doc/User_Manual/scripts_text.php,
+	  examples/gca_lissom.ty,
+	  examples/goodhill_network90.ty,
+	  examples/hierarchical.ty,
+	  examples/leaky_lissom_or.ty,
+	  examples/lissom.ty,
+	  examples/lissom_fsa.ty,
+	  examples/lissom_oo_or.ty,
+	  examples/lissom_or.ty,
+	  examples/lissom_whisker_barrels.ty,
+	  examples/obermayer_pnas90.ty,
+	  examples/perrinet_retina.ty,
+	  examples/saccade_demo.ty,
+	  examples/som_retinotopy.ty,
+	  examples/sullivan_neurocomputing04.ty,
+	  examples/tiny.ty, param,
+	  param/__init__.py,
+	  param/external.py,
+	  param/externaltk,
+	  param/externaltk/README,
+	  param/externaltk/scrodget-2.1,
+	  param/externaltk/scrodget-2.1/pkgIndex.tcl,
+	  param/externaltk/scrodget-2.1/scrodget.tcl,
+	  param/externaltk/snit-2.2.1,
+	  param/externaltk/snit-2.2.1/main1.tcl,
+	  param/externaltk/snit-2.2.1/main1_83.tcl,
+	  param/externaltk/snit-2.2.1/main2.tcl,
+	  param/externaltk/snit-2.2.1/pkgIndex.tcl,
+	  param/externaltk/snit-2.2.1/snit.tcl,
+	  param/externaltk/snit-2.2.1/snit2.tcl,
+	  param/externaltk/snit-2.2.1/snit_tcl83_utils.tcl,
+	  param/externaltk/snit-2.2.1/validate.tcl,
+	  param/externaltk/tooltip-1.4,
+	  param/externaltk/tooltip-1.4/pkgIndex.tcl,
+	  param/externaltk/tooltip-1.4/tipstack.tcl,
+	  param/externaltk/tooltip-1.4/tooltip.tcl,
+	  param/parameterized.py,
+	  param/tk.py, topo/param:
+	  Moved topo.param to param.
+
+2009-10-27  jbednar
+
+	* [r10667] contrib/surround_analysis.py:
+	  Fixed missing newline at end of file
+
+	* [r10666] topo/pattern/basic.py:
+	  Fixed TwoRectangles to allow non-square patterns
+
+2009-10-27  antolikjan
+
+	* [r10665] topo/sheet/basic.py:
+	  made continuos to activate during learning step
+
+	* [r10664] contrib/surround_analysis.py:
+	  parameter changes
+
+	* [r10663] contrib/surround_analysis.py:
+	  parameter changes
+
+	* [r10662] contrib/surround_analysis.py:
+	  moved legend
+
+	* [r10661] contrib/surround_analysis.py:
+	  moved legend
+
+2009-10-26  antolikjan
+
+	* [r10660] contrib/surround_analysis.py:
+	  bug correction
+
+	* [r10659] contrib/surround_analysis.py:
+	  parameter changes
+
+	* [r10658] contrib/surround_analysis.py:
+	  bug correction
+
+	* [r10657] contrib/surround_analysis.py:
+	  bug correction
+
+	* [r10656] contrib/surround_analysis.py:
+	  bug correction
+
+	* [r10655] contrib/surround_analysis.py:
+	  bug correction
+
+	* [r10654] contrib/surround_analysis.py:
+	  adadded run_dynamics_analysis
+
+	* [r10653] contrib/surround_analysis.py:
+	  added neuron analysis function
+
+	* [r10652] contrib/surround_analysis.py:
+	  added neuron analysis function
+
+2009-10-18  antolikjan
+
+	* [r10651] contrib/surround_analysis.py:
+	  change of parameters
+
+2009-10-17  antolikjan
+
+	* [r10650] contrib/cc_lesi_final.ty:
+	  more parameter changes
+
+	* [r10649] contrib/cc_lesi_final.ty:
+	  delay paremeter change
+
+2009-10-16  antolikjan
+
+	* [r10648] contrib/cc_lesi_final.ty:
+	  Adding newest version of CCLESI
+
+	* [r10647] contrib/surround_analysis.py:
+	  bugg correction
+
+	* [r10646] contrib/surround_analysis.py:
+	  changes
+
+	* [r10645] contrib/surround_analysis.py:
+	  changes
+
+	* [r10644] contrib/surround_analysis.py:
+	  changes
+
+	* [r10643] contrib/surround_analysis.py:
+	  changes
+
+2009-10-14  antolikjan
+
+	* [r10642] contrib/modelfit.py:
+	  moved Image to FileImage
+
+	* [r10641] contrib/modelfit.py:
+	  changes
+
+	* [r10640] contrib/surround_analysis.py:
+	  bug correction
+
+2009-10-13  antolikjan
+
+	* [r10639] contrib/surround_analysis.py:
+	  bug correction
+
+	* [r10638] contrib/surround_analysis.py:
+	  changes
+
+	* [r10637] contrib/surround_analysis.py:
+	  change of parameters
+
+2009-10-12  ceball
+
+	* [r10636] doc/buildbot/master.cfg:
+	  cider.csres was updated to OS X 10.6 (Snow Leopard).
+
+2009-10-11  antolikjan
+
+	* [r10635]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  corrected V1Simple lateral connections
+
+2009-10-09  ceball
+
+	* [r10634] setup.py:
+	  Added note about creating pypi entry.
+
+	* [r10633] _setup.py,
+	  debian/control,
+	  external/Makefile,
+	  setup_app.py,
+	  setup_ez.py,
+	  topo/param/externaltk/README:
+	  Updated information about external packages.
+
+	* [r10632] doc/Downloads/index_text.php:
+	  Added missing dependency from Ubuntu example.
+
+	* [r10631] external/Makefile,
+	  topo/param/externaltk,
+	  topo/param/externaltk/scrodget-2.1,
+	  topo/param/externaltk/scrodget-2.1/pkgIndex.tcl,
+	  topo/param/externaltk/scrodget-2.1/scrodget.tcl,
+	  topo/param/externaltk/snit-2.2.1,
+	  topo/param/externaltk/snit-2.2.1/main1.tcl,
+	  topo/param/externaltk/snit-2.2.1/main1_83.tcl,
+	  topo/param/externaltk/snit-2.2.1/main2.tcl,
+	  topo/param/externaltk/snit-2.2.1/pkgIndex.tcl,
+	  topo/param/externaltk/snit-2.2.1/snit.tcl,
+	  topo/param/externaltk/snit-2.2.1/snit2.tcl,
+	  topo/param/externaltk/snit-2.2.1/snit_tcl83_utils.tcl,
+	  topo/param/externaltk/snit-2.2.1/validate.tcl,
+	  topo/param/externaltk/tooltip-1.4,
+	  topo/param/externaltk/tooltip-1.4/pkgIndex.tcl,
+	  topo/param/externaltk/tooltip-1.4/tipstack.tcl,
+	  topo/param/externaltk/tooltip-1.4/tooltip.tcl,
+	  topo/param/tk.py,
+	  topo/tkgui/__init__.py:
+	  Moved snit, scrodget, and tooltip into topo.param so that they do
+	  not appear as external dependencies.
+
+	* [r10630] doc/Downloads/git_text.php:
+	  Fixed a few formatting errors.
+
+2009-10-05  antolikjan
+
+	* [r10629]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Image -> FileImage
+
+2009-10-04  ceball
+
+	* [r10628] Makefile:
+	  Added info about rpm generation.
+
+	* [r10627] Makefile,
+	  debian/python-scrodget.debhelper.log,
+	  debian/python-scrodget.postinst.debhelper,
+	  debian/python-scrodget.preinst.debhelper,
+	  debian/python-scrodget.prerm.debhelper,
+	  debian/python-scrodget.substvars:
+	  Cleaned up debian/ directory.
+
+	* [r10626] external:
+	  Updated ignore list.
+
+	* [r10625] debian/control:
+	  Updated package dependencies (scrodget, not pyscrodget).
+
+	* [r10624] _setup.py,
+	  setup_ez.py:
+	  Updated info about scrodget.
+
+	* [r10623] external/Makefile,
+	  external/pyscrodget-0.0.2_2.1.tar.gz,
+	  external/scrodget-2.1.tar.gz,
+	  topo/param/tk.py:
+	  Moved pyscrodget wrapper to topo.param.tk.
+
+	* [r10622] Makefile:
+	  Added transcript of uploading .deb based on svn version of
+	  Topographica.
+
+	* [r10621] Makefile:
+	  More to clean.
+
+	* [r10620] external:
+	  More to ignore.
+
+2009-10-03  ceball
+
+	* [r10619] Makefile:
+	  Added info about signing deb.
+
+	* [r10618] Makefile:
+	  Corrected ppa upload command.
+
+	* [r10617] Makefile:
+	  Minor addition.
+
+	* [r10616] Makefile,
+	  debian/changelog,
+	  debian/docs:
+	  Added doc/ and examples/ to deb package.
+
+	* [r10615] Makefile,
+	  debian, debian/changelog,
+	  debian/compat,
+	  debian/control,
+	  debian/copyright,
+	  debian/docs,
+	  debian/pycompat,
+	  debian/python-scrodget.debhelper.log,
+	  debian/python-scrodget.postinst.debhelper,
+	  debian/python-scrodget.preinst.debhelper,
+	  debian/python-scrodget.prerm.debhelper,
+	  debian/python-scrodget.substvars,
+	  debian/rules:
+	  Sketch of creating an Ubuntu deb file.
+
+	* [r10614] _setup.py,
+	  setup.py, setup_app.py:
+	  Topographica's 'python setup.py install' can work on Ubuntu 9.04
+	  and Mac OS X 10.6 (with MacPorts).
+
+	* [r10613] external/Makefile,
+	  topo/__init__.py,
+	  topo/base/sheetcoords.py,
+	  topo/param/__init__.py,
+	  topo/param/parameterized.py:
+	  Added some notes relating to Python 2.6.
+
+2009-10-01  ceball
+
+	* [r10612] setup_ez.py:
+	  First version that appears to work, depending only on Python,
+	  Tcl/Tk, and GMP.
+
+	* [r10611] topo/__init__.py:
+	  Support setuptools-based installations of PIL.
+
+	* [r10610] topo/misc/legacy.py,
+	  topo/pattern/image.py:
+	  Removed old 'Image=FileImage' hack.
+
+2009-10-01  antolikjan
+
+	* [r10609]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Removed ExpLinear
+
+2009-09-30  ceball
+
+	* [r10608] doc/Downloads/git_text.php:
+	  Added more info to git docs about sharing.
+
+	* [r10607] doc/Downloads/git_text.php:
+	  Added more to git docs.
+
+	* [r10606] doc/Downloads/git_text.php:
+	  Added more to git docs.
+
+	* [r10605] doc/Downloads/git_text.php:
+	  Added clarification.
+
+	* [r10604] doc/Downloads/git_text.php:
+	  Updated sharing command.
+
+	* [r10603] doc/Downloads/git_text.php:
+	  Added warning.
+
+	* [r10602] doc/Downloads/git_text.php:
+	  Added more info about sharing git repository.
+
+	* [r10601] doc/Downloads/git_text.php:
+	  Began extending git documentation to cover more advanced usage.
+
+	* [r10600] external/Makefile:
+	  Added link to relevant mailing list item.
+
+	* [r10599] external/Makefile,
+	  external/matplotlib-0.91.4.tar.gz,
+	  external/matplotlib-0.99.1.1.tar.gz,
+	  topo/command/pylabplots.py:
+	  Upgraded to matplotlib 0.99.1.1.
+
+	* [r10598] doc/buildbot/index.html,
+	  doc/buildbot/master.cfg:
+	  Added jupiter3 buildslave.
+
+2009-09-26  ceball
+
+	* [r10597] external/Makefile,
+	  external/weave.diff:
+	  Changes missed from r10596 (patch to make weave not depend on
+	  scipy).
+
+	* [r10596] external/Makefile:
+	  Fixed installation of weave. SF #2791212 is now fixed.
+
+2009-09-24  antolikjan
+
+	* [r10595] external/Makefile:
+	  corrected dependency of weave on old scipy
+
+2009-09-23  antolikjan
+
+	* [r10594] external/Makefile,
+	  external/numpy-1.1.1.tar.gz,
+	  external/numpy-1.2.1.tar.gz,
+	  external/numpy.diff,
+	  external/scipy-0.5.2.tar.gz,
+	  external/scipy-0.7.1.tar.gz,
+	  external/scipy-site.cfg:
+	  Upgraded numpy and scipy, and edited the example scipy-site.cfg
+	  to be suitable for DICE.
+
+2009-09-22  antolikjan
+
+	* [r10593] contrib/surround_analysis.py:
+	  further modifications
+
+2009-09-22  jbednar
+
+	* [r10592] topo/plotting/plotgroup.py:
+	  Trivial fixes to comments and docstrings
+
+2009-09-21  antolikjan
+
+	* [r10591]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  changes to lateral connectivity in layer 4C
+
+2009-09-19  antolikjan
+
+	* [r10590] contrib/cc_lesi_oo_or_new.ty:
+	  added treshold to V1 complex
+
+2009-09-18  ceball
+
+	* [r10589] topo/base/boundingregion.py,
+	  topo/pattern/image.py:
+	  Small changes reducing attribute lookups inside two particular
+	  loops, improving the performance of the Image pattern generators.
+
+	* [r10588] topo/transferfn/basic.py:
+	  Clean up DivisiveNormalizeLinf (to use numpy max and abs; vastly
+	  improves performance).
+
+2009-09-17  ceball
+
+	* [r10587] doc/buildbot/master.cfg:
+	  buildbot: examples/ and doc/ no longer split from 'python
+	  setup.py install' archive.
+
+	* [r10586] Makefile:
+	  Archive produced for 'python setup.py install' now contains
+	  examples/ and doc/.
+
+	* [r10585] topo/param/tk.py:
+	  If Topographica doesn't have 'grab', don't try to get grab for
+	  window causing the error.
+
+2009-09-16  antolikjan
+
+	* [r10584] contrib/surround_analysis.py:
+	  few more changes
+
+2009-09-16  ceball
+
+	* [r10583] doc/buildbot/master.cfg:
+	  Added archive-making slave.
+
+2009-09-15  antolikjan
+
+	* [r10582] contrib/surround_analysis.py:
+	  few more changes
+
+2009-09-14  antolikjan
+
+	* [r10581] contrib/surround_analysis.py:
+	  few more changes
+
+2009-09-13  ceball
+
+	* [r10580] setup_ez.py:
+	  Various updates. Getting closer to working...
+
+	* [r10579] doc/Developer_Manual:
+	  More to ignore.
+
+	* [r10578] external:
+	  Updated files to ignore.
+
+	* [r10577] Makefile:
+	  First go at making archives suitable for packaging.
+
+	* [r10576] _setup.py,
+	  setup.py:
+	  setup.py fixes.
+
+	* [r10575] topo/command/analysis.py:
+	  Renamed variable (to avoid potential clash). Should be no visible
+	  change.
+
+2009-09-10  antolikjan
+
+	* [r10574] contrib/surround_analysis.py:
+	  few parameter changes
+
+2009-09-08  antolikjan
+
+	* [r10573] contrib/modelfit.py:
+	  further improvements
+
+	* [r10572]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  further improvements
+
+2009-09-07  antolikjan
+
+	* [r10571] contrib/modelfit.py:
+	  further improvements
+
+	* [r10570] contrib/surround_analysis.py:
+	  moved surround analysis from jaccomands into sepparate file
+
+2009-09-06  antolikjan
+
+	* [r10569] contrib/modelfit.py:
+	  few more changes
+
+	* [r10568] contrib/modelfit.py:
+	  few more changes
+
+	* [r10567]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  few more changes
+
+2009-09-02  ceball
+
+	* [r10566] topo/tkgui/topoconsole.py:
+	  Added ALERT.
+
+	* [r10565] topo/base/projection.py,
+	  topo/base/sheet.py,
+	  topo/sheet/basic.py:
+	  Moved definition of output_fns to Sheet. (Fixes problem where
+	  state_push()/pop() assume output_fns are present in Sheet.)
+
+2009-08-30  ceball
+
+	* [r10564] topo/command/pylabplots.py,
+	  topo/plotting/plotgroup.py:
+	  Minor clarifcation of docs.
+
+	* [r10563] topo/plotting/plotgroup.py:
+	  Renamed normalize='Joint' to normalize='JointProjections'.
+
+	* [r10562] topo/plotting/plotgroup.py:
+	  Renamed normalize='All' to normalize='AllTogether'.
+
+	* [r10561] topo/command/analysis.py,
+	  topo/command/pylabplots.py,
+	  topo/plotting/plotgroup.py,
+	  topo/sheet/basic.py:
+	  Renamed normalize='Independent' to normalize='Individually'.
+
+	* [r10560] topo/tkgui/topoconsole.py:
+	  Hide any error generated while trying to find an appropriate
+	  status bar for displaying messages.
+
+	* [r10559] topo/param/tk.py,
+	  topo/tkgui/plotgrouppanel.py,
+	  topo/tkgui/topoconsole.py:
+	  Progress bars, messages, warnings, and errors should now display
+	  on the appropriate status bar. This is quite a significant
+	  change, and is likely to need tuning based on feedback from
+	  users.
+
+	* [r10558] topo/param/__init__.py,
+	  topo/tkgui/projectionpanel.py:
+	  Hacked support for exclusive right and top bounds when editing
+	  parameters in the GUI.
+
+2009-08-26  antolikjan
+
+	* [r10557]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  new external parameter lgn_tresh
+
+2009-08-22  antolikjan
+
+	* [r10556]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  new external parameter lgn_density
+
+2009-08-21  antolikjan
+
+	* [r10555]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  new external parameter RingScale
+
+	* [r10554]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  further changes
+
+	* [r10553]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  further changes
+
+2009-08-20  antolikjan
+
+	* [r10552]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  further changes
+
+2009-08-18  antolikjan
+
+	* [r10551] contrib/jacommands.py:
+	  surround modulation analysis, change of contrast parameters
+
+2009-08-14  antolikjan
+
+	* [r10550]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  added external parameterers and made latencies shorter
+
+	* [r10549] contrib/jacommands.py:
+	  surround modulation analysis minor changes
+
+2009-08-13  antolikjan
+
+	* [r10548] contrib/jaanalysis.py:
+	  lot of changes imported from Eddie version
+
+2009-08-07  antolikjan
+
+	* [r10547] contrib/jacommands.py:
+	  Further improvements to the surround modulation analysis
+
+2009-08-06  antolikjan
+
+	* [r10546] contrib/jacommands.py:
+	  Improvements to the surround modulation analysis
+
+2009-08-04  antolikjan
+
+	* [r10545]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Parameter changes
+
+	* [r10544]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Parameter changes
+
+	* [r10543]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Parameter changes
+
+2009-08-03  jbednar
+
+	* [r10542] examples/lissom.ty:
+	  Fixed outdated dims='All' to work as dims=[] instead. Fixed SF
+	  map measurement to set frequencies parameter before instantiation
+	  of measure_sine_pref, so that the value will be respected.
+
+	* [r10541] topo/command/analysis.py:
+	  Added PhaseDisparity Preference&Selectivity plot
+
+2009-08-03  antolikjan
+
+	* [r10540] contrib/jacommands.py:
+	  Corrected some bugs in surround modulation measurements
+
+	* [r10539] contrib/cc_lesi_oo_or_new.ty:
+	  Addapted to new GC parameters
+
+	* [r10538]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Made to use expander
+
+2009-08-03  jbednar
+
+	* [r10537] doc/Downloads/index_text.php,
+	  topo/transferfn/basic.py:
+	  Minor fix to doc
+
+2009-08-02  antolikjan
+
+	* [r10536] contrib/jacommands.py:
+	  Added new pattern generator - Expander - increases size of
+	  patterns
+
+2009-07-30  ceball
+
+	* [r10535] topo/base/simulation.py:
+	  Added note.
+
+	* [r10534] doc/Downloads/index_text.php:
+	  Mentioned about using a 64-bit platform for large simulations.
+
+2009-07-29  jbednar
+
+	* [r10533] contrib/basic.py,
+	  contrib/cc_lesi_oo_or.ty,
+	  contrib/cc_lissom_oo_or_simple_rv.ty,
+	  contrib/jsldefs.py,
+	  contrib/lesi_judethesisversion.ty,
+	  contrib/lesi_whisker_barrels.ty,
+	  contrib/lissom.ty,
+	  contrib/lissom_oo_or_homeostatic.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked.ty,
+	  contrib/lissom_rgb.ty,
+	  contrib/modelfit.py,
+	  contrib/rgbhsv.py,
+	  contrib/sparse_connectivity_LESI.ty,
+	  contrib/sparse_connectivity_model.ty,
+	  contrib/species_cf_jitter.ty,
+	  contrib/species_lat_jitter.ty,
+	  contrib/species_pf_jitter.ty,
+	  examples/leaky_lissom_or.ty,
+	  examples/lissom.ty,
+	  examples/lissom_oo_or_cr.ty,
+	  examples/lissom_whisker_barrels.ty,
+	  examples/perrinet_retina_pynest.py,
+	  examples/sullivan_neurocomputing04.ty,
+	  examples/tiny.ty,
+	  topo/analysis/featureresponses.py,
+	  topo/analysis/vision.py,
+	  topo/base/cf.py,
+	  topo/base/sheetcoords.py,
+	  topo/base/sheetview.py,
+	  topo/command/analysis.py,
+	  topo/command/basic.py,
+	  topo/command/pylabplots.py,
+	  topo/coordmapper/basic.py,
+	  topo/learningfn/basic.py,
+	  topo/learningfn/optimized.py,
+	  topo/learningfn/projfn.py,
+	  topo/learningfn/som.py,
+	  topo/pattern/basic.py,
+	  topo/plotting/bitmap.py,
+	  topo/plotting/palette.py,
+	  topo/plotting/plot.py,
+	  topo/plotting/plotgroup.py,
+	  topo/projection/basic.py,
+	  topo/responsefn/optimized.py,
+	  topo/responsefn/projfn.py,
+	  topo/sheet/lissom.py,
+	  topo/sheet/slissom.py,
+	  topo/tests/testoutputfnsbasic.py,
+	  topo/tests/testplot.py,
+	  topo/tests/testplotgroup.py,
+	  topo/tests/testsheet.py,
+	  topo/tests/testsheetview.py,
+	  topo/tests/testtkparameterizedobject.py,
+	  topo/tkgui/editor.py,
+	  topo/tkgui/plotgrouppanel.py,
+	  topo/tkgui/projectionpanel.py,
+	  topo/tkgui/testpattern.py,
+	  topo/tkgui/topoconsole.py,
+	  topo/transferfn/basic.py:
+	  Expanded tabs to spaces to avoid problems with some editors
+
+	* [r10532] contrib/hegdeessen.py:
+	  Fixed typos
+
+2009-07-28  ceball
+
+	* [r10531] topo/analysis/featureresponses.py:
+	  Fixed variable name. (Hue map measurement for separate R, G, and
+	  B retinas has presumably been broken since I added support for
+	  hue map measurement using a single RGB retina.)
+
+2009-07-27  ceball
+
+	* [r10530] topo/plotting/bitmap.py:
+	  When enlarging an image by an integer factor, avoid PIL by using
+	  numpy (PIL has a bug). Mitigates SF #2820821.
+
+2009-07-26  ceball
+
+	* [r10529] topo/misc/commandline.py,
+	  topo/tkgui/__init__.py,
+	  topo/tkgui/topoconsole.py:
+	  Simplified dock-by-default for -G option.
+
+	* [r10528] topo/plotting/plot.py:
+	  Fix for #1962478 ('Status bar information bug on the map
+	  window'). Actually caused by TemplatePlot instances sharing the
+	  same view_dict (the Sheet's sheet_views dictionary).
+
+2009-07-25  ceball
+
+	* [r10527] topo/plotting/plotgroup.py:
+	  Fixed mistake in r10524 (mistakenly introduced a space into plot
+	  labels).
+
+	* [r10526] topo/analysis/featureresponses.py:
+	  Set MeasureResponseCommand's pattern_presenter parameter to
+	  instantiate its value, since the value will be mutable.
+
+	* [r10525] contrib/cbmisc.py:
+	  Updated my analysis function.
+
+2009-07-24  ceball
+
+	* [r10524] examples/lissom.ty,
+	  topo/command/analysis.py,
+	  topo/command/pylabplots.py,
+	  topo/plotting/plot.py,
+	  topo/plotting/plotgroup.py,
+	  topo/tkgui/testpattern.py:
+	  Implemented joint normalization for plotting (SF #1829844).
+	  Includes some clean-up of the PlotGroup classes. Various parts of
+	  plotgroup.py and plot.py still require cleaning, and the GUI's
+	  normalization widget placement also needs to be sorted out.
+
+	* [r10523] topo/param/__init__.py:
+	  Fix for SF #2661510. (Intermediate checkin: will be cleaned up.
+
+2009-07-23  ceball
+
+	* [r10522] doc/Downloads/git_text.php:
+	  Added link and hint.
+
+	* [r10521] topo/tkgui/plotgrouppanel.py,
+	  topo/tkgui/projectionpanel.py:
+	  Fixed GUI's dynamic coordinates: now there is no systematic
+	  offset (SF #2127012), and coordinates work on projection and CF
+	  panels (ALERT). Also: changed plot borders to be drawn by tk
+	  rather than by us.
+
+	* [r10520] _setup.py:
+	  Removed package that no longer exists.
+
+	* [r10519] topo/command/basic.py:
+	  Added comment about pickling.
+
+	* [r10518] Makefile:
+	  File missed from previous commit.
+
+	* [r10517] external/Makefile,
+	  external/idle_tk8.5.patch:
+	  Experimental: 'make topographicagui; ./topographicagui' to try
+	  using Topographica with IDLE.
+
+	* [r10516] external/Makefile,
+	  external/ipythonTk.diff,
+	  external/ipythonTk.tar.gz,
+	  external/ipython_view.diff,
+	  topo/ipythonTk,
+	  topo/tkgui/topoconsole.py:
+	  Moved topo.ipythonTk to an external package (plus patches to fix
+	  some problems). The package contains unmodified copies of
+	  ipython_view.py from Accerciser and ipythonTk.py from CCP1GUI.
+	  ipython_view.py is now part of new IPython releases, so we should
+	  just use IPython's version eventaully. (IPython focuses on wx,
+	  though, so there is no equivalent of ipythonTk.py in IPython.)
+
+2009-07-22  ceball
+
+	* [r10515] topo/tkgui/__init__.py:
+	  File missed from previous commit.
+
+	* [r10514] topo/misc/commandline.py:
+	  Hack to allow -G to have windows docked by default.
+
+	* [r10513] topo/ipythonTk/ipython_view.py:
+	  ipythonTk: Apparently fixed tab completion.
+
+2009-07-17  jmoudrik
+
+	* [r10512] contrib/jm_plotting.py:
+	  Added title for the Phase preference scatter plot
+
+2009-07-15  antolikjan
+
+	* [r10511] contrib/modelfit.py:
+	  added backpropagation
+
+2009-07-14  antolikjan
+
+	* [r10510]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  switching back to uncorrelated
+
+2009-07-13  antolikjan
+
+	* [r10509] contrib/modelfit.py:
+	  changed default density
+
+	* [r10508] contrib/modelfit.py:
+	  added learning rate parameter'
+
+	* [r10507] contrib/modelfit.py:
+	  made the file 'executable'
+
+	* [r10506] contrib/modelfit.py:
+	  added external parameters
+
+2009-07-13  ceball
+
+	* [r10505] topo/param/parameterized.py:
+	  Updated comment.
+
+2009-07-13  machalekj
+
+	* [r10504] contrib/complex_shapes_analysis.py:
+	  Added python header info to analysis plots.
+
+2009-07-12  machalekj
+
+	* [r10503] contrib/complex_shapes_analysis.py,
+	  contrib/hegdeessen.py:
+	  Modification of Hegde and Van Essen stimuli as were used in
+	  complex shapes analysis in bachalor thesis of Machalek. Added
+	  script with analysis plots.
+
+2009-07-12  jmoudrik
+
+	* [r10502] contrib/jm_analysis.py,
+	  contrib/jm_cc_lissom.ty,
+	  contrib/jm_cf_matrix.py,
+	  contrib/jm_plotting.py,
+	  contrib/jm_smooth.py:
+	  Merged jm_smooth into jm_analysis; jm_analysis splitted to
+	  analysis and plotting (jm_plotting).
+	  Added an extension of complex cell model.
+
+2009-07-12  antolikjan
+
+	* [r10501] contrib/gc_alissom.ty:
+	  increased the retinal density in order to improve RV LGN response
+
+2009-07-11  antolikjan
+
+	* [r10500]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  switching of correlated RV
+
+2009-07-09  ceball
+
+	* [r10499] contrib/cbmisc.py:
+	  Updated my analysis functions.
+
+2009-07-09  antolikjan
+
+	* [r10498] contrib/modelfit.py:
+	  new models
+
+2009-07-08  ceball
+
+	* [r10497] contrib/cbmisc.py:
+	  Added function to create single-eye plotgroups. Added function I
+	  use for OR/OD/CR simulations.
+
+	* [r10496] topo/analysis/featureresponses.py:
+	  Added generator_sheets parameter to MeasureResponseCommand, to
+	  simplify setting this parameter on the PatternPresenter.
+
+	* [r10495] topo/analysis/featureresponses.py:
+	  Added sheet_views_prefix to allow distinction between e.g.
+	  OrientationPreference and LeftRetina OrientationPreference.
+
+	* [r10494] topo/analysis/featureresponses.py:
+	  Put blank patterns in GeneratorSheets that are not being used.
+
+	* [r10493] topo/analysis/featureresponses.py:
+	  Added generator_sheets parameter to PatternPresenter (allowing
+	  restriction of set of GeneratorSheets).
+
+	* [r10492] topo/analysis/featureresponses.py:
+	  Set instantiate=True for pattern_presenter pararameter of
+	  SinusoidalMeasureResponseCommand (since it defaults to a mutable
+	  object).
+
+2009-07-07  jbednar
+
+	* [r10491] examples/lissom.ty:
+	  Added speed parameter, and allowed linear interpolation between
+	  integer values
+
+	* [r10490] topo/misc/util.py:
+	  Added linearly_interpolate
+
+2009-07-03  ceball
+
+	* [r10489] contrib/parameter_search,
+	  contrib/parameter_search.cfg:
+	  Tidying. Should be no visible change.
+
+	* [r10488] contrib/parameter_search,
+	  contrib/parameter_search.cfg:
+	  Saves combinations file. Saves command used to launch
+	  parameter_search. Saves everything (all run_batch() directories,
+	  combinations file, etc) into one directory.
+
+	* [r10487] contrib/parameter_search,
+	  contrib/parameter_search.cfg:
+	  Added ability to pass dirname_prefix to run_batch().
+
+	* [r10486] topo/command/basic.py:
+	  Added name_time_format parameter to run_batch().
+
+	* [r10485] topo/command/basic.py:
+	  Added optional dirname_prefix to run_batch().
+
+2009-07-01  ceball
+
+	* [r10484] topo/base/cf.py:
+	  Removed unused import.
+
+	* [r10483] topo/base/sheetview.py:
+	  Replaced tabs with spaces.
+
+	* [r10482] topo/base/sheetcoords.py:
+	  Removed unused import.
+
+2009-07-01  antolikjan
+
+	* [r10481]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Minnor changes
+
+2009-06-30  ceball
+
+	* [r10480] doc/Downloads/git_text.php,
+	  doc/Downloads/index_text.php:
+	  Updated some documentation relating to git.
+
+2009-06-26  ceball
+
+	* [r10479] topo/base/cf.py,
+	  topo/misc/legacy.py,
+	  topo/projection/basic.py,
+	  topo/tests/testcf.py:
+	  ConnectionField no longer stores x and y.
+
+	* [r10478] topo/base/sheet.py:
+	  Removed never-been-used sheet_offset() method.
+
+	* [r10477] examples/hierarchical.ty,
+	  examples/lissom.ty,
+	  examples/lissom_fsa.ty,
+	  examples/lissom_oo_or.ty,
+	  examples/lissom_oo_or_cr.ty,
+	  examples/lissom_or.ty,
+	  examples/lissom_whisker_barrels.ty,
+	  topo/base/cf.py,
+	  topo/projection/basic.py,
+	  topo/tests/reference/lissom_fsa_reference.ty,
+	  topo/tests/reference/lissom_oo_dr_reference.ty,
+	  topo/tests/reference/lissom_oo_or_reference.ty,
+	  topo/tests/reference/lissom_or_reference.ty:
+	  Added ResizableCFProjection and removed bounds-changing-related
+	  code from CFProjection and ConnectionField.
+
+	* [r10476] topo/base/cf.py:
+	  Added _generate_coords() method to CFProjection, with the
+	  intention of allowing subclasses to e.g. store the generated
+	  coords. Improved simple_vectorize() to handle functions with any
+	  number of outputs.
+
+	* [r10475] topo/base/sheet.py:
+	  Added method to get arrays of X and Y sheet coordinates.
+
+	* [r10474] topo/base/cf.py,
+	  topo/projection/basic.py:
+	  Tried to simplify CFProjection by adding a _create_cf() method
+	  and avoiding a visible loop through the dest sheet units.
+
+	* [r10473] topo/base/sheet.py:
+	  Added ALERT.
+
+2009-06-26  antolikjan
+
+	* [r10472]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Minor changes
+
+2009-06-25  ceball
+
+	* [r10471] topo/param/__init__.py:
+	  Added ALERT.
+
+2009-06-25  antolikjan
+
+	* [r10470] contrib/jacommands.py:
+	  variouse changes to surround analysis
+
+	* [r10469] topo/command/pylabplots.py:
+	  corrected the units in measure_orientation_contrast
+
+	* [r10468] contrib/gc_alissom.ty:
+	  Minor changes
+
+2009-06-23  ceball
+
+	* [r10467] topo/base/cf.py,
+	  topo/base/sheetcoords.py,
+	  topo/plotting/plot.py,
+	  topo/plotting/plotgroup.py,
+	  topo/projection/basic.py,
+	  topo/tests/testsheet.py:
+	  Slice no longer stores bounds. Reduces memory usage (as recorded
+	  in 'memuse_rSlice_no_bounds.out'). Could increase plotting times
+	  - not sure.
+
+	* [r10466] topo/base/cf.py:
+	  Corrected an error in CFProjection.change_bounds(): the
+	  bounds_template that is stored after changing bounds is now that
+	  which corresponds exactly to the slice. Should make no change to
+	  any of our simulations, because the correct slice was being
+	  passed to the ConnectionField; CFProjection's bounds_template is
+	  not currently used by anything after the point it is stored.
+
+2009-06-23  antolikjan
+
+	* [r10465] contrib/modelfit.py:
+	  Added motion to the model
+
+	* [r10464] contrib/gc_alissom.ty:
+	  Overhaul of gain control and consequently parameters
+
+	* [r10463]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Overhaul of gain control and consequently parameters
+
+	* [r10462] contrib/jacommands.py:
+	  GC update and LGN channel randomization updates
+
+	* [r10461] topo/command/basic.py:
+	  Adding the wipe_out_activity and clear_even_queue into the
+	  analysis pre-presentation hooks
+
+	* [r10460] topo/sheet/basic.py:
+	  Addjusted the JointNormalizingCFSheet_Continuous such that it
+	  works more in line with LISSOM
+
+	* [r10459] topo/analysis/featureresponses.py:
+	  pre presentation hooks are now set in different place
+
+	* [r10458] topo/tkgui/testpattern.py:
+	  Adjusted test pattern so it clears the activity and state of the
+	  network properly before presenting stimulus
+
+2009-06-19  ceball
+
+	* [r10457] doc/buildbot/master.cfg:
+	  Fixed 'warn on errors' in various cases (e.g. for make lint-base,
+	  which niow only causes warnings even if pylint reports errors
+	  with the code).
+
+2009-06-18  jbednar
+
+	* [r10456] topo/responsefn/optimized.py:
+	  Replaced C code with macros; verified that the .cpp code did not
+	  change
+
+	* [r10455] topo/misc/inlinec.py:
+	  Added macro for looking up contiguous array from slot
+
+	* [r10454] topo/responsefn/optimized.py:
+	  Further reorganized C code to match macros
+
+	* [r10453] topo/responsefn/optimized.py:
+	  Reorganized C code to match macros
+
+2009-06-18  ceball
+
+	* [r10452] topo/tests/test_script.py:
+	  Run current density combinations to 20000 rather than 1000.
+
+2009-06-17  ceball
+
+	* [r10451] external:
+	  Ignore guppy.
+
+	* [r10450] external/Makefile,
+	  external/logilab-astng-0.17.2.tar.gz,
+	  external/logilab-astng-0.19.0.tar.gz,
+	  external/logilab-common-0.25.0.tar.gz,
+	  external/logilab-common-0.41.0.tar.gz,
+	  external/pylint-0.14.0.tar.gz,
+	  external/pylint-0.18.0.tar.gz:
+	  Upgraded pylint.
+
+2009-06-17  antolikjan
+
+	* [r10449] contrib/gc_alissom.ty:
+	  added two new natural image datasets
+
+2009-06-16  antolikjan
+
+	* [r10448] contrib/cc_lesi_oo_or_new.ty:
+	  made V1 complex inh neurons have external parameter defining
+	  their threshold
+
+2009-06-16  machalekj
+
+	* [r10447] contrib/hegdeessen.py:
+	  48 Grating and 80 contour stimuli used in Hegde and Van Essen
+	  works. 5 new patterns classes added.
+
+2009-06-15  antolikjan
+
+	* [r10446] contrib/cc_lesi_oo_or_new.ty:
+	  made V1 complex inh neurons have external parameter defining
+	  their threshold
+
+	* [r10445] topo/command/pylabplots.py:
+	  Modified the Orientation Contrast analysis so it better reflects
+	  the published figures
+
+	* [r10444] contrib/jacommands.py:
+	  Added surround modulation analysis batch test
+
+	* [r10443] contrib/cc_lesi_oo_or.ty:
+	  minor parameter changes
+
+	* [r10442] topo/pattern/basic.py:
+	  Removed some spurious parameters in the OrientationContrast
+	  pattern
+
+2009-06-15  ceball
+
+	* [r10441] topo/base/cf.py,
+	  topo/misc/legacy.py,
+	  topo/projection/basic.py:
+	  ConnectionField no longer stores input_sheet.
+
+	* [r10440] topo/projection/basic.py:
+	  Fixed SharedWeightCFProjection.n_bytes(): count
+	  input_sheet_slice, not weights_slice.
+
+2009-06-14  ceball
+
+	* [r10439] topo/misc/legacy.py:
+	  File missed from the previous checkin.
+
+	* [r10438] topo/base/cf.py,
+	  topo/projection/basic.py:
+	  ConnectionField no longer stores weights_slice.
+
+	* [r10437] topo/projection/basic.py:
+	  Fixed error in recent commit.
+
+	* [r10436] topo/base/cf.py,
+	  topo/misc/legacy.py,
+	  topo/projection/basic.py:
+	  Made ConnectionField no longer have a __dict__ (to save memory).
+
+	* [r10435] examples/saccade_demo.ty,
+	  topo/base/cf.py,
+	  topo/projection/basic.py:
+	  Moved min_matrix_radius from cf to projection.
+
+	* [r10434] topo/base/cf.py,
+	  topo/param/parameterized.py,
+	  topo/projection/basic.py:
+	  Made ConnectionField inherit from object rather than
+	  Parameterized (to reduce memory usage). Intermediate checkin:
+	  added slots for all attributes except _has_norm_total; still have
+	  to remove __dict__.
+
+	* [r10433] topo/misc/legacy.py:
+	  Added support for __setstate__ for classes that used to - but no
+	  longer - have __setstate__.
+
+	* [r10432] topo/misc/legacy.py:
+	  Removed stray import.
+
+2009-06-14  antolikjan
+
+	* [r10431]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  made LGN center size external parameter
+
+2009-06-14  jbednar
+
+	* [r10430] topo/learningfn/optimized.py,
+	  topo/responsefn/optimized.py,
+	  topo/sheet/optimized.py,
+	  topo/transferfn/optimized.py:
+	  Changed double * to npfloat * to allow changing float type ;
+	  should be no change in function or performance
+
+	* [r10429] topo/sheet/basic.py:
+	  Removed unused import
+
+2009-06-13  jbednar
+
+	* [r10428] topo/learningfn/optimized.py:
+	  Simplified C code based on new macros in c_header
+
+	* [r10427] topo/misc/inlinec.py:
+	  Added c_header with declarations and macros
+
+	* [r10426] topo/learningfn/optimized.py:
+	  Reordered statements and renamed temporaries to match macro
+	  version to be checked in next, to allow direct comparison of .cpp
+	  code
+
+	* [r10425] topo/base/sheet.py:
+	  Made numpy float type explicit
+
+2009-06-13  ceball
+
+	* [r10424] doc/Downloads/index_text.php,
+	  external/Makefile:
+	  Added documentation about package required for antialiased fonts
+	  (fixes SF #2791479).
+
+	* [r10423] _setup.py:
+	  Added list of dependencies in the form of what I had to install
+	  on Ubuntu 9.04.
+
+2009-06-12  jbednar
+
+	* [r10422]
+	  doc/Developer_Manual/memuse_text.php:
+	  Fixed typo
+
+	* [r10421] topo/analysis/featureresponses.py:
+	  Removed changes from r10404, making a correct fix for RF plots
+	  instead
+
+	* [r10420] doc/shared/util.php:
+	  Added fns for building the Developer Manual
+
+	* [r10419] topo/command/basic.py:
+	  Added docstring
+
+	* [r10418] doc/Developer_Manual/index_text.php,
+	  doc/Developer_Manual/memuse_text.php,
+	  doc/Developer_Manual/optimization_text.php,
+	  topo/misc/memuse.py:
+	  Added documentation about optimizing memory usage
+
+2009-06-12  judelaw
+
+	* [r10417] contrib/laminar_oo_or.ty,
+	  contrib/laminar_or.ty,
+	  contrib/lissom_oo_or_species.ty,
+	  contrib/lissom_oo_or_species_tracked.ty,
+	  contrib/species_lateral_sparsity.ty:
+	  removed old versions replaced by newer files
+
+	* [r10416] contrib/lesi_judethesisversion.ty:
+	  Version which matches simulations presented in thesis
+
+	* [r10415] contrib/species_lat_jitter.ty:
+	  Updated to match simulations presented in thesis
+
+	* [r10414] contrib/species_pf_jitter.ty:
+	  Updated to match simulations presented in thesis
+
+	* [r10413] contrib/jsldefs.py,
+	  contrib/lesi.ty,
+	  contrib/species_cf_jitter.ty,
+	  topo/command/pylabplots.py,
+	  topo/coordmapper/basic.py:
+	  added NormalJitter for jitter chosen from a Normal distribution
+
+	* [r10412] topo/base/arrayutil.py:
+	  added clip_upper function
+
+	* [r10411] topo/transferfn/basic.py:
+	  added Threshold function that sets values below a particular
+	  value to zero but leaves others unchanged
+
+	* [r10410] topo/analysis/featureresponses.py:
+	  added multiplier and offset parameters to Feature class so that
+	  individual SheetViews can be maipulated separately for each
+	  feature
+
+2009-06-12  ceball
+
+	* [r10409] topo/param/tk.py:
+	  Fixed typo.
+
+	* [r10408] topo/param/tk.py:
+	  Fixed part of SF bug #2805379 (only Parameterized classes can be
+	  represented by ClassSelector, but GUI was attempting to use
+	  ClassSelector for e.g. floats when editing a list).
+
+2009-06-11  jbednar
+
+	* [r10407] topo/misc/memuse.py:
+	  Made topsize work for small-size process ids
+
+2009-06-11  ceball
+
+	* [r10406] Makefile,
+	  topo/tkgui/topoconsole.py:
+	  Allow exit status to be passed to quit_topographica(), and use it
+	  for gui-tests.
+
+	* [r10405] topo/tkgui/topoconsole.py:
+	  Attempt to fix strange Windows 'unusual termination' error: one
+	  cause of the error is quitting with matplotlib windows open.
+
+2009-06-11  jbednar
+
+	* [r10404] topo/analysis/featureresponses.py:
+	  Updated ReverseCorrelation to match recent changes to
+	  FeatureResponses; may help fix RF plots
+
+	* [r10403] topo/analysis/featureresponses.py:
+	  Suppressed message about number of test patterns being printed
+
+	* [r10402] topo/misc/memuse.py:
+	  Shortened default message length
+
+	* [r10401] topo/projection/basic.py:
+	  Removed Python variables from n_bytes so that it more accurately
+	  reflects weight and activity array sizes
+
+	* [r10400] topo/misc/memuse.py:
+	  Initial version; code for measuring memry usage
+
+	* [r10399] topo/misc/asizeof.py:
+	  Copied recipe
+	  http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/546530
+	  verbatim
+
+2009-06-11  ceball
+
+	* [r10398] external/Makefile,
+	  external/guppy-r70.tar.gz:
+	  Added guppy (which provides heapy, for memory profiling), from
+	  https://guppy-pe.svn.sourceforge.net/svnroot/guppy-pe/trunk/guppy
+	  r70.
+
+	* [r10397] topo/tests/test_map_measurement.py:
+	  Added support for Parameterized BoundingRegions in pickled map
+	  test data.
+
+2009-06-10  ceball
+
+	* [r10396] topo/base/boundingregion.py:
+	  Removed redundant __init__ methods.
+
+	* [r10395] topo/base/boundingregion.py,
+	  topo/misc/legacy.py,
+	  topo/param/parameterized.py:
+	  BoundingRegion is now just an object (no longer inherits from
+	  Parameterized). Reduces memory consumption of "./topographica -i
+	  -p 'cortex_density=retina_density=1' -p lgn_density=20 -p
+	  'dims=[or,od,dr,cr,sf]' examples/lissom.ty" from 435 to 334 MB
+	  (as reported by top). Also added legacy support.
+
+	* [r10394] topo/tests/testsnapshots.py:
+	  Added preferred search_path. (Avoids conflict with any unrelated
+	  testsnapshot.typ that happens to be in a default search path.)
+
+	* [r10393] topo/base/sheetcoords.py:
+	  Added __slots__ to Slice. Reduces memory consumption of
+	  "./topographica -i -p 'cortex_density=retina_density=1' -p
+	  lgn_density=20 -p 'dims=[or,od,dr,cr,sf]' examples/lissom.ty"
+	  from 525 to 435 MB (as reported by top).
+
+2009-06-10  jbednar
+
+	* [r10392] topo/base/cf.py,
+	  topo/base/projection.py,
+	  topo/projection/basic.py:
+	  Made n_bytes be implemented at the Projection level
+
+	* [r10391] topo/projection/basic.py:
+	  Added missing n_conns method
+
+2009-06-10  antolikjan
+
+	* [r10390]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  made sure all random generators are seeded
+
+2009-06-10  ceball
+
+	* [r10389] topo/base/sheetcoords.py:
+	  Added ALERT.
+
+2009-06-09  jbednar
+
+	* [r10388] topo/command/basic.py:
+	  Added print_sizes command, which is now called in run_batch (but
+	  can also be called explicitly)
+
+	* [r10387] topo/projection/basic.py:
+	  Added more SharedCF overhead
+
+	* [r10386] topo/base/cf.py:
+	  Minor cleanup
+
+	* [r10385] topo/base/cf.py,
+	  topo/base/projection.py,
+	  topo/base/sheet.py,
+	  topo/command/basic.py,
+	  topo/projection/basic.py:
+	  Added n_bytes() and n_conns() methods and global commands to
+	  calculate memory size and number of connections in the current
+	  simulation
+
+2009-06-09  ceball
+
+	* [r10384] contrib/parameter_search,
+	  contrib/parameter_search.cfg:
+	  Moved some options into a config file.
+
+2009-06-08  ceball
+
+	* [r10383] contrib/parameter_search:
+	  Minor simplification.
+
+	* [r10382] contrib/parameter_search:
+	  Use simpler string formatting.
+
+	* [r10381] setup_app.py:
+	  Added notes.
+
+	* [r10380]
+	  external/pyscrodget-0.0.2_2.1.tar.gz:
+	  Accidentally left in the build/ directory in previous version.
+
+	* [r10379] _setup.py,
+	  setup.py, setup_app.py,
+	  setup_exe.py,
+	  setup_ez.py:
+	  Added create_topographica_script() to _setup.py. Previously, the
+	  topographica script had to be created by make before running
+	  setup.
+
+2009-06-06  ceball
+
+	* [r10378] doc/Future_Work/current_text.php,
+	  setup_app.py:
+	  Added info about icons from future work doc.
+
+	* [r10377] setup_app.py:
+	  Began attempting to include external packages.
+
+	* [r10376] setup_ez.py:
+	  Added docstring.
+
+	* [r10375] Makefile,
+	  easysetup.py,
+	  setup_app.py,
+	  setup_exe.py,
+	  setup_ez.py,
+	  win_build_exe.py:
+	  Made setup script naming more consistent. Added beginnings of
+	  py2app script.
+
+	* [r10374] Makefile:
+	  More files to delete from distribution.
+
+	* [r10373] doc/Downloads/index_text.php:
+	  Added comment.
+
+2009-06-05  ceball
+
+	* [r10372] topo/plotting/plotgroup.py:
+	  Fixed bogus 'self'.
+
+	* [r10371] easysetup.py,
+	  setup.py:
+	  Added some documentation.
+
+	* [r10370] easysetup.py:
+	  Fixed typos.
+
+	* [r10369] _setup.py,
+	  easysetup.py, setup.py:
+	  Moved code common to distutils and setuptools into _setup.py.
+
+	* [r10368] easysetup.py:
+	  Beginnings of 'easy_install topographica'
+
+	* [r10367] topo/misc/filepath.py:
+	  Removed erroneous use of set() (search paths were not being
+	  searched in order). It doesn't matter if a path appears more than
+	  once.
+
+	* [r10366] topo/misc/filepath.py:
+	  Fixed (presumably accidental) mutable default argument.
+
+	* [r10365] topo/tests/testsnapshots.py:
+	  Simplified paths.
+
+	* [r10364] topo/misc/filepath.py:
+	  Added output_path to resolve_path()'s list of search_paths.
+
+	* [r10363]
+	  topo/tests/testCompositeSheetMasks.txt:
+	  Fixed path.
+
+	* [r10362] topo/tests/__init__.py:
+	  Skip gmpy/Number tests if gmpy not available.
+
+	* [r10361] topo/tests/testNumberParameter.txt,
+	  topo/tests/testgmpynumber.txt:
+	  Split gmpy/Number tests from other Number tests.
+
+	* [r10360] setup.py:
+	  Added more missing files.
+
+	* [r10359] topo/analysis/vision.py,
+	  topo/command/analysis.py,
+	  topo/tests/testbitmap.py,
+	  topo/tests/testimage.py,
+	  topo/tkgui/plotgrouppanel.py:
+	  Cleaned up file paths.
+
+2009-06-05  antolikjan
+
+	* [r10358]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  added missing import
+
+2009-06-05  ceball
+
+	* [r10357]
+	  external/pyscrodget-0.0.2_2.1.tar.gz:
+	  Forgot to gzip previous version.
+
+	* [r10356]
+	  external/pyscrodget-0.0.2_2.1.tar.gz:
+	  Minor update to path finding.
+
+	* [r10355] topo/plotting/bitmap.py:
+	  Added level to vera.ttf detection hack, so that vera.ttf can be
+	  found when topo is installed as a package.
+
+	* [r10354] setup.py:
+	  Added missing files.
+
+	* [r10353]
+	  external/pyscrodget-0.0.2_2.1.tar.gz:
+	  Corrected typo in package info.
+
+	* [r10352] external/Makefile,
+	  external/pyscrodget-0.0.1_2.1.tar.gz,
+	  external/pyscrodget-0.0.2_2.1.tar.gz:
+	  Minor alterations to pyscrodget package.
+
+	* [r10351] topo/misc/filepath.py:
+	  Expanded comment.
+
+	* [r10350] external/Makefile,
+	  external/Tile.py,
+	  external/odict.py,
+	  topo/param/external.py,
+	  topo/param/tk.py,
+	  topo/tkgui/editor.py,
+	  topo/tkgui/topoconsole.py:
+	  Moved odict and tilewrapper to topo.param.external module.
+
+	* [r10349] setup.py:
+	  Added a comment.
+
+	* [r10348] setup.py,
+	  topo/misc/filepath.py,
+	  topo/tests/testsnapshots.py:
+	  Fixed error introduced into testsnapshots (I mistakenly thought
+	  testsnapshot.typ was checked in).
+
+2009-06-04  ceball
+
+	* [r10347] topo/tests/testplotfilesaver.py:
+	  Simplified temporary file handling.
+
+	* [r10346] topo/tests/testsnapshots.py:
+	  Use resolve_path() to locate the snapshot file.
+
+	* [r10345] setup.py:
+	  Added some notes.
+
+	* [r10344] topo/tests/testsnapshots.py:
+	  Removed out-of-date ALERT.
+
+	* [r10343] topo/command/basic.py:
+	  Tried to simplify handling snapshots that might or might not be
+	  xml, when gnosis (for xml pickles) might or might not be
+	  available. Will probably have to revisit this if we also add
+	  hdf5.
+
+	* [r10342] topo/param/tk.py:
+	  Adjustment to paths now that package_path is available.
+
+	* [r10341] topo/misc/commandline.py,
+	  topo/tests/test_map_measurement.py,
+	  topo/tkgui/topoconsole.py:
+	  Adjustment to paths now that topo.misc.filepath.package_path is
+	  available. Not yet complete: other uses of
+	  application_path/normalize_path/resolve_path might need to be
+	  updated.
+
+	* [r10340] topo/plotting/bitmap.py:
+	  Added comment.
+
+	* [r10339] topo/misc/filepath.py:
+	  Added 'package_path' (the location of the topo module), which is
+	  often what is needed when 'application_path' is currently used.
+	  (Some uses of 'application_path' should be 'output_path'.)
+
+	* [r10338] topo/tests/testplotfilesaver.py:
+	  Cleaned up temporary file creation.
+
+	* [r10337] topo/param/tk.py:
+	  Removed unused output_path variable.
+
+	* [r10336] topo/misc/trace.py:
+	  Removed unused import.
+
+	* [r10335] setup.py,
+	  topo/__init__.py:
+	  Added missing numbergen package.
+
+	* [r10334] topo/misc/util.py:
+	  Made pstats & cProfile dependencies optional.
+
+	* [r10333] topo/misc/filepath.py:
+	  topo.misc.filepath.output_path is set to ~/topographica if the
+	  application_path is not writable.
+
+2009-06-04  antolikjan
+
+	* [r10332]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  change of default parameters
+
+	* [r10331]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Added intrinsic noise and parametrization of V1 afferent extents
+
+2009-06-04  ceball
+
+	* [r10330] setup.py:
+	  Added installation of topographica script.
+
+	* [r10329] topo/misc/inlinec.py:
+	  Check for scipy.weave if weave module is not found (for e.g.
+	  Ubuntu package).
+
+	* [r10328] topo/command/basic.py:
+	  Removed topo.command.basic's dependency on gnosis module (making
+	  it optional).
+
+	* [r10327] setup.py:
+	  Initial version.
+
+2009-06-04  jbednar
+
+	* [r10326] doc/User_Manual/overview_text.php:
+	  Added note about one-to-one and all-to-all connections
+
+2009-06-03  jbednar
+
+	* [r10325] contrib/jj_tiny.ty:
+	  Added missing imports
+
+	* [r10324] contrib/jj_tiny.ty:
+	  Simple starting point for John to optimize
+
+2009-05-31  ceball
+
+	* [r10323] doc/buildbot/master.cfg:
+	  svn backup and build scheduled at different times. Skip docs on
+	  mac build.
+
+	* [r10322] topo/__init__.py,
+	  topo/misc/legacy.py:
+	  Replace gmpy.mpq with fixedpoint.FixedPoint if gmpy is
+	  unavailable.
+
+	* [r10321] topo/misc/util.py:
+	  Added warning.
+
+	* [r10320] topo/misc/legacy.py,
+	  topo/misc/util.py:
+	  More advanced module faking: the fake module is not created until
+	  an attempt is made to import the module. So far, only gmpy faking
+	  uses this. Should make no visible change to legacy support for
+	  gmpy.
+
+	* [r10319] topo/misc/legacy.py:
+	  Removed testing code (accidentally left in).
+
+2009-05-29  jbednar
+
+	* [r10318] topo/analysis/featureresponses.py:
+	  Cleaned up docstring
+
+2009-05-28  ceball
+
+	* [r10317] doc/buildbot/master.cfg:
+	  Set up windows build. Added svn checkout retries (to avoid
+	  clobbering the checkout quite so readily). Reduced frequency of
+	  performance tests. The windows build's VM is on doozy, so added
+	  doozy_lock to windows build.
+
+	* [r10316] doc/Downloads/index_text.php:
+	  Updated info about using fink to build docs.
+
+2009-05-28  antolikjan
+
+	* [r10315] contrib/gc_alissom.ty:
+	  change the default parameters of retinal waves
+
+2009-05-28  ceball
+
+	* [r10314] topo/misc/legacy.py:
+	  Fixed support for no gmpy.mpq: numbers like '5/7' couldn't be
+	  parsed by FixedPoint, so the number is first eval'd (using float
+	  division).
+
+	* [r10313] external/gmpy-1.04.tar.gz:
+	  Latest release of gmpy.
+
+	* [r10312]
+	  topo/tests/reference/topo_or_defs.py:
+	  Corrected typo.
+
+	* [r10311]
+	  topo/tests/reference/topo_or_defs.py:
+	  Updated output_fn -> output_fns.
+
+	* [r10310]
+	  topo/tests/reference/lissom_oo_dr_reference.ty,
+	  topo/tests/reference/lissom_oo_or_reference.ty,
+	  topo/tests/reference/lissom_or_reference.ty:
+	  Updated output_fn to output_fns.
+
+	* [r10309] doc/buildbot/index.html:
+	  Various simplifications.
+
+	* [r10308] doc/buildbot/master.cfg:
+	  Cleaned up. Added Ubuntu 9.04 builder.
+
+2009-05-28  jbednar
+
+	* [r10307] doc/buildbot/master.cfg:
+	  Fixed typo
+
+2009-05-27  ceball
+
+	* [r10306] doc/buildbot/master.cfg:
+	  Simplification of builders.
+
+2009-05-27  jmoudrik
+
+	* [r10305] contrib/jm_analysis.py,
+	  contrib/jm_cf_matrix.py,
+	  contrib/jm_smooth.py:
+	  files for complex analysis and an improved CFProjection
+
+2009-05-27  ceball
+
+	* [r10304] topo/misc/legacy.py:
+	  Added missing import statement.
+
+	* [r10303] doc/buildbot/doozy-buildbot.tac:
+	  Removed out-of-date file.
+
+	* [r10302] doc/buildbot/index.html:
+	  Updated links.
+
+	* [r10301] doc/buildbot/master.cfg:
+	  Beginnings of reorganization. Added new machines cider (OS X) and
+	  light (Windows XP).
+
+	* [r10300] doc/buildbot/master.cfg:
+	  Unoptimized train-tests TESTDP reverted to 5. Changes have been
+	  running on buildbot for a while.
+
+2009-05-26  antolikjan
+
+	* [r10299] topo/command/pylabplots.py:
+	  added parameter to size tuning curve measurment function which
+	  defines the size of the maximum disk grating
+
+	* [r10298] contrib/jacommands.py:
+	  added surround modulation analysis function
+
+	* [r10297] contrib/cc_lesi_oo_or_new.ty:
+	  removed double retina
+
+	* [r10296] contrib/gc_alissom.ty:
+	  made Hysteresis optional
+
+	* [r10295] topo/analysis/featureresponses.py:
+	  deleted the debugging info and renamed num_repetitions to
+	  repetitions
+
+2009-05-26  ceball
+
+	* [r10294]
+	  doc/Developer_Manual/testing_text.php:
+	  Added note.
+
+	* [r10293] doc/Downloads/index_text.php:
+	  Minor reorganization.
+
+2009-05-24  jbednar
+
+	* [r10292] external/Makefile,
+	  external/gmp-4.2.2.tar.gz,
+	  external/gmp-4.3.1.tar.gz:
+	  Upgraded gmp to 4.3.1 to fix CPU detection problem on some Macs
+
+2009-05-22  antolikjan
+
+	* [r10291] topo/command/analysis.py:
+	  Set correct default duration for corner orientation map
+	  measurement
+
+2009-05-21  antolikjan
+
+	* [r10290] topo/analysis/featureresponses.py:
+	  Implemented the repetitions paradigm
+
+2009-05-20  antolikjan
+
+	* [r10289]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  Made only single fake retina
+
+	* [r10288] contrib/cc_lesi_oo_or_new.ty:
+	  changed default contrasts where tuning curves are measured
+
+	* [r10287] contrib/jacommands.py:
+	  made hysteresis in V2 reset
+
+2009-05-18  jbednar
+
+	* [r10286] topo/projection/basic.py:
+	  Clarified docstring
+
+2009-05-17  jbednar
+
+	* [r10285]
+	  /releases/0.9.6/topographica/doc/User_Manual/overview_text.php:
+	  Added note about one-to-one and all-to-all connections
+
+2009-05-15  antolikjan
+
+	* [r10284] contrib/jacommands.py:
+	  switched off V1 plasticity in outputfn after adding V2
+
+	* [r10283] contrib/jacommands.py:
+	  changes to AddV2 function
+
+	* [r10282] contrib/jacommands.py:
+	  changes to AddV2 function
+
+	* [r10281] contrib/v2_cc_lesi_oo_or.ty:
+	  loads a simulation, adds V2
+
+2009-05-11  antolikjan
+
+	* [r10280] contrib/cc_lesi_oo_or_new.ty:
+	  Added SimpleHomeoLinear
+
+2009-05-09  jbednar
+
+	* [r10279] ChangeLog.txt:
+	  Added recent changes
+
 2009-05-06  ceball
 
 	* [r10278] contrib/parameter_search:
