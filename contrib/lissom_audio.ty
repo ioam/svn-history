@@ -50,24 +50,24 @@ p.add (
 			(
 				default = 0.01, 
 				bounds = (0, None),
-				doc = """ratio of cochlea width to its length"""
+				doc = """ratio of Cochlea width to its length"""
 			),
 					
 	# not too sure what densities are atm
     cochlea_density = param.Number
 			(
-				default = 24.0, 
+				default = 48.0, 
 				bounds = (0, None),
 				inclusive_bounds = (False, True),
-				doc = """The nominal_density to use for the cochlea."""
+				doc = """The nominal_density to use for the Cochlea."""
 			),
 
-    mgn_density = param.Number
+    mgbv_density = param.Number
 			(
-				default = 24.0, 
+				default = 48.0, 
 				bounds = (0, None),
 				inclusive_bounds = (False, True),
-				doc = """The nominal_density to use for the MGN."""
+				doc = """The nominal_density to use for the MGB (Ventral division)."""
 			),
 
     cortex_density = param.Number
@@ -99,7 +99,7 @@ projection.CFProjection.learning_fn = learningfn.optimized.CFPLF_Hebbian_opt()
 input_pattern = pattern.audio.Audio (
 										min_frequency = 20, 
 										max_frequency = 20000, 
-										filename = "square/sqr-1kHz.wav", 
+										filename = "sounds/sqr-1kHz.wav", 
 										sample_window = 0.3,
 										seconds_per_timestep = 0.1
 									)
@@ -109,15 +109,34 @@ input_pattern = pattern.audio.Audio (
 ### Sheets
 
 # useful parameters
-cochlea_mgn_connection_radius = 1.0 #375
+a1_nominal_radius = p.area / 2.0
+a1_mgbv_connection_radius = a1_nominal_radius / 2.0
 
-cochlea_half_length = p.area / 2.0 + cochlea_mgn_connection_radius
-cochlea_half_width = cochlea_half_length * p.cochlea_aspect_ratio
+mgbv_nominal_radius = a1_nominal_radius + a1_mgbv_connection_radius
+mgbv_cochlea_connection_radius = 0.5
 
+cochlea_half_width = 2.0 + mgbv_cochlea_connection_radius + a1_mgbv_connection_radius
+cochlea_half_length = (2.0 * p.cochlea_aspect_ratio) + mgbv_cochlea_connection_radius + a1_mgbv_connection_radius
+
+# A1 Sheet
+topo.sim['A1'] = sheet.lissom.LISSOM (
+										nominal_density = p.cortex_density,
+										nominal_bounds = sheet.BoundingBox(radius = a1_nominal_radius),
+										#tsettle = 9,
+										#output_fns = [transferfn.PiecewiseLinear(lower_bound = 0.083, upper_bound = 0.633)],
+										joint_norm_fn = sheet.optimized.compute_joint_norm_totals_opt
+									 )
+
+# MGN Sheet
+topo.sim['MGBv'] = sheet.CFSheet (
+									nominal_density = p.mgbv_density,
+									nominal_bounds = sheet.BoundingBox(radius = mgbv_nominal_radius)
+									#output_fns = [transferfn.PiecewiseLinear(lower_bound = 0.0, upper_bound = 1.0)],
+								 )
+																	 
 # Cochlea Sheet
 topo.sim['Cochlea'] = sheet.GeneratorSheet (
 												nominal_density = p.cochlea_density,
-												# p.area, 0.25
 												nominal_bounds = sheet.BoundingBox 
 													(
 														points = ( (-cochlea_half_length, -cochlea_half_width),
@@ -126,23 +145,7 @@ topo.sim['Cochlea'] = sheet.GeneratorSheet (
 												input_generator = input_pattern, 
 												period = 1.0, 
 												phase = 0.05
-											)
-
-# MGN Sheet    
-topo.sim['MGN'] = sheet.CFSheet (
-									nominal_density = p.mgn_density,
-									nominal_bounds = sheet.BoundingBox(radius = p.area / 2.0)
-									#output_fns = [transferfn.PiecewiseLinear(lower_bound = 0.0, upper_bound = 1.0)],
-								)
-
-# A1 Sheet
-#topo.sim['A1'] = sheet.lissom.LISSOM (
-#										nominal_density = p.cortex_density,
-#										nominal_bounds = sheet.BoundingBox(radius = p.area / 2.0),
-#										tsettle = 9,
-#										output_fns=[transferfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633)],
-#										joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt
-#									 )
+										   )
 
 
 
@@ -151,51 +154,53 @@ topo.sim['MGN'] = sheet.CFSheet (
 # TODO: how to model mgn simply?
 topo.sim.connect (
 					'Cochlea',
-					'MGN',
+					'MGBv',
 					delay = 0.05,
 					strength = 2.33,
-					name = 'Afferent',
+					name = 'Cochlea Afferent',
 					connection_type = projection.CFProjection,
-					nominal_bounds_template = sheet.BoundingBox(radius = cochlea_mgn_connection_radius),
+					nominal_bounds_template = sheet.BoundingBox(radius = mgbv_cochlea_connection_radius),
 					weights_generator = pattern.Constant()
 				 )
 
-#topo.sim.connect (
-#					'MGN',
-#					'A1',
-#					delay = 0.05,
-#					strength = 1.0,
-#					name = 'LGNOnAfferent',
-#					dest_port = ('Activity', 'JointNormalize', 'Afferent'),
-#					connection_type = projection.CFProjection,
-#					learning_rate = 0.9590/2,
-#					nominal_bounds_template = sheet.BoundingBox(radius = 0.27083),
-#					weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.27083)
-#				 )
+topo.sim.connect (
+					'MGBv',
+					'A1',
+					delay = 0.05,
+					strength = 1.0,
+					name = 'MGBv Afferent',
+					dest_port = ('Activity', 'JointNormalize', 'Afferent'),
+					connection_type = projection.CFProjection,
+					learning_rate = 0.9590/2,
+					nominal_bounds_template = sheet.BoundingBox(radius = a1_mgbv_connection_radius),
+					weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.27083)
+					#weights_generator = pattern.Constant()
+				 )
 
-#topo.sim.connect (
-#					'A1',
-#					'A1',
-#					delay = 0.05,
-#					strength = 0.9,
-#					name = 'LateralExcitatory',
-#					connection_type = projection.ResizableCFProjection,
-#					learning_rate = 2.55528,
-#					nominal_bounds_template = sheet.BoundingBox(radius = 0.10417),
-#					weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.10417)
-#				  )
+
+topo.sim.connect (
+					'A1',
+					'A1',
+					delay = 0.05,
+					strength = 0.9,
+					name = 'LateralExcitatory',
+					connection_type = projection.ResizableCFProjection,
+					learning_rate = 2.55528,
+					nominal_bounds_template = sheet.BoundingBox(radius = 0.10417),
+					weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.10417)
+				 )
             
-#topo.sim.connect (
-#					'A1',
-#					'A1',
-#					delay = 0.05,
-#					strength = -0.9,
-#					name = 'LateralInhibitory',
-#					connection_type = projection.CFProjection,
-#					learning_rate = 1.80873,
-#					nominal_bounds_template = sheet.BoundingBox(radius = 0.22917),
-#					weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.22917)
-#				 )
+topo.sim.connect (
+					'A1',
+					'A1',
+					delay = 0.05,
+					strength = -0.9,
+					name = 'LateralInhibitory',
+					connection_type = projection.CFProjection,
+					learning_rate = 1.80873,
+					nominal_bounds_template = sheet.BoundingBox(radius = 0.22917),
+					weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.22917)
+				 )
 
 
 
@@ -209,11 +214,11 @@ topo.sim.connect (
 
 topo.sim.grid_layout (
 						[
-							#[None,    'A1',     None],
-							[None,   'MGN',     None],
-							[None,   'Cochlea', None]
+							[None,    'A1',     None],
+							[None,   'MGBv',    None],
+							[None,   None, 'Cochlea']
 						],
-						xstart = 150
+						xstart =  50
 					 )
 
 
