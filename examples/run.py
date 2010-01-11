@@ -58,7 +58,7 @@ topographica = join(topographica_path,"topographica")
 #  examples = join(topographica_path,"examples")
 examples = "examples"
 # temporary (I hope) test to ensure script is run from the topographica main directory
-#from os import getcwd; assert topographica_path==getcwd(), "Must be run from main topographica directory."
+from os import getcwd; assert topographica_path==getcwd(), "Must be run from main topographica directory."
 
 
 specified_targets = locals().get('targets',['all_quick'])
