@@ -1,11 +1,90 @@
-<!--
-  <div class="i2">- PatternGenerators: 
-  <?php classref('topo.transferfn.basic','ExponentialDecay')?>,
-  <?php classref('topo.transferfn.basic','HalfPlane')?>,
-  <?php classref('topo.transferfn.basic','Arc')?>,
-  <?php classref('topo.transferfn.basic','Curve')?>, and
-  <?php classref('topo.transferfn.basic','Rectangle')?> (now with smoothing)</div>
--->
+<p><b>14 January 2010:</b> Version 0.9.7 is being prepared for
+release.  Changes and new features, already available in the
+<A HREF="../Downloads/cvs.html">SVN</A> version, include:
+
+<!-- Updated to r10814 -->
+<center>
+<table width="100%" cellpadding="5">
+<tr>
+<td width="50%">
+<dl COMPACT>
+<font size="-1">
+<dt>General improvements:</dt>
+<dd>
+  <div class="i2">- <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository</div>
+  <div class="i2">- minor bugfixes</div>
+  <div class="i2">- significantly reduced memory consumption (35% for lissom.ty)</div>
+  <div class="i2">- optional
+  <A target="_top" href="http://divmod.org/trac/wiki/DivmodPyflakes">PyFlakes</A> package for detecting common Python problems</div>
+  <div class="i2">- optional
+  <A target="_top" href="http://mpi4py.scipy.org">mpi4py</A> package using OpenMPI for writing parallel applications</div>
+<!--  <div class="i2">- optional (experimental) integration with IDLE; try 'make topographicagui; ./topographicagui'</div> -->
+  <A target="_top" href="http://mpi4py.scipy.org">mpi4py</A> package using OpenMPI for writing parallel applications</div>
+  <div class="i2">- now available as .deb package for Debian and
+  Ubuntu, in addition to .zip and .tar.gz versions, and via
+  'easy_install topographica'</div>
+  <div class="i2">- supports Python 2.6</div>
+</dd>
+<br>
+<dt>Command-line and batch:</dt>
+<dd>
+  <div class="i2">- -G: dock windows by default</div>
+  <div class="i2">- run_batch: name_time_format and dirname_prefix parameters</div>
+  <div class="i2">- n_bytes,n_conns,print_sizes: display size and memory usage of current network</div>
+</dd>
+</font>
+</dl>
+</td>
+<td width="50%">
+<dl COMPACT>
+<font size="-1">
+<dt>GUI:</dt>
+<dd>
+  <div class="i2">- Moved progress bars, messages, warnings, and
+  errors into the status bar for each window, to make it clear where
+  the error or status issue arose</div>
+</dd>
+<br>
+<dt>Plotting:</dt>
+<dd>
+  <div class="i2">- More joint normalization options
+  ("JointProjections","AllTogether","Individually"), to show 
+  relative differences in weight strength and activity</div>
+  <div class="i2">- PhaseDisparity plot</div>
+</dd>
+<br>
+<dt>Example scripts:</dt>
+<dd>
+  <div class="i2">-   (examples/)</div>
+</dd>
+<br>
+<dt>Component library:</dt>
+<dd>
+  <div class="i2">- PatternGenerators:
+  <?php classref('topo.pattern.basic','ExponentialDecay')?>,
+  <?php classref('topo.pattern.basic','HalfPlane')?>,
+  <?php classref('topo.pattern.basic','Arc')?>,
+  <?php classref('topo.pattern.basic','Curve')?>, 
+  <?php classref('topo.pattern.basic','Rectangle')?> (now with smoothing),
+  <?php classref('topo.pattern.basic','RawRectangle')?> (no smoothing),
+  <?php classref('topo.pattern.basic','OneDPowerSpectrum')?> (for frequency decomposition),
+  <?php classref('topo.pattern.audio','Audio')?> (for audio spectrograms)
+  </div>
+  <div class="i2">- 5 other pattern families from Hegde and Van
+  Essen 2000 paper are temporarily in contrib/hegdeessen.py; to move
+  to topo.pattern</div>
+  <div class="i2">- Minor changes to PatternGenerator parameter
+  passing to allow better nesting and composition</div>
+  <div class="i2">- topo.misc.util: linearly_interpolate</div>
+  <div class="i2">- topo.base.arrayutil: clip_upper</div>
+</dd>
+</font>
+</dl>
+</td>
+</tr>
+</table>
+</center>
+
 
 <p><b>12 February 2009:</b> Version 0.9.6 released, including:
 
@@ -15,7 +94,7 @@
 <tr>
 <td width="50%">
 <dl COMPACT>
-<font size="-1">  
+<font size="-1">
 <!--CB: surely these divs should be some kind of li?-->
 <!--  <div class="i2">- optional XML snapshot
   <A HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">saving</A> and
@@ -29,10 +108,10 @@
   simulations (nearly 2X overall), plotting (2X), and startup time </div>
   <div class="i2">- minor bugfixes</div>
 <!--  <div class="i2">- updated Windows packages</div> -->
-  <div class="i2">- more options for 
+  <div class="i2">- more options for
   <A target="_top" href="../User_Manual/noise.html">adding noise</A>
   to ConnectionField shapes</div>
-  <div class="i2">- optional 
+  <div class="i2">- optional
   <A target="_top" href="../Developer_Manual/optimization.html#line-by-line">line-by-line profiling</A></div>
   <div class="i2">- optional
   <A target="_top" href="http://www.cython.org">Cython</A> package for writing fast components</div>
@@ -41,7 +120,7 @@
 <dt>Command-line and batch:</dt>
 <dd>
   <div class="i2">- -v and -d options to print verbose and debugging messages</div>
-  <div class="i2">- new options to  
+  <div class="i2">- new options to
   <?php classref('topo.command.basic','run_batch')?> and better progress messages</div>
   <div class="i2">- replaced most commands with
   <?php classref('param.parameterized','ParameterizedFunction')?>s,
@@ -51,7 +130,7 @@
   <A target="_top" HREF="../Reference_Manual/topo.command-module.html">topo.command</A>
   with simpler, general-purpose, easily .ty-file controllable versions (see
   lissom_oo_or.ty and lissom.ty for examples)</div>
-  <div class="i2">- <?php classref('topo.command.analysis','save_plotgroup')?>: 
+  <div class="i2">- <?php classref('topo.command.analysis','save_plotgroup')?>:
   more useful default values; results can be cached to avoid recomputation</div>
   <div class="i2">- <?php classref('topo.command.analysis','measure_sine_pref')?>:
   general purpose measurement for any preference that can be tested
@@ -59,7 +138,7 @@
   <div class="i2">- Changed locals to script-level parameters using
   <?php classref('topo.misc.commandline','GlobalParams')?>;
   see examples/lissom.ty</div>
-  <div class="i2">- Made 
+  <div class="i2">- Made
   <?php classref('topo.command.pylabplots','gradientplot')?> and
   <?php classref('topo.command.pylabplots','fftplot')?> available in
   batch mode.</div>
@@ -95,17 +174,17 @@
 <br>
 <dt>Component library:</dt>
 <dd>
-  <div class="i2">- PatternGenerators: 
-  <?php classref('topo.pattern.basic','Translator')?>; 
+  <div class="i2">- PatternGenerators:
+  <?php classref('topo.pattern.basic','Translator')?>;
     mask_shape parameter also now makes it easy to specify a mask
     for any pattern, e.g. in the GUI</div>
   <div class="i2">- TransferFns (formerly called OutputFns):
   <?php classref('topo.transferfn.basic','HalfRectifyAndPower')?>,
   <?php classref('topo.transferfn.basic','Hysteresis')?>, and
   <?php classref('topo.transferfn.basic','HomeostaticResponse')?></div>
-  <div class="i2">- Sheets: 
+  <div class="i2">- Sheets:
   <?php classref('topo.sheet.basic','ActivityCopy')?></div>
-  <div class="i2">- LearningFns: 
+  <div class="i2">- LearningFns:
   <?php classref('topo.learningfn.optimized','CFPLF_BCMFixed_opt')?>,
   <?php classref('topo.learningfn.optimized','CFPLF_Scaled_opt')?></div>
   <div class="i2">- Added <?php classref('param','HookList')?>
@@ -118,7 +197,7 @@
   plot_command, etc.)  to reflect shared concept of Hooks and
   HookLists (lists of callables to run at specific spots in the
   code).</div>
-  <div class="i2">- Parameters: bounds can now be exclusive, optional support for None in most 
+  <div class="i2">- Parameters: bounds can now be exclusive, optional support for None in most
   types</div>
 </dd>
 </font>
@@ -132,14 +211,14 @@ that were written for version 0.9.5.</small> </td></tr>
 </center>
 
 
-<p><b>05 September 2008:</b> Version 0.9.5 
+<p><b>05 September 2008:</b> Version 0.9.5
 <A target="_top" href="../Downloads/index.html">released</A>, including:
 <center>
 <table width="100%" cellpadding="5">
 <tr>
 <td width="50%">
 <dl COMPACT>
-<font size="-1">  
+<font size="-1">
 <dt>General improvements:</dt>
 <dd>
 <!--CB: surely these divs should be some kind of li?-->
@@ -155,7 +234,7 @@ that were written for version 0.9.5.</small> </td></tr>
   <A HREF="../Reference_Manual/topo.command.basic-module.html#load_snapshot">loading</A></div>
 -->
 
-  <div class="i2">- simpler and more complete support for dynamic parameters</div>  
+  <div class="i2">- simpler and more complete support for dynamic parameters</div>
 <!-- dynamic parameters now update at most once per simulation time<BR> -->
 
   <div class="i2">- updated to Python 2.5 and numpy 1.1.1.</div>
@@ -169,7 +248,7 @@ that were written for version 0.9.5.</small> </td></tr>
   <div class="i2">- divisive and multiplicative connections</div>
   <div class="i2">- simulation time is now a rational number for precision</div>
   <div class="i2">- PyTables HDF5 interface</div>
-  <div class="i2">- more options for 
+  <div class="i2">- more options for
   <A target="_top" href="../User_Manual/noise.html">adding noise</A></div>
 <!-- topo/misc/legacy.py i.e. we can now support old snapshots if necessary<BR> -->
 <!-- incomplete <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository<BR> -->
@@ -219,14 +298,14 @@ that were written for version 0.9.5.</small> </td></tr>
 <BR>
 <dt>Component library:</dt>
 <dd>
-  <div class="i2">- OutputFns: 
+  <div class="i2">- OutputFns:
   <?php classref('topo.outputfn.basic','PoissonSample')?>,<BR>
   <?php classref('topo.outputfn.basic','ScalingOF')?> (for homeostatic plasticity),<BR>
   <?php classref('topo.outputfn.basic','NakaRushton')?> (for contrast gain control)<BR>
   <?php classref('topo.outputfn.basic','AttributeTrackingOF')?> (for analyzing or plotting values over time)</div>
 <!-- &nbsp;&nbsp;&nbsp;('x=HalfRectify() ; y=Square() ; z=x+y' gives 'z==PipelineOF(output_fns=x,y)')<BR> -->
 <div class="i2">- PatternGenerator: <?php classref('topo.misc.robotics','CameraImage')?> (for real-time camera inputs)</div>
-<!--  allowed <?php classref('topo.sheet.lissom','LISSOM')?>  normalization to be 
+<!--  allowed <?php classref('topo.sheet.lissom','LISSOM')?>  normalization to be
   <A HREF="../Reference_Manual/topo.sheet.lissom.LISSOM-class.html#post_initialization_weights_output_fn">changed</A>
   after initialization<BR> -->
 
@@ -253,7 +332,7 @@ that were written for version 0.9.4.</small> </td></tr>
 </table>
 </center>
 
-<p><b>26 October 2007:</b> Version 0.9.4 
+<p><b>26 October 2007:</b> Version 0.9.4
 <A target="_top" href="../Downloads/index.html">released</A>, including:
 
 <center>
@@ -261,7 +340,7 @@ that were written for version 0.9.4.</small> </td></tr>
 <tr>
 <td width="50%">
 <dl COMPACT>
-<font size="-1">  
+<font size="-1">
 <dt>General improvements:</dt>
 <dd>
   numerous bugfixes<br>
@@ -278,9 +357,9 @@ that were written for version 0.9.4.</small> </td></tr>
 <dd>
   <!-- <A target="_top" href="../User_Manual/commandline.html#option-a">-a
   option to import commands automatically<br> -->
-  <A target="_top" href="../User_Manual/batch.html">batch 
+  <A target="_top" href="../User_Manual/batch.html">batch
   mode</A> for running multiple similar simulations<br>
-  <A target="_top" href="../User_Manual/commandline.html#saving-bitmaps">saving 
+  <A target="_top" href="../User_Manual/commandline.html#saving-bitmaps">saving
   bitmaps</A> from script/command-line (for batch runs)<br>
   script/command-line <A target="_top" href="../User_Manual/commandline.html#scripting-gui">control over GUI</A><br>
   <!-- grid_layout command to simplify model diagrams<br> -->
@@ -306,7 +385,7 @@ that were written for version 0.9.4.</small> </td></tr>
 <dt>Plotting:</dt>
 <dd>
   <A target="_top" href="../User_Manual/plotting.html#rfplots">reverse-correlation RF mapping</A><br>
-  <A target="_top" href="../User_Manual/commandline.html#3d-plotting">3D 
+  <A target="_top" href="../User_Manual/commandline.html#3d-plotting">3D
   wireframe plotting</A> (in right-click menu)<br>
   gradient plots, histogram plots (in right-click menu)<br>
   <A target="_top" href="../User_Manual/plotting.html#measuring-preference-maps">simplified
@@ -328,13 +407,13 @@ that were written for version 0.9.4.</small> </td></tr>
 </table>
 </center>
 
-Screenshots: 
-<A target="_top" href="../images/071018_plotting1_ubuntu.png">plotting 1</A>, 
-<A target="_top" href="../images/071018_plotting2_ubuntu.png">plotting 2</A>, 
+Screenshots:
+<A target="_top" href="../images/071018_plotting1_ubuntu.png">plotting 1</A>,
+<A target="_top" href="../images/071018_plotting2_ubuntu.png">plotting 2</A>,
 <A target="_top" href="../images/071018_modeleditor_ubuntu.png">model editor</A>.
 <br><br>
 
-<p><b>23 April 2007:</b> Version 0.9.3 
+<p><b>23 April 2007:</b> Version 0.9.3
 <A target="_top" href="../Downloads/index.html">released</A>, including:
 
 <center>
@@ -342,7 +421,7 @@ Screenshots:
 <tr>
 <td width="50%">
 <dl COMPACT>
-<font size="-1">  
+<font size="-1">
 <dt>General improvements:</dt>
 <dd>
   numerous bugfixes<br>
@@ -360,7 +439,7 @@ Screenshots:
   basic auditory pattern generation<br>
 <!--  greatly simplified convolutions<br>--> <!-- SharedWeightCFProjection -->
   greatly simplified SOM support<br> <!-- now can be mixed and matched with any other components<br> -->
-  more dynamic parameters (such as ExponentialDecay)<br> 
+  more dynamic parameters (such as ExponentialDecay)<br>
   flexible mapping of ConnectionField centers between sheets<br>
 </dd>
 <dt>Example scripts:</dt>
@@ -405,8 +484,8 @@ Screenshots:
 </table>
 </center>
 
-Screenshots: 
-<A target="_top" href="../images/topographica-0.9.3_ubuntu.png">Plotting</A>, 
+Screenshots:
+<A target="_top" href="../images/topographica-0.9.3_ubuntu.png">Plotting</A>,
 <A target="_top" href="../images/topographica-0.9.3_modeleditor_ubuntu.png">Model editor</A>.
 <br><br>
 
@@ -453,8 +532,8 @@ on your platform.
 <br><br>
 
 <p><b>07 June 2006:</b> Version 0.9.0
-<A target="_top" href="../Downloads/index.html">released</A>, including 
-numerous bugfixes, 
+<A target="_top" href="../Downloads/index.html">released</A>, including
+numerous bugfixes,
 context-sensitive (balloon) help for nearly every parameter and control,
 full Windows support (<A target="_top" href="../images/060607_topographica_win_screenshot.png">screenshot</A>),
 full Mac OS X support,
@@ -484,7 +563,7 @@ Topographica</a>.
 <br><br>
 
 <p><b>20 February 2006:</b> Version 0.8.2 released, including numerous
-bugfixes, 
+bugfixes,
 circular receptive fields,
 shared-weight projections,
 <A TARGET="_top" href="../Tutorials/lissom_oo_or.html">tutorial with ON/OFF LGN model</A>,
@@ -494,7 +573,7 @@ density-independent SOM parameters,
 <A TARGET="_top" href="../Downloads/cvs.html#osx">Mac OS X instructions</A>,
 <A TARGET="_top" href="../Developer_Manual/index.html">developer manual</A>,
 <A TARGET="_top" href="../User_Manual/index.html">partial user manual</A>,
-much-improved 
+much-improved
 <A target="_top" href="../images/060220_model_editor_screen_shot.png">model editor</A>,
 <A TARGET="_top" href="../User_Manual/commandline.html#pylab">generic Matlab-style plotting</A>,
 topographic grid plotting,
@@ -502,7 +581,7 @@ RGB plots,
 user-controllable plot sorting,
 plot color keys,
 <!-- Normally distributed random PatternGenerator, -->
-and progress reports during learning.  See the 
+and progress reports during learning.  See the
 <A target="_top" href="../images/060220_topographica_screen_shot.png">Linux screenshot</A>.
 <br><br>
 
