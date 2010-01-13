@@ -1,3 +1,94 @@
+2010-01-09  jbednar
+
+	* [r10846] ChangeLog.txt:
+	  Brought up to date as of 11 Dec 2009
+
+	* [r10845] topo/base/cf.py:
+	  Upgraded alert
+
+2010-01-05  antolikjan
+
+	* [r10844] contrib/surround_analysis.py:
+	  bug
+
+	* [r10843] contrib/surround_analysis.py:
+	  bug
+
+	* [r10842] contrib/surround_analysis.py:
+	  added FREQ parameter
+
+	* [r10841] topo/base/cf.py:
+	  bug correction
+
+2010-01-05  aplebe
+
+	* [r10840] topo/pattern/basic.py:
+	  Minor modification of GaussiansCorner: two additional parameters,
+	  the internal
+	  angle and the control on the intersection points of the two
+	  Gaussians. Now it is
+	  possible to combina e cross shape, as before, and also a corner
+	  shape, with
+	  arbitrary angle. The dafault values of the new parameters
+	  preserve
+	  the behaviour of the previous version of the pattern.
+
+2010-01-04  antolikjan
+
+	* [r10839] contrib/surround_analysis.py:
+	  small changes
+
+2009-12-29  ceball
+
+	* [r10838] topo/base/cf.py,
+	  topo/base/projection.py,
+	  topo/learningfn/optimized.py,
+	  topo/learningfn/projfn.py,
+	  topo/learningfn/som.py,
+	  topo/misc/legacy.py,
+	  topo/responsefn/optimized.py,
+	  topo/sheet/basic.py,
+	  topo/sheet/optimized.py,
+	  topo/tests/testcf.py,
+	  topo/transferfn/optimized.py:
+	  Added flatcfs and made CFIter use it. Adjusted
+	  CFPOF_DivisiveNormalizeL1_opt, CFPLF_Hebbian_opt,
+	  CFPRF_DotProduct_opt, and optimized joint normalization to use
+	  flatcfs. Removed CFProjection's _cfs attribute.
+
+	* [r10837] topo/base/cf.py,
+	  topo/base/projection.py:
+	  Removed MaskedCFIter. CFIter is now MaskedCFIter, unless
+	  ignore_sheet_mask is True. Simplified CFIter.
+
+	* [r10836] topo/base/cf.py,
+	  topo/base/projection.py,
+	  topo/learningfn/optimized.py,
+	  topo/sheet/optimized.py,
+	  topo/transferfn/optimized.py:
+	  CFPOF_DivisiveNormalizeL1_opt, CFPLF_Hebbian_opt, and optimized
+	  joint normalization now respect the sheet mask.
+
+	* [r10835] topo/base/cf.py,
+	  topo/base/projection.py,
+	  topo/projection/basic.py,
+	  topo/sheet/basic.py,
+	  topo/sheet/lissom.py,
+	  topo/sheet/optimized.py,
+	  topo/transferfn/optimized.py:
+	  Moved 'activity masking' into CFIter and made active_units_mask
+	  be a switch for apply_learn_output_fns and weight normalization.
+
+	* [r10834] topo/base/cf.py,
+	  topo/learningfn/optimized.py,
+	  topo/projection/basic.py,
+	  topo/sheet/basic.py,
+	  topo/sheet/optimized.py,
+	  topo/transferfn/optimized.py:
+	  Tried to document the 'activity mask' used to decide whether or
+	  not to apply weights_output_fns. Added ALERTs about sheet mask
+	  being ignored by several functions.
+
 2009-12-11  antolikjan
 
 	* [r10833] contrib/modelfit.py:
