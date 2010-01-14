@@ -61,6 +61,7 @@ from copy import copy, deepcopy
 
 import bisect
 
+# JABALERT: Are these used for anything?
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulation Stopped"
 
