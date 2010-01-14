@@ -26,7 +26,8 @@ from topo.pattern.basic import PatternGenerator,OneDPowerSpectrum
 class Audio(OneDPowerSpectrum):
     """
     Returns the spectral density of a rolling window of the input
-    signal each time it is called. Over time, outputs a spectrogram.
+    audio signal each time it is called. Over time, outputs an audio
+    spectrogram.
     """
 
     filename = Filename(default='sounds/test.wav',constant=True,precedence=0.9,doc="""
