@@ -11,26 +11,38 @@ release.  Changes and new features, already available in the
 <font size="-1">
 <dt>General improvements:</dt>
 <dd>
-  <div class="i2">- <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository</div>
+  <div class="i2">- now supports Python 2.6</div>
+  <div class="i2">- significantly reduced memory consumption (35% less for lissom.ty)</div>
   <div class="i2">- minor bugfixes</div>
-  <div class="i2">- significantly reduced memory consumption (35% for lissom.ty)</div>
+  <div class="i2">- now available as .deb package for Debian and
+  Ubuntu, in addition to .zip and .tar.gz versions, and via
+  'easy_install topographica'</div>
   <div class="i2">- optional
   <A target="_top" href="http://divmod.org/trac/wiki/DivmodPyflakes">PyFlakes</A> package for detecting common Python problems</div>
   <div class="i2">- optional
   <A target="_top" href="http://mpi4py.scipy.org">mpi4py</A> package using OpenMPI for writing parallel applications</div>
 <!--  <div class="i2">- optional (experimental) integration with IDLE; try 'make topographicagui; ./topographicagui'</div> -->
-  <A target="_top" href="http://mpi4py.scipy.org">mpi4py</A> package using OpenMPI for writing parallel applications</div>
-  <div class="i2">- now available as .deb package for Debian and
-  Ubuntu, in addition to .zip and .tar.gz versions, and via
-  'easy_install topographica'</div>
-  <div class="i2">- supports Python 2.6</div>
+  <div class="i2">- <A HREF="../Downloads/git.html">instructions</A>
+  available for checking out Git version of repository</div>
 </dd>
 <br>
 <dt>Command-line and batch:</dt>
 <dd>
   <div class="i2">- -G: dock windows by default</div>
-  <div class="i2">- run_batch: name_time_format and dirname_prefix parameters</div>
-  <div class="i2">- n_bytes,n_conns,print_sizes: display size and memory usage of current network</div>
+  <div class="i2">- <?php classref('topo.command.basic','run_batch')?>:
+  name_time_format and dirname_prefix parameters</div>
+  <div class="i2">-
+  <?php fnref('topo.command.basic','n_bytes')?>,
+  <?php fnref('topo.command.basic','n_conns')?>,
+  <?php fnref('topo.command.basic','print_sizes')?>:
+  display size and memory usage of current network</div>
+</dd>
+<br>
+<dt>GUI:</dt>
+<dd>
+  <div class="i2">- moved progress bars, messages, warnings, and
+  errors into the status bar for each window, to make it clear where
+  the error or status issue arose</div>
 </dd>
 </font>
 </dl>
@@ -38,24 +50,13 @@ release.  Changes and new features, already available in the
 <td width="50%">
 <dl COMPACT>
 <font size="-1">
-<dt>GUI:</dt>
-<dd>
-  <div class="i2">- Moved progress bars, messages, warnings, and
-  errors into the status bar for each window, to make it clear where
-  the error or status issue arose</div>
-</dd>
 <br>
 <dt>Plotting:</dt>
 <dd>
-  <div class="i2">- More joint normalization options
-  ("JointProjections","AllTogether","Individually"), to show 
+  <div class="i2">- more joint normalization options
+  ("JointProjections", "AllTogether", "Individually"), to show 
   relative differences in weight strength and activity</div>
   <div class="i2">- PhaseDisparity plot</div>
-</dd>
-<br>
-<dt>Example scripts:</dt>
-<dd>
-  <div class="i2">-   (examples/)</div>
 </dd>
 <br>
 <dt>Component library:</dt>
@@ -70,13 +71,15 @@ release.  Changes and new features, already available in the
   <?php classref('topo.pattern.basic','OneDPowerSpectrum')?> (for frequency decomposition),
   <?php classref('topo.pattern.audio','Audio')?> (for audio spectrograms)
   </div>
-  <div class="i2">- 5 other pattern families from Hegde and Van
-  Essen 2000 paper are temporarily in contrib/hegdeessen.py; to move
+  <div class="i2">- SpiralGrating, HyperbolicGrating, RadialGrating,
+  ConcentricRings, and ArcCentered pattern families are temporarily in
+  <A HREF="../../contrib/hegdeessen.py">contrib/hegdeessen.py</A>; to move
   to topo.pattern</div>
-  <div class="i2">- Minor changes to PatternGenerator parameter
+  <div class="i2">- minor changes to PatternGenerator parameter
   passing to allow better nesting and composition</div>
-  <div class="i2">- topo.misc.util: linearly_interpolate</div>
-  <div class="i2">- topo.base.arrayutil: clip_upper</div>
+  <div class="i2">- misc:
+  <?php fnref('topo.misc.util','linearly_interpolate')?>,
+  <?php fnref('topo.base.arrayutil','clip_upper')?></div>
 </dd>
 </font>
 </dl>
@@ -143,12 +146,7 @@ release.  Changes and new features, already available in the
   <?php classref('topo.command.pylabplots','fftplot')?> available in
   batch mode.</div>
 </dd>
-</font>
-</dl>
-</td>
-<td width="50%">
-<dl COMPACT>
-<font size="-1">
+<BR>
 <dt>GUI:</dt>
 <dd>
   <div class="i2">- model editor supports non-Sheet EventProcessors
@@ -158,7 +156,12 @@ release.  Changes and new features, already available in the
   (see <?php classref('topo.base.sheet','Sheet')?>.row_precedence)</div>
   </div>
 </dd>
-<br>
+</font>
+</dl>
+</td>
+<td width="50%">
+<dl COMPACT>
+<font size="-1">
 <dt>Example scripts:</dt>
 <dd>
   <div class="i2">- example file for
@@ -171,6 +174,10 @@ release.  Changes and new features, already available in the
   <div class="i2">- allowed saving of local functions and instance
   method calls in snapshots</div>
 </dd>
+<br>
+<br>
+<br>
+<br>
 <br>
 <dt>Component library:</dt>
 <dd>
@@ -228,11 +235,6 @@ that were written for version 0.9.5.</small> </td></tr>
 <!-- EventProcessor.start() run only when Simulation starts, e.g. to allow joint normalization across a Sheet's projections<BR> -->
 
   <div class="i2">- simulation can now be locked to real time</div>
-
-<!--  <div class="i2">- optional XML snapshot
-  <A HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">saving</A> and
-  <A HREF="../Reference_Manual/topo.command.basic-module.html#load_snapshot">loading</A></div>
--->
 
   <div class="i2">- simpler and more complete support for dynamic parameters</div>
 <!-- dynamic parameters now update at most once per simulation time<BR> -->
@@ -313,7 +315,8 @@ that were written for version 0.9.5.</small> </td></tr>
   <div class="i2">- SheetMasks: <?php classref('topo.base.projection','AndMask')?>,
   <?php classref('topo.base.projection','OrMask')?>,
   <?php classref('topo.base.projection','CompositeSheetMask')?></div>
-  <div class="i2">- command: <A HREF="../Reference_Manual/topo.command.analysis-module.html#decode_feature">decode_feature</A> (for estimating perceived values)
+  <div class="i2">- command:
+  <?php fnref('topo.command.analysis','decode_feature')?> (for estimating perceived values)
   (e.g. for calculating aftereffects)</div>
   <div class="i2">- functions for analyzing V1 complex cells</div>
   <div class="i2">- <?php classref('topo.base.functionfamily','PipelineOF')?> OutputFns can now be constructed easily using +</div>
