@@ -62,5 +62,5 @@ keep up with all of the changes.
 HREF="http://nn.cs.utexas.edu/area-view.php?RECORD_KEY%28Areas%29=AreaID&AreaID(Areas)=11">
 research pages</a> for results from simulations run with Topographica
 and related tools, and our <A target="_top"
-HREF="http://computationalmaps.org">new book</A> for more details.
+HREF="http://computationalmaps.org">2005 book</A> for more details.
 
