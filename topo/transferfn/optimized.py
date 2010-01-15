@@ -76,16 +76,20 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
 
                     double total = PyFloat_AsDouble(sum_obj); // sum of the cf's weights
 
-                    int rr1 = *slice++;
-                    int rr2 = *slice++;
-                    int cc1 = *slice++;
-                    int cc2 = *slice;
+                    if( total > 0.0000000000001 ) {
 
-                    // normalize the weights
-                    double factor = 1.0/total;
-                    int rc = (rr2-rr1)*(cc2-cc1);
-                    for (int i=0; i<rc; ++i) {
-                        *(wi++) *= factor;
+                        int rr1 = *slice++;
+                        int rr2 = *slice++;
+                        int cc1 = *slice++;
+                        int cc2 = *slice;
+    
+                        // normalize the weights
+                        double factor = 1.0/total;
+                        int rc = (rr2-rr1)*(cc2-cc1);
+                        for (int i=0; i<rc; ++i) {
+                            *(wi++) *= factor;
+                        }
+
                     }
 
                     // Anything obtained with PyObject_GetAttrString must be explicitly freed
@@ -122,13 +126,15 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
         the value it would have has been changed.
         """
         # CEBALERT: fix this here and elsewhere
+	import param
         if type(self.single_cf_fn) is not IdentityTF:
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
             for cf,i in iterator():
                 current_sum=cf.norm_total
-                factor = norm_value/current_sum
-                cf.weights *= factor
+		if current_sum > 0.0000000000001:
+                    factor = norm_value/current_sum
+                    cf.weights *= factor
                 del cf.norm_total
 
 
