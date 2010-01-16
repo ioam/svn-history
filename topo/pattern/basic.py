@@ -867,109 +867,179 @@ class Translator(PatternGenerator):
 
 
 # how much preprocessing to offer? E.g. Offer to remove DC? Etc.
+# BK-NOTE: whats DC when its at home?
 class OneDPowerSpectrum(PatternGenerator):
+    
     """
     Returns the spectral density of a rolling window of the input
     signal each time it is called. Over time, outputs a spectrogram.
     """
 
-    window_length = param.Number(default=4,constant=True,doc="""
-        The most recent portion of the signal on which to perform the
-        Fourier transform, in units of 1/sample_rate.
+    ### DEFAULT VALUES
+    
+    # length of sliding window which we spectrally decompose at each step
+    window_length = param.Number ( 
+                                    default = 4,
+                                    constant = True,
+                                    doc = """The most recent portion of the 
+                                          signal on which to perform the Fourier 
+                                          transform, in units of 1/sample_rate.
 
-        The Fourier transform algorithm is most efficient for powers
-        of 2 (or can be decomposed into small prime factors - see
-        numpy.fft.rfft).""")
+                                          The Fourier transform algorithm is most 
+                                          efficient for powers of 2 (or can be 
+                                          decomposed into small prime factors - see
+                                          numpy.fft.rfft)."""
+                                 )
 
-    window_overlap = param.Number(default=1,constant=True,doc="""
-        The amount of overlap between each window, in units of 
-        1/sample_rate.""")
+    # how much the next window overlaps the previous one
+    window_overlap = param.Number ( 
+                                     default = 0,
+                                     constant = True,
+                                     doc = """The amount of overlap between each window,
+                                           in units of 1/sample_rate."""
+                                  )
 
-    sample_rate = param.Number(default=100,constant=True,doc="""
-        Defines the unit for frequency.""")
+    # sample rate is the discrete num of samples per second
+    sample_rate = param.Number (
+                                  default = 100,
+                                  constant = True,
+                                  doc = """Defines the unit for frequency."""
+                               )
 
-    windowing_function = param.Parameter(default=numpy.hanning,constant=True,doc="""
-        This function is multiplied with the window most recent portion of the waveforminterval of signal before
-        performing the Fourier transform (i.e. it is used to shape the
-        interval).
+    windowing_function = param.Parameter ( 
+                                            default = numpy.hanning,
+                                            constant = True,
+                                            doc = """This function is multiplied with 
+                                                  the window most recent portion of the 
+                                                  waveform interval of signal before
+                                                  performing the Fourier transform (i.e. 
+                                                  it is used to shape the interval).
 
-        The function chosen here dictates the tradeoff between
-        resolving comparable signal strengths with similar
-        frequencies, and resolving disparate signal strengths with
-        dissimilar frequencies.
+                                                  The function chosen here dictates the 
+                                                  tradeoff between resolving comparable 
+                                                  signal strengths with similar frequencies,
+                                                  and resolving disparate signal strengths 
+                                                  with dissimilar frequencies.
 
-        numpy provides a number of options, e.g. bartlett, blackman,
-        hamming, hanning, kaiser; see
-        http://docs.scipy.org/doc/numpy/reference/routines.window.html. You
-        can also supply your own.""")
+                                                  numpy provides a number of options, 
+                                                  e.g. bartlett, blackman, hamming, hanning, kaiser; 
+                                                  see http://docs.scipy.org/doc/numpy/reference/routines.window.html
+                                                  You can also supply your own."""
+                                         )
 
-    min_frequency = param.Number(default=1,doc="""
-        Smallest frequency for which to return an amplitude.""")
+    min_frequency = param.Number ( 
+                                    default = 20,
+                                    doc = """Smallest frequency for which to return an amplitude."""
+                                 )
 
-    max_frequency = param.Number(default=10,doc="""
-        Largest frequency for which to return an amplitude.""")
-
-
-    def __init__(self,signal=[1]*24,**params):
-        super(OneDPowerSpectrum,self).__init__(**params)
+    max_frequency = param.Number ( 
+                                    default = 20000,
+                                    doc = """Largest frequency for which to return an amplitude."""
+                                 )
+    
+    
+    ### DEFINITIONS
+    
+    def __init__(self, signal = [1] * 24, **params):
+    
+        super(OneDPowerSpectrum, self).__init__(**params)
         self._initialize_window_parameters(signal)
-
+        
+        
 
     @as_uninitialized
-    def _initialize_window_parameters(self,signal,**params):
+    def _initialize_window_parameters(self, signal, **params):
+       
         # CEBALERT! For subclasses: to specify the values of
         # parameters on this, the parent class, subclasses might first
         # need access to their own parameter values. Having the window
         # initialization in this separate method allows subclasses to
         # make the usual super.__init__(**params) call.
-        for n,v in params.items():
-            setattr(self,n,v)
-
-        self._window_samples = int(self.window_length*self.sample_rate)
-        self._overlap_samples = int(self.window_overlap*self.sample_rate)
+        for n, v in params.items():
+            setattr(self, n, v)
         
-        self.signal = numpy.asarray(signal,dtype=numpy.float32)
-        assert len(self.signal)>0 
+        # get a float32 array of the frames of the input signal
+        self.signal = numpy.asarray(signal, dtype = numpy.float32)
+        
+        # make sure the array isnt empty ..
+        assert len(self.signal) > 0
+        
+        self._overlap_samples = int(self.window_overlap * self.sample_rate)
 
+        self._window_samples = int(self.window_length * self.sample_rate)
+        
+        self.smoothing_window = self.windowing_function(self._window_samples)  
+         
+        # get the frequencies back from a fft
+        self._all_frequencies = numpy.fft.fftfreq( self._window_samples, d = 1.0 / self.sample_rate )[0 : self._window_samples / 2]
+        
+        # depends on numpy.fftfreq ordering
+        assert self._all_frequencies.min() >= 0
+        
+        # set the 'current position in sound file' pointer to the start
         self.location = 0
         
-        self._all_frequencies = numpy.fft.fftfreq(
-            self._window_samples,
-            d=1.0/self.sample_rate)[0:self._window_samples/2]
+        # this is used by _create_indices when initialising the spectrogram array
+        self._first_run = True
 
-        assert self._all_frequencies.min()>=0 # depends on numpy.fftfreq ordering
-
-        self.smoothing_window = self.windowing_function(self._window_samples)  
+        
 
 
-    def _create_indices(self,p):
+    def _create_indices(self, p):
+    
         # given all the constant params, could do some caching
 
-        if not self._all_frequencies.min()<=p.min_frequency or not self._all_frequencies.max()>=p.max_frequency:
-            raise ValueError("Specified frequency interval [%s,%s] is unavailable (actual interval is [%s,%s]. Adjust sample_rate and/or window_length."%(p.min_frequency,p.max_frequency,self._all_frequencies.min(),self._all_frequencies.max()))
+        # verify returned frequencies fall within the specified [min : max] range
+        if not self._all_frequencies.min() <= p.min_frequency or not self._all_frequencies.max() >= p.max_frequency:
+            raise ValueError ( 
+                                "Specified frequency interval [%s,%s] is unavailable (actual interval is [%s,%s]. Adjust sample_rate and/or window_length."
+                                %( p.min_frequency, p.max_frequency, self._all_frequencies.min(), self._all_frequencies.max() )
+                             )
+        
+        # set up a sheet to populate
+        shape = SheetCoordinateSystem(p.bounds, p.xdensity, p.ydensity).shape
 
-        shape = SheetCoordinateSystem(p.bounds,p.xdensity,p.ydensity).shape
-
-        # index of closest to minimum and maximum
-        mini = numpy.nonzero(self._all_frequencies>=p.min_frequency)[0][0]
-        maxi = numpy.nonzero(self._all_frequencies<=p.max_frequency)[0][-1]
-
-        self._frequency_indices=self._generate_frequency_indices(mini,maxi,shape[0])#row
+        # indices of those frequences from the fft closest to user defined minimum and maximum
+        mini = numpy.nonzero(self._all_frequencies >= p.min_frequency)[0][0]
+        maxi = numpy.nonzero(self._all_frequencies <= p.max_frequency)[0][-1]
+        
+        # frquency indicies, ie num of rows
+        self._frequency_indices = self._generate_frequency_indices(mini, maxi, shape[0])
         self.frequencies = self._all_frequencies[self._frequency_indices]
 
         # How many times to repeat the 1d output for the specified 2d bounds.
         # Probably a better alternative would be to treat the second
         # dimension as a rolling queue, i.e. a temporal buffer.
-        self._column_repeat = shape[1]#col
-        if self._column_repeat > 1:
-            self.warning("Shape mismatch: 1D output will be repeated to fill the array.")
+        
+        # BK-TODO: temporal buffer calculation goes here
+        self._column_repeat = shape[1] # column
+                
+        # initalise a new, empty, spectrogram of the size of the sheet
+        # ie implicitly control buffer size through sheet size 
+        if self._first_run:
+            self._spectrogram = numpy.zeros(shape, dtype = numpy.float32)
+            self._first_run = False
+                
+        # no longer necessary, cochlea is meant to repeat
+        #if self._column_repeat > 1:
+            #self.warning("Shape mismatch: 1D output will be repeated to fill the array.")
 
-    def _generate_frequency_indices(self,mini,maxi,length):
-        # linear selection
-        return numpy.linspace(mini,maxi,num=length,endpoint=True).astype(int)
+
+
     # CEBALERT: space function should probably be a parameter
+    # BK-TODO: see cebalert above
+    # BK-TODO: approximate cochlear map is very easy but we need to define our own space.
+    #           again, not hard or long, just not currently a priority
+    def _generate_frequency_indices(self, mini, maxi, length):
+        
+        # stretch data over linear space between mini and maxi, with number of samples num.
+        # endpoint = true means last point is maxi, not some multiple of num closest to maxi
+        return numpy.linspace(mini, maxi, num = length, endpoint = True).astype(int)
 
-    def __call__(self,**params_to_override):
+
+
+    def __call__(self, **params_to_override):
+        
         """
         Perform a real Discrete Fourier Transform (DFT; implemented
         using a Fast Fourier Transform algorithm, FFT) of the current
@@ -977,17 +1047,32 @@ class OneDPowerSpectrum(PatternGenerator):
 
         See numpy.rfft for information about the Fourier transform.
         """
-        p = ParamOverrides(self,params_to_override)
+        
+        # override defaults with user defined parameters
+        p = ParamOverrides(self, params_to_override)
+        
+        # set up indices for frequencies
         self._create_indices(p)
 
-        self.location+=self._window_samples
-        end = self.location-self._overlap_samples
-        start = end-self._window_samples
+        # move the 'current position in sound file' pointer up a notch
+        self.location += self._window_samples
+        
+        # calculate the sliding window start and end positions
+        end = self.location - self._overlap_samples
+        start = end - self._window_samples
 
+        # if there's not enough signal come in yet to fill sliding window
         if start < 0:
-            # enough signal hasn't yet passed through to fill window
+            
+            # fill an array the size of the smoothing window with zeros
             signal_sample = numpy.zeros(self.smoothing_window.shape)
+            
+            # BK-NOTE: why are we doing this? if the window is empty does it
+            #           not make sense to simply call ourselves again till 
+            #           this condition is false?
+            
         elif end > self.signal.size:
+        
             # Could loop around and print warning. 
 
             # Consider how to provide good support for the presumably
@@ -1000,19 +1085,28 @@ class OneDPowerSpectrum(PatternGenerator):
             # do that, and eventually that would allow mixing of
             # signals too.
             raise ValueError("Reached the end of the signal.")
+            
         else:
-            signal_sample = self.signal[start:end]
+        
+            # take our snippit of signal ...
+            signal_sample = self.signal[start : end]
+        
+        
+        # ... and do a fft on it for amplitudes
+        # BK-NOTE: ask Chris why we're only keeping half ..
+        all_amplitudes = numpy.abs( numpy.fft.rfft(signal_sample * self.smoothing_window) )[0 : len(signal_sample) / 2]
+        amplitudes = all_amplitudes[self._frequency_indices].reshape( len(self._frequency_indices), 1 )
+        
+        # add on latest spectral information to the rightmost edge
+        self._spectrogram = numpy.hstack((self._spectrogram, amplitudes))
+                
+        # knock off the column on the left most edge
+        temporary_spectogram = self._spectrogram.copy()
+        self._spectrogram = temporary_spectogram[0: , 1:]
 
-        all_amplitudes = numpy.abs(numpy.fft.rfft(
-                signal_sample*self.smoothing_window))[0:len(signal_sample)/2]
-
-        amplitudes = all_amplitudes[self._frequency_indices].reshape((len(self._frequency_indices),1))
-
-        # tile to get a 2d array where the 1 column is repeated; see
-        # comment by self._column_repeat
-        return numpy.tile(amplitudes,(1,self._column_repeat))
-
-
-
+        return self._spectrogram
+        # tile to get a 2d array where the 1 column is repeated; 
+        # see comment by self._column_repeat
+        #return numpy.tile( amplitudes, (1, self._column_repeat) )
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,PatternGenerator)]))
