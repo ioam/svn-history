@@ -82,6 +82,16 @@ elif dataset=="Natural":
 disk_scale=locals().get('diskscale',0.35)
 reg=locals().get('Region',1.0)
 
+disk_scale=locals().get('diskscale',0.35)
+input_type=topo.pattern.basic.Composite
+noisy_disks=input_type(operator=numpy.add,x=UniformRandom(lbound=-reg,ubound=reg,seed=12),
+             y=UniformRandom(lbound=-reg,ubound=reg,seed=36),
+             generators=[topo.pattern.basic.Disk(
+             size=0.5, aspect_ratio=1.0, scale=RingScale,
+             offset=0.5,
+             bounds=BoundingBox(radius=2.125), smoothing=0.1),
+             topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',-0.5), scale=locals().get('rand_scale',0.3))])
+
 ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-reg,ubound=reg,seed=12),
                                                             y=UniformRandom(lbound=-reg,ubound=reg,seed=36),
                        generators=[topo.pattern.basic.Ring(size=0.5, aspect_ratio=1.0, scale=locals().get('RingScale',0.25),thickness=locals().get('Thickness',0.01),
@@ -92,6 +102,7 @@ ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-r
  
 
 retinal_waves=Expander(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
+retinal_waves1=Expander(generator=noisy_disks,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
 
 
 zeroInput = topo.pattern.basic.Null();
@@ -153,7 +164,7 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
                                 nominal_bounds=BoundingBox(radius=core_size+0.25+0.375+0.25))
 
 topo.sim['FakeRetina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=retinal_waves,  
+                                  input_generator=retinal_waves1,  
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=core_size+0.25+0.25))
 
@@ -189,7 +200,7 @@ on_weights = topo.pattern.basic.Composite(
 off_weights = topo.pattern.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
-if False:
+if True:
     topo.sim.connect('FakeRetina','LGNOn',delay=0.05,
                         connection_type=SharedWeightCFProjection,strength=2.33,
                         nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOnAfferent1',
@@ -324,7 +335,7 @@ def secondStage():
     topo.sim['FakeRetina'].set_input_generator(zeroInput)
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
-    randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.1))
+    #randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.1))
     
 from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand
 FeatureMaps.num_orientation=16
