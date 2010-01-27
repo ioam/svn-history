@@ -1,15 +1,51 @@
-## Dependencies for Ubuntu 9.04
-## ============================
-##
-## $ sudo apt-get install python python-dev python-numpy python-gmpy python-matplotlib python-scipy ipython python-tk python-imaging python-imaging-tk
-## 
-##
-## Dependencies for MacPorts on OS X 10.6
-## ======================================
-## 
-## $ sudo port install python25 py25-tkinter py25-numpy py25-matplotlib py25-pil py25-scipy py25-ipython
-## $ sudo port install python_select
-## $ sudo port python_select python25
+"""
+Required Dependencies
+=====================
+
+Below are the requirements for Topographica. Packages are listed with
+the version we normally use, followed by other versions we expect
+would work (but have not necessarily tested).
+
+* Python 2.6 (with Tkinter to get the GUI)
+Python 2.5 
+
+* NumPy 1.3
+NumPy>=1.0
+
+* Matplotlib 0.99 (with support for Tkinter for GUI)
+Matplotlib 0.91
+
+* Imaging (PIL) (with support for Tkinter for GUI)
+PIL>=1.1.4
+
+* SciPy 0.7
+SciPy>=0.3 (must be compatible with NumPy version)
+
+* IPython 0.10
+IPython>0.8
+
+* gmpy >=1.01 OR * fixedpoint 0.1.2
+
+
+
+Ubuntu 9.04
+-----------
+
+$ sudo apt-get install python python-dev python-numpy python-gmpy python-matplotlib python-scipy ipython python-tk python-imaging python-imaging-tk
+
+
+MacPorts on Mac OS X 10.6
+-------------------------
+
+$ sudo port install python26 py26-numpy py26-matplotlib py26-pil py26-scipy py26-ipython gmp python_select
+$ sudo port python_select python26
+$ curl http://gmpy.googlecode.com/files/gmpy-1.10.zip > gmpy-1.10.zip
+$ open gmpy-1.10.zip; rm gmpy-1.10.zip
+$ cd gmpy-1.10/; sudo python setup.py install
+
+
+
+"""
 
 _topographica_devs='Topographica Developers'
 _topographica_devs_email='developers[at]topographica[dot]org'

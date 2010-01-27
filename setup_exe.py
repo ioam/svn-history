@@ -1,7 +1,7 @@
 """
 py2exe build script for Topographica.
 
-Work in progress
+** Work in progress **
 
 Usage:
     python setup.py py2exe

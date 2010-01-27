@@ -3,7 +3,7 @@ easy_install build script for Topographica.
 
 (eventually "easy_install topographica")
 
-Work in progress.
+** Work in progress ** 
 
 Usage:
     python setup_ez.py develop

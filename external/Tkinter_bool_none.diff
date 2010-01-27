@@ -1,5 +1,5 @@
---- Python-2.5.1/Lib/lib-tk/Tkinter.py	2006-07-18 18:46:31.000000000 +0100
-+++ Python-2.5.1/Lib/lib-tk/Tkinter.py.new	2008-12-20 15:01:40.000000000 +0000
+--- Python-2.6.4/Lib/lib-tk/Tkinter.py	2006-07-18 18:46:31.000000000 +0100
++++ Python-2.6.4/Lib/lib-tk/Tkinter.py.new	2008-12-20 15:01:40.000000000 +0000
 @@ -321,7 +321,13 @@
  
      def get(self):

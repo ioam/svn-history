@@ -8,13 +8,15 @@ PYSETUP_OPT = --prefix=${PREFIX}
 
 default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy pyflakes
 
+# avoid building some things on some platforms
 # uses touch -a to avoid changing modification dates
 platform-skip:
-# avoid building blt, tcl, and tk on OS X
 ifeq ("$(shell uname -s)","Darwin")
 	touch -a blt
 	touch -a tcl
 	touch -a tk
+# CEBALERT: doesn't stop readline building on mac!
+	touch -a readline
 endif
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
 	touch -a blt
@@ -30,9 +32,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean svn2cl-clean readline-clean termcap-clean guppy-clean pyopenssl-clean foolscap-clean zope_interface-clean twisted-clean mpi4py-clean openmpi-clean pyflakes-clean setuptools-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean svn2cl-clean readline-clean termcap-clean guppy-clean pyopenssl-clean foolscap-clean zope_interface-clean twisted-clean mpi4py-clean openmpi-clean pyflakes-clean setuptools-clean freetype-clean libpng-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall pyopenssl-uninstall foolscap-uninstall zope_interface-uninstall twisted-uninstall mpi4py-uninstall openmpi-uninstall pyflakes-clean setuptools-clean
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall pyopenssl-uninstall foolscap-uninstall zope_interface-uninstall twisted-uninstall mpi4py-uninstall openmpi-uninstall pyflakes-clean setuptools-clean freetype-uninstall libpng-uninstall
 
 
 
@@ -62,14 +64,14 @@ blt-uninstall:
 ##############################################################
 # Python (interpreted language)
 #
-PYTHON = Python-2.5.1
+PYTHON = Python-2.6.4
 
-PYTHON_LIB  = lib/python2.5
-PYTHON_INC  = include/python2.5
-PYTHON_CONF = lib/python2.5/config
+PYTHON_LIB  = lib/python2.6
+PYTHON_INC  = include/python2.6
+PYTHON_CONF = lib/python2.6/config
 
-PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.5 
-PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
+PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.6
+PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.6
 
 
 # LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
@@ -78,28 +80,22 @@ python: ${PYTHON}.tgz tk blt readline
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
 
-# 32-bit/64-bit snapshot patch: topo SF.net #2119256
-# (Patch won't be necessary on 2.6: "The random module’s Random
-# objects can now be pickled on a 32-bit system and unpickled on a
-# 64-bit system, and vice versa. Unfortunately, this change also means
-# that Python 2.6’s Random objects can’t be unpickled correctly on
-# earlier versions of Python. (Contributed by Shawn Ligocki; issue
-# 1727780.)" http://docs.python.org/whatsnew/2.6.html)
-	patch -p0 < Python_64bit_pickle.diff
 # Tkinter: support None in BooleanVar
 	patch -p0 < Tkinter_bool_none.diff
-# IDLE: work with tk 8.5 (see http://bugs.python.org/issue2693).
-# (Patch shouldn't be necessary on 2.6)
-	patch -p0 < idle_tk8.5.patch
 # Configure for specific operating system versions
 ifeq ("$(shell uname -s)","Darwin")
-	patch -p0 < Python_OSX_tk.diff # build python with tcl/tk from /Library/Frameworks
 ifeq ("$(shell uname -r | cut -d . -f 1)","9") # Darwin 9.x == Mac OS X 10.5 (Leopard)
+	patch -p0 < Python_OSX_tk.diff # build python with tcl/tk from /Library/Frameworks
 	cd ${PYTHON}; ./configure --prefix=${PREFIX} MACOSX_DEPLOYMENT_TARGET=10.5
 else
+ifeq ("$(shell uname -r | cut -d . -f 1)","10") # Darwin 10.x == Mac OS X 10.6 (Snow Leopard)
+	cd ${PYTHON}; ./configure --prefix=${PREFIX} MACOSX_DEPLOYMENT_TARGET=10.6 
+else # Darwin pre 9
+	patch -p0 < Python_OSX_tk.diff # build python with tcl/tk from /Library/Frameworks
 	cd ${PYTHON}; ./configure --prefix=${PREFIX}
 endif
-else
+endif
+else # linux
 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
 endif
 	cd ${PYTHON}; env PREFIX=${PREFIX} make EXTRA_CFLAGS=-I${PREFIX}/include
@@ -171,6 +167,44 @@ ipython-uninstall:
 	rm -rf ipython ${IPYTHON} $(foreach f, ${IPYTHON_UNINSTALL}, ${PREFIX}/${f})
 
 
+#############################################################
+# freetype 
+
+FREETYPE = freetype-2.3.9
+# CEBALERT: stuff missing, probably
+FREETYPE_UNINSTALL += lib/libfreetype.* 
+
+freetype: ${FREETYPE}.tar.gz
+	tar -xzf ${FREETYPE}.tar.gz
+	cd ${FREETYPE}; ./configure --prefix=${PREFIX} 
+	make -C ${FREETYPE}
+	make -C ${FREETYPE} install
+	touch freetype
+
+freetype-clean: 
+	rm -rf ${FREETYPE} 
+freetype-uninstall:
+	rm -rf freetype $(foreach f, ${FREETYPE_UNINSTALL}, ${PREFIX}/${f})
+
+
+#############################################################
+# libpng 
+
+LIBPNG = libpng-1.2.40
+# CEBALERT: stuff missing, probably
+LIBPNG_UNINSTALL += lib/liblibpng.* 
+
+libpng: ${LIBPNG}.tar.gz
+	tar -xzf ${LIBPNG}.tar.gz
+	cd ${LIBPNG}; ./configure --prefix=${PREFIX} 
+	make -C ${LIBPNG}
+	make -C ${LIBPNG} install
+	touch libpng
+
+libpng-clean: 
+	rm -rf ${LIBPNG} 
+libpng-uninstall:
+	rm -rf libpng $(foreach f, ${LIBPNG_UNINSTALL}, ${PREFIX}/${f})
 
 
 #############################################################
@@ -187,6 +221,9 @@ JPEG_UNINSTALL += include/jconfig.h include/jerror.h include/jmorecfg.h include/
 
 jpeg: ${JPEG}.tgz
 	tar -xzf ${JPEG}.tgz
+# CEBALERT: for mac!
+	mkdir -p ${PREFIX}/man
+	mkdir -p ${PREFIX}/man/man1
 	cd ${JPEG}; ./configure --prefix=${PREFIX} --enable-shared --enable-static
 	make -C ${JPEG}
 	make -C ${JPEG} test
@@ -229,7 +266,7 @@ pil-uninstall:
 ##############################################################
 # numpy (matrix library)
 #
-NUMPY = numpy-1.2.1
+NUMPY = numpy-1.3.0
 NUMPY_UNINSTALL =  ${PYTHON_LIB}/site-packages/numpy
 
 numpy: ${NUMPY}.tar.gz python
@@ -260,12 +297,13 @@ else
   MATPLOTLIB_DISPLAY=
 endif
 
-matplotlib: ${MATPLOTLIB}.tar.gz python
+matplotlib: ${MATPLOTLIB}.tar.gz python freetype libpng
 	tar -xzf ${MATPLOTLIB}.tar.gz
 # mistakenly included in matplotlib distribution?
-	cd ${MATPLOTLIB}; rm setup.cfg
 # http://thread.gmane.org/gmane.comp.python.matplotlib.devel/7737
-	cd ${MATPLOTLIB}; ${PREFIX}/bin/python setup.py build_ext -L${PREFIX}/lib/
+	cd ${MATPLOTLIB}; rm setup.cfg
+# use env vars because mpl somehow doesn't pass through I and L properly
+	cd ${MATPLOTLIB}; env LDFLAGS="-L${PREFIX}/lib" CFLAGS="-I${PREFIX}/include -I${PREFIX}/include/freetype2 -I${PREFIX}/include/libpng12" ${PREFIX}/bin/python setup.py build_ext -L${PREFIX}/lib/
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py build
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
 	touch matplotlib

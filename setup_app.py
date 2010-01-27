@@ -1,7 +1,8 @@
 """
 py2app build script for Topographica.
 
-Work in progress!
+** Work in progress **
+
 """
 from setuptools import setup
 
@@ -13,16 +14,6 @@ from setuptools import setup
 # ========================
 #
 # $ cd ~/topographica
-# $ mkdir man; mkdir man/man1 # otherwise building libjpeg fails later on!
-# $ cd external/freetype-2.3.9
-# $ ./configure --prefix=/Users/ceball/topographica
-# $ make; make install
-# $ cd ../..
-# (patch as given in https://mail.google.com/mail/#sent/1241b25dfa448c33)
-# $ make
-# $ cd external/setuptools-0.6c9/
-# $ ../../bin/python setup.py install
-# $ cd ../../
 # $ bin/python setup_app.py py2app
 # (fails)
 #
@@ -34,8 +25,6 @@ from setuptools import setup
 # ------------
 #
 # (1) see those listed in _setup.py
-# (2) no py25-gmpy so use fixedpoint (as per Makefile, but "sudo
-# python setup.py install"
 #
 # Building .app
 # -------------
