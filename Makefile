@@ -163,7 +163,7 @@ lint:
 	${PYLINT} topo
 
 lint-base:
-	${PYLINT} topo.base
+	${PYLINT} topo.base | cat
 
 
 # Compare topographica and C++ lissom output
