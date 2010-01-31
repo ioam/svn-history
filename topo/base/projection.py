@@ -367,7 +367,8 @@ class ProjectionSheet(Sheet):
         lesions, etc.""")
 
     # CEBALERT: not sure what to call this, and the default should
-    # actually be False. True to match existing behavior.
+    # actually be False. True to match existing behavior.  Not sure
+    # this parameter is necessary; clean up with NeighborhoodMask.
     # (Plus same comment as mask: why not parameter of sheet?)
     allow_skip_non_responding_units = param.Boolean(default=True,doc="""
         If true, then units that are inactive after the response

@@ -806,10 +806,7 @@ class CFIter(object):
         self.mask = cfprojection.dest.mask
         self.cf_type = cfprojection.cf_type
         self.proj_n_units = cfprojection.n_units
-
-        ### CB: still working here
         self.allow_skip_non_responding_units = cfprojection.dest.allow_skip_non_responding_units
-        ###
 
         self.active_units_mask = active_units_mask
         self.ignore_sheet_mask = ignore_sheet_mask
