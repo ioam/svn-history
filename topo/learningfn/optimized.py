@@ -45,10 +45,10 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
         if single_connection_learning_rate==0:
             return
 
-        cfs = iterator.proj.flatcfs
+        cfs = iterator.flatcfs
         num_cfs = len(cfs)
         irows,icols = input_activity.shape
-        cf_type = iterator.proj.cf_type
+        cf_type = iterator.cf_type
 
         # CEBALERT: this function *always* skips inactive units,
         # because it uses the output_activity directly rather than
@@ -146,7 +146,8 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
     
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
-        cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
+        cfs = iterator.flatcfs
+        num_cfs = len(cfs)
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         if single_connection_learning_rate==0:
             return
@@ -154,7 +155,7 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
         unit_threshold=self.unit_threshold
         
         irows,icols = input_activity.shape
-        cf_type = iterator.proj.cf_type
+        cf_type = iterator.cf_type
         code = c_header + """
             // CEBALERT: should provide a macro for getting offset
 
@@ -175,61 +176,59 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
 
 
             npfloat *x = output_activity;
-            for (int r=0; r<rows; ++r) {
-                PyObject *cfsr = PyList_GetItem(cfs,r);
-                for (int l=0; l<cols; ++l) {
-                    double load = *x++;
-                    double unit_activity= load;
-                    if (load != 0) {
-                        load *= single_connection_learning_rate;
 
-                        PyObject *cf = PyList_GetItem(cfsr,l);
+            for (int r=0; r<num_cfs; ++r) {
+                double load = *x++;
+                double unit_activity= load;
+                if (load != 0) {
+                    load *= single_connection_learning_rate;
 
-                        PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
-                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
-                        PyArrayObject *mask_obj = *((PyArrayObject **)((char *)cf + mask_offset));
-                        
-                        float *wi = (float *)(weights_obj->data);
-                        int *slice = (int *)(slice_obj->data);
-                        float *m = (float *)(mask_obj->data);
-                        
-                        int rr1 = *slice++;
-                        int rr2 = *slice++;
-                        int cc1 = *slice++;
-                        int cc2 = *slice;
-                        
-                        double total = 0.0;
-                        
-                        // modify non-masked weights
-                        npfloat *inpj = input_activity+icols*rr1+cc1;
-                        for (int i=rr1; i<rr2; ++i) {
-                            npfloat *inpi = inpj;
-                            for (int j=cc1; j<cc2; ++j) {
-                                // The mask is floating point, so we have to 
-                                // use a robust comparison instead of testing 
-                                // against exactly 0.0.
-                                if (*(m++) >= 0.000001) {
-                                    *wi += load * *inpi * (unit_activity - unit_threshold);
-                                    if (*wi<0) { *wi = 0;}
-                                    total += fabs(*wi);
-                                }
-                                ++wi;
-                                ++inpi;
+                    PyObject *cf = PyList_GetItem(cfs,r);
+
+                    PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
+                    PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
+                    PyArrayObject *mask_obj = *((PyArrayObject **)((char *)cf + mask_offset));
+
+                    float *wi = (float *)(weights_obj->data);
+                    int *slice = (int *)(slice_obj->data);
+                    float *m = (float *)(mask_obj->data);
+
+                    int rr1 = *slice++;
+                    int rr2 = *slice++;
+                    int cc1 = *slice++;
+                    int cc2 = *slice;
+
+                    double total = 0.0;
+
+                    // modify non-masked weights
+                    npfloat *inpj = input_activity+icols*rr1+cc1;
+                    for (int i=rr1; i<rr2; ++i) {
+                        npfloat *inpi = inpj;
+                        for (int j=cc1; j<cc2; ++j) {
+                            // The mask is floating point, so we have to 
+                            // use a robust comparison instead of testing 
+                            // against exactly 0.0.
+                            if (*(m++) >= 0.000001) {
+                                *wi += load * *inpi * (unit_activity - unit_threshold);
+                                if (*wi<0) { *wi = 0;}
+                                total += fabs(*wi);
                             }
-                            inpj += icols;
+                            ++wi;
+                            ++inpi;
                         }
-                        
-                        // store the sum of the cf's weights
-                        PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
-                        PyObject_SetAttrString(cf,"_norm_total",total_obj);
-                        PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
-                        Py_DECREF(total_obj);
+                        inpj += icols;
                     }
+
+                    // store the sum of the cf's weights
+                    PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
+                    PyObject_SetAttrString(cf,"_norm_total",total_obj);
+                    PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
+                    Py_DECREF(total_obj);
                 }
             }
         """
 
-        inline(code, ['input_activity', 'output_activity','rows', 'cols',
+        inline(code, ['input_activity', 'output_activity','num_cfs',
                       'icols', 'cfs', 'single_connection_learning_rate',
                       'unit_threshold','cf_type'],
                local_dict=locals(),
@@ -263,8 +262,8 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
 
         learning_rate_scaling_factor = self.learning_rate_scaling_factor
 
-        rows,cols = output_activity.shape
-        cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
+        cfs = iterator.flatcfs
+        num_cfs = len(cfs)
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         if single_connection_learning_rate==0:
             return
@@ -273,66 +272,63 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
         code = c_header + """
             npfloat *x = output_activity;
             double *sclr = learning_rate_scaling_factor;
-            for (int r=0; r<rows; ++r) {
-                PyObject *cfsr = PyList_GetItem(cfs,r);
-                for (int l=0; l<cols; ++l) {
-                    double load = *x++;
-                    double  a= *sclr++;
-                    load = load * a;
-                    if (load != 0) {
-                        load *= single_connection_learning_rate;
 
-                        PyObject *cf = PyList_GetItem(cfsr,l);
-                        PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
-                        PyObject *mask_obj    = PyObject_GetAttrString(cf,"mask");
+            for (int r=0; r<num_cfs; ++r) {
+                double load = *x++;
+                double  a= *sclr++;
+                load = load * a;
+                if (load != 0) {
+                    load *= single_connection_learning_rate;
+                    PyObject *cf = PyList_GetItem(cfs,r);
+                    PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
+                    PyObject *mask_obj    = PyObject_GetAttrString(cf,"mask");
 
-                        float *wi = (float *)(((PyArrayObject*)weights_obj)->data);
-                        int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
-                        float *m  = (float *)(((PyArrayObject*)mask_obj)->data);
-                        
-                        int rr1 = *slice++;
-                        int rr2 = *slice++;
-                        int cc1 = *slice++;
-                        int cc2 = *slice;
-                        
-                        double total = 0.0;
-                        
-                        // modify non-masked weights
-                        npfloat *inpj = input_activity+icols*rr1+cc1;
-                        for (int i=rr1; i<rr2; ++i) {
-                            npfloat *inpi = inpj;
-                            for (int j=cc1; j<cc2; ++j) {
-                                // The mask is floating point, so we have to 
-                                // use a robust comparison instead of testing 
-                                // against exactly 0.0.
-                                if (*(m++) >= 0.000001) {
-                                    *wi += load * *inpi;
-                                    total += fabs(*wi);
-                                }
-                                ++wi;
-                                ++inpi;
+                    float *wi = (float *)(((PyArrayObject*)weights_obj)->data);
+                    int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
+                    float *m  = (float *)(((PyArrayObject*)mask_obj)->data);
+
+                    int rr1 = *slice++;
+                    int rr2 = *slice++;
+                    int cc1 = *slice++;
+                    int cc2 = *slice;
+
+                    double total = 0.0;
+
+                    // modify non-masked weights
+                    npfloat *inpj = input_activity+icols*rr1+cc1;
+                    for (int i=rr1; i<rr2; ++i) {
+                        npfloat *inpi = inpj;
+                        for (int j=cc1; j<cc2; ++j) {
+                            // The mask is floating point, so we have to 
+                            // use a robust comparison instead of testing 
+                            // against exactly 0.0.
+                            if (*(m++) >= 0.000001) {
+                                *wi += load * *inpi;
+                                total += fabs(*wi);
                             }
-                            inpj += icols;
+                            ++wi;
+                            ++inpi;
                         }
-
-                        // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                        Py_DECREF(weights_obj);
-                        Py_DECREF(slice_obj);
-                        Py_DECREF(mask_obj);
-                        
-                        // store the sum of the cf's weights
-                        PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
-                        PyObject_SetAttrString(cf,"_norm_total",total_obj);
-                        PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
-                        Py_DECREF(total_obj);
+                        inpj += icols;
                     }
+
+                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                    Py_DECREF(weights_obj);
+                    Py_DECREF(slice_obj);
+                    Py_DECREF(mask_obj);
+
+                    // store the sum of the cf's weights
+                    PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
+                    PyObject_SetAttrString(cf,"_norm_total",total_obj);
+                    PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
+                    Py_DECREF(total_obj);
                 }
             }
             
         """
 
-        inline(code, ['input_activity','learning_rate_scaling_factor', 'output_activity','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
+        inline(code, ['input_activity','learning_rate_scaling_factor', 'output_activity','num_cfs', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
 
 
 class CFPLF_Scaled(CFPLF_PluginScaled):
@@ -354,8 +350,7 @@ class CFPLF_Trace_opt(CFPLearningFn):
         doc="LearningFn that will be applied to each CF individually.")              
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-        rows,cols = output_activity.shape
-        cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
+        cfs = iterator.flatcfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         irows,icols = input_activity.shape
         
@@ -371,63 +366,60 @@ class CFPLF_Trace_opt(CFPLearningFn):
         
         code = c_header + """
             npfloat *x = traces;
-            for (int r=0; r<rows; ++r) {
-                PyObject *cfsr = PyList_GetItem(cfs,r);
-                for (int l=0; l<cols; ++l) {
-                    double load = *x++;
-                    if (load != 0) {
-                        load *= single_connection_learning_rate;
 
-                        PyObject *cf = PyList_GetItem(cfsr,l);
-                        PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
-                        PyObject *mask_obj    = PyObject_GetAttrString(cf,"mask");
+            for (int r=0; r<num_cfs; ++r) {
+                double load = *x++;
+                if (load != 0) {
+                    load *= single_connection_learning_rate;
+                    PyObject *cf = PyList_GetItem(cfs,r);
+                    PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
+                    PyObject *mask_obj    = PyObject_GetAttrString(cf,"mask");
 
-                        float *wi = (float *)(((PyArrayObject*)weights_obj)->data);
-                        int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
-                        float *m  = (float *)(((PyArrayObject*)mask_obj)->data);
-                        
-                        int rr1 = *slice++;
-                        int rr2 = *slice++;
-                        int cc1 = *slice++;
-                        int cc2 = *slice;
-                        
-                        double total = 0.0;
-                        
-                        // modify non-masked weights
-                        npfloat *inpj = input_activity+icols*rr1+cc1;
-                        for (int i=rr1; i<rr2; ++i) {
-                            npfloat *inpi = inpj;
-                            for (int j=cc1; j<cc2; ++j) {
-                                // The mask is floating point, so we have to 
-                                // use a robust comparison instead of testing 
-                                // against exactly 0.0.
-                                if (*(m++) >= 0.000001) {
-                                    *wi += load * *inpi;
-                                    total += fabs(*wi);
-                                }
-                                ++wi;
-                                ++inpi;
+                    float *wi = (float *)(((PyArrayObject*)weights_obj)->data);
+                    int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
+                    float *m  = (float *)(((PyArrayObject*)mask_obj)->data);
+
+                    int rr1 = *slice++;
+                    int rr2 = *slice++;
+                    int cc1 = *slice++;
+                    int cc2 = *slice;
+
+                    double total = 0.0;
+
+                    // modify non-masked weights
+                    npfloat *inpj = input_activity+icols*rr1+cc1;
+                    for (int i=rr1; i<rr2; ++i) {
+                        npfloat *inpi = inpj;
+                        for (int j=cc1; j<cc2; ++j) {
+                            // The mask is floating point, so we have to 
+                            // use a robust comparison instead of testing 
+                            // against exactly 0.0.
+                            if (*(m++) >= 0.000001) {
+                                *wi += load * *inpi;
+                                total += fabs(*wi);
                             }
-                            inpj += icols;
+                            ++wi;
+                            ++inpi;
                         }
-
-                        // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                        Py_DECREF(weights_obj);
-                        Py_DECREF(slice_obj);
-                        Py_DECREF(mask_obj);
-                        
-                        // store the sum of the cf's weights
-                        PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
-                        PyObject_SetAttrString(cf,"norm_total",total_obj);
-                        PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
-                        Py_DECREF(total_obj);
+                        inpj += icols;
                     }
+
+                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                    Py_DECREF(weights_obj);
+                    Py_DECREF(slice_obj);
+                    Py_DECREF(mask_obj);
+
+                    // store the sum of the cf's weights
+                    PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
+                    PyObject_SetAttrString(cf,"norm_total",total_obj);
+                    PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
+                    Py_DECREF(total_obj);
                 }
             }
         """
 
-        inline(code, ['input_activity', 'traces','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
+        inline(code, ['input_activity', 'traces','num_cfs', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
 
 
 provide_unoptimized_equivalent("CFPLF_Trace_opt","CFPLF_Trace",locals())

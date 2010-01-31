@@ -34,20 +34,20 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
     SOM algorithm, the activity should be the neighborhood kernel
     centered around the winning unit, as implemented by KernelMax.
     """
-    # CEBALERT: why isn't this using the iterator? Presumably this means
-    # it's ignoring the sheet mask.
+    # CEBERRORALERT: ignoring the sheet mask
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         # This learning function does not need to scale the learning
         # rate like some do, so it does not use constant_sum_connection_rate()
 
-        cfs = iterator.proj.cfs
+        cfs = iterator.flatcfs
         rows,cols = output_activity.shape
         for r in xrange(rows):
             for c in xrange(cols):
-                out = output_activity[r,c]
+                flati = r*cols+c
+                out = output_activity.flat[flati]
                 if out !=0:
                     rate = learning_rate * out                    
-                    cf = cfs[r,c]
+                    cf = cfs[flati]
                     X = cf.get_input_matrix(input_activity)
                     cf.weights += rate * (X - cf.weights)
 
@@ -126,7 +126,6 @@ class CFPLF_Trace(CFPLearningFn):
         doc="LearningFn that will be applied to each CF individually.")              
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-        cfs = iterator.proj.cfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         single_cf_fn = self.single_cf_fn
         ##Initialise traces to zero if they don't already exist
@@ -162,7 +161,6 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
     outstar_wsum = None
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-        cfs = iterator.proj.cfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
@@ -218,8 +216,6 @@ class HomeoSynaptic(CFPLearningFn):
         and the response of this unit (the unit_activity), governed by
         a per-connection learning rate.
         """
-        
-        cfs = iterator.proj.cfs
         if not hasattr(self,'averages'):
             self.averages = ones(output_activity.shape,Float) * 0.1
             
@@ -251,8 +247,9 @@ class HomeoSynaptic(CFPLearningFn):
             cf.weights *= cf.mask
          
         # For analysis only; can be removed (in which case also remove the initializations above)
-        self.ave_hist.append(self.averages[0][7])
-        self.temp_hist.append (Numeric.sum(abs(cfs[0,7].weights.ravel())))
+# CEBALERT: I changed [0][7] to [0]!
+        self.ave_hist.append(self.averages.flat[0])
+        self.temp_hist.append (Numeric.sum(abs(iterator.flatcfs[0].weights.ravel())))
 
 
 

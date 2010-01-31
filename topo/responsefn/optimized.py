@@ -35,11 +35,11 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
         temp_act = activity
         irows,icols = input_activity.shape
         X = input_activity.ravel()
-        cfs = iterator.proj.flatcfs
+        cfs = iterator.flatcfs
         num_cfs = len(cfs)
-        mask = iterator.proj.dest.mask.data
+        mask = iterator.mask.data
 
-        cf_type = iterator.proj.cf_type
+        cf_type = iterator.cf_type
     
         code = c_header + """
             DECLARE_SLOT_OFFSET(weights,cf_type);
@@ -95,7 +95,7 @@ class CFPRF_DotProduct(CFPRF_Plugin):
 provide_unoptimized_equivalent("CFPRF_DotProduct_opt","CFPRF_DotProduct",locals())
 
 
-
+# CEBERRORALERT: ignores the sheet mask!
 class CFPRF_EuclideanDistance_opt(CFPResponseFn):
     """
     Euclidean-distance response function.
@@ -109,65 +109,63 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
         rows,cols = activity.shape
         irows,icols = input_activity.shape
         X = input_activity.ravel()
-        cfs = iterator.proj.cfs.tolist() # CEBALERT: adjust to use flatcfs
+        cfs = iterator.flatcfs
+        num_cfs = len(cfs)
 
         code = c_header + """
             #include <math.h>
             npfloat *tact = temp_act;
             double max_dist=0.0;
     
-            for (int r=0; r<rows; ++r) {
-                PyObject* cfsr = PyList_GetItem(cfs,r);
-                for (int l=0; l<cols; ++l) {
-                    PyObject *cf = PyList_GetItem(cfsr,l);
-                    PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
-                    
-                    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
-                    int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
-                    
-                    int rr1 = *slice++;
-                    int rr2 = *slice++;
-                    int cc1 = *slice++;
-                    int cc2 = *slice;
+            for (int r=0; r<num_cfs; ++r) {
+                PyObject *cf = PyList_GetItem(cfs,r);
 
-                    npfloat *xj = X+icols*rr1+cc1;
-    
-                    // computes the dot product
-                    double tot = 0.0;
-                    for (int i=rr1; i<rr2; ++i) {
-                        npfloat *xi = xj;                        
-                        float *wi = wj;
-                        for (int j=cc1; j<cc2; ++j) {
-                            double diff = *wi - *xi;
-                            tot += diff*diff;
-                            ++wi;
-                            ++xi;
-                        }
-                        xj += icols;
-                        wj += cc2-cc1;
+                PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
+
+                float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
+                int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
+
+                int rr1 = *slice++;
+                int rr2 = *slice++;
+                int cc1 = *slice++;
+                int cc2 = *slice;
+
+                npfloat *xj = X+icols*rr1+cc1;
+
+                // computes the dot product
+                double tot = 0.0;
+                for (int i=rr1; i<rr2; ++i) {
+                    npfloat *xi = xj;                        
+                    float *wi = wj;
+                    for (int j=cc1; j<cc2; ++j) {
+                        double diff = *wi - *xi;
+                        tot += diff*diff;
+                        ++wi;
+                        ++xi;
                     }
-                    
-                    double euclidean_distance = sqrt(tot); 
-                    if (euclidean_distance>max_dist)
-                        max_dist = euclidean_distance;
-                    
-                    *tact = euclidean_distance;
-                    ++tact;
-                    
-                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                    Py_DECREF(weights_obj);
-                    Py_DECREF(slice_obj);
+                    xj += icols;
+                    wj += cc2-cc1;
                 }
+
+                double euclidean_distance = sqrt(tot); 
+                if (euclidean_distance>max_dist)
+                    max_dist = euclidean_distance;
+
+                *tact = euclidean_distance;
+                ++tact;
+
+                // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                Py_DECREF(weights_obj);
+                Py_DECREF(slice_obj);
             }
             tact = temp_act;
-            for (int r=0; r<rows; ++r) {
-                for (int l=0; l<cols; ++l) {
-                    *tact = strength*(max_dist - *tact);
-                    ++tact;
-                }
+            for (int r=0; r<num_cfs; ++r) {
+                *tact = strength*(max_dist - *tact);
+                ++tact;
             }   
         """
-        inline(code, ['X', 'strength', 'icols', 'temp_act','cfs','cols','rows'], local_dict=locals())
+        inline(code, ['X', 'strength', 'icols', 'temp_act','cfs','num_cfs'],
+               local_dict=locals())
 
 provide_unoptimized_equivalent("CFPRF_EuclideanDistance_opt","CFPRF_EuclideanDistance",locals())

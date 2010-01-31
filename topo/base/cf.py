@@ -817,6 +817,8 @@ class CFIter(object):
 
         # Distribute for now, but see JCALERT next to n_units().
         self.proj_n_units = cfprojection.n_units()
+        
+        self.cf_type = cfprojection.cf_type
 
         self.active_units_mask = active_units_mask
         self.ignore_sheet_mask = ignore_sheet_mask

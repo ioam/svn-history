@@ -31,10 +31,9 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
         TransferFn,DivisiveNormalizeL1(norm_value=1.0),readonly=True)
     
     def __call__(self, iterator, **params):
-        proj = iterator.proj
-        cf_type=proj.cf_type
-        cfs = proj.flatcfs
-        num_cfs = len(proj.flatcfs)
+        cf_type=iterator.cf_type
+        cfs = iterator.flatcfs
+        num_cfs = len(iterator.flatcfs)
         
         # CB: for performance, it is better to process the masks in
         # the C code (rather than combining them before).
