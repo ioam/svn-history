@@ -652,14 +652,12 @@ class CFProjection(Projection):
 
     def n_units(self):
         """Return the number of unmasked units in a typical ConnectionField."""      
-        ### JCALERT! Right now, we take the number of units at the
-        ### center of the cfs matrix.  It would be more reliable to
-        ### calculate it directly from the target sheet density and
-        ### the weight_bounds.  Example:
-        #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
-        rows,cols=self.cfs.shape
-        cf = self.cfs[rows/2,cols/2]
-        return len(cf.mask.ravel().nonzero()[0]) # CB: newer numpy array has .flatnonzero()
+
+        return min(len(self.mask_template.ravel().nonzero()[0]),
+                   # CEBALERT: if the mask_template is bigger than the
+                   # src sheet (e.g.  conn radius bigger than src
+                   # radius), return the size of the source sheet
+                   self.src.shape[0]*self.src.shape[1])
 
 
     def cf(self,r,c):
@@ -972,6 +970,7 @@ class ResizableCFProjection(CFProjection):
         mask_template = _create_mask(self.cf_shape,bounds_template,self.src,
                                     self.autosize_mask,self.mask_threshold)
 
+        self.mask_template = mask_template
         self.nominal_bounds_template = nominal_bounds_template
 
         self.bounds_template = bounds_template
