@@ -147,7 +147,8 @@ class SharedWeightCFProjection(CFProjection):
         # for each cf, and is only used for learning.
         CF = SharedWeightCF(self.__sharedcf,self.src,x=x_cf,y=y_cf, #JUDE ADDED
                             template=self._slice_template,
-                            min_matrix_radius=self.min_matrix_radius)
+                            min_matrix_radius=self.min_matrix_radius,
+                            mask=self.mask_template)
 
         return CF
             
@@ -169,7 +170,7 @@ class SharedWeightCFProjection(CFProjection):
         """
         pass
 
-
+    # CEBERRORALERT: should be cf,i
     def n_bytes(self):
         return self.activity.nbytes + self.__sharedcf.weights.nbytes + \
                sum([cf.input_sheet_slice.nbytes
