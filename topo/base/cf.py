@@ -378,7 +378,7 @@ class CFPLearningFn(param.Parameterized):
 
 
     # JABALERT: Should the learning_rate be a parameter of this object instead of an argument?
-    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         """
         Apply this learning function to the given set of ConnectionFields,
         and input and output activities, using the given learning_rate.
