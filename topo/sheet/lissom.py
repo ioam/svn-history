@@ -371,7 +371,7 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",
     
     # Lateral excitatory learning rate changes
     idss=("" if ids==1 else "/%3.1f"%ids)
-    estr='%s.learning_rate=%%s%s*%s.n_units()'%(LE,idss,LE)
+    estr='%s.learning_rate=%%s%s*%s.n_units'%(LE,idss,LE)
     
     topo.sim.schedule_command(  200*st,estr%'0.12168')
     topo.sim.schedule_command(  500*st,estr%'0.06084')

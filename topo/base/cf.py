@@ -585,6 +585,8 @@ class CFProjection(Projection):
         self.mask_template = _create_mask(self.cf_shape,self.bounds_template,
                                          self.src,self.autosize_mask,
                                          self.mask_threshold)
+
+        self.n_units = self._calc_n_units()
         
         if initialize_cfs:
             self._create_cfs()
@@ -650,7 +652,7 @@ class CFProjection(Projection):
 
 
 
-    def n_units(self):
+    def _calc_n_units(self):
         """Return the number of unmasked units in a typical ConnectionField."""      
 
         return min(len(self.mask_template.ravel().nonzero()[0]),
@@ -803,10 +805,10 @@ class CFIter(object):
         self.activity = cfprojection.dest.activity
         self.mask = cfprojection.dest.mask
         self.cf_type = cfprojection.cf_type
+        self.proj_n_units = cfprojection.n_units
 
         ### CB: still working here
         self.allow_skip_non_responding_units = cfprojection.dest.allow_skip_non_responding_units
-        self.proj_n_units = cfprojection.n_units()
         ###
 
         self.active_units_mask = active_units_mask
@@ -971,6 +973,7 @@ class ResizableCFProjection(CFProjection):
                                     self.autosize_mask,self.mask_threshold)
 
         self.mask_template = mask_template
+        self.n_units = self._calc_n_units()
         self.nominal_bounds_template = nominal_bounds_template
 
         self.bounds_template = bounds_template
