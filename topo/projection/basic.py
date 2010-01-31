@@ -170,11 +170,11 @@ class SharedWeightCFProjection(CFProjection):
         """
         pass
 
-    # CEBERRORALERT: should be cf,i
+
     def n_bytes(self):
         return self.activity.nbytes + self.__sharedcf.weights.nbytes + \
                sum([cf.input_sheet_slice.nbytes
-                    for cf,r,c in CFIter(self)()])
+                    for cf,i in CFIter(self)()])
                    
 
 
