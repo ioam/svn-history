@@ -796,10 +796,25 @@ class CFIter(object):
     ignore_sheet_mask is True, even units excluded by the sheet mask
     will be included.
     """
+    def get_proj(self):
+#        print "access iterator.proj"
+        return self._proj
+
+    def set_proj(self,proj):
+        self._proj = proj
+
+    proj = property(get_proj,set_proj)
+    
     # CB: as noted elsewhere, rename active_units_mask (to e.g.
     # ignore_inactive_units).
     def __init__(self,cfprojection,active_units_mask=False,ignore_sheet_mask=False):
         self.proj = cfprojection
+
+        self.flatcfs = cfprojection.flatcfs
+        self.activity = cfprojection.dest.activity
+        self.mask = cfprojection.dest.mask
+        self.allow_skip_non_responding_units = cfprojection.dest.allow_skip_non_responding_units
+
         self.active_units_mask = active_units_mask
         self.ignore_sheet_mask = ignore_sheet_mask
 
@@ -814,19 +829,19 @@ class CFIter(object):
         
         # dtype for C functions. 
         # could just be flat.
-        return numpy.ones(self.proj.dest.shape,dtype=self.proj.dest.activity.dtype)
+        return numpy.ones(self.activity.shape,dtype=self.activity.dtype)
 
     # CEBALERT: make _
     def get_sheet_mask(self):
         if not self.ignore_sheet_mask:
-            return self.proj.dest.mask.data
+            return self.mask.data
         else: 
             return self.__nomask()
 
     # CEBALERT: make _ (and probably drop '_mask').
     def get_active_units_mask(self):
-        if self.proj.dest.allow_skip_non_responding_units and self.active_units_mask:
-            return self.proj.dest.activity
+        if self.allow_skip_non_responding_units and self.active_units_mask:
+            return self.activity
         else:
             return self.__nomask()
 
@@ -855,14 +870,10 @@ class CFIter(object):
         active_units_mask = self.get_active_units_mask()
         return numpy.logical_and(sheet_mask,active_units_mask)
     
-    # CB: should probably remove this; I don't know if I actually used
-    # it.
-    def get_shape(self):
-        return self.proj.dest.shape
 
     def __call__(self):
         mask = self.get_overall_mask()
-        for i,cf in enumerate(self.proj.flatcfs):
+        for i,cf in enumerate(self.flatcfs):
             if cf is not None:
                 if mask.flat[i]:
                     yield cf,i
