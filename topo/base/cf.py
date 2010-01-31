@@ -796,38 +796,23 @@ class CFIter(object):
     ignore_sheet_mask is True, even units excluded by the sheet mask
     will be included.
     """
-    def get_proj(self):
-#        print "access iterator.proj"
-        return self._proj
-
-    def set_proj(self,proj):
-        self._proj = proj
-
-    proj = property(get_proj,set_proj)
     
     # CB: as noted elsewhere, rename active_units_mask (to e.g.
     # ignore_inactive_units).
     def __init__(self,cfprojection,active_units_mask=False,ignore_sheet_mask=False):
-        self.proj = cfprojection
 
         self.flatcfs = cfprojection.flatcfs
         self.activity = cfprojection.dest.activity
         self.mask = cfprojection.dest.mask
-        self.allow_skip_non_responding_units = cfprojection.dest.allow_skip_non_responding_units
-
-        # Distribute for now, but see JCALERT next to n_units().
-        self.proj_n_units = cfprojection.n_units()
-        
         self.cf_type = cfprojection.cf_type
+
+        ### CB: still working here
+        self.allow_skip_non_responding_units = cfprojection.dest.allow_skip_non_responding_units
+        self.proj_n_units = cfprojection.n_units()
+        ###
 
         self.active_units_mask = active_units_mask
         self.ignore_sheet_mask = ignore_sheet_mask
-
-    # CB: if there were a method on proj to access "dest.activity",
-    # then for MultiprocessorCFProjection, that method would be
-    # overridden to return the appropriate array.  Similarly, a method
-    # on proj to access "dest.mask" would be overridden to return the
-    # appropriate array (the mask having been distributed).
 
     def __nomask(self):
         # return an array indicating all units should be processed 
@@ -850,7 +835,7 @@ class CFIter(object):
         else:
             return self.__nomask()
 
-    # CEBALERT: rename to something like 
+    # CEBALERT: rename?
     def get_overall_mask(self):
         """
         Return an array indicating whether or not each unit should be
