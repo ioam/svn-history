@@ -41,7 +41,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),readonly=True)
     
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         if single_connection_learning_rate==0:
             return
 
@@ -147,7 +147,7 @@ class CFPLF_BCMFixed_opt(CFPLearningFn):
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
         cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
-        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         if single_connection_learning_rate==0:
             return
         
@@ -265,7 +265,7 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
 
         rows,cols = output_activity.shape
         cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
-        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         if single_connection_learning_rate==0:
             return
         
@@ -356,7 +356,7 @@ class CFPLF_Trace_opt(CFPLearningFn):
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
         cfs = iterator.proj.cfs.tolist() # CEBALERT: convert to use flatcfs
-        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         irows,icols = input_activity.shape
         
         if single_connection_learning_rate==0:

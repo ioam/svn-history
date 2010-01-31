@@ -82,7 +82,7 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
 ##        rows,cols = output_activity.shape
 ##
 ##        # JABALERT: Is this correct?
-##      single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+##      single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
 ##
 ##        # avoid evaluating these references each time in the loop
 ##        single_cf_fn = self.single_cf_fn
@@ -127,7 +127,7 @@ class CFPLF_Trace(CFPLearningFn):
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         cfs = iterator.proj.cfs
-        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         single_cf_fn = self.single_cf_fn
         ##Initialise traces to zero if they don't already exist
         if not hasattr(self,'traces'):
@@ -163,7 +163,7 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         cfs = iterator.proj.cfs
-        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
         outstar_wsum = zeros(input_activity.shape)
@@ -236,7 +236,7 @@ class HomeoSynaptic(CFPLearningFn):
         activity_norm = 1.0 + self.beta_n * \
            ((self.averages - self.activity_target)/self.activity_target)
 
-        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
 
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
@@ -279,7 +279,7 @@ class CFPLF_PluginScaled(CFPLearningFn):
             self.learning_rate_scaling_factor = ones(output_activity.shape)
             
         single_cf_fn = self.single_cf_fn
-        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         
         for cf,i in iterator():
             sc_learning_rate = self.learning_rate_scaling_factor.flat[i] * single_connection_learning_rate 

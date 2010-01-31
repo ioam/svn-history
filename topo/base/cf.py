@@ -368,13 +368,13 @@ class CFPLearningFn(param.Parameterized):
     __abstract = True
         
 
-    def constant_sum_connection_rate(self,proj,learning_rate):
+    def constant_sum_connection_rate(self,n_units,learning_rate):
         """ 
         Return the learning rate for a single connection assuming that
         the total rate is to be divided evenly among all the units in
         the connection field.
         """
-        return float(learning_rate)/proj.n_units()
+        return float(learning_rate)/n_units
 
 
     # JABALERT: Should the learning_rate be a parameter of this object instead of an argument?
@@ -400,7 +400,7 @@ class CFPLF_Plugin(CFPLearningFn):
         doc="Accepts a LearningFn that will be applied to each CF individually.")
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
-        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
 
@@ -814,6 +814,9 @@ class CFIter(object):
         self.activity = cfprojection.dest.activity
         self.mask = cfprojection.dest.mask
         self.allow_skip_non_responding_units = cfprojection.dest.allow_skip_non_responding_units
+
+        # Distribute for now, but see JCALERT next to n_units().
+        self.proj_n_units = cfprojection.n_units()
 
         self.active_units_mask = active_units_mask
         self.ignore_sheet_mask = ignore_sheet_mask
