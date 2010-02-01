@@ -37,6 +37,20 @@ clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotl
 uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall pyopenssl-uninstall foolscap-uninstall zope_interface-uninstall twisted-uninstall mpi4py-uninstall openmpi-uninstall pyflakes-clean setuptools-clean freetype-uninstall libpng-uninstall
 
 
+### CEB: working here (testing for buildbot)
+%.tar.gz_extract: %.tar.gz
+	cp $< $<_tmp.tar.gz
+	gunzip $<_tmp.tar.gz
+	tar -xf $<_tmp.tar
+	rm -f $<_tmp.tar
+
+%.tgz_extract: %.tgz
+	cp $< $<_tmp.tgz
+	gunzip -f $<_tmp.tgz
+	tar -xf $<_tmp.tar
+	rm -f $<_tmp.tar
+###
+
 
 ##############################################################
 # libblt: already available on nearly all systems, but some systems
@@ -298,7 +312,8 @@ else
 endif
 
 matplotlib: ${MATPLOTLIB}.tar.gz python freetype libpng
-	tar -xzf ${MATPLOTLIB}.tar.gz
+	make ${MATPLOTLIB}.tar.gz_extract
+#	tar -xzf ${MATPLOTLIB}.tar.gz
 # mistakenly included in matplotlib distribution?
 # http://thread.gmane.org/gmane.comp.python.matplotlib.devel/7737
 	cd ${MATPLOTLIB}; rm setup.cfg
