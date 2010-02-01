@@ -943,3 +943,22 @@ def cfproj_add_flatcfs():
 S.append(cfproj_add_flatcfs)
 
 
+def cfproj_add_n_units():
+    # n_units() -> n_units 
+
+    from topo.base.cf import CFProjection
+
+    def get_n_units(self):
+        try:
+            return self.__dict__['n_units']
+        except KeyError:
+            n = self._calc_n_units()
+            self.__dict__['n_units'] = n
+            
+    def set_n_units(self,n):
+        self.__dict__['n_units'] = n
+
+    type.__setattr__(CFProjection,'n_units',property(get_n_units,set_n_units))
+            
+
+S.append(cfproj_add_n_units)
