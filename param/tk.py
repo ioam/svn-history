@@ -216,6 +216,9 @@ def initialize(external_root=None):
     
     root.tk.call("lappend","auto_path",externaltk_path)
 
+    if T.TkVersion<8.5:
+        root.tk.call("package","require","tile")
+
 
 ########################################
 # CEBALERT: copied from topo.misc.filepath, to make it clear what we
