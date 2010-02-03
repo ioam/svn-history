@@ -21,11 +21,10 @@ from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring
+from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring#,sigmoid
 from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,float_error_ignore
 from topo.misc.numbergenerator import UniformRandom
-
-
+# BK-Note: Why can we not do a from topo.transferfn import DivisiveNormalizeL1?
 
 # Could add a Gradient class, where the brightness varies as a
 # function of an equation for a plane.  This could be useful as a
@@ -866,8 +865,94 @@ class Translator(PatternGenerator):
 
 
 
+class Sigmoid(PatternGenerator):
+    
+    slope = param.Number(default=0.3, bounds=(None,None), softbounds=(-0.5,0.5),
+                     doc=""" """)
+    
+    x_offset = param.Number(default=0.0, bounds=(None,None), softbounds=(-0.5,0.5),
+                     doc=""" """)
+    
+    def function(self, p):
+    
+        with float_error_ignore():
+            return (2.0 / (1.0 + numpy.exp(-2.0 * p.slope * numpy.add(self.pattern_x, p.x_offset)))) - 1.0
+            
+
+class SigmoidedDoGs(PatternGenerator):
+
+    # best freq corresponds to position on the y (freq) axis
+    best_freq = param.Number( default=0, bounds=(None,None), softbounds=(-1.0,1.0),
+                              doc=""" """)
+    
+    # latency corresponds to position on the x (time) axis
+    latency = param.Number( default=-0.2, bounds=(None,None), softbounds=(-1.0,1.0),
+                            doc=""" """)
+
+    response_period = param.Number( default=4.0, bounds=(0.1,None), softbounds=(0.0,5.0),
+                                    doc=""" """)
+                                        
+    response_bandwidth = param.Number( default=2.0, bounds=(0.1,None), softbounds=(0.0,5.0),
+                                       doc=""" """)
+    
+    freq_inhib_bandwidth = param.Number( default=30.0, bounds=(0.1,None), softbounds=(0.0,5.0),
+                                         doc=""" """)
+    
+    post_response_inhib_period = param.Number( default=10.0, bounds=(0.1,None), softbounds=(0.0,5.0),
+                                               doc=""" """)
+
+    sigmoid_slope = param.Number( default=-0.17, bounds=(-1.0,1.0), softbounds=(-1.0,1.0),
+                                  doc=""" """)
+    
+    sigmoid_x_offset = param.Number( default=-0.0, bounds=(None,None), softbounds=(-1.0,1.0),
+                                     doc=""" """)
+                                      
+    def function(self, p):
+                
+        # NOTE - ysigma of a gaussian is its size/2, xsigma is ysigma * aspect_ratio
+        
+        # 1st Difference of Gaussians
+        center_asp_ratio = p.response_period / p.response_bandwidth
+        surround_asp_ratio = p.response_period / p.freq_inhib_bandwidth
+        
+        center_gaussian = Gaussian(size=p.response_bandwidth, aspect_ratio=center_asp_ratio, 
+                                   x=p.latency, y=p.best_freq, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+                                    
+        surround_gaussian = Gaussian(size=p.freq_inhib_bandwidth, aspect_ratio=surround_asp_ratio, 
+                                     x=p.latency, y=p.best_freq, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        
+        diff_of_gaussians = Composite(generators=[center_gaussian, surround_gaussian], operator=numpy.subtract)
+
+
+        # 2nd Difference of Gaussians
+        center_asp_ratio2 = p.post_response_inhib_period / p.response_bandwidth
+        surround_asp_ratio2 = p.post_response_inhib_period / p.freq_inhib_bandwidth
+        
+        time_position = p.latency + p.response_period / 2 + p.post_response_inhib_period / 2
+        
+        center_gaussian2 = Gaussian(size=p.response_bandwidth, aspect_ratio=center_asp_ratio2, 
+                                    x=time_position, y=p.best_freq, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+       
+        surround_gaussian2 = Gaussian(size=p.freq_inhib_bandwidth, aspect_ratio=surround_asp_ratio2, 
+                                      x=time_position, y=p.best_freq, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        
+        diff_of_gaussians2 = Composite(generators=[center_gaussian2, surround_gaussian2], operator=numpy.subtract)
+        
+        
+        # Sigmoid
+        sigmoid = Sigmoid(slope=p.sigmoid_slope, x_offset=p.sigmoid_x_offset)
+        
+        
+        # Combination
+        summed = Composite(generators=[diff_of_gaussians, diff_of_gaussians2], operator=numpy.add)
+        multiplied = Composite(generators=[summed, sigmoid], operator=numpy.multiply)
+        
+        return multiplied()
+
+        
+                
+                                
 # how much preprocessing to offer? E.g. Offer to remove DC? Etc.
-# BK-NOTE: whats DC when its at home?
 class OneDPowerSpectrum(PatternGenerator):
     
     """

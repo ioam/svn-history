@@ -41,7 +41,6 @@ def float_error_ignore():
     seterr(**oldsettings)
 
 
-
 def gaussian(x, y, xsigma, ysigma):
     """
     Two-dimensional oriented Gaussian pattern (i.e., 2D version of a
