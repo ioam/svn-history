@@ -867,11 +867,11 @@ class Translator(PatternGenerator):
 
 class Sigmoid(PatternGenerator):
     
-    slope = param.Number(default=0.3, bounds=(None,None), softbounds=(-0.5,0.5),
-                     doc=""" """)
+    slope = param.Number(default=0.15, bounds=(-1.0,1.0), softbounds=(-1.0,1.0),
+                     doc="""Controls the degree of slope of the sigmoid function""")
     
-    x_offset = param.Number(default=0.0, bounds=(None,None), softbounds=(-0.5,0.5),
-                     doc=""" """)
+    x_offset = param.Number(default=0.0, bounds=(None,None), softbounds=(-10.0,10.0),
+                     doc="""Controls the horizontal position of the generated pattern""")
     
     def function(self, p):
     
@@ -880,66 +880,81 @@ class Sigmoid(PatternGenerator):
             
 
 class SigmoidedDoGs(PatternGenerator):
+    
+    """
+    Generates two differences of Gaussians, labelled A and B, whose composite Gaussians are named
+    A1, A2, B1, and B2 respectively where _1 is the centre Gaussian and _2 the outer Gaussian.
+    
+    These two differences of Gaussians are summed and then multiplied by a sigmoid (logistic) function.
+    """
+    
+    
+    # BK-AudioNote: This is the Best Frequency of Response
+    y_position_A_and_B = param.Number(default=0, bounds=(None,None), softbounds=(-50.0,50.0),
+                                      doc="""The Y Position shared by both Differences of Gaussians A and B""")
+    
+    # BK-AudioNote: This is the Positive Response Latency
+    x_position_A = param.Number(default=-0.2, bounds=(None,None), softbounds=(-100.0,100.0),
+                                doc="""The X Position of the Difference of Gaussians labelled A""")
 
-    # best freq corresponds to position on the y (freq) axis
-    best_freq = param.Number( default=0, bounds=(None,None), softbounds=(-1.0,1.0),
-                              doc=""" """)
+    # BK-AudioNote: This is the Positive Response Period
+    x_width_A = param.Number(default=4.0, bounds=(0.1,None), softbounds=(0.1,30.0),
+                             doc="""The length in X of the Difference of Gaussians labelled A""")
+                             
+    # BK-AudioNote: This is the Response Bandwidth
+    y_width_A1_and_B1 = param.Number(default=2.0, bounds=(0.1,None), softbounds=(0.1,10.0),
+                                     doc="""The length in Y shared by both Gaussians A1 and B1""")
     
-    # latency corresponds to position on the x (time) axis
-    latency = param.Number( default=-0.2, bounds=(None,None), softbounds=(-1.0,1.0),
-                            doc=""" """)
+    # BK-AudioNote: This is the Bandwidth of inhibition for Frequency
+    y_width_A2_and_B2 = param.Number(default=30.0, bounds=(0.1,None), softbounds=(0.1,100.0),
+                                     doc="""The length in Y shared by both Gaussians A2 and B2""")
+   
+    # BK-AudioNote: This is the Period of inhibition for Best Frequency following Positive Response
+    x_width_B = param.Number(default=10.0, bounds=(0.1,None), softbounds=(0.0,50.0),
+                             doc="""The length in X of the Difference of Gaussians labelled B""")
 
-    response_period = param.Number( default=4.0, bounds=(0.1,None), softbounds=(0.0,5.0),
-                                    doc=""" """)
-                                        
-    response_bandwidth = param.Number( default=2.0, bounds=(0.1,None), softbounds=(0.0,5.0),
-                                       doc=""" """)
+    sigmoid_slope = param.Number(default=-0.17, bounds=(-1.0,1.0), softbounds=(-1.0,1.0),
+                                 doc="""Controls the degree of slope of the sigmoid function""")
     
-    freq_inhib_bandwidth = param.Number( default=30.0, bounds=(0.1,None), softbounds=(0.0,5.0),
-                                         doc=""" """)
+    sigmoid_x_offset = param.Number(default=-0.0, bounds=(None,None), softbounds=(-100.0,100.0),
+                                    doc="""Controls the horizontal position of the generated pattern""")
+           
     
-    post_response_inhib_period = param.Number( default=10.0, bounds=(0.1,None), softbounds=(0.0,5.0),
-                                               doc=""" """)
-
-    sigmoid_slope = param.Number( default=-0.17, bounds=(-1.0,1.0), softbounds=(-1.0,1.0),
-                                  doc=""" """)
-    
-    sigmoid_x_offset = param.Number( default=-0.0, bounds=(None,None), softbounds=(-1.0,1.0),
-                                     doc=""" """)
-                                      
     def function(self, p):
                 
         # NOTE - ysigma of a gaussian is its size/2, xsigma is ysigma * aspect_ratio
         
         # 1st Difference of Gaussians
-        center_asp_ratio = p.response_period / p.response_bandwidth
-        surround_asp_ratio = p.response_period / p.freq_inhib_bandwidth
+        center_asp_ratio = p.x_width_A / p.y_width_A1_and_B1
+        surround_asp_ratio = p.x_width_A / p.y_width_A2_and_B2
         
-        center_gaussian = Gaussian(size=p.response_bandwidth, aspect_ratio=center_asp_ratio, 
-                                   x=p.latency, y=p.best_freq, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        center_gaussian = Gaussian(size=p.y_width_A1_and_B1, aspect_ratio=center_asp_ratio, 
+                                   x=p.x_position_A, y=p.y_position_A_and_B, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
                                     
-        surround_gaussian = Gaussian(size=p.freq_inhib_bandwidth, aspect_ratio=surround_asp_ratio, 
-                                     x=p.latency, y=p.best_freq, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        surround_gaussian = Gaussian(size=p.y_width_A2_and_B2, aspect_ratio=surround_asp_ratio, 
+                                     x=p.x_position_A, y=p.y_position_A_and_B, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
         
         diff_of_gaussians = Composite(generators=[center_gaussian, surround_gaussian], operator=numpy.subtract)
 
 
         # 2nd Difference of Gaussians
-        center_asp_ratio2 = p.post_response_inhib_period / p.response_bandwidth
-        surround_asp_ratio2 = p.post_response_inhib_period / p.freq_inhib_bandwidth
+        center_asp_ratio2 = p.x_width_B / p.y_width_A1_and_B1
+        surround_asp_ratio2 = p.x_width_B / p.y_width_A2_and_B2
         
-        time_position = p.latency + p.response_period / 2 + p.post_response_inhib_period / 2
+        time_position = p.x_position_A + p.x_width_A / 2 + p.x_width_B / 2
         
-        center_gaussian2 = Gaussian(size=p.response_bandwidth, aspect_ratio=center_asp_ratio2, 
-                                    x=time_position, y=p.best_freq, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        center_gaussian2 = Gaussian(size=p.y_width_A1_and_B1, aspect_ratio=center_asp_ratio2, 
+                                    x=time_position, y=p.y_position_A_and_B, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
        
-        surround_gaussian2 = Gaussian(size=p.freq_inhib_bandwidth, aspect_ratio=surround_asp_ratio2, 
-                                      x=time_position, y=p.best_freq, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        surround_gaussian2 = Gaussian(size=p.y_width_A2_and_B2, aspect_ratio=surround_asp_ratio2, 
+                                      x=time_position, y=p.y_position_A_and_B, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
         
         diff_of_gaussians2 = Composite(generators=[center_gaussian2, surround_gaussian2], operator=numpy.subtract)
         
         
         # Sigmoid
+        #BK-NOTE: need to adjust the x offset here to the x_position_A + xsigma of the positive bit of a neurons response,
+        # .. once ive made sure the xoffset code in the sigmoid function is actually doing what i think (hope) its doing
         sigmoid = Sigmoid(slope=p.sigmoid_slope, x_offset=p.sigmoid_x_offset)
         
         
@@ -949,7 +964,6 @@ class SigmoidedDoGs(PatternGenerator):
         
         return multiplied()
 
-        
                 
                                 
 # how much preprocessing to offer? E.g. Offer to remove DC? Etc.
