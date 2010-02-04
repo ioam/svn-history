@@ -150,7 +150,7 @@ on the <code>external/</code> directory by doing something like this:
 <pre>
 svn propget svn:ignore external/ > tmp
 emacs tmp   # edit tmp to include the entries above
-svn propset svn:ignore external/ - F tmp
+svn propset svn:ignore external/ -F tmp
 rm tmp
 </pre>
 
