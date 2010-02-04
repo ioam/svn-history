@@ -117,10 +117,10 @@ endif
 	touch python
 
 python-clean: blt-clean
-	rm -rf ${PYTHON} Python-2.4*/
+	rm -rf ${PYTHON} Python-2.4*/ Python-2.5*/
 
 python-uninstall: blt-uninstall
-	rm -rf python ${foreach f,${PYTHON_UNINSTALL}, ${PREFIX}/${f}} Python-2.4*/
+	rm -rf python ${foreach f,${PYTHON_UNINSTALL}, ${PREFIX}/${f}} Python-2.4*/ Python-2.5*/
 
 ##############################################################
 # Tcl (required by Tk GUI toolkit)
