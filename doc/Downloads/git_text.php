@@ -296,17 +296,32 @@ If your repository is on SourceForge, it will be visible on the web:
 http://topographica.git.sourceforge.net/git/gitweb.cgi?p=topographica/NAME
 </pre>
 
-Additionally, others can get a copy of your repository using the
+Others can get a copy of your repository using the
 following commands:
 <pre>
 # copies your repository into NAME/
 $ git clone git://topographica.git.sourceforge.net/gitroot/topographica/NAME
 </pre>
-In the future, they can get your latest changes:
+
+They can see your branches, and then change into your
+<code>newfeature</code> branch:
+
 <pre>
-$ cd NAME/
-$ git pull
+$ git branch -r
+$ git checkout origin/newfeature
 </pre>
+
+In the future, they can get your latest changes with <code>git
+pull</code>, or by rebasing:
+
+<pre>
+$ git checkout master
+$ git fetch origin
+$ git rebase origin
+</pre>
+
+CEBALERT: should add doc about how to get someone's work
+as a branch in your existing git repository.
 
 <!-- Keeping up to date with svn requires rebase; this will make your
 local repository incompatible with the remote one. Can fix this problem
