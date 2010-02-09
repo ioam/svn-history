@@ -222,10 +222,10 @@ topo.sim.run(0) # topog doesn't jointly normalize weights on creation
 
 
 # Topographica learning rate is independent of density
-Af00.learning_rate=alpha_input*Af00.n_units()
-Af01.learning_rate=alpha_input*Af01.n_units()
-LE.learning_rate=alpha_exc*LE.n_units()
-LI.learning_rate=alpha_inh*LI.n_units()
+Af00.learning_rate=alpha_input*Af00.n_units
+Af01.learning_rate=alpha_input*Af01.n_units
+LE.learning_rate=alpha_exc*LE.n_units
+LI.learning_rate=alpha_inh*LI.n_units
 
 
 # Scheduled actions
