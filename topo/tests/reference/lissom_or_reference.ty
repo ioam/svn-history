@@ -171,9 +171,9 @@ LI = topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05")
 
 
 # Topographica learning rate is independent of density
-Af.learning_rate=alpha_input*Af.n_units()
-LE.learning_rate=alpha_exc*LE.n_units()
-LI.learning_rate=alpha_inh*LI.n_units()
+Af.learning_rate=alpha_input*Af.n_units
+LE.learning_rate=alpha_exc*LE.n_units
+LI.learning_rate=alpha_inh*LI.n_units
 
 # Scheduled actions
 add_scheduled_outputfn_changes(topo.sim)

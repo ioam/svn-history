@@ -103,7 +103,7 @@ def add_scheduled_exc_bounds_changes(sim):
 ##     change_bounds = "LE.cf_shape.size=2.0*round(max(exc_rad,min_exc_rad))/BaseN;LE.change_bounds(BoundingBox(radius=exc_rad/BaseN,min_radius=min_exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()"
 
 
-    change_bounds = "LE.change_bounds(BoundingBox(radius=half_odd_array(exc_rad)/BaseN,min_radius=min_exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()"
+    change_bounds = "LE.change_bounds(BoundingBox(radius=half_odd_array(exc_rad)/BaseN,min_radius=min_exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units"
 ##     times = [199,499,999,1999,2999,3999,4999,6499,7999,19999]
     e =     [0.6,0.7,0.8, 0.8, 0.8, 0.6, 0.6, 0.6, 0.6,  0.6]
     
@@ -125,16 +125,16 @@ def add_scheduled_exc_bounds_changes(sim):
 def add_scheduled_exc_Lrate_changes(sim):
     ### Excitatory learning rate changes
     #
-    sim.schedule_command(499,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(499,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*LE.n_units')
 
 
 def add_scheduled_aff_Lrate_changes(sim,pname="Af"):
     ### Afferent learning rate changes
     #
-    sim.schedule_command(499,  'alpha_input=0.0050*acs; %s.learning_rate=alpha_input*%s.n_units()'%(pname,pname))
-    sim.schedule_command(1999, 'alpha_input=0.0040*acs; %s.learning_rate=alpha_input*%s.n_units()'%(pname,pname))
-    sim.schedule_command(3999, 'alpha_input=0.0030*acs; %s.learning_rate=alpha_input*%s.n_units()'%(pname,pname))
-    sim.schedule_command(19999,'alpha_input=0.0015*acs; %s.learning_rate=alpha_input*%s.n_units()'%(pname,pname))
+    sim.schedule_command(499,  'alpha_input=0.0050*acs; %s.learning_rate=alpha_input*%s.n_units'%(pname,pname))
+    sim.schedule_command(1999, 'alpha_input=0.0040*acs; %s.learning_rate=alpha_input*%s.n_units'%(pname,pname))
+    sim.schedule_command(3999, 'alpha_input=0.0030*acs; %s.learning_rate=alpha_input*%s.n_units'%(pname,pname))
+    sim.schedule_command(19999,'alpha_input=0.0015*acs; %s.learning_rate=alpha_input*%s.n_units'%(pname,pname))
 
 
 
