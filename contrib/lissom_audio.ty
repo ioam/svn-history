@@ -80,65 +80,6 @@ p.add (
 
 
 
-class MGBvAfferent(pattern.Composite):
-    """
-    2D cartoon face pattern.
-    
-    The face has a round outline, two eyes and a curved mouth. It is
-    parameterized by the 'happiness' value, which ranges from 1.0
-    (happy, concave) to -1.0 (sad, convex). Happiness 0.0 represents a
-    straight line.
-    """
-
-    happiness = param.Number(default=1.0, bounds=(-1.0, 1.0),
-        precedence=0.60, doc="""
-        Happiness value that determines whether the mouth
-        is concave (happy, positive) or convex
-        (sad, negative).""")
-
-    eyes_smoothing = param.Number(default=3.0*1.21/1.7/24.0,
-        bounds=(0.0, None), softbounds=(0.0, 0.5),
-        precedence=0.61, doc="Width of the Gaussian fall-off of two eyes.")
-
-    face_thickness = param.Number(default=0.002,bounds=(0.0, None), softbounds=(0.0,0.5),
-        precedence=0.62, doc="Thickness (line width) of face.")
-
-    face_smoothing = param.Number(default=0.02, bounds=(0.0, None), softbounds=(0.0, 0.5),
-        precedence=0.63, doc="Width of the Gaussian fall-off of face.")
-
-    mouth_thickness = param.Number(default=0.002,bounds=(0.0, None), softbounds=(0.0,0.5),
-        precedence=0.64, doc="Thickness (line width) of mouth.")
-
-    mouth_smoothing = param.Number(default=0.05, bounds=(0.0, None), softbounds=(0.0, 0.5),
-        precedence=0.65, doc="Width of the Gaussian fall-off of mouth.")
-
-
-    def _advance_pattern_generators(self, generators):
-        """Constructs combined pattern out of the individual ones."""
-
-        sb=1.0 / 24.0
-        mouth_width=20.8 / 2.0
-        mouth_curvature=self.happiness / 2.0 # less height, needs revision
-        mouth_y=-7.5 - 1.5 * self.happiness
-
-        lefteye = pattern.Gaussian(aspect_ratio=1.0, x=-4.5*sb, y=1.0*sb,
-                                   size=self.eyes_smoothing, scale=0.5, offset=0.5059)
-        righteye= pattern.Gaussian(aspect_ratio=1.0, x=4.5*sb, y=1.0*sb,
-                                   size=self.eyes_smoothing, scale=0.5, offset=0.5059)
-        face    = pattern.Ring(aspect_ratio=1.0, x=0.0*sb, y=-3.0*sb,
-                               thickness=self.face_thickness, smoothing=self.face_smoothing,
-                               size=2.0*1.21/1.7*15.0*sb)
-        mouth   = pattern.Curve(x=0.0*sb, y=mouth_y*sb,
-                                size=mouth_width*sb, curvature=mouth_curvature, size_type='constant_width',
-                                thickness=self.mouth_thickness, smoothing=self.mouth_smoothing)
-
-        return [lefteye, righteye, face, mouth]
-
-
-
-
-
-
 
 #BK- LOOKHERE
 projection.CFProjection.cf_shape = pattern.Disk(smoothing = 0.0)
@@ -159,7 +100,7 @@ projection.CFProjection.learning_fn = learningfn.optimized.CFPLF_Hebbian_opt()
 input_pattern = pattern.audio.Audio (
                                         min_frequency = 20, 
                                         max_frequency = 20000, 
-                                        filename = "sounds/testing.wav", 
+                                        filename = "sounds/test.wav", 
                                         sample_window = 0.3,
                                         seconds_per_timestep = 0.1
                                     )
@@ -206,7 +147,15 @@ topo.sim['Cochlea'] = sheet.GeneratorSheet (
                                                 period = 1.0, 
                                                 phase = 0.05
                                            )
-                                           
+
+topo.sim['Test'] = sheet.GeneratorSheet (
+                                                nominal_density = 24.0,
+                                                nominal_bounds = sheet.BoundingBox 
+                                                    (
+                                                        points = ( (-5, -2),
+                                                                   (5, 2) )
+                                                    ),
+                                           )                                           
 
 ### Connections
 

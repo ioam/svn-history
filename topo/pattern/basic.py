@@ -867,18 +867,17 @@ class Translator(PatternGenerator):
 
 class Sigmoid(PatternGenerator):
     
-    offset = param.Number(default=0.5)
+    offset = param.Number(default=0.0)
     
-    scale = param.Number(default=0.5)
+    scale = param.Number(default=1.0)
    
     slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),
                          doc="""Controls the degree of slope of the sigmoid function""")
     
     def function(self, p):
         
-        #with float_error_ignore():
-        sigmoid = (2.0 / (1.0 + numpy.exp(-2.0 * p.slope * self.pattern_y))) - 1.0            
-        print sigmoid
+        with float_error_ignore():
+            sigmoid = (2.0 / (1.0 + numpy.exp(-2.0 * p.slope * self.pattern_y))) - 1.0            
 
         return sigmoid
         
@@ -889,24 +888,9 @@ class SigmoidedDoG(PatternGenerator):
     Generates two differences of Gaussians, labelled A and B, placed at the same y position and
     adjacent x positions.
     """
-
-    # BK-AudioNote: This is the Positive Response Period
-    #width_A = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,10.0),
-    #                       doc="""The length in X of the Difference of Gaussians labelled A (left)""")
     
-    # BK-AudioNote: This is the Period of inhibition for Best Frequency following Positive Response
-    #width_B = param.Number(default=2.0, bounds=(0.1,None), softbounds=(0.0,20.0),
-    #                       doc="""The length in X of the Difference of Gaussians labelled B (right)""")
-                             
-    # BK-AudioNote: This is the Response Bandwidth
-    #height_centre_A_centre_B = param.Number(default=0.5, bounds=(0.1,None), softbounds=(0.1,5.0),
-    #                                        doc="""The length in Y shared by centre Gaussians of both A (left) and B (right)""")
-    
-    # BK-AudioNote: This is the Bandwidth of inhibition for Frequency
-    #height_surround_A_surround_B = param.Number(default=1.5, bounds=(0.1,None), softbounds=(0.1,5.0),
-    #                                            doc="""The length in Y shared by surround Gaussians of both A (left) and B (right)""")
-             
-    
+    x = param.Number(default=-1.5)
+        
     center_size = param.Number(default=0.5, bounds=(0.1,None), softbounds=(0.1,5.0),
                                doc=""" """)
     
@@ -919,9 +903,12 @@ class SigmoidedDoG(PatternGenerator):
     surround_aspect_ratio = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),
                                          doc=""" """)
     
-    sigmoid_slope = param.Number(default=10, bounds=(None,None), softbounds=(-100.0,100.0),
+    sigmoid_slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),
                                  doc=""" """)
-                             
+    
+    sigmoid_x = param.Number(default=0.0, bounds=(None,None), softbounds=(-1.0,1.0),
+                                 doc=""" """)
+                                                          
     def function(self, p):
         
         center_gaussian = Gaussian(size=p.center_size, aspect_ratio=p.center_aspect_ratio, orientation=p.orientation, 
@@ -933,11 +920,7 @@ class SigmoidedDoG(PatternGenerator):
         diff_of_gaussians = Composite(generators=[center_gaussian, surround_gaussian], operator=numpy.subtract,#)
                              xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)
         
-        sigmoid = Sigmoid(slope=p.sigmoid_slope, x=p.x+(p.center_size/2)*p.center_aspect_ratio, y=p.y, orientation=pi/2)
-        
-        print "--------------------------------------------"
-        print sigmoid()
-        print "--------------------------------------------"
+        sigmoid = Sigmoid(slope=p.sigmoid_slope, x=p.sigmoid_x+p.x+(p.center_size/2)*p.center_aspect_ratio, y=p.y, orientation=pi/2)
 
 
         combined = Composite(generators=[diff_of_gaussians, sigmoid], operator=numpy.multiply,
@@ -946,39 +929,6 @@ class SigmoidedDoG(PatternGenerator):
         return combined()
 
 
-        # NOTE - ysigma of a gaussian is its size/2, xsigma is ysigma * aspect_ratio
-        
-        # 1st Difference of Gaussians
-        #center_asp_ratio = p.width_A / p.height_centre_A_centre_B
-        #surround_asp_ratio = p.width_A / p.height_surround_A_surround_B
-        
-        #center_gaussian = Gaussian(size=p.height_centre_A_centre_B, aspect_ratio=center_asp_ratio, 
-        #                           x=p.x, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
-                                    
-        #surround_gaussian = Gaussian(size=p.height_surround_A_surround_B, aspect_ratio=surround_asp_ratio, 
-        #                             x=p.x, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
-        
-        #diff_of_gaussians = Composite(generators=[center_gaussian, surround_gaussian], operator=numpy.subtract)
-
-
-        # 2nd Difference of Gaussians
-        #center_asp_ratio2 = p.width_B / p.height_centre_A_centre_B
-        #surround_asp_ratio2 = p.width_B / p.height_surround_A_surround_B
-        
-        #x_position = p.x + p.width_A / 2.0 + p.width_B
-        
-        #center_gaussian2 = Gaussian(size=p.height_centre_A_centre_B, aspect_ratio=center_asp_ratio2, 
-        #                            x=x_position, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
-       
-        #surround_gaussian2 = Gaussian(size=p.height_surround_A_surround_B, aspect_ratio=surround_asp_ratio2, 
-        #                              x=x_position, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
-        
-        #diff_of_gaussians2 = Composite(generators=[center_gaussian2, surround_gaussian2], operator=numpy.subtract)
-        
-        
-        # Combination
-        #return Composite(generators=[diff_of_gaussians, diff_of_gaussians2], operator=numpy.subtract,
-        #                 xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
                 
                                 
 # how much preprocessing to offer? E.g. Offer to remove DC? Etc.
