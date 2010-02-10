@@ -866,152 +866,126 @@ class Translator(PatternGenerator):
 
 
 class Sigmoid(PatternGenerator):
-    
     """
-    Generates a Sigmoid function 
+    Two-dimensional sigmoid pattern, dividing the plane into positive and negative
+    halves with a smoothly sloping transition between them.
     """
     
-    offset = param.Number(default=0.0)
-    
-    scale = param.Number(default=1.0)
-   
-    slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),
-                         doc="""Controls the degree of slope of the sigmoid function""")
+    slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),doc="""
+        Multiplicative parameter controlling the smoothness of the transition 
+        between the two regions; high values give a sharp transition.""")
+
     
     def function(self, p):
-        
         with float_error_ignore():
             sigmoid = (2.0 / (1.0 + numpy.exp(-2.0 * p.slope * self.pattern_y))) - 1.0            
-
         return sigmoid
+
         
 
 class SigmoidedDoG(PatternGenerator):
-    
     """
-    Generates a difference of Gaussians function and a Sigmoid function, 
-    and returns a multiplicative composite of the two.
+    Sigmoid multiplicatively combined with a difference of Gaussians,
+    such that one part of the plane can be the mirror image of the other.
     """
-    
+
+    # JABALERT: It would be better to have a default of zero for this composite pattern,
+    # and instead to offset the component parts, so that someone can
+    # easily place this pattern wherever they need to
     x = param.Number(default=-1.5)
         
-    center_size = param.Number(default=0.5, bounds=(0.1,None), softbounds=(0.1,5.0),
-                               doc="""Adjusts the sigmas of the center gaussian, ysigma=size/2""")
+    center_size = param.Number(default=0.5, bounds=(0.1,None), softbounds=(0.1,5.0),doc="""
+        size parameter for the center Gaussian.""")
     
-    center_aspect_ratio = param.Number(default=2.0, bounds=(0.1,None), softbounds=(0.1,5.0),
-                                       doc="""Adjusts the x sigma of the center gaussian, xsigma=ysigma*aspectratio""")
+    center_aspect_ratio = param.Number(default=2.0, bounds=(0.1,None), softbounds=(0.1,5.0),doc="""
+        aspect_ratio parameter for the center Gaussian.""")
     
-    surround_size = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),
-                                 doc="""Adjusts the sigmas of the surround gaussian, ysigma=size/2""")
+    surround_size = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),doc="""
+        size parameter for the surround Gaussian.""")
     
-    surround_aspect_ratio = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),
-                                         doc="""Adjusts the x sigma of the surround gaussian, xsigma=ysigma*aspectratio""")
+    surround_aspect_ratio = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),doc="""
+        aspect_ratio parameter for the surround Gaussian.""")
     
-    sigmoid_slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),
-                                 doc="""Adjusts the degree of slope of the sigmoid function""")
+    sigmoid_slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),doc="""
+        slope parameter for the Sigmoid""")
     
-    sigmoid_x = param.Number(default=-0.5, bounds=(None,None), softbounds=(-1.0,1.0),
-                             doc="""adjusts the x position of the sigmoid function""")
+    sigmoid_x = param.Number(default=-0.5, bounds=(None,None), softbounds=(-1.0,1.0),doc="""
+        x parameter for the Sigmoid.""")
 
-    sigmoid_y = param.Number(default=-0.0, bounds=(None,None), softbounds=(-1.0,1.0),
-                             doc="""adjusts the y position of the sigmoid function""")
+    sigmoid_y = param.Number(default=-0.0, bounds=(None,None), softbounds=(-1.0,1.0),doc="""
+        y parameter for the Sigmoid.""")
+
                                                                                        
     def function(self, p):
-        
-        center_gaussian = Gaussian(size=p.center_size, aspect_ratio=p.center_aspect_ratio, orientation=p.orientation, 
-                                   x=p.x, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        center   = Gaussian(size=p.center_size, aspect_ratio=p.center_aspect_ratio,
+                            orientation=p.orientation, x=p.x, y=p.y,
+                            output_fns=[topo.transferfn.DivisiveNormalizeL1()])
                                     
-        surround_gaussian = Gaussian(size=p.surround_size, aspect_ratio=p.surround_aspect_ratio, orientation=p.orientation,
-                                     x=p.x, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        surround = Gaussian(size=p.surround_size, aspect_ratio=p.surround_aspect_ratio,
+                            orientation=p.orientation, x=p.x, y=p.y,
+                            output_fns=[topo.transferfn.DivisiveNormalizeL1()])
         
-        diff_of_gaussians = Composite(generators=[center_gaussian, surround_gaussian], operator=numpy.subtract,#)
-                             xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)
+        dog = Composite(generators=[center, surround], operator=numpy.subtract,#)
+                        xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)
         
-        sigmoid = Sigmoid(slope=p.sigmoid_slope, x=p.sigmoid_x+p.x+(p.center_size/2)*p.center_aspect_ratio, y=p.sigmoid_y+p.y, orientation=p.orientation+pi/2)
+        sigmoid = Sigmoid(slope=p.sigmoid_slope,
+                          x=p.sigmoid_x+p.x+(p.center_size/2)*p.center_aspect_ratio,
+                          y=p.sigmoid_y+p.y, orientation=p.orientation+pi/2)
 
-        return Composite(generators=[diff_of_gaussians, sigmoid], operator=numpy.multiply,
+        return Composite(generators=[dog, sigmoid], operator=numpy.multiply,
                          xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
 
 
                                 
 # how much preprocessing to offer? E.g. Offer to remove DC? Etc.
 class OneDPowerSpectrum(PatternGenerator):
-    
     """
-    Returns the spectral density of a rolling window of the input
-    signal each time it is called. Over time, outputs a spectrogram.
+    Outputs the spectral density of a rolling window of the input
+    signal each time it is called. Over time, generates a spectrogram.
     """
 
-    ### DEFAULT VALUES
+    window_length = param.Number(default=4,constant=True,doc="""
+        The most recent portion of the signal on which to perform the Fourier
+        transform, in units of 1/sample_rate, i.e., the length of a
+        sliding window on which to operate.
+
+        Note that the Fourier transform algorithm is most efficient
+        for matrix sizes that are powers of 2, or that can be
+        decomposed into small prime factors; see numpy.fft.rfft.""" )
+
+    window_overlap = param.Number(default=0,constant=True,doc="""
+        The amount of overlap between each window, in units of 1/sample_rate.""")
+
+    # JABALERT: Should this be an integer?  Clarify what unit time means.
+    sample_rate = param.Number(default=100,constant=True,doc="""
+        Number of samples per unit time, which defines the unit for frequency.""")
+
+    windowing_function = param.Parameter (default=numpy.hanning,constant=True,doc="""
+        This function is multiplied with the current window, i.e. the
+        most recent portion of the waveform interval of a signal, before
+        performing the Fourier transform.  It thus shapes the
+        interval, which would otherwise always be rectangular.
+
+        The function chosen here dictates the tradeoff between
+        resolving comparable signal strengths with similar
+        frequencies, and resolving disparate signal strengths with
+        dissimilar frequencies.
+
+        numpy provides a number of options, e.g. bartlett, blackman,
+        hamming, hanning, kaiser; see
+        http://docs.scipy.org/doc/numpy/reference/routines.window.html
+        You can also supply your own.""")
+
+    min_frequency = param.Number(default=20,doc="""
+        Smallest frequency for which to return an amplitude.""")
+
+    max_frequency = param.Number(default=20000,doc="""
+        Largest frequency for which to return an amplitude.""")
     
-    # length of sliding window which we spectrally decompose at each step
-    window_length = param.Number ( 
-                                    default = 4,
-                                    constant = True,
-                                    doc = """The most recent portion of the 
-                                          signal on which to perform the Fourier 
-                                          transform, in units of 1/sample_rate.
-
-                                          The Fourier transform algorithm is most 
-                                          efficient for powers of 2 (or can be 
-                                          decomposed into small prime factors - see
-                                          numpy.fft.rfft)."""
-                                 )
-
-    # how much the next window overlaps the previous one
-    window_overlap = param.Number ( 
-                                     default = 0,
-                                     constant = True,
-                                     doc = """The amount of overlap between each window,
-                                           in units of 1/sample_rate."""
-                                  )
-
-    # sample rate is the discrete num of samples per second
-    sample_rate = param.Number (
-                                  default = 100,
-                                  constant = True,
-                                  doc = """Defines the unit for frequency."""
-                               )
-
-    windowing_function = param.Parameter ( 
-                                            default = numpy.hanning,
-                                            constant = True,
-                                            doc = """This function is multiplied with 
-                                                  the window most recent portion of the 
-                                                  waveform interval of signal before
-                                                  performing the Fourier transform (i.e. 
-                                                  it is used to shape the interval).
-
-                                                  The function chosen here dictates the 
-                                                  tradeoff between resolving comparable 
-                                                  signal strengths with similar frequencies,
-                                                  and resolving disparate signal strengths 
-                                                  with dissimilar frequencies.
-
-                                                  numpy provides a number of options, 
-                                                  e.g. bartlett, blackman, hamming, hanning, kaiser; 
-                                                  see http://docs.scipy.org/doc/numpy/reference/routines.window.html
-                                                  You can also supply your own."""
-                                         )
-
-    min_frequency = param.Number ( 
-                                    default = 20,
-                                    doc = """Smallest frequency for which to return an amplitude."""
-                                 )
-
-    max_frequency = param.Number ( 
-                                    default = 20000,
-                                    doc = """Largest frequency for which to return an amplitude."""
-                                 )
-    
-    
-    ### DEFINITIONS
     
     def __init__(self, signal = [1] * 24, **params):
-    
         super(OneDPowerSpectrum, self).__init__(**params)
         self._initialize_window_parameters(signal)
-        
         
 
     @as_uninitialized
@@ -1028,17 +1002,15 @@ class OneDPowerSpectrum(PatternGenerator):
         # get a float32 array of the frames of the input signal
         self.signal = numpy.asarray(signal, dtype = numpy.float32)
         
-        # make sure the array isnt empty ..
+        # make sure the array isn't empty ..
         assert len(self.signal) > 0
         
         self._overlap_samples = int(self.window_overlap * self.sample_rate)
-
-        self._window_samples = int(self.window_length * self.sample_rate)
-        
+        self._window_samples  = int(self.window_length  * self.sample_rate)
         self.smoothing_window = self.windowing_function(self._window_samples)  
          
         # get the frequencies back from a fft
-        self._all_frequencies = numpy.fft.fftfreq( self._window_samples, d = 1.0 / self.sample_rate )[0 : self._window_samples / 2]
+        self._all_frequencies = numpy.fft.fftfreq(self._window_samples,d=1.0/self.sample_rate)[0 : self._window_samples/2]
         
         # depends on numpy.fftfreq ordering
         assert self._all_frequencies.min() >= 0
@@ -1049,19 +1021,14 @@ class OneDPowerSpectrum(PatternGenerator):
         # this is used by _create_indices when initialising the spectrogram array
         self._first_run = True
 
-        
-
 
     def _create_indices(self, p):
-    
         # given all the constant params, could do some caching
 
         # verify returned frequencies fall within the specified [min : max] range
         if not self._all_frequencies.min() <= p.min_frequency or not self._all_frequencies.max() >= p.max_frequency:
-            raise ValueError ( 
-                                "Specified frequency interval [%s,%s] is unavailable (actual interval is [%s,%s]. Adjust sample_rate and/or window_length."
-                                %( p.min_frequency, p.max_frequency, self._all_frequencies.min(), self._all_frequencies.max() )
-                             )
+            raise ValueError("Specified frequency interval [%s,%s] is unavailable (actual interval is [%s,%s]. Adjust sample_rate and/or window_length."
+                             %( p.min_frequency, p.max_frequency, self._all_frequencies.min(), self._all_frequencies.max() ))
         
         # set up a sheet to populate
         shape = SheetCoordinateSystem(p.bounds, p.xdensity, p.ydensity).shape
@@ -1074,24 +1041,12 @@ class OneDPowerSpectrum(PatternGenerator):
         self._frequency_indices = self._generate_frequency_indices(mini, maxi, shape[0])
         self.frequencies = self._all_frequencies[self._frequency_indices]
 
-        # How many times to repeat the 1d output for the specified 2d bounds.
-        # Probably a better alternative would be to treat the second
-        # dimension as a rolling queue, i.e. a temporal buffer.
-        
-        # BK-TODO: temporal buffer calculation goes here
-        self._column_repeat = shape[1] # column
-                
         # initalise a new, empty, spectrogram of the size of the sheet
         # ie implicitly control buffer size through sheet size 
         if self._first_run:
             self._spectrogram = numpy.zeros(shape, dtype = numpy.float32)
             self._first_run = False
                 
-        # no longer necessary, cochlea is meant to repeat
-        #if self._column_repeat > 1:
-            #self.warning("Shape mismatch: 1D output will be repeated to fill the array.")
-
-
 
     # CEBALERT: space function should probably be a parameter
     # BK-TODO: see cebalert above
@@ -1106,7 +1061,6 @@ class OneDPowerSpectrum(PatternGenerator):
 
 
     def __call__(self, **params_to_override):
-        
         """
         Perform a real Discrete Fourier Transform (DFT; implemented
         using a Fast Fourier Transform algorithm, FFT) of the current
@@ -1128,9 +1082,8 @@ class OneDPowerSpectrum(PatternGenerator):
         end = self.location - self._overlap_samples
         start = end - self._window_samples
 
-        # if there's not enough signal come in yet to fill sliding window
+        # if not enough signal has come in yet to fill sliding window
         if start < 0:
-            
             # fill an array the size of the smoothing window with zeros
             signal_sample = numpy.zeros(self.smoothing_window.shape)
             
@@ -1139,7 +1092,6 @@ class OneDPowerSpectrum(PatternGenerator):
             #           this condition is false?
             
         elif end > self.signal.size:
-        
             # Could loop around and print warning. 
 
             # Consider how to provide good support for the presumably
@@ -1154,7 +1106,6 @@ class OneDPowerSpectrum(PatternGenerator):
             raise ValueError("Reached the end of the signal.")
             
         else:
-        
             # take our snippit of signal ...
             signal_sample = self.signal[start : end]
         
@@ -1167,13 +1118,12 @@ class OneDPowerSpectrum(PatternGenerator):
         # add on latest spectral information to the rightmost edge
         self._spectrogram = numpy.hstack((self._spectrogram, amplitudes))
                 
-        # knock off the column on the left most edge
+        # knock off the column on the left-most edge
         temporary_spectogram = self._spectrogram.copy()
         self._spectrogram = temporary_spectogram[0: , 1:]
 
         return self._spectrogram
-        # tile to get a 2d array where the 1 column is repeated; 
-        # see comment by self._column_repeat
-        #return numpy.tile( amplitudes, (1, self._column_repeat) )
+
+
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,PatternGenerator)]))
