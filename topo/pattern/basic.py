@@ -867,103 +867,118 @@ class Translator(PatternGenerator):
 
 class Sigmoid(PatternGenerator):
     
-    slope = param.Number(default=0.15, bounds=(-1.0,1.0), softbounds=(-1.0,1.0),
-                     doc="""Controls the degree of slope of the sigmoid function""")
+    offset = param.Number(default=0.5)
     
-    x_offset = param.Number(default=0.0, bounds=(None,None), softbounds=(-10.0,10.0),
-                     doc="""Controls the horizontal position of the generated pattern""")
+    scale = param.Number(default=0.5)
+   
+    slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),
+                         doc="""Controls the degree of slope of the sigmoid function""")
     
     def function(self, p):
-    
-        with float_error_ignore():
-            return (2.0 / (1.0 + numpy.exp(-2.0 * p.slope * numpy.add(self.pattern_x, p.x_offset)))) - 1.0
-            
+        
+        #with float_error_ignore():
+        sigmoid = (2.0 / (1.0 + numpy.exp(-2.0 * p.slope * self.pattern_y))) - 1.0            
+        print sigmoid
 
-class SigmoidedDoGs(PatternGenerator):
+        return sigmoid
+        
+
+class SigmoidedDoG(PatternGenerator):
     
     """
-    Generates two differences of Gaussians, labelled A and B, whose composite Gaussians are named
-    A1, A2, B1, and B2 respectively where _1 is the centre Gaussian and _2 the outer Gaussian.
-    
-    These two differences of Gaussians are summed and then multiplied by a sigmoid (logistic) function.
+    Generates two differences of Gaussians, labelled A and B, placed at the same y position and
+    adjacent x positions.
     """
-    
-    
-    # BK-AudioNote: This is the Best Frequency of Response
-    y_position_A_and_B = param.Number(default=0, bounds=(None,None), softbounds=(-50.0,50.0),
-                                      doc="""The Y Position shared by both Differences of Gaussians A and B""")
-    
-    # BK-AudioNote: This is the Positive Response Latency
-    x_position_A = param.Number(default=-0.2, bounds=(None,None), softbounds=(-100.0,100.0),
-                                doc="""The X Position of the Difference of Gaussians labelled A""")
 
     # BK-AudioNote: This is the Positive Response Period
-    x_width_A = param.Number(default=4.0, bounds=(0.1,None), softbounds=(0.1,30.0),
-                             doc="""The length in X of the Difference of Gaussians labelled A""")
+    #width_A = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,10.0),
+    #                       doc="""The length in X of the Difference of Gaussians labelled A (left)""")
+    
+    # BK-AudioNote: This is the Period of inhibition for Best Frequency following Positive Response
+    #width_B = param.Number(default=2.0, bounds=(0.1,None), softbounds=(0.0,20.0),
+    #                       doc="""The length in X of the Difference of Gaussians labelled B (right)""")
                              
     # BK-AudioNote: This is the Response Bandwidth
-    y_width_A1_and_B1 = param.Number(default=2.0, bounds=(0.1,None), softbounds=(0.1,10.0),
-                                     doc="""The length in Y shared by both Gaussians A1 and B1""")
+    #height_centre_A_centre_B = param.Number(default=0.5, bounds=(0.1,None), softbounds=(0.1,5.0),
+    #                                        doc="""The length in Y shared by centre Gaussians of both A (left) and B (right)""")
     
     # BK-AudioNote: This is the Bandwidth of inhibition for Frequency
-    y_width_A2_and_B2 = param.Number(default=30.0, bounds=(0.1,None), softbounds=(0.1,100.0),
-                                     doc="""The length in Y shared by both Gaussians A2 and B2""")
-   
-    # BK-AudioNote: This is the Period of inhibition for Best Frequency following Positive Response
-    x_width_B = param.Number(default=10.0, bounds=(0.1,None), softbounds=(0.0,50.0),
-                             doc="""The length in X of the Difference of Gaussians labelled B""")
-
-    sigmoid_slope = param.Number(default=-0.17, bounds=(-1.0,1.0), softbounds=(-1.0,1.0),
-                                 doc="""Controls the degree of slope of the sigmoid function""")
+    #height_surround_A_surround_B = param.Number(default=1.5, bounds=(0.1,None), softbounds=(0.1,5.0),
+    #                                            doc="""The length in Y shared by surround Gaussians of both A (left) and B (right)""")
+             
     
-    sigmoid_x_offset = param.Number(default=-0.0, bounds=(None,None), softbounds=(-100.0,100.0),
-                                    doc="""Controls the horizontal position of the generated pattern""")
-           
+    center_size = param.Number(default=0.5, bounds=(0.1,None), softbounds=(0.1,5.0),
+                               doc=""" """)
     
+    center_aspect_ratio = param.Number(default=2.0, bounds=(0.1,None), softbounds=(0.1,5.0),
+                                       doc=""" """)
+    
+    surround_size = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),
+                                 doc=""" """)
+    
+    surround_aspect_ratio = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),
+                                         doc=""" """)
+    
+    sigmoid_slope = param.Number(default=10, bounds=(None,None), softbounds=(-100.0,100.0),
+                                 doc=""" """)
+                             
     def function(self, p):
-                
+        
+        center_gaussian = Gaussian(size=p.center_size, aspect_ratio=p.center_aspect_ratio, orientation=p.orientation, 
+                                   x=p.x, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+                                    
+        surround_gaussian = Gaussian(size=p.surround_size, aspect_ratio=p.surround_aspect_ratio, orientation=p.orientation,
+                                     x=p.x, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        
+        diff_of_gaussians = Composite(generators=[center_gaussian, surround_gaussian], operator=numpy.subtract,#)
+                             xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)
+        
+        sigmoid = Sigmoid(slope=p.sigmoid_slope, x=p.x+(p.center_size/2)*p.center_aspect_ratio, y=p.y, orientation=pi/2)
+        
+        print "--------------------------------------------"
+        print sigmoid()
+        print "--------------------------------------------"
+
+
+        combined = Composite(generators=[diff_of_gaussians, sigmoid], operator=numpy.multiply,
+                             xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)
+
+        return combined()
+
+
         # NOTE - ysigma of a gaussian is its size/2, xsigma is ysigma * aspect_ratio
         
         # 1st Difference of Gaussians
-        center_asp_ratio = p.x_width_A / p.y_width_A1_and_B1
-        surround_asp_ratio = p.x_width_A / p.y_width_A2_and_B2
+        #center_asp_ratio = p.width_A / p.height_centre_A_centre_B
+        #surround_asp_ratio = p.width_A / p.height_surround_A_surround_B
         
-        center_gaussian = Gaussian(size=p.y_width_A1_and_B1, aspect_ratio=center_asp_ratio, 
-                                   x=p.x_position_A, y=p.y_position_A_and_B, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        #center_gaussian = Gaussian(size=p.height_centre_A_centre_B, aspect_ratio=center_asp_ratio, 
+        #                           x=p.x, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
                                     
-        surround_gaussian = Gaussian(size=p.y_width_A2_and_B2, aspect_ratio=surround_asp_ratio, 
-                                     x=p.x_position_A, y=p.y_position_A_and_B, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        #surround_gaussian = Gaussian(size=p.height_surround_A_surround_B, aspect_ratio=surround_asp_ratio, 
+        #                             x=p.x, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
         
-        diff_of_gaussians = Composite(generators=[center_gaussian, surround_gaussian], operator=numpy.subtract)
+        #diff_of_gaussians = Composite(generators=[center_gaussian, surround_gaussian], operator=numpy.subtract)
 
 
         # 2nd Difference of Gaussians
-        center_asp_ratio2 = p.x_width_B / p.y_width_A1_and_B1
-        surround_asp_ratio2 = p.x_width_B / p.y_width_A2_and_B2
+        #center_asp_ratio2 = p.width_B / p.height_centre_A_centre_B
+        #surround_asp_ratio2 = p.width_B / p.height_surround_A_surround_B
         
-        time_position = p.x_position_A + p.x_width_A / 2 + p.x_width_B / 2
+        #x_position = p.x + p.width_A / 2.0 + p.width_B
         
-        center_gaussian2 = Gaussian(size=p.y_width_A1_and_B1, aspect_ratio=center_asp_ratio2, 
-                                    x=time_position, y=p.y_position_A_and_B, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        #center_gaussian2 = Gaussian(size=p.height_centre_A_centre_B, aspect_ratio=center_asp_ratio2, 
+        #                            x=x_position, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
        
-        surround_gaussian2 = Gaussian(size=p.y_width_A2_and_B2, aspect_ratio=surround_asp_ratio2, 
-                                      x=time_position, y=p.y_position_A_and_B, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        #surround_gaussian2 = Gaussian(size=p.height_surround_A_surround_B, aspect_ratio=surround_asp_ratio2, 
+        #                              x=x_position, y=p.y, output_fns=[topo.transferfn.DivisiveNormalizeL1()])
         
-        diff_of_gaussians2 = Composite(generators=[center_gaussian2, surround_gaussian2], operator=numpy.subtract)
-        
-        
-        # Sigmoid
-        #BK-NOTE: need to adjust the x offset here to the x_position_A + xsigma of the positive bit of a neurons response,
-        # .. once ive made sure the xoffset code in the sigmoid function is actually doing what i think (hope) its doing
-        sigmoid = Sigmoid(slope=p.sigmoid_slope, x_offset=p.sigmoid_x_offset)
+        #diff_of_gaussians2 = Composite(generators=[center_gaussian2, surround_gaussian2], operator=numpy.subtract)
         
         
         # Combination
-        summed = Composite(generators=[diff_of_gaussians, diff_of_gaussians2], operator=numpy.add)
-        multiplied = Composite(generators=[summed, sigmoid], operator=numpy.multiply)
-        
-        return multiplied()
-
+        #return Composite(generators=[diff_of_gaussians, diff_of_gaussians2], operator=numpy.subtract,
+        #                 xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
                 
                                 
 # how much preprocessing to offer? E.g. Offer to remove DC? Etc.
