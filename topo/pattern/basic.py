@@ -867,6 +867,10 @@ class Translator(PatternGenerator):
 
 class Sigmoid(PatternGenerator):
     
+    """
+    Generates a Sigmoid function 
+    """
+    
     offset = param.Number(default=0.0)
     
     scale = param.Number(default=1.0)
@@ -885,30 +889,33 @@ class Sigmoid(PatternGenerator):
 class SigmoidedDoG(PatternGenerator):
     
     """
-    Generates two differences of Gaussians, labelled A and B, placed at the same y position and
-    adjacent x positions.
+    Generates a difference of Gaussians function and a Sigmoid function, 
+    and returns a multiplicative composite of the two.
     """
     
     x = param.Number(default=-1.5)
         
     center_size = param.Number(default=0.5, bounds=(0.1,None), softbounds=(0.1,5.0),
-                               doc=""" """)
+                               doc="""Adjusts the sigmas of the center gaussian, ysigma=size/2""")
     
     center_aspect_ratio = param.Number(default=2.0, bounds=(0.1,None), softbounds=(0.1,5.0),
-                                       doc=""" """)
+                                       doc="""Adjusts the x sigma of the center gaussian, xsigma=ysigma*aspectratio""")
     
     surround_size = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),
-                                 doc=""" """)
+                                 doc="""Adjusts the sigmas of the surround gaussian, ysigma=size/2""")
     
     surround_aspect_ratio = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),
-                                         doc=""" """)
+                                         doc="""Adjusts the x sigma of the surround gaussian, xsigma=ysigma*aspectratio""")
     
     sigmoid_slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),
-                                 doc=""" """)
+                                 doc="""Adjusts the degree of slope of the sigmoid function""")
     
-    sigmoid_x = param.Number(default=0.0, bounds=(None,None), softbounds=(-1.0,1.0),
-                                 doc=""" """)
-                                                          
+    sigmoid_x = param.Number(default=-0.5, bounds=(None,None), softbounds=(-1.0,1.0),
+                             doc="""adjusts the x position of the sigmoid function""")
+
+    sigmoid_y = param.Number(default=-0.0, bounds=(None,None), softbounds=(-1.0,1.0),
+                             doc="""adjusts the y position of the sigmoid function""")
+                                                                                       
     def function(self, p):
         
         center_gaussian = Gaussian(size=p.center_size, aspect_ratio=p.center_aspect_ratio, orientation=p.orientation, 
@@ -920,16 +927,12 @@ class SigmoidedDoG(PatternGenerator):
         diff_of_gaussians = Composite(generators=[center_gaussian, surround_gaussian], operator=numpy.subtract,#)
                              xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)
         
-        sigmoid = Sigmoid(slope=p.sigmoid_slope, x=p.sigmoid_x+p.x+(p.center_size/2)*p.center_aspect_ratio, y=p.y, orientation=pi/2)
+        sigmoid = Sigmoid(slope=p.sigmoid_slope, x=p.sigmoid_x+p.x+(p.center_size/2)*p.center_aspect_ratio, y=p.sigmoid_y+p.y, orientation=p.orientation+pi/2)
+
+        return Composite(generators=[diff_of_gaussians, sigmoid], operator=numpy.multiply,
+                         xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
 
 
-        combined = Composite(generators=[diff_of_gaussians, sigmoid], operator=numpy.multiply,
-                             xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)
-
-        return combined()
-
-
-                
                                 
 # how much preprocessing to offer? E.g. Offer to remove DC? Etc.
 class OneDPowerSpectrum(PatternGenerator):

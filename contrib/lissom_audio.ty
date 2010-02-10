@@ -168,7 +168,7 @@ topo.sim.connect (
                     name = 'Cochlea Afferent',
                     connection_type = projection.CFProjection,
                     nominal_bounds_template = sheet.BoundingBox(radius = mgbv_cochlea_connection_radius),
-                    weights_generator = pattern.Constant() # work here! usual strf of a mgb neuron, composite pattern of several functions
+                    weights_generator = pattern.SigmoidedDoG()
                  )
 
 topo.sim.connect (
@@ -182,7 +182,6 @@ topo.sim.connect (
                     learning_rate = 0.9590/2,
                     nominal_bounds_template = sheet.BoundingBox(radius = a1_mgbv_connection_radius),
                     weights_generator = pattern.random.GaussianCloud(gaussian_size = 2 * 0.27083)
-                    #weights_generator = pattern.Constant()
                  )
 
 
