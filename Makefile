@@ -488,6 +488,7 @@ ChangeLog.txt: FORCE
 # ceball@fiver:~/pkg$ dput ppa:ceball/ppa topographica_0.9.6-0ubuntu3_source.changes
 
 
+# must be run with no diffs and having done svn update following any commits (so svnversion doesn't end in M)
 # sudo apt-get install devscripts fakeroot cdbs
 deb-svn:
 	make dist-setup.py
