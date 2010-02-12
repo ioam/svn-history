@@ -488,6 +488,19 @@ ChangeLog.txt: FORCE
 # ceball@fiver:~/pkg$ dput ppa:ceball/ppa topographica_0.9.6-0ubuntu3_source.changes
 
 
+# sudo apt-get install devscripts fakeroot cdbs
+deb-svn:
+	make dist-setup.py
+	${CD} ${DIST_TMPDIR}
+## CEBALERT: no svnversion in this?
+	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${RELEASE}.orig.tar.gz
+	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${RELEASE}+r${shell svnversion}
+	cp -R debian ${DIST_TMPDIR}/topographica-${RELEASE}+r${shell svnversion}/debian
+	cd ${DIST_TMPDIR}; rm -rf topographica-${RELEASE}+r${shell svnversion}/debian/.svn
+## rm debian/changelog
+## dch --create
+## dch -i
+	cd ${DIST_TMPDIR}/topographica-${RELEASE}+r${shell svnversion};	env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
 
 # .deb of svn 
 # 

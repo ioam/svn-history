@@ -6,7 +6,13 @@
 import sys
 import os
 
-def write(python_bin,release,version):
+DEFAULTS = dict(python_bin="/usr/bin/env python",
+                release = None
+                version = None)
+
+def write(python_bin=DEFAULTS['python_bin'],
+          release=DEFAULTS['release'],
+          version=DEFAULTS['version']):
     script = """#!%s
 # Startup script for Topographica
 
@@ -27,27 +33,28 @@ process_argv(argv[1:])
     os.system('chmod +x topographica')
 
 
+
 if __name__=='__main__':
     print "creating topographica script..."
 
     try:
         python_bin = sys.argv[1]
     except:
-        python_bin = "/usr/bin/env python"
+        python_bin = DEFAULTS['python_bin']
 
     print "python: %s"%python_bin
 
     try:
         release = sys.argv[2]
     except:
-        release = None
+        release = DEFAULTS['release']
 
     print "release: %s"%release
 
     try:
         version = sys.argv[3]
     except:
-        version = None
+        version = DEFAULTS['version']
 
     print "version: %s"%version
 
