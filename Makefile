@@ -493,7 +493,7 @@ deb-svn:
 	make dist-setup.py
 	${CD} ${DIST_TMPDIR}
 ## CEBALERT: no svnversion in this?
-	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${RELEASE}.orig.tar.gz
+	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${RELEASE}+r${shell svnversion}.orig.tar.gz
 	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${RELEASE}+r${shell svnversion}
 	cp -R debian ${DIST_TMPDIR}/topographica-${RELEASE}+r${shell svnversion}/debian
 	cd ${DIST_TMPDIR}; rm -rf topographica-${RELEASE}+r${shell svnversion}/debian/.svn
