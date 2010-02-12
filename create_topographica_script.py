@@ -7,7 +7,7 @@ import sys
 import os
 
 DEFAULTS = dict(python_bin="/usr/bin/env python",
-                release = None
+                release = None,
                 version = None)
 
 def write(python_bin=DEFAULTS['python_bin'],
