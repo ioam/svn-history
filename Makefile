@@ -499,17 +499,12 @@ deb-svn:
 	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${PRERELEASE}~r${shell svnversion}
 	cp -R debian ${DIST_TMPDIR}/topographica-${PRERELEASE}~r${shell svnversion}/debian
 	cd ${DIST_TMPDIR}; rm -rf topographica-${PRERELEASE}~r${shell svnversion}/debian/.svn
-## rm debian/changelog
-## dch --create
-## dch -i
-####
-#topographica (0.9.7~r10898-0ubuntu0) karmic; urgency=low
-#
-#  * Pre-release version 0.9.7 (SVN r10898); see Changelog.txt for details.
-#
-# -- C. E. Ball <ceball@gmail.com>  Sat, 13 Feb 2010 12:50:00 +0000
-#
-####
+	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0) karmic; urgency=low" > topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
+	echo "" >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
+	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
+	echo "" >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
+	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
+	echo "" >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
 	cd ${DIST_TMPDIR}/topographica-${PRERELEASE}~r${shell svnversion};	env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
 
 # .deb of svn 
