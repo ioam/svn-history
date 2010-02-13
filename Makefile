@@ -487,21 +487,30 @@ ChangeLog.txt: FORCE
 # 
 # ceball@fiver:~/pkg$ dput ppa:ceball/ppa topographica_0.9.6-0ubuntu3_source.changes
 
-
+# CEBALERT: need to make this be calc'd from RELEASE
+PRERELEASE = 0.9.7
 # must be run with no diffs and having done svn update following any commits (so svnversion doesn't end in M)
 # sudo apt-get install devscripts fakeroot cdbs
 deb-svn:
 	make dist-setup.py
 	${CD} ${DIST_TMPDIR}
 ## CEBALERT: no svnversion in this?
-	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${RELEASE}+r${shell svnversion}.orig.tar.gz
-	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${RELEASE}+r${shell svnversion}
-	cp -R debian ${DIST_TMPDIR}/topographica-${RELEASE}+r${shell svnversion}/debian
-	cd ${DIST_TMPDIR}; rm -rf topographica-${RELEASE}+r${shell svnversion}/debian/.svn
+	cd ${DIST_TMPDIR}; mv topographica-${PRERELEASE}.tar.gz topographica_${PRERELEASE}~r${shell svnversion}.orig.tar.gz
+	cd ${DIST_TMPDIR}; mv topographica-${PRERELEASE} topographica-${PRERELEASE}~r${shell svnversion}
+	cp -R debian ${DIST_TMPDIR}/topographica-${PRERELEASE}~r${shell svnversion}/debian
+	cd ${DIST_TMPDIR}; rm -rf topographica-${PRERELEASE}~r${shell svnversion}/debian/.svn
 ## rm debian/changelog
 ## dch --create
 ## dch -i
-	cd ${DIST_TMPDIR}/topographica-${RELEASE}+r${shell svnversion};	env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
+####
+#topographica (0.9.7~r10898-0ubuntu0) karmic; urgency=low
+#
+#  * Pre-release version 0.9.7 (SVN r10898); see Changelog.txt for details.
+#
+# -- C. E. Ball <ceball@gmail.com>  Sat, 13 Feb 2010 12:50:00 +0000
+#
+####
+	cd ${DIST_TMPDIR}/topographica-${PRERELEASE}~r${shell svnversion};	env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
 
 # .deb of svn 
 # 

@@ -1,17 +1,5 @@
-topographica (0.9.6-0ubuntu3) jaunty; urgency=low
+topographica (0.9.7~r10898-0ubuntu0) karmic; urgency=low
 
-  * Added Topographica's documentation and examples.
+  * Pre-release version 0.9.7 (SVN r10898); see Changelog.txt for details.
 
- -- C. E. Ball <ceball@gmail.com>  Sat, 03 Oct 2009 23:24:34 +0100
-
-topographica (0.9.6-0ubuntu2) jaunty; urgency=low
-
-  * Removed stray files.
-
- -- C. E. Ball <ceball@gmail.com>  Thu, 01 Oct 2009 20:28:41 +0100
-
-topographica (0.9.6-0ubuntu1) jaunty; urgency=low
-
-  * Initial release
-
- -- Krzysztof Gorgolewski <krzysztof.gorgolewski@gmail.com>  Mon, 21 Sep 2009 17:21:17 +0100
+ -- C. E. Ball <ceball@gmail.com>  Sat, 13 Feb 2010 12:50:00 +0000
