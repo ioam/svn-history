@@ -502,6 +502,8 @@ UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
 #incoming = ~ceball/ppa/ubuntu/
 #login = anonymous
 #allow_unsigned_uploads = 0
+DEBUILD = env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
+DPUT = dput topographica-unstable topographica_${UBUNTU_RELEASE}-0ubuntu0_source.changes
 
 deb-svn:
 	make dist-setup.py
@@ -509,17 +511,27 @@ deb-svn:
 	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${UBUNTU_RELEASE}
 	cp -R debian ${UBUNTU_DIR}/debian
 	rm -rf ${UBUNTU_DIR}/debian/.svn
-	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0) jaunty; urgency=low" > ${UBUNTU_CHANGELOG}
+	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0) karmic; urgency=low" > ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
 	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
 	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> ${UBUNTU_CHANGELOG}
-	cd ${UBUNTU_DIR}; env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
+	cd ${UBUNTU_DIR}; ${DEBUILD}
 
 deb-svn-ppa:
 	make deb-svn
-	cd ${DIST_TMPDIR}; dput topographica-unstable topographica_${UBUNTU_RELEASE}-0ubuntu0_source.changes
-
+	cd ${DIST_TMPDIR}; ${DPUT}
+	cd ${UBUNTU_DIR}/debian; cp changelog ../../changelog.orig
+#
+	cd ${UBUNTU_DIR}/debian; rm changelog; cp ../../changelog.orig changelog	
+	cd ${UBUNTU_DIR}; debchange --force-bad-version --newversion "${UBUNTU_RELEASE}-0ubuntu0" --force-distribution --distribution jaunty "Backport to 9.04 (Jaunty)."
+	cd ${UBUNTU_DIR}; ${DEBUILD}
+	cd ${DIST_TMPDIR}; ${DPUT}
+#
+	cd ${UBUNTU_DIR}/debian; rm changelog; cp ../../changelog.orig changelog
+	cd ${UBUNTU_DIR}; debchange --force-bad-version --newversion "${UBUNTU_RELEASE}-0ubuntu0" --force-distribution --distribution jaunty "Backport to 8.04 LTS (Hardy)."
+	cd ${UBUNTU_DIR}; ${DEBUILD}
+	cd ${DIST_TMPDIR}; ${DPUT}
 
 # .deb of svn 
 # 
