@@ -495,8 +495,8 @@ deb-svn:
 	make dist-setup.py
 	${CD} ${DIST_TMPDIR}
 ## CEBALERT: no svnversion in this?
-	cd ${DIST_TMPDIR}; mv topographica-${PRERELEASE}.tar.gz topographica_${PRERELEASE}~r${shell svnversion}.orig.tar.gz
-	cd ${DIST_TMPDIR}; mv topographica-${PRERELEASE} topographica-${PRERELEASE}~r${shell svnversion}
+	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${PRERELEASE}~r${shell svnversion}.orig.tar.gz
+	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${PRERELEASE}~r${shell svnversion}
 	cp -R debian ${DIST_TMPDIR}/topographica-${PRERELEASE}~r${shell svnversion}/debian
 	cd ${DIST_TMPDIR}; rm -rf topographica-${PRERELEASE}~r${shell svnversion}/debian/.svn
 ## rm debian/changelog
