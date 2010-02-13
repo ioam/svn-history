@@ -514,13 +514,12 @@ deb-svn:
 	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
 	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> ${UBUNTU_CHANGELOG}
-	echo "" >> ${UBUNTU_CHANGELOG}
 	cd ${UBUNTU_DIR}; env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
-# testing
-	echo "dput topographica-unstable topographica_${UBUNTU_RELEASE}-0ubuntu0_source.changes"
 
+deb-svn-ppa:
+	make deb-svn
+	cd ${DIST_TMPDIR}; dput topographica-unstable topographica_${UBUNTU_RELEASE}-0ubuntu0_source.changes
 
-#
 
 # .deb of svn 
 # 
