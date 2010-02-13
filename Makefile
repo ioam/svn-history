@@ -499,7 +499,7 @@ UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
 #[topographica-unstable]
 #fqdn = ppa.launchpad.net
 #method = ftp
-#incoming = ~ceball/topographica-unstable/ubuntu/
+#incoming = ~ceball/ppa/ubuntu/
 #login = anonymous
 #allow_unsigned_uploads = 0
 
