@@ -489,23 +489,24 @@ ChangeLog.txt: FORCE
 
 # CEBALERT: need to make this be calc'd from RELEASE
 PRERELEASE = 0.9.7
+UBUNTU_RELEASE = ${PRERELEASE}~r${shell svnversion}
+UBUNTU_DIR = ${DIST_TMPDIR}/topographica-${UBUNTU_RELEASE}
+UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
 # must be run with no diffs and having done svn update following any commits (so svnversion doesn't end in M)
 # sudo apt-get install devscripts fakeroot cdbs
 deb-svn:
 	make dist-setup.py
-	${CD} ${DIST_TMPDIR}
-## CEBALERT: no svnversion in this?
-	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${PRERELEASE}~r${shell svnversion}.orig.tar.gz
-	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${PRERELEASE}~r${shell svnversion}
-	cp -R debian ${DIST_TMPDIR}/topographica-${PRERELEASE}~r${shell svnversion}/debian
-	cd ${DIST_TMPDIR}; rm -rf topographica-${PRERELEASE}~r${shell svnversion}/debian/.svn
-	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0) karmic; urgency=low" > topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
-	echo "" >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
-	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
-	echo "" >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
-	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
-	echo "" >> topographica-${PRERELEASE}~r${shell svnversion}/debian/changelog
-	cd ${DIST_TMPDIR}/topographica-${PRERELEASE}~r${shell svnversion};	env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
+	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${UBUNTU_RELEASE}.orig.tar.gz
+	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${UBUNTU_RELEASE}
+	cp -R debian ${UBUNTU_DIR}/debian
+	rm -rf ${UBUNTU_DIR}/debian/.svn
+	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0) karmic; urgency=low" > ${UBUNTU_CHANGELOG}
+	echo "" >> ${UBUNTU_CHANGELOG}
+	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> ${UBUNTU_CHANGELOG}
+	echo "" >> ${UBUNTU_CHANGELOG}
+	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> ${UBUNTU_CHANGELOG}
+	echo "" >> ${UBUNTU_CHANGELOG}
+	cd ${UBUNTU_DIR}; env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
 
 # .deb of svn 
 # 
