@@ -509,7 +509,7 @@ deb-svn:
 	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${UBUNTU_RELEASE}
 	cp -R debian ${UBUNTU_DIR}/debian
 	rm -rf ${UBUNTU_DIR}/debian/.svn
-	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0) hardy; urgency=low" > ${UBUNTU_CHANGELOG}
+	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0) jaunty; urgency=low" > ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
 	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
