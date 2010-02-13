@@ -493,20 +493,34 @@ UBUNTU_RELEASE = ${PRERELEASE}~r${shell svnversion}
 UBUNTU_DIR = ${DIST_TMPDIR}/topographica-${UBUNTU_RELEASE}
 UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
 # must be run with no diffs and having done svn update following any commits (so svnversion doesn't end in M)
-# sudo apt-get install devscripts fakeroot cdbs
+# sudo apt-get install devscripts fakeroot cdbs dput
+
+#~/.dput.cf
+#[topographica-unstable]
+#fqdn = ppa.launchpad.net
+#method = ftp
+#incoming = ~ceball/topographica-unstable/ubuntu/
+#login = anonymous
+#allow_unsigned_uploads = 0
+
 deb-svn:
 	make dist-setup.py
 	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${UBUNTU_RELEASE}.orig.tar.gz
 	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${UBUNTU_RELEASE}
 	cp -R debian ${UBUNTU_DIR}/debian
 	rm -rf ${UBUNTU_DIR}/debian/.svn
-	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0) karmic; urgency=low" > ${UBUNTU_CHANGELOG}
+	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0) hardy; urgency=low" > ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
 	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
 	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
 	cd ${UBUNTU_DIR}; env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7 debuild -S -sa
+# testing
+	echo "dput topographica-unstable topographica_${UBUNTU_RELEASE}-0ubuntu0_source.changes"
+
+
+#
 
 # .deb of svn 
 # 
