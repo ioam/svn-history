@@ -439,7 +439,86 @@ ChangeLog.txt: FORCE
 
 
 
-# CREATING .DEB FOR UBUNTU
+######################################################################
+# Ubuntu packages
+#
+# To create an environment suitable for deb-svn and related entries
+# (Ubuntu 9.04 upward):
+# 
+# sudo apt-get install devscripts fakeroot cdbs dput pbuilder alien
+# sudo pbuilder create
+#
+# cp doc/buildbot/dot-dput.cf ~/.dput.cf
+#
+# Set up GPG key, sign Launchpad code of conduct.
+#
+# NOTE: These commands must be run with no diffs, and having done "svn
+# update" following any commits (so svnversion doesn't end in M or
+# have a colon in it).
+
+# CEBALERT: need to make this be calc'd from RELEASE
+PRERELEASE = 0.9.7
+UBUNTU_RELEASE = ${PRERELEASE}~r${shell svnversion}-0ubuntu0
+UBUNTU_DIR = ${DIST_TMPDIR}/topographica-${UBUNTU_RELEASE}
+UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
+UBUNTU_ENV = env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7
+DEBUILD = ${UBUNTU_ENV} debuild
+UBUNTU_TARGET = karmic
+UBUNTU_BACKPORTS = jaunty hardy
+
+######################################################################
+# Make binary and source deb files for UBUNTU_TARGET and
+# UBUNTU_BACKPORTS
+deb-svn: 
+# CEBALERT: Requires that you have first run "make dist-setup.py"
+	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${UBUNTU_RELEASE}.orig.tar.gz
+	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${UBUNTU_RELEASE}
+	cp -R debian ${UBUNTU_DIR}/debian
+	rm -rf ${UBUNTU_DIR}/debian/.svn
+	echo "topographica (${UBUNTU_RELEASE}~${UBUNTU_TARGET}) ${UBUNTU_TARGET}; urgency=low" > ${UBUNTU_CHANGELOG}
+	echo "" >> ${UBUNTU_CHANGELOG}
+	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> ${UBUNTU_CHANGELOG}
+	echo "" >> ${UBUNTU_CHANGELOG}
+	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> ${UBUNTU_CHANGELOG}
+	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
+	cd ${UBUNTU_DIR}; ${DEBUILD} 
+# CEBALERT: should put this line in to test the build
+# sudo pbuilder build topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}.dsc 
+	cd ${UBUNTU_DIR}/debian; cp changelog ../../changelog.orig
+# CEBALERT: change to use UBUNTU_BACKPORTS list
+# JAUNTY
+	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
+	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~jaunty" --force-distribution --distribution jaunty "Backport to 9.04 (Jaunty)."
+	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
+	cd ${UBUNTU_DIR}; ${DEBUILD} 
+# HARDY
+	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
+	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~hardy" --force-distribution --distribution jaunty "Backport to 8.04 LTS (Hardy)."
+	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
+	cd ${UBUNTU_DIR}; ${DEBUILD} 
+
+######################################################################
+# Upload to PPA for UBUNTU_TARGET and UBUNTU_BACKPORTS
+#
+deb-svn-ppa:
+# CEBALERT: Requires that you have first run "make deb-svn"
+	cd ${DIST_TMPDIR}; dput topographica-unstable-force-${UBUNTU_TARGET} topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_source.changes
+# CEBALERT: use UBUNTU_BACKPORTS list here
+	cd ${DIST_TMPDIR}; dput topographica-unstable-force-jaunty topographica_${UBUNTU_RELEASE}~jaunty_source.changes
+	cd ${DIST_TMPDIR}; dput topographica-unstable-force-hardy topographica_${UBUNTU_RELEASE}~hardy_source.changes
+
+
+######################################################################
+# Create rpm
+#
+# CEBALERT: untested
+rpm-bin:
+# CEBALERT: Requires that you have first run "make deb-svn"
+# Does it need sudo?
+	alien -r topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_all.deb
+
+
+# CEBALERT: still need to add procedure for creating release packages...
 #
 # https://wiki.ubuntu.com/PackagingGuide/Complete
 #
@@ -487,81 +566,5 @@ ChangeLog.txt: FORCE
 # 
 # ceball@fiver:~/pkg$ dput ppa:ceball/ppa topographica_0.9.6-0ubuntu3_source.changes
 
-# CEBALERT: need to make this be calc'd from RELEASE
-PRERELEASE = 0.9.7
-UBUNTU_RELEASE = ${PRERELEASE}~r${shell svnversion}
-UBUNTU_DIR = ${DIST_TMPDIR}/topographica-${UBUNTU_RELEASE}
-UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
-# must be run with no diffs and having done svn update following any commits (so svnversion doesn't end in M)
-# sudo apt-get install devscripts fakeroot cdbs dput
-
-#~/.dput.cf
-#[topographica-unstable]
-#fqdn = ppa.launchpad.net
-#method = ftp
-#incoming = ~ceball/ppa/ubuntu/
-#login = anonymous
-#allow_unsigned_uploads = 0
-UBUNTU_ENV = env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7
-DEBUILD = ${UBUNTU_ENV} debuild -S -sa
-
-deb-svn:
-	make dist-setup.py
-	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${UBUNTU_RELEASE}.orig.tar.gz
-	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${UBUNTU_RELEASE}
-	cp -R debian ${UBUNTU_DIR}/debian
-	rm -rf ${UBUNTU_DIR}/debian/.svn
-	echo "topographica (0.9.7~r${shell svnversion}-0ubuntu0~karmic) karmic; urgency=low" > ${UBUNTU_CHANGELOG}
-	echo "" >> ${UBUNTU_CHANGELOG}
-	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> ${UBUNTU_CHANGELOG}
-	echo "" >> ${UBUNTU_CHANGELOG}
-	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> ${UBUNTU_CHANGELOG}
-	cd ${UBUNTU_DIR}; ${DEBUILD}
-##
-	cd ${UBUNTU_DIR}/debian; cp changelog ../../changelog.orig
-# JAUNTY
-	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
-	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}-0ubuntu0~jaunty" --force-distribution --distribution jaunty "Backport to 9.04 (Jaunty)."
-	cd ${UBUNTU_DIR}; ${DEBUILD}
-# HARDY
-	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog
-	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}-0ubuntu0~hardy" --force-distribution --distribution jaunty "Backport to 8.04 LTS (Hardy)."
-	cd ${UBUNTU_DIR}; ${DEBUILD}
-
-deb-svn-ppa:
-	make deb-svn
-	cd ${DIST_TMPDIR}; dput topographica-unstable-force-karmic topographica_${UBUNTU_RELEASE}-0ubuntu0~karmic_source.changes
-#
-	cd ${DIST_TMPDIR}; dput topographica-unstable-force-jaunty topographica_${UBUNTU_RELEASE}-0ubuntu0~jaunty_source.changes
-#
-	cd ${DIST_TMPDIR}; dput topographica-unstable-force-hardy topographica_${UBUNTU_RELEASE}-0ubuntu0~hardy_source.changes
 
 
-# .deb of svn 
-# 
-# ceball@fiver:~/working/topographica3$ nice make dist-setup.py
-# ceball@fiver:~/working/topographica3$ cd ../distributions/
-# ceball@fiver:~/working/distributions$ ls
-# topographica-0.9.6  topographica-0.9.6.tar.gz
-# ceball@fiver:~/working/distributions$ mv topographica-0.9.6.tar.gz topographica_0.9.6+r10621.orig.tar.gz 
-# ceball@fiver:~/working/distributions$ mv topographica-0.9.6/ topographica-0.9.6+r10621
-# ceball@fiver:~/working/distributions$ cp -R ../topographica3/debian topographica-0.9.6+r10621/debian
-# ceball@fiver:~/working/distributions$ rm -rf topographica-0.9.6+r10621/debian/.svn
-# ceball@fiver:~/working/distributions$ cd topographica-0.9.6+r10621/
-# use ~rXXXXX to indicate pre e.g. 0.9.7~r10600; then skip rm debian/changelog and dch --create
-# ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ rm debian/changelog
-# ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ dch --create
-# ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ dch -i
-# ceball@fiver:~/working/distributions/topographica-0.9.6+r10621$ debuild -S -sa
-# ceball@fiver:~/working/distributions$ ls
-# topographica-0.9.6+r10621
-# topographica_0.9.6+r10621-0ubuntu1.diff.gz
-# topographica_0.9.6+r10621-0ubuntu1.dsc
-# topographica_0.9.6+r10621-0ubuntu1_source.build
-# topographica_0.9.6+r10621-0ubuntu1_source.changes
-# topographica_0.9.6+r10621.orig.tar.gz
-# ceball@fiver:~/working/distributions$ sudo pbuilder build topographica_0.9.6+r10621-0ubuntu1.dsc 
-# ceball@fiver:~/working/distributions$ dput ppa:ceball/ppa topographica_0.9.6+r10621-0ubuntu1_source.changes
-
-# after debuild to get deb, can get rpm by doing 
-# $ sudo alien -r topographica_0.9.6+r10624-0ubuntu1_all.deb
