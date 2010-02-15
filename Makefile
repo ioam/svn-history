@@ -491,11 +491,12 @@ deb-svn:
 	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~jaunty" --force-distribution --distribution jaunty "Backport to 9.04 (Jaunty)."
 	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 	cd ${UBUNTU_DIR}; ${DEBUILD} 
-# HARDY
-	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
-	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~hardy" --force-distribution --distribution jaunty "Backport to 8.04 LTS (Hardy)."
-	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
-	cd ${UBUNTU_DIR}; ${DEBUILD} 
+### HARDY
+##	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
+##	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~hardy" --force-distribution --distribution jaunty "Backport to 8.04 LTS (Hardy)."
+##	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
+##	cd ${UBUNTU_DIR}; ${DEBUILD} 
+
 
 ######################################################################
 # Upload to PPA for UBUNTU_TARGET and UBUNTU_BACKPORTS
@@ -505,7 +506,7 @@ deb-svn-ppa:
 	cd ${DIST_TMPDIR}; dput topographica-unstable-force-${UBUNTU_TARGET} topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_source.changes
 # CEBALERT: use UBUNTU_BACKPORTS list here
 	cd ${DIST_TMPDIR}; dput topographica-unstable-force-jaunty topographica_${UBUNTU_RELEASE}~jaunty_source.changes
-	cd ${DIST_TMPDIR}; dput topographica-unstable-force-hardy topographica_${UBUNTU_RELEASE}~hardy_source.changes
+##	cd ${DIST_TMPDIR}; dput topographica-unstable-force-hardy topographica_${UBUNTU_RELEASE}~hardy_source.changes
 
 
 ######################################################################
