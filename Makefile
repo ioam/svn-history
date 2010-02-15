@@ -486,8 +486,8 @@ deb-svn:
 	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
 	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> ${UBUNTU_CHANGELOG}
-	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 	cd ${UBUNTU_DIR}; ${DEBUILD} 
+	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 # CEBALERT: should put this line in to test the build
 # sudo pbuilder build topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}.dsc 
 	cd ${UBUNTU_DIR}/debian; cp changelog ../../changelog.orig
@@ -495,13 +495,14 @@ deb-svn:
 # JAUNTY
 	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
 	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~jaunty" --force-distribution --distribution jaunty "Backport to 9.04 (Jaunty)."
-	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 	cd ${UBUNTU_DIR}; ${DEBUILD} 
+	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 ### HARDY
 	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
 	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~hardy" --force-distribution --distribution hardy "Backport to 8.04 LTS (Hardy)."
-	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 	cd ${UBUNTU_DIR}; ${DEBUILD} 
+	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
+
 
 
 ######################################################################
