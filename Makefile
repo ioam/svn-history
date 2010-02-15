@@ -493,7 +493,7 @@ deb-svn:
 	cd ${UBUNTU_DIR}; ${DEBUILD} 
 ### HARDY
 ##	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
-##	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~hardy" --force-distribution --distribution jaunty "Backport to 8.04 LTS (Hardy)."
+##	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~hardy" --force-distribution --distribution hardy "Backport to 8.04 LTS (Hardy)."
 ##	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 ##	cd ${UBUNTU_DIR}; ${DEBUILD} 
 
