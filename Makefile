@@ -451,6 +451,12 @@ ChangeLog.txt: FORCE
 # cp doc/buildbot/dot-dput.cf ~/.dput.cf
 #
 # Set up GPG key, sign Launchpad code of conduct.
+# gpg key agent to avoid password requests:
+# sudo aptitude install gnupg-agent pinentry-gtk2 pinentry-curses
+# export GPGKEY=whatever
+# killall -q gpg-agent
+# eval $(gpg-agent --daemon)
+#
 #
 # NOTE: These commands must be run with no diffs, and having done "svn
 # update" following any commits (so svnversion doesn't end in M or
