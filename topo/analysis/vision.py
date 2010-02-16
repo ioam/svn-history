@@ -26,7 +26,7 @@ from topo.misc.filepath import normalize_path
 from topo.misc.numbergenerator import UniformRandom
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.command.analysis import measure_sine_pref
-
+import matplotlib.ticker as mticker
 max_value = 0
 global_index = ()
 
@@ -93,16 +93,26 @@ def complexity(full_matrix):
                 res = res + abs(full_matrix.full_matrix[tuple(iindex.tolist())][x][y] - average)
                 complex_matrix[x,y] = complex_matrix[x,y] + [full_matrix.full_matrix[tuple(iindex.tolist())][x][y]]
 
-            #this is taking away the DC component
-            #complex_matrix[x,y] -= numpy.min(complex_matrix[x,y])
-            if x==15 and y==15:
+            if x==0 and y==0:
                 pylab.figure()
-                pylab.plot(complex_matrix[x,y])
+		ax = pylab.subplot(111)
+		z = complex_matrix[x,y][:]
+		z.append(z[0])
+                pylab.plot(z,linewidth=4)
+		pylab.axis(xmin=0.0,xmax=numpy.pi)
+		ax.yaxis.set_major_locator(mticker.MaxNLocator(4))
+		pylab.xticks([0,len(z)/2,len(z)-1], ['0','pi/2','pi'])
+
             if x==26 and y==26:
                 pylab.figure()
-                pylab.plot(complex_matrix[x,y])
- 
-            #complexity[x,y] = res / (2*sum)
+		ax = pylab.subplot(111)
+		z = complex_matrix[x,y][:]
+		z.append(z[0])
+                pylab.plot(z,linewidth=4)
+		pylab.axis(xmin=0.0,xmax=numpy.pi)
+		ax.yaxis.set_major_locator(mticker.MaxNLocator(4))
+		pylab.xticks([0,len(z)/2,len(z)-1], ['0','pi/2','pi'])
+		
             fft = numpy.fft.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
             first_har = 2048/len(complex_matrix[0,0])
             if abs(fft[0]) != 0:
