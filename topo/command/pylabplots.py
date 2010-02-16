@@ -795,24 +795,28 @@ class plot_modulation_ratio(PylabPlotCommand):
         p=ParamOverrides(self,params)
 
         from topo.analysis.vision import complexity
-
         if (topo.sim.objects().has_key(simple_sheet_name) and topo.sim.objects().has_key(complex_sheet_name)):
             v1s = complexity(fullmatrix[topo.sim[simple_sheet_name]]).flatten()
             v1c = complexity(fullmatrix[topo.sim[complex_sheet_name]]).flatten()
-            
+            import matplotlib.ticker as mticker
             #double the number of complex cells to reflect large width of layer 2/3
             v1c = numpy.concatenate((array(v1c),array(v1c)),axis=1)
             pylab.figure()
             n = pylab.subplot(311)
             pylab.hist(v1s,bins)
-            pylab.axis([0,2.0,0,3500])
-            n = pylab.subplot(312)
+            pylab.axis([0,2.0,0,4100])
+	    n.yaxis.set_major_locator(mticker.MaxNLocator(3))
+            
+	    n = pylab.subplot(312)
             pylab.hist(v1c,bins)
-            pylab.axis([0,2.0,0,3500])
-            n = pylab.subplot(313)
+            pylab.axis([0,2.0,0,4100])
+	    n.yaxis.set_major_locator(mticker.MaxNLocator(3))
+            
+	    n = pylab.subplot(313)
             pylab.hist(numpy.concatenate((array(v1s),array(v1c)),axis=1),bins)
-            pylab.axis([0,2.0,0,3500])
-    
+            pylab.axis([0,2.0,0,4100])
+	    n.yaxis.set_major_locator(mticker.MaxNLocator(3))
+
         self._generate_figure(p)
 
 
@@ -1170,10 +1174,10 @@ class measure_orientation_contrast(UnitCurveCommand):
             self.or_surrounds=[]
             orientation=p.orientation_center
             self.orientationcenter=orientation
-            print orientation
+
             for i in xrange(0,self.num_orientation):
-                self.or_surrounds.append(orientation+i*pi/self.num_orientation)    
-            print self.or_surrounds
+                self.or_surrounds.append(orientation+i*pi/(self.num_orientation))
+            
             self.x=self._sheetview_unit(sheet,coord,'XPreference',default=coord[0])
             self.y=self._sheetview_unit(sheet,coord,'YPreference',default=coord[1])
             
@@ -1182,7 +1186,7 @@ class measure_orientation_contrast(UnitCurveCommand):
     def _feature_list(self,p):
         return [Feature(name="phase",range=(0.0,2*pi),step=2*pi/p.num_phase,cyclic=True),
     	 	Feature(name="frequency",values=p.frequencies),
-                Feature(name="orientationsurround",values=self.or_surrounds,cyclic=True)]
+		Feature(name="orientationsurround",values=self.or_surrounds,cyclic=True)]
 
 create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
                  doc='Measure the response of one unit to a center and surround sine grating disk.',
@@ -1192,9 +1196,30 @@ create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category
 
 
 
+class test_measure(UnitCurveCommand):
+
+    static_parameters = param.List(default=["size","x","y"])
+
+    x_axis = param.String(default='contrast',constant=True)
+
+    units = param.String(default=" rad")
+
+    def __call__(self,**params):
+        p=ParamOverrides(self,params)
+        self.params('sheet').compute_default()
+        sheet=p.sheet
+        self.x = 0.0
+	self.y = 0.0
+        for coord in p.coords:
+            self._compute_curves(p,sheet,val_format="%.4f")
+
+    def _feature_list(self,p):
+        return [Feature(name="orientation",values=[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],cyclic=True),
+    		Feature(name="contrast",values=[100],cyclic=False)]
 
 import types
 __all__ = list(set([k for k,v in locals().items()
                     if isinstance(v,types.FunctionType) or 
                     (isinstance(v,type) and issubclass(v,ParameterizedFunction))
                     and not v.__name__.startswith('_')]))
+
