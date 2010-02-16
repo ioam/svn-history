@@ -460,11 +460,10 @@ ChangeLog.txt: FORCE
 #
 # NOTE: These commands must be run with no diffs, and having done "svn
 # update" following any commits (so svnversion doesn't end in M or
-# have a colon in it).
+# have a colon in it). Also, you should pass RELEASE, making it 0.0.1 
+# higher than RELEASE as currently set in this file.
 
-# CEBALERT: need to make this be calc'd from RELEASE
-PRERELEASE = 0.9.7
-UBUNTU_RELEASE = ${PRERELEASE}~r${shell svnversion}-0ubuntu0
+UBUNTU_RELEASE = ${RELEASE}~r${shell svnversion}-0ubuntu0
 UBUNTU_DIR = ${DIST_TMPDIR}/topographica-${UBUNTU_RELEASE}
 UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
 UBUNTU_ENV = env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7
@@ -476,7 +475,7 @@ UBUNTU_BACKPORTS = jaunty hardy
 # Make binary and source deb files for UBUNTU_TARGET and
 # UBUNTU_BACKPORTS
 deb-svn: 
-# CEBALERT: Requires that you have first run "make dist-setup.py"
+# CEBALERT: Requires that you have first run "make RELEASE=0.9.7 dist-setup.py"
 	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${UBUNTU_RELEASE}.orig.tar.gz
 	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${UBUNTU_RELEASE}
 	cp -R debian ${UBUNTU_DIR}/debian
@@ -509,7 +508,7 @@ deb-svn:
 # Upload to PPA for UBUNTU_TARGET and UBUNTU_BACKPORTS
 #
 deb-svn-ppa:
-# CEBALERT: Requires that you have first run "make deb-svn"
+# CEBALERT: Requires that you have first run "make RELEASE=0.9.7 deb-svn"
 	cd ${DIST_TMPDIR}; dput topographica-unstable-force-${UBUNTU_TARGET} topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_source.changes
 # CEBALERT: use UBUNTU_BACKPORTS list here
 	cd ${DIST_TMPDIR}; dput topographica-unstable-force-jaunty topographica_${UBUNTU_RELEASE}~jaunty_source.changes
@@ -521,7 +520,7 @@ deb-svn-ppa:
 #
 # CEBALERT: untested
 rpm-bin:
-# CEBALERT: Requires that you have first run "make deb-svn"
+# CEBALERT: Requires that you have first run "make RELEASE=0.9.7 deb-svn"
 # Does it need sudo?
 	alien -r topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_all.deb
 
