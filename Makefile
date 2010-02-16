@@ -519,7 +519,7 @@ deb-svn-ppa:
 # Create rpm
 #
 # CEBALERT: untested
-rpm-bin:
+rpm-svn:
 # CEBALERT: Requires that you have first run "make RELEASE=0.9.7 deb-svn"
 # Does it need sudo?
 	alien -r topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_all.deb
