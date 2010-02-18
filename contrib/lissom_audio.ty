@@ -1,9 +1,9 @@
 """
 Bilal work in progress
 
-$Id: lissom_audio.ty 10778 2009-11-17 23:33:16Z KKudryavtsev $
+$Id$
 """
-__version__='$Revision: 10778 $'
+__version__='$Revision$'
 
 
 from math import pi, sqrt
