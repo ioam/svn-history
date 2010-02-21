@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import __main__
 import numpy
 import pylab
@@ -462,11 +463,11 @@ def measure_histogram(iterations=1000, sheet_name="V1"):
     print shape(concat_activities)
     mu = sum(concat_activities) / len(concat_activities)
     print mu
-    (bins, a, b) = pylab.hist(concat_activities, (numpy.arange(40.0) / 40.0) , visible=True)
-    bins_axis = numpy.arange(39.0) / 40.0 +0.0125
+    (bins, a, b) = pylab.hist(concat_activities, (numpy.arange(80.0) / 40.0) , visible=True)
+    bins_axis = numpy.arange(79.0) / 40.0 
     bins = bins * 1.0 / sum(bins)
     print sum(bins)
-    exponential = numpy.arange(39, dtype='float32') / 40.0 + 0.0125
+    exponential = numpy.arange(79, dtype='float32') / 40.0 
     # compute the mean of the actual distribution
     #mu=0.024
     pylab.figure()
@@ -475,17 +476,23 @@ def measure_histogram(iterations=1000, sheet_name="V1"):
     print len(bins)
     print bins_axis
     print bins
-    exponential = numpy.exp(- (1 / mu) * exponential) / mu
+    print numpy.exp(- (1 / mu) * (exponential+0.025))
+    print numpy.exp(- (1 / mu) * (exponential))
+
+    exponential = - numpy.exp(- (1 / mu) * (exponential+0.025)) + numpy.exp(- (1 / mu) * (exponential))  
     pylab.plot(bins_axis, bins)
     pylab.plot(bins_axis, bins, 'ro')
-    pylab.plot(bins_axis, exponential*0.025)
-    pylab.plot(bins_axis, exponential*0.025, 'go')
+    pylab.plot(bins_axis, exponential)
+    pylab.plot(bins_axis, exponential, 'go')
     pylab.axis(ymin=0.0000000001, ymax=100)
     #pylab.axis("tight")
-    pylab.show()
+    print mean(exponential)
+    print mean(bins)
+    #pylab.show()
       
     
     pylab.savefig(normalize_path(str(topo.sim.time()) + 'activity_histogram.png'))
+    return bins
 
     
     
