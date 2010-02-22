@@ -464,6 +464,7 @@ def measure_histogram(iterations=1000, sheet_name="V1"):
     mu = sum(concat_activities) / len(concat_activities)
     print mu
     (bins, a, b) = pylab.hist(concat_activities, (numpy.arange(80.0) / 40.0) , visible=True)
+    pylab.savefig(normalize_path(str(topo.sim.time()) + 'activity_bar_histogram.png'))
     bins_axis = numpy.arange(79.0) / 40.0 
     bins = bins * 1.0 / sum(bins)
     print sum(bins)
