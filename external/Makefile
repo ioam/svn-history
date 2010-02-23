@@ -965,7 +965,7 @@ termcap-uninstall:
 
 #############################################################
 # CYTHON
-CYTHON = Cython-0.9.8.1.1
+CYTHON = Cython-0.12.1
 
 CYTHON_UNINSTALL += ${PYTHON_LIB}/site-packages/Cython*
 CYTHON_UNINSTALL += ${PYTHON_LIB}/site-packages/pyximport
