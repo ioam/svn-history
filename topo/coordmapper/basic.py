@@ -26,26 +26,21 @@ from topo.misc.util import signabs
 from topo.misc.numbergenerator import UniformRandom, NormalRandom
 
 
-##########################################################################
-# coordinate mapper functions
 
 
 class ConstantMapper(CoordinateMapperFn):
     """
-    Coordinate Mapper that uses constant mapping values.
-
-    Outputs constant coordinate (x_cons, y_cons).
+    Map all values to the same constant, pre-specified coordinates.
     """
-    x_cons = param.Number(default=0.0,bounds=(0,None),doc="""
-       The maximum range of the mapping input.""")
-    y_cons = param.Number(default=0.0,bounds=(0,None), doc="""
-       The y coordinate of the mapping output.""")
+    
+    x_cons = param.Number(default=0.0,doc="""
+       Constant x value returned by the mapping.""")
+    
+    y_cons = param.Number(default=0.0, doc="""
+       Constant y value returned by the mapping.""")
 
     def __call__(self, x, y):
-        """
-        Arguments x and y are used to follow the abstraction class
-        CoordinateMapperFn only.
-        """
+        # Ignores all (x,y), always returning (x_cons,y_cons)
         return self.x_cons, self.y_cons
 
 
