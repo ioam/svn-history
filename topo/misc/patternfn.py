@@ -17,7 +17,7 @@ from math import pi
 from numpy.oldnumeric import where,maximum,cos,sin,sqrt,divide,greater_equal,bitwise_xor,exp
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy.oldnumeric import arcsin,logical_and,logical_or,tan,sin,less,minimum
-from numpy import seterr
+from numpy import seterr, power
 
 from contextlib import contextmanager
 
@@ -56,6 +56,18 @@ def gaussian(x, y, xsigma, ysigma):
         return exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
 
 
+def factorial(x): 
+    return (1 if x <= 1 else x * factorial(x - 1))
+
+#     
+def gamma(x, y, alpha, beta):
+        
+    # BKALERT: erroring for some reason, despite float error ignore.
+    with float_error_ignore():
+        gamma = exp(-x / beta) *  ( 1 / (power(beta, alpha) * factorial(alpha - 1)) ) * power(x, alpha - 1) 
+        
+    return gamma
+    
 def exponential(x, y, xscale, yscale):
     """
     Two-dimensional oriented exponential decay pattern.
