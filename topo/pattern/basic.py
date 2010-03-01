@@ -21,7 +21,7 @@ from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring#,sigmoid
+from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,gamma
 from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,float_error_ignore
 from topo.misc.numbergenerator import UniformRandom
 # BK-Note: Why can we not do a from topo.transferfn import DivisiveNormalizeL1?
@@ -877,22 +877,39 @@ class Sigmoid(PatternGenerator):
 
     
     def function(self, p):
+        
         with float_error_ignore():
             sigmoid = (2.0 / (1.0 + numpy.exp(-2.0 * p.slope * self.pattern_y))) - 1.0            
+        
         return sigmoid
 
-        
+
+class GammaDistribution(PatternGenerator):
+    """
+    The Gamma Distribution represents the sum of N exponentially distributed random variables, 
+    defined in terms of a rate (1/scale) parameter and a shape parameter.
+    
+    The Gaussian Distribution and Exponential Distribution are both special cases of the Gamma,
+    Where the pattern on the sheet can be arranged such that it resembles a one dimensional Gaussian
+    with a movable peak.
+    """
+    
+    rate_parameter = param.Number(default=1.0, bounds=(1.0,None), softbounds=(1.0,100.0), doc="""
+        The scale parameter is the mean of the exponential distribution. 
+        The rate is 1/scale.""")
+    
+    shape_parameter = param.Number(default=1.0, bounds=(1.0,None), softbounds=(1.0,100.0), doc="""
+        The shape parameter represents the number of variables.""")
+
+    def function(self, p):
+         return gamma(self.pattern_x, self.pattern_y, p.shape_parameter, p.rate_parameter);
+
 
 class SigmoidedDoG(PatternGenerator):
     """
     Sigmoid multiplicatively combined with a difference of Gaussians,
     such that one part of the plane can be the mirror image of the other.
     """
-
-    # JABALERT: It would be better to have a default of zero for this composite pattern,
-    # and instead to offset the component parts, so that someone can
-    # easily place this pattern wherever they need to
-    x = param.Number(default=-1.5)
         
     center_size = param.Number(default=0.5, bounds=(0.1,None), softbounds=(0.1,5.0),doc="""
         size parameter for the center Gaussian.""")
@@ -907,21 +924,21 @@ class SigmoidedDoG(PatternGenerator):
         aspect_ratio parameter for the surround Gaussian.""")
     
     sigmoid_slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),doc="""
-        slope parameter for the Sigmoid""")
+        slope parameter for the Sigmoid.""")
     
-    sigmoid_x = param.Number(default=-0.5, bounds=(None,None), softbounds=(-1.0,1.0),doc="""
+    sigmoid_x = param.Number(default=0.0, bounds=(None,None), softbounds=(-1.0,1.0),doc="""
         x parameter for the Sigmoid.""")
 
-    sigmoid_y = param.Number(default=-0.0, bounds=(None,None), softbounds=(-1.0,1.0),doc="""
+    sigmoid_y = param.Number(default=0.0, bounds=(None,None), softbounds=(-1.0,1.0),doc="""
         y parameter for the Sigmoid.""")
 
                                                                                        
     def function(self, p):
-        center   = Gaussian(size=p.center_size, aspect_ratio=p.center_aspect_ratio,
+        center   = Gaussian(size=p.center_size*p.size, aspect_ratio=p.center_aspect_ratio,
                             orientation=p.orientation, x=p.x, y=p.y,
                             output_fns=[topo.transferfn.DivisiveNormalizeL1()])
                                     
-        surround = Gaussian(size=p.surround_size, aspect_ratio=p.surround_aspect_ratio,
+        surround = Gaussian(size=p.surround_size*p.size, aspect_ratio=p.surround_aspect_ratio,
                             orientation=p.orientation, x=p.x, y=p.y,
                             output_fns=[topo.transferfn.DivisiveNormalizeL1()])
         
