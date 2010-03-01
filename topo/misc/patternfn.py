@@ -61,7 +61,7 @@ def factorial(x):
     Recursively calculates the factorial of an integer.
     """
     # Make sure we only get integers.
-    assert type(x) = type(1)
+    assert type(x) == type(1)
     
     # Recursively calculate the factorial.
     return (1 if x <= 1 else x * factorial(x - 1))

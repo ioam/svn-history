@@ -18,8 +18,6 @@ try:
 except ImportError:
     pass
 
-import time
-
 import param
 from param.parameterized import PicklableClassAttributes, ParameterizedFunction
 from param.parameterized import ParamOverrides
@@ -68,7 +66,7 @@ def clear_event_queue():
     topo.sim.event_clear()
 
 
-def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=False,apply_output_fns=True,slow_down_by=0):
+def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=False,apply_output_fns=True):
     """
     Present the specified test patterns for the specified duration.
 
@@ -128,11 +126,6 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
     topo.sim.event_push()
     # CBENHANCEMENT: would be nice to break this up for visualizing motion
     topo.sim.run(duration) 
-    
-    # BKALERT: see CBENHANCEMENT above
-    if slow_down_by > 0:
-        time.sleep(slow_down_by)
-    
     topo.sim.event_pop()
 
     # turn sheets' plasticity and output_fn plasticity back on if we turned it off before
