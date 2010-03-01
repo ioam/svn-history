@@ -57,16 +57,30 @@ def gaussian(x, y, xsigma, ysigma):
 
 
 def factorial(x): 
+    """
+    Recursively calculates the factorial of an integer.
+    """
+    # Make sure we only get integers.
+    assert type(x) = type(1)
+    
+    # Recursively calculate the factorial.
     return (1 if x <= 1 else x * factorial(x - 1))
-
-#     
-def gamma(x, y, alpha, beta):
-        
-    # BKALERT: erroring for some reason, despite float error ignore.
+  
+  
+def gamma(x, y, shape, rate):
+    """
+    Tne one dimensional Gamma Distribution.
+    
+    The Exponential Distribution (peak at either limit), 
+    and The Gaussian (peak in the center) are special cases.
+    """
+    
+    # BKALERT: the code below float errors sometimes, despite float error ignore.
     with float_error_ignore():
-        gamma = exp(-x / beta) *  ( 1 / (power(beta, alpha) * factorial(alpha - 1)) ) * power(x, alpha - 1) 
+        gamma = exp(-x / rate) *  ( 1 / (power(rate, shape) * factorial(shape - 1)) ) * power(x, shape - 1) 
         
     return gamma
+    
     
 def exponential(x, y, xscale, yscale):
     """
