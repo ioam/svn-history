@@ -350,7 +350,7 @@ class ReverseCorrelation(FeatureResponses):
         # here for no reason except maybe the input_sheet got changed). Would be better
         # to have the input_sheet fixed.
         self.initialize_featureresponses(features) 
-        
+
         super(ReverseCorrelation,self).measure_responses(pattern_presenter,param_dict,
                                                          features,display)
                                                          
@@ -387,10 +387,8 @@ class ReverseCorrelation(FeatureResponses):
             for ii in range(rows): 
                 for jj in range(cols):
                     self._featureresponses[sheet][ii,jj]+=sheet.activity[ii,jj]*self.input_sheet.activity
+                    
 
-
-
-                          
 class FeatureMaps(FeatureResponses):
     """
     Measures and collects the responses to a set of features for calculating feature maps.
@@ -585,8 +583,12 @@ class Feature(object):
          else:
              if range is None:
                  raise ValueError('The range or values must be specified.')
-             low_bound,up_bound = self.range
-             values=(frange(low_bound,up_bound,step,not cyclic))
+             elif len(range) == 1: 
+                values=range
+             else:
+                low_bound,up_bound = self.range
+                values=(frange(low_bound,up_bound,step,not cyclic))
+             
              self.values = values if offset == 0 else \
                            [(v+offset)%(up_bound-low_bound) if cyclic else (v+offset)
                             for v in values]
@@ -906,6 +908,7 @@ class PatternPresenter(param.Parameterized):
                 for g in inputs.itervalues():
                     g.offset=0.0
                     g.scale=g.contrast
+                
 
         # blank patterns for unused generator sheets
         for sheet_name in set(all_input_sheet_names).difference(set(input_sheet_names)):
@@ -913,7 +916,6 @@ class PatternPresenter(param.Parameterized):
             
         pattern_present(inputs, self.duration, plastic=False,
                      apply_output_fns=self.apply_output_fns)
-
 
 
 class Subplotting(param.Parameterized):
