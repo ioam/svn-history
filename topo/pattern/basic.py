@@ -867,8 +867,8 @@ class Translator(PatternGenerator):
 
 class Sigmoid(PatternGenerator):
     """
-    Two-dimensional sigmoid pattern, dividing the plane into positive and negative
-    halves with a smoothly sloping transition between them.
+    Two-dimensional sigmoid pattern, dividing the plane into positive
+    and negative halves with a smoothly sloping transition between them.
     """
     
     slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),doc="""
@@ -884,25 +884,29 @@ class Sigmoid(PatternGenerator):
         return sigmoid
 
 
+
 class GammaDistribution(PatternGenerator):
     """
-    The Gamma Distribution represents the sum of N exponentially distributed random variables, 
-    defined in terms of a rate (1/scale) parameter and a shape parameter.
+    The gamma distribution represents the sum of N exponentially
+    distributed random variables, defined in terms of a rate (1/scale)
+    parameter and a shape parameter.
     
-    The Gaussian Distribution and Exponential Distribution are both special cases of the Gamma,
-    Where the pattern on the sheet can be arranged such that it resembles a one dimensional Gaussian
-    with a movable peak.
+    The Gaussian and exponential distributions are both special cases
+    of gamma, where the pattern on the sheet can be arranged such that
+    it resembles a one dimensional Gaussian with a movable peak.
     """
     
     rate_parameter = param.Number(default=1.0, bounds=(1.0,None), softbounds=(1.0,100.0), doc="""
-        The scale parameter is the mean of the exponential distribution. 
+        The mean of the exponential distribution. 
         The rate is 1/scale.""")
     
     shape_parameter = param.Number(default=1.0, bounds=(1.0,None), softbounds=(1.0,100.0), doc="""
-        The shape parameter represents the number of variables.""")
+        Number of variables N.""") # JAB: Which determines what?
+
 
     def function(self, p):
          return gamma(self.pattern_x, self.pattern_y, p.shape_parameter, p.rate_parameter);
+
 
 
 class SigmoidedDoG(PatternGenerator):
