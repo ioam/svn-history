@@ -91,6 +91,10 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
 
     If plastic is False, overwrites the existing values of Sheet.plastic
     to disable plasticity, then reenables plasticity.
+    
+    In order to to see the sequence of values presented, use the back arrow 
+    history mechanism in the GUI. Note that the GUI's Activity window must 
+    be open and the display parameter set to true (display=True).
     """
     # ensure EPs get started (if pattern_present is called before the simulation is run())
     topo.sim.run(0.0) 
