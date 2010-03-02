@@ -21,10 +21,12 @@ from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,gamma
+from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring
 from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,float_error_ignore
 from topo.misc.numbergenerator import UniformRandom
-# BK-Note: Why can we not do a from topo.transferfn import DivisiveNormalizeL1?
+
+# BKALERT: Why can we not do a from topo.transferfn import DivisiveNormalizeL1?
+from scipy.stats.distributions import gengamma as gamma
 
 # Could add a Gradient class, where the brightness varies as a
 # function of an equation for a plane.  This could be useful as a
@@ -884,28 +886,25 @@ class Sigmoid(PatternGenerator):
         return sigmoid
 
 
-
-class GammaDistribution(PatternGenerator):
+class Gamma(PatternGenerator):
     """
-    The gamma distribution represents the sum of N exponentially
-    distributed random variables, defined in terms of a rate (1/scale)
-    parameter and a shape parameter.
+    Gamma resembles a one dimensional gaussian with a movable peak.
+    As such the gaussian and exponential distributions are both special cases of gamma.
     
-    The Gaussian and exponential distributions are both special cases
-    of gamma, where the pattern on the sheet can be arranged such that
-    it resembles a one dimensional Gaussian with a movable peak.
+    By moving the peak to either limit the pattern on the sheet can be arranged such 
+    that it is exponential.
+    
+    By moving the peak to the center the pattern on the sheet can be arranged such 
+    that it is gaussian.
+    
+    Note that gamma is undefined for negative values.
     """
-    
-    rate_parameter = param.Number(default=1.0, bounds=(1.0,None), softbounds=(1.0,100.0), doc="""
-        The mean of the exponential distribution. 
-        The rate is 1/scale.""")
-    
-    shape_parameter = param.Number(default=1.0, bounds=(1.0,None), softbounds=(1.0,100.0), doc="""
-        Number of variables N.""") # JAB: Which determines what?
-
-
+    shape = param.Number(default=0.1, bounds=(0.0,None), inclusive_bounds=(False,True), 
+    softbounds=(0.0,10.0), doc="""The shape parameter directly controls the position of 
+        the peak, which also influences its decay.""")
+        
     def function(self, p):
-         return gamma(self.pattern_x, self.pattern_y, p.shape_parameter, p.rate_parameter);
+         return gamma.pdf(self.pattern_y, p.shape, p.scale);
 
 
 
