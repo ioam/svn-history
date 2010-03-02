@@ -26,7 +26,7 @@ from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,flo
 from topo.misc.numbergenerator import UniformRandom
 
 # BKALERT: Why can we not do a from topo.transferfn import DivisiveNormalizeL1?
-from scipy.stats.distributions import gengamma as gamma
+
 
 # Could add a Gradient class, where the brightness varies as a
 # function of an equation for a plane.  This could be useful as a
@@ -886,33 +886,36 @@ class Sigmoid(PatternGenerator):
         return sigmoid
 
 
+# BKNOTE: Commented out Gamma instead of removing it's dependence on SciPy
+# as its not presently needed. I attempted to copy the SciPy implementation 
+# but its not as straight forward since that in turn depends on a python/c
+# hybrid implementation.
 
-class Gamma(PatternGenerator):
-    """
-    Gamma distribution as a one-dimensional pattern.
-    
-    Gamma resembles a one-dimensional Gaussian with a movable peak,
-    allowing the distribution to be skewed to one side or the other.
-
-    The Gaussian and exponential distributions are both special cases
-    of gamma: with the peak in the center, the distribution is
-    Gaussian, and as the peak is moved to either limit, the
-    distribution approaches an exponential.
-
-    Note that gamma is undefined for negative values.
-    """
-    
-    shape = param.Number(default=0.1, bounds=(0.0,None),
-                         inclusive_bounds=(False,True), 
-                         softbounds=(0.0,10.0), doc="""
-        The position of the peak along the X axis, which also influences
-        its decay.""")
-
-
-    def function(self, p):
-         return gamma.pdf(self.pattern_y, p.shape, p.scale);
-
-
+#class Gamma(PatternGenerator):
+#    """
+#    Gamma distribution as a one-dimensional pattern.
+#    
+#    Gamma resembles a one-dimensional Gaussian with a movable peak,
+#    allowing the distribution to be skewed to one side or the other.
+#
+#    The Gaussian and exponential distributions are both special cases
+#    of gamma: with the peak in the center, the distribution is
+#    Gaussian, and as the peak is moved to either limit, the
+#    distribution approaches an exponential.
+#
+#    Note that gamma is undefined for negative axes coordinates.
+#    """
+#    
+#    shape = param.Number(default=0.1, bounds=(0.0,None),
+#                         inclusive_bounds=(False,True), 
+#                         softbounds=(0.0,10.0), doc="""
+#        The position of the peak along the X axis, which also influences
+#        its decay.""")
+#
+#
+#    def function(self, p):
+#         return gamma.pdf(self.pattern_y, p.shape, p.scale);
+         
 
 class SigmoidedDoG(PatternGenerator):
     """
