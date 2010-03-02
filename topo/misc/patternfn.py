@@ -54,32 +54,6 @@ def gaussian(x, y, xsigma, ysigma):
         x_w = divide(x,xsigma)
         y_h = divide(y,ysigma)
         return exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
-
-
-def factorial(x): 
-    """
-    Recursively calculate the factorial of an integer.
-    """
-    # Make sure we only get integers.
-    assert type(x) == type(1)
-    
-    return (1 if x <= 1 else x * factorial(x - 1))
-  
-  
-def gamma(x, y, shape, rate):
-    """
-    One-dimensional Gamma distribution.
-    
-    The exponential distribution (peak at either limit), and the
-    Gaussian distribution (peak in the center) are special cases.
-    """
-    
-    # BKALERT: the code below float errors sometimes, despite float error ignore.
-    with float_error_ignore():
-        gamma = exp(-x / rate) *  \
-                ( 1 / (power(rate, shape) * factorial(shape - 1)) ) * \
-                power(x, shape - 1)
-    return gamma
     
     
 def exponential(x, y, xscale, yscale):
