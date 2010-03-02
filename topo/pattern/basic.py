@@ -886,23 +886,29 @@ class Sigmoid(PatternGenerator):
         return sigmoid
 
 
+
 class Gamma(PatternGenerator):
     """
-    Gamma resembles a one dimensional gaussian with a movable peak.
-    As such the gaussian and exponential distributions are both special cases of gamma.
+    Gamma distribution as a one-dimensional pattern.
     
-    By moving the peak to either limit the pattern on the sheet can be arranged such 
-    that it is exponential.
-    
-    By moving the peak to the center the pattern on the sheet can be arranged such 
-    that it is gaussian.
-    
+    Gamma resembles a one-dimensional Gaussian with a movable peak,
+    allowing the distribution to be skewed to one side or the other.
+
+    The Gaussian and exponential distributions are both special cases
+    of gamma: with the peak in the center, the distribution is
+    Gaussian, and as the peak is moved to either limit, the
+    distribution approaches an exponential.
+
     Note that gamma is undefined for negative values.
     """
-    shape = param.Number(default=0.1, bounds=(0.0,None), inclusive_bounds=(False,True), 
-    softbounds=(0.0,10.0), doc="""The shape parameter directly controls the position of 
-        the peak, which also influences its decay.""")
-        
+    
+    shape = param.Number(default=0.1, bounds=(0.0,None),
+                         inclusive_bounds=(False,True), 
+                         softbounds=(0.0,10.0), doc="""
+        The position of the peak along the X axis, which also influences
+        its decay.""")
+
+
     def function(self, p):
          return gamma.pdf(self.pattern_y, p.shape, p.scale);
 
