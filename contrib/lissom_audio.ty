@@ -28,7 +28,7 @@ from topo.misc.commandline import global_params as p
 
 p.add (
 
-    density = param.Number(default=20.0,bounds=(0, None),inclusive_bounds=(False,True),doc="""
+    density_multiplier = param.Number(default=1.0,bounds=(0, None),inclusive_bounds=(False,True),doc="""
          Multiplier for the other densities."""),
 
     # Average Human Basilar membrane length = 32mm
@@ -41,20 +41,20 @@ p.add (
     cochlea_aspect_ratio = param.Number(default=0.5,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         Ratio of Cochlea width to its length."""),
                                                   
-    cochlea_density = param.Number(default=1.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
+    cochlea_density = param.Number(default=10.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         The nominal_density to use for the Cochlea."""),
 
-    mgbv_density = param.Number(default=1.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
+    mgbv_density = param.Number(default=10.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         The nominal_density to use for the MGB (Ventral division)."""),
 
-    cortex_density = param.Number(default=2.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
+    cortex_density = param.Number(default=20.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         The nominal_density to use for A1.""")
 
 )
 
-p.cochlea_density = p.cochlea_density * p.density
-p.mgbv_density = p.mgbv_density * p.density
-p.cortex_density = p.cortex_density * p.density
+p.cochlea_density = p.cochlea_density * p.density_multiplier
+p.mgbv_density = p.mgbv_density * p.density_multiplier
+p.cortex_density = p.cortex_density * p.density_multiplier
 
 
 #BK- LOOKHERE
