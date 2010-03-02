@@ -575,7 +575,6 @@ class Feature(object):
          self.value_offset=value_offset
          self.value_multiplier=value_multiplier
                  
-                             
          if values is not None:
              self.values=values if offset == 0 else [v+offset for v in values]
              if not self.range:
@@ -583,16 +582,11 @@ class Feature(object):
          else:
              if range is None:
                  raise ValueError('The range or values must be specified.')
-             elif len(range) == 1: 
-                values=range
-             else:
-                low_bound,up_bound = self.range
-                values=(frange(low_bound,up_bound,step,not cyclic))
-             
+             low_bound,up_bound = self.range
+             values=(frange(low_bound,up_bound,step,not cyclic))
              self.values = values if offset == 0 else \
                            [(v+offset)%(up_bound-low_bound) if cyclic else (v+offset)
                             for v in values]
-
 
 
 class PatternPresenter(param.Parameterized):
