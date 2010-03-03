@@ -41,13 +41,13 @@ p.add (
     cochlea_aspect_ratio = param.Number(default=0.5,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         Ratio of Cochlea width to its length."""),
                                                   
-    cochlea_density = param.Number(default=10.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
+    cochlea_density = param.Number(default=24.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         The nominal_density to use for the Cochlea."""),
 
-    mgbv_density = param.Number(default=10.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
+    mgbv_density = param.Number(default=32.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         The nominal_density to use for the MGB (Ventral division)."""),
 
-    cortex_density = param.Number(default=20.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
+    cortex_density = param.Number(default=48.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         The nominal_density to use for A1.""")
 
 )
@@ -57,7 +57,6 @@ p.mgbv_density = p.mgbv_density * p.density_multiplier
 p.cortex_density = p.cortex_density * p.density_multiplier
 
 
-#BK- LOOKHERE
 projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
 projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()]
@@ -67,11 +66,9 @@ projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
 
 ### Input patterns
 
-input_pattern=pattern.audio.Audio(min_frequency=20,max_frequency=20000,filename="sounds/test.wav",
+# Test sound - Daisy Bell, in tribute to the IBM 704 which in 1962 became the first ever computer to 'sing'.
+input_pattern=pattern.audio.Audio(min_frequency=20,max_frequency=20000,filename="sounds/daisy.wav",
                                   sample_window=0.3,seconds_per_timestep=0.1)
-                                  
-#input_pattern=pattern.audio.Audio(min_frequency=20,max_frequency=20000,filename="sounds/blowin_in_the_wind.wav",
-#                                  sample_window=0.3,seconds_per_timestep=0.1)
 
 
 ### Sheets
@@ -112,15 +109,14 @@ topo.sim.connect(
     connection_type=projection.CFProjection,
     nominal_bounds_template=sheet.BoundingBox(points=((-1,-10),(1,10))),
     cf_shape=pattern.Constant(),
-    weights_generator=pattern.SigmoidedDoG(center_aspect_ratio=3.5,center_size=0.5,
-        surround_aspect_ratio=2.3,surround_size=0.9,
-        sigmoid_slope=8,sigmoid_x=-1.0, size=0.2))
+    weights_generator=pattern.SigmoidedDoG(center_aspect_ratio=4.0,center_size=0.5,
+        surround_aspect_ratio=1.0,surround_size=2.0,
+        sigmoid_slope=9,sigmoid_x=-1.28, size=0.2))
 
 topo.sim.connect(
-    'MGBv','A1',delay=0.05,strength=1.0,name='MGBv Afferent',
+    'MGBv','A1',delay=0.05,strength=0.1,name='MGBv Afferent',
     dest_port=('Activity','JointNormalize','Afferent'),
     connection_type=projection.CFProjection,
-    learning_rate=0.9590/2,
     nominal_bounds_template=sheet.BoundingBox(radius=0.2),
     weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
 
@@ -136,7 +132,7 @@ topo.sim.connect(
     nominal_bounds_template=sheet.BoundingBox(radius=0.22917),
     weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.22917))
 
-
+    
 ### Actions scheduled to occur as the simulation proceeds.
 
 #sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/p.num_inputs,aff_name="Afferent")
