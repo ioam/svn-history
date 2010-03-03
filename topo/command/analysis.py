@@ -304,8 +304,6 @@ pg =  create_plotgroup(name='Projection Activity',category="Basic",
 pg.add_plot('Projection Activity',[('Strength','ProjectionActivity')])
 
 
-
-
 class measure_rfs(SingleInputResponseCommand):
     """
     Map receptive fields by reverse correlation.
@@ -325,17 +323,14 @@ class measure_rfs(SingleInputResponseCommand):
     very effective way to drive the unit to activate.  The value
     should be set high enough that the target units activate at least
     some of the time there is a pattern on the input.
-    """
-    
+    """  
     static_parameters = param.List(default=["offset","size"])
-
     __abstract = True
-
 
     def __call__(self,**params):
         p=ParamOverrides(self,params)
         self.params('input_sheet').compute_default()
-        x=ReverseCorrelation(self._feature_list(p),input_sheet=p.input_sheet) #+change argument
+        x=ReverseCorrelation(self._feature_list(p),input_sheet=p.input_sheet)
         static_params = dict([(s,p[s]) for s in p.static_parameters])
     
         if p.duration is not None:
@@ -343,105 +338,39 @@ class measure_rfs(SingleInputResponseCommand):
         if p.apply_output_fns is not None:
             p.pattern_presenter.apply_output_fns=p.apply_output_fns
         x.collect_feature_responses(p.pattern_presenter,static_params,p.display,self._feature_list(p))
-
-
-    def _feature_list(self,p):
-        # Present the pattern at each pixel location by default
-        l,b,r,t = p.input_sheet.nominal_bounds.lbrt()
-        density=p.input_sheet.nominal_density*1.0 # Should make into a parameter
-        # BKALERT: divisions assumes a square sheet
-        divisions = density*(r-l)-1
-        size = 1.0/density
-        x_range=(r-size/2,l)
-        # BKALERT: why isnt it going half a unit down y here?
-        y_range=(t-size,b)
-        p['size']=size
-
-        # BKALERT: incorrect square sheet assumption means it wont always go all the way down the vertical axis (y) in such a case
-        return [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
-                Feature(name="scale",range=(-p.scale,p.scale),step=p.scale*2)]
-
-
-pg= create_plotgroup(name='RF Projection',category="Other",
-    doc='Measure receptive fields.',
-    pre_plot_hooks=[measure_rfs.instance()],
-    normalize='Individually')
-    
-pg.add_plot('RFs',[('Strength','RFs')])
-
-
-# Class to measure Best Frequency Receptive Fields.
-# We iterate through all possible frequencies (y axis),
-# independent of the temporal aspect (x axis).
-class MeasureFrequencyRFs(measure_rfs):
-
-    # Method to present a pattern, cycling through only y pixel locations.
+          
     def _feature_list(self,p):
     
         # Obtain sheet dimensions and density.
         left, bottom, right, top = p.input_sheet.nominal_bounds.lbrt()
         sheet_density = float(p.input_sheet.nominal_density)
         
-        # Cannot assume square sheet so two independent values for axes divisions,
-        # we, however, only require vertical.
+        # Cannot assume square sheet so two independent values for axes divisions.
         vertical_divisions = (sheet_density * (top - bottom)) - 1
-        
-        # Calculate size of a division
+        horizontal_divisions = (sheet_density * (right - left)) - 1
+
+        # Calculate size of a division.
         unit_size = 1.0 / sheet_density
-        half_unit_size = unit_size / 2.0 # saves repeated calculation
+        half_unit_size = unit_size / 2.0 # saves repeated calculation.
         p['size'] = unit_size
         
-        # Set the y range down by half a unit so patterns are presented in the centre of each unit
+        # Set the x and y max values down by half a unit so patterns are presented in the centre of each unit.
         y_range = (top - half_unit_size, bottom)
+        x_range = (right - half_unit_size, left)
 
-        # BKALERT - check these in with just the comments 1st copied to reverse correlation, then check in with code
-        
-                # Set the x position to the centre + half a unit size so patterns are presented in the centre of the central unit
-        return [Feature(name="x", range=[left + ((right-left)/2.0) + half_unit_size]), 
-                # Set the y range, and set step to one unit at a time.
-                Feature(name="y", range=y_range, step=float(y_range[1] - y_range[0])/vertical_divisions),
+        return [Feature(name="x", range=x_range, step=float(x_range[1]-x_range[0])/horizontal_divisions), 
+                Feature(name="y", range=y_range, step=float(y_range[1]-y_range[0])/vertical_divisions),
                 Feature(name="scale", range=(-p.scale, p.scale), step=p.scale*2)]
-                
-"""                
-pg = create_plotgroup(name='Frequency RF Projection',category='Other',
-    doc='Measure best frequency receptive fields.',
-    pre_plot_hooks=[MeasureFrequencyRFs.instance(display=True, 
-    pattern_presenter=PatternPresenter(RawRectangle(size=0.01,aspect_ratio=100.0)))],
+        
+pg = create_plotgroup(name='RF Projection',category='Other',
+    doc='Measure receptive fields.',
+    pre_plot_hooks=[measure_rfs.instance(display=True, 
+    pattern_presenter=PatternPresenter(RawRectangle(size=0.01,aspect_ratio=1.0)))],
     normalize='Individually')
 
-pg.add_plot('FrequencyRFs',[('Strength','FrequencyRFs')])
-"""
-
-pg= create_plotgroup(name='RF Projection',category='Other',
-    doc='Measure best frequency receptive fields.',
-    pre_plot_hooks=[MeasureFrequencyRFs.instance(display=True, 
-    pattern_presenter=PatternPresenter(RawRectangle(size=0.01,aspect_ratio=100.0)))],
-    normalize='Individually')
-    
 pg.add_plot('RFs',[('Strength','RFs')])
-
-
-
-class MeasureSTRFs(measure_rfs):
-
-    def __call__(self, **params):
-    
-        p = ParamOverrides(self, params)
-        self.params('input_sheet').compute_default()
-        
-        x = BestFrequencyReverseCorrelation(self._feature_list(p),input_sheet=p.input_sheet) #+change argument
-        static_params = dict([(s,p[s]) for s in p.static_parameters])
-    
-        if p.duration is not None:
-            p.pattern_presenter.duration=p.duration
-            
-        if p.apply_output_fns is not None:
-            p.pattern_presenter.apply_output_fns=p.apply_output_fns
-            
-        x.collect_feature_responses(p.pattern_presenter,static_params,p.display,self._feature_list(p))
-        
-        
+ 
+               
 # Helper function for measuring direction maps
 def compute_orientation_from_direction(current_values):
     """ 
