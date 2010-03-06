@@ -26,6 +26,15 @@ try:
 except ImportError:
     print "Warning: Could not import matplotlib; pylab plots will not work."
 
+ipython_imported=False
+try:
+    import ipython
+    ipython_imported=True
+except ImportError:
+    print "Warning: Could not import ipython; certain interactive features will be missing."
+
+
+
 # Startup banner
 BANNER = """
 Welcome to Topographica!
@@ -490,17 +499,18 @@ def process_argv(argv):
         # IPython? Or at least set up some kind of topographica ipython
         # config file
 
-        # Stop IPython namespace hack?
-        # http://www.nabble.com/__main__-vs-__main__-td14606612.html
-        __main__.__name__="__mynamespace__"
+        if ipython_imported:
+            # Stop IPython namespace hack?
+            # http://www.nabble.com/__main__-vs-__main__-td14606612.html
+            __main__.__name__="__mynamespace__"
 
-        from IPython.Shell import IPShell
+            from IPython.Shell import IPShell
 
-        IPShell(['-noconfirm_exit','-nobanner',
-                 '-pi1',CommandPrompt.get_format(),
-                 '-pi2',CommandPrompt2.get_format(),
-                 '-po',OutputPrompt.get_format()],
-                user_ns=__main__.__dict__).mainloop(sys_exit=1)            
+            IPShell(['-noconfirm_exit','-nobanner',
+                     '-pi1',CommandPrompt.get_format(),
+                     '-pi2',CommandPrompt2.get_format(),
+                     '-po',OutputPrompt.get_format()],
+                    user_ns=__main__.__dict__).mainloop(sys_exit=1)            
 
         
 
