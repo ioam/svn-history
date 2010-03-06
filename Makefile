@@ -56,7 +56,7 @@ DIST_ZIP                   = ${DIST_DIRNAME}.zip
 
 
 # Default does not include doc, in case user lacks PHP
-default: win-msys-patch ext-packages topographica
+default: ext-packages topographica
 
 all: default reference-manual doc tests examples 
 
@@ -67,50 +67,6 @@ clean: clean-doc clean-ext-packages clean-compiled
 
 uninstall:
 	make -C external uninstall
-
-
-# Windows: to build topographica using msys, having already installed
-# binary python, pil, jpeg
-win-msys-patch:
-ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
-	mkdir -p bin
-	ln -f -s /c/Python25/python.exe bin/python
-## prerequisites
-	touch external/tcl external/tk external/blt external/python external/pil external/jpeg
-## needed during the build process
-# CEBALERT: shouldn't be required; why can't I get this to work as an
-# option to setup.py? Use site.cfg?
-	echo "[build]" > /c/Python25/Lib/distutils/distutils.cfg
-	echo "compiler = mingw32" >> /c/Python25/Lib/distutils/distutils.cfg
-## topographica.pth for Python to locate Topographica 
-# CEBALERT: means there can only be one copy of Topographica on
-# Windows.  Can't the topographica script modify sys.path at startup?
-# Still, we'd need a way to have this work during the build process,
-# too.
-
-	bin/python external/msys_path.py /c/Python25/Lib/site-packages/topographica.pth ${PREFIX}/lib ${PREFIX}/lib/site-packages
-	patch --force external/Makefile external/Makefile_win_msys.diff
-	touch win-msys-patch
-endif
-
-
-
-win-msys-patch-uninstall:
-	patch --force --reverse external/Makefile external/Makefile_win_msys.diff
-	${RM} win-msys-patch
-	${RM} /c/Python25/Lib/distutils.cfg
-	${RM} /c/Python25/Lib/site-packages/topographica.pth
-# CEBALERT: incomplete
-
-
-# Mac OS X: to build python with X11 Tkinter
-#osx-x11-patch: 
-#	patch --force external/Makefile external/Makefile_OSX_X11.diff
-#	touch osx-x11-patch
-
-#osx-x11-patch-uninstall:
-#	patch --force --reverse external/Makefile external/Makefile_OSX_X11.diff
-#	${RM} osx-x11-patch
 
 
 saved-examples: 
@@ -318,9 +274,6 @@ doc: FORCE
 	make -C doc/
 
 
-# CB: work in progress (to be run on windows, for creating exe)
-build-win-exe: topographica
-	bin/python win_build_exe.py py2exe
 
 #############################################################################
 # For maintainer only; be careful with these commands
@@ -371,7 +324,7 @@ SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_o
 #@@	   ${RM} -r images
 #@@	   ${RM} -r info
 #@@	   mkdir images; mv ./TMPellen_arthur.pgm images/ellen_arthur.pgm
-#@@	   ${RM} -r setup.py setup_ez.py setup_app.py setup_exe.py _setup.py
+#@@	   ${RM} -r setup.py MANIFEST.in
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r contrib/
 #@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn
@@ -419,10 +372,8 @@ dist: doc distdir reference-manual FORCE
 dist-setup.py: doc distdir reference-manual FORCE
 # clean dir but keep setup.py-related files
 	${CD} ${DIST_DIR}; ${MV} setup.py TMPsetup.py
-	${CD} ${DIST_DIR}; ${MV} _setup.py TMP_setup.py
 	${CD} ${DIST_DIR}; make distclean
 	${CD} ${DIST_DIR}; ${MV} TMPsetup.py setup.py
-	${CD} ${DIST_DIR}; ${MV} TMP_setup.py _setup.py
 # won't need to build this copy
 	${RM} ${DIST_DIR}/Makefile 
 	${RM} -r ${DIST_DIR}/external
@@ -437,6 +388,17 @@ ChangeLog.txt: FORCE
 	make -C external svn2cl
 	external/svn2cl -r HEAD:9000 --include-rev --group-by-day --separate-daylogs --break-before-msg --stdout https://topographica.svn.sourceforge.net/svnroot/topographica/ | sed -e 's|/trunk/topographica/||g' > ChangeLog.txt
 
+
+# generate Topographica-xxx.tar.gz (i.e. source suitable for python setup.py install)
+setup.py-sdist: doc reference-manual
+	rm -rf build/ dist/ MANIFEST
+# should automatically update version number in setup.py
+	${PREFIX}/bin/python setup.py sdist
+
+# generate windows exe (like the exe you get for numpy or matplotlib)
+setup.py-bdist_wininst: doc reference-manual
+	${PREFIX}/bin/python setup.py bdist_wininst
+# should add --install-script option including create_shortcut() call, etc
 
 
 ######################################################################

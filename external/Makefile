@@ -18,14 +18,6 @@ ifeq ("$(shell uname -s)","Darwin")
 # CEBALERT: doesn't stop readline building on mac!
 	touch -a readline
 endif
-ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
-	touch -a blt
-	touch -a tcl
-	touch -a tk
-	touch -a python
-	touch -a jpeg
-	touch -a pil
-endif
 
 
 all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
