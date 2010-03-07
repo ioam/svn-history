@@ -389,7 +389,7 @@ fixedpoint: ${FIXEDPT}.tgz python fixedpoint.diff fixedpoint_setup.py
 fixedpoint-clean:
 	rm -rf ${FIXEDPT}
 fixedpoint-uninstall:
-	rm -rf fixedpoint ${FIXEDPT} ${FIXEDPT_UNINSTALL}/fixedpoint.*
+	rm -rf fixedpoint ${FIXEDPT} ${FIXEDPT_UNINSTALL}/fixedpoint*
 
 
 ##############################################################
