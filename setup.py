@@ -12,7 +12,33 @@ setup(
 
     description='A general-purpose neural simulator focusing on topographic maps.',
 
-    long_description="[NOTE: packaging under development.] Topographica is a software package for computational modeling of neural maps. The goal is to help researchers understand brain function at the level of the topographic maps that make up sensory and motor systems.",
+    long_description="""
+`Topographica`_ is a software package for computational modeling of neural maps. The goal is to help researchers understand brain function at the level of the topographic maps that make up sensory and motor systems.
+
+Topographica's full documentation is available at http://topographica.org/.
+
+Installation
+============
+
+Topographica requires `NumPy`_ and `PIL`_. We strongly recommend that you also install `MatPlotLib`_ so you can access all Topographica's plots, as well as `Gmpy`_ and Weave (available as part of `SciPy`_) for optimum performance.
+
+Once you have the prerequisites, you should be able to install Topographica system-wide with a command like ``sudo python setup.py install``, or into your user directory with ``python setup.py install --user``.
+
+Note that this package is not yet fully tested; please see http://topographica.org/Downloads for official releases.
+
+.. _Topographica:
+   http://topographica.org/Home/index.html
+.. _NumPy: 
+   http://pypi.python.org/pypi/numpy
+.. _Gmpy: 
+   http://pypi.python.org/pypi/gmpy
+.. _SciPy: 
+   http://pypi.python.org/pypi/scipy
+.. _MatPlotLib: 
+   http://pypi.python.org/pypi/matplotlib
+.. _PIL: 
+   http://pypi.python.org/pypi/PIL
+""",
 
     author= _topographica_devs,
     author_email= _topographica_devs_email,
