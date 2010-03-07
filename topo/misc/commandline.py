@@ -16,6 +16,7 @@ import sys, __main__, math, os, re
 import topo
 from param.parameterized import Parameterized,OptionalSingleton
 
+# CEBALERT: should these be using parameterized.warning()?
 matplotlib_imported=False
 try:
     # Import matplotlib, if available, and use a non-GUI backend by default

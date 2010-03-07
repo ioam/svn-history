@@ -137,8 +137,16 @@ __all__ = [re.sub('\.py$','',f)
 
 all_doctest = sorted(fnmatch.filter(os.listdir(__path__[0]),'test*.txt'))
 
-import gmpy
-if gmpy.__file__ is None:
+try:
+    import gmpy
+    gmpy_imported=True
+except ImportError:
+    gmpy_imported=False
+
+if gmpy_imported and gmpy.__file__ is None:
+    gmpy_imported=False
+
+if not gmpy_imported:
     import param
     param.Parameterized().warning('no gmpy module: testgmpynumber.txt skipped')
     all_doctest.remove('testgmpynumber.txt')

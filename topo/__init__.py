@@ -141,34 +141,36 @@ def _instance_method_pickle_support():
 _instance_method_pickle_support()
 
 
-# Set the default value of Simulation.time_type to gmpy.mpq
-# If gmpy is unavailable, use the slower fixedpoint.FixedPoint. Also,
-# provide a fake gmpy.mpq (to allow e.g. pickled test data to be
-# loaded).
-# CEBALERT: here while gmpy is not universally available (i.e. for the
-# mac). Once it's always available, the code below should be removed,
-# and gmpy support should be uncommented in topo.misc.legacy (to
-# provide support for pre-gmpy snapshots).
+# Set the default value of Simulation.time_type to gmpy.mpq If gmpy is
+# unavailable, use the slower fixedpoint.FixedPoint. Also, in that
+# case, provide a fake gmpy.mpq (to allow e.g. pickled test data to be
+# loaded). If neither gmpy nor fixedpoint is available, the default
+# will be float. Consider making that be decimal.Decimal.
+import param
+time_type = None
 try:
     import gmpy
     time_type = gmpy.mpq
     time_type_args = ()
     _mpq_pickle_support()
 except ImportError:
-    import param
-    import fixedpoint
-    param.Parameterized().warning('gmpy.mpq not available; using fixedpoint.FixedPoint for simulation time.')
-    time_type = fixedpoint.FixedPoint
-    time_type_args = (4,)  # gives precision=4
+    try:
+        import fixedpoint
+        param.Parameterized().warning('gmpy.mpq not available; using slower fixedpoint.FixedPoint for simulation time.')
+        time_type = fixedpoint.FixedPoint
+        time_type_args = (4,)  # gives precision=4
     
-    from topo.misc.util import gmpyImporter
-    import sys
-    sys.meta_path.append(gmpyImporter())
-
-
+        from topo.misc.util import gmpyImporter
+        import sys
+        sys.meta_path.append(gmpyImporter())
+    except ImportError:
+        param.Parameterized().warning('Neither gmpy nor fixedpoint available; simulation time will use float, which may lead to strange behavior.')
+        
 from topo.base.simulation import Simulation
-Simulation.time_type = time_type
-Simulation.time_type_args = time_type_args
+
+if time_type is not None:
+    Simulation.time_type = time_type
+    Simulation.time_type_args = time_type_args
 
 sim = Simulation() 
 
