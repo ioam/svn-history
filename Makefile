@@ -393,15 +393,16 @@ dist-setup.py: doc distdir reference-manual FORCE
 ######################################################################
 # pypi
 #
-# These commands assume you have run "make dist-setup.py"
-# 
+# These commands assume you have run "make dist-setup.py".
+# (Archives don't include doc/ because of its size.)
+
 # generate Topographica-xxx.tar.gz (i.e. source suitable for python setup.py install)
-setup.py-sdist: doc reference-manual
+setup.py-sdist: 
 # should automatically update version number in setup.py
 	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py sdist
 
 # generate windows exe (like the exe you get for numpy or matplotlib)
-setup.py-bdist_wininst: doc reference-manual
+setup.py-bdist_wininst: 
 # should automatically update version number in setup.py
 	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py bdist_wininst
 # should add --install-script option including create_shortcut() call, etc

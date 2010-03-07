@@ -10,15 +10,15 @@ setup(
 
     version='0.9.7a',
 
-    description='[NOTE: PACKAGING UNDER DEVELOPEMT] A general-purpose neural simulator focusing on topographic maps.',
+    description='A general-purpose neural simulator focusing on topographic maps.',
 
-    long_description="Topographica is a software package for computational modeling of neural maps. The goal is to help researchers understand brain function at the level of the topographic maps that make up sensory and motor systems.",
+    long_description="[NOTE: packaging under development.] Topographica is a software package for computational modeling of neural maps. The goal is to help researchers understand brain function at the level of the topographic maps that make up sensory and motor systems.",
 
     author= _topographica_devs,
     author_email= _topographica_devs_email,
     maintainer= _topographica_devs,
     maintainer_email= _topographica_devs_email,
-    platforms=['Windows','Mac OS X','Linux'],
+    platforms=['Windows', 'Mac OS X', 'Linux'],
     license='GPL',
     download_url='http://sourceforge.net/projects/topographica/files/',
     url='http://topographica.org/',
@@ -36,8 +36,8 @@ setup(
         "Topic :: Scientific/Engineering"],
 
     # Ignored by distutils! Useful only for documentation?
-    requires = ["PIL",          # >= 1.1.6     
-                "numpy"],       # >= 1.1
+    requires = ["PIL (>=1.1.6)",          # >= 1.1.6     
+                "NumPy (>=1.0)"],       # >= 1.1
     # CEBALERT: strongly recommended: gmpy, weave, matplotlib
     #                    recommended: ipython
     #                       optional: scipy
