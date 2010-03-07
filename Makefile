@@ -379,8 +379,7 @@ ChangeLog.txt: FORCE
 dist-setup.py: doc distdir reference-manual FORCE
 # clean dir but keep setup.py-related files
 	svnversion=${shell svnversion}
-# (requires python)
-	${CD} ${DIST_DIR}; python create_topographica_script.py ${RELEASE} ${svnversion}
+	${CD} ${DIST_DIR}; ${PREFIX}/bin/python create_topographica_script.py ${RELEASE} ${svnversion}
 	${CD} ${DIST_DIR}; ${MV} setup.py TMPsetup.py; mv MANIFEST.in tmpMANIFEST.in; mv topographica TMPtopographica
 	${CD} ${DIST_DIR}; make distclean
 	${CD} ${DIST_DIR}; ${MV} TMPsetup.py setup.py; mv tmpMANIFEST.in MANIFEST.in; mv TMPtopographica topographica
@@ -393,20 +392,22 @@ dist-setup.py: doc distdir reference-manual FORCE
 
 ######################################################################
 # pypi
-
+#
+# These commands assume you have run "make dist-setup.py"
+# 
 # generate Topographica-xxx.tar.gz (i.e. source suitable for python setup.py install)
 setup.py-sdist: doc reference-manual
 # should automatically update version number in setup.py
-	${CD} ${DIST_DIR}; python setup.py sdist
+	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py sdist
 
 # generate windows exe (like the exe you get for numpy or matplotlib)
 setup.py-bdist_wininst: doc reference-manual
 # should automatically update version number in setup.py
-	${CD} ${DIST_DIR}; python setup.py bdist_wininst
+	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py bdist_wininst
 # should add --install-script option including create_shortcut() call, etc
 
 pypi-upload:
-	${CD} ${DIST_DIR}; python setup.py register sdist upload
+	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py register sdist upload
 # + bdist_wininst
 
 ######################################################################

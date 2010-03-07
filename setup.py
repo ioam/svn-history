@@ -8,7 +8,7 @@ _topographica_devs_email='developers[at]topographica[dot]org'
 setup(
     name='Topographica',
 
-    version='0.9.7~r10954',
+    version='0.9.7a',
 
     description='[NOTE: PACKAGING UNDER DEVELOPEMT] A general-purpose neural simulator focusing on topographic maps.',
 
@@ -18,7 +18,9 @@ setup(
     author_email= _topographica_devs_email,
     maintainer= _topographica_devs,
     maintainer_email= _topographica_devs_email,
-
+    platforms=['Windows','Mac OS X','Linux'],
+    license='GPL',
+    download_url='http://sourceforge.net/projects/topographica/files/',
     url='http://topographica.org/',
 
     classifiers = [
