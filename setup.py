@@ -2,17 +2,13 @@
 
 from distutils.core import setup
 
-import create_topographica_script
-
-create_topographica_script.write()
-
 _topographica_devs='Topographica Developers'
 _topographica_devs_email='developers[at]topographica[dot]org' 
 
 setup(
     name='Topographica',
 
-    version='0.9.7~r10952',
+    version='0.9.7~r10954',
 
     description='[NOTE: PACKAGING UNDER DEVELOPEMT] A general-purpose neural simulator focusing on topographic maps.',
 
@@ -39,10 +35,10 @@ setup(
 
     # Ignored by distutils! Useful only for documentation?
     requires = ["PIL",          # >= 1.1.6     
-                "numpy",        # >= 1.1
-                "matplotlib",   # >= 0.9
-                "ipython"],     # >= 0.8
-    # CEBALERT: fixedpoint/gmpy, weave, ipython
+                "numpy"],       # >= 1.1
+    # CEBALERT: strongly recommended: gmpy, weave, matplotlib
+    #                    recommended: ipython
+    #                       optional: scipy
 
     # CEBALERT: do I have to list these? if I do, can I generate the list automatically?
     packages=['topo',

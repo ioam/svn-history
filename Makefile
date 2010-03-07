@@ -324,7 +324,7 @@ SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_o
 #@@	   ${RM} -r images
 #@@	   ${RM} -r info
 #@@	   mkdir images; mv ./TMPellen_arthur.pgm images/ellen_arthur.pgm
-#@@	   ${RM} -r setup.py MANIFEST.in
+#@@	   ${RM} -r setup.py MANIFEST.in create_topographica_script.py
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r contrib/
 #@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn
@@ -363,23 +363,6 @@ distdir: FORCE
 dist: doc distdir reference-manual FORCE
 	${CD} ${DIST_DIR}; ${MAKE} distarc
 
-# CEBALERT: should make this use different path? Or sneakily combine
-# with dist somehow? Tradeoff: avoiding interference/surprise vs
-# saving time and hard disks...
-#
-# Create public distribution suitable for python setup.py install, as
-# well as examples and doc archives
-dist-setup.py: doc distdir reference-manual FORCE
-# clean dir but keep setup.py-related files
-	${CD} ${DIST_DIR}; ${MV} setup.py TMPsetup.py
-	${CD} ${DIST_DIR}; make distclean
-	${CD} ${DIST_DIR}; ${MV} TMPsetup.py setup.py
-# won't need to build this copy
-	${RM} ${DIST_DIR}/Makefile 
-	${RM} -r ${DIST_DIR}/external
-# create archives
-	${CD} ${DIST_TMPDIR} ; ${MAKE_ARCHIVE} ${DIST_DIRNAME} | ${COMPRESS_ARCHIVE} > ${DIST_ARCHIVE}
-
 
 # Note that the output needs to be appended to a copy of the old file,
 # to keep old fixes to formatting. The 9000:HEAD can be omitted to get
@@ -389,17 +372,42 @@ ChangeLog.txt: FORCE
 	external/svn2cl -r HEAD:9000 --include-rev --group-by-day --separate-daylogs --break-before-msg --stdout https://topographica.svn.sourceforge.net/svnroot/topographica/ | sed -e 's|/trunk/topographica/||g' > ChangeLog.txt
 
 
+######################################################################
+# Create public distribution suitable for creating setup.py-based
+# packages (e.g. debs)
+
+dist-setup.py: doc distdir reference-manual FORCE
+# clean dir but keep setup.py-related files
+	svnversion=${shell svnversion}
+# (requires python)
+	${CD} ${DIST_DIR}; python create_topographica_script.py ${RELEASE} ${svnversion}
+	${CD} ${DIST_DIR}; ${MV} setup.py TMPsetup.py; mv MANIFEST.in tmpMANIFEST.in; mv topographica TMPtopographica
+	${CD} ${DIST_DIR}; make distclean
+	${CD} ${DIST_DIR}; ${MV} TMPsetup.py setup.py; mv tmpMANIFEST.in MANIFEST.in; mv TMPtopographica topographica
+# won't need to build this copy
+	${RM} ${DIST_DIR}/Makefile 
+	${RM} -r ${DIST_DIR}/external
+# create tar.gz
+	${CD} ${DIST_TMPDIR} ; ${MAKE_ARCHIVE} ${DIST_DIRNAME} | ${COMPRESS_ARCHIVE} > ${DIST_ARCHIVE}
+
+
+######################################################################
+# pypi
+
 # generate Topographica-xxx.tar.gz (i.e. source suitable for python setup.py install)
 setup.py-sdist: doc reference-manual
-	rm -rf build/ dist/ MANIFEST
 # should automatically update version number in setup.py
-	${PREFIX}/bin/python setup.py sdist
+	${CD} ${DIST_DIR}; python setup.py sdist
 
 # generate windows exe (like the exe you get for numpy or matplotlib)
 setup.py-bdist_wininst: doc reference-manual
-	${PREFIX}/bin/python setup.py bdist_wininst
+# should automatically update version number in setup.py
+	${CD} ${DIST_DIR}; python setup.py bdist_wininst
 # should add --install-script option including create_shortcut() call, etc
 
+pypi-upload:
+	${CD} ${DIST_DIR}; python setup.py register sdist upload
+# + bdist_wininst
 
 ######################################################################
 # Ubuntu packages
@@ -433,7 +441,6 @@ DEBUILD = ${UBUNTU_ENV} debuild
 UBUNTU_TARGET = karmic
 UBUNTU_BACKPORTS = jaunty hardy
 
-######################################################################
 # Make binary and source deb files for UBUNTU_TARGET and
 # UBUNTU_BACKPORTS
 deb-svn: 
@@ -471,7 +478,6 @@ deb-svn:
 	cd ${UBUNTU_DIR}/debian; cp ../../changelog.orig changelog
 
 
-######################################################################
 # Upload to PPA for UBUNTU_TARGET and UBUNTU_BACKPORTS
 #
 deb-svn-ppa:
@@ -481,8 +487,6 @@ deb-svn-ppa:
 	cd ${DIST_TMPDIR}; dput topographica-unstable-force-jaunty topographica_${UBUNTU_RELEASE}~jaunty_source.changes
 	cd ${DIST_TMPDIR}; dput topographica-unstable-force-hardy topographica_${UBUNTU_RELEASE}~hardy_source.changes
 
-
-######################################################################
 # Create rpm
 #
 # CEBALERT: untested

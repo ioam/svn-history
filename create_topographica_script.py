@@ -10,9 +10,12 @@ DEFAULTS = dict(python_bin="/usr/bin/env python",
                 release = None,
                 version = None)
 
-def write(python_bin=DEFAULTS['python_bin'],
-          release=DEFAULTS['release'],
-          version=DEFAULTS['version']):
+def write(python_bin=None,release=None,version=None):
+
+    python_bin = python_bin or DEFAULTS['python_bin']
+    release = release or DEFAULTS['release']
+    version = version or DEFAULTS['version']
+
     script = """#!%s
 # Startup script for Topographica
 
@@ -37,25 +40,25 @@ process_argv(argv[1:])
 if __name__=='__main__':
     print "creating topographica script..."
 
-    try:
-        python_bin = sys.argv[1]
-    except:
-        python_bin = DEFAULTS['python_bin']
+    python_bin = DEFAULTS['python_bin']
+    release = DEFAULTS['release']
+    version = DEFAULTS['version']
+
+    args = sys.argv[1::]
+
+    if len(args)==0:
+        pass
+    elif len(args)==1:
+        python_bin = args[0]
+    elif len(args)==3:
+        python_bin = args[0]
+        release = args[1]
+        version = args[2]
+    else:
+        raise ValueError("Pass no arguments, or python_bin or python_bin,release,version")
 
     print "python: %s"%python_bin
-
-    try:
-        release = sys.argv[2]
-    except:
-        release = DEFAULTS['release']
-
     print "release: %s"%release
-
-    try:
-        version = sys.argv[3]
-    except:
-        version = DEFAULTS['version']
-
     print "version: %s"%version
 
     write(python_bin,release,version)
