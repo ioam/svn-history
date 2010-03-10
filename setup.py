@@ -94,13 +94,13 @@ part of `SciPy`_) for optimum performance.
     maintainer_email= _topographica_devs_email,
     platforms=['Windows', 'Mac OS X', 'Linux'],
     license='GPL',
-    download_url='http://sourceforge.net/projects/topographica/files/',
+#    download_url='http://sourceforge.net/projects/topographica/files/',
     url='http://topographica.org/',
 
     classifiers = [
         "License :: OSI Approved :: GNU General Public License (GPL)",
 # (until packaging tested)
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 2",
         "Operating System :: OS Independent",
         "Intended Audience :: Education",
