@@ -52,16 +52,22 @@ setup_args.update(dict(
     long_description="""
 `Topographica`_ is a software package for computational modeling of neural maps. The goal is to help researchers understand brain function at the level of the topographic maps that make up sensory and motor systems.
 
-Topographica's full documentation is available at http://topographica.org/.
+Most users will want to download an official release from http://topographica.org/.
 
 Installation
 ============
 
-Topographica requires `NumPy`_ and `PIL`_. We strongly recommend that you also install `MatPlotLib`_ so you can access all Topographica's plots, as well as `Gmpy`_ and Weave (available as part of `SciPy`_) for optimum performance.
+If you have `easy_install`_ or `pip`_, you could use one of these to
+install Topographica and its dependencies automatically
+(e.g. ``easy_install topographica``).
 
-Once you have the prerequisites, you should be able to install Topographica system-wide with a command like ``sudo python setup.py install``, or into your user directory with ``python setup.py install --user``.
-
-Note that this package is not yet fully tested; please see http://topographica.org/Downloads for official releases.
+Alternatively, you can install Topographica with a command like
+``python setup.py install --user`` (or ``sudo python setup.py
+install`` for a site-wide installation). You will need install at
+least `NumPy`_ and `PIL`_ before running Topographica. We also
+strongly recommend that you install `MatPlotLib`_ so you can access
+all Topographica's plots, as well as `Gmpy`_ and Weave (available as
+part of `SciPy`_) for optimum performance.
 
 .. _Topographica:
    http://topographica.org/Home/index.html
@@ -75,6 +81,11 @@ Note that this package is not yet fully tested; please see http://topographica.o
    http://pypi.python.org/pypi/matplotlib
 .. _PIL: 
    http://pypi.python.org/pypi/PIL
+.. _easy_install:
+   http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _pip:
+   http://pip.openplans.org/
+
 """,
 
     author= _topographica_devs,
