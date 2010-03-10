@@ -18,6 +18,8 @@ TESTDP = 7
 # see topographica-other-python target
 OTHER_PYTHON = "/usr/bin/env python"
 
+SVNVERSION = ${shell svnversion}	
+
 # CEBALERT: tied to exact windows version!
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
 	TIMER = 
@@ -94,11 +96,11 @@ clean-ext-packages:
 # Build the Python startup script.  Rebuilt whenever a file changes in
 # topo/ or examples, to make sure that topo.version is up to date.
 topographica: external Makefile topo/*/*.py examples/*.ty
-	${PREFIX}/create_topographica_script.py ${PREFIX}bin/python ${RELEASE} ${shell svnversion}
+	${PREFIX}/create_topographica_script.py ${PREFIX}bin/python ${RELEASE} ${SVNVERSION}
 
 
 topographica-other-python:
-	${PREFIX}/create_topographica_script.py ${OTHER_PYTHON} ${RELEASE} ${shell svnversion}
+	${PREFIX}/create_topographica_script.py ${OTHER_PYTHON} ${RELEASE} ${SVNVERSION}
 
 
 # CB: experimental
@@ -177,7 +179,7 @@ snapshot-tests: simulation-snapshot-tests snapshot-compatibility-tests script-re
 
 print-info:
 	@echo Running at ${shell date +%s}
-	@echo svnversion ${shell svnversion}
+	@echo svnversion ${SVNVERSION}
 
 # CB: snapshot-tests is not part of slow-tests for the moment
 # (until slow-tests split up on buildbot).
@@ -378,8 +380,7 @@ ChangeLog.txt: FORCE
 
 dist-setup.py: doc distdir reference-manual FORCE
 # clean dir but keep setup.py-related files
-	svnversion=${shell svnversion}
-	${CD} ${DIST_DIR}; ${PREFIX}/bin/python create_topographica_script.py ${RELEASE} ${svnversion}
+	${CD} ${DIST_DIR}; ${PREFIX}/bin/python create_topographica_script.py None ${RELEASE} ${SVNVERSION}
 	${CD} ${DIST_DIR}; ${MV} setup.py TMPsetup.py; mv MANIFEST.in tmpMANIFEST.in; mv topographica TMPtopographica
 	${CD} ${DIST_DIR}; make distclean
 	${CD} ${DIST_DIR}; ${MV} TMPsetup.py setup.py; mv tmpMANIFEST.in MANIFEST.in; mv TMPtopographica topographica
@@ -435,7 +436,7 @@ pypi-upload:
 # have a colon in it). Also, you should pass RELEASE, making it 0.0.1 
 # higher than RELEASE as currently set in this file.
 
-UBUNTU_RELEASE = ${RELEASE}~r${shell svnversion}-0ubuntu0
+UBUNTU_RELEASE = ${RELEASE}~r${SVNVERSION}-0ubuntu0
 UBUNTU_DIR = ${DIST_TMPDIR}/topographica-${UBUNTU_RELEASE}
 UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
 UBUNTU_ENV = env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7

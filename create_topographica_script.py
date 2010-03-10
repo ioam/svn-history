@@ -45,17 +45,8 @@ if __name__=='__main__':
     version = DEFAULTS['version']
 
     args = sys.argv[1::]
-
-    if len(args)==0:
-        pass
-    elif len(args)==1:
-        python_bin = args[0]
-    elif len(args)==3:
-        python_bin = args[0]
-        release = args[1]
-        version = args[2]
-    else:
-        raise ValueError("Pass no arguments, or python_bin or python_bin,release,version")
+    assert len(args)==3, "Pass python_bin, release, version (any of which may be None)"
+    python_bin,release,version = args
 
     print "python: %s"%python_bin
     print "release: %s"%release
