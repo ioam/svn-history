@@ -4,11 +4,11 @@ import sys
 from distutils.core import setup
 
 ### TOPOGRAPHICA DEPENDENCIES ########################################
-required = {}#'PIL':">=1.16",
-            #'numpy':">=1.0"} 
+required = {'PIL':">=1.16",
+            'numpy':">=1.0"} 
 
-recommended = {#'gmpy':'>=1.0',
-               #'matplotlib':'>=0.8',
+recommended = {'gmpy':'>=1.0', 
+               'matplotlib':'>=0.8',
                'weave':'>=0.1'}
 
 optional = {'scipy':'>=0.5','ipython':">=0.7"}
