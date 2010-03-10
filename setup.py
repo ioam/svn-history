@@ -43,7 +43,7 @@ _topographica_devs_email='developers[at]topographica[dot]org'
 
 
 setup_args.update(dict(
-    name='Topographica',
+    name='topographica',
 
     version='0.9.7a',
 
