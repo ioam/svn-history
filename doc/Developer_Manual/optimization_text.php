@@ -1,6 +1,6 @@
 <H1>Performance optimization</H1>
 
-<P>Hello According to C.A.R. Hoare, "Premature optimization is the root of all
+<P>According to C.A.R. Hoare, "Premature optimization is the root of all
 evil".  Although the performance of Topographica is critically
 important, the way to achieve high performance is by spending <i>all</i> of
 our optimization efforts on the very small portion of the code that
@@ -129,7 +129,7 @@ instance the <code>CFProjection</code> has a learning function of
 the simulation.
 
 In order to see how basic optimisation could be applied lets first roll this
-script to the unoptimised version. You can do this by editing 
+script back to the unoptimised version. You can do this by editing 
 <code>examples/lissom_oo_or.ty</code>. Replace code at line 76 with the following:
 <code>projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct()</code> 
 
@@ -138,7 +138,8 @@ script to the unoptimised version. You can do this by editing
 performance:
 
 <pre>
-./topographica examples/lissom_oo_or.ty -c "from topo.misc.util import profile; profile('topo.sim.run(99)',n=20)"  
+$ ./topographica examples/lissom_oo_or.ty -c "from topo.misc.util import profile; \
+profile('topo.sim.run(99)',n=20)"  
 
          28115548 function calls (28112974 primitive calls) in 74.199 CPU seconds
 
@@ -253,7 +254,7 @@ all the CFs and having the slice_arrays available, all in C++, etc-
 should add this explanation somewhere -->
 <!-- CB: certainly for the response function, anyway.-->
 
-<P>Lets edit the <code>examples/lissom_oo_or.ty</code> file once again and replace
+<P>Let us edit the <code>examples/lissom_oo_or.ty</code> file once again and replace
 the code at line 76 with 
 <code>projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()</code> </P>
 
