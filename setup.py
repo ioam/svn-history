@@ -1,11 +1,48 @@
 #!/usr/bin/env python
 
+import sys
 from distutils.core import setup
+
+### TOPOGRAPHICA DEPENDENCIES ########################################
+required = {}#'PIL':">=1.16",
+            #'numpy':">=1.0"} 
+
+recommended = {#'gmpy':'>=1.0',
+               #'matplotlib':'>=0.8',
+               'weave':'>=0.1'}
+
+optional = {'scipy':'>=0.5','ipython':">=0.7"}
+            
+# for easy_install
+packages_to_install = [required,recommended]
+
+# for pypi/distutils
+packages_to_state = [required]
+######################################################################
+
+setup_args = {}
+
+
+if 'setuptools' in sys.modules:
+    # support easy_install without depending on setuptools
+    install_requires = []
+    for package_list in packages_to_install:
+        install_requires+=["%s%s"%(package,version) for package,version in package_list.items()]
+    setup_args['install_requires']=install_requires
+    setup_args['dependency_links']=["http://buildbot.topographica.org/extra/"]
+    setup_args['zip_safe']=False
+
+for package_list in packages_to_state:
+    requires = []
+    requires+=["%s (%s)"%(package,version) for package,version in package_list.items()]
+    setup_args['requires']=requires
+
 
 _topographica_devs='Topographica Developers'
 _topographica_devs_email='developers[at]topographica[dot]org' 
 
-setup(
+
+setup_args.update(dict(
     name='Topographica',
 
     version='0.9.7a',
@@ -61,13 +98,6 @@ Note that this package is not yet fully tested; please see http://topographica.o
         "Topic :: Education",
         "Topic :: Scientific/Engineering"],
 
-    # Ignored by distutils! Useful only for documentation?
-    requires = ["PIL (>=1.1.6)",          # >= 1.1.6     
-                "NumPy (>=1.0)"],       # >= 1.1
-    # CEBALERT: strongly recommended: gmpy, weave, matplotlib
-    #                    recommended: ipython
-    #                       optional: scipy
-
     # CEBALERT: do I have to list these? if I do, can I generate the list automatically?
     packages=['topo',
               'param',
@@ -99,5 +129,8 @@ Note that this package is not yet fully tested; please see http://topographica.o
         'topo.command':['*.png','*.pdf'],
         'topo.tests':['*.txt','*.jpg','*.pgm']},
 
-    scripts = ['topographica'])
+    scripts = ['topographica']))
 
+
+
+setup(**setup_args)
