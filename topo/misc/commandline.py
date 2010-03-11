@@ -32,7 +32,7 @@ try:
     import ipython
     ipython_imported=True
 except ImportError:
-    print "Warning: Could not import ipython; certain interactive features will be missing."
+    print "Note: IPython is not available; using basic interactive Python prompt instead."
 
 
 

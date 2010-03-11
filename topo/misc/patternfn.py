@@ -58,8 +58,8 @@ def gaussian(x, y, xsigma, ysigma):
 
 def sigmoid(axis, slope):     
     """
-    Two-dimensional sigmoid pattern, dividing the plane into positive
-    and negative halves with a smoothly sloping transition between them.
+    Sigmoid dividing axis into positive and negative halves with a
+    smoothly sloping transition between them (controlled by the slope).
     """
     with float_error_ignore():
         return (2.0 / (1.0 + exp(-2.0*slope*axis))) - 1.0   
