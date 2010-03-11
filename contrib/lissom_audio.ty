@@ -66,10 +66,35 @@ projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
 
 ### Input patterns
 
-# Test sound - Daisy Bell, in tribute to the IBM 704 which in 1962 became the first ever computer to 'sing'.
-input_pattern=pattern.audio.Audio(min_frequency=20,max_frequency=20000,filename="sounds/daisy.wav",
-                                  sample_window=0.3,seconds_per_timestep=0.1)
+## Complex Test Sound
+# Guitar rendition of Daisy Bell, in tribute to the IBM 704
+# which in 1962 became the first ever computer to 'sing'.
+sound_file = "complex/daisy"
 
+## Pure Sine Waves
+#sound_file = "sine_waves/00020hz"
+#sound_file = "sine_waves/00030hz"
+#sound_file = "sine_waves/00040hz"
+#sound_file = "sine_waves/00050hz"
+#sound_file = "sine_waves/00060hz"
+#sound_file = "sine_waves/00100hz"
+#sound_file = "sine_waves/00200hz"
+#sound_file = "sine_waves/00500hz"
+#sound_file = "sine_waves/01000hz"
+#sound_file = "sine_waves/02000hz"
+#sound_file = "sine_waves/05000hz"
+#sound_file = "sine_waves/08000hz"
+#sound_file = "sine_waves/10000hz"
+#sound_file = "sine_waves/12000hz"
+#sound_file = "sine_waves/15000hz"
+#sound_file = "sine_waves/16000hz"
+#sound_file = "sine_waves/17000hz"
+#sound_file = "sine_waves/18000hz"
+#sound_file = "sine_waves/19000hz"
+#sound_file = "sine_waves/20000hz"
+
+input_pattern=pattern.audio.Spectrogram(min_frequency=20,max_frequency=20000,filename="sounds/"+sound_file+".wav",
+                                  sample_window=0.3,seconds_per_timestep=0.1)
 
 ### Sheets
 
@@ -99,8 +124,13 @@ topo.sim['A1']=sheet.lissom.LISSOM(
     nominal_bounds=sheet.BoundingBox(points=((-a1_half_width,-a1_half_length),
                                              (a1_half_width,a1_half_length) )),
     joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt)
+ 
+       
+#topo.sim['Test']=sheet.GeneratorSheet(
+#    nominal_density = 24.0,
+#    nominal_bounds = sheet.BoundingBox(points=((-5,-2),(5,2))),
+#    input_generator=input_pattern,period=1.0,phase=0.05)
     
-
 
 ### Connections
 

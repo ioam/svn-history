@@ -77,8 +77,8 @@ class Spectrogram(OneDPowerSpectrum):
     # BKALERT: accurate cochlear map is very simple but we need to define our own space.
     #          again, not hard or long, just not currently a priority
     def _generate_frequency_indices(self, mini, maxi, length):
-        #return numpy.logspace(numpy.log10(maxi),numpy.log10(mini),num=length,endpoint=True).astype(int)
-        return numpy.linspace(maxi, mini, num = length, endpoint = True).astype(int)
+        return numpy.logspace(numpy.log10(maxi),numpy.log10(mini),num=length,endpoint=True).astype(int)
+        #return numpy.linspace(maxi, mini, num = length, endpoint = True).astype(int)
 
 
     def _create_indices(self, p):
