@@ -367,7 +367,7 @@ dist: doc distdir reference-manual FORCE
 
 
 # Note that the output needs to be appended to a copy of the old file,
-# to keep old fixes to formatting. The 9000:HEAD can be omitted to get
+# to keep old fixes to formatting. The HEAD:9000 can be omitted to get
 # the full list, but this is faster.
 ChangeLog.txt: FORCE
 	make -C external svn2cl

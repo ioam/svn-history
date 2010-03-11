@@ -141,7 +141,7 @@ def _instance_method_pickle_support():
 _instance_method_pickle_support()
 
 
-# Set the default value of Simulation.time_type to gmpy.mpq If gmpy is
+# Set the default value of Simulation.time_type to gmpy.mpq. If gmpy is
 # unavailable, use the slower fixedpoint.FixedPoint. Also, in that
 # case, provide a fake gmpy.mpq (to allow e.g. pickled test data to be
 # loaded). If neither gmpy nor fixedpoint is available, the default
