@@ -68,8 +68,8 @@ def sigmoid(axis, slope):
 def log_gaussian(x, y, x_sigma, y_sigma, x_center, y_center):
     """
     Two-dimensional oriented Log Gaussian pattern (i.e., 2D version of a
-    bell curve with an independant, movable peak. Much like a normal 
-    distribution but not necessarily placing the peak above the center,
+    bell curve with an independent, movable peak). Much like a normal 
+    distribution, but not necessarily placing the peak above the center,
     and not necessarily summing to 1.0).
     """
     if x_sigma==0.0 or y_sigma==0.0:
