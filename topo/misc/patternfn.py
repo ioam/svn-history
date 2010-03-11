@@ -15,9 +15,9 @@ __version__='$Revision$'
 from math import pi
 
 from numpy.oldnumeric import where,maximum,cos,sin,sqrt,divide,greater_equal,bitwise_xor,exp
-from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
+from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or,subtract
 from numpy.oldnumeric import arcsin,logical_and,logical_or,tan,sin,less,minimum
-from numpy import seterr, power
+from numpy import seterr,power,log,sum,size,where
 
 from contextlib import contextmanager
 
@@ -55,7 +55,16 @@ def gaussian(x, y, xsigma, ysigma):
         y_h = divide(y,ysigma)
         return exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
     
-    
+
+def sigmoid(axis, slope):     
+    """
+    Two-dimensional sigmoid pattern, dividing the plane into positive
+    and negative halves with a smoothly sloping transition between them.
+    """
+    with float_error_ignore():
+        return (2.0 / (1.0 + exp(-2.0*slope*axis))) - 1.0   
+        
+     
 def exponential(x, y, xscale, yscale):
     """
     Two-dimensional oriented exponential decay pattern.

@@ -21,7 +21,7 @@ from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring
+from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,sigmoid
 from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,float_error_ignore
 from topo.misc.numbergenerator import UniformRandom
 
@@ -866,7 +866,6 @@ class Translator(PatternGenerator):
             orientation=(direction-pi/2)+p.generator.orientation)
 
 
-
 class Sigmoid(PatternGenerator):
     """
     Two-dimensional sigmoid pattern, dividing the plane into positive
@@ -877,44 +876,8 @@ class Sigmoid(PatternGenerator):
         Multiplicative parameter controlling the smoothness of the transition 
         between the two regions; high values give a sharp transition.""")
 
-    
     def function(self, p):
-        
-        with float_error_ignore():
-            sigmoid = (2.0 / (1.0 + numpy.exp(-2.0 * p.slope * self.pattern_y))) - 1.0            
-        
-        return sigmoid
-
-
-# BKNOTE: Commented out Gamma instead of removing it's dependence on SciPy
-# as its not presently needed. I attempted to copy the SciPy implementation 
-# but its not as straight forward since that in turn depends on a python/c
-# hybrid implementation.
-
-#class Gamma(PatternGenerator):
-#    """
-#    Gamma distribution as a one-dimensional pattern.
-#    
-#    Gamma resembles a one-dimensional Gaussian with a movable peak,
-#    allowing the distribution to be skewed to one side or the other.
-#
-#    The Gaussian and exponential distributions are both special cases
-#    of gamma: with the peak in the center, the distribution is
-#    Gaussian, and as the peak is moved to either limit, the
-#    distribution approaches an exponential.
-#
-#    Note that gamma is undefined for negative axes coordinates.
-#    """
-#    
-#    shape = param.Number(default=0.1, bounds=(0.0,None),
-#                         inclusive_bounds=(False,True), 
-#                         softbounds=(0.0,10.0), doc="""
-#        The position of the peak along the X axis, which also influences
-#        its decay.""")
-#
-#
-#    def function(self, p):
-#         return gamma.pdf(self.pattern_y, p.shape, p.scale);
+        return sigmoid(self.pattern_y, p.slope)
          
 
 class SigmoidedDoG(PatternGenerator):
@@ -964,16 +927,13 @@ class SigmoidedDoG(PatternGenerator):
         return Composite(generators=[dog, sigmoid], operator=numpy.multiply,
                          xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
 
-
                                 
-# how much preprocessing to offer? E.g. Offer to remove DC? Etc.
 class OneDPowerSpectrum(PatternGenerator):
     """
     Outputs the spectral density of a rolling window of the input
     signal each time it is called. Over time, generates a spectrogram.
     """
-
-    window_length = param.Number(default=4,constant=True,doc="""
+    window_length = param.Number(default=1,constant=True,doc="""
         The most recent portion of the signal on which to perform the Fourier
         transform, in units of 1/sample_rate, i.e., the length of a
         sliding window on which to operate.
@@ -985,11 +945,10 @@ class OneDPowerSpectrum(PatternGenerator):
     window_overlap = param.Number(default=0,constant=True,doc="""
         The amount of overlap between each window, in units of 1/sample_rate.""")
 
-    # JABALERT: Should this be an integer?  Clarify what unit time means.
-    sample_rate = param.Number(default=100,constant=True,doc="""
-        Number of samples per unit time, which defines the unit for frequency.""")
+    sample_rate = param.Number(default=44100,constant=True,doc="""
+        Number of samples per second, which defines the unit for frequency.""")
 
-    windowing_function = param.Parameter (default=numpy.hanning,constant=True,doc="""
+    windowing_function = param.Parameter(default=numpy.hanning,constant=True,doc="""
         This function is multiplied with the current window, i.e. the
         most recent portion of the waveform interval of a signal, before
         performing the Fourier transform.  It thus shapes the
@@ -1005,10 +964,10 @@ class OneDPowerSpectrum(PatternGenerator):
         http://docs.scipy.org/doc/numpy/reference/routines.window.html
         You can also supply your own.""")
 
-    min_frequency = param.Number(default=20,doc="""
+    min_frequency = param.Number(default=1,doc="""
         Smallest frequency for which to return an amplitude.""")
 
-    max_frequency = param.Number(default=20000,doc="""
+    max_frequency = param.Number(default=100000,doc="""
         Largest frequency for which to return an amplitude.""")
     
     
@@ -1019,7 +978,8 @@ class OneDPowerSpectrum(PatternGenerator):
 
     @as_uninitialized
     def _initialize_window_parameters(self, signal, **params):
-       
+        # BK-ALERT: how much preprocessing to offer? E.g. Offer to remove DC? Etc.
+
         # CEBALERT! For subclasses: to specify the values of
         # parameters on this, the parent class, subclasses might first
         # need access to their own parameter values. Having the window
@@ -1037,18 +997,15 @@ class OneDPowerSpectrum(PatternGenerator):
         self._overlap_samples = int(self.window_overlap * self.sample_rate)
         self._window_samples  = int(self.window_length  * self.sample_rate)
         self.smoothing_window = self.windowing_function(self._window_samples)  
-         
+
         # get the frequencies back from a fft
         self._all_frequencies = numpy.fft.fftfreq(self._window_samples,d=1.0/self.sample_rate)[0 : self._window_samples/2]
         
         # depends on numpy.fftfreq ordering
         assert self._all_frequencies.min() >= 0
-        
+
         # set the 'current position in sound file' pointer to the start
         self.location = 0
-        
-        # this is used by _create_indices when initialising the spectrogram array
-        self._first_run = True
 
 
     def _create_indices(self, p):
@@ -1060,36 +1017,26 @@ class OneDPowerSpectrum(PatternGenerator):
                              %( p.min_frequency, p.max_frequency, self._all_frequencies.min(), self._all_frequencies.max() ))
         
         # set up a sheet to populate
-        shape = SheetCoordinateSystem(p.bounds, p.xdensity, p.ydensity).shape
+        self.sheet_shape = SheetCoordinateSystem(p.bounds, p.xdensity, p.ydensity).shape
 
         # indices of those frequences from the fft closest to user defined minimum and maximum
         mini = numpy.nonzero(self._all_frequencies >= p.min_frequency)[0][0]
         maxi = numpy.nonzero(self._all_frequencies <= p.max_frequency)[0][-1]
         
         # frquency indicies, ie num of rows
-        self._frequency_indices = self._generate_frequency_indices(mini, maxi, shape[0])
+        self._frequency_indices = self._generate_frequency_indices(mini, maxi, self.sheet_shape[0])
         self.frequencies = self._all_frequencies[self._frequency_indices]
 
-        # initalise a new, empty, spectrogram of the size of the sheet
-        # ie implicitly control buffer size through sheet size 
-        if self._first_run:
-            self._spectrogram = numpy.zeros(shape, dtype = numpy.float32)
-            self._first_run = False
-                
 
     # CEBALERT: space function should probably be a parameter
-    # BK-TODO: see cebalert above
-    # BK-TODO: approximate cochlear map is very easy but we need to define our own space.
-    #           again, not hard or long, just not currently a priority
     def _generate_frequency_indices(self, mini, maxi, length):
-        
-        # stretch data over linear space between mini and maxi, with number of samples num.
-        # endpoint = true means last point is maxi, not some multiple of num closest to maxi
-        return numpy.linspace(mini, maxi, num = length, endpoint = True).astype(int)
+        # stretch data over linear space between mini and maxi, with number of 
+        # samples num. endpoint = true means last point is maxi, not some multiple of samples
+        # num closest to maxi.
+        return numpy.linspace(maxi, mini, num = length, endpoint = True).astype(int)
 
 
-
-    def __call__(self, **params_to_override):
+    def _do_fft(self, **params_to_override):
         """
         Perform a real Discrete Fourier Transform (DFT; implemented
         using a Fast Fourier Transform algorithm, FFT) of the current
@@ -1111,15 +1058,12 @@ class OneDPowerSpectrum(PatternGenerator):
         end = self.location - self._overlap_samples
         start = end - self._window_samples
 
+        # BK-ALERT: would be nice to have this as an option.
         # if not enough signal has come in yet to fill sliding window
         if start < 0:
             # fill an array the size of the smoothing window with zeros
             signal_sample = numpy.zeros(self.smoothing_window.shape)
-            
-            # BK-NOTE: why are we doing this? if the window is empty does it
-            #           not make sense to simply call ourselves again till 
-            #           this condition is false?
-            
+
         elif end > self.signal.size:
             # Could loop around and print warning. 
 
@@ -1138,21 +1082,15 @@ class OneDPowerSpectrum(PatternGenerator):
             # take our snippit of signal ...
             signal_sample = self.signal[start : end]
         
-        
         # ... and do a fft on it for amplitudes
-        # BK-NOTE: ask Chris why we're only keeping half ..
-        all_amplitudes = numpy.abs( numpy.fft.rfft(signal_sample * self.smoothing_window) )[0 : len(signal_sample) / 2]
-        amplitudes = all_amplitudes[self._frequency_indices].reshape( len(self._frequency_indices), 1 )
+        #all_amplitudes = numpy.abs(numpy.fft.rfft(signal_sample * self.smoothing_window))[0 : len(signal_sample) / 2]
+        all_amplitudes = numpy.abs(numpy.fft.rfft(signal_sample))[0 : len(signal_sample) / 2]
+        return all_amplitudes[self._frequency_indices].reshape(len(self._frequency_indices), 1)
         
-        # add on latest spectral information to the rightmost edge
-        self._spectrogram = numpy.hstack((self._spectrogram, amplitudes))
-                
-        # knock off the column on the left-most edge
-        temporary_spectogram = self._spectrogram.copy()
-        self._spectrogram = temporary_spectogram[0: , 1:]
-
-        return self._spectrogram
-
+        
+    def __call__(self, **params_to_override):
+        return _do_fft(**params_to_override)
+    
 
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,PatternGenerator)]))

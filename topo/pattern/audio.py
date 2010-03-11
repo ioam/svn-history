@@ -24,14 +24,14 @@ except ImportError:
 
 
 
-class Audio(OneDPowerSpectrum):
+class Spectrogram(OneDPowerSpectrum):
     """
     Returns the spectral density of a rolling window of the input
     audio signal each time it is called. Over time, outputs an audio
     spectrogram.
     """
 
-    filename=Filename(default='sounds/test.wav',constant=True,precedence=0.9,doc="""
+    filename=Filename(default='sounds/complex/daisy.wav',constant=True,precedence=0.9,doc="""
         File path (can be relative to Topographica's base path) to an
         audio file.  The audio can be in any format accepted by
         pyaudiolab, e.g. WAV, AIFF, or FLAC.""")
@@ -39,7 +39,7 @@ class Audio(OneDPowerSpectrum):
     seconds_per_timestep=param.Number(default=1.0,constant=True,doc="""
         Number of seconds represented by 1 simulation time step.""")
 
-    sample_window=param.Number(default=2.0,constant=True,doc="""
+    sample_window=param.Number(default=1.0,constant=True,doc="""
         The length of interval of the signal (in seconds) on which to
         perform the Fourier transform.
 
@@ -66,11 +66,49 @@ class Audio(OneDPowerSpectrum):
                                            window_length=self.seconds_per_timestep,
                                            window_overlap=self.sample_window-self.seconds_per_timestep)
     
+    
+    def _initialize_window_parameters(self, signal, **params):
+        # this is used by _create_indices when initialising the spectrogram array
+        self._first_run = True
+        
+        super(Spectrogram, self)._initialize_window_parameters(signal, **params)
+        
+    
+    # BKALERT: accurate cochlear map is very simple but we need to define our own space.
+    #          again, not hard or long, just not currently a priority
     def _generate_frequency_indices(self, mini, maxi, length):
-        # logarithmic selection
-        return numpy.logspace( numpy.log10(mini), numpy.log10(maxi), num=length, endpoint=True ).astype(int)
+        #return numpy.logspace(numpy.log10(maxi),numpy.log10(mini),num=length,endpoint=True).astype(int)
+        return numpy.linspace(maxi, mini, num = length, endpoint = True).astype(int)
 
 
+    def _create_indices(self, p):
+        super(Spectrogram, self)._create_indices(p)
+
+        # initalise a new, empty, spectrogram of the size of the sheet
+        # ie implicitly control buffer size through sheet size 
+        if self._first_run:
+            self._spectrogram = numpy.zeros(self.sheet_shape, dtype = numpy.float32)
+            self._first_run = False
+            
+            
+    def __call__(self, **params_to_override):
+        """
+        Return a spectrogram by performing a real Discrete Fourier 
+        Transform (DFT; implemented using a Fast Fourier Transform 
+        algorithm, FFT) of the next sample segment in the signal, 
+        appended to the previous spectral history.
+
+        See numpy.rfft for information about the Fourier transform.
+        """
+        amplitudes = super(Spectrogram, self)._do_fft(**params_to_override)
+        
+        # add on latest spectral information to the left edge
+        self._spectrogram = numpy.hstack((amplitudes, self._spectrogram))
+                
+        # knock off the column on the right-most edge
+        self._spectrogram = self._spectrogram[0:, 0:self._spectrogram.shape[1]-1]
+        return self._spectrogram
+        
 
 if __name__=='__main__' or __name__=='__mynamespace__':
 
@@ -78,9 +116,8 @@ if __name__=='__main__' or __name__=='__mynamespace__':
     import topo
 
     topo.sim['C']=sheet.GeneratorSheet(
-        input_generator=Audio(filename='sounds/test.wav',sample_window=0.3,
-                              seconds_per_timestep=0.1,min_frequency=100,max_frequency=10000),
-        nominal_density=10,nominal_bounds=sheet.BoundingBox(points=((-0.1,-0.5),(0.0,0.5))),
-        period=1.0,phase=0.05)
+        input_generator=Spectrogram(filename='sounds/complex/daisy.wav',sample_window=0.3,
+            seconds_per_timestep=0.1,min_frequency=20,max_frequency=20000),nominal_density=10,
+            nominal_bounds=sheet.BoundingBox(points=((-0.1,-0.5),(0.0,0.5))),period=1.0,phase=0.05)
 
 
