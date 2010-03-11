@@ -64,7 +64,37 @@ def sigmoid(axis, slope):
     with float_error_ignore():
         return (2.0 / (1.0 + exp(-2.0*slope*axis))) - 1.0   
         
-     
+
+def log_gaussian(x, y, x_sigma, y_sigma, x_center, y_center):
+    """
+    Two-dimensional oriented Log Gaussian pattern (i.e., 2D version of a
+    bell curve with an independant, movable peak. Much like a normal 
+    distribution but not necessarily placing the peak above the center,
+    and not necessarily summing to 1.0).
+    """
+    if x_sigma==0.0 or y_sigma==0.0:
+        return x * 0.0
+
+    with float_error_ignore():
+
+        # Explicitly replace all negative 
+        # values in x and y with 0.0.
+        # This version of numpy.log doesn't 
+        # handle log errors gracefully. 
+        x = log( where(x>0.0,x,0.0) )
+        y = log( where(y>0.0,y,0.0) )
+        
+        # Adjust position of peak
+        x = subtract(x,x_center)
+        y = subtract(y,y_center)
+
+        # Adjust decay rate
+        x = divide( power(x,2),power(x_sigma,2) )
+        y = divide( power(y,2),power(y_sigma,2) )
+    
+        return exp(-0.5 * (x + y))
+        
+                  
 def exponential(x, y, xscale, yscale):
     """
     Two-dimensional oriented exponential decay pattern.

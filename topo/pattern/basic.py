@@ -21,7 +21,7 @@ from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,sigmoid
+from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,sigmoid,log_gaussian
 from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,float_error_ignore
 from topo.misc.numbergenerator import UniformRandom
 
@@ -880,6 +880,44 @@ class Sigmoid(PatternGenerator):
         return sigmoid(self.pattern_y, p.slope)
          
 
+class LogGaussian(PatternGenerator):
+    """
+    2D Log Gaussian pattern generator allowing standard gaussian 
+    patterns but with the added advantage of movable peaks.
+
+    The sigmas, governing decay rates from the peak of the Gaussian,
+    are calculated from the size and aspect_ratio parameters as
+    follows:
+
+      y_sigma = size / 2
+      x_sigma = y_sigma * aspect_ratio
+
+    """
+    
+    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+        doc="""Ratio of the pattern's width to its height.""")
+    
+    size = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+        doc="""Overall size of the pattern on the sheet.""")
+    
+    x_peak = param.Number(default=0.0,bounds=(None,None),softbounds=(-10.0,10.0),
+        doc="""Position of peak along the X axis, relative to the pattern.""")
+
+    y_peak = param.Number(default=0.0,bounds=(None,None),softbounds=(-10.0,10.0),
+        doc="""Position of peak along the Y axis, relative to the pattern.""")
+
+    # Cannot calculate logs of negative values and hence the pattern is drawn
+    # in the positive sheet quadrant. As such it is not immediately visible on
+    # rectangular sheets and is partially occluded on square sheets. To rememdy
+    # this simply shift it -1.0 in each axis such that it is central to the sheet.
+        
+    def function(self, p):
+        y_sigma = p.size/2.0
+        x_sigma = y_sigma*p.aspect_ratio
+        
+        return log_gaussian(self.pattern_x, self.pattern_y, x_sigma, y_sigma, p.x_peak, p.y_peak)
+  
+              
 class SigmoidedDoG(PatternGenerator):
     """
     Sigmoid multiplicatively combined with a difference of Gaussians,
@@ -926,8 +964,8 @@ class SigmoidedDoG(PatternGenerator):
 
         return Composite(generators=[dog, sigmoid], operator=numpy.multiply,
                          xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
-
-                                
+        
+                                                                        
 class OneDPowerSpectrum(PatternGenerator):
     """
     Outputs the spectral density of a rolling window of the input
