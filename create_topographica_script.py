@@ -40,13 +40,12 @@ process_argv(argv[1:])
 if __name__=='__main__':
     print "creating topographica script..."
 
-    python_bin = DEFAULTS['python_bin']
-    release = DEFAULTS['release']
-    version = DEFAULTS['version']
-
     args = sys.argv[1::]
     assert len(args)==3, "Pass python_bin, release, version (any of which may be None)"
-    python_bin,release,version = args
+
+    python_bin = args[0] if args[0]!='None' else DEFAULTS['python_bin']
+    release = args[1] if args[1]!='None' else DEFAULTS['release']
+    version = args[2] if args[2]!='None' else DEFAULTS['version']
 
     print "python: %s"%python_bin
     print "release: %s"%release

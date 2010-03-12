@@ -15,8 +15,11 @@ optional = {'scipy':'>=0.5','ipython':">=0.7"}
             
 # for easy_install
 packages_to_install = [required,recommended]
-
-# for pypi/distutils
+packages_to_install.reverse() # CEBALERT: setuptools processes in
+                              # reverse order; weave's *setup.py* (not
+                              # just weave itself) depends on numpy,
+                              # so we have this hack to ensure numpy
+                              # gets installed before weave
 packages_to_state = [required]
 ######################################################################
 
@@ -29,7 +32,7 @@ if 'setuptools' in sys.modules:
     for package_list in packages_to_install:
         install_requires+=["%s%s"%(package,version) for package,version in package_list.items()]
     setup_args['install_requires']=install_requires
-    setup_args['dependency_links']=["http://buildbot.topographica.org/extra/"]
+    setup_args['dependency_links']=["http://buildbot.topographica.org/extra/","http://pypi.python.org/simple/"]
     setup_args['zip_safe']=False
 
 for package_list in packages_to_state:
@@ -50,24 +53,30 @@ setup_args.update(dict(
     description='A general-purpose neural simulator focusing on topographic maps.',
 
     long_description="""
-`Topographica`_ is a software package for computational modeling of neural maps. The goal is to help researchers understand brain function at the level of the topographic maps that make up sensory and motor systems.
+`Topographica`_ is a software package for computational modeling of
+neural maps. The goal is to help researchers understand brain function
+at the level of the topographic maps that make up sensory and motor
+systems.
 
-Most users will want to download an official release from http://topographica.org/.
+**Please note that most users will want to use an official Topographica
+release from http://topographica.org/ rather than this
+in-development package.**
 
 Installation
 ============
 
-If you have `easy_install`_ or `pip`_, you could use one of these to
-install Topographica and its dependencies automatically
-(e.g. ``easy_install topographica``).
+If you have `easy_install`_ or `pip`_ (or similar), you can use one of
+those to install Topographica and its dependencies automatically
+(e.g. ``easy_install topographica`` or ``pip install topographica``).
 
 Alternatively, you can install Topographica with a command like
 ``python setup.py install --user`` (or ``sudo python setup.py
-install`` for a site-wide installation). You will need install at
-least `NumPy`_ and `PIL`_ before running Topographica. We also
-strongly recommend that you install `MatPlotLib`_ so you can access
-all Topographica's plots, as well as `Gmpy`_ and Weave (available as
-part of `SciPy`_) for optimum performance.
+install`` for a site-wide installation) after downloading and
+unpacking the archive below. You will need to install at least
+`NumPy`_ and `PIL`_ before running Topographica. We also strongly
+recommend that you install `MatPlotLib`_ so you can access all
+Topographica's plots, as well as `Gmpy`_ and Weave (available as part
+of `SciPy`_) for optimum performance.
 
 .. _Topographica:
    http://topographica.org/Home/index.html
@@ -130,8 +139,8 @@ part of `SciPy`_) for optimum performance.
               'topo.tkgui'],
 
     package_data={
-        # CEBALERT: These things are not data. Should be in
-        # MANIFEST.in, but need to update deb packaging first.
+        # CEBALERT: These things are not data, but I don't see how
+        # else to make sure they are included
         'param': ['externaltk/snit-2.2.1/*.tcl',
                   'externaltk/scrodget-2.1/*.tcl',
                   'externaltk/tooltip-1.4/*.tcl'],

@@ -18,7 +18,7 @@ TESTDP = 7
 # see topographica-other-python target
 OTHER_PYTHON = "/usr/bin/env python"
 
-SVNVERSION = ${shell svnversion}	
+SVNVERSION = ${shell svnversion}
 
 # CEBALERT: tied to exact windows version!
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
