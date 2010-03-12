@@ -1,11 +1,6 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-# Options to pass to all setup.py install commands.
-# (Allows us to control installation location even when not using our
-# own Python, e.g. on Windows.)
-PYSETUP_OPT = --prefix=${PREFIX}
-
 default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy pyflakes
 
 # avoid building some things on some platforms
@@ -164,7 +159,7 @@ IPYTHON_UNINSTALL =  ${PYTHON_LIB}/site-packages/IPython
 
 ipython: ${IPYTHON}.tar.gz python 
 	tar -xzf ${IPYTHON}.tar.gz
-	cd ${IPYTHON}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${IPYTHON}; ${PREFIX}/bin/python setup.py install
 	touch ipython
 
 ipython-clean:
@@ -260,7 +255,7 @@ ifeq ("$(shell uname -m)","x86_64")
 endif
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
-	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch pil
 
 pil-clean:
@@ -277,7 +272,7 @@ NUMPY_UNINSTALL =  ${PYTHON_LIB}/site-packages/numpy
 
 numpy: ${NUMPY}.tar.gz python
 	tar -xzf ${NUMPY}.tar.gz
-	cd ${NUMPY}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${NUMPY}; ${PREFIX}/bin/python setup.py install
 	touch numpy
 
 numpy-clean:
@@ -312,7 +307,7 @@ matplotlib: ${MATPLOTLIB}.tar.gz python freetype libpng
 # use env vars because mpl somehow doesn't pass through I and L properly
 	cd ${MATPLOTLIB}; env LDFLAGS="-L${PREFIX}/lib" CFLAGS="-I${PREFIX}/include -I${PREFIX}/include/freetype2 -I${PREFIX}/include/libpng12" ${PREFIX}/bin/python setup.py build_ext -L${PREFIX}/lib/
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py build
-	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install
 	touch matplotlib
 
 matplotlib-clean:
@@ -340,7 +335,7 @@ weave: ${WEAVE}.tar.gz python
 	patch -p0 < weave_keyerror.patch
 	cp ${WEAVE}/scipy/io/dumb_shelve.py ${WEAVE}/scipy/weave/
 	cp ${WEAVE}/scipy/io/dumbdbm_patched.py ${WEAVE}/scipy/weave
-	cd ${WEAVE}/scipy/weave/; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${WEAVE}/scipy/weave/; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch weave
 
 weave-clean:
@@ -361,7 +356,7 @@ scipy: ${SCIPY}.tar.gz python
 	rm -f ${PYTHON_LIB}/site-packages/scipy external/scipy
 	tar -xzf ${SCIPY}.tar.gz
 	cp scipy-site.cfg ${SCIPY}/site.cfg
-	cd ${SCIPY}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${SCIPY}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch scipy
 
 scipy-clean:
@@ -383,7 +378,7 @@ fixedpoint: ${FIXEDPT}.tgz python fixedpoint.diff fixedpoint_setup.py
 	mv fixedpoint ${FIXEDPT}
 	cp fixedpoint.diff ${FIXEDPT}
 	cp fixedpoint_setup.py ${FIXEDPT}/setup.py
-	cd ${FIXEDPT}; patch < fixedpoint.diff; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${FIXEDPT}; patch < fixedpoint.diff; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch fixedpoint
 
 fixedpoint-clean:
@@ -401,7 +396,7 @@ PYFLAKES_UNINSTALL = ${PREFIX}/bin/pyflakes
 
 pyflakes: ${PYFLAKES}.tar.gz python
 	tar -xzf ${PYFLAKES}.tar.gz
-	cd ${PYFLAKES}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PYFLAKES}; ${PREFIX}/bin/python setup.py install
 	touch pyflakes
 
 pyflakes-clean:
@@ -419,7 +414,7 @@ PYCHECKER_UNINSTALL = ${PYTHON_LIB}/site-packages/pychecker
 
 pychecker: ${PYCHECKER}.tar.gz python
 	tar -xzf ${PYCHECKER}.tar.gz
-	cd ${PYCHECKER}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PYCHECKER}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch pychecker
 
 pychecker-clean:
@@ -438,7 +433,7 @@ COMMON_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/common
 
 common: ${COMMON}.tar.gz python
 	tar -xzf ${COMMON}.tar.gz
-	cd ${COMMON}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${COMMON}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch common
 
 common-clean:
@@ -456,7 +451,7 @@ ASTNG_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/astng
 
 astng: ${ASTNG}.tar.gz python
 	tar -xzf ${ASTNG}.tar.gz
-	cd ${ASTNG}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${ASTNG}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch astng
 
 astng-clean:
@@ -474,7 +469,7 @@ PYLINT_UNINSTALL = ${PYTHON_LIB}/site-packages/pylint
 
 pylint: ${PYLINT}.tar.gz python common astng
 	tar -xzf ${PYLINT}.tar.gz
-	cd ${PYLINT}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PYLINT}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch pylint
 
 pylint-clean: astng-clean common-clean
@@ -492,7 +487,7 @@ EPYDOC_UNINSTALL = ${PYTHON_LIB}/site-packages/epydoc
 
 epydoc: ${EPYDOC}.tar.gz python
 	tar -xzf ${EPYDOC}.tar.gz
-	cd ${EPYDOC}; cd epydoc ; patch -p0 < ../../epydoc.diff; cd .. ; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${EPYDOC}; cd epydoc ; patch -p0 < ../../epydoc.diff; cd .. ; ${PREFIX}/bin/python setup.py install
 	touch epydoc
 
 epydoc-clean:
@@ -510,7 +505,7 @@ DOCUTILS_UNINSTALL = ${PYTHON_LIB}/site-packages/docutils
 
 docutils: ${DOCUTILS}.tar.gz python
 	tar -xzf ${DOCUTILS}.tar.gz
-	cd ${DOCUTILS}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${DOCUTILS}; ${PREFIX}/bin/python setup.py install
 	touch docutils
 
 docutils-clean:
@@ -531,7 +526,7 @@ gnosis: ${GNOSIS}.tar.gz python
 	rm -rf $(foreach f, ${GNOSIS_UNINSTALL}, ${PREFIX}/${f})
 	tar -xzf ${GNOSIS}.tar.gz
 	cd ${GNOSIS}; patch -p0 < ../Gnosis_Utils.diff
-	cd ${GNOSIS}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${GNOSIS}; ${PREFIX}/bin/python setup.py install
 	touch gnosis
 
 gnosis-clean:
@@ -570,7 +565,7 @@ SETUPTOOLS_UNINSTALL = ${PYTHON_LIB}/site-packages/setuptools*
 
 setuptools: ${SETUPTOOLS}.tar.gz python
 	tar -xzf ${SETUPTOOLS}.tar.gz
-	cd ${SETUPTOOLS}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${SETUPTOOLS}; ${PREFIX}/bin/python setup.py install
 	touch setuptools
 
 setuptools-clean:
@@ -589,7 +584,7 @@ PYAUDIOLAB_UNINSTALL = ${PYTHON_LIB}/site-packages/scikits.audiolab*egg
 
 pyaudiolab: ${PYAUDIOLAB}.tar.gz python libsndfile setuptools 
 	tar -xzf ${PYAUDIOLAB}.tar.gz
-	cd ${PYAUDIOLAB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PYAUDIOLAB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch pyaudiolab
 
 pyaudiolab-clean:
@@ -609,7 +604,7 @@ MLABWRAP_UNINSTALL += ${PYTHON_LIB}/site-packages/mlabrawmodule.so
 
 mlabwrap: ${MLABWRAP}.tar.gz python 
 	tar -xzf ${MLABWRAP}.tar.gz
-	cd ${MLABWRAP}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${MLABWRAP}; ${PREFIX}/bin/python setup.py install
 	touch mlabwrap
 
 mlabwrap-clean:
@@ -628,7 +623,7 @@ PSYCO_UNINSTALL += ${PYTHON_LIB}/site-packages/psyco
 
 psyco: ${PSYCO}-svn56930.tar.gz python
 	tar -xzf ${PSYCO}-svn56930.tar.gz
-	cd ${PSYCO}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PSYCO}; ${PREFIX}/bin/python setup.py install
 	touch psyco
 
 psyco-clean:
@@ -647,7 +642,7 @@ PYREX_UNINSTALL += ${PYTHON_LIB}/site-packages/Pyrex
 
 pyrex: ${PYREX}.tar.gz python
 	tar -xzf ${PYREX}.tar.gz
-	cd ${PYREX}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PYREX}; ${PREFIX}/bin/python setup.py install
 	touch pyrex
 
 pyrex-clean:
@@ -685,7 +680,7 @@ PYTABLES_UNINSTALL += ${PYTHON_LIB}/site-packages/tables
 
 pytables: ${PYTABLES}-20070518.tar.gz pyrex hdf5
 	tar -xzf ${PYTABLES}-20070518.tar.gz
-	cd ${PYTABLES}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT} --hdf5=${PREFIX}
+	cd ${PYTABLES}; ${PREFIX}/bin/python setup.py install --hdf5=${PREFIX}
 	touch pytables
 
 pytables-clean:
@@ -725,7 +720,7 @@ GNUPLOTPY_UNINSTALL += ${PYTHON_LIB}/site-packages/Gnuplot
 
 gnuplotpy: ${GNUPLOTPY}.tar.gz
 	tar -xzf ${GNUPLOTPY}.tar.gz
-	cd ${GNUPLOTPY}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${GNUPLOTPY}; ${PREFIX}/bin/python setup.py install
 	touch gnuplotpy
 
 gnuplotpy-clean:
@@ -746,7 +741,7 @@ player: ${PLAYER}.tar.bz2
 	cd ${PLAYER}; ./configure --prefix=${PREFIX} ${PLAYER_FLAGS}
 	make -C ${PLAYER} install
 	make -C ${PLAYER}/client_libs/libplayerc/bindings/python
-	cd ${PLAYER}/client_libs/libplayerc/bindings/python ; ${PREFIX}/bin/python ./setup.py install ${PYSETUP_OPT} 
+	cd ${PLAYER}/client_libs/libplayerc/bindings/python ; ${PREFIX}/bin/python ./setup.py install 
 	touch player
 
 player-clean:
@@ -786,7 +781,7 @@ PROGRESSBAR_UNINSTALL += ${PYTHON_LIB}/site-packages/progressbar.py
 
 progressbar: ${PROGRESSBAR}.tar.gz python
 	tar -xzf ${PROGRESSBAR}.tar.gz
-	cd ${PROGRESSBAR}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PROGRESSBAR}; ${PREFIX}/bin/python setup.py install
 	touch progressbar
 
 progressbar-clean:
@@ -832,7 +827,7 @@ MXNUMBER_UNINSTALL += ${PYTHON_LIB}/site-packages/egenix_mx_experimental-3.0.0-p
 
 mxnumber: ${MXNUMBER}.tar.gz python gmp
 	tar -xzf ${MXNUMBER}.tar.gz
-	cd ${MXNUMBER}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${MXNUMBER}; ${PREFIX}/bin/python setup.py install
 	touch mxnumber
 
 mxnumber-clean:
@@ -851,7 +846,7 @@ GMPY_UNINSTALL += ${PYTHON_LIB}/site-packages/gmpy.so
 
 gmpy: ${GMPY}.tar.gz python gmp
 	tar -xzf ${GMPY}.tar.gz
-	cd ${GMPY}; ${PREFIX}/bin/python setup.py build_ext --include-dirs='${PREFIX}/include' --library-dirs='${PREFIX}/lib'; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${GMPY}; ${PREFIX}/bin/python setup.py build_ext --include-dirs='${PREFIX}/include' --library-dirs='${PREFIX}/lib'; ${PREFIX}/bin/python setup.py install
 	touch gmpy
 
 gmpy-clean:
@@ -870,7 +865,7 @@ PROCESSING_UNINSTALL += ${PYTHON_LIB}/site-packages/processing-0.51-py2.5.egg-in
 
 processing: ${PROCESSING}.tar.gz python 
 	tar -xzf ${PROCESSING}.tar.gz
-	cd ${PROCESSING}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PROCESSING}; ${PREFIX}/bin/python setup.py install
 	touch processing
 
 processing-clean:
@@ -904,7 +899,7 @@ PYTTK_UNINSTALL += ${PYTHON_LIB}/site-packages/pyttk.py
 
 pyttk: ${PYTTK}.tar.gz python
 	tar -xzf ${PYTTK}.tar.gz
-	cd ${PYTTK}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PYTTK}; ${PREFIX}/bin/python setup.py install
 	touch pyttk
 
 pyttk-clean:
@@ -965,7 +960,7 @@ CYTHON_UNINSTALL += bin/cython
 
 cython: ${CYTHON}.tar.gz
 	tar -xzf ${CYTHON}.tar.gz
-	cd ${CYTHON}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${CYTHON}; ${PREFIX}/bin/python setup.py install
 	touch cython
 
 cython-clean: 
@@ -983,7 +978,7 @@ LINE_PROFILER_UNINSTALL += bin/kernprof.py
 
 line_profiler: ${LINE_PROFILER}.tar.gz cython
 	tar -xzf ${LINE_PROFILER}.tar.gz
-	cd ${LINE_PROFILER}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${LINE_PROFILER}; ${PREFIX}/bin/python setup.py install
 	touch line_profiler
 
 line_profiler-clean: 
@@ -1001,7 +996,7 @@ GUPPY_UNINSTALL += ${PYTHON_LIB}/site-packages/guppy*.egg*
 
 guppy: ${GUPPY}.tar.gz python
 	tar -xzf ${GUPPY}.tar.gz
-	cd ${GUPPY}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${GUPPY}; ${PREFIX}/bin/python setup.py install
 	touch guppy
 
 guppy-clean: 
@@ -1131,7 +1126,7 @@ TWISTED_UNINSTALL += ${PYTHON_LIB}/site-packages/twisted*.egg*
 
 twisted: ${TWISTED}.tar.gz python
 	tar -xzf ${TWISTED}.tar.gz
-	cd ${TWISTED}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${TWISTED}; ${PREFIX}/bin/python setup.py install
 	touch twisted
 
 twisted-clean: 
@@ -1148,7 +1143,7 @@ ZOPE_INTERFACE_UNINSTALL += ${PYTHON_LIB}/site-packages/zope*
 
 zope_interface: ${ZOPE_INTERFACE}.tar.gz python
 	tar -xzf ${ZOPE_INTERFACE}.tar.gz
-	cd ${ZOPE_INTERFACE}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${ZOPE_INTERFACE}; ${PREFIX}/bin/python setup.py install
 	touch zope_interface
 
 zope_interface-clean: 
@@ -1166,7 +1161,7 @@ FOOLSCAP_UNINSTALL += ${PYTHON_LIB}/site-packages/foolscap*
 
 foolscap: ${FOOLSCAP}.tar.gz python pyopenssl
 	tar -xzf ${FOOLSCAP}.tar.gz
-	cd ${FOOLSCAP}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${FOOLSCAP}; ${PREFIX}/bin/python setup.py install
 	touch foolscap
 
 foolscap-clean: 
@@ -1187,7 +1182,7 @@ PYOPENSSL_UNINSTALL += ${PYTHON_LIB}/site-packages/pyopenssl*
 pyopenssl: ${PYOPENSSL}.tar.gz python 
 	tar -xzf ${PYOPENSSL}.tar.gz
 	cd ${PYOPENSSL}; ${PREFIX}/bin/python setup.py build
-	cd ${PYOPENSSL}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${PYOPENSSL}; ${PREFIX}/bin/python setup.py install
 	touch pyopenssl
 
 pyopenssl-clean: 
