@@ -1202,5 +1202,82 @@ class PowerSpectrum(PatternGenerator):
         # perform a fft to get amplitudes of the composite frequencies.
         return _do_fft(p)
     
+    
+class Spectrogram(PowerSpectrum):
+    """
+    Returns the spectral density of a rolling window of the input
+    audio signal each time it is called. Over time, outputs an audio
+    spectrogram.
+    """
+    
+    seconds_per_timestep=param.Number(default=1.0,doc="""
+        Number of seconds represented by 1 simulation time step.""")
+
+    sample_window=param.Number(default=1.0,doc="""
+        The length of interval of the signal (in seconds) on which to
+        perform the Fourier transform.
+
+        How much history of the signal to include in the window.
+        sample_window > seconds_per_timestep -> window overlap
+                                         
+        The Fourier transform algorithm is most efficient if the
+        resulting window_length(sample_window * sample_rate) is a
+        power of 2, or can be decomposed into small prime factors; see
+        numpy.fft.""")
+     
+    def __init__(self, signal, **params):
+        # this is used by _create_indices when initialising the spectrogram array.
+        self._first_run = True
+ 
+        # overload default sample_window and seconds_per_timestep,
+        # if a new ones are supplied.
+        for parameter,value in params.items():
+            if parameter == "sample_window" or \
+               parameter == "seconds_per_timestep":
+                setattr(self,parameter,value)
         
+        if self.sample_window < self.seconds_per_timestep:
+            self.warning("sample_window < seconds_per_timestep; some signal will be skipped.")
+        
+        super(Spectrogram, self).__init__(signal, window_length=self.seconds_per_timestep,
+                                           window_overlap=self.sample_window-self.seconds_per_timestep, **params)
+        
+    def _create_indices(self, p):
+        super(Spectrogram, self)._create_indices(p)
+
+        # initalise a new, empty, spectrogram of the size of the generator sheet
+        # i.e. allow user to implicitly control spectrogram time history through 
+        # sheet size.
+        if self._first_run:
+            self._spectrogram = zeros(self.sheet_dimensions, dtype=float32)
+            self._first_run = False
+            
+            
+    def __call__(self, **params_to_override):
+        # override defaults with user defined parameters.
+        p = ParamOverrides(self, params_to_override)
+        
+        # calculate frequency bin divisions.
+        self._create_indices(p)
+        
+        # perform a fft to get amplitudes of the composite frequencies.
+        amplitudes = super(Spectrogram, self)._do_fft(p)
+        
+        # first make sure arrays are of compatible size, then add on 
+        # latest spectral information to the spectrograms leftmost edge.
+        assert shape(amplitudes)[0] == shape(self._spectrogram)[0]
+        self._spectrogram = hstack((amplitudes, self._spectrogram))
+                
+        # knock off the column on the spectrograms right-most edge,
+        # i.e. the oldest spectral information.
+        self._spectrogram = self._spectrogram[0:, 0:self._spectrogram.shape[1]-1]
+        
+        # the following print statements are very useful when calibrating,
+        # allowing you to calculate how much time history a particular generator
+        # sheet size corresponds to.
+        #print shape(amplitudes); print shape(self._spectrogram)
+        
+        return self._spectrogram
+        
+                      
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,PatternGenerator)]))
