@@ -949,9 +949,6 @@ class LogGaussian(PatternGenerator):
     aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
         doc="""Ratio of the pattern's width to its height.""")
     
-    size = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
-        doc="""Overall size of the pattern on the sheet.""")
-    
     x_peak = param.Number(default=0.0,bounds=(None,None),softbounds=(-10.0,10.0),
         doc="""Position of peak along the X axis, relative to the pattern.""")
 
@@ -961,7 +958,8 @@ class LogGaussian(PatternGenerator):
     # Cannot calculate logs of negative values and hence the pattern is drawn
     # in the positive sheet quadrant. As such it is not immediately visible on
     # rectangular sheets and is partially occluded on square sheets. To rememdy
-    # this simply shift it -1.0 in each axis such that it is central to the sheet.
+    # this simply shift it -1.0 in each axis such that it is central to the sheet,
+    # and rotate by pi/2.
         
     def function(self, p):
         y_sigma = p.size/2.0
