@@ -1030,6 +1030,16 @@ class SigmoidedDoLG(PatternGenerator):
                    xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
           
 
+def rectangular(signal_size):
+    """
+    Generates a Rectangular signal smoothing window by computing a Kaiser 
+    smoothing window with Beta parameter 0.
+    
+    http://docs.scipy.org/doc/numpy/reference/generated/numpy.kaiser.html
+    """
+    return kaiser(signal_size, 0)
+    
+    
 class PowerSpectrum(PatternGenerator):
     """
     Outputs the spectral density of a rolling window of the input
@@ -1050,7 +1060,7 @@ class PowerSpectrum(PatternGenerator):
     sample_rate = param.Number(default=44100,constant=True,doc="""
         Number of samples per second, which defines the unit for frequency.""")
 
-    windowing_function = param.Parameter(default=hanning,constant=True,doc="""
+    windowing_function = param.Parameter(default=rectangular,constant=True,doc="""
         This function is multiplied with the current window, i.e. the
         most recent portion of the waveform interval of a signal, before
         performing the Fourier transform.  It thus shapes the
@@ -1072,11 +1082,9 @@ class PowerSpectrum(PatternGenerator):
     max_frequency = param.Number(default=100000,doc="""
         Largest frequency for which to return an amplitude.""")
     
-    
     def __init__(self, signal=[1]*24, **params):
         super(PowerSpectrum, self).__init__(**params)
         self._initialize_window_parameters(signal, **params)
-        
 
     @as_uninitialized
     def _initialize_window_parameters(self, signal, **params):
@@ -1111,7 +1119,6 @@ class PowerSpectrum(PatternGenerator):
         # set the "next window starting position" to the start of the soundfile
         self.next_location = 0
 
-
     def _create_indices(self, p):
         
         # CEBALERT: given all the constant params, could do some caching
@@ -1138,7 +1145,6 @@ class PowerSpectrum(PatternGenerator):
         self._frequency_indices = logspace(log10(maxi), log10(mini), num=self.sheet_dimensions[0], endpoint=True).astype(int)
         #self._frequency_indices = linspace(maxi, mini, num=self.sheet_dimensions[0], endpoint=True).astype(int)
         self.frequencies = self._all_frequencies[self._frequency_indices]
-
 
     def _do_fft(self, p):
         """
@@ -1190,7 +1196,6 @@ class PowerSpectrum(PatternGenerator):
         # ... and perform a fft on it for amplitudes, discarding the negative frequency values.
         all_amplitudes = abs(fft.rfft(signal_sample * self.smoothing_window))[0 : len(signal_sample)/2]
         return all_amplitudes[self._frequency_indices].reshape(len(self._frequency_indices), 1)
-        
         
     def __call__(self, **params_to_override):
         # override defaults with user defined parameters
@@ -1251,7 +1256,6 @@ class Spectrogram(PowerSpectrum):
         if self._first_run:
             self._spectrogram = zeros(self.sheet_dimensions, dtype=float32)
             self._first_run = False
-            
             
     def __call__(self, **params_to_override):
         # override defaults with user defined parameters.
