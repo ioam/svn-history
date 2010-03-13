@@ -13,7 +13,7 @@ import param
 
 from topo import learningfn, numbergen, transferfn, pattern, projection, responsefn, sheet
 
-import topo.pattern.audio
+from topo.pattern.audio import Audio
 import topo.learningfn.optimized
 import topo.learningfn.projfn 
 import topo.transferfn.optimized 
@@ -30,26 +30,15 @@ p.add (
 
     density_multiplier = param.Number(default=1.0,bounds=(0, None),inclusive_bounds=(False,True),doc="""
          Multiplier for the other densities."""),
-
-    # Average Human Basilar membrane length = 32mm
-    # Human Basilar membrane widest (0.42 - 0.65mm) at apex,
-    # and narrowest (0.08 - 0.16mm) at base
-    # Av apex width = (0.42 + 0.65) / 2 = 0.535
-    # Av base width = (0.08 + 0.16) / 2 - 0.12
-    # Approximating uniform width = (0.535 + 0.12) / 2 = 0.3275mm
-    # Ratio(width, length) =  0.3275 / 32 = 0.010234375
-    cochlea_aspect_ratio = param.Number(default=0.5,bounds=(0,None),inclusive_bounds=(False,True),doc="""
-        Ratio of Cochlea width to its length."""),
                                                   
-    cochlea_density = param.Number(default=24.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
+    cochlea_density = param.Number(default=12.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         The nominal_density to use for the Cochlea."""),
 
-    mgbv_density = param.Number(default=32.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
+    mgbv_density = param.Number(default=12.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         The nominal_density to use for the MGB (Ventral division)."""),
 
-    cortex_density = param.Number(default=48.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
+    cortex_density = param.Number(default=24.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
         The nominal_density to use for A1.""")
-
 )
 
 p.cochlea_density = p.cochlea_density * p.density_multiplier
@@ -83,7 +72,7 @@ sound_file = "complex/daisy"
 #sound_file = "sine_waves/01000hz"
 #sound_file = "sine_waves/02000hz"
 #sound_file = "sine_waves/05000hz"
-#sound_file = "sine_waves/08000hz"
+sound_file = "sine_waves/08000hz"
 #sound_file = "sine_waves/10000hz"
 #sound_file = "sine_waves/12000hz"
 #sound_file = "sine_waves/15000hz"
@@ -93,42 +82,44 @@ sound_file = "complex/daisy"
 #sound_file = "sine_waves/19000hz"
 #sound_file = "sine_waves/20000hz"
 
-input_pattern=pattern.audio.Spectrogram(min_frequency=20,max_frequency=20000,filename="sounds/"+sound_file+".wav",
-                                  sample_window=0.3,seconds_per_timestep=0.1)
+input_pattern=Audio(filename="sounds/"+sound_file+".wav",
+                    min_frequency=20,max_frequency=20000,
+                    sample_window=0.3,seconds_per_timestep=0.1)
 
 ### Sheets
 
-cochlea_half_length=2.0
-cochlea_half_width=0.5
+cochlea_dimensions = (1.0,4.0)
+
+mgbv_connection_dimensions = (cochlea_dimensions[0],0.2)
+a1_connection_dimensions = (0.5,0.5)
 
 topo.sim['Cochlea']=sheet.GeneratorSheet(
     nominal_density=p.cochlea_density,
-    nominal_bounds=sheet.BoundingBox(points=((-cochlea_half_width,-cochlea_half_length),
-                                             (cochlea_half_width,cochlea_half_length) )),
+    nominal_bounds=sheet.BoundingBox(points=((-cochlea_dimensions[0]/2,-cochlea_dimensions[1]/2),
+                                             (cochlea_dimensions[0]/2,cochlea_dimensions[1]/2) )),
     input_generator=input_pattern,period=1.0,phase=0.05)
     
-    
-mgbv_half_length=cochlea_half_length*0.5
-mgbv_half_width=cochlea_half_width*0.5
+mgbv_dimensions = (cochlea_dimensions[0],
+                   cochlea_dimensions[1]-mgbv_connection_dimensions[1])
 
 topo.sim['MGBv']=sheet.CFSheet(
     nominal_density=p.mgbv_density,
-    nominal_bounds=sheet.BoundingBox(points=((-mgbv_half_width,-mgbv_half_length),
-                                             (mgbv_half_width,mgbv_half_length))) )
-                                                                 
-a1_half_length=mgbv_half_length*0.5
-a1_half_width=mgbv_half_width*0.5
+    nominal_bounds=sheet.BoundingBox(points=((-mgbv_dimensions[0]/2,-mgbv_dimensions[1]/2),
+                                             (mgbv_dimensions[0]/2,mgbv_dimensions[1]/2)) ))
+        
+a1_dimensions = (mgbv_dimensions[0]-a1_connection_dimensions[0],
+                 mgbv_dimensions[1]-a1_connection_dimensions[1])
                                                   
 topo.sim['A1']=sheet.lissom.LISSOM(
     nominal_density=p.cortex_density,
-    nominal_bounds=sheet.BoundingBox(points=((-a1_half_width,-a1_half_length),
-                                             (a1_half_width,a1_half_length) )),
+    nominal_bounds=sheet.BoundingBox(points=((-a1_dimensions[0]/2,-a1_dimensions[1]/2),
+                                             (a1_dimensions[0]/2,a1_dimensions[1]/2) )),
     joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt)
  
        
 #topo.sim['Test']=sheet.GeneratorSheet(
 #    nominal_density = 24.0,
-#    nominal_bounds = sheet.BoundingBox(points=((-5,-2),(5,2))),
+#    nominal_bounds = sheet.BoundingBox(points=((-5.0,-2.0),(5.0,2.0))),
 #    input_generator=input_pattern,period=1.0,phase=0.05)
     
 
@@ -137,17 +128,21 @@ topo.sim['A1']=sheet.lissom.LISSOM(
 topo.sim.connect(
     'Cochlea','MGBv',delay=0.05,strength=2.33,name='Cochlea Afferent',
     connection_type=projection.CFProjection,
-    nominal_bounds_template=sheet.BoundingBox(points=((-1,-10),(1,10))),
+    nominal_bounds_template=sheet.BoundingBox(
+        points=((-mgbv_connection_dimensions[0]/2,-mgbv_connection_dimensions[1]/2),
+                (mgbv_connection_dimensions[0]/2,mgbv_connection_dimensions[1]/2))),
     cf_shape=pattern.Constant(),
     weights_generator=pattern.SigmoidedDoG(center_aspect_ratio=4.0,center_size=0.5,
         surround_aspect_ratio=1.0,surround_size=2.0,
         sigmoid_slope=9,sigmoid_x=-1.28, size=0.2))
 
 topo.sim.connect(
-    'MGBv','A1',delay=0.05,strength=0.1,name='MGBv Afferent',
+    'MGBv','A1',delay=0.05,strength=1.0,name='MGBv Afferent',
     dest_port=('Activity','JointNormalize','Afferent'),
     connection_type=projection.CFProjection,
-    nominal_bounds_template=sheet.BoundingBox(radius=0.2),
+    nominal_bounds_template=sheet.BoundingBox(
+        points=((-a1_connection_dimensions[0]/2,-a1_connection_dimensions[1]/2),
+                (a1_connection_dimensions[0]/2,a1_connection_dimensions[1]/2))),
     weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
 
 topo.sim.connect(
@@ -166,7 +161,6 @@ topo.sim.connect(
 ### Actions scheduled to occur as the simulation proceeds.
 
 #sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/p.num_inputs,aff_name="Afferent")
-
 
 
 ### Default locations for model editor
