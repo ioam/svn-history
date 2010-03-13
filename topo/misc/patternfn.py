@@ -58,8 +58,10 @@ def gaussian(x, y, xsigma, ysigma):
 
 def sigmoid(axis, slope):     
     """
-    Sigmoid dividing axis into positive and negative halves with a
-    smoothly sloping transition between them (controlled by the slope).
+    Sigmoid dividing axis into a positive and negative half, 
+    with a smoothly sloping transition between them (controlled by the slope).
+    
+    At default rotation, axis refers to the vertical (y) axis.
     """
     with float_error_ignore():
         return (2.0 / (1.0 + exp(-2.0*slope*axis))) - 1.0   
