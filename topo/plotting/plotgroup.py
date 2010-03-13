@@ -988,8 +988,6 @@ class RFProjectionPlotGroup(GridPlotGroup):
 
 
 
-
-
 # CEBALERT: haven't modified; might need updating. Doesn't seem to be
 # a way to call it from the GUI - is it known to be broken?
 class RetinotopyPlotGroup(TemplatePlotGroup):
@@ -1261,7 +1259,7 @@ needed.
 
 plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
                    'Projection': CFProjectionPlotGroup,
-                   'RF Projection':RFProjectionPlotGroup,
+                   'RF Projection': RFProjectionPlotGroup,
                    'Retinotopy': RetinotopyPlotGroup,
                    'Projection Activity': ProjectionActivityPlotGroup}
 
