@@ -29,7 +29,7 @@ except ImportError:
 
 ipython_imported=False
 try:
-    import ipython
+    import IPython
     ipython_imported=True
 except ImportError:
     print "Note: IPython is not available; using basic interactive Python prompt instead."
