@@ -103,8 +103,8 @@ class AudioFolder(Spectrogram):
                 combined_signal = numpy.hstack((combined_signal, source.read_frames(source.nframes, dtype=float32)))
                 
                 # if a gap between sounds was specified, add it.
-                if self.gap_between_sounds > 0.0:
-                    combined_signal = numpy.hstack((combined_signal, zeros(self.samplerate*self.gap_between_sounds,float32))
+                if (self.gap_between_sounds > 0.0):
+                    combined_signal = numpy.hstack((combined_signal, zeros(self.samplerate*self.gap_between_sounds,float32)))
         
         super(AudioFolder, self).__init__(signal=combined_signal, sample_rate=self.samplerate, **params)
                   
