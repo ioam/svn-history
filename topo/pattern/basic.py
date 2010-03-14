@@ -13,7 +13,7 @@ from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
 from numpy import asarray, float32, nonzero, zeros, ones, shape, hstack 
-from numpy import linspace, logspace, log10, abs
+from numpy import linspace, logspace, log10, abs, round
 from numpy import fft, bartlett, blackman, hamming, hanning, kaiser
 
 import param
@@ -1107,9 +1107,10 @@ class PowerSpectrum(PatternGenerator):
         # set smoothing window to the same size as the window 
         # on which an fft is to performed.
         self.smoothing_window = self.windowing_function(self._window_samples)  
-
-        # get the discrete frequency bins, discarding negative frequencies.
-        # (window_length in num of samples, d=unit time per sample)
+        
+        # get all the discrete frequency bins that fit in the window length,
+        # i.e. starting at 0, and incrementing by the length of time per sample (d).
+        # finally, discard the negative frequencies.
         self._all_frequencies = fft.fftfreq(self._window_samples,
                         d=1.0/self.sample_rate)[0 : self._window_samples/2]
         assert self._all_frequencies.min() >= 0
@@ -1128,21 +1129,19 @@ class PowerSpectrum(PatternGenerator):
                             (actual interval is [%s,%s]. Adjust sample_rate and/or window_length."
                              %( p.min_frequency, p.max_frequency, \
                              self._all_frequencies.min(), self._all_frequencies.max() ))
-
-        # indices of those frequences from the fft closest to user defined minimum and maximum
+        
+        # index of nonzero element whose value is above or equal to the min frequency.
         mini = nonzero(self._all_frequencies >= p.min_frequency)[0][0]
+        # index of nonzero element whose value is above or equal to the max frequency.
         maxi = nonzero(self._all_frequencies <= p.max_frequency)[0][-1]
         
         # get the dimensions of the generator sheet.
-        self.sheet_dimensions = SheetCoordinateSystem(p.bounds, p.xdensity, p.ydensity).shape
+        self._sheet_dimensions = SheetCoordinateSystem(p.bounds, p.xdensity, p.ydensity).shape
         
-        # BKALERT!: The below frequency remapping could well be the source of the 
-        # discrete frequency issue.
-    
-        # frequency indicies, i.e. mapping of frequencies to rows, choice between linear and logarithmic
-        self._frequency_indices = logspace(log10(maxi), log10(mini), num=self.sheet_dimensions[0], endpoint=True).astype(int)
-        #self._frequency_indices = linspace(maxi, mini, num=self.sheet_dimensions[0], endpoint=True).astype(int)
-        self.frequencies = self._all_frequencies[self._frequency_indices]
+        # frequency spacing to use, i.e. mapping of frequencies to sheet rows, 
+        # choice between linearly (uniform) and logarithmic
+        self._frequency_indices = round(logspace(log10(maxi), log10(mini), num=(maxi-mini), endpoint=True)).astype(int)
+        #self._frequency_indices = round(linspace(maxi, mini, num=(maxi-mini), endpoint=True)).astype(int)
 
     def _do_fft(self, p):
         """
@@ -1193,7 +1192,33 @@ class PowerSpectrum(PatternGenerator):
         
         # ... and perform a fft on it for amplitudes, discarding the negative frequency values.
         all_amplitudes = abs(fft.rfft(signal_sample * self.smoothing_window))[0 : len(signal_sample)/2]
-        return all_amplitudes[self._frequency_indices].reshape(len(self._frequency_indices), 1)
+
+        # number of discrete units defined by our sheet size, into which we need to 
+        # partition our frequency space (actually frequency index space).
+        indices_per_unit = len(self._frequency_indices)/self._sheet_dimensions[0]
+        
+        # list to store the summed amplitudes per unit (parition)
+        amplitudes = [0.0]*self._sheet_dimensions[0]
+        
+        # for each unit in the total number of sheet units (partitions):
+        for unit in range(0, self._sheet_dimensions[0]):
+        
+            # find the largest frequency that falls in it       
+            frequency_end_index = self._frequency_indices[unit*indices_per_unit] 
+            # and the smallest frequency that falls in it
+            frequency_start_index = self._frequency_indices[(unit*indices_per_unit)+indices_per_unit]
+                        
+            # number of unique frequencies that fell in this unit (partition)
+            num_unique = frequency_end_index-frequency_start_index+1
+                    
+            # store the sum of the amplitudes for each of those frequencies
+            for frequency in range(frequency_start_index, frequency_end_index+1):
+                # BKALERT: i think option a) makes most sense here, but we had two:-
+                # a) dividing by number of unique frequencies per unit (partition), or
+                # b) dividing by the total number of amplitudes per unit (num of indices_per_unit).
+                amplitudes[unit] += all_amplitudes[frequency]/num_unique
+        
+        return (asarray(amplitudes, float32).reshape(len(amplitudes),1))        
         
     def __call__(self, **params_to_override):
         # override defaults with user defined parameters
@@ -1252,7 +1277,7 @@ class Spectrogram(PowerSpectrum):
         # i.e. allow user to implicitly control spectrogram time history through 
         # sheet size.
         if self._first_run:
-            self._spectrogram = zeros(self.sheet_dimensions, dtype=float32)
+            self._spectrogram = zeros(self._sheet_dimensions, dtype=float32)
             self._first_run = False
             
     def __call__(self, **params_to_override):
@@ -1264,7 +1289,7 @@ class Spectrogram(PowerSpectrum):
         
         # perform a fft to get amplitudes of the composite frequencies.
         amplitudes = super(Spectrogram, self)._do_fft(p)
-        
+
         # first make sure arrays are of compatible size, then add on 
         # latest spectral information to the spectrograms leftmost edge.
         assert shape(amplitudes)[0] == shape(self._spectrogram)[0]
@@ -1274,9 +1299,9 @@ class Spectrogram(PowerSpectrum):
         # i.e. the oldest spectral information.
         self._spectrogram = self._spectrogram[0:, 0:self._spectrogram.shape[1]-1]
         
-        # the following print statements are very useful when calibrating,
+        # the following print statements are very useful when calibrating sheets,
         # allowing you to calculate how much time history a particular generator
-        # sheet size corresponds to.
+        # sheets x dimension corresponds to.
         #print shape(amplitudes); print shape(self._spectrogram)
         
         return self._spectrogram
