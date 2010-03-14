@@ -870,6 +870,7 @@ def onedpowerspectrum_was_in_basic():
     # rXXXX-rXXXX OneDPowerSpectrum moved back to pattern/audio 
     import topo.pattern.audio
     import topo.pattern.basic
+    topo.pattern.audio.OneDPowerSpectrum=topo.pattern.basic.Spectrogram
     topo.pattern.basic.OneDPowerSpectrum=topo.pattern.audio.OneDPowerSpectrum
 S.append(onedpowerspectrum_was_in_basic)
 
