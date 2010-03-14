@@ -670,3 +670,29 @@ __all__ = list(set([k for k,v in locals().items()
                     if isinstance(v,types.FunctionType) or 
                     (isinstance(v,type) and issubclass(v,ParameterizedFunction))
                     and not v.__name__.startswith('_')]))
+
+
+# Measure frequency preference maps
+class measure_frequency_pref(PositionMeasurementCommand):
+    """Measure a frequency preference map by collating the response to patterns."""
+        
+    display = param.Boolean(True) 
+    
+    pattern_presenter = param.Callable(PatternPresenter(RawRectangle(size=0.01,aspect_ratio=10.0)))
+
+    x_range = param.NumericTuple((0.0,0.0))
+    y_range = param.NumericTuple((-2.0,2.0))
+    
+    divisions = param.Integer(48)
+    
+    def _feature_list(self,p):
+        return [Feature(name="x", values=[0]), 
+            Feature(name="y", range=p.y_range, step=(p.y_range[1]-p.y_range[0])/float(p.divisions))]
+
+
+pg= create_plotgroup(name='Frequency Preference',category="Preference Maps",
+             doc='Measure frequency preference for auditory sheets.',
+             pre_plot_hooks=[measure_frequency_pref.instance()],
+             normalize='Individually')
+             
+pg.add_plot('Frequency Preference',[('Strength','YPreference')])
