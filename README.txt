@@ -6,21 +6,9 @@ to load files saved from this version, and scripts developed using
 this version are likely to need modification when subsequent versions
 are released.
 
-The Topographica software code and documentation are copyright
-2005-2009 James A. Bednar, James Adwick, Jan Antolik, Christopher
-Ball, Andy Cameron, Yoonsuck Choe, Julien Ciroux, Judah B. De Paula,
-Foivos Demertzis, Kateryna Gerasymova, John Jacob, Chris Jeffery,
-Veldri Kurniawan, Judith Law, Alan Lindsay, Louise Mathews, Lewis Ng,
-Christopher Palmer, Ruaidhri Primrose, Jefferson Provost, Tikesh
-Ramtohul, Yiu Fai Sit, Stuart Wilson, and Roger Zhao.
+This program is free, open-source software available under the BSD
+license (see LICENSE.txt).
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License version 2 as
-published by the Free Software Foundation. This program is distributed
-in the hope that it will be useful, but without any warranty; without
-even the implied warranty of merchantability or fitness for a
-particular purpose.  See the GNU General Public License for more
-details, in the file COPYING.txt.
 
 Before you start, make sure that you have a copy of Topographica in a
 directory where you have at least 800MB of disk space available.

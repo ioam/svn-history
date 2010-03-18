@@ -1,3 +1,11 @@
+<!-- CEBALERT: The names below were removed from the copyright notice
+but are not yet present on this page. Also, some other names might be
+missing.
+
+James Adwick, Andy Cameron, John Jacob, Chris Jeffery, Veldri
+Kurniawan, Lewis Ng, Ruaidhri Primrose, Tikesh Ramtohul, Stuart Wilson
+-->
+
 <P>Topographica is developed by a distributed team of researchers in
 the United Kingdom and the United States.  The principal developers are:
 
