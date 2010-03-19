@@ -26,7 +26,8 @@ __version__='$Revision$'
 
 
 # JABALERT: Need to go through and eliminate unused imports.
-from math import pi
+from math import pi, sin, cos
+from PIL import Image, ImageDraw
 import copy
 
 from colorsys import hsv_to_rgb
@@ -46,7 +47,7 @@ from topo.command.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerator import UniformRandom
 from topo.misc.util import frange
 from topo.misc.distribution import Distribution
-from topo.pattern.basic import Gaussian, RawRectangle
+from topo.pattern.basic import Gaussian, GaussiansCorner, RawRectangle
 from topo.pattern.random import GaussianRandom
 from topo.sheet import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps
@@ -55,6 +56,7 @@ from topo.plotting.plotgroup import create_plotgroup, plotgroups, ConnectionFiel
 from topo.plotting.plotgroup import UnitMeasurementCommand,ProjectionSheetMeasurementCommand,default_input_sheet
 from topo.analysis.featureresponses import Feature, PatternPresenter, Subplotting
 from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand, PositionMeasurementCommand, SingleInputResponseCommand
+from topo.misc.filepath import Filename
 
 # Helper function for save_plotgroup
 def _equivalent_for_plotgroup_update(p1,p2):
@@ -663,6 +665,130 @@ pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPref
                                                    ('Confidence','OrientationSelectivity')])
 pg.add_plot('Corner Orientation Selectivity',[('Strength','OrientationSelectivity')])
 
+
+class measure_corner_angle_pref(PositionMeasurementCommand):
+    """Generate the preference map for angle shapes, by collating the response to patterns."""
+    
+    scale		= param.Number(  default=1.0 )
+    size		= param.Number(  default=0.2 )
+    positions		= param.Integer( default=6 )
+    x_range		= param.NumericTuple( (-1.0, 1.0) )
+    y_range		= param.NumericTuple( (-1.0, 1.0) )
+    num_or		= param.Integer(
+    		default		= 4,
+		bounds		= ( 1, None ),
+		softbounds	= ( 1, 24 ),
+		doc		= "Number of orientations to test."
+    )
+    angle_0	= param.Number(
+    		default		= 0.25 * pi,
+		bounds		= ( 0.0, pi ),
+		softbounds	= ( 0.0, 0.5 * pi ),
+                doc		= "First angle to test."
+    )
+    angle_1	= param.Number(
+    		default		= 0.75 * pi,
+		bounds		= ( 0.0, pi ),
+		softbounds	= ( 0.5 * pi, pi ),
+                doc		= "Last angle to test."
+    )
+    num_angle	= param.Integer(
+    		default		= 4,
+		bounds		= ( 1, None ),
+		softbounds	= ( 1, 12 ),
+                doc		= "Number of angles to test."
+    )
+    key_img_fname	= Filename(
+    		default		= 'command/key_angles.png',
+		doc		= "name of the file with the image used to code angles with hues"
+    )
+    pattern_presenter	= PatternPresenter(
+		GaussiansCorner(
+			aspect_ratio	= 4.0,
+			cross		= 0.85
+    		),
+		apply_output_fns=False,
+		duration=1.0
+    )
+    static_parameters = param.List( default=[ "size", "scale", "offset" ] )
+
+    
+
+    def _feature_list( self, p ):
+    	"""Return the list of features to vary, generate hue code static image"""
+        x_step	= ( p.x_range[1]-p.x_range[0] ) / float( p.positions - 1 )
+        y_step	= ( p.y_range[1]-p.y_range[0] ) / float( p.positions - 1 )
+	o_step	= 2.0*pi / p.num_or
+	if p.angle_0 < p.angle_1:
+		angle_0	= p.angle_0
+		angle_1	= p.angle_1
+	else:
+		angle_0	= p.angle_1
+		angle_1	= p.angle_0
+	a_range	= ( angle_0, angle_1 )
+	a_step	= ( angle_1 - angle_0 ) / float( p.num_angle - 1 )
+	self._make_key_image( p )
+        return [
+		Feature( name = "x",           range = p.x_range, step = x_step ),
+                Feature( name = "y",           range = p.y_range, step = y_step ),
+                Feature( name = "orientation", range = (0, 2*pi), step = o_step, cyclic = True ),
+                Feature( name = "angle",       range = a_range,   step = a_step,
+			value_offset     = - angle_0,
+			value_multiplier = 1. / ( angle_1 - angle_0 ) )
+	]
+
+    def _make_key_image( self, p ):
+    	"""Generate the image with keys to hues used to code angles
+	   the image is saved on-the-fly, in order to fit the current
+	   choice of angle range
+	"""
+	width	= 60
+	height	= 300
+	border	= 6
+	n_a	= 7
+	angle_0	= p.angle_0
+	angle_1	= p.angle_1
+	a_step	= 0.5 * ( angle_1 - angle_0 ) / float( n_a )
+	x_0	= border
+	x_1	= ( width - border ) / 2
+	x_a	= x_1 + 2 * border
+	y_use	= height - 2 * border
+	y_step	= y_use / float( n_a )
+	y_d	= int( float( 0.5 * y_step ) )
+	y_0	= border + y_d
+	l	= 15
+
+	hues	= [ "hsl(%2d,100%%,50%%)" % h		for h in range( 0, 255, 255 / n_a) ]
+	angles	= [ 0.5*angle_0 + a_step * a		for a in range( n_a ) ]
+	y_pos	= [ int( round( y_0 + y * y_step ) )	for y in range( n_a ) ]
+	deltas	= [ ( int( round( l * cos( a ) ) ), int( round( l * sin( a ) ) ) )
+							for a in angles ]
+	lb_img	= Image.new( "RGB", ( width, height ), "white" )
+	dr_img	= ImageDraw.Draw( lb_img )
+
+	for h, y, d	in zip( hues, y_pos, deltas ):
+		dr_img.rectangle( [ ( x_0, y - y_d ), ( x_1, y + y_d ) ], fill = h )
+		dr_img.line( [ ( x_a, y ), ( x_a + d[ 0 ], y + d[ 1 ] ) ], fill = "black" )
+		dr_img.line( [ ( x_a, y ), ( x_a + d[ 0 ], y - d[ 1 ] ) ], fill = "black" )
+	
+	lb_img.save( p.key_img_fname )
+
+	#return( p.key_img_fname.default )
+		
+
+pg= create_plotgroup(name='Corner Angle Preference',category="Preference Maps",
+             doc='Measure preference for angles in corner shapes',
+             normalize='Individually')
+pg.pre_plot_hooks=[ measure_corner_angle_pref.instance() ]
+pg.add_plot('Corner Angle Preference',[('Hue','AnglePreference')])
+pg.add_plot('Corner Angle Preference&Selectivity',[('Hue','AnglePreference'),
+                                                   ('Confidence','AngleSelectivity')])
+pg.add_plot('Corner Angle Selectivity',[('Strength','AngleSelectivity')])
+pg.add_plot('Corner Orientation Preference',[('Hue','OrientationPreference')])
+pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
+                                                   ('Confidence','OrientationSelectivity')])
+pg.add_plot('Corner Orientation Selectivity',[('Strength','OrientationSelectivity')])
+pg.add_static_image( 'Hue Code', measure_corner_angle_pref.instance().key_img_fname )
 
 
 import types
