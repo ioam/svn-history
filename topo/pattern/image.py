@@ -162,14 +162,16 @@ class PatternSampler(ImageSampler):
         if pattern_rows==0 or pattern_cols==0:
             return pattern_sample
         else:
-            # CEBALERT: is there a more NumPy way to do this that would be faster?
-            rows,cols = pattern_sample.shape
-            contains_exclusive = self.scs.bounds.contains_exclusive
-            for i in xrange(rows):
-                for j in xrange(cols):
-                    # indexes outside the pattern are left with the background color
-                    if contains_exclusive(x[i,j],y[i,j]):
-                        pattern_sample[i,j] = self.image[r[i,j],c[i,j]]
+
+            left,bottom,right,top = self.scs.bounds.lbrt()
+            # where(cond,x,y) evaluates x whether cond is True or False
+            r.clip(0,pattern_rows-1,out=r)
+            c.clip(0,pattern_cols-1,out=c)
+
+            pattern_sample = numpy.where((x>=left) & (x<right) & (y>bottom) & (y<=top),  
+                                         self.image[r,c],
+                                         self.background_value)
+
 
         return pattern_sample
 
