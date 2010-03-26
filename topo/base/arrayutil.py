@@ -7,8 +7,8 @@ __version__ = "$Revision$"
 
 import re
 
-from numpy import sqrt,dot,arctan2,array2string,fmod,floor,\
-     array,concatenate,set_printoptions,divide,maximum,minimum
+from numpy import sqrt,dot,arctan2,array2string,fmod,floor,array, \
+     unravel_index,concatenate,set_printoptions,divide,maximum,minimum
 from numpy import abs # pylint: disable-msg=W0622
 from numpy import ufunc
 
@@ -154,19 +154,9 @@ def wrap(lower, upper, x):
     return lower + fmod(x-lower + 2*range_*(1-floor(x/(2*range_))), range_)
 
 
-# There might already be a function for this in Numpy...
-# CB: there isn't, but this method is listed at
-# http://www.scipy.org/PerformanceTips:
-## def min_ij(x):
-##     i, j = divmod(x.argmin(), x.shape[1])
-##     return i, j
-def array_argmax(mat):
-    "Returns the coordinates of the maximum element in the given matrix."
-    rows,cols = mat.shape # pylint: disable-msg=W0612
-    pos = mat.argmax()
-    r = pos/cols
-    c = pos%cols
-    return r,c
+def array_argmax(arr):
+    "Returns the coordinates of the maximum element in the given array."
+    return unravel_index(arr.argmax(),arr.shape)
 
 
 def divide_with_constant(x,y):
