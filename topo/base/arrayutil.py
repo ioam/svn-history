@@ -7,8 +7,8 @@ __version__ = "$Revision$"
 
 import re
 
-from numpy import sqrt,dot,arctan2,array2string,logical_not,fmod,floor,\
-     array,concatenate,set_printoptions,divide
+from numpy import sqrt,dot,arctan2,array2string,fmod,floor,\
+     array,concatenate,set_printoptions,divide,maximum,minimum
 from numpy import abs # pylint: disable-msg=W0622
 from numpy import ufunc
 
@@ -121,36 +121,22 @@ def centroid(array_2D):
     return row_centroid, col_centroid
 
 
-
-# CB: I suggest that we replace clip_lower with one of the two
-# functions below. They both look simpler, and might be slightly
-# faster. I think, however, that we have no test of clip_lower (direct
-# or indirect), so I'm not prepared to switch.
-#
-# (I haven't actually tested these functions.)
-#
-## def clip_lower1(mat,lower_bound,upper_bound):
-##    mat[mat<lower_bound]=lower_bound
-
-## from numpy import putmask
-## def clip_lower2(mat, lower_bound):
-##    putmask(mat, mat<lower_bound, lower_bound)
-
 def clip_lower(mat,lower_bound):
-    """One-sided version of clip_in_place."""
-    lower_cropping = mat<lower_bound
-    to_keep = logical_not(lower_cropping)
+    """
+    In-place, one-sided version of numpy.clip().
 
-    mat *= to_keep
-    mat += lower_cropping*lower_bound
+    i.e. numpy.clip(mat,a_min=lower_bound,out=mat) if it existed.
+    """
+    maximum(mat,lower_bound,mat)
+
 
 def clip_upper(mat,upper_bound):
-    """One-sided version of clip_in_place."""
-    upper_cropping = mat>upper_bound
-    to_keep = logical_not(upper_cropping)
+    """
+    In-place, one-sided version of numpy.clip().
 
-    mat *= to_keep
-    mat += upper_cropping*upper_bound
+    i.e. numpy.clip(mat,a_max=upper_bound,out=mat) if it existed.
+    """
+    minimum(mat,upper_bound,mat)
 
 
 def wrap(lower, upper, x):
