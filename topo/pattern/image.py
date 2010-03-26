@@ -135,13 +135,11 @@ class PatternSampler(ImageSampler):
             self.background_value = 0.0
         else:
             self.background_value = self.background_value_fn(self.image)
-        
-        # create new pattern sample, filled initially with the background value
-        pattern_sample = ones(x.shape, Float)*self.background_value
 
-        # if the height or width is zero, there's no pattern to display...
-        if width==0 or height==0:
-            return pattern_sample
+        pattern_rows,pattern_cols = self.image.shape
+
+        if width==0 or height==0 or pattern_cols==0 or pattern_rows==0:
+            return ones(x.shape, Float)*self.background_value
 
         # scale the supplied coordinates to match the pattern being at density=1
         x=x*sheet_xdensity # deliberately don't operate in place (so as not to change supplied x & y)
@@ -154,27 +152,16 @@ class PatternSampler(ImageSampler):
         x/=width
         y/=height
 
-        # convert the sheet (x,y) coordinates to matrixidx (r,c) ones
-        r,c = self.scs.sheet2matrixidx(x,y)
-
         # now sample pattern at the (r,c) corresponding to the supplied (x,y)
-        pattern_rows,pattern_cols = self.image.shape
-        if pattern_rows==0 or pattern_cols==0:
-            return pattern_sample
-        else:
-
-            left,bottom,right,top = self.scs.bounds.lbrt()
-            # where(cond,x,y) evaluates x whether cond is True or False
-            r.clip(0,pattern_rows-1,out=r)
-            c.clip(0,pattern_cols-1,out=c)
-
-            pattern_sample = numpy.where((x>=left) & (x<right) & (y>bottom) & (y<=top),  
-                                         self.image[r,c],
-                                         self.background_value)
-
-
-        return pattern_sample
-
+        r,c = self.scs.sheet2matrixidx(x,y)
+        # (where(cond,x,y) evaluates x whether cond is True or False)
+        r.clip(0,pattern_rows-1,out=r)
+        c.clip(0,pattern_cols-1,out=c)
+        left,bottom,right,top = self.scs.bounds.lbrt()
+        return numpy.where((x>=left) & (x<right) & (y>bottom) & (y<=top),  
+                           self.image[r,c],
+                           self.background_value)
+    
 
     def __apply_size_normalization(self,x,y,sheet_xdensity,sheet_ydensity,size_normalization):
         pattern_rows,pattern_cols = self.image.shape
