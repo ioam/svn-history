@@ -121,22 +121,22 @@ def centroid(array_2D):
     return row_centroid, col_centroid
 
 
-def clip_lower(mat,lower_bound):
+def clip_lower(arr,lower_bound):
     """
     In-place, one-sided version of numpy.clip().
 
-    i.e. numpy.clip(mat,a_min=lower_bound,out=mat) if it existed.
+    i.e. numpy.clip(arr,a_min=lower_bound,out=arr) if it existed.
     """
-    maximum(mat,lower_bound,mat)
+    maximum(arr,lower_bound,arr)
 
 
-def clip_upper(mat,upper_bound):
+def clip_upper(arr,upper_bound):
     """
     In-place, one-sided version of numpy.clip().
 
-    i.e. numpy.clip(mat,a_max=upper_bound,out=mat) if it existed.
+    i.e. numpy.clip(arr,a_max=upper_bound,out=arr) if it existed.
     """
-    minimum(mat,upper_bound,mat)
+    minimum(arr,upper_bound,arr)
 
 
 def wrap(lower, upper, x):
