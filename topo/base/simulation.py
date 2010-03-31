@@ -1398,6 +1398,12 @@ class Simulation(param.Parameterized,OptionalSingleton):
         objs  = [o.script_repr(imports=imports) for o in
                  sorted(self.objects().values(), cmp=lambda x, y: cmp(x.name,y.name))]
 
+        # CBENHANCEMENT: I have a function that compares conns based
+        # on name, then on src, then on dest, because lots of
+        # connections share the same name and I want the order to be
+        # the same every time for comparion. Can I just put that in
+        # here instead of cmp-by-name, or should we provide the chance
+        # for a user to plug in any sorting function?
         conns = [o.script_repr(imports=imports) for o in
                  sorted(self.connections(),      cmp=lambda x, y: cmp(x.name,y.name))]
 
