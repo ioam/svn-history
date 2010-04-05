@@ -726,6 +726,10 @@ class AttributeTrackingTF(TransferFnWithState):
           
 
 
+# CEBALERT: I think this TF is a bit misleading because it does not
+# alter the input array. Is a TransferFn the right thing to use to
+# record an average activity? Could consider replacing this with my
+# "attribute tracking" code (some of which is not yet in SVN).
 class ActivityAveragingTF(TransferFnWithState):
     """
     Calculates the average of the input activity.
