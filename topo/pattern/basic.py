@@ -870,6 +870,48 @@ class Translator(PatternGenerator):
             orientation=(direction-pi/2)+p.generator.orientation)
 
 
+class DifferenceOfGaussians(PatternGenerator):
+    """
+    Two-dimensional difference of gaussians pattern.
+    """
+
+    positive_size = param.Number(default=0.5, bounds=(0.0,None), softbounds=(0.0,5.0),
+        precedence=(1), doc="""size parameter for the center Gaussian.""")
+    
+    positive_aspect_ratio = param.Number(default=2.0, bounds=(0.0,None), softbounds=(0.0,5.0),
+        precedence=(2), doc="""aspect_ratio parameter for the center Gaussian.""")
+    
+    positive_x = param.Number(default=0.0, bounds=(None,None), softbounds=(-2.0,2.0),
+        precedence=(3), doc="""x position for the central peak of the positive gaussian.""")
+    
+    positive_y = param.Number(default=0.0, bounds=(None,None), softbounds=(-2.0,2.0),
+        precedence=(4), doc="""y position for the central peak of the positive gaussian.""")
+
+    negative_size = param.Number(default=1.0, bounds=(0.0,None), softbounds=(0.0,5.0),
+        precedence=(5), doc="""size parameter for the surround Gaussian.""")
+    
+    negative_aspect_ratio = param.Number(default=2.0, bounds=(0.0,None), softbounds=(0.0,5.0),
+        precedence=(6), doc="""aspect_ratio parameter for the surround Gaussian.""")
+    
+    negative_x = param.Number(default=0.0, bounds=(None,None), softbounds=(-2.0,2.0),
+        precedence=(7), doc="""x position for the central peak of the negative gaussian.""")
+    
+    negative_y = param.Number(default=0.0, bounds=(None,None), softbounds=(-2.0,2.0),
+        precedence=(8), doc="""y position for the central peak of the negative gaussian.""")
+    
+    def function(self, p):
+        center   = Gaussian(size=p.positive_size*p.size, aspect_ratio=p.positive_aspect_ratio,
+                            orientation=p.orientation, x=p.positive_x+p.x, y=p.positive_y+p.y,
+                            output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+                                    
+        surround = Gaussian(size=p.negative_size*p.size, aspect_ratio=p.negative_aspect_ratio,
+                            orientation=p.orientation, x=p.negative_x+p.x, y=p.negative_y+p.y,
+                            output_fns=[topo.transferfn.DivisiveNormalizeL1()])
+        
+        return Composite(generators=[center,surround], operator=numpy.subtract,
+                         xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
+                         
+
 class Sigmoid(PatternGenerator):
     """
     Two-dimensional sigmoid pattern, dividing the plane into positive
