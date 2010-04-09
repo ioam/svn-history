@@ -13,7 +13,7 @@ from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
 from numpy import asarray, float32, nonzero, zeros, ones, shape, hstack 
-from numpy import linspace, logspace, log10, abs, round
+from numpy import linspace, logspace, log10, abs, round, multiply
 from numpy import fft, bartlett, blackman, hamming, hanning, kaiser
 
 import param
@@ -25,7 +25,7 @@ from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,sigmoid,log_gaussian
+from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,sigmoid
 from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,float_error_ignore
 from topo.misc.numbergenerator import UniformRandom
 
@@ -934,12 +934,9 @@ class SigmoidedDoG(PatternGenerator):
 
 def rectangular(signal_size):
     """
-    Generates a Rectangular signal smoothing window by computing a Kaiser 
-    smoothing window with Beta parameter 0.
-    
-    http://docs.scipy.org/doc/numpy/reference/generated/numpy.kaiser.html
+    Generates a Rectangular signal smoothing window,
     """
-    return kaiser(signal_size, 0)
+    return [1.0]*int(signal_size)
     
     
 class PowerSpectrum(PatternGenerator):
