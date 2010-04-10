@@ -251,7 +251,7 @@ def load_snapshot(snapshot_name):
         
     try:
         _load_pickle(snapshot)
-    except: # what?
+    except Exception, original_exception:
         p = param.Parameterized(name="load_snapshot")
         p.message("snapshot '%s' couldn't be loaded; installing legacy support"%snapshot_name)
         import topo.misc.legacy as L 
@@ -259,11 +259,8 @@ def load_snapshot(snapshot_name):
         try:
             _load_pickle(snapshot)
             p.message("snapshot loaded successfully with legacy support")
-        except: # what?
-            
-            # CEBALERT: should store original exception so it can be
-            # displayed here.
-    
+        except:
+            import traceback
             m = """
             Snapshot could not be loaded.
 
@@ -271,10 +268,13 @@ def load_snapshot(snapshot_name):
             Topographica's developers, support for it can be added to
             Topographica; please file a bug report via the website.
 
-            Error:
-            """
+Original error:
+
+%s
+            """%traceback.format_exc()
             p.warning(m)
-            raise 
+            print "Error after loading legacy support:\n"
+            raise original_exception
 
     snapshot.close()
 
