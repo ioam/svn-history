@@ -932,43 +932,35 @@ class SigmoidedDoG(PatternGenerator):
     such that one part of the plane can be the mirror image of the other.
     """
         
-    center_size = param.Number(default=0.5, bounds=(0.1,None), softbounds=(0.1,5.0),doc="""
-        size parameter for the center Gaussian.""")
+    center_size = param.Number(default=0.5, bounds=(0.0,None), softbounds=(0.0,5.0),
+        precedence=(1), doc="""size parameter for the center Gaussian.""")
     
-    center_aspect_ratio = param.Number(default=2.0, bounds=(0.1,None), softbounds=(0.1,5.0),doc="""
-        aspect_ratio parameter for the center Gaussian.""")
+    center_aspect_ratio = param.Number(default=2.0, bounds=(0.0,None), softbounds=(0.0,5.0),
+        precedence=(2), doc="""aspect_ratio parameter for the center Gaussian.""")
     
-    surround_size = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),doc="""
-        size parameter for the surround Gaussian.""")
+    surround_size = param.Number(default=1.0, bounds=(0.0,None), softbounds=(0.0,5.0),
+        precedence=(3), doc="""size parameter for the surround Gaussian.""")
     
-    surround_aspect_ratio = param.Number(default=1.0, bounds=(0.1,None), softbounds=(0.1,5.0),doc="""
-        aspect_ratio parameter for the surround Gaussian.""")
+    surround_aspect_ratio = param.Number(default=1.0, bounds=(0.0,None), softbounds=(0.0,5.0),
+        precedence=(4), doc="""aspect_ratio parameter for the surround Gaussian.""")
     
-    sigmoid_slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),doc="""
-        slope parameter for the Sigmoid.""")
+    sigmoid_slope = param.Number(default=10.0, bounds=(None,None), softbounds=(-100.0,100.0),
+        precedence=(5), doc="""slope parameter for the Sigmoid.""")
     
-    sigmoid_x = param.Number(default=0.0, bounds=(None,None), softbounds=(-1.0,1.0),doc="""
-        x parameter for the Sigmoid.""")
+    sigmoid_x = param.Number(default=0.0, bounds=(None,None), softbounds=(-1.0,1.0),
+        precedence=(6), doc="""x parameter for the Sigmoid.""")
 
-    sigmoid_y = param.Number(default=0.0, bounds=(None,None), softbounds=(-1.0,1.0),doc="""
-        y parameter for the Sigmoid.""")
+    sigmoid_y = param.Number(default=0.0, bounds=(None,None), softbounds=(-1.0,1.0),
+        precedence=(7), doc="""y parameter for the Sigmoid.""")
 
                                                                                        
     def function(self, p):
-        center   = Gaussian(size=p.center_size*p.size, aspect_ratio=p.center_aspect_ratio,
-                            orientation=p.orientation, x=p.x, y=p.y,
-                            output_fns=[topo.transferfn.DivisiveNormalizeL1()])
-                                    
-        surround = Gaussian(size=p.surround_size*p.size, aspect_ratio=p.surround_aspect_ratio,
-                            orientation=p.orientation, x=p.x, y=p.y,
-                            output_fns=[topo.transferfn.DivisiveNormalizeL1()])
-        
-        dog = Composite(generators=[center, surround], operator=numpy.subtract,#)
-                        xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)
-        
-        sigmoid = Sigmoid(slope=p.sigmoid_slope,
-                          x=p.sigmoid_x+p.x+(p.center_size/2)*p.center_aspect_ratio,
-                          y=p.sigmoid_y+p.y, orientation=p.orientation+pi/2)
+        dog = DifferenceOfGaussians(positive_size=p.center_size*p.size, positive_aspect_ratio=p.center_aspect_ratio,
+                                    negative_size=p.surround_size*p.size, negative_aspect_ratio=p.surround_aspect_ratio,
+                                    positive_x=p.x, positive_y=p.y, negative_x=p.x, negative_y=p.y)
+
+        sigmoid = Sigmoid(slope=p.sigmoid_slope, orientation=p.orientation+pi/2,
+                          x=p.sigmoid_x+p.x, y=p.sigmoid_y+p.y)
 
         return Composite(generators=[dog, sigmoid], operator=numpy.multiply,
                          xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
