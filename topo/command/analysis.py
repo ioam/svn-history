@@ -47,7 +47,11 @@ from topo.command.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerator import UniformRandom
 from topo.misc.util import frange
 from topo.misc.distribution import Distribution
+<<<<<<< .mine
+from topo.pattern.basic import Gaussian, RawRectangle, Line
+=======
 from topo.pattern.basic import Gaussian, GaussiansCorner, RawRectangle
+>>>>>>> .r11011
 from topo.pattern.random import GaussianRandom
 from topo.sheet import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps
@@ -800,25 +804,25 @@ __all__ = list(set([k for k,v in locals().items()
 
 # Measure frequency preference maps
 class measure_frequency_pref(PositionMeasurementCommand):
-    """Measure a frequency preference map by collating the response to patterns."""
+    """Measure a frequency preference and selectivity map"""
         
     display = param.Boolean(True) 
+    pattern_presenter = param.Callable(PatternPresenter(Line(smoothing=0.0001,thickness=0.05)))
     
-    pattern_presenter = param.Callable(PatternPresenter(RawRectangle(size=0.01,aspect_ratio=10.0)))
-
-    x_range = param.NumericTuple((0.0,0.0))
-    y_range = param.NumericTuple((-2.0,2.0))
-    
-    divisions = param.Integer(48)
+    # BK-ALERT: These are hard coded to the lissom audio sheet dimensions.
+    # i'm not sure how to avoid that, PositionMeasurementCommand isn't
+    # actually able to access the sheet dimensions.
+    y_range = param.NumericTuple((-0.5,0.5))
+    divisions = param.Integer(100)
     
     def _feature_list(self,p):
-        return [Feature(name="x", values=[0]), 
-            Feature(name="y", range=p.y_range, step=(p.y_range[1]-p.y_range[0])/float(p.divisions))]
+        return [Feature(name="x", values=[0.0]), 
+                Feature(name="y", range=p.y_range, step=(p.y_range[1]-p.y_range[0])/float(p.divisions))]
 
 
-pg= create_plotgroup(name='Frequency Preference',category="Preference Maps",
-             doc='Measure frequency preference for auditory sheets.',
-             pre_plot_hooks=[measure_frequency_pref.instance()],
-             normalize='Individually')
-             
-pg.add_plot('Frequency Preference',[('Strength','YPreference')])
+pg= create_plotgroup(name='Frequency Preference and Selectivity',category="Preference Maps",
+                     pre_plot_hooks=[measure_frequency_pref.instance()], normalize='Individually',
+                     doc='Measure best frequency preference and selectivity for auditory neurons.')
+
+pg.add_plot('[Frequency Preference]', [('Strength','YPreference')])
+pg.add_plot('[Frequency Selectivity]', [('Strength','YSelectivity')])
