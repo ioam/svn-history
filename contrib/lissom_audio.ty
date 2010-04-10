@@ -38,29 +38,31 @@ from topo.misc.patternfn import float_error_ignore
 from numpy import log, max, subtract, add, divide, power, exp, pi
           
         
-      
-# Parameters that can be passed on the command line using -p
-from topo.misc.commandline import global_params as p
+        
+###################################
+###   COMMAND LINE PARAMETERS   ###
+###################################       
 
-p.add (
+p.add (density_multiplier = param.Number(default=1.0, bounds=(None,None), 
+        doc="""Multiplicatively scales mgb and cortex densities"""),
+        
+       cochlea_density = param.Number(default=100.0, bounds=(0,None), inclusive_bounds=(False,True),
+        doc="""The nominal_density to use for the Cochlea."""),
+        
+       mgbv_density = param.Number(default=50.0, bounds=(0,None), inclusive_bounds=(False,True),
+        doc="""The nominal_density to use for the Medial Geniculate Body (Ventral division)."""),
 
-    density_multiplier = param.Number(default=1.0,bounds=(0, None),inclusive_bounds=(False,True),doc="""
-         Multiplier for the other densities."""),
-                                                  
-    cochlea_density = param.Number(default=12.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
-        The nominal_density to use for the Cochlea."""),
+       cortex_density = param.Number(default=50.0, bounds=(0,None), inclusive_bounds=(False,True),
+        doc="""The nominal_density to use for Auditory Cortex (AI)."""))
 
-    mgbv_density = param.Number(default=12.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
-        The nominal_density to use for the MGB (Ventral division)."""),
-
-    cortex_density = param.Number(default=24.0,bounds=(0,None),inclusive_bounds=(False,True),doc="""
-        The nominal_density to use for A1.""")
-)
-
-p.cochlea_density = p.cochlea_density * p.density_multiplier
 p.mgbv_density = p.mgbv_density * p.density_multiplier
 p.cortex_density = p.cortex_density * p.density_multiplier
 
+
+
+#######################
+###   PROJECTIONS   ###
+#######################
 
 projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
