@@ -47,11 +47,7 @@ from topo.command.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerator import UniformRandom
 from topo.misc.util import frange
 from topo.misc.distribution import Distribution
-<<<<<<< .mine
-from topo.pattern.basic import Gaussian, RawRectangle, Line
-=======
-from topo.pattern.basic import Gaussian, GaussiansCorner, RawRectangle
->>>>>>> .r11011
+from topo.pattern.basic import Gaussian, GaussiansCorner, RawRectangle, Line
 from topo.pattern.random import GaussianRandom
 from topo.sheet import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps

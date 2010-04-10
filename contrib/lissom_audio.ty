@@ -363,3 +363,4 @@ class SigmoidedDoLG(PatternGenerator):
 
         return Composite(generators=[dolg, sigmoid], operator=numpy.multiply,
                    xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
+
