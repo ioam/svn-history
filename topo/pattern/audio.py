@@ -132,59 +132,67 @@ class AudioFile(Spectrogram):
         return self._spectrogram
 
 
-class AudioFolder(Spectrogram):
+class AudioFolder(AudioFile):
     """
     Returns a spectrogram, i.e. the spectral density over time 
     of a rolling window of the input audio signal, for all files 
     in the specified folder.
     """
-      
-    folderpath=param.String(default='sounds/complex/',precedence=0.9,doc="""
+       
+    folderpath=param.String(default='sounds/complex/', doc="""
         Folder path (can be relative to Topographica's base path) to a
         folder containing audio files. The audio can be in any format 
         accepted by pyaudiolab, e.g. WAV, AIFF, or FLAC.""")
-
-    samplerate=param.Number(default=44100,precedence=0.9,doc="""
-        The sample rate of the audio files contained in folderpath.
-        All files must have the same sample rate.""")
-        
-    gap_between_sounds=param.Number(default=0.0,precedence=0.9,doc="""
-        The gap in seconds to insert between consecutive soundfiles.""")
-        
-    def __init__(self, **params):
-        # overload default foldername if a new one is supplied
-        for parameter,value in params.items():
-            if parameter == "folderpath":
-                setattr(self,parameter,value)
-                break
          
-        combined_signal = zeros(self.samplerate,float32)
-        
-        # list all sound files in the directory
+    gap_between_sounds=param.Number(default=0.0, doc="""
+        The gap in seconds to insert between consecutive soundfiles.""")
+                 
+    def __init__(self, **params):
+        for parameter,value in params.items():
+            if parameter == "folderpath" or \
+               parameter == "gap_between_sounds":
+                setattr(self,parameter,value)
+                 
         all_files = os.listdir(self.folderpath)
+        self._sound_files = []
         for file in all_files:
-            if file[-4:]==".wav" or file[-3:]==".wv" \
-                or file[-5:]==".aiff" or file[-4:]==".aif" \
-                or file[-5:]==".flac":
-                
-                # get pylab to load the file
-                source = pyaudiolab.Sndfile(self.folderpath+file, 'r')
-                
-                # make sure sample rates match
-                if not (self.samplerate==source.samplerate):
-                    raise ValueError("Sample rates of all audio files must match the \
-                    sample rate specified. %s has a sample rate of %s, you specified a \
-                    sample rate of %s." %(file, source.samplerate, self.samplerate))
-                    
-                # add the signal to the others
-                combined_signal = numpy.hstack((combined_signal, source.read_frames(source.nframes, dtype=float32)))
-                
-                # if a gap between sounds was specified, add it.
-                if (self.gap_between_sounds > 0.0):
-                    combined_signal = numpy.hstack((combined_signal, zeros(self.samplerate*self.gap_between_sounds,float32)))
+            if file[-4:]==".wav" or file[-3:]==".wv" or \
+               file[-5:]==".aiff" or file[-4:]==".aif" or \
+               file[-5:]==".flac":
+                self._sound_files.append(self.folderpath+file) 
+
+        self._next_file = 1
+        super(AudioFolder, self).__init__(filename=self._sound_files[0], **params)
+
+    def _extract_sample_window(self, p):
+        # add inter-signal gap to end of current signal
+        if self._window_start == 0:
+            self.signal = hstack((self.signal, [0.0]*int(self.gap_between_sounds*self.sample_rate)))
+            
+        start = self._window_start
+        end = start+self._samples_per_window
+                           
+        # move window forward for next cycle
+        self._window_start += int(self.window_increment * self.sample_rate) 
         
-        super(AudioFolder, self).__init__(signal=combined_signal, sample_rate=self.samplerate, **params)
-                  
+        if (end > self.signal.size) and (self._next_file < len(self._sound_files)):
+            next_source = pyaudiolab.Sndfile(self._sound_files[self._next_file], 'r')
+            self._next_file = self._next_file + 1
+ 
+            if next_source.samplerate != self.sample_rate:
+                raise ValueError("All sound files must be of the same sample rate")
+        
+            next_signal = next_source.read_frames(next_source.nframes, dtype=float32)                                   
+            self.signal = hstack((self.signal[start:len(self.signal)], next_signal))
+            
+            self._window_start = 0
+            return self.signal[0:end-start]
+        
+        elif end > self.signal.size:
+            raise ValueError("Reached the end of the signal.")
+            
+        return self.signal[start:end]
+                          
 
 if __name__=='__main__' or __name__=='__mynamespace__':
 
