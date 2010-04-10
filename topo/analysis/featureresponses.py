@@ -647,25 +647,25 @@ class PatternPresenter(param.Parameterized):
         
     def __call__(self,features_values,param_dict):
         for param,value in param_dict.iteritems():
-           # CEBALERT: why not setattr(self.gen,param,value)
-           # CEBALERT: messed up spacing?
-           self.gen.__setattr__(param,value)
-               
+            # CEBALERT: why not setattr(self.gen,param,value)
+            #if ('_'+param+'_param_value') not in self.gen.__dict__:
+            self.gen.__setattr__(param,value)                                
+                              
         for feature,value in features_values.iteritems():
-           self.gen.__setattr__(feature,value)
-
+            self.gen.__setattr__(feature,value)
+        
         all_input_sheet_names = topo.sim.objects(GeneratorSheet).keys()
 
         if len(self.generator_sheets)>0:
             input_sheet_names = [sheet.name for sheet in self.generator_sheets]
         else:
             input_sheet_names = all_input_sheet_names
-
+        
         # Copy the given generator once for every GeneratorSheet
         inputs = dict.fromkeys(input_sheet_names)
         for k in inputs.keys():
             inputs[k]=copy.deepcopy(self.gen)
-
+        
         ### JABALERT: Should replace these special cases with general
         ### support for having meta-parameters controlling the
         ### generation of different patterns for each GeneratorSheet.
@@ -679,7 +679,7 @@ class PatternPresenter(param.Parameterized):
         ### should be able to provide general support for manipulating
         ### both pattern parameters and parameters controlling
         ### interaction between or differences between patterns.
-
+        
         if 'direction' in features_values:
             import __main__
             if '_new_motion_model' in __main__.__dict__ and __main__.__dict__['_new_motion_model']:
@@ -708,8 +708,7 @@ class PatternPresenter(param.Parameterized):
                     inputs[name] = Sweeper(generator=inputs[name],step=step,speed=speed)
                     setattr(inputs[name],'orientation',orientation)
             ##########################
-
-
+        
         if features_values.has_key('hue'):
 
             # could be three retinas (R, G, and B) or a single RGB
@@ -742,8 +741,7 @@ class PatternPresenter(param.Parameterized):
                     inputs[name] = rgbimages.ExtendToRGB(generator=inputs[name],
                                                          relative_channel_strengths=[r,g,b])
                 # CEBALERT: should warn as above if not a color network
-
-
+        
         #JL: This is only used for retinotopy measurement in jude laws contrib/jsldefs.py
         #Also needs cleaned up
         if features_values.has_key('retinotopy'):
@@ -781,7 +779,7 @@ class PatternPresenter(param.Parameterized):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
                 inputs[name].x = features_values['retx']
                 inputs[name].y = features_values['rety']           
-          
+                
         if features_values.has_key("phasedisparity"):
             temp_phase1=features_values['phase']-features_values['phasedisparity']/2.0
             temp_phase2=features_values['phase']+features_values['phasedisparity']/2.0
@@ -795,7 +793,6 @@ class PatternPresenter(param.Parameterized):
                         self.warning('Unable to measure disparity preference, because disparity is defined only when there are inputs for Right and Left retinas.')
                         self.disparity_warned=True
                 
-          
         ## Not yet used; example only
         #if features_values.has_key("xdisparity"):
         #    if len(input_sheet_names)!=2:
@@ -819,7 +816,6 @@ class PatternPresenter(param.Parameterized):
         #        inputs[input_sheet_names[0]]=inputs[input_sheet_names[0]]
         #        inputs[input_sheet_names[1]]=inputs[input_sheet_names[1]]
 
-
         if features_values.has_key("ocular"):
             for name in inputs.keys():
                 if (name.count('Right')):
@@ -835,8 +831,6 @@ class PatternPresenter(param.Parameterized):
                 for g in inputs.itervalues():
                     g.offsetcenter=0.5
                     g.scalecenter=2*g.offsetcenter*g.contrastcenter/100.0
-
-            
         
             elif self.contrast_parameter=='weber_contrast':
                 # Weber_contrast is currently only well defined for
@@ -847,21 +841,16 @@ class PatternPresenter(param.Parameterized):
                     g.offsetcenter=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scalecenter=2*g.offsetcenter*g.contrastcenter/100.0
             
-                
             elif self.contrast_parameter=='scale':
                 for g in inputs.itervalues():
                     g.offsetcenter=0.0
                     g.scalecenter=g.contrastcenter
-
-
 
         if features_values.has_key("contrastsurround")or param_dict.has_key("contrastsurround"):
             if self.contrast_parameter=='michelson_contrast':
                 for g in inputs.itervalues():
                     g.offsetsurround=0.5
                     g.scalesurround=2*g.offsetsurround*g.contrastsurround/100.0
-
-            
         
             elif self.contrast_parameter=='weber_contrast':
                 # Weber_contrast is currently only well defined for
@@ -871,22 +860,17 @@ class PatternPresenter(param.Parameterized):
                 for g in inputs.itervalues():
                     g.offsetsurround=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scalesurround=2*g.offsetsurround*g.contrastsurround/100.0
-            
                 
             elif self.contrast_parameter=='scale':
                 for g in inputs.itervalues():
                     g.offsetsurround=0.0
                     g.scalesurround=g.contrastsurround
-
-
-
+        
         if features_values.has_key("contrast") or param_dict.has_key("contrast"):
             if self.contrast_parameter=='michelson_contrast':
                 for g in inputs.itervalues():
                     g.offset=0.5
                     g.scale=2*g.offset*g.contrast/100.0
-
-            
         
             elif self.contrast_parameter=='weber_contrast':
                 # Weber_contrast is currently only well defined for
@@ -896,18 +880,16 @@ class PatternPresenter(param.Parameterized):
                 for g in inputs.itervalues():
                     g.offset=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scale=2*g.offset*g.contrast/100.0
-            
                 
             elif self.contrast_parameter=='scale':
                 for g in inputs.itervalues():
                     g.offset=0.0
                     g.scale=g.contrast
-                
 
         # blank patterns for unused generator sheets
         for sheet_name in set(all_input_sheet_names).difference(set(input_sheet_names)):
             inputs[sheet_name]=pattern.Constant(scale=0)
-            
+                
         pattern_present(inputs, self.duration, plastic=False,
                      apply_output_fns=self.apply_output_fns)
 

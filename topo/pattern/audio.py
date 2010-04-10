@@ -192,7 +192,7 @@ class AudioFolder(AudioFile):
             raise ValueError("Reached the end of the signal.")
             
         return self.signal[start:end]
-                          
+                   
 
 if __name__=='__main__' or __name__=='__mynamespace__':
 

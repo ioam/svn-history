@@ -910,8 +910,8 @@ class DifferenceOfGaussians(PatternGenerator):
         
         return Composite(generators=[center,surround], operator=numpy.subtract,
                          xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
-                         
-
+                        
+                        
 class Sigmoid(PatternGenerator):
     """
     Two-dimensional sigmoid pattern, dividing the plane into positive
@@ -964,8 +964,8 @@ class SigmoidedDoG(PatternGenerator):
 
         return Composite(generators=[dog, sigmoid], operator=numpy.multiply,
                          xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
-          
-
+   
+                             
 def rectangular(signal_size):
     """
     Generates a Rectangular signal smoothing window,
@@ -1130,7 +1130,7 @@ class PowerSpectrum(PatternGenerator):
         
         # perform a fft to get amplitudes of the composite frequencies.
         return self._get_amplitudes(p)
-            
+    
     
 class Spectrogram(PowerSpectrum):
     """
