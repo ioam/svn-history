@@ -156,39 +156,45 @@ topo.sim['A1']=sheet.lissom.LISSOM(
     
 
 
-### Connections
+#######################
+###   CONNECTIONS   ###
+#######################
 
-topo.sim.connect(
-    'Cochlea','MGBv',delay=0.05,strength=2.33,name='Cochlea Afferent',
-    connection_type=projection.CFProjection,
+### COCHLEA TO MEDIAL GENICULATE BODY ###
+
+topo.sim.connect('Cochlea', 'MGBv', name='Cochlea Afferent', delay=0.05, 
     nominal_bounds_template=sheet.BoundingBox(
-        points=((-mgbv_connection_dimensions[0]/2,-mgbv_connection_dimensions[1]/2),
-                (mgbv_connection_dimensions[0]/2,mgbv_connection_dimensions[1]/2))),
-    cf_shape=pattern.Constant(),
-    weights_generator=pattern.SigmoidedDoG(center_aspect_ratio=4.0,center_size=0.5,
-        surround_aspect_ratio=1.0,surround_size=2.0,
-        sigmoid_slope=9,sigmoid_x=-1.28, size=0.2))
+        points=((-mgbv_connection_dimensions[0]/2, -mgbv_connection_dimensions[1]/2),
+                (mgbv_connection_dimensions[0]/2, mgbv_connection_dimensions[1]/2))),
+    connection_type=projection.CFProjection, cf_shape=pattern.Constant(), strength=1.0, 
+    weights_generator=pattern.SigmoidedDoG(center_size=0.03, center_aspect_ratio=3.9,
+                                surround_size=0.09, surround_aspect_ratio=1.8, 
+                                sigmoid_slope=20.0, sigmoid_x=0.01, size=0.5))      
+                           
+                                                                                                                                                                                                                     
+### MEDIAL GENICULATE BODY TO CORTEX ###
 
 topo.sim.connect(
-    'MGBv','A1',delay=0.05,strength=1.0,name='MGBv Afferent',
+    'MGBv', 'A1', name='MGB Afferent',
     dest_port=('Activity','JointNormalize','Afferent'),
     connection_type=projection.CFProjection,
     nominal_bounds_template=sheet.BoundingBox(
-        points=((-a1_connection_dimensions[0]/2,-a1_connection_dimensions[1]/2),
-                (a1_connection_dimensions[0]/2,a1_connection_dimensions[1]/2))),
-    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
+        points=((-a1_connection_dimensions[0]/2, -a1_connection_dimensions[1]/2),
+                (a1_connection_dimensions[0]/2, a1_connection_dimensions[1]/2))),
+    delay=0.05, learning_rate=0.9590/8, strength=1.0,
+    weights_generator=pattern.random.GaussianCloud(gaussian_size=0.27083))
 
 topo.sim.connect(
-    'A1','A1',delay=0.05,strength=0.9,name='LateralExcitatory',
-    connection_type=projection.ResizableCFProjection,learning_rate=2.55528,
+    'A1', 'A1', name='Lateral Excitatory', delay=0.05, strength=0.9,
+    connection_type=projection.ResizableCFProjection, learning_rate=2.55528,
     nominal_bounds_template=sheet.BoundingBox(radius=0.10417),
-    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.10417))
+    weights_generator=pattern.random.GaussianCloud(gaussian_size=0.10417))
         
 topo.sim.connect(
-    'A1','A1',delay=0.05,strength=-0.9,name='LateralInhibitory',
-    connection_type=projection.CFProjection,learning_rate=1.80873,
+    'A1', 'A1', name='Lateral Inhibitory', delay=0.05, strength=-0.9,
+    connection_type=projection.CFProjection, learning_rate=1.80873,
     nominal_bounds_template=sheet.BoundingBox(radius=0.22917),
-    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.22917))
+    weights_generator=pattern.random.GaussianCloud(gaussian_size=0.22917))
 
 
 
