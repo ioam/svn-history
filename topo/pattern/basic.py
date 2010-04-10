@@ -978,7 +978,8 @@ class PowerSpectrum(PatternGenerator):
     Outputs the spectral density of a rolling window of the input
     signal each time it is called. Over time, generates a spectrogram.
     """
-    window_length = param.Number(default=1,constant=True,doc="""
+    
+    window_increment = param.Number(default=1,constant=True,doc="""
         The most recent portion of the signal on which to perform the Fourier
         transform, in units of 1/sample_rate, i.e., the length of a
         sliding window on which to operate.
@@ -987,11 +988,11 @@ class PowerSpectrum(PatternGenerator):
         for matrix sizes that are powers of 2, or that can be
         decomposed into small prime factors; see numpy.fft.rfft.""" )
         
-    window_overlap = param.Number(default=0,constant=True,doc="""
+    window_length = param.Number(default=0,constant=True,doc="""
         The amount of overlap between each window, in units of 1/sample_rate.""")
 
     sample_rate = param.Number(default=44100,constant=True,doc="""
-        Number of samples per second, which defines the unit for frequency.""")
+        Number of samples per second, which defines the range for frequency.""")
 
     windowing_function = param.Parameter(default=rectangular,constant=True,doc="""
         This function is multiplied with the current window, i.e. the
@@ -1009,12 +1010,13 @@ class PowerSpectrum(PatternGenerator):
         http://docs.scipy.org/doc/numpy/reference/routines.window.html
         You can also supply your own.""")
 
-    min_frequency = param.Number(default=1,doc="""
+    min_frequency = param.Number(default=0,doc="""
         Smallest frequency for which to return an amplitude.""")
 
-    max_frequency = param.Number(default=100000,doc="""
+    max_frequency = param.Number(default=20000,doc="""
         Largest frequency for which to return an amplitude.""")
-    
+
+                
     def __init__(self, signal=[1]*24, **params):
         super(PowerSpectrum, self).__init__(**params)
         self._initialize_window_parameters(signal, **params)
@@ -1022,7 +1024,7 @@ class PowerSpectrum(PatternGenerator):
     @as_uninitialized
     def _initialize_window_parameters(self, signal, **params):
         # BKALERT: how much preprocessing to offer? E.g. Offer to remove DC? Etc.
-
+                
         # For subclasses: to specify the values of parameters on this, the parent class,
         # subclasses might first need access to their own parameter values. 
         # Having the window initialization in this separate method allows subclasses
@@ -1030,34 +1032,27 @@ class PowerSpectrum(PatternGenerator):
         for parameter,value in params.items():
             setattr(self,parameter,value)
         
-        # convert the values of the input signal array to float32's
         self.signal = asarray(signal, dtype=float32)        
         assert len(self.signal) > 0
         
-        # number of samples to use per fft calculation.
-        self._window_samples  = int(self.window_length * self.sample_rate)
-        # number of samples that overlap with the previous fft calculation.
-        # (per fft calculation)
-        self._overlap_samples = int(self.window_overlap * self.sample_rate)
-        # set smoothing window to the same size as the window 
-        # on which an fft is to performed.
-        self.smoothing_window = self.windowing_function(self._window_samples)  
-        
-        # get all the discrete frequency bins that fit in the window length,
-        # i.e. starting at 0, and incrementing by the length of time per sample (d).
-        # finally, discard the negative frequencies.
-        self._all_frequencies = fft.fftfreq(self._window_samples,
-                        d=1.0/self.sample_rate)[0 : self._window_samples/2]
+        self._window_start = 0
+        self._samples_per_window = int(self.window_length*self.sample_rate)
+        self._smoothing_window = self.windowing_function(self._samples_per_window)  
+
+        # calculate the discrete frequency bins possible for the given sample rate.
+        # (discarding the negative frequencies)
+        self._all_frequencies = fft.fftfreq(self._samples_per_window, d=1.0/self.sample_rate)[0:self._samples_per_window/2]
         assert self._all_frequencies.min() >= 0
-                
-        # set the "next window starting position" to the start of the soundfile
-        self.next_location = 0
-
+     
+    def _create_spacing(self, mini, maxi): 
+        """
+        Overload if custom frequency spacing is required.
+        """
+        # frequency spacing to use, i.e. mapping of frequencies to sheet rows, 
+        self._frequency_indices = round(linspace(maxi, mini, num=(maxi-mini), endpoint=True)).astype(int)
+              
+    # CEBALERT: given all the constant params, could do some caching
     def _create_indices(self, p):
-        
-        # CEBALERT: given all the constant params, could do some caching
-
-        # verify frequency bins fit within the specified [min:max] range
         if not self._all_frequencies.min() <= p.min_frequency \
             or not self._all_frequencies.max() >= p.max_frequency:
             raise ValueError("Specified frequency interval [%s,%s] is unavailable \
@@ -1065,20 +1060,27 @@ class PowerSpectrum(PatternGenerator):
                              %( p.min_frequency, p.max_frequency, \
                              self._all_frequencies.min(), self._all_frequencies.max() ))
         
-        # index of nonzero element whose value is above or equal to the min frequency.
+        # index of first nonzero element whose value is above or equal to the min frequency.
         mini = nonzero(self._all_frequencies >= p.min_frequency)[0][0]
-        # index of nonzero element whose value is above or equal to the max frequency.
+        # index of first nonzero element whose value is above or equal to the max frequency.
         maxi = nonzero(self._all_frequencies <= p.max_frequency)[0][-1]
+        self._create_spacing(mini, maxi)
         
-        # get the dimensions of the generator sheet.
-        self._sheet_dimensions = SheetCoordinateSystem(p.bounds, p.xdensity, p.ydensity).shape
+    def _extract_sample_window(self, p):
+        """
+        Overload if special behaviour is required when a signal ends.
+        """
+        start = self._window_start
+        end = start+self._samples_per_window
         
-        # frequency spacing to use, i.e. mapping of frequencies to sheet rows, 
-        # choice between linearly (uniform) and logarithmic
-        self._frequency_indices = round(logspace(log10(maxi), log10(mini), num=(maxi-mini), endpoint=True)).astype(int)
-        #self._frequency_indices = round(linspace(maxi, mini, num=(maxi-mini), endpoint=True)).astype(int)
-
-    def _do_fft(self, p):
+        # move window forward for next cycle
+        self._window_start += int(self.window_increment * self.sample_rate) 
+        
+        if end > self.signal.size:
+            raise ValueError("Reached the end of the signal.")
+        return self.signal[start:end]
+            
+    def _get_amplitudes(self, p):
         """
         Perform a real Discrete Fourier Transform (DFT; implemented
         using a Fast Fourier Transform algorithm, FFT) of the current
@@ -1086,72 +1088,33 @@ class PowerSpectrum(PatternGenerator):
 
         See numpy.rfft for information about the Fourier transform.
         """
-
-        # increment the "next window starting position" pointer
-        # by the number of samples in a window.
-        # i.e. it points to the starting position of the window 
-        # on which an fft will be performed on the next fft cycle,
-        # (the one after the current fft is performed).
-        self.next_location += self._window_samples
-        
-        # calculate the current fft window start and end positions, 
-        # taking into account the overlap desired by backtracing from
-        # the "next window starting position".
-        end = self.next_location-self._overlap_samples
-        start = end-self._window_samples
-        
-        # if we're at the start of the soundfile and our overlap
-        # calculation backtracked such that the window start position 
-        # is negative.
-        if start < 0:
-            # fill an array the size of the window with zeros ...
-            signal_sample = zeros(self.smoothing_window.shape)
-
-        elif end > self.signal.size:
-            # Could loop around and print warning. 
-
-            # Consider how to provide good support for the presumably
-            # common use case of having a directory full of auditory
-            # samples from which to choose in a random order, with
-            # each one having a different length.  In that case one
-            # will want to have some indication of when a sample has
-            # run out, in order to move on to the next one.  Maybe
-            # there needs to be a special AudioComposite generator to
-            # do that, and eventually that would allow mixing of
-            # signals too.
-            raise ValueError("Reached the end of the signal.")
-            
-        else:
-            # take our window of signal ...
-            signal_sample = self.signal[start : end]
-        
-        # ... and perform a fft on it for amplitudes, discarding the negative frequency values.
-        all_amplitudes = abs(fft.rfft(signal_sample * self.smoothing_window))[0 : len(signal_sample)/2]
-
+        # perform a fft on it for amplitudes, discarding the negative frequency values.
+        signal_sample = self._extract_sample_window(p)
+        assert shape(signal_sample)[0] == shape(self._smoothing_window)[0]
+        all_amplitudes = abs(fft.rfft(signal_sample * self._smoothing_window))[0 : len(signal_sample)/2]
+                      
         # number of discrete units defined by our sheet size, into which we need to 
-        # partition our frequency space (actually frequency index space).
+        # partition our frequency index space (and thereby frequency space).
         indices_per_unit = len(self._frequency_indices)/self._sheet_dimensions[0]
         
-        # list to store the summed amplitudes per unit (parition)
+        # list to store summed amplitudes per unit
         amplitudes = [0.0]*self._sheet_dimensions[0]
-        
-        # for each unit in the total number of sheet units (partitions):
+
+        # for each unit in the total number of sheet units
         for unit in range(0, self._sheet_dimensions[0]):
         
             # find the largest frequency that falls in it       
             frequency_end_index = self._frequency_indices[unit*indices_per_unit] 
             # and the smallest frequency that falls in it
             frequency_start_index = self._frequency_indices[(unit*indices_per_unit)+indices_per_unit]
-                        
-            # number of unique frequencies that fell in this unit (partition)
-            num_unique = frequency_end_index-frequency_start_index+1
-                    
+            
+            # Useful when calibrating: prints out frequencies that fall each unit
+            #print (self._all_frequencies[frequency_start_index], self._all_frequencies[frequency_end_index])
+            
             # store the sum of the amplitudes for each of those frequencies
             for frequency in range(frequency_start_index, frequency_end_index+1):
-                # BKALERT: i think option a) makes most sense here, but we had two:-
-                # a) dividing by number of unique frequencies per unit (partition), or
-                # b) dividing by the total number of amplitudes per unit (num of indices_per_unit).
-                amplitudes[unit] += all_amplitudes[frequency]/num_unique
+                # normalise amplitudes: divide by number of unique frequencies per unit (partition)
+                amplitudes[unit] += all_amplitudes[frequency]/indices_per_unit
         
         return (asarray(amplitudes, float32).reshape(len(amplitudes),1))        
         
@@ -1159,12 +1122,15 @@ class PowerSpectrum(PatternGenerator):
         # override defaults with user defined parameters
         p = ParamOverrides(self, params_to_override)
         
+        # get the dimensions of the generator sheet.
+        self._sheet_dimensions = SheetCoordinateSystem(p.bounds, p.xdensity, p.ydensity).shape
+        
         # calculate frequency bin divisions.
         self._create_indices(p)
         
         # perform a fft to get amplitudes of the composite frequencies.
-        return _do_fft(p)
-    
+        return self._get_amplitudes(p)
+            
     
 class Spectrogram(PowerSpectrum):
     """
@@ -1202,8 +1168,8 @@ class Spectrogram(PowerSpectrum):
         if self.sample_window < self.seconds_per_timestep:
             self.warning("sample_window < seconds_per_timestep; some signal will be skipped.")
         
-        super(Spectrogram, self).__init__(signal, window_length=self.seconds_per_timestep,
-                                           window_overlap=self.sample_window-self.seconds_per_timestep, **params)
+        super(Spectrogram, self).__init__(signal, window_increment=self.seconds_per_timestep,
+                                           window_length=self.sample_window, **params)
         
     def _create_indices(self, p):
         super(Spectrogram, self)._create_indices(p)
@@ -1219,12 +1185,15 @@ class Spectrogram(PowerSpectrum):
         # override defaults with user defined parameters.
         p = ParamOverrides(self, params_to_override)
         
+        # get the dimensions of the generator sheet.
+        self._sheet_dimensions = SheetCoordinateSystem(p.bounds, p.xdensity, p.ydensity).shape
+        
         # calculate frequency bin divisions.
         self._create_indices(p)
-        
+                
         # perform a fft to get amplitudes of the composite frequencies.
-        amplitudes = super(Spectrogram, self)._do_fft(p)
-
+        amplitudes = self._get_amplitudes(p)
+        
         # first make sure arrays are of compatible size, then add on 
         # latest spectral information to the spectrograms leftmost edge.
         assert shape(amplitudes)[0] == shape(self._spectrogram)[0]
