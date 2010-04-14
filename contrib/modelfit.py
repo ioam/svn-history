@@ -2,6 +2,7 @@ from topo.pattern.basic import Gabor, SineGrating, Gaussian
 import __main__
 import numpy
 import pylab
+import matplotlib
 from numpy import array, size, mat, shape, ones, arange
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 #from topo.base.functionfamily import IdentityTF
@@ -18,11 +19,20 @@ import contrib.jacommands
 from topo.misc.filepath import normalize_path, application_path
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 import contrib.dd
+from matplotlib.ticker import MaxNLocator
 
 from helper import *
 
 #dd = contrib.dd.DB()
 #dd.load_db("modelfitDB.dat")
+
+save_fig=__main__.__dict__.get('SaveFig',False)
+save_fig_directory='./'
+
+def release_fig(filename=None):
+    import pylab        
+    if save_fig:
+       pylab.savefig(save_fig_directory+filename)
 
 
 class ModelFit():
@@ -207,7 +217,7 @@ class ModelFit():
         import operator
         for i in xrange(0,self.num_of_units):
             t.append((i,err[i]))
-        t=sorted(t, key=operator.itemgetter(1))
+        #t=sorted(t, key=operator.itemgetter(1))
         self.reliable_indecies*=0     
         
         for i in xrange(0,self.num_of_units*top_percentage/100):   
@@ -440,7 +450,7 @@ def calculateReceptiveField(RFs,weights):
     return RF
               
             
-def loadSimpleDataSet(filename,num_stimuli,n_cells,num_rep=1,transpose=False):
+def loadSimpleDataSet(filename,num_stimuli,n_cells,num_rep=1,num_frames=1,offset=0,transpose=False):
     f = file(filename, "r") 
     data = [line.split() for line in f]
     
@@ -451,15 +461,13 @@ def loadSimpleDataSet(filename,num_stimuli,n_cells,num_rep=1,transpose=False):
     print "Dataset shape:", shape(data)
 
     dataset = [([[] for i in xrange(0,num_stimuli)]) for j in xrange(0,n_cells)]
-    print shape(dataset)
-    
     
     for k in xrange(0,n_cells):
         for i in xrange(0,num_stimuli):
 	    for rep in xrange(0,num_rep):
 		f = []
-            	for fr in xrange(0,1):
-                       f.append(float(data[num_stimuli*rep+i][k]))
+            	for fr in xrange(0,num_frames):
+                       f.append(float(data[rep*num_stimuli+i*num_frames+fr+offset][k]))
             	dataset[k][i].append(f)
     print shape(dataset)
     return (numpy.arange(0,num_stimuli),dataset)
@@ -500,41 +508,38 @@ def loadRandomizedDataSet(directory,num_rep,num_frames,num_stimuli,n_cells):
 def mergeDatasets(dataset1,dataset2):
     print "Warning: Indexes must match"
     (index,data1) = dataset1
-    (index,data2) = dataset2		
-    for cell in data2:
-	data1.append(cell)
+    (index,data2) = dataset2
+    data1.extend(data2)
     return (index,data1)
  
 def averageRangeFrames(dataset,min,max):
     (index,data) = dataset
+    
     for cell in data:
         for stimulus in cell:
             for r in xrange(0,len(stimulus)):
                 stimulus[r]=[numpy.average(stimulus[r][min:max])]
-    return (index,data)
+    
+    return (index,data) 		
 
 def averageRepetitions(dataset,reps=None):
     (index,data) = dataset
-    (num_cells,num_stim,num_rep,num_frames) = shape(data)
-
+    (num_cells,num_stim,num_rep,num_frames) = numpy.shape(data)
     if reps==None:
        reps = numpy.arange(0,num_rep,1)
 
-    print reps
-    
     for cell in data:
         for stimulus in xrange(0,num_stim):
             r = [0 for i in range(0,num_frames)]
             for rep in reps:
                 for f in xrange(0,num_frames):
                     r[f]+=cell[stimulus][rep][f]/(len(reps)*1.0)
+	    
             cell[stimulus]=[r]
     return (index,data)
 
 def analyse_reliability(dataset,params):
     (index,data) = dataset
-    (num_cells,num_stim,num_rep,num_frames) = shape(data)	
-    
     c = []
 
     for cell in data:
@@ -599,21 +604,41 @@ def generateTrainingSet(dataset):
         training_set.append(cell_set)
     return numpy.array(numpy.matrix(training_set).T)
 
+def flattenDataset(dataset):
+    (index,data) = dataset
+    (num_cells,num_stim,num_rep,num_frames) = numpy.shape(data)
+    data_new = numpy.zeros((num_cells,num_stim*num_rep*num_frames,1,1))
+    index_new = []
+
+    z=0
+    for j in xrange(0,num_stim):
+	for k in xrange(0,num_rep):		
+	    for l in xrange(0,num_frames):
+		index_new.append(index[j])
+		for i in xrange(0,num_cells):			
+    		    data_new[i][z][0][0]=data[i][j][k][l]
+		z=z+1
+    return (index_new,data_new)
+
 def generateInputs(dataset,directory,image_matching_string,density,aspect,offset):
     (index,data) = dataset
-
+    import PIL
+    import Image
     # ALERT ALERT ALERT We do not handle repetitions yet!!!!!
-    
     image_filenames=[directory+image_matching_string %(i+offset) for i in index]
-    inputs=[FileImage(filename=f,size=0.55, x=0,y=0)   for f in image_filenames]
-    
-    ins=[]
+    ins = []
     for j in xrange(0,len(index)):
-        inputs[j].pattern_sampler.whole_pattern_output_fns=[]
-        inp = inputs[j](xdensity=density,ydensity=density) /255.0
-        (x,y) = shape(inp)
-        z=(x - x / aspect)/2
-        ins.append(inp[z:x-z,:])
+        #inputs[j].pattern_sampler.whole_pattern_output_fns=[]
+	image = Image.open(image_filenames[j])
+	(width,height) = image.size
+        inp = image.resize((int(width*density), int(height*density)), Image.ANTIALIAS)
+	
+		
+	#inputs[j](xdensity=density,ydensity=density) /255.0
+        #(x,y) = shape(inp)
+        #z=(x - x / aspect)/2
+        #ins.append(inp[z:x-z,:])
+	ins.append(numpy.array(inp.getdata()).reshape( int(height*density),int(width*density)))
  
     
     #training_inputs=[]
@@ -929,7 +954,7 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
     validation_inputs = numpy.mat(validation_inputs)
     validation_activities = numpy.mat(validation_activities)
     S = numpy.mat(inputs).copy()
-    
+    print 'AAAA'
     for x in xrange(0,sizex):
         for y in xrange(0,sizey):
             norm = numpy.mat(numpy.zeros((sizex,sizey)))
@@ -943,7 +968,10 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
             if y < sizey-1:
                norm[x,y+1]=-1
             S = numpy.concatenate((S,alpha*norm.flatten()),axis=0)
-	    
+    
+    print numpy.shape(activities)
+    print numpy.shape(numpy.zeros((sizey*sizex,np)))
+    print 'BBBB'
     activities_padded = numpy.concatenate((activities,numpy.mat(numpy.zeros((sizey*sizex,np)))),axis=0)
     Z = numpy.linalg.pinv(S)*activities_padded
     Z=Z.T
@@ -976,25 +1004,17 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
 	    corr_coef_tf.append(numpy.corrcoef(validation_activities[:,i].T, tf_validation_predicted_activities[:,i].T)[0][1])
     
     
-    print numpy.shape(array([mean_mat,]*np))
-    print numpy.shape(validation_activities)
-    
-    act_var = numpy.sum(numpy.power(validation_activities-array([mean_mat,]*np).T,2),axis=0)
-    normalized_errors = 1-numpy.array(errors / act_var)[0]
-    tf_normalized_errors = 1-numpy.array(tf_errors / act_var)[0]
-    error = numpy.mean(errors)
-    normalized_error = numpy.mean(normalized_errors)
-
-
     for i in xrange(0,np):
         RFs.append(numpy.array(Z[i]).reshape(sizex,sizey))
+    
+    av=[]
+    for i in xrange(0,np):
+        av.append(numpy.sqrt(numpy.sum(numpy.power(Z[i],2))))
 	    
     if display:
-        av=[]
         pylab.figure()
         pylab.title(str(alpha), fontsize=16)
         for i in xrange(0,np):
-            av.append(numpy.sqrt(numpy.sum(numpy.power(Z[i],2))))
             pylab.subplot(10,11,i+1)
             w = numpy.array(Z[i]).reshape(sizex,sizey)
             pylab.show._needmain=False
@@ -1013,7 +1033,31 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
             pylab.subplot(10,11,i+1)
             pylab.plot(numpy.mat(tf_validation_predicted_activities).T[i],validation_activities.T[i],'ro')
         
-	pylab.figure()
+        
+        pylab.figure()
+        pylab.title(str(alpha), fontsize=16)
+        for i in xrange(0,np):
+            pylab.subplot(10,11,i+1)
+            w = numpy.array(Z[i]).reshape(sizex,sizey)
+            pylab.show._needmain=False
+            m = numpy.max([abs(numpy.min(numpy.min(w))),abs(numpy.max(numpy.max(w)))])
+            pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+            pylab.axis('off')
+    
+    
+    # prediction
+    act_var = numpy.sum(numpy.power(validation_activities-array([mean_mat,]*np).T,2),axis=0)
+    normalized_errors = 1-numpy.array(errors / act_var)[0]
+    tf_normalized_errors = 1-numpy.array(tf_errors / act_var)[0]
+    error = numpy.mean(errors)
+    normalized_error = numpy.mean(normalized_errors)
+
+    (rank,correct,tr) = performIdentification(validation_activities,validation_predicted_activities)
+    (tf_rank,tf_correct,tf_tr) = performIdentification(validation_activities,tf_validation_predicted_activities)
+    
+    
+    if display:
+    	pylab.figure()
         pylab.hist(av)
         pylab.xlabel("rf_magnitued")
         
@@ -1028,16 +1072,7 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
         pylab.plot(av,tf_normalized_errors,'ro')
         pylab.xlabel("rf_magnitued")
         pylab.ylabel("tf_normalized error")
-        
-        pylab.figure()
-        pylab.title(str(alpha), fontsize=16)
-        for i in xrange(0,np):
-            pylab.subplot(10,11,i+1)
-            w = numpy.array(Z[i]).reshape(sizex,sizey)
-            pylab.show._needmain=False
-            m = numpy.max([abs(numpy.min(numpy.min(w))),abs(numpy.max(numpy.max(w)))])
-            pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
-            pylab.axis('off')
+
     
         pylab.figure()
         pylab.hist(normalized_errors)
@@ -1054,26 +1089,6 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
 	pylab.figure()
         pylab.hist(corr_coef_tf)
         pylab.xlabel("Correlation coefficient with transfer function")
-    
-    
-    # prediction
-    
-    correct=0
-    for i in xrange(0,len(validation_inputs)):
-        tmp = []
-        for j in xrange(0,len(validation_inputs)):
-            tmp.append(numpy.sqrt(numpy.sum(numpy.power(validation_activities[i]-validation_predicted_activities[j],2))))
-        x = numpy.argmin(tmp)
-        if (x == i): correct+=1
-         
-    tf_correct=0
-    for i in xrange(0,len(validation_inputs)):
-        tmp = []
-        for j in xrange(0,len(validation_inputs)):
-            tmp.append(numpy.sqrt(numpy.sum(numpy.power(validation_activities[i]-tf_validation_predicted_activities[j],2))))
-        x = numpy.argmin(tmp)
-        if (x == i): tf_correct+=1
-    
     
     #saving section
     dd.add_data("ReversCorrelationRFs",RFs,force=True)
@@ -1160,19 +1175,19 @@ def apply_output_function(activities,of):
     
     return acts
 
-def fit_sigmoids_to_of(activities,predicted_activities,display=True):
+def fit_sigmoids_to_of(activities,predicted_activities,offset=True,display=True):
 	
     (num_in,num_ne) = numpy.shape(activities)	
     from scipy import optimize 	
     pylab.figure()
 
-    fitfunc = lambda p, x: p[2] + p[3] * 1 / (1 + numpy.exp(-p[0]*(x-p[1]))) # Target function
+    fitfunc = lambda p, x:  (offset*p[2])+p[3] / (1 + numpy.exp(-p[0]*(x-p[1]))) # Target function
     errfunc = lambda p,x, y: numpy.mean(numpy.power(fitfunc(p, x) - y,2)) # Distance to the target function
     
     params=[]
     for i in xrange(0,num_ne):
     	p0 = [3.0,0.5,-0.4,2.0] # Initial guess for the parameters
-	(p,success,c)=optimize.fmin_tnc(errfunc,p0[:],bounds=[(-20,20),(-1,1),(-10,10),(-10,10)],args=(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0]),approx_grad=True,messages=0)
+	(p,success,c)=optimize.fmin_tnc(errfunc,p0[:],bounds=[(-20,20),(-1,1),(-10,10),(0,10)],args=(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0]),approx_grad=True,messages=0)
         params.append(p)
 	if display:
 		pylab.subplot(13,13,i+1)
@@ -1181,8 +1196,52 @@ def fit_sigmoids_to_of(activities,predicted_activities,display=True):
 
     return params
     
-def apply_sigmoid_output_function(activities,of):
-    sig = lambda p, x: p[2] + p[3] * 1 / (1 + numpy.exp(-p[0]*(x-p[1]))) # Target function
+def fit_exponential_to_of(activities,predicted_activities,display=True):
+	
+    (num_in,num_ne) = numpy.shape(activities)	
+    from scipy import optimize 	
+    pylab.figure()
+
+    fitfunc = lambda p, x: p[0] + p[1] * numpy.exp(p[2]*(x-p[3])) # Target function
+    errfunc = lambda p,x, y: numpy.mean(numpy.power(fitfunc(p, x) - y,2)) # Distance to the target function
+    
+    params=[]
+    for i in xrange(0,num_ne):
+    	p0 = [0.0,1.0,0.1,0.0] # Initial guess for the parameters
+	(p,success,c)=optimize.fmin_tnc(errfunc,p0[:],bounds=[(-20,20),(-1,1),(0,1),(-1,1)],args=(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0]),approx_grad=True,messages=0)
+        params.append(p)
+	if display:
+		pylab.subplot(13,13,i+1)
+	        pylab.plot(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0],'go')
+        	pylab.plot(numpy.array(predicted_activities[:,i].T)[0],fitfunc(p,numpy.array(predicted_activities[:,i].T)[0]),'bo')
+
+    return params
+    
+def fit_power_to_of(activities,predicted_activities,display=True):
+	
+    (num_in,num_ne) = numpy.shape(activities)	
+    from scipy import optimize 	
+    pylab.figure()
+
+    fitfunc = lambda p, x: p[0] + p[1] * numpy.power(x,p[2]) # Target function
+    errfunc = lambda p,x, y: numpy.mean(numpy.power(fitfunc(p, x) - y,2)) # Distance to the target function
+    
+    params=[]
+    for i in xrange(0,num_ne):
+    	p0 = [0.0,1.0,-0.5] # Initial guess for the parameters
+	(p,success,c)=optimize.fmin_tnc(errfunc,p0[:],bounds=[(-20,20),(-1,1),(-1,2)],args=(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0]),approx_grad=True,messages=0)
+        params.append(p)
+	if display:
+		pylab.subplot(13,13,i+1)
+	        pylab.plot(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0],'go')
+        	pylab.plot(numpy.array(predicted_activities[:,i].T)[0],fitfunc(p,numpy.array(predicted_activities[:,i].T)[0]),'bo')
+
+    return params
+    
+    
+    
+def apply_sigmoid_output_function(activities,of,offset=True):
+    sig = lambda p, x: (offset*p[2]) + p[3] * 1 / (1 + numpy.exp(-p[0]*(x-p[1])))
     (x,y) = numpy.shape(activities)	
     new_acts = numpy.zeros((x,y))
     
@@ -1190,7 +1249,26 @@ def apply_sigmoid_output_function(activities,of):
 	new_acts[:,i] = sig(of[i],numpy.array(activities[:,i].T)[0]).T
     return new_acts
 
-def later_interaction_prediction(activities,predicted_activities,validation_activities,validation_predicted_activities,display=True):
+def apply_exponential_output_function(activities,of):
+    sig = lambda p, x: p[0] + p[1] * numpy.exp(p[2]*(x-p[3])) 
+    (x,y) = numpy.shape(activities)	
+    new_acts = numpy.zeros((x,y))
+    
+    for i in xrange(0,y):
+	new_acts[:,i] = sig(of[i],numpy.array(activities[:,i].T)[0]).T
+    return new_acts
+
+def apply_power_output_function(activities,of):
+    sig = lambda p, x: p[0] + p[1] * numpy.power(x,p[2])
+    (x,y) = numpy.shape(activities)	
+    new_acts = numpy.zeros((x,y))
+    
+    for i in xrange(0,y):
+	new_acts[:,i] = sig(of[i],numpy.array(activities[:,i].T)[0]).T
+    return new_acts
+
+
+def later_interaction_prediction(activities,predicted_activities,validation_activities,validation_predicted_activities,raw_validation_set,node,display=True):
     
     (num_pres,num_neurons) = numpy.shape(activities)
     
@@ -1217,37 +1295,85 @@ def later_interaction_prediction(activities,predicted_activities,validation_acti
     
     
     mf = ModelFit()
-    mf.learning_rate = __main__.__dict__.get('lr',0.01)
-    mf.epochs=__main__.__dict__.get('epochs',100)
+    mf.learning_rate = __main__.__dict__.get('lr',0.005)
+    mf.epochs=__main__.__dict__.get('epochs',4000)
     mf.num_of_units = num_neurons
     mf.init()
     
-    (err,stop,min_errors) = mf.trainModel(mat(predicted_activities[0:num_pres*0.9]),numpy.mat(activities[0:num_pres*0.9]),mat(predicted_activities[num_pres*0.9:-1]),numpy.mat(activities[num_pres*0.9:-1]))
-    print "\nStop criterions", stop
-    print "Model test with all neurons"
-    mf.testModel(mat(validation_predicted_activities),numpy.mat(validation_activities))
-    mf.testModelBiased(mat(validation_predicted_activities),numpy.mat(validation_activities),1.0)
-    mf.testModelBiased(mat(validation_predicted_activities),numpy.mat(validation_activities),1.1)
-    mf.testModelBiased(mat(validation_predicted_activities),numpy.mat(validation_activities),1.2)
-    mf.testModelBiased(mat(validation_predicted_activities),numpy.mat(validation_activities),1.5)
-    mf.testModelBiased(mat(validation_predicted_activities),numpy.mat(validation_activities),2.0)
+    #pylab.figure()
+    #print "Weight shape",numpy.shape(mf.weigths)
+    #pylab.imshow(numpy.array(mf.weigths),vmin=-1.0,vmax=1.0,interpolation='nearest')
+    #pylab.colorbar()
     
-    model_predicted_activities = mf.returnPredictedActivities(mat(predicted_activities))
-    model_validation_predicted_activities = mf.returnPredictedActivities(mat(validation_predicted_activities))
+    (err,stop,min_errors) = mf.trainModel(numpy.mat(activities[0:num_pres*0.9]),mat(predicted_activities[0:num_pres*0.9]),numpy.mat(activities[num_pres*0.9:-1]),mat(predicted_activities[num_pres*0.9:-1]))
+    print "\nStop criterions", stop
+    new_activities = mf.returnPredictedActivities(mat(activities))
+    new_validation_activities = mf.returnPredictedActivities(mat(validation_activities))
+    
+    new_raw_validation_set = []
+    for r in raw_validation_set:
+	new_raw_validation_set.append(mf.returnPredictedActivities(mat(r)))
+    
+    
+    
+    ofs = fit_sigmoids_to_of(numpy.mat(new_activities),numpy.mat(predicted_activities))
+    predicted_activities_t = apply_sigmoid_output_function(numpy.mat(predicted_activities),ofs)
+    validation_predicted_activities_t = apply_sigmoid_output_function(numpy.mat(validation_predicted_activities),ofs)
+
     
     if display:
 	pylab.figure()
 	print "Weight shape",numpy.shape(mf.weigths)
-    	pylab.imshow(numpy.array(mf.weigths),vmin=-1.0,vmax=1.0,interpolation='nearest')
+    	pylab.imshow(numpy.array(mf.weigths),vmin=-numpy.max(numpy.abs(mf.weigths)),vmax=numpy.max(numpy.abs(mf.weigths)),interpolation='nearest')
 	pylab.colorbar()
+	#print numpy.sum(mf.weigths,axis=0)
+	print numpy.sum(mf.weigths,axis=1)
+    
+	pylab.figure()
+        pylab.title("model_relationship", fontsize=16)    
+        for i in xrange(0,num_neurons):
+            pylab.subplot(13,13,i+1)
+            pylab.plot(numpy.mat(validation_activities).T[i],numpy.mat(validation_predicted_activities).T[i],'ro')
+
     
         pylab.figure()
         pylab.title("model_relationship", fontsize=16)    
         for i in xrange(0,num_neurons):
             pylab.subplot(13,13,i+1)
-            pylab.plot(model_validation_predicted_activities.T[i],numpy.mat(validation_activities).T[i],'ro')
+            pylab.plot(new_validation_activities.T[i],numpy.mat(validation_predicted_activities).T[i],'ro')
 
-    return (model_predicted_activities,model_validation_predicted_activities)
+
+    
+
+    (ranks,correct,pred) = performIdentification(validation_activities,validation_predicted_activities)
+    print "ORIGINAL> Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_activities - validation_predicted_activities,2))
+
+    print '\n\nWithout TF'
+    (ranks,correct,pred) = performIdentification(new_validation_activities,validation_predicted_activities)
+    print "LATER> Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(new_validation_activities - validation_predicted_activities,2))
+
+    print '\n\nWith TF'
+    (ranks,correct,pred) = performIdentification(new_validation_activities,validation_predicted_activities_t)
+    print "LATER> Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(new_validation_activities - validation_predicted_activities_t,2))
+
+
+
+    raw_validation_data_set=numpy.rollaxis(numpy.array(new_raw_validation_set),2)
+    signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, numpy.array(new_activities), numpy.array(new_validation_activities), predicted_activities, validation_predicted_activities)
+    signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, numpy.array(new_activities), numpy.array(new_validation_activities), predicted_activities_t, validation_predicted_activities_t)
+	
+    print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power*(training_prediction_power>0)) , " / " , numpy.mean(validation_prediction_power*(validation_prediction_power>0))
+    print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t*(training_prediction_power_t>0)) , " / " , numpy.mean(validation_prediction_power_t*(validation_prediction_power_t>0))
+
+
+    node.add_data("LaterReversCorrelationPredictedActivities+TF",predicted_activities_t,force=True)
+    node.add_data("LaterReversCorrelationPredictedValidationActivities+TF",validation_predicted_activities_t,force=True)
+    node.add_data("LaterTrainingSet",new_activities,force=True)
+    node.add_data("LaterValidationSet",new_validation_activities,force=True)
+    node.add_data("LaterModel",mf,force=True)
+    
+    
+    return (new_activities,new_validation_activities)
 	
 	
 def cut_out_images_set(inputs,size,pos):
@@ -1265,29 +1391,25 @@ def cut_out_images_set(inputs,size,pos):
     return inp
 
 def runRFinference():
-    #d = contrib.dd.DB2(None)
-    	
-	
-    f = open("modelfitDB2.dat",'rb')
+    f = open("modelfitDatabase1.dat",'rb')
     import pickle
     d = pickle.load(f)
     f.close()
     
     (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = sortOutLoading(d)
-    params={}
-    params["alpha"] = __main__.__dict__.get('Alpha',50)
-    db_node1 = db_node
-    db_node = db_node.get_child(params)
     
     e = []
     c = []
     b = []
     if False:
-        x = 0.2
-        for i in xrange(0,20):
+        x = 5000
+        for i in xrange(0,10):
             print i
-            x = i*20
-            (e1,te1,c1,tc1,RFs,pa,pva) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,x,validation_inputs,validation_set,db_node,False)
+            x = (i+1)*10000
+    	    params={}
+    	    params["alpha"] = __main__.__dict__.get('Alpha',x)
+            db_node1 = db_node.get_child(params)
+            (e1,te1,c1,tc1,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,x,validation_inputs,validation_set,db_node1,False)
             e.append(e1)
             c.append(c1)
             b.append(x)
@@ -1298,8 +1420,13 @@ def runRFinference():
         pylab.figure()
         #pylab.semilogx(b,c)
         pylab.plot(b,c)
-    	
     #return (e,c,b)
+    
+    
+    params={}
+    params["alpha"] = __main__.__dict__.get('Alpha',50)
+    db_node1 = db_node
+    db_node = db_node.get_child(params)
     
     if False:
         alphas=[120, 290,  50, 240, 290, 260, 120, 100, 290, 130, 290, 290, 230,170, 120, 190, 290, 100, 140, 290, 290,  60, 290, 290,  80, 210,50, 250, 170, 290, 290, 290,  60, 290, 290,  60, 260, 290, 290,290,  60,  90, 290, 120, 290,  80, 270, 120, 290, 290]
@@ -1309,12 +1436,12 @@ def runRFinference():
 	c = []
 	te = []
 	tc = []
-	pa = []
+	#pa = []
 	pva = []
 	for i in xrange(0,len(alphas)):
 	      print numpy.shape(training_set)
 	      print numpy.shape(training_set[:,i:i+1])
-	      (e1,te1,c1,tc1,RF,pa1,pva1) = regulerized_inverse_rf(training_inputs,training_set[:,i:i+1],sizex,sizey,alphas[i],validation_inputs,validation_set[:,i:i+1],False)
+	      (e1,te1,c1,tc1,RF,pa1,pva1,corr_coef,corr_coef_tf)   = regulerized_inverse_rf(training_inputs,training_set[:,i:i+1],sizex,sizey,alphas[i],validation_inputs,validation_set[:,i:i+1],False)
 	      
 	      print numpy.shape(RF)
 	      RFs.append(RF[0])
@@ -1338,7 +1465,6 @@ def runRFinference():
     	return (e,te,c,tc,RFs,pa,pva)
 	      
     (e,te,c,tc,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,params["alpha"],validation_inputs,validation_set,db_node,True)
-    later_interaction_prediction(training_set,pa,validation_set,pva)
     
     pylab.figure()
     pylab.xlabel("fano factor")
@@ -1360,10 +1486,11 @@ def runRFinference():
     pylab.ylabel("correlation coef after transfer function")
     pylab.plot(ff,corr_coef_tf,'ro')
     
-    f = open("modelfitDB2.dat",'wb')
+    f = open("modelfitDatabase1.dat",'wb')
     pickle.dump(d,f,-2)
     f.close()
     
+    pylab.show()
     return (training_set,pa,validation_set,pva)
 
 
@@ -1420,30 +1547,26 @@ def analyze_rf_possition(w,level):
     a= pylab.figure().gca()
     (sx,sy) = numpy.shape(w[0])
     
-    X = numpy.zeros((sx,sy))
-    Y = numpy.zeros((sx,sy))
-        
-    for x in xrange(0,sx):
-        for y in xrange(0,sy):
-            X[x][y] = x
-            Y[x][y] = y
-    
+    X = numpy.tile(numpy.arange(0,sx,1),(sy,1))	
+    Y = numpy.tile(numpy.arange(0,sy,1),(sx,1)).T
+
     cgs = []
     RFs=[]
     
     for i in xrange(0,len(w)):
-            pylab.subplot(10,11,i+1)
+            pylab.subplot(15,15,i+1)
             mi=numpy.min(numpy.min(w[i]))
             ma=numpy.max(numpy.max(w[i]))
-            z = ((w[i]<=(mi-mi*level))*1.0) * w[i] + ((w[i]>=(ma-ma*level))*1.0) * w[i] 
+            #z = ((w[i]<=(mi-mi*level))*1.0) * w[i] + ((w[i]>=(ma-ma*level))*1.0) * w[i]
+	    z = w[i] * (numpy.abs(w[i])>= numpy.max(numpy.abs(w[i]))*(1-level))
             RFs.append(z)  
-            cgx = numpy.sum(numpy.sum(numpy.multiply(X,numpy.power(z,2))))/numpy.sum(numpy.sum(numpy.power(z,2)))
-            cgy = numpy.sum(numpy.sum(numpy.multiply(Y,numpy.power(z,2))))/numpy.sum(numpy.sum(numpy.power(z,2)))
             
-            print cgx/sx,cgy/sy
-            cgs.append((cgx/sx,cgy/sy))
+	    cgx = numpy.sum(numpy.multiply(X,numpy.power((abs(z)>0.0)*1.0,2)))/numpy.sum(numpy.power((abs(z)>0.0)*1.0,2))
+	    cgy = numpy.sum(numpy.multiply(Y,numpy.power((abs(z)>0.0)*1.0,2)))/numpy.sum(numpy.power((abs(z)>0.0)*1.0,2))
+	    
+            cgs.append((cgx,cgy))
             r = numpy.max([numpy.abs(numpy.min(numpy.min(z))),numpy.abs(numpy.max(numpy.max(z)))])
-            cir = Circle( (cgy,cgx), radius=1)
+            cir = Circle( (cgx,cgy), radius=1)
             pylab.gca().add_patch(cir)
             
             pylab.show._needmain=False
@@ -1460,12 +1583,12 @@ def fitGabor(weights):
     #(x,y) = numpy.shape(weights[0])
     #weights  = cut_out_images_set(weights,int(y*0.49),(int(x*0.1),int(y*0.4)))
     (denx,deny) = numpy.shape(weights[0])
-    centers,RFs = analyze_rf_possition(weights,0.4)
+    centers,RFs = analyze_rf_possition(weights,0.5)
     RFs=weights
     # determine frequency
     
     freqor = []
-    for w in RFs:
+    for w in weights:
         ff = pylab.fftshift(pylab.fft2(w))
         (x,y) = array_argmax(numpy.abs(ff))
         (n,rubish) = shape(ff)
@@ -1474,7 +1597,6 @@ def fitGabor(weights):
         phase = numpy.angle(ff[x,y])
 	
         if (x - n/2) != 0:
-            print (y - n/2.0)/(x - n/2.0)
             orr = numpy.arctan((y - n/2.0)/(x - n/2.0))
         else:
             orr = numpy.pi/2
@@ -1488,9 +1610,10 @@ def fitGabor(weights):
         freqor.append((freq,orr,phase))
     
     parameters=[]
-    
+    errors = []
+    variances = []
     for j in xrange(0,len(RFs)):
-        minf = numpy.max([freqor[j][0]-2,0])
+        minf = 0
         
         x = centers[j][0]
         y = centers[j][1] 
@@ -1502,36 +1625,54 @@ def fitGabor(weights):
 	
 	min_x = []
 	min_err = 100000000000000
-	
-	for r in xrange(0,100): 
-		x0 = [x,y,0.2,freqor[j][1],freqor[j][0],freqor[j][2],1.5,0.001]
+	for r in xrange(0,1000): 
+		x0 = [x,y,4,freqor[j][1],freqor[j][0]/denx,freqor[j][2],1.0,0.0002]
+		#pylab.figure()
+		#pylab.imshow(RFs[0])
+		#gab(x0,RFs[0],display=True)
+		#return
 		x1 = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
 		
-		x1[0] += 2.0*(rand()-0.5)*0.1*x0[0]
-		x1[1] += 2.0*(rand()-0.5)*0.1*x0[1]
-		x1[2] =  rand()*0.2
-		x1[3] = x0[3]+2.0*(rand()-0.5)*(numpy.pi/4)
-		x1[4] = x0[4]
-		x1[5] = rand()*2*numpy.pi
-		x1[6] = 1.0+3.0*rand()
-		x1[7] = x0[7]
+		x1[0] = x0[0] + 2.0*(rand()-0.5)*0.15*denx
+		x1[1] = x0[1] + 2.0*(rand()-0.5)*0.15*deny
+		x1[2] = rand()*0.2*denx
+		x1[3] = rand()*numpy.pi#x0[3]+2.0*(rand()-0.5)*(numpy.pi/4)
+		x1[4] = x0[4]*(rand()*2)
+		x1[5] = rand()*numpy.pi
+		x1[6] = 0.3 + rand()*3.7
+		x1[7] = rand()*x0[7]
 		
-		(z,b,c) = fmin_tnc(gab,x1,bounds=[(x-x*0.1,x+x*0.1)        ,(y-y*0.1,y+y*0.1),(0.005,0.3),(0.0,numpy.pi),(minf,freqor[j][0]+2),(0,numpy.pi*2),(1.0,2.0),(0.0001,0.01)],args=[weights[j]/numpy.sum(numpy.abs(weights[j]))], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0,2.0,2.0],maxCGit=1000, ftol=0.000001,approx_grad=True,maxfun=10000,eta=0.01)
-		e = gab(z,weights[j]/numpy.sum(numpy.abs(weights[j])),display=False)
+		(z,b,c) = fmin_tnc(gab,x1,bounds=[(x-denx*0.3,x+denx*0.3)        ,(y-deny*0.3,y+deny*0.3),(1.0,denx*0.5),(0.0,numpy.pi),(minf,freqor[j][0]/denx*3),(0,numpy.pi*2),(0.3,4.0),(0.0,0.1)],args=[weights[j]], xtol=0.0000000001,scale=[0.5,0.5,0.5,2.0,0.5,2.0,2.0,2.0],maxCGit=1000, ftol=0.0000000000001,approx_grad=True,maxfun=10000,eta=0.01,messages=0)
+		e = gab(z,weights[j],display=False)
 		if(e  < min_err):
 		   min_err = e
 		   min_x = z	
         
 	#pylab.figure()
-        #gab(min_x,weights[j]/numpy.sum(numpy.abs(weights[j])),display=True)
+        #gab(min_x,weights[j],display=True)
+	errors.append(min_err/(denx*deny))
+	variances = numpy.var(weights[j])
         parameters.append(min_x)
+    
+    pylab.figure()
+    pylab.hist(numpy.array(errors)/numpy.array(variances))
+    pylab.xlabel('Fraction of unexplained variance')
+    pylab.ylabel('# Cells')
+    
+    pylab.figure()
+    (x,y,sigma,angle,f,p,ar,alpha) = tuple(parameters[0])
+    pylab.imshow(gabor(frequency=f,x=x,y=y,xdensity=denx,ydensity=deny,size=sigma,orientation=angle,phase=p,ar=ar) * alpha)
+    pylab.colorbar()    
         
-        
+    pylab.figure()		
+    pylab.imshow(weights[0])
+    pylab.colorbar()	
+	
     pylab.figure()
     for i in xrange(0,len(parameters)):
             pylab.subplot(15,15,i+1)
             (x,y,sigma,angle,f,p,ar,alpha) = tuple(parameters[i])
-            g = Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=y-0.5,y=0.5-x,xdensity=denx,ydensity=deny,size=sigma,orientation=angle,phase=p,aspect_ratio=ar)() * alpha
+            g = gabor(frequency=f,x=x,y=y,xdensity=denx,ydensity=deny,size=sigma,orientation=angle,phase=p,ar=ar) * alpha
             m = numpy.max([-numpy.min(g),numpy.max(g)])
             pylab.show._needmain=False
             pylab.imshow(g,vmin=-m,vmax=m,cmap=pylab.cm.RdBu)
@@ -1541,13 +1682,12 @@ def fitGabor(weights):
     
 def gab(z,w,display=False):
     from matplotlib.patches import Circle
-    print z
     (x,y,sigma,angle,f,p,ar,alpha) = tuple(z)
     
     a = numpy.zeros(numpy.shape(w))
     (dx,dy) = numpy.shape(w)
     
-    g =  Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=y-0.5,y=0.5-x,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,aspect_ratio=ar)() * alpha
+    g =  gabor(frequency=f,x=x,y=y,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,ar=ar) * alpha
     
     if display:
         pylab.subplot(2,1,1)
@@ -1570,7 +1710,16 @@ def gab(z,w,display=False):
     
     return numpy.sum(numpy.power(g[0:dx,0:dy] - w,2)) 
 
-
+def gabor(frequency=1.0,x=0.0,y=0.0,xdensity=1.0,ydensity=1.0,size=1.0,orientation=1.0,phase=1.0,ar=1.0):
+    X = numpy.tile(numpy.arange(0,xdensity,1),(ydensity,1))	
+    Y = numpy.tile(numpy.arange(0,ydensity,1),(xdensity,1)).T
+    X1 = (X-x)*numpy.cos(orientation) + (Y-y)*numpy.sin(orientation)
+    Y1 = -(X-x)*numpy.sin(orientation) + (Y-y)*numpy.cos(orientation)
+    
+    ker =  - ((X1/numpy.sqrt(2)/(size*ar))**2 + (Y1/numpy.sqrt(2)/size)**2)
+    g = numpy.exp(ker)*numpy.cos(2*numpy.pi*X1*frequency+phase)
+    return g
+    
 def runSTC():
 	
     f = open("modelfitDB2.dat",'rb')
@@ -1795,42 +1944,53 @@ def STC(inputs,activities,validation_inputs,validation_activities,STA,cutoff=85,
     return eis
 
 def fitting():
-    f = open("modelfitDB2.dat",'rb')
+    f = open("modelfitDatabase1.dat",'rb')
     import pickle
     dd = pickle.load(f)
-
-
-    rfs = dd.children[0].children[0].data["ReversCorrelationRFs"]
-
-    print len(rfs)
-    params = fitGabor(rfs)
+    f.close()
     
-    m = numpy.max(numpy.abs(numpy.min(rfs)),numpy.abs(numpy.max(rfs)))
+    which = [0,1,4]
     
-    pylab.figure()
-    for i in xrange(0,len(rfs)):
-        pylab.subplot(15,15,i+1)
-        w = numpy.array(rfs[i])
-        pylab.show._needmain=False
-        pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
-	pylab.axis('off')
-    pylab.figure()
-
+    for i in which:    
+	node = dd.children[i].children[0]
+	rfs = node.data["ReversCorrelationRFs"]
+	params = fitGabor(rfs)
+	node.add_data("FittedParams",params,force=True)
+    
+    #m = numpy.max([numpy.abs(numpy.min(rfs)),numpy.abs(numpy.max(rfs))])
+    #pylab.figure()
+    #for i in xrange(0,len(rfs)):
+    #    pylab.subplot(15,15,i+1)
+    #    w = numpy.array(rfs[i])
+    #    pylab.show._needmain=False
+    #    pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+    #	pylab.axis('off')
+    #pylab.figure()
+    
+    
+    
+    f = open("modelfitDatabase1.dat",'wb')
+    pickle.dump(dd,f,-2)
+    f.close()
+    
     return (params)
 
 def tiling():
-    f = open("modelfitDB2.dat",'rb')
+    contrib.modelfit.save_fig_directory='/home/antolikjan/Doc/reports/Sparsness/'
+    f = open("modelfitDatabase1.dat",'rb')
     import pickle
+    from matplotlib.patches import Circle
     dd = pickle.load(f)
-
+    
+    rand = UniformRandom()
    
     rfs = [dd.children[0].children[0].data["ReversCorrelationRFs"],
     	   dd.children[1].children[0].data["ReversCorrelationRFs"],
-	   dd.children[3].children[0].data["ReversCorrelationRFs"]]
+	   dd.children[4].children[0].data["ReversCorrelationRFs"]]
     
     m=0
     for r in rfs:
-        m = numpy.max(numpy.max(numpy.abs(numpy.min(r)),numpy.abs(numpy.max(r))),m)
+        m = numpy.max([numpy.max([numpy.abs(numpy.min(r)),numpy.abs(numpy.max(r))]),m])
     loc = []
     
     f = file("./Mice/2009_11_04/region3_cell_locations", "r")
@@ -1846,17 +2006,14 @@ def tiling():
     f.close()
     
     param=[]
-    f = open("./Mice/2009_11_04/region=3_fitting_rep=100","rb")
-    import pickle
-    param.append(pickle.load(f))
-    f.close()
-    f = open("./Mice/2009_11_04/region=5_fitting_rep=100","rb")
-    param.append(pickle.load(f))
-    f.close()    		
-    f = open("./Mice/20090925_14_36_01/region=2_fitting_rep=100","rb")
-    param.append(pickle.load(f))
-    f.close()    		
-		
+    param.append(dd.children[0].children[0].data["FittedParams"])
+    param.append(dd.children[1].children[0].data["FittedParams"])
+    param.append(dd.children[4].children[0].data["FittedParams"])
+    
+    denx,deny=numpy.shape(rfs[0][0])
+    
+    view_angle = monitor_view_angle(59,20)
+    degrees_per_pixel = view_angle / (2*denx) 
 		
     for locations in loc:
 	(a,b) = numpy.shape(locations)
@@ -1867,33 +2024,336 @@ def tiling():
     loc[0] = numpy.array(loc[0])/256.0*261.0
     loc[1] = numpy.array(loc[1])/256.0*261.0
     loc[2] = numpy.array(loc[2])/256.0*230.0
-    
+
+
     fitted_corr=[]
-    for rf in rfs:
-	f=[]	    	     
-	for i in xrange(0,len(rf)):
-		#(x,y,sigma,angle,f,p,ar,alpha) = tuple(params[i])
-		#(dx,dy) = numpy.shape(rfs[0])
-		#g = Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=y-0.5,y=0.5-x,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,aspect_ratio=ar)() * alpha    
-		f.append(numpy.sum(numpy.power(rf[i].flatten()- numpy.mean(rf[i].flatten()),2)))
-	fitted_corr.append(f)
+    fitted_rfs=[]
+    fev = []
+    for (j,rf) in zip(numpy.arange(0,len(rfs),1),rfs):
+	q=[]
+	g=[]
+	v=[]
+	rand_g=[]
+	numpy.random.seed(1111)
 	
+	for i in xrange(0,len(rf)):
+		(x,y,sigma,angle,f,p,ar,alpha) = tuple(param[j][i])
+		(dx,dy) = numpy.shape(rfs[j][0])
+		g.append(gabor(frequency=f,x=x,y=y,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,ar=ar) * alpha)
+		#q.append(numpy.sum(numpy.power(rf[i].flatten()- numpy.mean(rf[i].flatten()),2)))
+		q.append(numpy.mean(numpy.power(rf[i],2)))
+		v.append(numpy.var(rf[i]- gabor(frequency=f,x=x,y=y,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,ar=ar) * alpha) / numpy.var(rf[i]))
+	fitted_corr.append(q)
+	fitted_rfs.append(g)
+	fev.append(v)
+
+    
+    #dd.children[0].children[0].add_data("FittedRFs",fitted_rfs[0],force=True)	
+    #dd.children[1].children[0].add_data("FittedRFs",fitted_rfs[1],force=True)
+    #dd.children[4].children[0].add_data("FittedRFs",fitted_rfs[2],force=True)
+    #f = open("modelfitDatabase1.dat",'wb')
+    #pickle.dump(dd,f,-2)
+    #f.close()		
+    pylab.figure()
+    pylab.hist(fev[0] + fev[1] + fev[2])
+    pylab.xlabel('Fraction of un-explained variance')
+		
+    pylab.figure()
+    ii=0
+    for k in xrange(0,len(rfs)):		
+	m = numpy.max([numpy.abs(numpy.min(rfs[k])),numpy.abs(numpy.max(rfs[k]))])
+	for i in xrange(0,len(rfs[k])):
+		pylab.subplot(15,15,ii+1)
+		w = numpy.array(rfs[k][i])
+		pylab.show._needmain=False
+		pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+		cir = Circle( (param[k][i][0],param[k][i][1]), radius=1,color='r')
+                pylab.gca().add_patch(cir)
+		xx,yy = centre_of_gravity(rfs[k][i])
+		cir = Circle( (xx,yy), radius=1,color='b')
+                pylab.gca().add_patch(cir)
+		pylab.axis('off')
+		ii+=1
+   
+    pylab.figure()	
+    ii=0
+    for k in xrange(0,len(rfs)):		
+	m = numpy.max([numpy.abs(numpy.min(fitted_rfs[k])),numpy.abs(numpy.max(fitted_rfs[k]))])
+	for i in xrange(0,len(fitted_rfs[k])):
+		pylab.subplot(15,15,ii+1)
+		w = numpy.array(fitted_rfs[k][i])
+		pylab.show._needmain=False
+		pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+		pylab.axis('off')
+		ii+=1		
+		
     for i in xrange(0,len(rfs)):
-	to_delete = numpy.nonzero((numpy.array(fitted_corr[i]) < 0.04)*1.0)[0]
+	#to_delete = numpy.nonzero((numpy.array(fitted_corr[i]) < 0.3*(10**-9))*1.0)[0]
+	to_delete = numpy.nonzero((numpy.array(fev[i]) > 0.3)*1.0)[0]
 	rfs[i] = numpy.delete(rfs[i],to_delete,axis=0)
+	fitted_rfs[i] = numpy.delete(fitted_rfs[i],to_delete,axis=0)
 	loc[i] = numpy.delete(numpy.array(loc[i]),to_delete,axis=0)
 	param[i] = numpy.delete(numpy.array(param[i]),to_delete,axis=0)
+    
+    
+    bb = [[],[],[]]
+    rand_fitted_rfs=[]
+    for a in xrange(0,3):
+	for j in xrange(0,10):
+		perm1 = numpy.random.permutation(len(param[a]))
+		perm2 = numpy.random.permutation(len(param[a]))
+		perm3 = numpy.random.permutation(len(param[a]))
+		perm4 = numpy.random.permutation(len(param[a]))
+		perm5 = numpy.random.permutation(len(param[a]))
+		perm6 = numpy.random.permutation(len(param[a]))
+		perm7 = numpy.random.permutation(len(param[a]))
+		perm8 = numpy.random.permutation(len(param[a]))
+		mmin = numpy.min(param[a],axis=0)
+		mmax = numpy.max(param[a],axis=0)
+		z = numpy.zeros(numpy.shape(rfs[a][0]))
+		for i in xrange(0,len(rfs[a])):
+			(x,y,sigma,angle,f,p,ar,alpha) = tuple(param[a][i])
+			x = param[a][perm1[i]][0]
+			y = param[a][perm2[i]][1]
+			sigma = param[a][perm3[i]][2]
+			angle = param[a][perm4[i]][3]
+			f = param[a][perm5[i]][4]
+			p = param[a][perm6[i]][5]
+			ar = param[a][perm7[i]][6]
+			alpha = param[a][perm8[i]][7]
+			
+			#x = (mmin+numpy.random.rand(8)*(mmax-mmin))[0]
+			#y = (mmin+numpy.random.rand(8)*(mmax-mmin))[1]
+			#sigma = (mmin+numpy.random.rand(8)*(mmax-mmin))[2]
+			#angle = (mmin+numpy.random.rand(8)*(mmax-mmin))[3]
+			#f = (mmin+numpy.random.rand(8)*(mmax-mmin))[4]
+			#p = (mmin+numpy.random.rand(8)*(mmax-mmin))[5]
+			#ar = (mmin+numpy.random.rand(8)*(mmax-mmin))[6]
+			#alpha = (mmin+numpy.random.rand(8)*(mmax-mmin))[7]
+		
+			z = z+ gabor(frequency=f,x=x,y=y,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,ar=ar) * alpha
+	        z = z / len(rfs[a])
+		if j == 0:
+		   rand_fitted_rfs.append(z)	
+		bb[a].append(numpy.var(z))
+	
+	
+    fitted_rfs_merged=numpy.concatenate(fitted_rfs)
+    rfs_merged=numpy.concatenate(rfs)
+    params_merged=numpy.concatenate(param)
+    order = numpy.argsort(params_merged[:,4])
 
+    
+    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))	
+    m = numpy.max([numpy.abs(numpy.min(rfs_merged)),numpy.abs(numpy.max(rfs_merged))])
+    for i in xrange(0,len(rfs_merged)):
+	pylab.subplot(15,15,i+1)
+	w = numpy.array(rfs_merged[i])
+	pylab.show._needmain=False
+	pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	pylab.axis('off')
+    release_fig('RawRFs.pdf') 	
+	
+	
+    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))	
+    m = numpy.max([numpy.abs(numpy.min(fitted_rfs_merged)),numpy.abs(numpy.max(fitted_rfs_merged))])
+    for i in xrange(0,len(fitted_rfs_merged)):
+	pylab.subplot(15,15,i+1)
+	w = numpy.array(fitted_rfs_merged[i])
+	pylab.show._needmain=False
+	pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	pylab.axis('off')
+    release_fig('FittedRFs.pdf')
+	    
+    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))
+    m = numpy.max([numpy.abs(numpy.min(rfs_merged)),numpy.abs(numpy.max(rfs_merged))])
+    for i in xrange(0,len(order)):
+	pylab.subplot(15,15,i+1)
+	w = numpy.array(rfs_merged[order[i]])
+	pylab.show._needmain=False
+	pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	pylab.axis('off')
+    release_fig('OrderedRFs.pdf')
+    	    
+    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))
+    m = numpy.max([numpy.abs(numpy.min(fitted_rfs_merged)),numpy.abs(numpy.max(fitted_rfs_merged))])
+    for i in xrange(0,len(order)):
+	pylab.subplot(15,15,i+1)
+	w = numpy.array(fitted_rfs_merged[order[i]])
+	pylab.show._needmain=False
+	pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	pylab.axis('off')
+    release_fig('OrderedFittedRFs.pdf')	    
+	    
+    # show RF coverage
     rc=[]
     for rf in rfs:
 	r=[]
 	for idx in xrange(0,len(rf)):
-	    r.append(numpy.array(centre_of_gravity(numpy.power(rf[idx],2)))*1000)
-        rc.append(r)
+	    r.append(numpy.array(centre_of_gravity(rf[idx])))
+        rc.append(numpy.array(r))
 
+    nx=[]
+    ny=[]
+    for i in xrange(len(param)):
+    	for j in xrange(len(param[i])):
+		nx.append(param[i][j][4] * param[i][j][2]* param[i][j][6])    
+	        ny.append(param[i][j][4] * param[i][j][2])	    
+    
+    # PLOT DIFFERENT FITTED PARAMETERS HISTOGRAMS
+    pylab.figure(dpi=300,facecolor='w',figsize=(6,4))
+    pylab.scatter(nx,ny,s=10,facecolor='none', edgecolor='b',marker='o')
+    pylab.axis([0,1.5,0.0,1.5])
+    pylab.axes().set_aspect('equal')
+    pylab.xlabel('nx')
+    pylab.ylabel('ny')
+    pylab.gca().xaxis.set_major_locator(MaxNLocator(3))
+    pylab.gca().yaxis.set_major_locator(MaxNLocator(3))
+    release_fig('NxNy.png')
+
+    pylab.figure(dpi=100,facecolor='w',figsize=(17,5))
+    pylab.subplot(1,5,1)
+    pylab.hist(numpy.array(param[0][:,4].flatten().tolist() + param[1][:,4].flatten().tolist() + param[2][:,4].flatten().tolist())*degrees_per_pixel)
+    pylab.xlabel('Frequency (deg. / visual angle)')
+    pylab.gca().xaxis.set_major_locator(MaxNLocator(5))
+
+    
+    pylab.subplot(1,5,2)
+    pylab.hist(numpy.array(param[0][:,2].flatten().tolist() + param[1][:,2].flatten().tolist() + param[2][:,2].flatten().tolist())*degrees_per_pixel)
+    pylab.xlabel('Sigma (deg. / visual angle)')
+    pylab.gca().xaxis.set_major_locator(MaxNLocator(5))
+    
+    pylab.subplot(1,5,3)
+    pylab.hist(param[0][:,6].flatten().tolist() + param[1][:,6].flatten().tolist() + param[2][:,6].flatten().tolist())
+    pylab.xlabel('Aspect ratio')
+    pylab.gca().xaxis.set_major_locator(MaxNLocator(5))
+    
+    pylab.subplot(1,5,4)
+    c=[]
+    for j in xrange(0,len(param)):
+    	for i in xrange(0,len(param[j][:,5])):
+		c.append(numpy.complex(numpy.abs(numpy.cos(param[j][i,5])),numpy.abs(numpy.sin(param[j][i,5]))))
+    pylab.hist(numpy.angle(c))
+    pylab.gca().xaxis.set_major_locator(MaxNLocator(5))			
+    pylab.xlabel('Phase')
+    
+    pylab.subplot(1,5,5)
+    pylab.hist(param[0][:,3].flatten().tolist() + param[1][:,3].flatten().tolist() + param[2][:,3].flatten().tolist())
+    pylab.xlabel('Orientation')
+    pylab.gca().xaxis.set_major_locator(MaxNLocator(5))		
+    release_fig('FittedParametersDistribution.pdf')
+    	
+			
+    #PLOT THE RETINOTOPIC COVERAGE 			
+    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))
+    for i in xrange(0,len(param)):
+	pylab.subplot(1,3,i+1)
+	pylab.title('Retinotopic coverage')
+	pylab.plot(param[i][:,0],param[i][:,1],'bo',label='Fitted')
+	pylab.plot(rc[i][:,0],rc[i][:,1],'ro',label='Center of gravity')
+        pylab.axis([0,numpy.shape(rfs[0][0])[0],0.0,numpy.shape(rfs[0][0])[1]])
+        pylab.gca().set_aspect('equal')
+	pylab.xlabel('X coordinate')
+	pylab.ylabel('Y coordinate')
+	pylab.legend()
+    release_fig('RetinotopicCoverage.pdf')
+
+
+    #PLOT THE ORIENTATION PREFERENCE AGIANST RETINOTOPY 			
+    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))
+    for i in xrange(0,len(param)):
+	pylab.subplot(1,3,i+1)
+	pylab.title('Retinotopic coverage')
+	pylab.scatter(param[i][:,0],param[i][:,1],c=param[i][:,3]/numpy.pi,s=50,cmap=pylab.cm.hsv)
+        #pylab.axis([0,numpy.shape(rfs[0][0])[0],0.0,numpy.shape(rfs[0][0])[1]])
+        pylab.gca().set_aspect('equal')
+	pylab.xlabel('X coordinate')
+	pylab.ylabel('Y coordinate')
+	pylab.colorbar(shrink=0.3)
+    release_fig('ORandRetinotopy.pdf')
+    
+    aaa = []
+    d = []	
+    for i in xrange(0,len(fitted_rfs[0])):
+	for j in xrange(i+1,len(fitted_rfs[0])):
+	    d.append(distance(loc[0],i,j))
+	    aaa.append(numpy.corrcoef(fitted_rfs[0][i].flatten(),fitted_rfs[0][j].flatten())[0][1])
+
+    pylab.figure(facecolor='w')
+    pylab.title('Correlation between distance and fitted RFs correlations')
+    ax = pylab.axes() 
+    ax.plot(d,aaa,'ro')
+    ax.plot(d,contrib.jacommands.weighted_local_average(d,aaa,30),'go')
+    ax.plot(d,numpy.array(contrib.jacommands.weighted_local_average(d,aaa,30))+numpy.array(contrib.jacommands.weighted_local_std(d,aaa,30)),'bo')
+    ax.plot(d,numpy.array(contrib.jacommands.weighted_local_average(d,aaa,30))-numpy.array(contrib.jacommands.weighted_local_std(d,aaa,30)),'bo')
+    ax.axhline(0,linewidth=4)
+    
+    
+    #PLOT RF COVERAGE
+    #first raw	
+    z = numpy.zeros(numpy.shape(rfs[0][0]))
+    for f in rfs[0]:
+	z = z+f
+    z = z/len(rfs[0])	
+    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))
+    pylab.subplot(1,5,1)
+    pylab.title('Raw')
+    m = numpy.max([numpy.abs(numpy.min(z)),numpy.abs(numpy.max(z))])
+    pylab.imshow(z,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+    pylab.colorbar(shrink=0.3)
+    print 'Variance of the raw averaged RFs',numpy.var(z)
+    
+    #then fitted
+    z = numpy.zeros(numpy.shape(fitted_rfs[0][0]))
+    for f in fitted_rfs[0]:
+	z = z+f
+    z = z/len(fitted_rfs[0])
+    pylab.subplot(1,5,2)
+    pylab.title('Fitted')
+    m = numpy.max([numpy.abs(numpy.min(z)),numpy.abs(numpy.max(z))])
+    pylab.imshow(z,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+    pylab.colorbar(shrink=0.3)
+    print 'Variance of the fitted averaged RFs',numpy.var(z)
+    
+    #then randomized fitted
+    pylab.subplot(1,5,3)
+    pylab.title('Randmozied fitted')
+    m = numpy.max([numpy.abs(numpy.min(rand_fitted_rfs[0])),numpy.abs(numpy.max(rand_fitted_rfs[0]))])
+    pylab.imshow(numpy.array(rand_fitted_rfs[0]),vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+    pylab.colorbar(shrink=0.3)	
+    
+    pylab.subplot(1,5,4)
+    pylab.title('Example fitted')
+    m = numpy.max([numpy.abs(numpy.min(fitted_rfs[0][0])),numpy.abs(numpy.max(fitted_rfs[0][0]))])
+    pylab.imshow(fitted_rfs[0][0],vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+    pylab.colorbar(shrink=0.3)
+
+    pylab.subplot(1,5,5)
+    pylab.title('Example raw')
+    m = numpy.max([numpy.abs(numpy.min(rfs[0][0])),numpy.abs(numpy.max(rfs[0][0]))])
+    pylab.imshow(rfs[0][0],vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+    pylab.colorbar(shrink=0.3)
+    release_fig('ONOFFcoverage.pdf')	
+
+    print 'Average variance and +/- 2*variance of the randomized fitted averaged RF',numpy.mean(bb[0]), numpy.mean(bb[0]) + 2*numpy.sqrt(numpy.var(bb[0])), numpy.mean(bb[0]) - 2*numpy.sqrt(numpy.var(bb[0])) 
 
     pylab.figure()
-    pylab.hist(fitted_corr)
+    pylab.subplot(1,3,1)
+    pylab.hist(bb[0],bins=30)
+    pylab.axvline(numpy.var(numpy.mean(fitted_rfs[0],axis=0)))
+    print numpy.var(numpy.mean(fitted_rfs[0],axis=0))
+    
+    pylab.subplot(1,3,2)
+    pylab.hist(bb[1],bins=30)
+    pylab.axvline(numpy.var(numpy.mean(fitted_rfs[1],axis=0)))
+    print numpy.var(numpy.mean(fitted_rfs[1],axis=0))
+
+    pylab.subplot(1,3,3)
+    pylab.hist(bb[2],bins=30)
+    pylab.axvline(numpy.var(numpy.mean(fitted_rfs[2],axis=0)))
+    print numpy.var(numpy.mean(fitted_rfs[2],axis=0))
+    
+    return
 
     membership=[]
     membership1=[]
@@ -1928,26 +2388,27 @@ def tiling():
         orrf.append(zip(numpy.array(p[:,3].T),rf))
 	orrphase.append(zip(numpy.array(p[:,3].T),numpy.array(p[:,5].T)))
 	
-    #monte_carlo(rc,orrphase,histogram_of_phase_dist_correl_of_cooriented_neurons,100)  
-    #monte_carlo(rc,orrf,histogram_of_RF_correl_of_cooriented_neurons,100)
-    #monte_carlo(rc,ors,average_or_histogram_of_proximite,100)
-    #monte_carlo(rc,ors,average_or_diff,100)	
+    #monte_carlo(loc,orrphase,histogram_of_phase_dist_correl_of_cooriented_neurons,30)  
+    #monte_carlo(loc,orrf,histogram_of_RF_correl_of_cooriented_neurons,30)
+    #monte_carlo(loc,ors,average_or_histogram_of_proximite,30)
+    #monte_carlo(loc,ors,average_or_diff,30)	
 	
-    monte_carlo(loc,ors,average_or_diff,100)	
-    monte_carlo(loc,orrf,average_cooriented_RF_corr,100)
-    monte_carlo(loc,orrf,average_RF_corr,100)
+    #monte_carlo(loc,ors,average_or_diff,30)	
+    monte_carlo(loc,orrf,average_cooriented_RF_corr,30)
+    #monte_carlo(loc,orrf,average_RF_corr,30)
+    return 
     
-    return
+    #return
     
-    monte_carlo(loc,orrphase,histogram_of_phase_dist_correl_of_cooriented_neurons,100)  
-    monte_carlo(loc,orrf,histogram_of_RF_correl_of_cooriented_neurons,100)
-    monte_carlo(loc,ors,average_or_histogram_of_proximite,100)
-    return
-    monte_carlo(locs,membership,number_of_same_neighbours,100)				
-    monte_carlo(loc,membership1,number_of_same_neighbours,100)
+    #monte_carlo(loc,orrphase,histogram_of_phase_dist_correl_of_cooriented_neurons,30)  
+    #monte_carlo(loc,orrf,histogram_of_RF_correl_of_cooriented_neurons,30)
+    #monte_carlo(loc,ors,average_or_histogram_of_proximite,30)
+    #return
+    #monte_carlo(locs,membership,number_of_same_neighbours,100)				
+    #monte_carlo(loc,membership1,number_of_same_neighbours,100)
         		    
     
-    return
+    #return
     
     colors=[]
     xx=[]
@@ -2134,7 +2595,7 @@ def RF_correlations():
     
     m=0
     for r in rfs:
-        m = numpy.max(numpy.max(numpy.abs(numpy.min(r)),numpy.abs(numpy.max(r))),m)
+        m = numpy.max([numpy.max([numpy.abs(numpy.min(r)),numpy.abs(numpy.max(r))]),m])
     loc = []
     
     f = file("./Mice/2009_11_04/region3_cell_locations", "r")
@@ -2202,7 +2663,7 @@ def RF_correlations():
 		b+=1
  
     for i in xrange(0,len(rfs)):
-	to_delete = numpy.nonzero((numpy.array(fitted_corr[i]) < 0.04)*1.0)[0]
+	to_delete = numpy.nonzero((numpy.array(fitted_corr[i]) < 0.00000004)*1.0)[0]
 	rfs[i] = numpy.delete(rfs[i],to_delete,axis=0)
 	loc[i] = numpy.delete(numpy.array(loc[i]),to_delete,axis=0)
 	param[i] = numpy.delete(numpy.array(param[i]),to_delete,axis=0)
@@ -2631,17 +3092,14 @@ def RF_corr_centered(RF1,RF2,fraction,display=True):
     return numpy.corrcoef(RF1c.flatten(),RF2c.flatten())[0][1]
 
 def centre_of_gravity(matrix):
-    sx,sy = numpy.shape(matrix)	
-	
-    X = numpy.zeros((sx,sy))
-    Y = numpy.zeros((sx,sy))
-    for x in xrange(0,sx):
-        for y in xrange(0,sy):
-            X[x][y] = x
-            Y[x][y] = y
-    
-    x = numpy.sum(numpy.sum(numpy.multiply(X,matrix)))/numpy.sum(numpy.sum(matrix))/sx
-    y = numpy.sum(numpy.sum(numpy.multiply(Y,matrix)))/numpy.sum(numpy.sum(matrix))/sy
+    sx,sy = numpy.shape(matrix)
+
+    m = matrix*(numpy.abs(matrix)>(0.5*numpy.max(numpy.abs(matrix))))	
+    X = numpy.tile(numpy.arange(0,sx,1),(sy,1))	
+    Y = numpy.tile(numpy.arange(0,sy,1),(sx,1)).T
+
+    x = numpy.sum(numpy.multiply(X,numpy.power(m,2)))/numpy.sum(numpy.power(m,2))
+    y = numpy.sum(numpy.multiply(Y,numpy.power(m,2)))/numpy.sum(numpy.power(m,2))
     
     return (x,y)
 	
@@ -2691,78 +3149,28 @@ def contrast(image):
 
 
 def run_LIP():
+	import scipy
 	from scipy import linalg
-	f = open("modelfitDB2.dat",'rb')
+	f = open("modelfitDatabase1.dat",'rb')
 	import pickle
 	dd = pickle.load(f)
+	node = dd.children[0]
+	rfs = node.children[0].data["ReversCorrelationRFs"]
+	pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"])
+	pred_val_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"])
+	
+	training_set = numpy.array(node.children[0].data["LaterTrainingSet"])
+	validation_set = numpy.array(node.children[0].data["LaterValidationSet"])
+	m = node.children[0].data["LaterModel"]
+	#training_set = node.data["training_set"]
+	#validation_set = node.data["validation_set"]
+        training_inputs = numpy.array(node.data["training_inputs"])
+	validation_inputs = numpy.array(node.data["validation_inputs"])
+	raw_validation_set = node.data["raw_validation_set"]
 
-	rfs_area1  = dd.children[0].children[0].data["ReversCorrelationRFs"]
-	rfs_area2  = dd.children[1].children[0].data["ReversCorrelationRFs"]
-	
-	
-	pred_act_area1  = dd.children[0].children[0].data["ReversCorrelationPredictedActivities"][0:1260,:]
-	pred_act_area2  = dd.children[1].children[0].data["ReversCorrelationPredictedActivities"]
-	
-	
-	print numpy.shape(pred_act_area1)
-	print numpy.shape(pred_act_area2)
-	
-	print numpy.shape(rfs_area2)
-	print numpy.shape(rfs_area1)
-	
-	rfs = numpy.concatenate((rfs_area1,rfs_area2),axis=0) 
-	
-	pred_act = numpy.concatenate((pred_act_area1,pred_act_area2),axis=1)
-	
-	
-	
-	corr_coef = []
-	
-	params={}
-    	params["normalize_activities"] = __main__.__dict__.get('NormalizeActivities',True)
-	params["cut_out"] = __main__.__dict__.get('CutOut',False)
+	for i in xrange(0,len(raw_validation_set)):
+	    raw_validation_set[i] = numpy.array(m.returnPredictedActivities(numpy.mat(raw_validation_set[i])))
 
-	
-	dataset_area1 = loadSimpleDataSet("Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes",1260,103)
-	dataset_area2 = loadSimpleDataSet("Mice/2009_11_04/region5_stationary_180_15fr_103cells_on_response_spikes",1260,55)
-	dataset = mergeDatasets(dataset_area1,dataset_area2)
-	
-	
-        (index,data) = dataset
-        index+=1
-    	dataset = (index,data)
-    	
-	
-	dataset = averageRangeFrames(dataset,0,1)
-    	dataset = averageRepetitions(dataset)
-	
-	
-        if False:	
-		(validation_data_set,dataset) = splitDataset(dataset,200)
-		validation_inputs=generateInputs(validation_data_set,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",100,1.8,offset=1000)
-        else:
-		validation_data_set_area1 = loadSimpleDataSet("Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes",50,103,10)
-		validation_data_set_area2 = loadSimpleDataSet("Mice/2009_11_04/region5_50stim_10reps_15fr_103cells_on_response_spikes",50,55,8)
-		
-		
-		#(validation_data_set_area1,trash) = splitDataset(validation_data_set_area1,40)
-		#(validation_data_set_area2,trash) = splitDataset(validation_data_set_area2,40)
-	        ff1  = analyse_reliability(validation_data_set_area1,{})
-		ff2  = analyse_reliability(validation_data_set_area2,{})
-		ff = numpy.append(numpy.array(ff1),numpy.array(ff2))
-		
-		validation_data_set_area1 = averageRangeFrames(validation_data_set_area1,0,1)
-		validation_data_set_area1 = averageRepetitions(validation_data_set_area1)
-		
-		validation_data_set_area2 = averageRangeFrames(validation_data_set_area2,0,1)
-		validation_data_set_area2 = averageRepetitions(validation_data_set_area2)
-		
-		validation_data_set = mergeDatasets(validation_data_set_area1,validation_data_set_area2)
-		
-		validation_inputs=generateInputs(validation_data_set,"/home/antolikjan/topographica/topographica/Mice/2009_11_04/","/20091104_50stimsequence/50stim%04d.tif",100,1.8,offset=0)
-	
-	training_set = generateTrainingSet(dataset)
-	validation_set = generateTrainingSet(validation_data_set)
 		
         #discard low image mean images
 	image_mean=[]	
@@ -2775,66 +3183,114 @@ def run_LIP():
 	print "Deleting trials with low mean of images"
 	validation_inputs = numpy.delete(validation_inputs, idx, axis = 0)	
 	validation_set = numpy.delete(validation_set, idx, axis = 0)
+	pred_val_act = numpy.delete(pred_val_act, idx, axis = 0)
+
+	
+	for i in xrange(0,len(raw_validation_set)):
+	    raw_validation_set[i] = numpy.delete(raw_validation_set[i], idx, axis = 0)	
 		
 	#compute neurons mean before normalization
 	neuron_mean = numpy.mean(training_set,axis=0)
 	neuron_mean_val = numpy.mean(validation_set,axis=0)
-	if params["normalize_activities"]:
-		(a,v) = compute_average_min_max(training_set)
-		training_set = normalize_data_set(training_set,a,v)
-		validation_set = normalize_data_set(validation_set,a,v)
 	
-	if params["cut_out"]:
-		(x,y)= numpy.shape(validation_inputs[0])
-		validation_inputs = cut_out_images_set(validation_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
 
-	#generate predicted activities
-	pred_val_act = numpy.zeros((len(validation_inputs),len(rfs)))
-	for inp in xrange(0,len(validation_inputs)):
-            for rf in xrange(0,len(rfs)):
-		pred_val_act[inp,rf] = numpy.sum(numpy.multiply(numpy.mat(validation_inputs[inp]),numpy.mat(rfs[rf])))
+	#training_set = training_set - numpy.min(training_set) 
+	#validation_set = validation_set - numpy.min(training_set)
+	#pred_act_t_a = pred_act_t - numpy.min(pred_act_t)
+	#print numpy.sum(((training_set_a >= 0)*1.0))
+	#print numpy.sum(((pred_act_t_a >= 0)*1.0))
+	
+	#training_set_a = numpy.multiply(training_set_a,((training_set_a > 0)*1.0))
+	#pred_act_t_a = numpy.multiply(pred_act_t_a,((pred_act_t_a > 0)*1.0))
+	#print numpy.sum(((training_set_a >= 0)*1.0))
+	#print numpy.sum(((pred_act_t_a >= 0)*1.0))
+
 
 	#of = run_nonlinearity_detection(numpy.mat(training_set),pred_act,10,False)
 	ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(pred_act))
-	
 	pred_act_t = apply_sigmoid_output_function(numpy.mat(pred_act),ofs)
 	pred_val_act_t= apply_sigmoid_output_function(numpy.mat(pred_val_act),ofs)
-		
-    	(num_pres,num_neurons) = numpy.shape(training_set)
-    
-        pve = []
-        for i in xrange(0,158):
-	    corr_coef.append(numpy.corrcoef(pred_act_t.T[i], training_set.T[i])[0][1])
-	    pve.append(1-numpy.sum(numpy.power(pred_act_t.T[i]- training_set.T[i],2)) / numpy.sum(numpy.power(numpy.mean(training_set.T[i])- training_set.T[i],2)))
-	    
-	print "The mean FEV : ", numpy.mean(pve)
-	print "The mean correltation coefficient : ", numpy.mean(corr_coef)
 	
+	
+	pylab.figure()
+	pylab.hist(training_set.flatten())
+		
+	
+	
+    	(num_pres,num_neurons) = numpy.shape(training_set)
+	raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
+	
+	signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act, pred_val_act)
+	signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act_t, pred_val_act_t)
+	
+	
+	print "Mean Reg. pseudoinverse prediction power on training set / validation set: ", numpy.mean(training_prediction_power) , " / " , numpy.mean(validation_prediction_power)
+	print "Mean Reg. pseudoinverse  prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t) , " / " , numpy.mean(validation_prediction_power_t)
+	
+	
+	
+	corr_coef=[]
+	for i in xrange(0,len(rfs)):
+	    corr_coef.append(numpy.corrcoef(pred_act_t.T[i], training_set.T[i])[0][1])
+	
+	print "The mean correltation coefficient : ", numpy.mean(corr_coef)
 	print "Mean variance of training set:", numpy.mean(numpy.power(numpy.std(training_set,axis=0),2))
 	print "Mean variance of validation set:", numpy.mean(numpy.power(numpy.std(validation_set,axis=0),2))
 	
-	val_pve = []
+
 	val_corr_coef = []
-        for i in xrange(0,158):
+	measured_neuron_sparsity = [] 
+	predicted_neuron_sparsity = []
+	
+        for i in xrange(0,num_neurons):
+	    measured_neuron_sparsity.append(numpy.power(numpy.mean(training_set.T[i]),2) / numpy.mean(numpy.power(training_set.T[i],2)))
+	    predicted_neuron_sparsity.append(numpy.power(numpy.mean(pred_act_t.T[i]),2) / numpy.mean(numpy.power(pred_act_t.T[i],2)))
 	    val_corr_coef.append(numpy.corrcoef(pred_val_act_t.T[i], validation_set.T[i])[0][1])
-	    val_pve.append(1-numpy.sum(numpy.power(pred_val_act_t.T[i]- validation_set.T[i],2)) / numpy.sum(numpy.power(numpy.mean(validation_set.T[i])- validation_set.T[i],2)))
-	print "The mean FEV on validation set: ", numpy.mean(val_pve)
-	print "The mean correlation coeficient on validation set: ", numpy.mean(val_corr_coef)
+	
+	measured_pop_sparsity = [] 
+	predicted_pop_sparsity = []
+	for i in xrange(0,num_pres):
+	    measured_pop_sparsity.append(numpy.power(numpy.mean(training_set[i]),2) / numpy.mean(numpy.power(training_set[i],2)))
+	    predicted_pop_sparsity.append(numpy.power(numpy.mean(pred_act_t[i]),2) / numpy.mean(numpy.power(pred_act_t[i],2)))	
 	
 	pylab.figure()
-	pylab.title("Histogram of explained variance")
-	pylab.hist(pve)
+	pylab.title('The sparsity of measured and predicted activity per neurons')
+	pylab.hist(numpy.vstack([numpy.array(measured_neuron_sparsity),numpy.array(predicted_neuron_sparsity)]).T,bins=numpy.arange(0,1.01,0.1),label=['measured','predicted'])
+	pylab.axvline(numpy.mean(measured_neuron_sparsity),color='b')
+	pylab.axvline(numpy.mean(predicted_neuron_sparsity),color='g')
+	pylab.legend()
 	
+	pylab.figure()
+	pylab.title('The sparsity of measured and predicted activity per population')
+	pylab.hist(numpy.vstack([numpy.array(measured_pop_sparsity),numpy.array(predicted_pop_sparsity)]).T,bins=numpy.arange(0,1.01,0.1),label=['measured','predicted'])
+	pylab.axvline(numpy.mean(measured_pop_sparsity),color='b')
+	pylab.axvline(numpy.mean(predicted_pop_sparsity),color='g')
+	pylab.legend()
+	
+	pylab.figure()
+	
+	
+	print "The mean correlation coeficient on validation set: ", numpy.mean(val_corr_coef)
 	pylab.figure()
 	pylab.title("Histogram of neural response means")
 	pylab.hist(neuron_mean)
+    	
+	pylab.figure()
+	pylab.title("Histogram of training prediction powers")
+	pylab.hist(training_prediction_power_t)
+    	
+	pylab.figure()
+	pylab.title("Histogram of validation prediction powers")
+	pylab.hist(validation_prediction_power_t)
+    	
 	
-    	#discard low correlation neurons
+	#discard low correlation neurons
 	r=[]
 	corr=[]
 	tresh=[]
+	print training_prediction_power_t
         for i in xrange(0,30):
-		f = numpy.nonzero((numpy.array(pve) < ((i-10.0)/50.0))*1.0)[0]
+		f = numpy.nonzero((numpy.array(training_prediction_power_t) < ((i-10)/30.0))*1.0)[0]
 	        tresh.append(((i-10.0)/50.0))
 		training_set_good = numpy.delete(training_set, f, axis = 1)
 		pred_act_good = numpy.delete(pred_act_t, f, axis = 1)
@@ -2844,9 +3300,9 @@ def run_LIP():
 		r.append(numpy.mean(rank))
 		corr.append(correct)
 	
-	f = numpy.nonzero((numpy.array(pve) < 0.22)*1.0)[0]
-	print f 
-	#f = []
+	f = numpy.nonzero((numpy.array(training_prediction_power_t) < 0.1)*1.0)[0]
+	f = []
+	print f
 	training_set = numpy.delete(training_set, f, axis = 1)
 	pred_act = numpy.delete(pred_act, f, axis = 1)
 	pred_act_t = numpy.delete(pred_act_t, f, axis = 1)
@@ -2855,6 +3311,17 @@ def run_LIP():
 	pred_val_act = numpy.delete(pred_val_act, f, axis = 1)
 
 	(num_pres,num_neurons) = numpy.shape(training_set)
+
+	
+    	(ranks,correct,tr) = performIdentification(validation_set,pred_val_act)
+    	print "Correct", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act,2))
+	(tf_ranks,tf_correct,pred) = performIdentification(validation_set,pred_val_act_t)
+	print "Correct", tf_correct , "Mean rank:", numpy.mean(tf_ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act_t,2))
+	
+	pylab.figure()
+	pylab.title("Ranks histogram")
+	pylab.xlabel("ranks")
+	pylab.hist(tf_ranks,bins=numpy.arange(0,len(tf_ranks),1))
 	
 	pylab.figure()
 	pylab.xlabel("tresh")
@@ -2865,46 +3332,7 @@ def run_LIP():
 	pylab.xlabel("tresh")
 	pylab.ylabel("rank")
 	pylab.plot(tresh,r)
-	
-	pylab.figure()
-	pylab.title('Histogram of fraction of explained variance on validation set')
-	pylab.hist(val_pve)
-	
-	pylab.figure()
-	pylab.title("Correlation between neuronal mean response and training set FVE")
-	pylab.xlabel("neuronal response mean")
-	pylab.ylabel("FVE")
-	pylab.plot(neuron_mean,pve,'ro')
 
-	pylab.figure()
-	pylab.title("Correlation between neuronal mean response and validation set FVE")
-	pylab.xlabel("neuronal response mean")
-	pylab.ylabel("FVE")
-	pylab.plot(neuron_mean,val_pve,'ro')
-
-	pylab.figure()
-	pylab.title("Correlation between neuronal mean on validation set response and validation set FVE")
-	pylab.xlabel("neuronal response mean")
-	pylab.ylabel("FVE")
-	pylab.plot(neuron_mean_val,val_pve,'ro')
-	
-	pylab.figure()
-	pylab.title('scatter plot of fraction of explained variance on training set against validation set')
-	pylab.plot(val_pve,pve,'ro')
-	pylab.xlabel('validation set')
-	pylab.ylabel('training set')
-	
-	(ranks,correct,tr) = performIdentification(validation_set,pred_val_act)
-	(tf_ranks,tf_correct,pred) = performIdentification(validation_set,pred_val_act_t)
-	
-	print "Correct:", correct , "Mean rank:", numpy.mean(ranks) 
-	print "TFCorrect:", tf_correct , "Mean tf_rank:", numpy.mean(tf_ranks)
-	
-	pylab.figure()
-	pylab.title("Ranks histogram")
-	pylab.xlabel("ranks")
-	pylab.hist(tf_ranks,bins=numpy.arange(0,len(tf_ranks),1))
-	
 	errors=[]
 	bp=[]
 	lp5=[]
@@ -2919,257 +3347,237 @@ def run_LIP():
 	image_mean=[]
 	corr_of_pop_resp=[]
 	
+	sx,sy = numpy.shape(rfs[0])
 	
-	for i in xrange(0,len(pred_val_act)):
-	    errors.append(numpy.sum(numpy.power(pred_val_act_t[i] - validation_set[i],2)) / 
-	                  numpy.sum(numpy.power(validation_set[i] - numpy.mean(validation_set[i]),2)))
-			  
-	    corr_of_pop_resp.append(numpy.corrcoef(pred_val_act_t[i],validation_set[i],2)[0][1])
-	    bp.append(band_power(validation_inputs[i],7,3))
-	    lp5.append(low_power(validation_inputs[i],5))
-	    lp6.append(low_power(validation_inputs[i],6))
-	    lp7.append(low_power(validation_inputs[i],7))
-	    lp8.append(low_power(validation_inputs[i],8))
-	    lp9.append(low_power(validation_inputs[i],9))
-	    lp10.append(low_power(validation_inputs[i],10))
-	    image_contrast.append(contrast(validation_inputs[i]))
-	    response_mean.append(numpy.mean(training_set[i]))
-	    image_mean.append(numpy.mean(validation_inputs[i]))
+	if False:	
+		for i in xrange(0,len(pred_val_act)):
+			errors.append(numpy.sum(numpy.power(pred_val_act_t[i] - validation_set[i],2)) / 
+					numpy.sum(numpy.power(validation_set[i] - numpy.mean(validation_set[i]),2)))
+				
+			corr_of_pop_resp.append(numpy.corrcoef(pred_val_act_t[i],validation_set[i],2)[0][1])
+			bp.append(band_power(numpy.reshape(validation_inputs[i],(sx,sy)),7,3))
+			lp5.append(low_power(numpy.reshape(validation_inputs[i],(sx,sy)),5))
+			lp6.append(low_power(numpy.reshape(validation_inputs[i],(sx,sy)),6))
+			lp7.append(low_power(numpy.reshape(validation_inputs[i],(sx,sy)),7))
+			lp8.append(low_power(numpy.reshape(validation_inputs[i],(sx,sy)),8))
+			lp9.append(low_power(numpy.reshape(validation_inputs[i],(sx,sy)),9))
+			lp10.append(low_power(numpy.reshape(validation_inputs[i],(sx,sy)),10))
+			image_contrast.append(contrast(numpy.reshape(validation_inputs[i],(sx,sy))))
+			response_mean.append(numpy.mean(training_set[i]))
+			image_mean.append(numpy.mean(numpy.reshape(validation_inputs[i],(sx,sy))))
  	
-	pylab.figure()
-	pylab.title("Correlation between prediction error and contrast of band-passed images")
-	pylab.plot(errors,bp,'ro')
-	pylab.xlabel("prediction error")
-	pylab.ylabel("band pass contrast")
 	
-	pylab.figure()
-	pylab.title("Correlation between prediction error and contrast of low-passed images")
-	pylab.plot(errors,lp7,'ro')
-	pylab.xlabel("prediction error")
-	pylab.ylabel("low pass contrast")
-	
-	pylab.figure()
-	pylab.title("Correlation between prediction error and basic contrast of images")
-	pylab.plot(errors,image_contrast,'ro')
-	pylab.xlabel("prediction error")
-	pylab.ylabel("basic contrast")
 
-	pylab.figure()
-	pylab.title("Correlation between correlation of pop resp and contrast of band-passed images")
-	pylab.plot(corr_of_pop_resp,bp,'ro')
-	pylab.xlabel("correlation of pop resp")
-	pylab.ylabel("band pass contrast")
+		pylab.figure()
+		pylab.title("Correlation between prediction error and contrast of band-passed images")
+		pylab.plot(errors,bp,'ro')
+		pylab.xlabel("prediction error")
+		pylab.ylabel("band pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between prediction error and contrast of low-passed images")
+		pylab.plot(errors,lp7,'ro')
+		pylab.xlabel("prediction error")
+		pylab.ylabel("low pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between prediction error and basic contrast of images")
+		pylab.plot(errors,image_contrast,'ro')
+		pylab.xlabel("prediction error")
+		pylab.ylabel("basic contrast")
 	
-	pylab.figure()
-	pylab.title("Correlation between correlation of pop resp and contrast of low-passed images")
-	pylab.plot(corr_of_pop_resp,lp7,'ro')
-	pylab.xlabel("correlation of pop resp")
-	pylab.ylabel("low pass contrast")
+		pylab.figure()
+		pylab.title("Correlation between correlation of pop resp and contrast of band-passed images")
+		pylab.plot(corr_of_pop_resp,bp,'ro')
+		pylab.xlabel("correlation of pop resp")
+		pylab.ylabel("band pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between correlation of pop resp and contrast of low-passed images")
+		pylab.plot(corr_of_pop_resp,lp7,'ro')
+		pylab.xlabel("correlation of pop resp")
+		pylab.ylabel("low pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between correlation of pop resp and basic contrast of images")
+		pylab.plot(corr_of_pop_resp,image_contrast,'ro')
+		pylab.xlabel("correlation of pop resp")
+		pylab.ylabel("basic contrast")
 	
-	pylab.figure()
-	pylab.title("Correlation between correlation of pop resp and basic contrast of images")
-	pylab.plot(corr_of_pop_resp,image_contrast,'ro')
-	pylab.xlabel("correlation of pop resp")
-	pylab.ylabel("basic contrast")
-
-	pylab.figure()
-	pylab.xlabel("fano factor")
-	pylab.ylabel("correlation coef")
-	pylab.plot(ff,corr_coef,'ro')
+		pylab.figure()
+		pylab.xlabel("neuronal response mean")
+		pylab.ylabel("correlation coef")
+		pylab.plot(neuron_mean,corr_coef,'ro')
+		
+		pylab.figure()
+		pylab.hist(tf_ranks,bins=numpy.arange(0,len(tf_ranks),1))
+		pylab.title("Histogram of ranks after application of transfer function")
+		
+		pylab.figure()
+		pylab.title("Correlation between correlation of pop resp and rank")
+		pylab.plot(corr_of_pop_resp,tf_ranks,'ro')
+		pylab.xlabel("correlation of pop resp")
+		pylab.ylabel("rank") 
+		
+		pylab.figure()
+		pylab.title("Correlation between rand and  prediction error")
+		pylab.plot(tf_ranks,errors,'ro')
+		pylab.ylabel("prediction error")
+		pylab.xlabel("rank")
 	
-	pylab.figure()
-	pylab.xlabel("neuronal response mean")
-	pylab.ylabel("correlation coef")
-	pylab.plot(neuron_mean,corr_coef,'ro')
+		
+		pylab.figure()
+		pylab.title("Correlation between rank error and contrast of band-passed images")
+		pylab.plot(tf_ranks,bp,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("band pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between rank error and contrast of low-passed images, tresh=5")
+		pylab.plot(tf_ranks,lp5,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("low pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between rank error and contrast of low-passed images, tresh=6")
+		pylab.plot(tf_ranks,lp6,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("low pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between rank error and contrast of low-passed images, tresh=7")
+		pylab.plot(tf_ranks,lp7,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("low pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between rank error and contrast of low-passed images, tresh=8")
+		pylab.plot(tf_ranks,lp8,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("low pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between rank error and contrast of low-passed images, tresh=9")
+		pylab.plot(tf_ranks,lp9,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("low pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between rank error and contrast of low-passed images, tresh=10")
+		pylab.plot(tf_ranks,lp10,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("low pass contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between rank error and basic contrast of images")
+		pylab.plot(tf_ranks,image_contrast,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("basic contrast")
+		
+		print "Bad images"
+		print image_mean[11]
+		
+		pylab.figure()
+		pylab.title("Correlation between rank error and mean of images")
+		pylab.plot(tf_ranks,image_mean,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("image mean")
 	
-	pylab.figure()
-	pylab.xlabel("neuronal response mean")
-	pylab.ylabel("fano factor")
-	pylab.plot(neuron_mean,ff,'ro')
+		pylab.figure()
+		pylab.title("Correlation between rank error and measured response mean")
+		pylab.plot(tf_ranks,response_mean,'ro')
+		pylab.xlabel("rank error")
+		pylab.ylabel("measured response mean")
+		
+		pylab.figure()
+		pylab.title("Correlation between correlation of pop resp and response mean")
+		pylab.plot(corr_of_pop_resp,response_mean,'ro')
+		pylab.xlabel("correlation of pop resp")
+		pylab.ylabel("response mean")
+		
+		pylab.figure()
+		pylab.title("Correlation between correlation of pop resp and image mean")
+		pylab.plot(corr_of_pop_resp,image_mean,'ro')
+		pylab.xlabel("correlation of pop resp")
+		pylab.ylabel("image mean")
+		
+		pylab.figure()
+		pylab.title("Correlation between measured response mean and image mean")
+		pylab.plot(response_mean,image_mean,'ro')
+		pylab.xlabel("response mean")
+		pylab.ylabel("image mean")
+		
+		pylab.figure()
+		pylab.title("Correlation between measured response mean and image basic contrast")
+		pylab.plot(response_mean,image_contrast,'ro')
+		pylab.xlabel("response mean")
+		pylab.ylabel("image basic contrast")
+		
+		pylab.figure()
+		pylab.title("Correlation between measured response mean and contrast of low passed image t=7")
+		pylab.plot(response_mean,lp7,'ro')
+		pylab.xlabel("response mean")
+		pylab.ylabel("low passed image contrast")
+		
+		
+		fig = pylab.figure()
+		from mpl_toolkits.mplot3d import Axes3D
+		ax = Axes3D(fig)
 	
-	pylab.figure()
-	pylab.title("Correlation between fano factor and FVE")
-	pylab.xlabel("fano factor")
-	pylab.ylabel("FVE")
-	pylab.plot(ff,pve,'ro')
-
+		ax.scatter(lp7,image_mean,tf_ranks)
+		ax.set_xlabel("contrast")
+		ax.set_ylabel("image mean")
+		ax.set_zlabel("rank")
+		
+		fig = pylab.figure()
+		ax = Axes3D(fig)
 	
-	print "final training set shape: ", pylab.shape(training_set)
+		ax.scatter(lp7,corr_of_pop_resp,tf_ranks)
+		ax.set_xlabel("contrast")
+		ax.set_ylabel("corr_of_pop_resp")
+		ax.set_zlabel("rank")
+		
+	if False:
+		(later_pred_act,later_pred_val_act) = later_interaction_prediction(training_set,pred_act_t,validation_set,pred_val_act_t,contrib.dd.DB2(None))
+		
+		#of = run_nonlinearity_detection(numpy.mat(training_set),later_pred_act,10,False)
+		training_set += 2.0
+		validation_set += 2.0
+		ofs = fit_exponential_to_of(numpy.mat(training_set),numpy.mat(later_pred_act)+2.0)
+		later_pred_act_t = apply_exponential_output_function(later_pred_act+2.0,ofs)
+		later_pred_val_act_t= apply_exponential_output_function(later_pred_val_act+2.0,ofs)
+		#later_pred_act_t = later_pred_act
+		#later_pred_val_act_t = later_pred_val_act
+		
+		(ranks,correct,pred) = performIdentification(validation_set,later_pred_val_act+2.0)
+		print "After lateral identification> Correct:", correct , "Mean rank:", numpy.mean(ranks)
 	
-        pylab.figure()
-	pylab.hist(tf_ranks,bins=numpy.arange(0,len(tf_ranks),1))
-    	pylab.title("Histogram of ranks after application of transfer function")
+		(tf_ranks,tf_correct,pred) = performIdentification(validation_set,later_pred_val_act_t)
+		print "After lateral identification> TFCorrect:", tf_correct , "Mean tf_rank:", numpy.mean(tf_ranks)
 	
-	pylab.figure()
-	pylab.title("Correlation between correlation of pop resp and rank")
-	pylab.plot(corr_of_pop_resp,tf_ranks,'ro')
-	pylab.xlabel("correlation of pop resp")
-	pylab.ylabel("rank") 
+		#signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, validation_set, later_pred_act, later_pred_val_act)
+		signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, training_set, validation_set, later_pred_act_t, later_pred_val_act_t)
 	
-	pylab.figure()
-	pylab.title("Correlation between rand and  prediction error")
-	pylab.plot(tf_ranks,errors,'ro')
-	pylab.ylabel("prediction error")
-	pylab.xlabel("rank")
-
-	
-	pylab.figure()
-	pylab.title("Correlation between rank error and contrast of band-passed images")
-	pylab.plot(tf_ranks,bp,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("band pass contrast")
-	
-	pylab.figure()
-	pylab.title("Correlation between rank error and contrast of low-passed images, tresh=5")
-	pylab.plot(tf_ranks,lp5,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("low pass contrast")
-	
-	pylab.figure()
-	pylab.title("Correlation between rank error and contrast of low-passed images, tresh=6")
-	pylab.plot(tf_ranks,lp6,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("low pass contrast")
-	
-	pylab.figure()
-	pylab.title("Correlation between rank error and contrast of low-passed images, tresh=7")
-	pylab.plot(tf_ranks,lp7,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("low pass contrast")
-	
-	pylab.figure()
-	pylab.title("Correlation between rank error and contrast of low-passed images, tresh=8")
-	pylab.plot(tf_ranks,lp8,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("low pass contrast")
-	
-	pylab.figure()
-	pylab.title("Correlation between rank error and contrast of low-passed images, tresh=9")
-	pylab.plot(tf_ranks,lp9,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("low pass contrast")
-	
-	pylab.figure()
-	pylab.title("Correlation between rank error and contrast of low-passed images, tresh=10")
-	pylab.plot(tf_ranks,lp10,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("low pass contrast")
-	
-	pylab.figure()
-	pylab.title("Correlation between rank error and basic contrast of images")
-	pylab.plot(tf_ranks,image_contrast,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("basic contrast")
-	
-	print "Bad images"
-	print image_mean[11]
-	
-	pylab.figure()
-	pylab.title("Correlation between rank error and mean of images")
-	pylab.plot(tf_ranks,image_mean,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("image mean")
-
-        pylab.figure()
-	pylab.title("Correlation between rank error and measured response mean")
-	pylab.plot(tf_ranks,response_mean,'ro')
-	pylab.xlabel("rank error")
-	pylab.ylabel("measured response mean")
-	
-	pylab.figure()
-	pylab.title("Correlation between correlation of pop resp and response mean")
-	pylab.plot(corr_of_pop_resp,response_mean,'ro')
-	pylab.xlabel("correlation of pop resp")
-	pylab.ylabel("response mean")
-	
-	pylab.figure()
-	pylab.title("Correlation between correlation of pop resp and image mean")
-	pylab.plot(corr_of_pop_resp,image_mean,'ro')
-	pylab.xlabel("correlation of pop resp")
-	pylab.ylabel("image mean")
-	
-	pylab.figure()
-	pylab.title("Correlation between measured response mean and image mean")
-	pylab.plot(response_mean,image_mean,'ro')
-	pylab.xlabel("response mean")
-	pylab.ylabel("image mean")
-	
-	pylab.figure()
-	pylab.title("Correlation between measured response mean and image basic contrast")
-	pylab.plot(response_mean,image_contrast,'ro')
-	pylab.xlabel("response mean")
-	pylab.ylabel("image basic contrast")
-	
-	pylab.figure()
-	pylab.title("Correlation between measured response mean and contrast of low passed image t=7")
-	pylab.plot(response_mean,lp7,'ro')
-	pylab.xlabel("response mean")
-	pylab.ylabel("low passed image contrast")
-	
-	
-	fig = pylab.figure()
-	from mpl_toolkits.mplot3d import Axes3D
-	ax = Axes3D(fig)
-
-	ax.scatter(lp7,image_mean,tf_ranks)
-	ax.set_xlabel("contrast")
-	ax.set_ylabel("image mean")
-	ax.set_zlabel("rank")
-	
-	fig = pylab.figure()
-	ax = Axes3D(fig)
-
-	ax.scatter(lp7,corr_of_pop_resp,tf_ranks)
-	ax.set_xlabel("contrast")
-	ax.set_ylabel("corr_of_pop_resp")
-	ax.set_zlabel("rank")
-	
-	
-	(later_pred_act,later_pred_val_act) = later_interaction_prediction(training_set,pred_act_t,validation_set,pred_val_act_t)
-	
-	#of = run_nonlinearity_detection(numpy.mat(training_set),later_pred_act,10,False)
-	ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(later_pred_act))
-        later_pred_act_t = apply_sigmoid_output_function(later_pred_act,ofs)
-        later_pred_val_act_t= apply_sigmoid_output_function(later_pred_val_act,ofs)
-	#later_pred_act_t = later_pred_act
-	#later_pred_val_act_t = later_pred_val_act
-	
-	(ranks,correct,pred) = performIdentification(validation_set,later_pred_val_act)
-	print "After lateral identification> Correct:", correct , "Mean rank:", numpy.mean(ranks)
-
-	(tf_ranks,tf_correct,pred) = performIdentification(validation_set,later_pred_val_act_t)
-	print "After lateral identification> TFCorrect:", tf_correct , "Mean tf_rank:", numpy.mean(tf_ranks)
+	#return
 	
 	
-	lat_pve = []
-	lat_corr_coef = []
-        for i in xrange(0,num_neurons):
-	    lat_corr_coef.append(numpy.corrcoef(later_pred_act_t.T[i], training_set.T[i])[0][1])
-	    lat_pve.append(1-numpy.sum(numpy.power(later_pred_act_t.T[i]- training_set.T[i],2)) / numpy.sum(numpy.power(numpy.mean(training_set.T[i])- training_set.T[i],2)))
-	    
-	lat_val_pve = []
-	lat_val_corr_coef = []
-        for i in xrange(0,num_neurons):
-	    lat_val_corr_coef.append(numpy.corrcoef(later_pred_val_act_t.T[i], validation_set.T[i])[0][1])
-	    lat_val_pve.append(1-numpy.sum(numpy.power(later_pred_val_act_t.T[i]- validation_set.T[i],2)) / numpy.sum(numpy.power(numpy.mean(validation_set.T[i])- validation_set.T[i],2)))
-	    
-	    
-	print "The mean FEV after lateral interactions: ", numpy.mean(lat_pve)
-	print "The mean correlation coeficient after lateral interactions: ", numpy.mean(lat_corr_coef)
-
-	print "The mean FEV on validation set after lateral interactions: ", numpy.mean(lat_val_pve)
-	print "The mean correlation coeficient on validation set  after lateral interactions: ", numpy.mean(lat_val_corr_coef)
-	return 
+	#for ii in xrange(0,5):
+	#    pylab.figure()
+	#    pylab.hist(later_pred_act_t[:,ii].flatten())
+	#    pylab.figure()
+	#    pylab.hist(training_set[:,ii].flatten())
+	 
 	g = 1
 	for (x,i) in pred:
-	    
 	    #if x==i: continue
 	    pylab.figure()
 	    pylab.subplot(3,1,1)
-	    pylab.imshow(validation_inputs[i],vmin=0.0,vmax=1.0,interpolation='nearest',cmap=pylab.cm.gray)
+	    pylab.imshow(numpy.reshape(validation_inputs[i],(sx,sy)),vmin=-128,vmax=128,interpolation='nearest',cmap=pylab.cm.gray)
+	    pylab.title('Correct')
 	    pylab.axis('off')
 	    pylab.subplot(3,1,2)
-	    pylab.imshow(validation_inputs[x],vmin=0.0,vmax=1.0,interpolation='nearest',cmap=pylab.cm.gray)
+	    pylab.imshow(numpy.reshape(validation_inputs[x],(sx,sy)),vmin=-128,vmax=128,interpolation='nearest',cmap=pylab.cm.gray)
+	    pylab.title('Picked')
 	    pylab.axis('off')
 	    
 	    pylab.subplot(3,1,3)
@@ -3178,9 +3586,14 @@ def run_LIP():
 	    pylab.axhline(y=numpy.mean(validation_set[i]),linewidth=1, color='b')
 	    pylab.axhline(y=numpy.mean(pred_val_act_t[i]),linewidth=1, color='r')
 	    if x != i:
-	       pylab.plot(validation_set[x],'go',label='Most similar')
-	       pylab.axhline(y=numpy.mean(validation_set[x]),linewidth=1, color='g')
+	       pylab.plot(numpy.array(pred_val_act_t)[x],'go',label='Most similar')
+	       pylab.axhline(y=numpy.mean(numpy.array(pred_val_act_t)[x]),linewidth=1, color='g')
 	    pylab.legend()
+	    
+	    for j in xrange(0,len(validation_set[0])):
+		if(abs(numpy.array(pred_val_act_t)[i][j] - validation_set[i][j]) < abs(numpy.array(pred_val_act_t)[x][j] - validation_set[i][j])):
+		   	pylab.axvline(j)	
+	    
             g+=1
 
 
@@ -3192,8 +3605,6 @@ def performIdentification(responses,model_responses):
         tmp = []
         for j in xrange(0,len(responses)):
             tmp.append(numpy.sqrt(numpy.mean(numpy.power(numpy.mat(responses)[i]-model_responses[j],2))))
-	    
-	    #/numpy.sqrt(numpy.var(numpy.mat(responses)[i]))
         x = numpy.argmin(tmp)
 	z = tmp[i]
 	ranks.append(numpy.nonzero((numpy.sort(tmp)==z)*1.0)[0][0])
@@ -3203,71 +3614,214 @@ def performIdentification(responses,model_responses):
 
 
 def sortOutLoading(db_node):
-    params = {}
-    params["density"] = __main__.__dict__.get('density', 20) 
-    #params["dataset"] = "Mice/20091110_19_16_53/(20091110_19_16_53)-_retinotopy_region4_stationary_180_15fr_66cells_on_response_spikes_DELTA"
-    #params["dataset"] = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes"
-    params["dataset"] = "Mice/2009_11_04/region5_stationary_180_15fr_103cells_on_response_spikes"
-    #params["dataset"] = "Mice/20090925_14_36_01/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_on_&_off_response"
-    
-    params["num_cells"] = 55
+    params={}	
     params["clump_mag"] = __main__.__dict__.get('ClumpMag',0.1)
     params["normalize_inputs"] = __main__.__dict__.get('NormalizeInputs',False)
     params["normalize_activities"] = __main__.__dict__.get('NormalizeActivities',True)
     params["cut_out"] = __main__.__dict__.get('CutOut',False)
-    params["validation_set_fraction"] = 40
-    params["sepparate_validation_set"] = True
-    
+    params["validation_set_fraction"] = __main__.__dict__.get('ValidationSetFraction',50)		
+    params["density"] = __main__.__dict__.get('density', 20)
+    density= params["density"]
+	
+    params["dataset"] = '2009_11_04_region3'	
+    custom_index=None
+	
+    if params["dataset"] == '2010_03_12':
+       dataset_loc = "/home/antolikjan/topographica/topographica/Mice/2010_03_12/Exp_nonfilt_dFoF.txt"	
+       num_cells = 47    
+       sepparate_validation_set = False
+       num_rep=1
+       num_frames=1
+       transpose=False
+       average_frames_from=0
+       average_frames_to=1
+       num_stim=1800
+       inputs_offset=0
+       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/depackaged/"
+       input_match_string = "frame%05d.tif"
+		
+    if params["dataset"] == '2010_03_15':
+       dataset_loc = "/home/antolikjan/topographica/topographica/Mice/2010_03_15/Exp_nonfilt.txt"	
+       num_cells = 51    
+       sepparate_validation_set = False
+       num_rep=1
+       num_frames=1
+       transpose=False
+       average_frames_from=0
+       average_frames_to=1
+       #num_stim=1708
+       num_stim=900
+       inputs_offset=0
+       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/depackaged/"
+       input_match_string = "frame%05d.tif"
+       custom_index = numpy.hstack((numpy.arange(1200,1408,1),numpy.arange(0,300,1),numpy.arange(0,300,1),numpy.arange(600,900,1),numpy.arange(600,900,1),numpy.arange(1200,1500,1)))
+		
+    if params["dataset"] == '2010_02_09_noise':
+       dataset_loc = "Mice/2010_02_09/2010_02_09_noise_56to58_LowCut_Filtered.txt"	
+       num_cells = 53    
+       sepparate_validation_set = False
+       num_rep=1
+       num_frames=1
+       transpose=False
+       average_frames_from=0
+       average_frames_to=1
+       num_stim=1800
+       inputs_offset=0
+       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/SparseNoise_DS=3.0_Step=2_Density=20/depackaged/"
+       input_match_string = "frame%05d.tif"
+	
+    if params["dataset"] == '2010_02_09_movies':
+       dataset_loc = "Mice/2010_02_09/2010_02_09_movies_46to48_LowCut_Filtered.txt"	
+       num_cells = 37   
+       sepparate_validation_set = False
+       num_rep=1
+       num_frames=1
+       transpose=False
+       average_frames_from=0
+       average_frames_to=1
+       num_stim=1800
+       inputs_offset=0
+       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/depackaged/"
+       input_match_string = "frame%05d.tif"
+	
+    if params["dataset"] == '2009_11_04_region3':
+       #dataset_loc = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes"
+       dataset_loc =  "Mice/2009_11_04/Raw/region3/spiking_0.02corrected:3-7.dat"
+       #dataset_loc = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_calcium"
+       #params["Calcium"]=True
+       val_dataset_loc = "Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes"
+       num_cells = 103    
+       sepparate_validation_set = True
+       num_rep=1
+       num_frames=1
+       transpose=False
+       average_frames_from=0
+       average_frames_to=1
+       num_stim=1800
+       inputs_offset=1001
+       inputs_directory = "/home/antolikjan/topographica/topographica/Flogl/DataOct2009/20090925_image_list_used/"
+       input_match_string = "image_%04d.tif"
+       
+       val_inputs_directory = "/home/antolikjan/topographica/topographica/Mice/2009_11_04/"
+       val_input_match_string = "/20091104_50stimsequence/50stim%04d.tif"
+       val_reps = 10
+
+    if params["dataset"] == '2009_11_04_region5':
+       dataset_loc = "Mice/2009_11_04/region5_stationary_180_15fr_103cells_on_response_spikes"	
+       val_dataset_loc = "Mice/2009_11_04/region5_50stim_10reps_15fr_103cells_on_response_spikes"
+       num_cells = 55    
+       sepparate_validation_set = True
+       num_rep=1
+       num_frames=1
+       transpose=False
+       average_frames_from=0
+       average_frames_to=1
+       num_stim=1260
+       inputs_offset=1001
+       inputs_directory = "/home/antolikjan/topographica/topographica/Flogl/DataOct2009/20090925_image_list_used/"
+       input_match_string = "image_%04d.tif"
+       val_inputs_directory = "/home/antolikjan/topographica/topographica/Mice/2009_11_04/"
+       val_input_match_string = "/20091104_50stimsequence/50stim%04d.tif"
+       val_reps = 8
+
+    if params["dataset"] == '20090925_14_36_01':
+       dataset_loc = "./Mice/20090925_14_36_01/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_spikes"	
+       num_cells = 50    
+       sepparate_validation_set = False
+       num_rep=1
+       num_frames=1
+       transpose=False
+       average_frames_from=0
+       average_frames_to=1
+       num_stim=2700
+       inputs_offset=1001
+       inputs_directory = "/home/antolikjan/topographica/topographica/Flogl/DataOct2009/20090925_image_list_used/"
+       input_match_string = "image_%04d.tif"
+
+
+    if params["dataset"] == '20091110_19_16_53':
+       dataset_loc = "Mice/20091110_19_16_53/(20091110_19_16_53)-_retinotopy_region4_stationary_180_15fr_66cells_on_response_spikes"	
+       num_cells = 68    
+       sepparate_validation_set = False
+       num_rep=1
+       num_frames=1
+       transpose=False
+       average_frames_from=0
+       average_frames_to=1
+       num_stim=1440
+       inputs_offset=1001
+       inputs_directory = "/home/antolikjan/topographica/topographica/Flogl/DataOct2009/20090925_image_list_used/"
+       input_match_string = "image_%04d.tif"
+
     db_node = db_node.get_child(params)
     
-    density=__main__.__dict__.get('density', 20)
+        
+    dataset = loadSimpleDataSet(dataset_loc,num_stim,num_cells,num_rep=num_rep,num_frames=num_frames,offset=0,transpose=transpose)
     
-    dataset = loadSimpleDataSet(params["dataset"],1260,params["num_cells"])
-    (index,data) = dataset
-    index+=1
-    dataset = (index,data)
-    dataset = averageRangeFrames(dataset,0,1)
+    if custom_index != None:
+       (index,data) = dataset
+       dataset = (custom_index, data)    
+    
+    
+    dataset = averageRangeFrames(dataset,average_frames_from,average_frames_to)
     dataset = averageRepetitions(dataset)
-
-
-    if not params["sepparate_validation_set"]:	
+    
+    if not sepparate_validation_set:	
 	(validation_data_set,dataset) = splitDataset(dataset,params["validation_set_fraction"])
 	validation_set = generateTrainingSet(validation_data_set)
-	ff = numpy.arange(0,params["num_cells"],1)*0
-	validation_inputs=generateInputs(validation_data_set,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",params["density"],1.8,offset=1000)
+	ff = numpy.arange(0,num_cells,1)*0
+	validation_inputs=generateInputs(validation_data_set,inputs_directory,input_match_string,params["density"],1.8,offset=inputs_offset)
     else:
-	#valdataset = loadSimpleDataSet("Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes",50,params["num_cells"],10)
-	valdataset = loadSimpleDataSet("Mice/2009_11_04/region5_50stim_10reps_15fr_103cells_on_response_spikes",50,params["num_cells"],8)
+	valdataset = loadSimpleDataSet(val_dataset_loc,50,num_cells,val_reps)
 	(valdataset,trash) = splitDataset(valdataset,params["validation_set_fraction"])
+	flat_valdataset = flattenDataset(valdataset)
 	ff  = analyse_reliability(valdataset,params)
+	#get rid of frames and make it into a 3D stack where first dimension is repetitions
+	from copy import deepcopy
+	(index,raw_val_set) = valdataset
+	rr=[]
+	for i in xrange(0,val_reps):
+	    rr.append(generateTrainingSet(averageRepetitions((index,deepcopy(raw_val_set)),reps=[i])))
+	raw_val_set = rr
 	valdataset = averageRangeFrames(valdataset,0,1)
     	valdataset = averageRepetitions(valdataset)
         validation_set = generateTrainingSet(valdataset)
-    	validation_inputs=generateInputs(valdataset,"/home/antolikjan/topographica/topographica/Mice/2009_11_04/","/20091104_50stimsequence/50stim%04d.tif",params["density"],1.8,offset=0)
-
+    	validation_inputs=generateInputs(valdataset,val_inputs_directory,val_input_match_string,params["density"],1.8,offset=0)
+	flat_validation_set = generateTrainingSet(flat_valdataset)
+    	flat_validation_inputs=generateInputs(flat_valdataset,val_inputs_directory,val_input_match_string,params["density"],1.8,offset=0)
+	
     
+
     training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",params["density"],1.8,offset=1000)
+    training_inputs=generateInputs(dataset,inputs_directory,input_match_string,params["density"],1.8,offset=inputs_offset)
+    
 
     
     if params["normalize_inputs"]:
        avgRF = compute_average_input(training_inputs)
        training_inputs = normalize_image_inputs(training_inputs,avgRF)
        validation_inputs = normalize_image_inputs(validation_inputs,avgRF)
+       
     
     if params["normalize_activities"]:
-        #(a,v) = compute_average_min_max(numpy.concatenate((training_set,validation_set),axis=0))
         (a,v) = compute_average_min_max(training_set)
         training_set = normalize_data_set(training_set,a,v)
         validation_set = normalize_data_set(validation_set,a,v)
+	if sepparate_validation_set:
+		for i in xrange(0,val_reps):
+		      raw_val_set[i] = normalize_data_set(raw_val_set[i],a,v)
     
     if params["cut_out"]:
         (x,y)= numpy.shape(training_inputs[0])
-        training_inputs = cut_out_images_set(training_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
-        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.55),(int(x*0.0),int(y*0.3)))
-        (sizex,sizey) = numpy.shape(training_inputs[0])
+	print x,y
+        training_inputs = cut_out_images_set(training_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
+    
     
     (sizex,sizey) = numpy.shape(training_inputs[0])
+    print (sizex,sizey)
+    
+    
     training_inputs = generate_raw_training_set(training_inputs)
     validation_inputs = generate_raw_training_set(validation_inputs)
     
@@ -3276,13 +3830,42 @@ def sortOutLoading(db_node):
     db_node.add_data("validation_inputs",validation_inputs,force=True)
     db_node.add_data("validation_set",validation_set,force=True)
     db_node.add_data("Fano Factors",ff,force=True)
+    if sepparate_validation_set:
+    	db_node.add_data("raw_validation_set",raw_val_set,force=True)
+	db_node.add_data("flat_validation_inputs",flat_validation_inputs,force=True)
+	db_node.add_data("flat_validation_set",flat_validation_set,force=True)
+    pylab.figure()
+    pylab.plot(training_set,'o')
+    
+    print "Training set size:"
+    print numpy.shape(training_set)
+    
+    pylab.figure()
+    pylab.imshow(training_inputs[0].reshape(sizex,sizey),interpolation='nearest',cmap=pylab.cm.gray)
+    pylab.figure()
+    pylab.imshow(training_inputs[1].reshape(sizex,sizey),interpolation='nearest',cmap=pylab.cm.gray)
+    pylab.figure()
+    pylab.imshow(training_inputs[2].reshape(sizex,sizey),interpolation='nearest',cmap=pylab.cm.gray)
     
     return (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node)
-
-
-
-
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 from pygene.organism import Organism
 from pygene.gene import FloatGene
@@ -3369,7 +3952,7 @@ def GeneticAlgorithms():
 	dx = numpy.sqrt(t)
 	dy = dx
 	g =  numpy.mat(Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=x-0.5,y=y-0.5,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,aspect_ratio=ar)() * alpha)
-	m=numpy.max(numpy.abs(numpy.min(g)),numpy.abs(numpy.max(g)))
+	m=numpy.max([numpy.abs(numpy.min(g)),numpy.abs(numpy.max(g))])
 	pylab.subplot(2,1,1)
 	pylab.imshow(g,vmin=-m,vmax=m,cmap=pylab.cm.RdBu,interpolation='nearest')
 	
@@ -3377,38 +3960,56 @@ def GeneticAlgorithms():
     	pylab.show()
 
 def runSurrondStructureDetection():
-    f = open("modelfitDB2.dat",'rb')
+    f = open("modelfitDatabase1.dat",'rb')
     import pickle
     dd = pickle.load(f)
+    node = dd.children[0]
+    act = node.data["training_set"]
+    val_act = node.data["validation_set"]
+    node = node.children[0]
+    pred_act  = numpy.array(node.data["ReversCorrelationPredictedActivities"])
+    pred_val_act  = numpy.array(node.data["ReversCorrelationPredictedValidationActivities"])
+		
 			
-    ddnode = dd.children[0]
-    act = ddnode.data["training_set"]
-    val_act = ddnode.data["validation_set"]
-    ddnode = ddnode.children[0]
     dataset = loadSimpleDataSet("Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes",1800,103)
     (index,data) = dataset
     index+=1
     dataset = (index,data)
     valdataset = loadSimpleDataSet("Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes",50,103,10)
-    (valdataset,trash) = splitDataset(valdataset,40)
+    #(valdataset,trash) = splitDataset(valdataset,40)
+    
     
     training_inputs=generateInputs(dataset,"/home/antolikjan/topographica/topographica/Flogl/DataOct2009","/20090925_image_list_used/image_%04d.tif",__main__.__dict__.get('density', 20),1.8,offset=1000)
     
     validation_inputs=generateInputs(valdataset,"/home/antolikjan/topographica/topographica/Mice/2009_11_04/","/20091104_50stimsequence/50stim%04d.tif",__main__.__dict__.get('density', 20),1.8,offset=0)
+    #validation_inputs = validation_inputs[0:40]
+    
+    (sizex,sizey) = numpy.shape(training_inputs[0])
+    #mask = numpy.zeros(numpy.shape(training_inputs[0]))
+    #mask[sizex*0.1:sizex*0.9,sizey*0.6:sizey*0.9]=1.0
+    
+    #for i in xrange(0,1800):
+    #	training_inputs[i] = training_inputs[i][:,sizey/2:sizey] 
+    #for i in xrange(0,50):	
+    # 	validation_inputs[i] = validation_inputs[i][:,sizey/2:sizey]
     
     (sizex,sizey) = numpy.shape(training_inputs[0])
     
     
+    ofs = fit_sigmoids_to_of(numpy.mat(act),numpy.mat(pred_act))
+    pred_act = apply_sigmoid_output_function(numpy.mat(pred_act),ofs)
+    pred_val_act= apply_sigmoid_output_function(numpy.mat(pred_val_act),ofs)
+
     
-    pred_act = ddnode.data["ReversCorrelationPredictedActivities+TF"]
-    pred_val_act = ddnode.data["ReversCorrelationPredictedValidationActivities+TF"]
+    print sizex,sizey
+    cc = 0.7
     #print pred_act
-    new_target_act =  numpy.divide(act+0.7,pred_act+0.7)
-    new_val_target_act =  numpy.divide(val_act+0.7,pred_val_act+0.7)
+    new_target_act =  numpy.divide(act+cc,pred_act+cc)
+    new_val_target_act =  numpy.divide(val_act+cc,pred_val_act+cc)
     
     training_inputs = generate_raw_training_set(training_inputs)
     validation_inputs = generate_raw_training_set(validation_inputs)
-    
+        
     print "Mins"
     print numpy.min(pred_act)
     print numpy.min(pred_val_act)
@@ -3416,18 +4017,38 @@ def runSurrondStructureDetection():
     print numpy.min(val_act)
     
     
-    (e,te,c,tc,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,new_target_act,sizex,sizey,100,validation_inputs,new_val_target_act,contrib.dd.DB2(None),True)
+    (e,te,c,tc,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,new_target_act,sizex,sizey,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.mat(new_val_target_act),contrib.dd.DB2(None),True)
     
-    ofs = fit_sigmoids_to_of(numpy.mat(act+0.7),numpy.mat(numpy.multiply(pred_act+0.7,pa)))
-    pa_t = apply_sigmoid_output_function(numpy.multiply(pred_act+0.7,pa),ofs)
-    pva_t = apply_sigmoid_output_function(numpy.multiply(pred_val_act+0.7,pva),ofs)
+    ofs = run_nonlinearity_detection(numpy.mat(act+cc),numpy.mat(numpy.multiply(pred_act+cc,pa)))
+    pa_t = apply_output_function(numpy.multiply(pred_act+cc,pa),ofs)
+    pva_t = apply_output_function(numpy.multiply(pred_val_act+cc,pva),ofs)
     
     print numpy.min(pva)
     print numpy.min(pva_t)
     
-    print performIdentification(val_act+0.7,pred_val_act+0.7)
-    print performIdentification(val_act+0.7,numpy.multiply(pred_val_act+0.7,pva))
-    print performIdentification(val_act+0.7,pva_t)
+    (ranks,correct,pred) = performIdentification(val_act+cc,pred_val_act+cc)
+    print "Without surround", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(val_act+cc - pred_val_act-cc,2))
+    
+    (ranks,correct,pred) = performIdentification(val_act+cc,numpy.multiply(pred_val_act+cc,pva))
+    print "With surround", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(val_act+cc - numpy.multiply(pred_val_act+cc,pva),2))
+    
+    (ranks,correct,pred) = performIdentification(val_act+cc,numpy.multiply(pred_val_act+cc,pva_t))
+    print "With surround+ TF", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(val_act+cc - numpy.multiply(pred_val_act+cc,pva_t),2))
+    
+    
+    params={}
+    params["SurrAnalysis"] = True
+    node = node.get_child(params)
+    node.add_data("TrainingInputs",training_inputs,force=True)
+    node.add_data("ValidationInputs",validation_inputs,force=True)
+    params={}
+    params["Alpha"] = __main__.__dict__.get('Alpha',50)
+    params["Density"] = __main__.__dict__.get('density', 20)
+    node = node.get_child(params)
+    node.add_data("SurrRFs",RFs,force=True)	
+    f = open("modelfitDatabase1.dat",'wb')
+    pickle.dump(dd,f,-2)
+    f.close()
 
 
 def runSTCandSTAtest():
@@ -3495,7 +4116,7 @@ def runSTCandSTAtest():
 
 def analyseInhFiring():
     dataset = loadSimpleDataSet("Mice/2009716_17_03_10/(20090716_17_03_10)-_orientation_classic_region9_15hz_8oris_4grey_2mov_DFOF",6138,27,transpose=True)
-    
+    #dataset = loadSimpleDataSet("Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes",1800,103,transpose=False)
     ts = generateTrainingSet(dataset)
     
     (x,y) = numpy.shape(ts)
@@ -3779,5 +4400,1252 @@ def activationPatterns():
     pylab.figure()
     pylab.plot(ranks,numpy.mat(validation_activities)*numpy.mat(la[ind[-1],:]).T,'ro')
     
+    
+def signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act, pred_val_act):
+	
+        signal_power=[]
+	noise_power=[]
+	normalized_noise_power=[]
+	
+	import contrib.ASDARD
+	for i in xrange(0,len(raw_validation_data_set)):
+	    (sp,np,nnp) = contrib.ASDARD.signal_and_noise_power(raw_validation_data_set[i])
+	    signal_power.append(sp)
+	    noise_power.append(np)
+	    normalized_noise_power.append(nnp)
+	
+	pylab.figure()
+	pylab.subplot(131)
+	pylab.title('distribution of estimated signal power in neurons')
+	pylab.plot(noise_power,signal_power,'ro')
+	pylab.ylabel('signal power')
+	pylab.xlabel('noise power')
 	
 	
+	training_prediction_power=numpy.divide(numpy.var(training_set,axis=0) - numpy.var(pred_act - training_set,axis=0), signal_power)
+	validation_prediction_power=numpy.divide(numpy.var(validation_set,axis=0) - numpy.var(pred_val_act - validation_set,axis=0), signal_power)
+	pylab.subplot(132)
+	pylab.title('distribution of estimated prediction power ')
+	pylab.plot(normalized_noise_power,training_prediction_power,'ro',label='training')
+	pylab.plot(normalized_noise_power,validation_prediction_power,'bo',label='validation')
+	pylab.axis([20.0,100.0,-2.0,2.0])
+	pylab.xlabel('normalized noise power')
+	pylab.ylabel('prediction power')
+	pylab.legend()
+
+	pylab.subplot(133)
+	pylab.title('relationship between test set prediction power \n and validation prediction power')
+	pylab.plot(validation_prediction_power,training_prediction_power,'ro')
+	pylab.axis([-2.0,2.0,0.0,2.0])
+	pylab.xlabel('validation set prediction power')
+	pylab.ylabel('test set prediction power')
+	
+
+	return (signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power)
+	
+def AdaptationAnalysis():
+	import scipy
+	from scipy import linalg
+	f = open("modelfitDatabase.dat",'rb')
+	import pickle
+	dd = pickle.load(f)
+
+	rfs_area1  = dd.children[0].children[0].data["ReversCorrelationRFs"]
+	rfs_area2  = dd.children[1].children[0].data["ReversCorrelationRFs"]
+	pred_act_area1  = dd.children[0].children[0].data["ReversCorrelationPredictedActivities"][0:1260,:]
+	pred_act_area2  = dd.children[1].children[0].data["ReversCorrelationPredictedActivities"]
+	
+	training_set_area1 = dd.children[0].data["training_set"][0:1260,:]
+	training_set_area2 = dd.children[1].data["training_set"]
+
+	rfs = numpy.concatenate((rfs_area1,rfs_area2),axis=0)
+	pred_act = numpy.mat(numpy.concatenate((pred_act_area1,pred_act_area2),axis=1))
+	training_set = numpy.mat(numpy.concatenate((training_set_area1,training_set_area2),axis=1))
+	
+	#weights = [0.0,1.0,0.5,0.3,0.1,0.05]
+	weights = numpy.exp(-numpy.arange(0,100,1.0)/500.0)
+	weights = numpy.insert(weights,0,0)
+	print weights
+	kl = len(weights)-1
+	
+	hist=[]
+	for i in xrange(0,158):
+ 	    hist.append(scipy.convolve(numpy.array(training_set[:,i])[:,0],weights,mode='valid'))
+	
+	print numpy.shape(numpy.mat(training_set[kl:,:]))
+	print numpy.shape(numpy.mat(numpy.array(hist)).T)
+	ofs = run_nonlinearity_detection(numpy.mat(training_set[kl:,:]),numpy.mat(numpy.array(hist)).T,display=True,num_bins=8)
+	
+	pylab.figure()
+	pylab.hist(numpy.array(hist).flatten())
+	pylab.figure()
+	pylab.hist(numpy.array(training_set).flatten())
+	
+	pylab.figure()
+	for i in xrange(0,103):
+	    pylab.subplot(13,13,i+1)
+	    errors = numpy.array((training_set[kl:,i] - pred_act[kl:,i]))[:,0]
+	    pylab.plot(hist[i],errors,'ro')
+	
+	pylab.figure()
+	for i in xrange(0,103):
+	    pylab.subplot(13,13,i+1)
+	    t = numpy.array(training_set[kl:,i])[:,0]
+	    pylab.plot(hist[i],t,'ro')
+
+
+	pylab.figure()
+	for i in xrange(0,103):
+	    pylab.subplot(13,13,i+1)
+	    t = numpy.array(pred_act[kl:,i])[:,0]
+	    pylab.plot(hist[i],t,'ro')
+	
+	fig = pylab.figure()
+	from mpl_toolkits.mplot3d import Axes3D
+	ax = Axes3D(fig)
+	ax.scatter(pred_act[kl:,89],hist[89],training_set[kl:,i])
+	ax.set_xlabel("predicted activity")
+	ax.set_ylabel("history")
+	ax.set_zlabel("training_set")
+	
+	fig = pylab.figure()
+	from mpl_toolkits.mplot3d import Axes3D
+	ax = Axes3D(fig)
+	ax.scatter(pred_act[kl:,88],hist[88],training_set[kl:,i])
+	ax.set_xlabel("predicted activity")
+	ax.set_ylabel("history")
+	ax.set_zlabel("training_set")
+
+	
+	#lets do the gradient 
+	from scipy.optimize import leastsq
+	xs = []
+	err = []
+	for i in xrange(0,158):
+	    rand = UniformRandom(seed=513)
+	    x0 = [0.7,-1.0,1.6,-1.0]
+       	    xopt = leastsq(history_error, x0[:], args=(numpy.array(hist)[i],numpy.array(pred_act)[kl:,i],numpy.array(training_set)[kl:,i]),ftol=0.0000000000000000001,xtol=0.0000000000000001,warning=False)
+	    xs.append(xopt[0])
+            new_error  = numpy.sum(history_error(xopt[0],numpy.array(hist)[i],numpy.array(pred_act)[kl:,i],numpy.array(training_set)[kl:,i])**2)
+	    old_error =  numpy.sum((numpy.array(pred_act)[kl:,i] - numpy.array(training_set)[kl:,i])**2)
+	    err.append( (old_error - new_error)/old_error * 100)
+	    	
+	print "Error decreased by:", numpy.mean(err) , '%'
+	
+	new_act = []
+	for i in xrange(0,158):
+	    new_act.append(history_estim(xs[i],numpy.array(hist)[i],numpy.array(pred_act)[kl:,i]))
+	    	
+	new_act = numpy.mat(new_act).T
+	print numpy.shape(new_act[0:40,:])
+	print numpy.shape(training_set[kl:40+kl,:])
+	
+	(ranks,correct,tr) = performIdentification(training_set[kl:40+kl,:],pred_act[kl:40+kl,:])
+	print "Correct:", correct , "Mean rank:", numpy.mean(ranks)
+	(ranks,correct,tr) = performIdentification(training_set[kl:40+kl,:],new_act[0:40,:])
+	print "Correct:", correct , "Mean rank:", numpy.mean(ranks)
+
+	
+	ofs = run_nonlinearity_detection(numpy.mat(training_set),numpy.mat(pred_act))
+	pred_act_t = apply_output_function(numpy.mat(pred_act),ofs)
+	ofs = run_nonlinearity_detection(numpy.mat(training_set[kl:,:]),numpy.mat(new_act))
+	new_act_t = apply_output_function(numpy.mat(new_act),ofs)
+
+
+	(ranks,correct,tr) = performIdentification(training_set[kl:40+kl,:],pred_act_t[kl:40+kl,:])
+	print "TFCorrect:", correct , "Mean tf_rank:", numpy.mean(ranks)
+	(ranks,correct,tr) = performIdentification(training_set[kl:40+kl,:],new_act_t[0:40,:])
+	print "TFCorrect:", correct , "Mean tf_rank:", numpy.mean(ranks)
+	
+	pylab.figure()
+	pylab.hist(ranks)
+	
+
+def history_estim(x,hist,pred_act):
+  		 (a,b,c,d) = list(x)
+		 return numpy.multiply(a*(pred_act+3.0)+b,c*(hist+3.0)+d)
+		 
+def history_error(x,hist,pred_act,training_set):
+		 return training_set - history_estim(x,hist,pred_act)
+		 
+def history_der(x,hist,pred_act,training_set):
+		(a,b,c,d) = list(x)
+		ad = numpy.multiply(hist , c*pred_act+d)
+		bd = c*pred_act+d
+		cd = numpy.multiply(a*hist+b,pred_act)
+		dd = a*hist+b
+		return numpy.vstack((ad,bd,cd,dd)).T	
+
+
+def CompareRegressions():
+	import scipy
+	from scipy import linalg
+	f = open("modelfitDatabase1.dat",'rb')
+	import pickle
+	dd = pickle.load(f)
+	node = dd.children[0]
+
+	rfs  = node.children[0].data["ReversCorrelationRFs"]
+	pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"])
+	pred_val_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"])
+	pred_act_t  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities+TF"])
+	pred_val_act_t  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities+TF"])
+	training_set = node.data["training_set"]
+	validation_set = node.data["validation_set"]
+	#training_set = numpy.array(node.children[0].data["LaterTrainingSet"])
+	#validation_set = numpy.array(node.children[0].data["LaterValidationSet"])
+	#m = node.children[0].data["LaterModel"]
+	
+	
+	
+	training_inputs = node.data["training_inputs"]
+	validation_inputs = node.data["validation_inputs"]
+	raw_validation_set = node.data["raw_validation_set"]
+	
+	#for i in xrange(0,len(raw_validation_set)):
+	#    raw_validation_set[i] = numpy.array(m.returnPredictedActivities(numpy.mat(raw_validation_set[i])))
+	
+	asd_rfs  = node.children[2].data["RFs"]
+	
+	
+	
+	# REGINV
+	pylab.figure()
+	m = numpy.max(numpy.abs(rfs))
+        for i in xrange(0,numpy.shape(training_set)[1]):
+            pylab.subplot(10,11,i+1)
+            w = rfs[i]
+            pylab.show._needmain=False
+            pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	    pylab.axis('off')
+
+	# ASD
+	pylab.figure()	
+	size = numpy.sqrt(numpy.shape(asd_rfs)[1])
+	
+        for i in xrange(0,numpy.shape(training_set)[1]):
+	    m = numpy.max(numpy.abs(asd_rfs[i]))
+            pylab.subplot(10,11,i+1)
+            w = numpy.array(asd_rfs[i]).reshape(size,size)
+            pylab.show._needmain=False
+            pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	    pylab.axis('off')
+
+	# create predicted activities
+	
+	asd_pred_act = numpy.array(numpy.mat(training_inputs) * numpy.mat(asd_rfs).T)
+	asd_pred_val_act = numpy.array(numpy.mat(validation_inputs) * numpy.mat(asd_rfs).T)
+	
+	ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(asd_pred_act))
+	asd_pred_act_t = apply_sigmoid_output_function(numpy.mat(asd_pred_act),ofs)
+	asd_pred_val_act_t= apply_sigmoid_output_function(numpy.mat(asd_pred_val_act),ofs)
+
+	
+	raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
+	
+	signal_power,noise_power,normalized_noise_power,reg_training_prediction_power,reg_validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act, pred_val_act)
+	pylab.suptitle('Signal power estimation for Pseudo inverse. Averaged trials validation set.')
+	print "Mean Reg. pseudoinverse POSITIVE prediction power on training set / validation set(averaged) :", numpy.mean(reg_training_prediction_power * (reg_training_prediction_power > 0)) , " / " , numpy.mean(reg_validation_prediction_power * (reg_validation_prediction_power > 0))
+	
+	
+	signal_power,noise_power,normalized_noise_power,asd_training_prediction_power,asd_validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, validation_set, asd_pred_act, asd_pred_val_act)
+	pylab.suptitle('Signal power estimation for ASDRD Averaged trials validation set.')
+	print "Mean ASD POSITIVE prediction power on training set / validation set(averaged) :", numpy.mean(asd_training_prediction_power * (asd_training_prediction_power > 0)) , " / " , numpy.mean(asd_validation_prediction_power * (asd_validation_prediction_power > 0))
+	
+	pylab.figure()
+	pylab.title('Before TF averaged trials')
+	pylab.plot(reg_validation_prediction_power,asd_validation_prediction_power,'ro')
+	pylab.plot([-2.0,2.0],[-2.0,2.0])
+	pylab.axis([-2.0,2.0,-2.0,2.0])
+	pylab.xlabel('Regurelized inverse prediction power')
+	pylab.ylabel('ASDRD prediction power')
+
+	signal_power,noise_power,normalized_noise_power,reg_training_prediction_power,reg_validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, raw_validation_set[0], pred_act, pred_val_act)
+	pylab.suptitle('Signal power estimation for Pseudo inverse. Single trial validation set.')
+	print "Mean Reg. pseudoinverse POSITIVE prediction power on training set / validation set : ", numpy.mean(reg_training_prediction_power * (reg_training_prediction_power > 0)) , " / " , numpy.mean(reg_validation_prediction_power * (reg_validation_prediction_power > 0))
+	
+	signal_power,noise_power,normalized_noise_power,asd_training_prediction_power,asd_validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, raw_validation_set[0], asd_pred_act, asd_pred_val_act)
+	pylab.suptitle('Signal power estimation for ASDRD. Single trial validation set.')
+	print "Mean ASD POSITIVE prediction power on training set / validation set : ", numpy.mean(asd_training_prediction_power * (asd_training_prediction_power > 0)) , " / " , numpy.mean(asd_validation_prediction_power * (asd_validation_prediction_power > 0))
+	
+	pylab.figure()
+	pylab.title('Before TF single trial')
+	pylab.plot(reg_validation_prediction_power,asd_validation_prediction_power,'ro')
+	pylab.plot([-2.0,2.0],[-2.0,2.0])
+	pylab.axis([-2.0,2.0,-2.0,2.0])
+	pylab.xlabel('Regurelized inverse prediction power')
+	pylab.ylabel('ASDRD prediction power')
+
+
+
+	(ranks,correct,pred) = performIdentification(raw_validation_set[0],pred_val_act)
+	print "Reg. pseudoinverse identification single trial> Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(raw_validation_set[0] - pred_val_act,2)) 
+
+	(ranks,correct,pred) = performIdentification(raw_validation_set[0],asd_pred_val_act)
+	print "ASD identification single trial> Correct:", correct , "Mean rank:", numpy.mean(ranks),  "MSE", numpy.mean(numpy.power(raw_validation_set[0] - asd_pred_val_act,2)) 
+	
+	(ranks,correct,pred) = performIdentification(validation_set,pred_val_act)
+	print "Reg. pseudoinverse identification trial average> Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act,2))  
+
+	(ranks,correct,pred) = performIdentification(validation_set,asd_pred_val_act)
+	print "ASD identification trial average> Correct:", correct , "Mean rank:", numpy.mean(ranks), "MSE", numpy.mean(numpy.power(validation_set - asd_pred_val_act,2)) 
+	
+	
+
+	# with transfer function analysis
+	
+	print '\n\n\nAFTER TRANSFER FUNCTION APPLICATION \n '
+	
+	signal_power,noise_power,normalized_noise_power,reg_training_prediction_power,reg_validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act_t, pred_val_act_t)
+	pylab.suptitle('Signal power estimation for Pseudo inverse. Averaged trials validation set with applied transfer function.')
+	print "Mean Reg. pseudoinverse POSITIVE prediction power on training set / validation set(averaged): ", numpy.mean(reg_training_prediction_power * (reg_training_prediction_power > 0)) , " / " , numpy.mean(reg_validation_prediction_power * (reg_validation_prediction_power > 0))
+	
+	signal_power,noise_power,normalized_noise_power,asd_training_prediction_power,asd_validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, validation_set, asd_pred_act_t, asd_pred_val_act_t)
+	pylab.suptitle('Signal power estimation for ASDRD. Averaged trials validation set with applied transfer function.')
+	print "Mean ASD POSITIVE prediction power on training set / validation set(averaged): ", numpy.mean(asd_training_prediction_power * (asd_training_prediction_power > 0)) , " / " , numpy.mean(asd_validation_prediction_power * (asd_validation_prediction_power > 0))
+
+	pylab.figure()
+	pylab.title('After TF averaged trials')
+	pylab.plot(reg_validation_prediction_power,asd_validation_prediction_power,'ro')
+	pylab.plot([-2.0,2.0],[-2.0,2.0])
+	pylab.axis([-2.0,2.0,-2.0,2.0])
+	pylab.xlabel('Regurelized inverse prediction power')
+	pylab.ylabel('ASDRD prediction power')
+
+
+	signal_power,noise_power,normalized_noise_power,reg_training_prediction_power,reg_validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, raw_validation_set[0], pred_act_t, pred_val_act_t)
+	pylab.suptitle('Signal power estimation for Pseudo inverse. Single trial validation set with applied transfer function.')
+	print "Mean Reg. pseudoinverse POSITIVE prediction power on training set / validation set: ", numpy.mean(reg_training_prediction_power * (reg_training_prediction_power > 0)) , " / " , numpy.mean(reg_validation_prediction_power * (reg_validation_prediction_power > 0))
+	
+	signal_power,noise_power,normalized_noise_power,asd_training_prediction_power,asd_validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, raw_validation_set[0], asd_pred_act_t, asd_pred_val_act_t)
+	pylab.suptitle('Signal power estimation for ASDRD. Single trial validation set with applied transfer function.')
+	print "Mean ASD POSITIVE prediction power on training set / validation set: ", numpy.mean(asd_training_prediction_power * (asd_training_prediction_power > 0)) , " / " , numpy.mean(asd_validation_prediction_power * (asd_validation_prediction_power > 0))
+
+	pylab.figure()
+	pylab.title('After TF single trial')
+	pylab.plot(reg_validation_prediction_power,asd_validation_prediction_power,'ro')
+	pylab.plot([-2.0,2.0],[-2.0,2.0])
+	pylab.axis([-2.0,2.0,-2.0,2.0])
+	pylab.xlabel('Regurelized inverse prediction power')
+	pylab.ylabel('ASDRD prediction power')
+
+
+	(ranks,correct,pred) = performIdentification(raw_validation_set[0],pred_val_act_t)
+	print "Reg. pseudoinverse identification single trial> Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(raw_validation_set[0] - pred_val_act_t,2)) 
+
+	(ranks,correct,pred) = performIdentification(raw_validation_set[0],asd_pred_val_act_t)
+	print "ASD identification single trial> Correct:", correct , "Mean rank:", numpy.mean(ranks),  "MSE", numpy.mean(numpy.power(raw_validation_set[0] - asd_pred_val_act_t,2)) 
+	
+	(ranks,correct,pred) = performIdentification(validation_set,pred_val_act_t)
+	print "Reg. pseudoinverse identification trial average> Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act_t,2))  
+
+	(ranks,correct,pred) = performIdentification(validation_set,asd_pred_val_act_t)
+	print "ASD identification trial average> Correct:", correct , "Mean rank:", numpy.mean(ranks), "MSE", numpy.mean(numpy.power(validation_set - asd_pred_val_act_t,2)) 
+	
+	pylab.show()
+	
+	
+def DeepLook():
+	import scipy
+	from scipy import linalg
+	f = open("modelfitDatabase1.dat",'rb')
+	import pickle
+	dd = pickle.load(f)
+	node = dd.children[0]
+
+	rfs  = node.children[0].data["ReversCorrelationRFs"]
+	sx,sy = numpy.shape(rfs[0])
+	asd_rfs  = node.children[1].data["RFs"]
+	asdrd_rfs  = node.children[2].data["RFs"]
+	pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"])
+	pred_val_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"])
+	
+	training_set_old = node.data["training_set"]
+	validation_set_old = node.data["validation_set"]
+	training_set = numpy.array(node.children[0].data["LaterTrainingSet"])
+	validation_set = numpy.array(node.children[0].data["LaterValidationSet"])
+	training_inputs = node.data["training_inputs"]
+	validation_inputs = node.data["validation_inputs"]
+	
+	print "Mean of old one:",numpy.mean(training_set_old) , " Variance of old one:", numpy.mean(numpy.var(training_set_old,axis=0))
+	print "Mean of modified:",numpy.mean(training_set) , " Variance of modified:", numpy.mean(numpy.var(training_set,axis=0))
+	print "Mean of predicted:",numpy.mean(pred_act) , " Variance of predicted:", numpy.mean(numpy.var(pred_act,axis=0))
+	
+	
+	#(e,te,c,tc,RFs,pred_act,pred_val_act,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,training_set,sx,sy,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),validation_set,contrib.dd.DB2(None),True)
+    
+	
+	valdataset = loadSimpleDataSet("Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes",50,103,10)
+	validation_inputs_big=generateInputs(valdataset,"/home/antolikjan/topographica/topographica/Mice/2009_11_04/","/20091104_50stimsequence/50stim%04d.tif",__main__.__dict__.get('density', 0.4),1.8,offset=0)
+	
+	
+	ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(pred_act),display=False)
+	pred_act_t = apply_sigmoid_output_function(numpy.mat(pred_act),ofs)
+	pred_val_act_t= apply_sigmoid_output_function(numpy.mat(pred_val_act),ofs)
+
+	val_errors = numpy.array(numpy.power(pred_val_act - validation_set,2))
+	val_errors_t = numpy.array(numpy.power(pred_val_act_t - validation_set,2))
+	neurons = [0,1,8,15,17,19,24,25,27,33,37,38]#,40,42,44,45,46,47,48,53,55,56,58,61,65,65,75,85,93,96]	
+	
+	
+	ssy,ssx = numpy.shape(validation_inputs_big[0])
+	
+	(ranks,correct,pred) = performIdentification(validation_set,pred_val_act)
+	print "Without TF. Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act,2))
+	
+	(ranks,correct,pred) = performIdentification(validation_set,pred_val_act_t)
+	print "With TF. Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act_t,2))
+	
+	
+	for n in neurons:
+	    s = numpy.argsort(val_errors_t[:,n])[::-1]
+	    f = pylab.figure()
+	    tn = 8 
+	    
+	    ax = f.add_axes([0.01,0.75,1.0/(tn+1)-0.02,0.24])
+	    m = numpy.max([-numpy.min(rfs[n]),numpy.max(rfs[n])])
+            pylab.imshow(rfs[n],vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	    
+	    ax = f.add_axes([0.01,0.5,1.0/(tn+1)-0.02,0.24])
+	    m = numpy.max([-numpy.min(asd_rfs[n]),numpy.max(asd_rfs[n])])
+            pylab.imshow(numpy.reshape(asd_rfs[n],(sx,sy)),vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	    
+	    ax = f.add_axes([0.01,0.25,1.0/(tn+1)-0.02,0.24])
+	    m = numpy.max([-numpy.min(asdrd_rfs[n]),numpy.max(asdrd_rfs[n])])
+            pylab.imshow(numpy.reshape(asdrd_rfs[n],(sx,sy)),vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+	    
+	    m = numpy.max([-numpy.min(rfs[n]),numpy.max(rfs[n])])
+	    for i in xrange(0,tn):
+		ax = f.add_axes()
+		
+		ax = f.add_axes([(i+1.0)/(tn+1.0),0.75,1.0/(tn+1)-0.02,0.24])
+  	        ax.imshow(validation_inputs_big[s[i]],vmin=0,vmax=256,interpolation='nearest',cmap=pylab.cm.gray)
+		ax.axis('off')
+		ax.add_line(matplotlib.lines.Line2D([ssx*0.3,ssx*0.3],[ssy*0.0,ssy*1.0]))
+		ax.add_line(matplotlib.lines.Line2D([ssx*0.8,ssx*0.8],[ssy*0.0,ssy*1.0]))
+			
+		ax = f.add_axes([(i+1.0)/(tn+1.0),0.5,1.0/(tn+1)-0.02,0.24])
+  	        ax.imshow(numpy.multiply(numpy.reshape(validation_inputs[s[i]],(sx,sy)),numpy.abs(rfs[n])/m),vmin=-135,vmax=135,interpolation='nearest',cmap=pylab.cm.gray)
+		ax.axis('off')
+			
+		ax = f.add_axes([(i+1.0)/(tn+1.0),0.25,1.0/(tn+1)-0.02,0.15])
+  	        ax.plot(validation_set[:,n],'ro')
+		ax.plot(pred_val_act_t[:,n],'bo')
+		ax.axvline(s[i])
+		
+		ax = f.add_axes([(i+1.0)/(tn+1.0),0.05,1.0/(tn+1)-0.02,0.15])
+  	        ax.plot(numpy.mean(validation_set,axis=1),'ro')
+		ax.axvline(s[i])
+
+
+
+def SuperModel():
+	import scipy
+	from scipy import linalg
+	f = open("modelfitDatabase1.dat",'rb')
+	import pickle
+	dd = pickle.load(f)
+	node = dd.children[0]
+
+	rfs  = node.children[0].data["ReversCorrelationRFs"][0:103]
+	fitted_rfs  = node.children[0].data["FittedRFs"][0:103]
+	
+	#SurrRFs = node.children[0].children[0].children[4].data["SurrRFs"]
+	#SurrTI = node.children[0].children[0].data["TrainingInputs"]
+	#SurrVI = node.children[0].children[0].data["ValidationInputs"]
+
+	
+	pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"][:,0:103])
+	pred_val_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"][:,0:103])
+	
+	training_set = node.data["training_set"][:,0:103]
+	validation_set = node.data["validation_set"][:,0:103]
+	
+	#training_set = numpy.array(node.children[0].data["LaterTrainingSet"])
+	#validation_set = numpy.array(node.children[0].data["LaterValidationSet"])
+
+	training_inputs = node.data["training_inputs"]
+	validation_inputs = node.data["validation_inputs"]
+	raw_validation_set = node.data["raw_validation_set"]
+	
+	rf_mag = [numpy.sum(numpy.power(r,2)) for r in rfs]
+	
+	#discard ugly RFs          	
+	
+	#to_delete = numpy.nonzero((numpy.array(rf_mag) < 0.0000003)*1.0)[0]
+	#rfs = numpy.delete(rfs,to_delete,axis=0)
+	#pred_act = numpy.delete(pred_act,to_delete,axis=1)
+	#pred_val_act = numpy.delete(pred_val_act,to_delete,axis=1)
+	#training_set = numpy.delete(training_set,to_delete,axis=1)
+	#validation_set = numpy.delete(validation_set,to_delete,axis=1)
+	
+	#for i in xrange(0,len(raw_validation_set)):
+	#    raw_validation_set[i] = numpy.delete(raw_validation_set[i],to_delete,axis=1)
+	
+	
+	(sx,sy) = numpy.shape(rfs[0])
+	#pred_act  =  numpy.array(numpy.mat(training_inputs)*numpy.mat(numpy.reshape(fitted_rfs,(103,sx*sy)).T))
+	#pred_val_act  =  numpy.array(numpy.mat(validation_inputs)*numpy.mat(numpy.reshape(fitted_rfs,(103,sx*sy)).T))
+	
+	ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(pred_act))
+	pred_act_t = apply_sigmoid_output_function(numpy.mat(pred_act),ofs)
+	pred_val_act_t= apply_sigmoid_output_function(numpy.mat(pred_val_act),ofs)
+	
+	#z = numpy.argsort(numpy.mean(training_set,axis=0))
+	#pylab.figure()
+	#pylab.plot(numpy.mean(training_set[:,z[0:10]],axis=1),numpy.mean(training_set[:,z[80:103]],axis=1),'ro')
+	#pylab.figure()
+	#pylab.plot(numpy.mean(pred_act[:,z[0:10]],axis=1),numpy.mean(pred_act[:,z[80:103]],axis=1),'ro')
+	#pylab.figure()
+	#pylab.plot(numpy.mean(pred_act_t[:,z[0:10]],axis=1),numpy.mean(pred_act_t[:,z[80:103]],axis=1),'ro')
+
+	
+	
+	#temp = numpy.reshape(rfs,(1800,sx*sy))
+	
+	#var = numpy.mat(training_inputs) * numpy.mat(numpy.abs(temp))
+	#val_var = numpy.mat(validation_inputs) * numpy.mat(temp)
+	
+	#var = numpy.var(training_inputs,axis=1)
+	#val_var = numpy.var(validation_inputs,axis=1)
+	#dataset= loadSimpleDataSet('/home/antolikjan/topographica/topographica/Mice/20090925_14_36_01/spont_filtered.dat',2852,50,num_rep=1,num_frames=1,offset=0,transpose=False)
+	#spont = generateTrainingSet(dataset)
+			
+	spont_corr,p = pearcorr(training_set)
+	
+	print numpy.shape(training_set)
+	print numpy.shape(spont_corr)
+	print numpy.shape(numpy.eye(len(rfs)))
+	spont_corr = numpy.multiply(numpy.multiply(spont_corr,abs(numpy.eye(len(rfs))-1.0)),(p<0.000001)*1.0)
+	
+	pylab.figure()
+	pylab.imshow(spont_corr)
+	pylab.colorbar()
+	
+	
+	
+	var1=var2=var3 = numpy.array(numpy.mat(training_set)*numpy.mat(spont_corr)) 
+	
+	#training_set = training_set-numpy.array(numpy.mat(training_set)*numpy.mat(spont_corr))
+	#validation_set = validation_set-numpy.array(numpy.mat(validation_set)*numpy.mat(spont_corr))
+	
+	#val_var = numpy.zeros(numpy.shape(validation_set))
+	val_var1 = val_var2 = val_var3=  numpy.array(numpy.mat(validation_set)*numpy.mat(spont_corr))
+	
+	#var  =  numpy.mat(SurrTI)*numpy.mat(numpy.reshape(SurrRFs,(103,sx*sy)).T)
+	#val_var  = numpy.mat(SurrVI)*numpy.mat(numpy.reshape(SurrRFs,(103,sx*sy)).T)
+	
+	#try what effect rotated RFs could have
+	if False: 
+		rfs_90 = []
+		rfs_180 = []
+		rfs_270 = []
+		for rf in rfs:
+			r90 = rot90_around_center_of_gravity(rf)
+			#r180 = rot90_around_center_of_gravity(r90)
+			#r270 = rot90_around_center_of_gravity(r180)
+			r180 = rf*-1.0
+			r270 = r90*-1.0
+			rfs_90.append(r90.flatten())	
+			rfs_180.append(r180.flatten())
+			rfs_270.append(r270.flatten())
+			var1  =  numpy.mat(training_inputs)*numpy.mat(rfs_90).T
+			val_var1  = numpy.mat(validation_inputs)*numpy.mat(rfs_90).T
+			var2  =  numpy.mat(training_inputs)*numpy.mat(rfs_180).T
+			val_var2  = numpy.mat(validation_inputs)*numpy.mat(rfs_180).T
+			var3  =  numpy.mat(training_inputs)*numpy.mat(rfs_270).T
+			val_var3  = numpy.mat(validation_inputs)*numpy.mat(rfs_270).T
+	
+	
+	
+	from scipy.optimize import leastsq
+	xs = []
+	err = []
+	for i in xrange(0,len(rfs)):
+	    #print i
+	    min_err = 100000000000000000
+	    xo=True
+	    for r in xrange(0,10):
+		rand = UniformRandom(seed=513)
+		r0 = (numpy.array([rand(),rand(),rand(),rand(),rand()])-0.5)*2.0
+		x0 = [0.0,0.0,0.0,0.0,1.0]
+		rand_scale = [3.0,3.0,3.0,3.0,3.0]
+		x0 = x0 + numpy.multiply(r0,rand_scale)
+		
+		xopt = leastsq(supermodel_error, x0[:], args=(numpy.array(var1)[:,i],numpy.array(var2)[:,i],numpy.array(var3)[:,i],numpy.array(pred_act)[:,i],numpy.array(training_set)[:,i]),ftol=0.0000000000000000001,xtol=0.0000000000000001,warning=False)
+		
+		er = numpy.sum(supermodel_error(xopt[0],numpy.array(var1)[:,i],numpy.array(var2)[:,i],numpy.array(var3)[:,i],numpy.array(pred_act)[:,i],numpy.array(training_set)[:,i])**2)
+		if min_err > er:
+		   min_err = er	
+	    	   xo=xopt[0] 
+				
+	    xs.append(xo)	
+	    new_error  = numpy.sum(supermodel_error(xo,numpy.array(var1)[:,i],numpy.array(var2)[:,i],numpy.array(var3)[:,i],numpy.array(pred_act)[:,i],numpy.array(training_set)[:,i])**2)
+	    old_error =  numpy.sum((numpy.array(pred_act)[:,i] - numpy.array(training_set)[:,i])**2)
+	    err.append( (old_error - new_error)/old_error * 100)
+	
+	
+	print numpy.mat(xs)
+	
+	print "Training error decreased by:", numpy.mean(err) , '%'
+	new_val_act = apply_supermodel_estim(xs,val_var1,val_var2,val_var3,pred_val_act)
+	new_act = apply_supermodel_estim(xs,var1,var2,var3,pred_act)
+	
+	#new_act = pred_act
+	#new_val_act = pred_val_act
+	
+	ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(new_act))
+	new_val_act_t= numpy.array(apply_sigmoid_output_function(numpy.mat(new_val_act),ofs))
+	new_act_t= numpy.array(apply_sigmoid_output_function(numpy.mat(new_act),ofs))
+	
+
+	(ranks,correct,pred) = performIdentification(validation_set,pred_val_act)
+	print "Original:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act,2))
+	
+	(ranks,correct,pred) = performIdentification(validation_set,pred_val_act_t)
+	print "TF+Original:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act_t,2))
+	
+	#validation_set = validation_set-numpy.array(numpy.mat(validation_set)*numpy.mat(spont_corr))*numpy.array(numpy.tile(numpy.mat(xs)[:,4].T,(len(validation_set),1)))
+	
+	#(e,te,c,tc,RFs,pred_act,pred_val_act,corr_coef,corr_coef_tf) = regulerized_inverse_rf(numpy.array(training_inputs),numpy.array(training_set),sx,sy,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.mat(validation_set),contrib.dd.DB2(None),True)
+	
+	examine_correlated_noise(validation_set,raw_validation_set,xs,pred_val_act,spont_corr)
+	
+	(ranks,correct,pred) = performIdentification(validation_set,new_val_act)
+	print "After contrast normalization:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - new_val_act,2))
+	
+	(ranks,correct,pred) = performIdentification(validation_set,new_val_act_t)
+	print "After contrast normalization:+TF", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - new_val_act_t,2))
+	
+	raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
+		
+	print 'ORIGINAL:'
+	
+	signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), pred_act, pred_val_act)
+	signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), pred_act_t, pred_val_act_t)
+	
+	print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power*(training_prediction_power>0)) , " / " , numpy.mean(validation_prediction_power*(validation_prediction_power>0))
+	print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t*(training_prediction_power_t>0)) , " / " , numpy.mean(validation_prediction_power_t*(validation_prediction_power_t>0))
+
+	print 'NEW:'
+	signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), new_act, new_val_act)
+	signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), new_act_t, new_val_act_t)
+	
+	print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power*(training_prediction_power>0)) , " / " , numpy.mean(validation_prediction_power*(validation_prediction_power>0))
+	print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t*(training_prediction_power_t>0)) , " / " , numpy.mean(validation_prediction_power_t*(validation_prediction_power_t>0))
+
+
+
+def supermodel_estim(x,var1,var2,var3,pred_act):
+  		 (a,b,c,d,e) = list(x)
+		 #return numpy.divide(a*pred_act+b,c*var+d)
+		 #zz=  (a*numpy.max([numpy.zeros(numpy.shape(pred_act)),pred_act+b],axis=0) + c*numpy.max([numpy.zeros(numpy.shape(pred_act)),-pred_act+d],axis=0))+e*var
+		 #zz=  numpy.divide(a*pred_act,1.0 + numpy.max([numpy.zeros(numpy.shape(pred_act)),e*numpy.abs(var1)+b]))
+		 #zz = numpy.divide(a*pred_act,numpy.max([numpy.ones(numpy.shape(pred_act)),e + b*var1 + c*var2 + d*var3],axis=0))
+		 #zz = numpy.multiply(a*pred_act,1.0+ d*numpy.abs(var1))
+		 zz = pred_act + e*var1 
+		 #zz = 1.0*var1
+		 #zz =  a*(numpy.shape(pred_act)+b)*var
+		 #return numpy.divide(zz+e,f*var+g)
+		 return zz
+		 
+def supermodel_error(x,var1,var2,var3,pred_act,training_set):
+		 return training_set - supermodel_estim(x,var1,var2,var3,pred_act)
+
+
+def apply_supermodel_estim(params,var1,var2,var3,pred_act):
+    new_act = []
+    for i in xrange(0,len(params)):
+	 new_act.append(supermodel_estim(params[i],numpy.array(var1)[:,i],numpy.array(var2)[:,i],numpy.array(var3)[:,i],numpy.array(pred_act)[:,i]))
+    return numpy.array(numpy.mat(new_act).T)
+
+def examine_correlated_noise(validation_set,raw_validation_set,params,pred_val_act,spont_corr):
+    
+    raw_later_act=[]
+    for raw in raw_validation_set:
+	var=numpy.mat(raw)*numpy.mat(spont_corr)  
+    	raw_later_act.append(var) 
+	
+    # MSE with predictions from the same trials
+    m=[]
+    m_orig=[]
+    for (rawlat,rawvs) in zip(raw_later_act,raw_validation_set):
+	m.append(MSE(apply_supermodel_estim(params,rawlat,rawlat,rawlat,pred_val_act),rawvs))
+	m_orig.append(MSE(pred_val_act,rawvs))
+    
+    print "MSE from matching trials, ORIGINAL:",numpy.mean(m_orig)
+    print "MSE from averaged trials, ORIGINAL:",MSE(pred_val_act,numpy.mean(numpy.array(raw_validation_set),0))	
+    print "MSE from matching trials:",numpy.mean(m)
+    var=numpy.mat(numpy.mean(numpy.array(raw_validation_set),0))*numpy.mat(spont_corr)
+    print "MSE from averaged trials:",MSE(apply_supermodel_estim(params,var,var,var,pred_val_act),numpy.mean(numpy.array(raw_validation_set),0))
+    
+    # MSE with predictions from the same trials
+    m=[]
+    m_orig=[]	
+    for j in xrange(0,len(raw_later_act)):
+	for k in xrange(0,len(raw_later_act)):
+	    if j != k:
+	       m.append(MSE(apply_supermodel_estim(params,raw_later_act[k],raw_later_act[k],raw_later_act[k],pred_val_act),raw_validation_set[j]))    
+    print "MSE from different trials",numpy.mean(m)	
+	
+def MSE(predictions,targets):
+    return numpy.mean(numpy.power(predictions-targets,2))	
+	
+	
+
+def spontaneousActivity():
+	import scipy
+	import scipy.stats
+	from scipy import linalg
+	f = open("modelfitDatabase1.dat",'rb')
+	import pickle
+	dd = pickle.load(f)
+	node = dd.children[9]
+	rfs = node.children[0].data["ReversCorrelationRFs"]
+	
+	pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"])
+	val_pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"])
+	training_set = node.data["training_set"]
+	validation_set = node.data["validation_set"]
+	#flat_validation_set = node.data["flat_validation_set"]
+	#flat_validation_inputs = node.data["flat_validation_inputs"]
+	
+	(z,sizex,sizey) = numpy.shape(rfs)
+	
+	#flat_val_pred_act = numpy.mat(flat_validation_inputs) *numpy.mat(numpy.reshape(rfs,(z,size*sizey))).T
+	
+	#dataset = loadSimpleDataSet('/home/antolikjan/topographica/topographica/Mice/20091110_19_16_53/spont_filtered.dat',5952,68,num_rep=1,num_frames=1,offset=0,transpose=False)
+	dataset= loadSimpleDataSet('/home/antolikjan/topographica/topographica/Mice/20090925_14_36_01/spont_filtered.dat',2852,50,num_rep=1,num_frames=1,offset=0,transpose=False)
+	spont = generateTrainingSet(dataset)		
+	
+	f = file("./Mice/20090925_14_36_01/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_cell_locations.txt", "r")
+    	loc= [line.split() for line in f]
+	(a,b) = numpy.shape(loc)
+	for i in xrange(0,a):
+		for j in xrange(0,b):
+			loc[i][j] = float(loc[i][j])
+
+	
+	
+	ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(pred_act))
+	pred_act_t = apply_sigmoid_output_function(numpy.mat(pred_act),ofs)
+	val_pred_act_t = apply_sigmoid_output_function(numpy.mat(val_pred_act),ofs)
+
+	diff_act = pred_act - training_set
+	diff_act_t = pred_act_t - training_set
+	val_diff_act = val_pred_act - validation_set
+	val_diff_act_t = val_pred_act_t - validation_set
+
+	
+	rfs_corr=[]
+	spont_corr=[]
+	diff_corr=[]
+	diff_t_corr=[]
+	act_corr=[]
+	val_act_corr=[]
+	val_diff_corr=[]
+	val_diff_t_corr=[]
+	pred_val_act_t_corr=[]
+
+	for i in xrange(0,len(rfs)):		
+	    for j in xrange(i+1,len(rfs)):
+		rfs_corr.append(scipy.stats.pearsonr(rfs[i].flatten(), rfs[j].flatten())[0])		
+		spont_corr.append(scipy.stats.pearsonr(spont[:,i], spont[:,j])[0])
+		diff_corr.append(scipy.stats.pearsonr(diff_act[:,i], diff_act[:,j])[0])
+		diff_t_corr.append(scipy.stats.pearsonr(diff_act_t[:,i], diff_act[:,j])[0])
+		act_corr.append(scipy.stats.pearsonr(training_set[:,i], training_set[:,j])[0])
+		val_act_corr.append(scipy.stats.pearsonr(validation_set[:,i], validation_set[:,j])[0])
+		val_diff_corr.append(scipy.stats.pearsonr(val_diff_act[:,i], val_diff_act[:,j])[0])
+		val_diff_t_corr.append(scipy.stats.pearsonr(val_diff_act_t[:,i], val_diff_act[:,j])[0])
+		pred_val_act_t_corr.append(scipy.stats.pearsonr(val_pred_act_t[:,i], val_pred_act_t[:,j])[0])
+		
+				
+	pylab.figure()
+	pylab.title('Correlation between spontaneous activity correlations and RFs correlations')
+	pylab.plot(rfs_corr,spont_corr,'bo')
+	pylab.xlabel('RFs correlations')
+	pylab.ylabel('Spontaneous activity correlations')
+	
+	pylab.figure()
+	pylab.title('Correlation between triggered activity correlations and RFs correlations')
+	pylab.plot(act_corr,spont_corr,'bo')
+	pylab.xlabel('Triggered activity')
+	pylab.ylabel('Spontaneous activity correlations')
+	
+	
+	pylab.figure()
+	pylab.title('Correlation between spontaneous activity correlations and prediction residuals correlations after removal of nonspecific RFs')
+	pylab.plot(diff_corr,spont_corr,'bo')
+	pylab.xlabel('Residuals correlations')
+	pylab.ylabel('Spontaneous activity correlations')
+	
+	pylab.figure()
+	pylab.title('Correlation between spontaneous activity correlations and prediction residuals +TF correlations after removal of nonspecific RFs')
+	pylab.plot(diff_t_corr,spont_corr,'bo')
+	pylab.xlabel('Residuals correlations+TF')
+	pylab.ylabel('Spontaneous activity correlations')
+	
+	pylab.figure()
+	pylab.title('Correlation between triggered activity correlations and prediction residuals correlations after removal of nonspecific RFs')
+	pylab.plot(act_corr,diff_corr,'bo')
+	pylab.xlabel('Triggered activity')
+	pylab.ylabel('Residuals correlations')
+	
+	
+        print 'Correlation between RFs corr. and Spont act corr.:', scipy.stats.pearsonr(rfs_corr,spont_corr)
+	
+	print 'On training set:'
+	print 'Correlation between Triggered activity corr. and Spont act corr.:', scipy.stats.pearsonr(act_corr,spont_corr)
+	print 'Correlation between Residuals corr. and Spont act corr.:', scipy.stats.pearsonr(diff_corr,spont_corr)
+	print 'Correlation between Residuals+TF corr. and Spont act corr.:', scipy.stats.pearsonr(diff_t_corr,spont_corr)
+	print 'Correlation between Residuals corr. and Triggered act corr.:', scipy.stats.pearsonr(diff_corr,act_corr)
+        	
+	print 'On validation set:'		
+	print 'Correlation between Triggered validation activity corr. and Spont act corr.:', scipy.stats.pearsonr(val_act_corr,spont_corr)
+        print 'Correlation between Residuals corr. and Spont act corr.:', scipy.stats.pearsonr(val_diff_corr,spont_corr)
+	print 'Correlation between Residuals+TF corr. and Spont act corr.:', scipy.stats.pearsonr(val_diff_t_corr,spont_corr)
+	print 'Correlation between Residuals corr. and Triggered act corr.:', scipy.stats.pearsonr(val_diff_corr,val_act_corr)
+	print 'Correlation between predicted validation activities corr. and Spont act corr.:', scipy.stats.pearsonr(pred_val_act_t_corr,spont_corr)
+	print 'Correlation between difference of predicted validation activities and measured validation activities corr. and Spont act corr.:', scipy.stats.pearsonr(numpy.array(val_act_corr)-numpy.array(pred_val_act_t_corr),spont_corr)
+	
+	
+	#remove ugly neurons
+	print 'Removing weak RFs'
+	rfs_mag=numpy.sum(numpy.reshape(numpy.abs(numpy.array(rfs)),(len(rfs),numpy.size(rfs[0]))),axis=1)
+	to_delete = numpy.nonzero((rfs_mag < 0.03) * 1.0)
+	pylab.figure()
+	pylab.hist(rfs_mag)
+	
+	rfs  = numpy.delete(numpy.array(rfs),to_delete[0],axis=0)	
+	spont  = numpy.array(numpy.delete(numpy.mat(spont),to_delete[0],axis=1))
+	diff_act  = numpy.array(numpy.delete(numpy.mat(diff_act),to_delete[0],axis=1))
+	diff_act_t  = numpy.array(numpy.delete(numpy.mat(diff_act_t),to_delete[0],axis=1))
+	training_set  = numpy.array(numpy.delete(numpy.mat(training_set),to_delete[0],axis=1))
+	validation_set  = numpy.array(numpy.delete(numpy.mat(validation_set),to_delete[0],axis=1))
+	val_diff_act  = numpy.array(numpy.delete(numpy.mat(val_diff_act),to_delete[0],axis=1))
+	val_diff_act_t  = numpy.array(numpy.delete(numpy.mat(val_diff_act_t),to_delete[0],axis=1))
+	val_pred_act_t  = numpy.array(numpy.delete(numpy.mat(val_pred_act_t),to_delete[0],axis=1))
+	
+	spont_corr=[]
+	diff_corr=[]
+	diff_t_corr=[]
+	act_corr=[]
+	val_act_corr=[]
+	val_diff_corr=[]
+	val_diff_t_corr=[]
+	pred_val_act_t_corr=[]
+	
+	pos_rfs_corr=[]
+	pos_spont_corr=[]
+	pos_dist=[]
+	neg_rfs_corr=[]
+	neg_spont_corr=[]
+	neg_dist=[]
+	
+	for i in xrange(0,len(rfs)):		
+	    for j in xrange(i+1,len(rfs)):
+		cor = numpy.corrcoef(rfs[i].flatten(), rfs[j].flatten())[0][1]
+		if cor > 0:
+			pos_rfs_corr.append(cor)		
+			pos_spont_corr.append(numpy.corrcoef(spont[:,i], spont[:,j])[0])
+			pos_dist.append(distance(loc,i,j))
+			
+	        else:
+			neg_rfs_corr.append(cor)		
+			neg_spont_corr.append(numpy.corrcoef(spont[:,i], spont[:,j])[0])
+			neg_dist.append(distance(loc,i,j))
+		spont_corr.append(scipy.stats.pearsonr(spont[:,i], spont[:,j])[0])
+		diff_corr.append(scipy.stats.pearsonr(diff_act[:,i], diff_act[:,j])[0])
+		diff_t_corr.append(scipy.stats.pearsonr(diff_act_t[:,i], diff_act[:,j])[0])
+		act_corr.append(scipy.stats.pearsonr(training_set[:,i], training_set[:,j])[0])
+		val_act_corr.append(scipy.stats.pearsonr(validation_set[:,i], validation_set[:,j])[0])
+		val_diff_corr.append(scipy.stats.pearsonr(val_diff_act[:,i], val_diff_act[:,j])[0])
+		val_diff_t_corr.append(scipy.stats.pearsonr(val_diff_act_t[:,i], val_diff_act[:,j])[0])
+		pred_val_act_t_corr.append(scipy.stats.pearsonr(val_pred_act_t[:,i], val_pred_act_t[:,j])[0])
+	
+	pylab.figure()
+	pylab.title('Correlation between spontaneous activit correlations and RFs positive correlations after removal of nonspecific RFs')
+	pylab.plot(pos_rfs_corr,pos_spont_corr,'bo')
+	pylab.xlabel('RFs correlations')
+	pylab.ylabel('Spontaneous activity correlations')
+	
+	
+
+	
+	#fig = pylab.figure()
+	#from mpl_toolkits.mplot3d import Axes3D
+	#ax = Axes3D(fig)
+	#pylab.title('Correlation between spontaneous activit correlations and RFs positive correlations after removal of nonspecific RFs')
+	#ax.scatter(pos_rfs_corr,pos_spont_corr,pos_dist)
+	#ax.set_xlabel('RFs correlations')
+	#ax.set_ylabel('Spontaneous activity correlations')
+	#ax.set_zlabel('distance')
+
+	
+	pylab.figure()
+	pylab.title('Correlation between spontaneous activit correlations and RFs negative correlations after removal of nonspecific RFs')
+	pylab.plot(neg_rfs_corr,neg_spont_corr,'bo')
+	pylab.xlabel('RFs correlations')
+	pylab.ylabel('Spontaneous activity correlations')
+	
+	
+	#fig = pylab.figure()
+	#from mpl_toolkits.mplot3d import Axes3D
+	#ax = Axes3D(fig)
+	#pylab.title('Correlation between spontaneous activit correlations and RFs positive correlations after removal of nonspecific RFs')
+	#ax.scatter(neg_rfs_corr,neg_spont_corr,neg_dist)
+	#ax.set_xlabel('RFs correlations')
+	#ax.set_ylabel('Spontaneous activity correlations')
+	#ax.set_zlabel('distance')
+	
+	print 'Correlation between positive RFs corr. and Spont act corr.:', numpy.corrcoef(pos_rfs_corr,pos_spont_corr)
+	print 'Correlation between negative RFs corr. and Spont act corr.:', numpy.corrcoef(neg_rfs_corr,neg_spont_corr)[0][1]
+        
+	print 'On training set:'
+	print 'Correlation between Triggered activity corr. and Spont act corr.:', numpy.corrcoef(act_corr,spont_corr)
+	print 'Correlation between Residuals corr. and Spont act corr.:', numpy.corrcoef(diff_corr,spont_corr)
+	print 'Correlation between Residuals+TF corr. and Spont act corr.:', numpy.corrcoef(diff_t_corr,spont_corr)
+	print 'Correlation between Residuals corr. and Triggered act corr.:', numpy.corrcoef(diff_corr,act_corr)
+        	
+	print 'On validation set:'		
+	print 'Correlation between Triggered validation activity corr. and Spont act corr.:', numpy.corrcoef(val_act_corr,spont_corr)		
+        print 'Correlation between Residuals corr. and Spont act corr.:', numpy.corrcoef(val_diff_corr,spont_corr)
+	print 'Correlation between Residuals+TF corr. and Spont act corr.:', numpy.corrcoef(val_diff_t_corr,spont_corr)
+	print 'Correlation between Residuals corr. and Triggered act corr.:', numpy.corrcoef(val_diff_corr,val_act_corr)
+       	print 'Correlation between predicted validation activities corr. and Spont act corr.:', numpy.corrcoef(pred_val_act_t_corr,spont_corr)
+	print 'Correlation between difference of predicted validation activities and measured validation activities corr. and Spont act corr.:', numpy.corrcoef(numpy.array(val_act_corr)-numpy.array(pred_val_act_t_corr),spont_corr)
+		
+
+
+def RFestimationFromOtherCells():
+	import scipy
+	from scipy import linalg
+	f = open("modelfitDatabase1.dat",'rb')
+	import pickle
+	dd = pickle.load(f)
+	node = dd.children[0]
+	rfs = node.children[0].data["ReversCorrelationRFs"]
+	pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"])
+	val_pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"])
+
+	training_set = node.data["training_set"]
+	validation_set = node.data["validation_set"]
+	training_inputs = node.data["training_inputs"]
+	validation_inputs = node.data["validation_inputs"]
+	raw_validation_set = node.data["raw_validation_set"]
+	
+	ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(pred_act))
+	pred_act_t = apply_sigmoid_output_function(numpy.mat(pred_act),ofs)
+	val_pred_act_t = apply_sigmoid_output_function(numpy.mat(val_pred_act),ofs)
+
+	(later_pred_act,later_pred_val_act) = later_interaction_prediction(training_set,pred_act_t,validation_set,val_pred_act_t,raw_validation_set,node.children[0])
+	
+	
+	#f = open("modelfitDatabase1.dat",'wb')
+    	#pickle.dump(dd,f,-2)
+	#f.close()
+	
+	return
+ 
+	(z,sizex,sizey) = numpy.shape(rfs)
+	
+	dataset= loadSimpleDataSet('/home/antolikjan/topographica/topographica/Mice/20090925_14_36_01/spont_filtered.dat',2852,50,num_rep=1,num_frames=1,offset=0,transpose=False)
+	spont = generateTrainingSet(dataset)		
+	
+	
+	trig_corr,p = pearcorr(training_set)
+	trig_corr = numpy.multiply(numpy.multiply(trig_corr,abs(numpy.eye(z)-1.0)),(p<0.01)*1.0)
+	
+	spont_corr,p = pearcorr(spont)
+	spont_corr = numpy.multiply(numpy.multiply(spont_corr,abs(numpy.eye(z)-1.0)),(p<0.01)*1.0)
+	
+	trig_pred_train_act = numpy.array(numpy.mat(training_set) * numpy.mat(trig_corr))
+	trig_pred_validation_act = numpy.array(numpy.mat(validation_set) * numpy.mat(trig_corr))
+	
+	spont_pred_train_act = numpy.array(numpy.mat(training_set) * numpy.mat(spont_corr))
+	spont_pred_validation_act = numpy.array(numpy.mat(validation_set) * numpy.mat(spont_corr))
+	
+	avg_pred_train_act =  numpy.array(numpy.mat(training_set) * numpy.mat(numpy.ones((z,1))))
+	avg_pred_validation_act =  numpy.array(numpy.mat(validation_set) * numpy.mat(numpy.ones((z,1))))
+	
+	pylab.figure()
+	pylab.imshow(trig_corr,interpolation='nearest')
+	pylab.colorbar()
+	
+	
+	pylab.figure()
+	pylab.imshow(spont_corr,interpolation='nearest')
+	pylab.colorbar()
+	
+	print numpy.shape(trig_pred_train_act)
+	print numpy.shape(trig_pred_validation_act)
+	print sizex
+	print sizey
+	print numpy.shape(training_set)
+	print numpy.shape(training_inputs)
+	
+	
+	(e,te,c,tc,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,numpy.divide(training_set,trig_pred_train_act),sizex,sizey,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.divide(validation_set,numpy.mat(spont_pred_validation_act)),contrib.dd.DB2(None),True)
+	pylab.show()
+	
+def pearcorr(X):
+    X = numpy.array(X)
+    import scipy.stats	
+    x,y = numpy.shape(X)	
+    c = numpy.zeros((y,y))
+    p = numpy.zeros((y,y))
+    for i in xrange(0,y):
+	for j in xrange(0,y):	
+	    a,b = scipy.stats.pearsonr(X[:,i],X[:,j])
+	    c[i][j]=a
+	    p[i][j]=b
+	    
+    return (c,p)	
+	
+def rot90_around_center_of_gravity(rf):
+    """
+    Assumes the RF is in lower right quadrant!!!!!!!!!!!!!!!!
+    """	
+    sx,sy = numpy.shape(rf)
+    cy,cx = centre_of_gravity(rf)
+    cx = round(cx)
+    cy = round(cy)
+    z=numpy.min([cx,cy,sx-cx,sy-cy])
+    res = numpy.zeros((sx,sy))
+    res[cx-z:cx+z,cy-z:cy+z] = numpy.rot90(rf[cx-z:cx+z,cy-z:cy+z])
+    return res
+	
+def SparsnessAnalysis():
+    import scipy
+    import scipy.stats
+    import numpy.random
+    from scipy import linalg
+    contrib.modelfit.save_fig_directory='/home/antolikjan/Doc/reports/Sparsness/'
+    f = open("modelfitDatabase1.dat",'rb')
+    import pickle
+    dd = pickle.load(f)
+    node = dd.children[0]
+    rfs = node.children[0].data["ReversCorrelationRFs"]
+    raw_validation_set = node.data["raw_validation_set"]
+    training_set = node.data["training_set"]
+    validation_set = node.data["validation_set"]
+
+    raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
+	
+    pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"])
+    val_pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"])
+    
+
+    # determine signal and noise power and created predictions with gaussian noise of corresponding variance 
+    signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act, val_pred_act)
+    nt,nn = numpy.shape(pred_act) 
+    numpy.random.randn(nt,nn)
+     
+
+    # LOAD NON-NORMALIZED DATA
+    (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = sortOutLoading(dd)
+
+    #set firing rate values bellow 0.02 to 0 (talk to Tom!!!) 
+    
+    
+    # fit the predicted activities to sigmoid again
+    # this time note that we are fitting it to measured activities that were this time not zero meaned and unit variance scaled
+    ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(pred_act),offset=False)
+    pred_act = apply_sigmoid_output_function(numpy.mat(pred_act),ofs,offset=False)
+    #pred_act_noise = apply_sigmoid_output_function(numpy.mat(pred_act_noise),ofs,offset=False)
+    val_pred_act = apply_sigmoid_output_function(numpy.mat(val_pred_act),ofs,offset=False)
+    (ranks,correct,pred) = performIdentification(validation_set,val_pred_act)
+    print "Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(val_pred_act - validation_set,2))
+
+    pred_act_noise = pred_act + numpy.multiply(numpy.tile(numpy.sqrt(noise_power),(nt,1)) , numpy.random.randn(nt,nn))
+    pred_act_noise = pred_act_noise * (pred_act_noise > 0)
+    
+
+    # Exclude neurons with weak RFs from further analysis
+    rfs_mag=numpy.sum(numpy.power(numpy.reshape(numpy.abs(numpy.array(rfs)),(len(rfs),numpy.size(rfs[0]))),2),axis=1)
+    pylab.figure()
+    pylab.hist(rfs_mag)
+    pylab.xlabel('RFs magnitued')
+    to_delete = numpy.array(numpy.nonzero((rfs_mag < 0.0000006) * 1.0))[0]
+    to_delete=[]
+    training_set = numpy.delete(training_set, to_delete, axis = 1)
+    validation_set = numpy.delete(validation_set, to_delete, axis = 1)
+    pred_act = numpy.delete(pred_act, to_delete, axis = 1)
+    val_pred_act = numpy.delete(val_pred_act, to_delete, axis = 1)
+
+    # SHOW MINIMUM FIRING RATES, HISTOGRAMS OF MEAN FIRING RATES AND HISTOGRAM OF FIRING RATES
+    print "Minimum activity levels for triggered activities:", numpy.min(training_set,axis=0)
+    print "Minimum activity levels for predicted activities:", numpy.min(pred_act,axis=0)
+    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))
+    pylab.subplot(3,2,1)
+    pylab.hist(numpy.mean(training_set,axis=0))
+    pylab.xlabel('Mean triggered firing rate')
+    pylab.subplot(3,2,2)
+    pylab.hist(numpy.mean(pred_act,axis=0))
+    pylab.xlabel('Mean predicted firing rate')
+    
+    pylab.subplot(3,2,3)
+    nonz = training_set.flatten()
+    nonz =nonz[numpy.nonzero(training_set.flatten())]
+    bins,edge  =  numpy.histogram(nonz,50)
+    pylab.plot(bins,'x',label='data')
+    ex = numpy.random.standard_exponential((1, len(training_set.flatten()))).flatten() * numpy.mean(nonz)
+    
+    print numpy.mean(ex)
+    print numpy.mean(nonz)
+    bins,edge  =  numpy.histogram(ex,50)
+    pylab.plot(bins,label='Exponential distribution')
+    pylab.xscale('log')
+    pylab.yscale('log')
+    pylab.xlabel('Triggered non-zero firing rates (pooled across population)')
+    
+    pylab.subplot(3,2,4)
+    nonz = pred_act.flatten()
+    nonz =nonz[numpy.nonzero(pred_act.flatten())]
+    bins,edge  =  numpy.histogram(nonz,50)
+    pylab.plot(bins,'x')
+    ex = numpy.random.standard_exponential((1, len(pred_act.flatten()))).flatten() * numpy.mean(nonz)
+    bins,edge  =  numpy.histogram(ex,50)
+    pylab.plot(bins,label='Exponential distribution')
+    pylab.xlabel('Predicted non-zero firing rate (pooled across population)')
+    pylab.xscale('log')
+    pylab.yscale('log')
+    
+    pylab.subplot(3,2,5)
+    nonz = training_set.flatten()
+    nonz =nonz[numpy.nonzero(training_set.flatten())]
+    bins,edge  =  numpy.histogram(nonz,50)
+    pylab.plot(bins,'x')
+    pylab.xlabel('Triggered non-zero firing rates (pooled across population)')
+    
+    pylab.subplot(3,2,6)
+    nonz = pred_act.flatten()
+    nonz =nonz[numpy.nonzero(pred_act.flatten())]
+    bins,edge  =  numpy.histogram(nonz,50)
+    pylab.plot(bins,'x')
+    pylab.xlabel('Predicted non-zero firing rate (pooled across population)')
+    release_fig('Firing_rate_distributions.pdf')
+    
+    
+    
+    ex = numpy.random.standard_exponential((1, len(training_set.flatten()))).flatten() * numpy.mean(training_set)
+    norm = numpy.random.normal(loc=numpy.mean(training_set),scale=0.0001,size=(1, len(training_set.flatten()))).flatten() 
+
+    
+    nonz=ex.flatten()
+    #nonz =nonz[numpy.nonzero(ex.flatten())]
+    bins1,edge1  =  numpy.histogram(nonz,50)
+    bins4,edge4  =  numpy.histogram(numpy.log(nonz),50)
+    
+    nonz=numpy.exp(norm.flatten())
+    #nonz =nonz[numpy.nonzero(numpy.exp(norm.flatten()))]
+    bins2,edge2  =  numpy.histogram(nonz,50)
+    bins3,edge3  =  numpy.histogram(numpy.log(nonz),50)
+    
+    pylab.figure()
+    pylab.plot(bins3)
+    pylab.plot(bins4)
+    pylab.figure()
+    pylab.plot(bins1,label='exp')
+    pylab.plot(bins2,label='lognormal')
+    pylab.yscale('log')    
+    pylab.xscale('log')
+    pylab.legend()
+    
+    
+    pylab.figure()
+    (bins,tr,tr) = pylab.hist(training_set.flatten(),bins=100)
+    
+    pylab.figure()
+    pylab.subplot(111, yscale='log')
+    pylab.plot(bins)
+    
+    pylab.figure()
+    pylab.subplot(111, xscale='log')
+    pylab.plot(bins)
+    
+    
+    pylab.figure()
+    (bins,tr,tr) = pylab.hist(pred_act.flatten(),bins=100)
+    
+    pylab.figure()
+    pylab.subplot(111, yscale='log')
+    pylab.plot(bins)
+    
+    pylab.figure()
+    pylab.subplot(111, xscale='log')
+    pylab.plot(bins)
+    
+    
+    
+    mu = 1.0
+    exponential = numpy.arange(39, dtype='float32') / 40.0 + 0.0125
+    exponential = numpy.exp(- (1 / mu) * exponential) / mu
+    
+    pylab.figure()
+    pylab.subplot(111, yscale='log')
+    pylab.plot(exponential)
+    
+    pylab.figure()
+    pylab.subplot(111, xscale='log')
+    pylab.plot(exponential)
+    
+    
+    lifetime_triggered_sparsness = TrevesRollsSparsness(numpy.mat(training_set))
+    population_triggered_sparsness = TrevesRollsSparsness(numpy.mat(training_set).T)
+    lifetime_predicted_sparsness = TrevesRollsSparsness(numpy.mat(pred_act))
+    population_predicted_sparsness = TrevesRollsSparsness(numpy.mat(pred_act).T)
+    lifetime_predicted_noise_sparsness = TrevesRollsSparsness(numpy.mat(pred_act_noise))
+    population_predicted_noise_sparsness = TrevesRollsSparsness(numpy.mat(pred_act_noise).T)
+    lifetime_triggered_averaged_sparsness = TrevesRollsSparsness(numpy.mat(validation_set))
+    population_triggered_averaged_sparsness = TrevesRollsSparsness(numpy.mat(validation_set).T)
+
+
+    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))
+    pylab.subplot(4,2,1)
+    pylab.hist(lifetime_triggered_sparsness)
+    pylab.xlabel('Life time sparsness of triggered activities')
+    pylab.axis(xmin=0.0,xmax=1.0) 
+    
+    pylab.subplot(4,2,2)
+    pylab.hist(population_triggered_sparsness)
+    pylab.xlabel('Population sparsness of triggered activities')
+    pylab.axis(xmin=0.0,xmax=1.0)
+    
+    pylab.subplot(4,2,3)
+    pylab.hist(lifetime_predicted_sparsness)
+    pylab.xlabel('Life time sparsness of predicted activities')
+    pylab.axis(xmin=0.0,xmax=1.0)
+    
+    pylab.subplot(4,2,4)
+    pylab.hist(population_predicted_sparsness)
+    pylab.xlabel('Population sparsness of predicted activities')
+    pylab.axis(xmin=0.0,xmax=1.0)
+    
+    pylab.subplot(4,2,5)
+    pylab.hist(lifetime_predicted_noise_sparsness)
+    pylab.xlabel('Life time sparsness of predicted activities with Gaussian noise')
+    pylab.axis(xmin=0.0,xmax=1.0)
+    
+    pylab.subplot(4,2,6)
+    pylab.hist(population_predicted_noise_sparsness)
+    pylab.xlabel('Population sparsness of predicted activities with Gaussian noise')
+    pylab.axis(xmin=0.0,xmax=1.0)
+    
+    pylab.subplot(4,2,7)
+    pylab.hist(lifetime_triggered_averaged_sparsness)
+    pylab.xlabel('Life time sparsness of triggered activities averaged over trials')
+    pylab.axis(xmin=0.0,xmax=1.0) 
+    
+    pylab.subplot(4,2,8)
+    pylab.hist(population_triggered_averaged_sparsness)
+    pylab.xlabel('Population sparsness of triggered activities averaged over trials')
+    pylab.axis(xmin=0.0,xmax=1.0)
+    release_fig('Sparsness.pdf')	
+	
+def TrevesRollsSparsness(mat):
+    # Computes Trevers Rolls Sparsness of data along columns
+    x,y  = numpy.shape(mat)
+    return numpy.array(1-(numpy.power(numpy.mean(mat,axis=0),2))/numpy.mean(numpy.power(mat,2),axis=0))[0]/ (1.0 - 1.0/x)    
+
+
