@@ -21,7 +21,7 @@ class GLM(object):
 	    self.k = self.K[0:self.kernel_size]
 	    self.n = self.K[self.kernel_size]
 	    self.a = self.K[self.kernel_size+1]
-	    self.loglikelyhood = T.sum(T.exp(self.a*T.dot(self.X,self.k.T)-self.n)) - T.sum(T.dot(self.Y.T,self.a*T.dot(self.X,self.k.T)-self.n)) + T.sum(self.k.T * self.Z *self.k) 
+	    self.loglikelyhood = T.sum(T.exp(self.a*T.dot(self.X,self.k.T)-self.n)) - T.sum(T.dot(self.Y.T,self.a*T.dot(self.X,self.k.T)-self.n)) + T.sum(T.dot(self.k ,T.dot(self.Z,self.k.T))) 
 	    #self.l*T.sum(self.k**2)
 
 	def func(self):
