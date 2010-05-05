@@ -6,15 +6,14 @@ import sys
 sys.path.append('/home/antolikjan/topographica/Theano/')
 import theano 
 from theano import tensor as T
-
+from topo.misc.filepath import normalize_path, application_path
 
 class GLM(object):
 	
 	def __init__(self,XX,YY,ZZ):
 	    (self.num_pres,self.kernel_size) = numpy.shape(XX) 	
 	    (self.num_pres,self.num_neurons) = numpy.shape(YY)
-		
-	    self.l = theano.shared(ll)
+
 	    self.Y = theano.shared(YY)
     	    self.X = theano.shared(XX)
 	    self.Z = theano.shared(ZZ)
@@ -22,7 +21,7 @@ class GLM(object):
 	    self.k = self.K[0:self.kernel_size]
 	    self.n = self.K[self.kernel_size]
 	    self.a = self.K[self.kernel_size+1]
-	    self.loglikelyhood = T.sum(T.exp(self.a*T.dot(self.X,self.k.T)-self.n)) - T.sum(T.dot(self.Y.T,self.a*T.dot(self.X,self.k.T)-self.n)) + T.sum(self.k.T * Z *self.k) 
+	    self.loglikelyhood = T.sum(T.exp(self.a*T.dot(self.X,self.k.T)-self.n)) - T.sum(T.dot(self.Y.T,self.a*T.dot(self.X,self.k.T)-self.n)) + T.sum(self.k.T * self.Z *self.k) 
 	    #self.l*T.sum(self.k**2)
 
 	def func(self):
@@ -33,7 +32,7 @@ class GLM(object):
 	    return theano.function(inputs=[self.K], outputs=g_K,mode='DEBUG_MODE')
  
  	def hess(self):
-            g_K = T.grad(self.loglikelyhood, self.K,consider_constant=[self.Y,self.X,self.l])
+            g_K = T.grad(self.loglikelyhood, self.K,consider_constant=[self.Y,self.X])
 	    H, updates = theano.scan(lambda i,v: T.grad(g_K[i],v), sequences= T.arange(g_K.shape[0]), non_sequences=self.K)
   	    return theano.function(inputs=[self.K], outputs=H,mode='DEBUG_MODE')
 	    
@@ -127,6 +126,7 @@ def runGLM():
     pylab.figure()
     m = numpy.max(numpy.abs(K[0:22*22]))
     pylab.imshow(numpy.reshape(K[0:22*22],(22,22)),vmin=-m,vmax=m,cmap=pylab.cm.RdBu,interpolation='nearest')
+    pylab.savefig(normalize_path('RFs.png'))
 
     
     return [K,validation_inputs, validation_set]
