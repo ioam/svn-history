@@ -20,7 +20,7 @@ from topo.misc.filepath import normalize_path, application_path
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 import contrib.dd
 from matplotlib.ticker import MaxNLocator
-
+from contrib.JanA.noiseEstimation import signal_power_test
 from helper import *
 
 #dd = contrib.dd.DB()
@@ -453,7 +453,6 @@ def calculateReceptiveField(RFs,weights):
 def loadSimpleDataSet(filename,num_stimuli,n_cells,num_rep=1,num_frames=1,offset=0,transpose=False):
     f = file(filename, "r") 
     data = [line.split() for line in f]
-    
     if transpose:
        data = numpy.array(data).transpose()	    
     
@@ -954,7 +953,6 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
     validation_inputs = numpy.mat(validation_inputs)
     validation_activities = numpy.mat(validation_activities)
     S = numpy.mat(inputs).copy()
-    print 'AAAA'
     for x in xrange(0,sizex):
         for y in xrange(0,sizey):
             norm = numpy.mat(numpy.zeros((sizex,sizey)))
@@ -969,9 +967,6 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
                norm[x,y+1]=-1
             S = numpy.concatenate((S,alpha*norm.flatten()),axis=0)
     
-    print numpy.shape(activities)
-    print numpy.shape(numpy.zeros((sizey*sizex,np)))
-    print 'BBBB'
     activities_padded = numpy.concatenate((activities,numpy.mat(numpy.zeros((sizey*sizex,np)))),axis=0)
     Z = numpy.linalg.pinv(S)*activities_padded
     Z=Z.T
@@ -987,8 +982,6 @@ def regulerized_inverse_rf(inputs,activities,sizex,sizey,alpha,validation_inputs
     tf_predicted_activities = apply_output_function(predicted_activities,of)
     tf_validation_predicted_activities = apply_output_function(validation_predicted_activities,of)
     
-    print numpy.shape(validation_activities)
-    print numpy.shape(validation_predicted_activities)
     
     errors = numpy.sum(numpy.power(validation_activities - validation_predicted_activities,2),axis=0)
     tf_errors = numpy.sum(numpy.power(validation_activities - tf_validation_predicted_activities,2),axis=0)
@@ -1405,11 +1398,11 @@ def runRFinference():
         x = 5000
         for i in xrange(0,10):
             print i
-            x = (i+1)*10000
+            x = (i+21)*30000
     	    params={}
     	    params["alpha"] = __main__.__dict__.get('Alpha',x)
-            db_node1 = db_node.get_child(params)
-            (e1,te1,c1,tc1,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,x,validation_inputs,validation_set,db_node1,False)
+            db_node = db_node.get_child(params)
+            (e1,te1,c1,tc1,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,x,validation_inputs,validation_set,db_node,False)
             e.append(e1)
             c.append(c1)
             b.append(x)
@@ -1420,8 +1413,11 @@ def runRFinference():
         pylab.figure()
         #pylab.semilogx(b,c)
         pylab.plot(b,c)
-    #return (e,c,b)
-    
+	
+	f = open("modelfitDatabase1.dat",'wb')
+    	pickle.dump(d,f,-2)
+    	f.close()
+    	return (e,c,b)
     
     params={}
     params["alpha"] = __main__.__dict__.get('Alpha',50)
@@ -1492,6 +1488,92 @@ def runRFinference():
     
     pylab.show()
     return (training_set,pa,validation_set,pva)
+
+def runRFFftInference():
+    f = open("modelfitDatabase1.dat",'rb')
+    import pickle
+    d = pickle.load(f)
+    f.close()
+    
+    (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = sortOutLoading(d)
+    
+    params={}
+    params["FFTalpha"] = __main__.__dict__.get('Alpha',50)
+    db_node1 = db_node
+    db_node = db_node.get_child(params)
+    
+    # turn inputs into fft domain
+    sx,sy = numpy.shape(training_set)
+    
+    new_training_inputs = numpy.zeros(numpy.shape(training_inputs))
+    new_validation_inputs = numpy.zeros(numpy.shape(validation_inputs))
+    
+    fft_norm=numpy.zeros((sizex,sizey))
+    #for i in xrange(0,sx):
+    # 	fft_norm += numpy.abs(numpy.fft.fft2(numpy.reshape(training_inputs[i,:],(sizex,sizey))).flatten())
+    #fft_norm/=sx
+    for i in xrange(0,sizex):
+	for j in xrange(0,sizex):
+	    if i-1==sizex/2 and j-1==sizex/2:
+	       fft_norm[i,j]=1
+	    else:    
+	       fft_norm[i,j]=1.0/numpy.power((i-1-sizex/2)**2+(j-1-sizey/2)**2,2)
+    print fft_norm
+    
+    for i in xrange(0,sx):
+	new_training_inputs[i,:] = numpy.divide(numpy.abs(numpy.fft.fft2(numpy.reshape(training_inputs[i,:],(sizex,sizey)))), fft_norm).flatten()
+	#new_training_inputs[i,:] = numpy.fft.fft2(numpy.reshape(training_inputs[i,:],(sizex,sizey))).flatten()
+    
+    for i in xrange(0,50):
+	new_validation_inputs[i,:] = numpy.divide(numpy.abs(numpy.fft.fft2(numpy.reshape(validation_inputs[i,:],(sizex,sizey)))), fft_norm).flatten()
+	#new_validation_inputs[i,:] = numpy.fft.fft2(numpy.reshape(validation_inputs[i,:],(sizex,sizey))).flatten()
+    
+    print params["FFTalpha"]
+    (e,te,c,tc,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(new_training_inputs,training_set,sizex,sizey,params["FFTalpha"],new_validation_inputs,validation_set,db_node,True)
+
+    ofs = run_nonlinearity_detection(numpy.mat(training_set),numpy.mat(pa),10,display=True)
+    pa_t = apply_output_function(numpy.mat(pa),ofs)
+    pva_t = apply_output_function(numpy.mat(pva),ofs)
+
+
+    (ranks,correct,pred) = performIdentification(validation_set,pva)
+    print "Direct Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pva,2))
+    
+    (ranks,correct,pred) = performIdentification(validation_set,pva_t)
+    print "Direct Correct+TF:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pva_t,2))
+    
+    (ranks,correct,pred) = performIdentification(training_set,pa_t)
+    print "Direct Correct+TF:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(training_set - pa_t,2))
+    
+    f = open("modelfitDatabase1.dat",'wb')
+    pickle.dump(d,f,-2)
+    f.close()
+    
+    
+    for i in xrange(0,sx):
+	for j in xrange(0,sy):    
+		z = numpy.multiply(numpy.reshape(new_training_inputs[i,:],(sizex,sizey)),RFs[j])
+		pa[i,j] = numpy.mean(numpy.power(numpy.fft.ifft2(z),2))
+    
+    for i in xrange(0,50):
+	for j in xrange(0,sy):    
+		z = numpy.multiply(numpy.reshape(new_validation_inputs[i,:],(sizex,sizey)),RFs[j])
+		pva[i,j] = numpy.mean(numpy.power(numpy.fft.ifft2(z),2))
+    
+    ofs = run_nonlinearity_detection(numpy.mat(training_set),numpy.mat(pa),10,display=True)
+    pa_t = apply_output_function(numpy.mat(pa),ofs)
+    pva_t = apply_output_function(numpy.mat(pva),ofs)
+		
+		
+    (ranks,correct,pred) = performIdentification(validation_set,pva)
+    print "Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pva,2))
+    
+    (ranks,correct,pred) = performIdentification(validation_set,pva_t)
+    print "Correct+TF:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pva_t,2))
+    
+    			
+    return (training_set,pa,validation_set,pva)
+
 
 
 def compute_spike_triggered_average_rf(inputs,activities,density):
@@ -3626,7 +3708,7 @@ def sortOutLoading(db_node):
     params["dataset"] = '2009_11_04_region3'	
     custom_index=None
 	
-    if params["dataset"] == '2010_03_12':
+    if params["dataset"] == '2010_04_22':
        dataset_loc = "/home/antolikjan/topographica/topographica/Mice/2010_03_12/Exp_nonfilt_dFoF.txt"	
        num_cells = 47    
        sepparate_validation_set = False
@@ -3685,11 +3767,13 @@ def sortOutLoading(db_node):
        input_match_string = "frame%05d.tif"
 	
     if params["dataset"] == '2009_11_04_region3':
+       dataset_loc = "Mice/2009_11_04/Raw/region3/spiking_3-7.dat"	    
        #dataset_loc = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes"
-       dataset_loc =  "Mice/2009_11_04/Raw/region3/spiking_0.02corrected:3-7.dat"
+       #dataset_loc =  "Mice/2009_11_04/Raw/region3/spiking_0.02corrected:2-8.dat"
        #dataset_loc = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_calcium"
        #params["Calcium"]=True
-       val_dataset_loc = "Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes"
+       val_dataset_loc = "Mice/2009_11_04/Raw/region3/val/spiking_3-7.dat"
+       #val_dataset_loc = "Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes"
        num_cells = 103    
        sepparate_validation_set = True
        num_rep=1
@@ -3753,6 +3837,28 @@ def sortOutLoading(db_node):
        inputs_directory = "/home/antolikjan/topographica/topographica/Flogl/DataOct2009/20090925_image_list_used/"
        input_match_string = "image_%04d.tif"
 
+    if params["dataset"] == '2010_04_22':
+       dataset_loc = "Mice/2010_04_22/spiking_3-7.dat"	    
+       val_dataset_loc = "Mice/2010_04_22/val/spiking_3-7.dat"
+       num_cells = 102    
+       sepparate_validation_set = True
+       num_rep=1
+       num_frames=1
+       transpose=False
+       average_frames_from=0
+       average_frames_to=1
+       num_stim=1800
+       inputs_offset=0
+       cut_out_x=0.1
+       cut_out_y=0.0
+       cut_out_size=1.0
+       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/1800/depackaged/"
+       input_match_string = "frame%05d.tif"
+       val_inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/1800/depackaged_val/"
+       val_input_match_string = "frame%05d.tif"
+       val_reps = 12
+
+
     db_node = db_node.get_child(params)
     
         
@@ -3798,9 +3904,11 @@ def sortOutLoading(db_node):
 
     
     if params["normalize_inputs"]:
-       avgRF = compute_average_input(training_inputs)
-       training_inputs = normalize_image_inputs(training_inputs,avgRF)
-       validation_inputs = normalize_image_inputs(validation_inputs,avgRF)
+       #avgRF = compute_average_input(training_inputs)
+       #training_inputs = normalize_image_inputs(training_inputs,avgRF)
+       #validation_inputs = normalize_image_inputs(validation_inputs,avgRF)
+       training_inputs = (numpy.array(training_inputs) - 128.0)/128.0 
+       validation_inputs = (numpy.array(validation_inputs) - 128.0)/128.0
        
     
     if params["normalize_activities"]:
@@ -3813,9 +3921,12 @@ def sortOutLoading(db_node):
     
     if params["cut_out"]:
         (x,y)= numpy.shape(training_inputs[0])
-	print x,y
-        training_inputs = cut_out_images_set(training_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
-        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
+        #training_inputs = cut_out_images_set(training_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
+        #validation_inputs = cut_out_images_set(validation_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
+        #training_inputs = cut_out_images_set(training_inputs,int(y*0.30),(int(x*0.2),int(y*0.45)))
+        #validation_inputs = cut_out_images_set(validation_inputs,int(y*0.30),(int(x*0.2),int(y*0.45)))
+        training_inputs = cut_out_images_set(training_inputs,int(x*cut_out_size),(int(x*cut_out_y),int(y*cut_out_x)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(x*cut_out_size),(int(x*cut_out_y),int(y*cut_out_x)))
     
     
     (sizex,sizey) = numpy.shape(training_inputs[0])
@@ -3848,20 +3959,6 @@ def sortOutLoading(db_node):
     pylab.imshow(training_inputs[2].reshape(sizex,sizey),interpolation='nearest',cmap=pylab.cm.gray)
     
     return (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	
@@ -4401,47 +4498,6 @@ def activationPatterns():
     pylab.plot(ranks,numpy.mat(validation_activities)*numpy.mat(la[ind[-1],:]).T,'ro')
     
     
-def signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act, pred_val_act):
-	
-        signal_power=[]
-	noise_power=[]
-	normalized_noise_power=[]
-	
-	import contrib.ASDARD
-	for i in xrange(0,len(raw_validation_data_set)):
-	    (sp,np,nnp) = contrib.ASDARD.signal_and_noise_power(raw_validation_data_set[i])
-	    signal_power.append(sp)
-	    noise_power.append(np)
-	    normalized_noise_power.append(nnp)
-	
-	pylab.figure()
-	pylab.subplot(131)
-	pylab.title('distribution of estimated signal power in neurons')
-	pylab.plot(noise_power,signal_power,'ro')
-	pylab.ylabel('signal power')
-	pylab.xlabel('noise power')
-	
-	
-	training_prediction_power=numpy.divide(numpy.var(training_set,axis=0) - numpy.var(pred_act - training_set,axis=0), signal_power)
-	validation_prediction_power=numpy.divide(numpy.var(validation_set,axis=0) - numpy.var(pred_val_act - validation_set,axis=0), signal_power)
-	pylab.subplot(132)
-	pylab.title('distribution of estimated prediction power ')
-	pylab.plot(normalized_noise_power,training_prediction_power,'ro',label='training')
-	pylab.plot(normalized_noise_power,validation_prediction_power,'bo',label='validation')
-	pylab.axis([20.0,100.0,-2.0,2.0])
-	pylab.xlabel('normalized noise power')
-	pylab.ylabel('prediction power')
-	pylab.legend()
-
-	pylab.subplot(133)
-	pylab.title('relationship between test set prediction power \n and validation prediction power')
-	pylab.plot(validation_prediction_power,training_prediction_power,'ro')
-	pylab.axis([-2.0,2.0,0.0,2.0])
-	pylab.xlabel('validation set prediction power')
-	pylab.ylabel('test set prediction power')
-	
-
-	return (signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power)
 	
 def AdaptationAnalysis():
 	import scipy
@@ -4848,7 +4904,7 @@ def SuperModel():
 	node = dd.children[0]
 
 	rfs  = node.children[0].data["ReversCorrelationRFs"][0:103]
-	fitted_rfs  = node.children[0].data["FittedRFs"][0:103]
+	#fitted_rfs  = node.children[0].data["FittedRFs"][0:103]
 	
 	#SurrRFs = node.children[0].children[0].children[4].data["SurrRFs"]
 	#SurrTI = node.children[0].children[0].data["TrainingInputs"]
@@ -4857,6 +4913,9 @@ def SuperModel():
 	
 	pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"][:,0:103])
 	pred_val_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"][:,0:103])
+	
+	
+	
 	
 	training_set = node.data["training_set"][:,0:103]
 	validation_set = node.data["validation_set"][:,0:103]
@@ -4871,13 +4930,17 @@ def SuperModel():
 	rf_mag = [numpy.sum(numpy.power(r,2)) for r in rfs]
 	
 	#discard ugly RFs          	
+	pylab.figure()
+	pylab.hist(rf_mag)
+	#pylab.show()
 	
-	#to_delete = numpy.nonzero((numpy.array(rf_mag) < 0.0000003)*1.0)[0]
-	#rfs = numpy.delete(rfs,to_delete,axis=0)
-	#pred_act = numpy.delete(pred_act,to_delete,axis=1)
-	#pred_val_act = numpy.delete(pred_val_act,to_delete,axis=1)
-	#training_set = numpy.delete(training_set,to_delete,axis=1)
-	#validation_set = numpy.delete(validation_set,to_delete,axis=1)
+	to_delete = numpy.nonzero((numpy.array(rf_mag) < 0.000000)*1.0)[0]
+	print to_delete
+	rfs = numpy.delete(rfs,to_delete,axis=0)
+	pred_act = numpy.delete(pred_act,to_delete,axis=1)
+	pred_val_act = numpy.delete(pred_val_act,to_delete,axis=1)
+	training_set = numpy.delete(training_set,to_delete,axis=1)
+	validation_set = numpy.delete(validation_set,to_delete,axis=1)
 	
 	#for i in xrange(0,len(raw_validation_set)):
 	#    raw_validation_set[i] = numpy.delete(raw_validation_set[i],to_delete,axis=1)
@@ -4890,6 +4953,13 @@ def SuperModel():
 	ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(pred_act))
 	pred_act_t = apply_sigmoid_output_function(numpy.mat(pred_act),ofs)
 	pred_val_act_t= apply_sigmoid_output_function(numpy.mat(pred_val_act),ofs)
+	
+	c=[]
+	for i in xrange(0,103-len(to_delete)):
+		c.append(numpy.corrcoef(validation_set[:,i],pred_val_act_t[:,i])[0][1])
+	print c
+	print numpy.mean(c)
+	return
 	
 	#z = numpy.argsort(numpy.mean(training_set,axis=0))
 	#pylab.figure()
@@ -4924,13 +4994,15 @@ def SuperModel():
 	
 	
 	
-	var1=var2=var3 = numpy.array(numpy.mat(training_set)*numpy.mat(spont_corr)) 
+	#var1=var2=var3 = numpy.array(numpy.mat(training_set)*numpy.mat(spont_corr)) 
+	var1=var2=var3 = numpy.array(node.children[3].data["ReversCorrelationPredictedActivities+TF"][:,0:103])
 	
 	#training_set = training_set-numpy.array(numpy.mat(training_set)*numpy.mat(spont_corr))
 	#validation_set = validation_set-numpy.array(numpy.mat(validation_set)*numpy.mat(spont_corr))
 	
 	#val_var = numpy.zeros(numpy.shape(validation_set))
-	val_var1 = val_var2 = val_var3=  numpy.array(numpy.mat(validation_set)*numpy.mat(spont_corr))
+	#val_var1 = val_var2 = val_var3=  numpy.array(numpy.mat(validation_set)*numpy.mat(spont_corr))
+	val_var1 = val_var2 = val_var3 = numpy.array(node.children[3].data["ReversCorrelationPredictedValidationActivities+TF"][:,0:103])
 	
 	#var  =  numpy.mat(SurrTI)*numpy.mat(numpy.reshape(SurrRFs,(103,sx*sy)).T)
 	#val_var  = numpy.mat(SurrVI)*numpy.mat(numpy.reshape(SurrRFs,(103,sx*sy)).T)
@@ -4998,6 +5070,7 @@ def SuperModel():
 	new_val_act_t= numpy.array(apply_sigmoid_output_function(numpy.mat(new_val_act),ofs))
 	new_act_t= numpy.array(apply_sigmoid_output_function(numpy.mat(new_act),ofs))
 	
+	
 
 	(ranks,correct,pred) = performIdentification(validation_set,pred_val_act)
 	print "Original:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act,2))
@@ -5009,7 +5082,7 @@ def SuperModel():
 	
 	#(e,te,c,tc,RFs,pred_act,pred_val_act,corr_coef,corr_coef_tf) = regulerized_inverse_rf(numpy.array(training_inputs),numpy.array(training_set),sx,sy,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.mat(validation_set),contrib.dd.DB2(None),True)
 	
-	examine_correlated_noise(validation_set,raw_validation_set,xs,pred_val_act,spont_corr)
+	#examine_correlated_noise(validation_set,raw_validation_set,xs,pred_val_act,spont_corr)
 	
 	(ranks,correct,pred) = performIdentification(validation_set,new_val_act)
 	print "After contrast normalization:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - new_val_act,2))
@@ -5042,8 +5115,8 @@ def supermodel_estim(x,var1,var2,var3,pred_act):
 		 #zz=  (a*numpy.max([numpy.zeros(numpy.shape(pred_act)),pred_act+b],axis=0) + c*numpy.max([numpy.zeros(numpy.shape(pred_act)),-pred_act+d],axis=0))+e*var
 		 #zz=  numpy.divide(a*pred_act,1.0 + numpy.max([numpy.zeros(numpy.shape(pred_act)),e*numpy.abs(var1)+b]))
 		 #zz = numpy.divide(a*pred_act,numpy.max([numpy.ones(numpy.shape(pred_act)),e + b*var1 + c*var2 + d*var3],axis=0))
-		 #zz = numpy.multiply(a*pred_act,1.0+ d*numpy.abs(var1))
-		 zz = pred_act + e*var1 
+		 #zz = numpy.multiply(a*pred_act,1.0+ d*numpy.abs(var1)+b)
+		 zz = a*pred_act + e*var1 
 		 #zz = 1.0*var1
 		 #zz =  a*(numpy.shape(pred_act)+b)*var
 		 #return numpy.divide(zz+e,f*var+g)
@@ -5444,9 +5517,6 @@ def SparsnessAnalysis():
 
     # LOAD NON-NORMALIZED DATA
     (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = sortOutLoading(dd)
-
-    #set firing rate values bellow 0.02 to 0 (talk to Tom!!!) 
-    
     
     # fit the predicted activities to sigmoid again
     # this time note that we are fitting it to measured activities that were this time not zero meaned and unit variance scaled
@@ -5466,8 +5536,8 @@ def SparsnessAnalysis():
     pylab.figure()
     pylab.hist(rfs_mag)
     pylab.xlabel('RFs magnitued')
-    to_delete = numpy.array(numpy.nonzero((rfs_mag < 0.0000006) * 1.0))[0]
-    to_delete=[]
+    to_delete = numpy.array(numpy.nonzero((rfs_mag < 0.0000004) * 1.0))[0]
+    #to_delete=[]
     training_set = numpy.delete(training_set, to_delete, axis = 1)
     validation_set = numpy.delete(validation_set, to_delete, axis = 1)
     pred_act = numpy.delete(pred_act, to_delete, axis = 1)
@@ -5646,6 +5716,6 @@ def SparsnessAnalysis():
 def TrevesRollsSparsness(mat):
     # Computes Trevers Rolls Sparsness of data along columns
     x,y  = numpy.shape(mat)
-    return numpy.array(1-(numpy.power(numpy.mean(mat,axis=0),2))/numpy.mean(numpy.power(mat,2),axis=0))[0]/ (1.0 - 1.0/x)    
+    return numpy.array(1-(numpy.power(numpy.mean(mat,axis=0),2))/numpy.mean(numpy.power(mat,2),axis=0))[0]/(1.0 - 1.0/x)
 
 
