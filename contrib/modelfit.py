@@ -3923,10 +3923,10 @@ def sortOutLoading(db_node):
         (x,y)= numpy.shape(training_inputs[0])
         #training_inputs = cut_out_images_set(training_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
         #validation_inputs = cut_out_images_set(validation_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
-        #training_inputs = cut_out_images_set(training_inputs,int(y*0.30),(int(x*0.2),int(y*0.45)))
-        #validation_inputs = cut_out_images_set(validation_inputs,int(y*0.30),(int(x*0.2),int(y*0.45)))
-        training_inputs = cut_out_images_set(training_inputs,int(x*cut_out_size),(int(x*cut_out_y),int(y*cut_out_x)))
-        validation_inputs = cut_out_images_set(validation_inputs,int(x*cut_out_size),(int(x*cut_out_y),int(y*cut_out_x)))
+        training_inputs = cut_out_images_set(training_inputs,int(y*0.30),(int(x*0.2),int(y*0.45)))
+        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.30),(int(x*0.2),int(y*0.45)))
+        #training_inputs = cut_out_images_set(training_inputs,int(x*cut_out_size),(int(x*cut_out_y),int(y*cut_out_x)))
+        #validation_inputs = cut_out_images_set(validation_inputs,int(x*cut_out_size),(int(x*cut_out_y),int(y*cut_out_x)))
     
     
     (sizex,sizey) = numpy.shape(training_inputs[0])
@@ -3964,97 +3964,97 @@ def sortOutLoading(db_node):
 	
 	
 
-from pygene.organism import Organism
-from pygene.gene import FloatGene
-class ComplexCellOrganism(Organism):
-	training_set = []
-	training_inputs = []
+#from pygene.organism import Organism
+#from pygene.gene import FloatGene
+#class ComplexCellOrganism(Organism):
+	#training_set = []
+	#training_inputs = []
 	
-	def fitness(self):
-		z,t = numpy.shape(self.training_inputs) 
-		x =  self[str(0)]
-		y =  self[str(1)]
-		sigma = self[str(2)]*0.1
-		angle = self[str(3)]*numpy.pi
-		p =  self[str(4)]*numpy.pi*2
-		f = self[str(5)]*10
-		ar = self[str(6)]*2.5
-		alpha = self[str(7)]
-		dx = numpy.sqrt(t)
-		dy = dx
-		g =  numpy.mat(Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=x-0.5,y=y-0.5,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,aspect_ratio=ar)() * alpha)
-		r1 = self.training_inputs * g.flatten().T
-		return numpy.mean(numpy.power(r1-self.training_set,2))  
+	#def fitness(self):
+		#z,t = numpy.shape(self.training_inputs) 
+		#x =  self[str(0)]
+		#y =  self[str(1)]
+		#sigma = self[str(2)]*0.1
+		#angle = self[str(3)]*numpy.pi
+		#p =  self[str(4)]*numpy.pi*2
+		#f = self[str(5)]*10
+		#ar = self[str(6)]*2.5
+		#alpha = self[str(7)]
+		#dx = numpy.sqrt(t)
+		#dy = dx
+		#g =  numpy.mat(Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=x-0.5,y=y-0.5,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,aspect_ratio=ar)() * alpha)
+		#r1 = self.training_inputs * g.flatten().T
+		#return numpy.mean(numpy.power(r1-self.training_set,2))  
 
-rand = UniformRandom(seed=513)
-class CCGene(FloatGene):
-      randMin=0.0
-      randMax=1.0
-      #def mutate(self):
-#	  self.value = self.value + self.value*2.0*(0.5-rand())
+#rand = UniformRandom(seed=513)
+#class CCGene(FloatGene):
+      #randMin=0.0
+      #randMax=1.0
+      ##def mutate(self):
+##	  self.value = self.value + self.value*2.0*(0.5-rand())
 
-def GeneticAlgorithms():
-    from pygene.gamete import Gamete
-    from pygene.population import Population
+#def GeneticAlgorithms():
+    #from pygene.gamete import Gamete
+    #from pygene.population import Population
     
-    f = open("modelfitDB2.dat",'rb')
-    import pickle
-    dd = pickle.load(f)
-    training_set = dd.children[0].data["training_set"][0:1800,:]
-    training_inputs = dd.children[0].data["training_inputs"][0:1800,:]
+    #f = open("modelfitDB2.dat",'rb')
+    #import pickle
+    #dd = pickle.load(f)
+    #training_set = dd.children[0].data["training_set"][0:1800,:]
+    #training_inputs = dd.children[0].data["training_inputs"][0:1800,:]
     
-    #dd = contrib.dd.DB2(None)
+    ##dd = contrib.dd.DB2(None)
     
-    #(sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = sortOutLoading(dd)
+    ##(sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = sortOutLoading(dd)
     
     
     
-    genome = {}
-    for i in range(8):
-    	genome[str(i)] = CCGene
+    #genome = {}
+    #for i in range(8):
+    	#genome[str(i)] = CCGene
     
-    ComplexCellOrganism.genome = genome
-    ComplexCellOrganism.training_set = numpy.mat(training_set)[:,0]
-    ComplexCellOrganism.training_inputs = numpy.mat(training_inputs)
+    #ComplexCellOrganism.genome = genome
+    #ComplexCellOrganism.training_set = numpy.mat(training_set)[:,0]
+    #ComplexCellOrganism.training_inputs = numpy.mat(training_inputs)
     	  
-    class CPopulation(Population):
-	  species = ComplexCellOrganism
-	  initPopulation = 200
-	  childCull = 100
-	  childCount = 500
-	  incest=10
-	  i = 0
+    #class CPopulation(Population):
+	  #species = ComplexCellOrganism
+	  #initPopulation = 200
+	  #childCull = 100
+	  #childCount = 500
+	  #incest=10
+	  #i = 0
 	  
-    pop = CPopulation()
+    #pop = CPopulation()
     
-    pylab.ion()
-    pylab.hold(False)
-    pylab.figure()
-    pylab.show._needmain=False
-    pylab.show()
-    pylab.figure()
-    while True:
-    	pop.gen()
-	best = pop.best()
-	print "fitness:" , (best.fitness())
-	z,t = numpy.shape(training_inputs) 
-	x =  best[str(0)]
-	y =  best[str(1)]
-	sigma = best[str(2)]*0.1
-	angle = best[str(3)]*numpy.pi
-	p =  best[str(4)]*numpy.pi*2
-	f = best[str(5)]*10
-	ar = best[str(6)]*2.5
-	alpha = best[str(7)]
-	dx = numpy.sqrt(t)
-	dy = dx
-	g =  numpy.mat(Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=x-0.5,y=y-0.5,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,aspect_ratio=ar)() * alpha)
-	m=numpy.max([numpy.abs(numpy.min(g)),numpy.abs(numpy.max(g))])
-	pylab.subplot(2,1,1)
-	pylab.imshow(g,vmin=-m,vmax=m,cmap=pylab.cm.RdBu,interpolation='nearest')
+    #pylab.ion()
+    #pylab.hold(False)
+    #pylab.figure()
+    #pylab.show._needmain=False
+    #pylab.show()
+    #pylab.figure()
+    #while True:
+    	#pop.gen()
+	#best = pop.best()
+	#print "fitness:" , (best.fitness())
+	#z,t = numpy.shape(training_inputs) 
+	#x =  best[str(0)]
+	#y =  best[str(1)]
+	#sigma = best[str(2)]*0.1
+	#angle = best[str(3)]*numpy.pi
+	#p =  best[str(4)]*numpy.pi*2
+	#f = best[str(5)]*10
+	#ar = best[str(6)]*2.5
+	#alpha = best[str(7)]
+	#dx = numpy.sqrt(t)
+	#dy = dx
+	#g =  numpy.mat(Gabor(bounds=BoundingBox(radius=0.5),frequency=f,x=x-0.5,y=y-0.5,xdensity=dx,ydensity=dy,size=sigma,orientation=angle,phase=p,aspect_ratio=ar)() * alpha)
+	#m=numpy.max([numpy.abs(numpy.min(g)),numpy.abs(numpy.max(g))])
+	#pylab.subplot(2,1,1)
+	#pylab.imshow(g,vmin=-m,vmax=m,cmap=pylab.cm.RdBu,interpolation='nearest')
 	
-	pylab.show._needmain=False
-    	pylab.show()
+	#pylab.show._needmain=False
+    	#pylab.show()
 
 def runSurrondStructureDetection():
     f = open("modelfitDatabase1.dat",'rb')
