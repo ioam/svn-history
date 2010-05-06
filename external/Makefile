@@ -1,7 +1,7 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy pyflakes
+default: gui-skip platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy pyflakes
 
 # avoid building some things on some platforms
 # uses touch -a to avoid changing modification dates
@@ -12,6 +12,13 @@ ifeq ("$(shell uname -s)","Darwin")
 	touch -a tk
 # CEBALERT: doesn't stop readline building on mac!
 	touch -a readline
+endif
+
+gui-skip:
+ifeq (${GUI},0)
+	touch -a blt
+	touch -a tcl
+	touch -a tk
 endif
 
 

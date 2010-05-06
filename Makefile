@@ -20,6 +20,10 @@ OTHER_PYTHON = "/usr/bin/env python"
 
 SVNVERSION = ${shell svnversion}
 
+# if 0, skips building tk and related external packages
+GUI = 1
+
+
 # CEBALERT: tied to exact windows version!
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
 	TIMER = 
