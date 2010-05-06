@@ -11,6 +11,9 @@ tests in files in topo/tests/ that:
 defines the 'suite' attribute;
 * have a name beginning with 'test' and ending with '.txt'.
 
+If Tkinter cannot be imported, files that have a name ending with
+'_tk' are not imported (hence any tests that they contain are
+skipped).
 
 
 unittest
@@ -136,6 +139,19 @@ __all__ = [re.sub('\.py$','',f)
            for f in fnmatch.filter(os.listdir(__path__[0]),'test*.py')]
 
 all_doctest = sorted(fnmatch.filter(os.listdir(__path__[0]),'test*.txt'))
+
+try:
+    import Tkinter
+except ImportError:
+    tk_tests = fnmatch.filter(__all__,'*_tk')
+    tk_doctests = fnmatch.filter(all_doctest,'*_tk')
+    import param
+    param.Parameterized().warning('no Tkinter module: skipping %s'%str(tk_tests+tk_doctests))
+    for t in tk_tests:
+        __all__.remove(t)
+    for t in tk_doctests:
+        all_doctest.remove(t)
+    
 
 try:
     import gmpy
