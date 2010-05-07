@@ -113,7 +113,7 @@ class TestParametersFrameWithApply(unittest.TestCase):
           Finally, check that when the string remains the same in a box
           that a new object is not instantiated each time Apply is pressed.
         """
-        exec "from topo.tests.testparametersframe import TestPO" in __main__.__dict__
+        exec "from topo.tests.testparametersframe_tk import TestPO" in __main__.__dict__
         w = self.f.representations['pa']['widget']
         w.delete(0,"end")
         w.insert(0,"TestPO()")
