@@ -54,8 +54,8 @@ class GLM(object):
 	    self.IN = theano.shared(X)	
 	    self.HH = theano.shared(H)
 	    self.model = T.exp(T.dot(self.IN,self.k.T)-self.n) 
-	    if HH != None:
-	     	T.dot(self.HH,self.h.T)	
+	    if H != None:
+	     	self.model + T.dot(self.HH,self.h.T)	
 	    resp =  theano.function(inputs=[self.K], outputs=self.model)
 	    
 	    (a,b) = numpy.shape(kernels)
@@ -86,10 +86,10 @@ def fitGLM(X,Y,H,l,hl,num_neurons_to_estimate):
 	print i
 	k0 = rpi[:,i].getA1().tolist()+[0,0]
 	if H!= None:
-	   k0 = k0 + +numpy.zeros((1,num_neurons)).flatten().tolist()
-	   
-	#numpy.mat(H)
-	glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,None,hl)
+	   k0 = k0 +numpy.zeros((1,num_neurons)).flatten().tolist()
+	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,numpy.mat(H),hl)
+	else:
+	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,None,hl)
 	K = fmin_ncg(glm.func(),numpy.array(k0),glm.der(),fhess = glm.hess(),avextol=0.00001)
 	Ks[i,:] = K
 	
@@ -126,9 +126,12 @@ def runGLM():
     num_neurons_to_run=1
     
     sx,sy = numpy.shape(training_set)	
-    
-    [K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),None,params["LaplacaBias"],params["HistBias"],num_neurons_to_run)
-
+    if __main__.__dict__.get('History',False):
+    	[K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),numpy.mat(history_set),params["LaplacaBias"],params["HistBias"],num_neurons_to_run)
+    else:
+	[K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),None,params["LaplacaBias"],params["HistBias"],num_neurons_to_run)
+	    
+	    
     analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,training_set,raw_validation_set,history_set,history_validation_set,db_node,num_neurons_to_run)
     
     db_node.add_data("Kernels",K,force=True)
@@ -159,9 +162,13 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     rpi_pred_act = training_inputs * rpi
     rpi_pred_val_act = validation_inputs * rpi
     
-    glm_pred_act = glm.response(training_inputs,history_set,K)
-    glm_pred_val_act = glm.response(validation_inputs,history_validation_set,K)
-        
+    if __main__.__dict__.get('History',False):
+    	glm_pred_act = glm.response(training_inputs,history_set,K)
+    	glm_pred_val_act = glm.response(validation_inputs,history_validation_set,K)
+    else:
+	glm_pred_act = glm.response(training_inputs,None,K)
+    	glm_pred_val_act = glm.response(validation_inputs,None,K)	
+	
     ofs = run_nonlinearity_detection(numpy.mat(training_set),numpy.mat(rpi_pred_act))
     rpi_pred_act_t = apply_output_function(numpy.mat(rpi_pred_act),ofs)
     rpi_pred_val_act_t = apply_output_function(numpy.mat(rpi_pred_val_act),ofs)
