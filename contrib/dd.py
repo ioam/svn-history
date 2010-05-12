@@ -1,68 +1,6 @@
 from sets import Set
 
 class DB:
-	db = []
-	
-	def add(self,param_dict,data_name,data):
-	    if not self.exist(param_dict,data_name):
-	    	self.db.append((param_dict,data_name,data))
-	    else:
-		print "Data point exists: ", param_dict , ":::" , data_name  
-
-	def load_db(self,filename):
- 	    f = open(filename,'rb')
-            import pickle
-            self.db = pickle.load(f)
-
-	def save_db(self,filename):
- 	    f = open(filename,'wb')
-            import pickle
-            pickle.dump(self.db,f)
-	
-	def exist(self,params,data_name):
-            for (d,dn,t) in self.db:		
-    		
-	    	if len(params.keys()) != len(d.keys()):
- 		   continue
-		f = True  
-		for k in d.keys():
-		    if k not in params:
-		       f = False
-		       break;
-		    if d[k] != params[k]:
-		       f = False
-		       break
-		if f and (data_name == dn):
-		   return True
-		
-	    return False  		
-		
-	
-	def find(self,params,data_name=None):
-		
-		matches = []
-		idd = 0
-		for d in self.db:
-		    idd+=1
-		    match = True;
-		    for p in params.keys():
-			if d[0].has_key(p) and (d[0][p] == params[p]):
-			   continue
-			else:
-			   match = False;
-			   			
-		    if match and ((data_name == None) or (data_name == d[1])):
-		       (a,b,c) = d
-		       matches.append((a,b,c,idd-1))
-		   
-		   
-	    	return matches
-		    
-		    
-		    
-		    
-
-class DB2:
 	
 	def __init__(self,parent):
     	    self.children_params = []
@@ -92,7 +30,7 @@ class DB2:
 	        if eq:
 		   return c
 	    self.children_params.append(param_dict)
-	    new_node = DB2(self)
+	    new_node = DB(self)
 	    self.children.append(new_node)
 	    return new_node	
 		
@@ -110,3 +48,16 @@ class DB2:
 	       return self.data[data_name]
 	    print "DATA DOES NOT EXIST:", data_name
 	    return None 	
+
+def loadResults(name):
+    f = open(name,'rb')
+    import pickle
+    dd = pickle.load(f)
+    f.close()
+    return dd
+
+def saveResults(dd,name):
+    import pickle
+    f = open(name,'wb')
+    pickle.dump(dd,f,-2)
+    f.close()
