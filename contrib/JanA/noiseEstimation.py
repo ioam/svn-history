@@ -57,21 +57,22 @@ def estimateNoise(trials):
 	
     mean_responses = numpy.mean(trials,1)
     		
-    for i in xrange(0,1):
+    for i in xrange(0,10):
 	pylab.figure()
+	pylab.subplot(3,3,2)
 	pylab.hist(mean_responses[i,:])
-	bins = numpy.arange(numpy.min(mean_responses[i,:]),numpy.max(mean_responses[i,:]) + (numpy.max(mean_responses[i,:])-numpy.min(mean_responses[i,:]))/5.0,( numpy.max(mean_responses[i,:])-numpy.min(mean_responses[i,:]))/5.0)
+	bins = numpy.arange(numpy.min(mean_responses[i,:]),numpy.max(mean_responses[i,:]) + (numpy.max(mean_responses[i,:])+0.00001-numpy.min(mean_responses[i,:]))/5.0,( numpy.max(mean_responses[i,:])+0.00001-numpy.min(mean_responses[i,:]))/5.0)
 	print numpy.min(mean_responses[i,:])
 	print numpy.max(mean_responses[i,:])
 	print bins
 	#membership = numpy.zeros(numpy.shape(mean_responses[i,:]))
 	for j in xrange(0,5):
-	    membership = ((mean_responses[i,:] >= bins[j]) &  (mean_responses[i,:] < bins[j+1]))
-	    print membership	
+	    membership = numpy.nonzero(numpy.array(((mean_responses[i,:] >= bins[j]) &  (mean_responses[i,:] < bins[j+1])))) 
 	    raw_responses = trials[i,:,membership].flatten()
-
-	    pylab.figure()
-	    pylab.hist(raw_responses)	
+	    pylab.subplot(3,3,3+j+1)
+	    if(len(raw_responses) != 0):
+	    	pylab.hist(raw_responses)
+		pylab.xlabel(str(bins[j])+'-'+str(bins[j+1]))	
 		
 	
 	
