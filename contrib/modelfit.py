@@ -22,6 +22,7 @@ import contrib.dd
 from matplotlib.ticker import MaxNLocator
 from contrib.JanA.noiseEstimation import signal_power_test
 from helper import *
+from contrib.JanA.dataimport import sortOutLoading
 
 #dd = contrib.dd.DB()
 #dd.load_db("modelfitDB.dat")
@@ -449,203 +450,7 @@ def calculateReceptiveField(RFs,weights):
         i+=1
     return RF
               
-            
-def loadSimpleDataSet(filename,num_stimuli,n_cells,num_rep=1,num_frames=1,offset=0,transpose=False):
-    f = file(filename, "r") 
-    data = [line.split() for line in f]
-    if transpose:
-       data = numpy.array(data).transpose()	    
-    
-    f.close()
-    print "Dataset shape:", shape(data)
 
-    dataset = [([[] for i in xrange(0,num_stimuli)]) for j in xrange(0,n_cells)]
-    
-    for k in xrange(0,n_cells):
-        for i in xrange(0,num_stimuli):
-	    for rep in xrange(0,num_rep):
-		f = []
-            	for fr in xrange(0,num_frames):
-                       f.append(float(data[rep*num_stimuli+i*num_frames+fr+offset][k]))
-            	dataset[k][i].append(f)
-    print shape(dataset)
-    return (numpy.arange(0,num_stimuli),dataset)
-            
-
-def loadRandomizedDataSet(directory,num_rep,num_frames,num_stimuli,n_cells):
-    f = file(directory + "/combined_data", "r") 
-    data = [line.split() for line in f]
-    f.close()
-
-    f = file(directory +"/image_sequence", "r") 
-    random = [line.split() for line in f]
-    random=numpy.array(random)
-    random = random[0]
-    f.close()
-    r=[]
-    for j in random:
-        r.append(int(float(j)))
-    random = r
-
-    dataset = [([[] for i in xrange(0,num_stimuli)]) for i in xrange(0,n_cells)]
-
-    (recordings,num_cells) = shape(data)
-
-    assert recordings == (num_rep * num_stimuli * num_frames)
-    assert recordings / num_frames == len(random)
-    assert n_cells == num_cells
-    
-    for k in xrange(0,num_cells):
-        for i in xrange(0,num_rep*num_stimuli):
-            f = []
-            for fr in xrange(0,num_frames):
-                        f.append(float(data[i*num_frames+fr][k]))
-            dataset[k][random[i]-1].append(f)
-
-    return (numpy.arange(0,num_stimuli),dataset)
-
-def mergeDatasets(dataset1,dataset2):
-    print "Warning: Indexes must match"
-    (index,data1) = dataset1
-    (index,data2) = dataset2
-    data1.extend(data2)
-    return (index,data1)
- 
-def averageRangeFrames(dataset,min,max):
-    (index,data) = dataset
-    
-    for cell in data:
-        for stimulus in cell:
-            for r in xrange(0,len(stimulus)):
-                stimulus[r]=[numpy.average(stimulus[r][min:max])]
-    
-    return (index,data) 		
-
-def averageRepetitions(dataset,reps=None):
-    (index,data) = dataset
-    (num_cells,num_stim,num_rep,num_frames) = numpy.shape(data)
-    if reps==None:
-       reps = numpy.arange(0,num_rep,1)
-
-    for cell in data:
-        for stimulus in xrange(0,num_stim):
-            r = [0 for i in range(0,num_frames)]
-            for rep in reps:
-                for f in xrange(0,num_frames):
-                    r[f]+=cell[stimulus][rep][f]/(len(reps)*1.0)
-	    
-            cell[stimulus]=[r]
-    return (index,data)
-
-def analyse_reliability(dataset,params):
-    (index,data) = dataset
-    c = []
-
-    for cell in data:
-	fano_factors=[]    
-	for stimuli in cell:
-	    z = [] 	
-	    for rep in stimuli:
-		z.append(numpy.mean(rep))
-	    z=numpy.array(z)
-	    fano_factors.append(numpy.array(z).var()/numpy.mean(z))
-	c.append(numpy.mean(fano_factors))
-    
-    #dd.add(params,"FanoFactors",c)
-    	
-    pylab.figure()
-    pylab.hist(c)
-    return c
-
-def splitDataset(dataset,ratio):
-    (index,data) = dataset
-    (num_cells,num_stim,trash1,trash2) = shape(data)
-
-    dataset1=[]
-    dataset2=[]
-    index1=[]
-    index2=[]
-
-    if ratio<=1.0:
-    	tresh = num_stim*ratio
-    else:
-	tresh = ratio
-
-    for i in xrange(0,num_stim):
-        if i < numpy.floor(tresh):
-            index1.append(index[i])
-        else:    
-            index2.append(index[i])
-    
-    for cell in data:
-        d1=[]
-        d2=[]
-        for i in xrange(0,num_stim):
-            if i < numpy.floor(tresh):
-               d1.append(cell[i])
-            else:    
-               d2.append(cell[i])
-        dataset1.append(d1)
-        dataset2.append(d2)
-
-    return ((index1,dataset1),(index2,dataset2))
-
-def generateTrainingSet(dataset):
-    (index,data) = dataset
-
-    training_set=[]
-    for cell in data:
-        cell_set=[]
-        for stimuli in cell:
-           for rep in stimuli:
-                for frame in rep:
-                    cell_set.append(frame)
-        training_set.append(cell_set)
-    return numpy.array(numpy.matrix(training_set).T)
-
-def flattenDataset(dataset):
-    (index,data) = dataset
-    (num_cells,num_stim,num_rep,num_frames) = numpy.shape(data)
-    data_new = numpy.zeros((num_cells,num_stim*num_rep*num_frames,1,1))
-    index_new = []
-
-    z=0
-    for j in xrange(0,num_stim):
-	for k in xrange(0,num_rep):		
-	    for l in xrange(0,num_frames):
-		index_new.append(index[j])
-		for i in xrange(0,num_cells):			
-    		    data_new[i][z][0][0]=data[i][j][k][l]
-		z=z+1
-    return (index_new,data_new)
-
-def generateInputs(dataset,directory,image_matching_string,density,aspect,offset):
-    (index,data) = dataset
-    import PIL
-    import Image
-    # ALERT ALERT ALERT We do not handle repetitions yet!!!!!
-    image_filenames=[directory+image_matching_string %(i+offset) for i in index]
-    ins = []
-    for j in xrange(0,len(index)):
-        #inputs[j].pattern_sampler.whole_pattern_output_fns=[]
-	image = Image.open(image_filenames[j])
-	(width,height) = image.size
-        inp = image.resize((int(width*density), int(height*density)), Image.ANTIALIAS)
-	
-		
-	#inputs[j](xdensity=density,ydensity=density) /255.0
-        #(x,y) = shape(inp)
-        #z=(x - x / aspect)/2
-        #ins.append(inp[z:x-z,:])
-	ins.append(numpy.array(inp.getdata()).reshape( int(height*density),int(width*density)))
- 
-    
-    #training_inputs=[]
-    #for s in range(len(data[0])):
-    #    for rep in data[0][s]:
-    #        for frame in rep:
-    #            training_inputs.append(inputs[s])
-    return ins
 
 def generate_pyramid_model(num_or,freqs,num_phase,size):
     filters=[]
@@ -659,12 +464,6 @@ def generate_pyramid_model(num_or,freqs,num_phase,size):
             #    filters.append(g())
 
     return filters
-
-def generate_raw_training_set(inputs):
-    out = []
-    for i in inputs:
-        out.append(i.flatten())
-    return numpy.array(out)
 
 def apply_filters(inputs, filters, spacing):
     (sizex,sizey) = numpy.shape(inputs[0])
@@ -1369,25 +1168,9 @@ def later_interaction_prediction(activities,predicted_activities,validation_acti
     return (new_activities,new_validation_activities)
 	
 	
-def cut_out_images_set(inputs,size,pos):
-    (sizex,sizey) = numpy.shape(inputs[0])
-    
-    print sizex,sizey
-    print size,pos
-    (x,y) = pos
-    inp = []
-    if (x+size <= sizex) and (y+size <= sizey):
-        for i in inputs:
-                inp.append(i[x:x+size,y:y+size])
-    else:
-        print "cut_out_images_set: out of bounds"
-    return inp
 
 def runRFinference():
-    f = open("modelfitDatabase1.dat",'rb')
-    import pickle
-    d = pickle.load(f)
-    f.close()
+    d = contrib.dd.loadResults("results.dat")
     
     (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = sortOutLoading(d)
     
@@ -1395,10 +1178,10 @@ def runRFinference():
     c = []
     b = []
     if False:
-        x = 5000
-        for i in xrange(0,10):
+        x = 0.0
+        for i in xrange(1,10):
             print i
-            x = (i+21)*30000
+            x = 0.003*i
     	    params={}
     	    params["alpha"] = __main__.__dict__.get('Alpha',x)
             db_node = db_node.get_child(params)
@@ -1414,13 +1197,13 @@ def runRFinference():
         #pylab.semilogx(b,c)
         pylab.plot(b,c)
 	
-	f = open("modelfitDatabase1.dat",'wb')
-    	pickle.dump(d,f,-2)
-    	f.close()
+	#f = open("results.dat",'wb')
+    	#pickle.dump(d,f,-2)
+    	#f.close()
     	return (e,c,b)
     
     params={}
-    params["alpha"] = __main__.__dict__.get('Alpha',50)
+    params["alpha"] = __main__.__dict__.get('Alpha',0.02)
     db_node1 = db_node
     db_node = db_node.get_child(params)
     
@@ -1482,15 +1265,13 @@ def runRFinference():
     pylab.ylabel("correlation coef after transfer function")
     pylab.plot(ff,corr_coef_tf,'ro')
     
-    f = open("modelfitDatabase1.dat",'wb')
-    pickle.dump(d,f,-2)
-    f.close()
+    contrib.dd.saveResults(d,"results.dat")
     
     pylab.show()
     return (training_set,pa,validation_set,pva)
 
 def runRFFftInference():
-    f = open("modelfitDatabase1.dat",'rb')
+    f = open("results.dat",'rb')
     import pickle
     d = pickle.load(f)
     f.close()
@@ -1545,7 +1326,7 @@ def runRFFftInference():
     (ranks,correct,pred) = performIdentification(training_set,pa_t)
     print "Direct Correct+TF:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(training_set - pa_t,2))
     
-    f = open("modelfitDatabase1.dat",'wb')
+    f = open("results.dat",'wb')
     pickle.dump(d,f,-2)
     f.close()
     
@@ -1695,6 +1476,7 @@ def fitGabor(weights):
     errors = []
     variances = []
     for j in xrange(0,len(RFs)):
+	print 'nenuron',j
         minf = 0
         
         x = centers[j][0]
@@ -1707,7 +1489,8 @@ def fitGabor(weights):
 	
 	min_x = []
 	min_err = 100000000000000
-	for r in xrange(0,1000): 
+	for r in xrange(0,30): 
+		print 'rep',r
 		x0 = [x,y,4,freqor[j][1],freqor[j][0]/denx,freqor[j][2],1.0,0.0002]
 		#pylab.figure()
 		#pylab.imshow(RFs[0])
@@ -2026,7 +1809,7 @@ def STC(inputs,activities,validation_inputs,validation_activities,STA,cutoff=85,
     return eis
 
 def fitting():
-    f = open("modelfitDatabase1.dat",'rb')
+    f = open("results.dat",'rb')
     import pickle
     dd = pickle.load(f)
     f.close()
@@ -2051,7 +1834,7 @@ def fitting():
     
     
     
-    f = open("modelfitDatabase1.dat",'wb')
+    f = open("results.dat",'wb')
     pickle.dump(dd,f,-2)
     f.close()
     
@@ -2059,7 +1842,7 @@ def fitting():
 
 def tiling():
     contrib.modelfit.save_fig_directory='/home/antolikjan/Doc/reports/Sparsness/'
-    f = open("modelfitDatabase1.dat",'rb')
+    f = open("results.dat",'rb')
     import pickle
     from matplotlib.patches import Circle
     dd = pickle.load(f)
@@ -2133,7 +1916,7 @@ def tiling():
     #dd.children[0].children[0].add_data("FittedRFs",fitted_rfs[0],force=True)	
     #dd.children[1].children[0].add_data("FittedRFs",fitted_rfs[1],force=True)
     #dd.children[4].children[0].add_data("FittedRFs",fitted_rfs[2],force=True)
-    #f = open("modelfitDatabase1.dat",'wb')
+    #f = open("results.dat",'wb')
     #pickle.dump(dd,f,-2)
     #f.close()		
     pylab.figure()
@@ -3233,7 +3016,7 @@ def contrast(image):
 def run_LIP():
 	import scipy
 	from scipy import linalg
-	f = open("modelfitDatabase1.dat",'rb')
+	f = open("results.dat",'rb')
 	import pickle
 	dd = pickle.load(f)
 	node = dd.children[0]
@@ -3620,7 +3403,7 @@ def run_LIP():
 		ax.set_zlabel("rank")
 		
 	if False:
-		(later_pred_act,later_pred_val_act) = later_interaction_prediction(training_set,pred_act_t,validation_set,pred_val_act_t,contrib.dd.DB2(None))
+		(later_pred_act,later_pred_val_act) = later_interaction_prediction(training_set,pred_act_t,validation_set,pred_val_act_t,contrib.dd.DB(None))
 		
 		#of = run_nonlinearity_detection(numpy.mat(training_set),later_pred_act,10,False)
 		training_set += 2.0
@@ -3695,270 +3478,6 @@ def performIdentification(responses,model_responses):
     return (ranks,correct,pred)
 
 
-def sortOutLoading(db_node):
-    params={}	
-    params["clump_mag"] = __main__.__dict__.get('ClumpMag',0.1)
-    params["normalize_inputs"] = __main__.__dict__.get('NormalizeInputs',False)
-    params["normalize_activities"] = __main__.__dict__.get('NormalizeActivities',True)
-    params["cut_out"] = __main__.__dict__.get('CutOut',False)
-    params["validation_set_fraction"] = __main__.__dict__.get('ValidationSetFraction',50)		
-    params["density"] = __main__.__dict__.get('density', 20)
-    density= params["density"]
-	
-    params["dataset"] = '2009_11_04_region3'	
-    custom_index=None
-	
-    if params["dataset"] == '2010_04_22':
-       dataset_loc = "/home/antolikjan/topographica/topographica/Mice/2010_03_12/Exp_nonfilt_dFoF.txt"	
-       num_cells = 47    
-       sepparate_validation_set = False
-       num_rep=1
-       num_frames=1
-       transpose=False
-       average_frames_from=0
-       average_frames_to=1
-       num_stim=1800
-       inputs_offset=0
-       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/depackaged/"
-       input_match_string = "frame%05d.tif"
-		
-    if params["dataset"] == '2010_03_15':
-       dataset_loc = "/home/antolikjan/topographica/topographica/Mice/2010_03_15/Exp_nonfilt.txt"	
-       num_cells = 51    
-       sepparate_validation_set = False
-       num_rep=1
-       num_frames=1
-       transpose=False
-       average_frames_from=0
-       average_frames_to=1
-       #num_stim=1708
-       num_stim=900
-       inputs_offset=0
-       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/depackaged/"
-       input_match_string = "frame%05d.tif"
-       custom_index = numpy.hstack((numpy.arange(1200,1408,1),numpy.arange(0,300,1),numpy.arange(0,300,1),numpy.arange(600,900,1),numpy.arange(600,900,1),numpy.arange(1200,1500,1)))
-		
-    if params["dataset"] == '2010_02_09_noise':
-       dataset_loc = "Mice/2010_02_09/2010_02_09_noise_56to58_LowCut_Filtered.txt"	
-       num_cells = 53    
-       sepparate_validation_set = False
-       num_rep=1
-       num_frames=1
-       transpose=False
-       average_frames_from=0
-       average_frames_to=1
-       num_stim=1800
-       inputs_offset=0
-       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/SparseNoise_DS=3.0_Step=2_Density=20/depackaged/"
-       input_match_string = "frame%05d.tif"
-	
-    if params["dataset"] == '2010_02_09_movies':
-       dataset_loc = "Mice/2010_02_09/2010_02_09_movies_46to48_LowCut_Filtered.txt"	
-       num_cells = 37   
-       sepparate_validation_set = False
-       num_rep=1
-       num_frames=1
-       transpose=False
-       average_frames_from=0
-       average_frames_to=1
-       num_stim=1800
-       inputs_offset=0
-       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/depackaged/"
-       input_match_string = "frame%05d.tif"
-	
-    if params["dataset"] == '2009_11_04_region3':
-       dataset_loc = "Mice/2009_11_04/Raw/region3/spiking_3-7.dat"	    
-       #dataset_loc = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes"
-       #dataset_loc =  "Mice/2009_11_04/Raw/region3/spiking_0.02corrected:2-8.dat"
-       #dataset_loc = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_calcium"
-       #params["Calcium"]=True
-       val_dataset_loc = "Mice/2009_11_04/Raw/region3/val/spiking_3-7.dat"
-       #val_dataset_loc = "Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes"
-       num_cells = 103    
-       sepparate_validation_set = True
-       num_rep=1
-       num_frames=1
-       transpose=False
-       average_frames_from=0
-       average_frames_to=1
-       num_stim=1800
-       inputs_offset=1001
-       inputs_directory = "/home/antolikjan/topographica/topographica/Flogl/DataOct2009/20090925_image_list_used/"
-       input_match_string = "image_%04d.tif"
-       
-       val_inputs_directory = "/home/antolikjan/topographica/topographica/Mice/2009_11_04/"
-       val_input_match_string = "/20091104_50stimsequence/50stim%04d.tif"
-       val_reps = 10
-
-    if params["dataset"] == '2009_11_04_region5':
-       dataset_loc = "Mice/2009_11_04/region5_stationary_180_15fr_103cells_on_response_spikes"	
-       val_dataset_loc = "Mice/2009_11_04/region5_50stim_10reps_15fr_103cells_on_response_spikes"
-       num_cells = 55    
-       sepparate_validation_set = True
-       num_rep=1
-       num_frames=1
-       transpose=False
-       average_frames_from=0
-       average_frames_to=1
-       num_stim=1260
-       inputs_offset=1001
-       inputs_directory = "/home/antolikjan/topographica/topographica/Flogl/DataOct2009/20090925_image_list_used/"
-       input_match_string = "image_%04d.tif"
-       val_inputs_directory = "/home/antolikjan/topographica/topographica/Mice/2009_11_04/"
-       val_input_match_string = "/20091104_50stimsequence/50stim%04d.tif"
-       val_reps = 8
-
-    if params["dataset"] == '20090925_14_36_01':
-       dataset_loc = "./Mice/20090925_14_36_01/(20090925_14_36_01)-_retinotopy_region2_sequence_50cells_2700images_spikes"	
-       num_cells = 50    
-       sepparate_validation_set = False
-       num_rep=1
-       num_frames=1
-       transpose=False
-       average_frames_from=0
-       average_frames_to=1
-       num_stim=2700
-       inputs_offset=1001
-       inputs_directory = "/home/antolikjan/topographica/topographica/Flogl/DataOct2009/20090925_image_list_used/"
-       input_match_string = "image_%04d.tif"
-
-
-    if params["dataset"] == '20091110_19_16_53':
-       dataset_loc = "Mice/20091110_19_16_53/(20091110_19_16_53)-_retinotopy_region4_stationary_180_15fr_66cells_on_response_spikes"	
-       num_cells = 68    
-       sepparate_validation_set = False
-       num_rep=1
-       num_frames=1
-       transpose=False
-       average_frames_from=0
-       average_frames_to=1
-       num_stim=1440
-       inputs_offset=1001
-       inputs_directory = "/home/antolikjan/topographica/topographica/Flogl/DataOct2009/20090925_image_list_used/"
-       input_match_string = "image_%04d.tif"
-
-    if params["dataset"] == '2010_04_22':
-       dataset_loc = "Mice/2010_04_22/spiking_3-7.dat"	    
-       val_dataset_loc = "Mice/2010_04_22/val/spiking_3-7.dat"
-       num_cells = 102    
-       sepparate_validation_set = True
-       num_rep=1
-       num_frames=1
-       transpose=False
-       average_frames_from=0
-       average_frames_to=1
-       num_stim=1800
-       inputs_offset=0
-       cut_out_x=0.1
-       cut_out_y=0.0
-       cut_out_size=1.0
-       inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/1800/depackaged/"
-       input_match_string = "frame%05d.tif"
-       val_inputs_directory = "/home/antolikjan/topographica/topographica/Mice/Stimuli/NG/1800/depackaged_val/"
-       val_input_match_string = "frame%05d.tif"
-       val_reps = 12
-
-
-    db_node = db_node.get_child(params)
-    
-        
-    dataset = loadSimpleDataSet(dataset_loc,num_stim,num_cells,num_rep=num_rep,num_frames=num_frames,offset=0,transpose=transpose)
-    
-    if custom_index != None:
-       (index,data) = dataset
-       dataset = (custom_index, data)    
-    
-    
-    dataset = averageRangeFrames(dataset,average_frames_from,average_frames_to)
-    dataset = averageRepetitions(dataset)
-    
-    if not sepparate_validation_set:	
-	(validation_data_set,dataset) = splitDataset(dataset,params["validation_set_fraction"])
-	validation_set = generateTrainingSet(validation_data_set)
-	ff = numpy.arange(0,num_cells,1)*0
-	validation_inputs=generateInputs(validation_data_set,inputs_directory,input_match_string,params["density"],1.8,offset=inputs_offset)
-    else:
-	valdataset = loadSimpleDataSet(val_dataset_loc,50,num_cells,val_reps)
-	(valdataset,trash) = splitDataset(valdataset,params["validation_set_fraction"])
-	flat_valdataset = flattenDataset(valdataset)
-	ff  = analyse_reliability(valdataset,params)
-	#get rid of frames and make it into a 3D stack where first dimension is repetitions
-	from copy import deepcopy
-	(index,raw_val_set) = valdataset
-	rr=[]
-	for i in xrange(0,val_reps):
-	    rr.append(generateTrainingSet(averageRepetitions((index,deepcopy(raw_val_set)),reps=[i])))
-	raw_val_set = rr
-	valdataset = averageRangeFrames(valdataset,0,1)
-    	valdataset = averageRepetitions(valdataset)
-        validation_set = generateTrainingSet(valdataset)
-    	validation_inputs=generateInputs(valdataset,val_inputs_directory,val_input_match_string,params["density"],1.8,offset=0)
-	flat_validation_set = generateTrainingSet(flat_valdataset)
-    	flat_validation_inputs=generateInputs(flat_valdataset,val_inputs_directory,val_input_match_string,params["density"],1.8,offset=0)
-	
-    
-
-    training_set = generateTrainingSet(dataset)
-    training_inputs=generateInputs(dataset,inputs_directory,input_match_string,params["density"],1.8,offset=inputs_offset)
-    
-
-    
-    if params["normalize_inputs"]:
-       #avgRF = compute_average_input(training_inputs)
-       #training_inputs = normalize_image_inputs(training_inputs,avgRF)
-       #validation_inputs = normalize_image_inputs(validation_inputs,avgRF)
-       training_inputs = (numpy.array(training_inputs) - 128.0)/128.0 
-       validation_inputs = (numpy.array(validation_inputs) - 128.0)/128.0
-       
-    
-    if params["normalize_activities"]:
-        (a,v) = compute_average_min_max(training_set)
-        training_set = normalize_data_set(training_set,a,v)
-        validation_set = normalize_data_set(validation_set,a,v)
-	if sepparate_validation_set:
-		for i in xrange(0,val_reps):
-		      raw_val_set[i] = normalize_data_set(raw_val_set[i],a,v)
-    
-    if params["cut_out"]:
-        (x,y)= numpy.shape(training_inputs[0])
-        #training_inputs = cut_out_images_set(training_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
-        #validation_inputs = cut_out_images_set(validation_inputs,int(y*0.50),(int(x*0.0),int(y*0.3)))
-        training_inputs = cut_out_images_set(training_inputs,int(y*0.30),(int(x*0.2),int(y*0.45)))
-        validation_inputs = cut_out_images_set(validation_inputs,int(y*0.30),(int(x*0.2),int(y*0.45)))
-        #training_inputs = cut_out_images_set(training_inputs,int(x*cut_out_size),(int(x*cut_out_y),int(y*cut_out_x)))
-        #validation_inputs = cut_out_images_set(validation_inputs,int(x*cut_out_size),(int(x*cut_out_y),int(y*cut_out_x)))
-    
-    
-    (sizex,sizey) = numpy.shape(training_inputs[0])
-    print (sizex,sizey)
-    
-    
-    training_inputs = generate_raw_training_set(training_inputs)
-    validation_inputs = generate_raw_training_set(validation_inputs)
-    
-    db_node.add_data("training_inputs",training_inputs,force=True)
-    db_node.add_data("training_set",training_set,force=True)
-    db_node.add_data("validation_inputs",validation_inputs,force=True)
-    db_node.add_data("validation_set",validation_set,force=True)
-    db_node.add_data("Fano Factors",ff,force=True)
-    if sepparate_validation_set:
-    	db_node.add_data("raw_validation_set",raw_val_set,force=True)
-	db_node.add_data("flat_validation_inputs",flat_validation_inputs,force=True)
-	db_node.add_data("flat_validation_set",flat_validation_set,force=True)
-    pylab.figure()
-    pylab.plot(training_set,'o')
-    
-    print "Training set size:"
-    print numpy.shape(training_set)
-    
-    pylab.figure()
-    pylab.imshow(training_inputs[0].reshape(sizex,sizey),interpolation='nearest',cmap=pylab.cm.gray)
-    pylab.figure()
-    pylab.imshow(training_inputs[1].reshape(sizex,sizey),interpolation='nearest',cmap=pylab.cm.gray)
-    pylab.figure()
-    pylab.imshow(training_inputs[2].reshape(sizex,sizey),interpolation='nearest',cmap=pylab.cm.gray)
-    
-    return (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node)
 	
 	
 	
@@ -4003,7 +3522,7 @@ def sortOutLoading(db_node):
     #training_set = dd.children[0].data["training_set"][0:1800,:]
     #training_inputs = dd.children[0].data["training_inputs"][0:1800,:]
     
-    ##dd = contrib.dd.DB2(None)
+    ##dd = contrib.dd.DB(None)
     
     ##(sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = sortOutLoading(dd)
     
@@ -4057,7 +3576,7 @@ def sortOutLoading(db_node):
     	#pylab.show()
 
 def runSurrondStructureDetection():
-    f = open("modelfitDatabase1.dat",'rb')
+    f = open("results.dat",'rb')
     import pickle
     dd = pickle.load(f)
     node = dd.children[0]
@@ -4114,7 +3633,7 @@ def runSurrondStructureDetection():
     print numpy.min(val_act)
     
     
-    (e,te,c,tc,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,new_target_act,sizex,sizey,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.mat(new_val_target_act),contrib.dd.DB2(None),True)
+    (e,te,c,tc,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,new_target_act,sizex,sizey,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.mat(new_val_target_act),contrib.dd.DB(None),True)
     
     ofs = run_nonlinearity_detection(numpy.mat(act+cc),numpy.mat(numpy.multiply(pred_act+cc,pa)))
     pa_t = apply_output_function(numpy.multiply(pred_act+cc,pa),ofs)
@@ -4143,7 +3662,7 @@ def runSurrondStructureDetection():
     params["Density"] = __main__.__dict__.get('density', 20)
     node = node.get_child(params)
     node.add_data("SurrRFs",RFs,force=True)	
-    f = open("modelfitDatabase1.dat",'wb')
+    f = open("results.dat",'wb')
     pickle.dump(dd,f,-2)
     f.close()
 
@@ -4636,7 +4155,7 @@ def history_der(x,hist,pred_act,training_set):
 def CompareRegressions():
 	import scipy
 	from scipy import linalg
-	f = open("modelfitDatabase1.dat",'rb')
+	f = open("results.dat",'rb')
 	import pickle
 	dd = pickle.load(f)
 	node = dd.children[0]
@@ -4804,7 +4323,7 @@ def CompareRegressions():
 def DeepLook():
 	import scipy
 	from scipy import linalg
-	f = open("modelfitDatabase1.dat",'rb')
+	f = open("results.dat",'rb')
 	import pickle
 	dd = pickle.load(f)
 	node = dd.children[0]
@@ -4898,7 +4417,7 @@ def DeepLook():
 def SuperModel():
 	import scipy
 	from scipy import linalg
-	f = open("modelfitDatabase1.dat",'rb')
+	f = open("results.dat",'rb')
 	import pickle
 	dd = pickle.load(f)
 	node = dd.children[0]
@@ -4913,9 +4432,6 @@ def SuperModel():
 	
 	pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"][:,0:103])
 	pred_val_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"][:,0:103])
-	
-	
-	
 	
 	training_set = node.data["training_set"][:,0:103]
 	validation_set = node.data["validation_set"][:,0:103]
@@ -4959,7 +4475,7 @@ def SuperModel():
 		c.append(numpy.corrcoef(validation_set[:,i],pred_val_act_t[:,i])[0][1])
 	print c
 	print numpy.mean(c)
-	return
+	#return
 	
 	#z = numpy.argsort(numpy.mean(training_set,axis=0))
 	#pylab.figure()
@@ -5070,6 +4586,10 @@ def SuperModel():
 	new_val_act_t= numpy.array(apply_sigmoid_output_function(numpy.mat(new_val_act),ofs))
 	new_act_t= numpy.array(apply_sigmoid_output_function(numpy.mat(new_act),ofs))
 	
+	pylab.figure()
+	for i in xrange(0,103):
+		pylab.subplot(11,11,i+1)    
+	    	pylab.plot(pred_val_act[:,i],validation_set[:,i],'o')
 	
 
 	(ranks,correct,pred) = performIdentification(validation_set,pred_val_act)
@@ -5080,7 +4600,7 @@ def SuperModel():
 	
 	#validation_set = validation_set-numpy.array(numpy.mat(validation_set)*numpy.mat(spont_corr))*numpy.array(numpy.tile(numpy.mat(xs)[:,4].T,(len(validation_set),1)))
 	
-	#(e,te,c,tc,RFs,pred_act,pred_val_act,corr_coef,corr_coef_tf) = regulerized_inverse_rf(numpy.array(training_inputs),numpy.array(training_set),sx,sy,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.mat(validation_set),contrib.dd.DB2(None),True)
+	#(e,te,c,tc,RFs,pred_act,pred_val_act,corr_coef,corr_coef_tf) = regulerized_inverse_rf(numpy.array(training_inputs),numpy.array(training_set),sx,sy,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.mat(validation_set),contrib.dd.DB(None),True)
 	
 	#examine_correlated_noise(validation_set,raw_validation_set,xs,pred_val_act,spont_corr)
 	
@@ -5097,15 +4617,15 @@ def SuperModel():
 	signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), pred_act, pred_val_act)
 	signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), pred_act_t, pred_val_act_t)
 	
-	print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power*(training_prediction_power>0)) , " / " , numpy.mean(validation_prediction_power*(validation_prediction_power>0))
-	print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t*(training_prediction_power_t>0)) , " / " , numpy.mean(validation_prediction_power_t*(validation_prediction_power_t>0))
+	print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power*(training_prediction_power>0)) , " / " , numpy.mean(validation_prediction_power)
+	print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t) , " / " , numpy.mean(validation_prediction_power_t)
 
 	print 'NEW:'
 	signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), new_act, new_val_act)
 	signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), new_act_t, new_val_act_t)
 	
-	print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power*(training_prediction_power>0)) , " / " , numpy.mean(validation_prediction_power*(validation_prediction_power>0))
-	print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t*(training_prediction_power_t>0)) , " / " , numpy.mean(validation_prediction_power_t*(validation_prediction_power_t>0))
+	print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power*(training_prediction_power>0)) , " / " , numpy.mean(validation_prediction_power)
+	print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t) , " / " , numpy.mean(validation_prediction_power_t)
 
 
 
@@ -5170,7 +4690,7 @@ def spontaneousActivity():
 	import scipy
 	import scipy.stats
 	from scipy import linalg
-	f = open("modelfitDatabase1.dat",'rb')
+	f = open("results.dat",'rb')
 	import pickle
 	dd = pickle.load(f)
 	node = dd.children[9]
@@ -5393,7 +4913,7 @@ def spontaneousActivity():
 def RFestimationFromOtherCells():
 	import scipy
 	from scipy import linalg
-	f = open("modelfitDatabase1.dat",'rb')
+	f = open("results.dat",'rb')
 	import pickle
 	dd = pickle.load(f)
 	node = dd.children[0]
@@ -5414,7 +4934,7 @@ def RFestimationFromOtherCells():
 	(later_pred_act,later_pred_val_act) = later_interaction_prediction(training_set,pred_act_t,validation_set,val_pred_act_t,raw_validation_set,node.children[0])
 	
 	
-	#f = open("modelfitDatabase1.dat",'wb')
+	#f = open("results.dat",'wb')
     	#pickle.dump(dd,f,-2)
 	#f.close()
 	
@@ -5458,7 +4978,7 @@ def RFestimationFromOtherCells():
 	print numpy.shape(training_inputs)
 	
 	
-	(e,te,c,tc,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,numpy.divide(training_set,trig_pred_train_act),sizex,sizey,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.divide(validation_set,numpy.mat(spont_pred_validation_act)),contrib.dd.DB2(None),True)
+	(e,te,c,tc,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,numpy.divide(training_set,trig_pred_train_act),sizex,sizey,__main__.__dict__.get('Alpha',50),numpy.mat(validation_inputs),numpy.divide(validation_set,numpy.mat(spont_pred_validation_act)),contrib.dd.DB(None),True)
 	pylab.show()
 	
 def pearcorr(X):
@@ -5488,234 +5008,6 @@ def rot90_around_center_of_gravity(rf):
     res[cx-z:cx+z,cy-z:cy+z] = numpy.rot90(rf[cx-z:cx+z,cy-z:cy+z])
     return res
 	
-def SparsnessAnalysis():
-    import scipy
-    import scipy.stats
-    import numpy.random
-    from scipy import linalg
-    contrib.modelfit.save_fig_directory='/home/antolikjan/Doc/reports/Sparsness/'
-    f = open("modelfitDatabase1.dat",'rb')
-    import pickle
-    dd = pickle.load(f)
-    node = dd.children[0]
-    rfs = node.children[0].data["ReversCorrelationRFs"]
-    raw_validation_set = node.data["raw_validation_set"]
-    training_set = node.data["training_set"]
-    validation_set = node.data["validation_set"]
-
-    raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
 	
-    pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedActivities"])
-    val_pred_act  = numpy.array(node.children[0].data["ReversCorrelationPredictedValidationActivities"])
-    
-
-    # determine signal and noise power and created predictions with gaussian noise of corresponding variance 
-    signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act, val_pred_act)
-    nt,nn = numpy.shape(pred_act) 
-    numpy.random.randn(nt,nn)
-     
-
-    # LOAD NON-NORMALIZED DATA
-    (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = sortOutLoading(dd)
-    
-    # fit the predicted activities to sigmoid again
-    # this time note that we are fitting it to measured activities that were this time not zero meaned and unit variance scaled
-    ofs = fit_sigmoids_to_of(numpy.mat(training_set),numpy.mat(pred_act),offset=False)
-    pred_act = apply_sigmoid_output_function(numpy.mat(pred_act),ofs,offset=False)
-    #pred_act_noise = apply_sigmoid_output_function(numpy.mat(pred_act_noise),ofs,offset=False)
-    val_pred_act = apply_sigmoid_output_function(numpy.mat(val_pred_act),ofs,offset=False)
-    (ranks,correct,pred) = performIdentification(validation_set,val_pred_act)
-    print "Correct:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(val_pred_act - validation_set,2))
-
-    pred_act_noise = pred_act + numpy.multiply(numpy.tile(numpy.sqrt(noise_power),(nt,1)) , numpy.random.randn(nt,nn))
-    pred_act_noise = pred_act_noise * (pred_act_noise > 0)
-    
-
-    # Exclude neurons with weak RFs from further analysis
-    rfs_mag=numpy.sum(numpy.power(numpy.reshape(numpy.abs(numpy.array(rfs)),(len(rfs),numpy.size(rfs[0]))),2),axis=1)
-    pylab.figure()
-    pylab.hist(rfs_mag)
-    pylab.xlabel('RFs magnitued')
-    to_delete = numpy.array(numpy.nonzero((rfs_mag < 0.0000004) * 1.0))[0]
-    #to_delete=[]
-    training_set = numpy.delete(training_set, to_delete, axis = 1)
-    validation_set = numpy.delete(validation_set, to_delete, axis = 1)
-    pred_act = numpy.delete(pred_act, to_delete, axis = 1)
-    val_pred_act = numpy.delete(val_pred_act, to_delete, axis = 1)
-
-    # SHOW MINIMUM FIRING RATES, HISTOGRAMS OF MEAN FIRING RATES AND HISTOGRAM OF FIRING RATES
-    print "Minimum activity levels for triggered activities:", numpy.min(training_set,axis=0)
-    print "Minimum activity levels for predicted activities:", numpy.min(pred_act,axis=0)
-    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))
-    pylab.subplot(3,2,1)
-    pylab.hist(numpy.mean(training_set,axis=0))
-    pylab.xlabel('Mean triggered firing rate')
-    pylab.subplot(3,2,2)
-    pylab.hist(numpy.mean(pred_act,axis=0))
-    pylab.xlabel('Mean predicted firing rate')
-    
-    pylab.subplot(3,2,3)
-    nonz = training_set.flatten()
-    nonz =nonz[numpy.nonzero(training_set.flatten())]
-    bins,edge  =  numpy.histogram(nonz,50)
-    pylab.plot(bins,'x',label='data')
-    ex = numpy.random.standard_exponential((1, len(training_set.flatten()))).flatten() * numpy.mean(nonz)
-    
-    print numpy.mean(ex)
-    print numpy.mean(nonz)
-    bins,edge  =  numpy.histogram(ex,50)
-    pylab.plot(bins,label='Exponential distribution')
-    pylab.xscale('log')
-    pylab.yscale('log')
-    pylab.xlabel('Triggered non-zero firing rates (pooled across population)')
-    
-    pylab.subplot(3,2,4)
-    nonz = pred_act.flatten()
-    nonz =nonz[numpy.nonzero(pred_act.flatten())]
-    bins,edge  =  numpy.histogram(nonz,50)
-    pylab.plot(bins,'x')
-    ex = numpy.random.standard_exponential((1, len(pred_act.flatten()))).flatten() * numpy.mean(nonz)
-    bins,edge  =  numpy.histogram(ex,50)
-    pylab.plot(bins,label='Exponential distribution')
-    pylab.xlabel('Predicted non-zero firing rate (pooled across population)')
-    pylab.xscale('log')
-    pylab.yscale('log')
-    
-    pylab.subplot(3,2,5)
-    nonz = training_set.flatten()
-    nonz =nonz[numpy.nonzero(training_set.flatten())]
-    bins,edge  =  numpy.histogram(nonz,50)
-    pylab.plot(bins,'x')
-    pylab.xlabel('Triggered non-zero firing rates (pooled across population)')
-    
-    pylab.subplot(3,2,6)
-    nonz = pred_act.flatten()
-    nonz =nonz[numpy.nonzero(pred_act.flatten())]
-    bins,edge  =  numpy.histogram(nonz,50)
-    pylab.plot(bins,'x')
-    pylab.xlabel('Predicted non-zero firing rate (pooled across population)')
-    release_fig('Firing_rate_distributions.pdf')
-    
-    
-    
-    ex = numpy.random.standard_exponential((1, len(training_set.flatten()))).flatten() * numpy.mean(training_set)
-    norm = numpy.random.normal(loc=numpy.mean(training_set),scale=0.0001,size=(1, len(training_set.flatten()))).flatten() 
-
-    
-    nonz=ex.flatten()
-    #nonz =nonz[numpy.nonzero(ex.flatten())]
-    bins1,edge1  =  numpy.histogram(nonz,50)
-    bins4,edge4  =  numpy.histogram(numpy.log(nonz),50)
-    
-    nonz=numpy.exp(norm.flatten())
-    #nonz =nonz[numpy.nonzero(numpy.exp(norm.flatten()))]
-    bins2,edge2  =  numpy.histogram(nonz,50)
-    bins3,edge3  =  numpy.histogram(numpy.log(nonz),50)
-    
-    pylab.figure()
-    pylab.plot(bins3)
-    pylab.plot(bins4)
-    pylab.figure()
-    pylab.plot(bins1,label='exp')
-    pylab.plot(bins2,label='lognormal')
-    pylab.yscale('log')    
-    pylab.xscale('log')
-    pylab.legend()
-    
-    
-    pylab.figure()
-    (bins,tr,tr) = pylab.hist(training_set.flatten(),bins=100)
-    
-    pylab.figure()
-    pylab.subplot(111, yscale='log')
-    pylab.plot(bins)
-    
-    pylab.figure()
-    pylab.subplot(111, xscale='log')
-    pylab.plot(bins)
-    
-    
-    pylab.figure()
-    (bins,tr,tr) = pylab.hist(pred_act.flatten(),bins=100)
-    
-    pylab.figure()
-    pylab.subplot(111, yscale='log')
-    pylab.plot(bins)
-    
-    pylab.figure()
-    pylab.subplot(111, xscale='log')
-    pylab.plot(bins)
-    
-    
-    
-    mu = 1.0
-    exponential = numpy.arange(39, dtype='float32') / 40.0 + 0.0125
-    exponential = numpy.exp(- (1 / mu) * exponential) / mu
-    
-    pylab.figure()
-    pylab.subplot(111, yscale='log')
-    pylab.plot(exponential)
-    
-    pylab.figure()
-    pylab.subplot(111, xscale='log')
-    pylab.plot(exponential)
-    
-    
-    lifetime_triggered_sparsness = TrevesRollsSparsness(numpy.mat(training_set))
-    population_triggered_sparsness = TrevesRollsSparsness(numpy.mat(training_set).T)
-    lifetime_predicted_sparsness = TrevesRollsSparsness(numpy.mat(pred_act))
-    population_predicted_sparsness = TrevesRollsSparsness(numpy.mat(pred_act).T)
-    lifetime_predicted_noise_sparsness = TrevesRollsSparsness(numpy.mat(pred_act_noise))
-    population_predicted_noise_sparsness = TrevesRollsSparsness(numpy.mat(pred_act_noise).T)
-    lifetime_triggered_averaged_sparsness = TrevesRollsSparsness(numpy.mat(validation_set))
-    population_triggered_averaged_sparsness = TrevesRollsSparsness(numpy.mat(validation_set).T)
-
-
-    pylab.figure(dpi=100,facecolor='w',figsize=(15,11))
-    pylab.subplot(4,2,1)
-    pylab.hist(lifetime_triggered_sparsness)
-    pylab.xlabel('Life time sparsness of triggered activities')
-    pylab.axis(xmin=0.0,xmax=1.0) 
-    
-    pylab.subplot(4,2,2)
-    pylab.hist(population_triggered_sparsness)
-    pylab.xlabel('Population sparsness of triggered activities')
-    pylab.axis(xmin=0.0,xmax=1.0)
-    
-    pylab.subplot(4,2,3)
-    pylab.hist(lifetime_predicted_sparsness)
-    pylab.xlabel('Life time sparsness of predicted activities')
-    pylab.axis(xmin=0.0,xmax=1.0)
-    
-    pylab.subplot(4,2,4)
-    pylab.hist(population_predicted_sparsness)
-    pylab.xlabel('Population sparsness of predicted activities')
-    pylab.axis(xmin=0.0,xmax=1.0)
-    
-    pylab.subplot(4,2,5)
-    pylab.hist(lifetime_predicted_noise_sparsness)
-    pylab.xlabel('Life time sparsness of predicted activities with Gaussian noise')
-    pylab.axis(xmin=0.0,xmax=1.0)
-    
-    pylab.subplot(4,2,6)
-    pylab.hist(population_predicted_noise_sparsness)
-    pylab.xlabel('Population sparsness of predicted activities with Gaussian noise')
-    pylab.axis(xmin=0.0,xmax=1.0)
-    
-    pylab.subplot(4,2,7)
-    pylab.hist(lifetime_triggered_averaged_sparsness)
-    pylab.xlabel('Life time sparsness of triggered activities averaged over trials')
-    pylab.axis(xmin=0.0,xmax=1.0) 
-    
-    pylab.subplot(4,2,8)
-    pylab.hist(population_triggered_averaged_sparsness)
-    pylab.xlabel('Population sparsness of triggered activities averaged over trials')
-    pylab.axis(xmin=0.0,xmax=1.0)
-    release_fig('Sparsness.pdf')	
-	
-def TrevesRollsSparsness(mat):
-    # Computes Trevers Rolls Sparsness of data along columns
-    x,y  = numpy.shape(mat)
-    return numpy.array(1-(numpy.power(numpy.mean(mat,axis=0),2))/numpy.mean(numpy.power(mat,2),axis=0))[0]/(1.0 - 1.0/x)
 
 
