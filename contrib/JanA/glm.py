@@ -181,14 +181,14 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     pylab.figure()
     pylab.title('RPI')
     for i in xrange(0,num_neurons):
-	pylab.subplot(4,4,i+1)    
+	pylab.subplot(11,11,i+1)    
     	pylab.plot(rpi_pred_val_act[:,i],validation_set[:,i],'o')
     pylab.savefig(normalize_path('RPI_val_relationship.png'))	
 	
     pylab.figure()
     pylab.title('GLM')
     for i in xrange(0,num_neurons):
-	pylab.subplot(4,4,i+1)    
+	pylab.subplot(11,11,i+1)    
  	pylab.plot(glm_pred_val_act[:,i],validation_set[:,i],'o')   
     pylab.savefig(normalize_path('GLM_val_relationship.png'))
     
@@ -196,7 +196,7 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     pylab.figure()
     pylab.title('RPI')
     for i in xrange(0,num_neurons):
-	pylab.subplot(4,4,i+1)    
+	pylab.subplot(11,11,i+1)    
     	pylab.plot(rpi_pred_val_act_t[:,i],validation_set[:,i],'o')
     pylab.savefig(normalize_path('RPI_t_val_relationship.png'))	
 	
@@ -204,7 +204,7 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     pylab.figure()
     pylab.title('GLM')
     for i in xrange(0,num_neurons):
-	pylab.subplot(4,4,i+1)    
+	pylab.subplot(11,11,i+1)    
  	pylab.plot(glm_pred_val_act_t[:,i],validation_set[:,i],'o')   
     pylab.savefig(normalize_path('GLM_t_val_relationship.png'))
     
