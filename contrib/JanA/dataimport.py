@@ -83,15 +83,17 @@ def sortOutLoading(db_node):
 	  dataset_loc = "Mice/2009_11_04/Raw/region3/spiking_3-7.dat"
 	  val_dataset_loc = "Mice/2009_11_04/Raw/region3/val/spiking_3-7.dat"
        else:
+	  #dataset_loc = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes"	
+          #val_dataset_loc = "Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes"
 	  dataset_loc = "Mice/2009_11_04/Raw/region3/nospiking_3-7.dat"
 	  val_dataset_loc = "Mice/2009_11_04/Raw/region3/val/nospiking_3-7.dat"
        
-       cut_out_x=0.45
-       cut_out_y=0.2
-       cut_out_size=0.7
-       #cut_out_x=0.3
-       #cut_out_y=0.0
-       #cut_out_size=1.0
+       #cut_out_x=0.45
+       #cut_out_y=0.2
+       #cut_out_size=0.7
+       cut_out_x=0.3
+       cut_out_y=0.0
+       cut_out_size=1.0
        
        num_cells = 103    
        sepparate_validation_set = True
@@ -489,3 +491,37 @@ def generate_raw_training_set(inputs):
     for i in inputs:
         out.append(i.flatten())
     return numpy.array(out)
+
+def compute_average_min_max(data_set):
+    avg = numpy.zeros(shape(data_set[0]))
+    var = numpy.zeros(shape(data_set[0]))
+    
+    for d in data_set:
+        avg += d
+    avg = avg/(len(data_set)*1.0)
+    
+    for d in data_set:
+        var += numpy.multiply((d-avg),(d-avg))
+    var = var/(len(data_set)*1.0)
+    return (avg,var)
+    
+def normalize_data_set(data_set,avg,var):
+    print shape(avg)
+    for i in xrange(0,len(data_set)):
+        data_set[i]-=avg
+        data_set[i]=numpy.divide(data_set[i],numpy.sqrt(var)) 
+    return data_set
+
+def compute_average_input(inputs):
+    avgRF = numpy.zeros(shape(inputs[0]))
+
+    for i in inputs:
+        avgRF += i
+    avgRF = avgRF/(len(inputs)*1.0)
+    return avgRF
+
+def normalize_image_inputs(inputs,avgRF):
+    for i in xrange(0,len(inputs)):
+        inputs[i]=inputs[i]-avgRF
+
+    return inputs
