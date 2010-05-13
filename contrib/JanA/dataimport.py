@@ -114,12 +114,12 @@ def sortOutLoading(db_node):
        dataset_loc = "Mice/2009_11_04/region5_stationary_180_15fr_103cells_on_response_spikes"	
        val_dataset_loc = "Mice/2009_11_04/region5_50stim_10reps_15fr_103cells_on_response_spikes"
        
-       cut_out_x=0.45
-       cut_out_y=0.2
-       cut_out_size=0.7
-       #cut_out_x=0.3
-       #cut_out_y=0.0
-       #cut_out_size=1.0
+       #cut_out_x=0.45
+       #cut_out_y=0.2
+       #cut_out_size=0.7
+       cut_out_x=0.3
+       cut_out_y=0.0
+       cut_out_size=1.0
 
        num_cells = 55    
        sepparate_validation_set = True
