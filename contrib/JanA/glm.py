@@ -102,6 +102,7 @@ def fitGLM(X,Y,H,l,hl,num_neurons_to_estimate):
 def runGLM():
     #res = dd.loadResults("results.dat")
     (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = contrib.JanA.dataimport.sortOutLoading(contrib.dd.DB(None))
+    return
     raw_validation_set = db_node.data["raw_validation_set"]
     
     # creat history
@@ -217,6 +218,7 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     pylab.plot([0.0,1.0],[0.0,1.0])
     pylab.xlabel('RPI')
     pylab.ylabel('GLM')
+    pylab.savefig(normalize_path('GLM_vs_RPI_MSE.png'))
     
     raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
     
@@ -231,7 +233,7 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), numpy.array(rpi_pred_act), numpy.array(rpi_pred_val_act))
     
     signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), numpy.array(rpi_pred_act_t), numpy.array(rpi_pred_val_act_t))
-    rpi_validation_prediction_power = validation_prediction_power	
+    rpi_validation_prediction_power = validation_prediction_power_t	
     print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power) , " / " , numpy.mean(validation_prediction_power)
     print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t) , " / " , numpy.mean(validation_prediction_power_t)
     
@@ -260,6 +262,7 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     pylab.plot([0.0,1.0],[0.0,1.0])
     pylab.xlabel('RPI')
     pylab.ylabel('GLM')
+    pylab.savefig(normalize_path('GLM_vs_RPI_prediction_power.png'))
     
     db_node.add_data("ReversCorrelationPredictedActivities",glm_pred_act,force=True)
     db_node.add_data("ReversCorrelationPredictedActivities+TF",glm_pred_act_t,force=True)
