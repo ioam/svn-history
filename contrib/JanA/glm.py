@@ -32,11 +32,13 @@ class GLM(object):
 	       self.H = theano.shared(HH)		    
 	       self.h = self.K[self.kernel_size+2:self.kernel_size+2+self.num_neurons]		    
 	       self.model = self.model + T.dot(self.H,self.h.T)
+	       print 'B'
 	    
 	    self.loglikelyhood = T.sum(self.model) - T.sum(T.dot(self.Y.T,  T.log(self.model))) + T.sum(T.dot(self.k ,T.dot(self.Z,self.k.T))) 
 	    
 	    if (HH != None) and (l != 0):
 	       self.loglikelyhood = self.loglikelyhood + l*T.sum(T.abs_(self.h))
+	       print 'B'
 
 	def func(self):
 	    return theano.function(inputs=[self.K], outputs=self.loglikelyhood) 
@@ -79,8 +81,9 @@ def fitGLM(X,Y,H,l,hl,num_neurons_to_estimate):
     
     laplace = laplaceBias(numpy.sqrt(kernel_size),numpy.sqrt(kernel_size))
     
-    rpi = numpy.linalg.pinv(X.T*X + 0.000016*laplace) * X.T * Y
+    rpi = numpy.linalg.pinv(X.T*X + 0.00001*laplace) * X.T * Y
     
+    print 'C'
     
     for i in xrange(0,num_neurons_to_estimate): 
 	print i
@@ -226,9 +229,9 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     print "Natural+TF:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - rpi_pred_val_act_t,2))
 		
     signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), numpy.array(rpi_pred_act), numpy.array(rpi_pred_val_act))
-    glm_validation_prediction_power = validation_prediction_power
+    
     signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), numpy.array(rpi_pred_act_t), numpy.array(rpi_pred_val_act_t))
-	
+    rpi_validation_prediction_power = validation_prediction_power	
     print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power) , " / " , numpy.mean(validation_prediction_power)
     print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t) , " / " , numpy.mean(validation_prediction_power_t)
     
@@ -242,11 +245,14 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     print "Natural+TF:", correct , "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - glm_pred_val_act_t,2))
 		
     signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), numpy.array(glm_pred_act), numpy.array(glm_pred_val_act))
+    
+    glm_validation_prediction_power = validation_prediction_power
+    
     signal_power,noise_power,normalized_noise_power,training_prediction_power_t,validation_prediction_power_t = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), numpy.array(glm_pred_act_t), numpy.array(glm_pred_val_act_t))
     	
     print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power) , " / " , numpy.mean(validation_prediction_power)
     print "Prediction power after TF on training set / validation set: ", numpy.mean(training_prediction_power_t) , " / " , numpy.mean(validation_prediction_power_t)
-    rpi_validation_prediction_power = validation_prediction_power
+    
     
     pylab.figure()
     pylab.plot(rpi_validation_prediction_power[:num_neurons],glm_validation_prediction_power[:num_neurons],'o')
