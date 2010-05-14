@@ -81,7 +81,7 @@ def fitGLM(X,Y,H,l,hl,num_neurons_to_estimate):
     
     laplace = laplaceBias(numpy.sqrt(kernel_size),numpy.sqrt(kernel_size))
     
-    rpi = numpy.linalg.pinv(X.T*X + 0.00001*laplace) * X.T * Y
+    rpi = numpy.linalg.pinv(X.T*X + __main__.__dict__.get('RPILaplaceBias',0.0001)*laplace) * X.T * Y
     
     print 'C'
     
@@ -119,7 +119,7 @@ def runGLM():
     print numpy.shape(training_inputs[0])
     
     params={}
-    params["LaplacaBias"] = __main__.__dict__.get('LaplaceBias',50)
+    params["LaplacaBias"] = __main__.__dict__.get('LaplaceBias',0.0004)
     params["HistBias"] = __main__.__dict__.get('HistBias',0)
     db_node1 = db_node
     db_node = db_node.get_child(params)
@@ -212,7 +212,7 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     pylab.savefig(normalize_path('GLM_t_val_relationship.png'))
     
     pylab.figure()
-    pylab.plot(numpy.mean(numpy.power(validation_set - rpi_pred_val_act_t,2)[:num_neurons],1),numpy.mean(numpy.power(validation_set - glm_pred_val_act,2)[:num_neurons],1),'o')
+    pylab.plot(numpy.mean(numpy.power(validation_set - rpi_pred_val_act_t,2)[:,:num_neurons],0),numpy.mean(numpy.power(validation_set - glm_pred_val_act,2)[:,:num_neurons],0),'o')
     pylab.hold(True)
     pylab.plot([0.0,1.0],[0.0,1.0])
     pylab.xlabel('RPI')
