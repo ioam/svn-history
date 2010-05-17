@@ -14,7 +14,7 @@ import contrib.JanA.dataimport
 
 class GLM(object):
 	
-	def __init__(self,XX,YY,ZZ,HH=None,l=1.0,sl=0.0,norm='LAPLACE'):
+	def __init__(self,XX,YY,ZZ,HH=None,history_bias=1.0,sparse_bias=0.0,norm='LAPLACE'):
 	    (self.num_pres,self.kernel_size) = numpy.shape(XX) 	
 	    
 	    self.Y = theano.shared(YY)
@@ -43,10 +43,10 @@ class GLM(object):
 	    	self.loglikelyhood = self.loglikelyhood + T.sum(T.dot(self.k ,T.dot(self.Z,self.k.T)))
 	    elif norm == 'SPARSE':
 		print 'SPARSE'
-	    	self.loglikelyhood = self.loglikelyhood + sl*T.sum(abs(self.k))
+	    	self.loglikelyhood = self.loglikelyhood + sparse_bias*T.sum(abs(self.k))
 	     
-	    if (HH != None) and (l != 0):
-	       self.loglikelyhood = self.loglikelyhood + l*T.sum(abs(self.h))
+	    if (HH != None) and (history_bias != 0):
+	       self.loglikelyhood = self.loglikelyhood + history_bias*T.sum(abs(self.h))
 	       print 'B'
 
 	def func(self):
@@ -105,7 +105,7 @@ def fitGLM(X,Y,H,l,hl,sp,norm,num_neurons_to_estimate):
 	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,numpy.mat(H),hl,sp,norm)
 	else:
 	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,None,hl,sp,norm)
-	K = fmin_ncg(glm.func(),numpy.array(k0),glm.der(),fhess = glm.hess(),avextol=0.00001)
+	K = fmin_ncg(glm.func(),numpy.array(k0),glm.der(),fhess = glm.hess(),avextol=0.00001,maxiter=20)
 	Ks[i,:] = K
 	
     return [Ks,rpi,glm]
@@ -144,7 +144,7 @@ def runGLM():
     
     num_pres,num_neurons = numpy.shape(training_set)
     num_pres,kernel_size = numpy.shape(training_inputs)
-    num_neurons_to_run=10#num_neurons
+    num_neurons_to_run=num_neurons
     
     sx,sy = numpy.shape(training_set)	
     if __main__.__dict__.get('History',False):
@@ -164,7 +164,7 @@ def runGLM():
 def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,training_set,raw_validation_set,history_set,history_validation_set,db_node,num_neurons_to_run):
     num_pres,kernel_size = numpy.shape(training_inputs)
     size = numpy.sqrt(kernel_size)
-    num_neurons=1#num_neurons_to_run
+    num_neurons=num_neurons_to_run
     
     pylab.figure()
     m = numpy.max(numpy.abs(K))
