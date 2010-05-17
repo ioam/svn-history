@@ -64,9 +64,12 @@ class GLM(object):
 	def response(self,X,H,kernels):
 	    self.IN = theano.shared(X)	
 	    self.HH = theano.shared(H)
-	    self.model = T.exp(T.dot(self.IN,self.k.T)-self.n) 
+	    self.lin = T.dot(self.IN,self.k.T) 
 	    if H != None:
-	     	self.model + T.dot(self.HH,self.h.T)	
+	     	self.lin + T.dot(self.HH,self.h.T)	
+		
+	    self.model = T.exp(self.lin -self.n)
+	     	
 	    resp =  theano.function(inputs=[self.K], outputs=self.model)
 	    
 	    (a,b) = numpy.shape(kernels)
@@ -141,7 +144,7 @@ def runGLM():
     
     num_pres,num_neurons = numpy.shape(training_set)
     num_pres,kernel_size = numpy.shape(training_inputs)
-    num_neurons_to_run=1#num_neurons
+    num_neurons_to_run=10#num_neurons
     
     sx,sy = numpy.shape(training_set)	
     if __main__.__dict__.get('History',False):
