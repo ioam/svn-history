@@ -102,9 +102,9 @@ def fitGLM(X,Y,H,l,hl,sp,norm,num_neurons_to_estimate):
 	k0 = rpi[:,i].getA1().tolist()+[0,0]
 	if H!= None:
 	   k0 = k0 +numpy.zeros((1,num_neurons)).flatten().tolist()
-	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,numpy.mat(H),hl,norm)
+	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,numpy.mat(H),hl,sp,norm)
 	else:
-	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,None,hl,norm)
+	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,None,hl,sp,norm)
 	K = fmin_ncg(glm.func(),numpy.array(k0),glm.der(),fhess = glm.hess(),avextol=0.00001)
 	Ks[i,:] = K
 	
