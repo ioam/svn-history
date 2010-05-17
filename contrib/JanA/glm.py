@@ -14,7 +14,7 @@ import contrib.JanA.dataimport
 
 class GLM(object):
 	
-	def __init__(self,XX,YY,ZZ,HH=None,l=1.0):
+	def __init__(self,XX,YY,ZZ,HH=None,l=1.0,sl=0.0,norm='LAPLACE'):
 	    (self.num_pres,self.kernel_size) = numpy.shape(XX) 	
 	    
 	    self.Y = theano.shared(YY)
@@ -24,20 +24,29 @@ class GLM(object):
 	    self.k = self.K[0:self.kernel_size]
 	    self.n = self.K[self.kernel_size]
 	    self.a = self.K[self.kernel_size+1]
-	    self.model = T.exp(T.dot(self.X,self.k.T)-self.n) 
+	    self.lin = T.dot(self.X,self.k.T) 
 	    
 	    if HH != None:
 	       #we also have a history of other neurons
 	       (self.num_pres,self.num_neurons) = numpy.shape(HH)
 	       self.H = theano.shared(HH)		    
 	       self.h = self.K[self.kernel_size+2:self.kernel_size+2+self.num_neurons]		    
-	       self.model = self.model + T.dot(self.H,self.h.T)
+	       self.lin = self.lin + T.dot(self.H,self.h.T)
 	       print 'B'
 	    
-	    self.loglikelyhood = T.sum(self.model) - T.sum(T.dot(self.Y.T,  T.log(self.model))) + T.sum(T.dot(self.k ,T.dot(self.Z,self.k.T))) 
+	    self.model = T.exp(self.lin - self.n)
 	    
+	    self.loglikelyhood = T.sum(self.model) - T.sum(T.dot(self.Y.T,  T.log(self.model)))
+	     
+	    if norm == 'LAPLACE':
+		print 'LAPLACE'
+	    	self.loglikelyhood = self.loglikelyhood + T.sum(T.dot(self.k ,T.dot(self.Z,self.k.T)))
+	    elif norm == 'SPARSE':
+		print 'SPARSE'
+	    	self.loglikelyhood = self.loglikelyhood + sl*T.sum(abs(self.k))
+	     
 	    if (HH != None) and (l != 0):
-	       self.loglikelyhood = self.loglikelyhood + l*T.sum(T.abs_(self.h))
+	       self.loglikelyhood = self.loglikelyhood + l*T.sum(abs(self.h))
 	       print 'B'
 
 	def func(self):
@@ -70,7 +79,7 @@ class GLM(object):
 	    
 	    return responses
 	    
-def fitGLM(X,Y,H,l,hl,num_neurons_to_estimate):
+def fitGLM(X,Y,H,l,hl,sp,norm,num_neurons_to_estimate):
     num_pres,num_neurons = numpy.shape(Y)
     num_pres,kernel_size = numpy.shape(X)
     
@@ -90,9 +99,9 @@ def fitGLM(X,Y,H,l,hl,num_neurons_to_estimate):
 	k0 = rpi[:,i].getA1().tolist()+[0,0]
 	if H!= None:
 	   k0 = k0 +numpy.zeros((1,num_neurons)).flatten().tolist()
-	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,numpy.mat(H),hl)
+	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,numpy.mat(H),hl,norm)
 	else:
-	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,None,hl)
+	   glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,None,hl,norm)
 	K = fmin_ncg(glm.func(),numpy.array(k0),glm.der(),fhess = glm.hess(),avextol=0.00001)
 	Ks[i,:] = K
 	
@@ -100,9 +109,9 @@ def fitGLM(X,Y,H,l,hl,num_neurons_to_estimate):
 	    
     
 def runGLM():
-    #res = dd.loadResults("results.dat")
-    (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = contrib.JanA.dataimport.sortOutLoading(contrib.dd.DB(None))
-    return
+    res = contrib.dd.loadResults("results.dat")
+    (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = contrib.JanA.dataimport.sortOutLoading(res)
+    #return
     raw_validation_set = db_node.data["raw_validation_set"]
     
     # creat history
@@ -121,19 +130,24 @@ def runGLM():
     
     params={}
     params["LaplacaBias"] = __main__.__dict__.get('LaplaceBias',0.0004)
-    params["HistBias"] = __main__.__dict__.get('HistBias',0)
+    params["Norm"] = __main__.__dict__.get('Norm','LAPLACE')
+    params["SparseBias"] = __main__.__dict__.get('SparseBias',0.0004)
+    params["History"] = __main__.__dict__.get('History',False)
+    if params["History"]:
+       params["HistBias"] = __main__.__dict__.get('HistBias',0)
+     
     db_node1 = db_node
     db_node = db_node.get_child(params)
     
     num_pres,num_neurons = numpy.shape(training_set)
     num_pres,kernel_size = numpy.shape(training_inputs)
-    num_neurons_to_run=1
+    num_neurons_to_run=1#num_neurons
     
     sx,sy = numpy.shape(training_set)	
     if __main__.__dict__.get('History',False):
-    	[K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),numpy.mat(history_set),params["LaplacaBias"],params["HistBias"],num_neurons_to_run)
+    	[K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),numpy.mat(history_set),params["LaplacaBias"],params["HistBias"],params["SparseBias"],params["Norm"],num_neurons_to_run)
     else:
-	[K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),None,params["LaplacaBias"],params["HistBias"],num_neurons_to_run)
+	[K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),None,params["LaplacaBias"],0,params["SparseBias"],params["Norm"],num_neurons_to_run)
 	    
 	    
     analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,training_set,raw_validation_set,history_set,history_validation_set,db_node,num_neurons_to_run)
@@ -141,13 +155,13 @@ def runGLM():
     db_node.add_data("Kernels",K,force=True)
     db_node.add_data("GLM",glm,force=True)
     
-    #dd.saveResults(res,"results.dat")
+    contrib.dd.saveResults(res,"results.dat")
 
     
 def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,training_set,raw_validation_set,history_set,history_validation_set,db_node,num_neurons_to_run):
     num_pres,kernel_size = numpy.shape(training_inputs)
     size = numpy.sqrt(kernel_size)
-    num_neurons=num_neurons_to_run
+    num_neurons=1#num_neurons_to_run
     
     pylab.figure()
     m = numpy.max(numpy.abs(K))
