@@ -16,6 +16,10 @@ def sortOutLoading(db_node):
     params["validation_set_fraction"] = __main__.__dict__.get('ValidationSetFraction',50)		
     params["density"] = __main__.__dict__.get('density', 20)
     params["spiking"] = __main__.__dict__.get('Spiking', True)
+    params['LGN'] =  __main__.__dict__.get('LGN', False)
+    if params['LGN']:
+    	params['LGNCenterSize'] =  __main__.__dict__.get('LGNCenterSize', 2.0) 
+    	params['LGNSurrSize'] =  __main__.__dict__.get('LGNSurroundSize', 5.0)
     density= params["density"]
     	
     custom_index=None
@@ -83,10 +87,10 @@ def sortOutLoading(db_node):
 	  dataset_loc = "Mice/2009_11_04/Raw/region3/spiking_3-7.dat"
 	  val_dataset_loc = "Mice/2009_11_04/Raw/region3/val/spiking_3-7.dat"
        else:
-	  #dataset_loc = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes"	
-          #val_dataset_loc = "Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes"
-	  dataset_loc = "Mice/2009_11_04/Raw/region3/nospiking_3-7.dat"
-	  val_dataset_loc = "Mice/2009_11_04/Raw/region3/val/nospiking_3-7.dat"
+	  dataset_loc = "Mice/2009_11_04/region3_stationary_180_15fr_103cells_on_response_spikes"	
+          val_dataset_loc = "Mice/2009_11_04/region3_50stim_10reps_15fr_103cells_on_response_spikes"
+	  #dataset_loc = "Mice/2009_11_04/Raw/region3/nospiking_3-7.dat"
+	  #val_dataset_loc = "Mice/2009_11_04/Raw/region3/val/nospiking_3-7.dat"
        
        #cut_out_x=0.45
        #cut_out_y=0.2
@@ -260,6 +264,10 @@ def sortOutLoading(db_node):
     
     (sizex,sizey) = numpy.shape(training_inputs[0])
     print (sizex,sizey)
+    
+    if __main__.__dict__.get('LGN', False):
+	training_inputs = LGN_preprocessing(training_inputs,params['LGNCenterSize'],params['LGNSurrSize'])    
+	validation_inputs = LGN_preprocessing(validation_inputs,params['LGNCenterSize'],params['LGNSurrSize'])
     
     training_inputs = generate_raw_training_set(training_inputs)
     validation_inputs = generate_raw_training_set(validation_inputs)
@@ -493,8 +501,8 @@ def generate_raw_training_set(inputs):
     return numpy.array(out)
 
 def compute_average_min_max(data_set):
-    avg = numpy.zeros(shape(data_set[0]))
-    var = numpy.zeros(shape(data_set[0]))
+    avg = numpy.zeros(numpy.shape(data_set[0]))
+    var = numpy.zeros(numpy.shape(data_set[0]))
     
     for d in data_set:
         avg += d
@@ -506,14 +514,14 @@ def compute_average_min_max(data_set):
     return (avg,var)
     
 def normalize_data_set(data_set,avg,var):
-    print shape(avg)
+    print numpy.shape(avg)
     for i in xrange(0,len(data_set)):
         data_set[i]-=avg
         data_set[i]=numpy.divide(data_set[i],numpy.sqrt(var)) 
     return data_set
 
 def compute_average_input(inputs):
-    avgRF = numpy.zeros(shape(inputs[0]))
+    avgRF = numpy.zeros(numpy.shape(inputs[0]))
 
     for i in inputs:
         avgRF += i
@@ -525,3 +533,19 @@ def normalize_image_inputs(inputs,avgRF):
         inputs[i]=inputs[i]-avgRF
 
     return inputs
+
+
+def LGN_preprocessing(images,center_size,surr_size):
+    import scipy.signal
+    sizex,sizey= numpy.shape(images[0])	 
+    new_images = numpy.zeros(numpy.shape(images))	
+	
+    xx = numpy.repeat([numpy.arange(0,sizex,1)],sizex,axis=0).T	
+    yy = numpy.repeat([numpy.arange(0,sizex,1)],sizex,axis=0)
+    kernel = numpy.exp(-((xx - sizex/2)**2 + (yy - sizex/2)**2)/center_size)/(numpy.pi*center_size) - numpy.exp(-((xx - sizex/2)**2 + (yy - sizex/2)**2)/surr_size)/(numpy.pi*surr_size)
+    
+    for i in xrange(0,len(images)):
+	new_images[i,:,:]  = scipy.signal.convolve2d(images[i],kernel,mode='same')
+    
+    return new_images
+	
