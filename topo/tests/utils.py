@@ -4,6 +4,18 @@ Utility functions used by the test files.
 $Id$
 """
 
+# CEB: note these from numpy 1.4 - might be handy: 
+#
+# #. assert_array_almost_equal_nulps: new method to compare two arrays of
+#    floating point values. With this function, two values are considered
+#    close if there are not many representable floating point values in
+#    between, thus being more robust than assert_array_almost_equal when the
+#    values fluctuate a lot.
+#
+# #. assert_array_max_ulp: raise an assertion if there are more than N
+#    representable numbers between two floating point values.
+  
+
 from numpy.testing import assert_array_equal,assert_array_almost_equal
 
 def assert_array_not_equal(a1,a2,msg=""):
