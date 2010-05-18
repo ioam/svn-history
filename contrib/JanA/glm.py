@@ -117,9 +117,17 @@ def runGLM():
     #return
     raw_validation_set = db_node.data["raw_validation_set"]
     
+    dataset = contrib.JanA.dataimport.loadSimpleDataSet('Mice/2009_11_04/Raw/region3/spiking_13-15.dat',1800,103,num_rep=1,num_frames=1,offset=0,transpose=False)
+    history_set = contrib.JanA.dataimport.generateTrainingSet(dataset)
+    
+    dataset = contrib.JanA.dataimport.loadSimpleDataSet('Mice/2009_11_04/Raw/region3/val/spiking_13-15.dat',50,103,num_rep=10,num_frames=1,offset=0,transpose=False)
+    dataset = contrib.JanA.dataimport.averageRepetitions(dataset)
+    history_validation_set = contrib.JanA.dataimport.generateTrainingSet(dataset)
+    
+    
     # creat history
-    history_set = training_set[0:-1,:]
-    history_validation_set = validation_set[0:-1,:]
+    history_set = history_set[0:-1,:]
+    history_validation_set = history_set[0:-1,:]
     training_set = training_set[1:,:]
     validation_set = validation_set[1:,:]
     training_inputs= training_inputs[1:,:]
@@ -144,7 +152,7 @@ def runGLM():
     
     num_pres,num_neurons = numpy.shape(training_set)
     num_pres,kernel_size = numpy.shape(training_inputs)
-    num_neurons_to_run=num_neurons
+    num_neurons_to_run=1#num_neurons
     
     sx,sy = numpy.shape(training_set)	
     if __main__.__dict__.get('History',False):
@@ -286,6 +294,28 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
     db_node.add_data("ReversCorrelationPredictedValidationActivities",glm_pred_val_act,force=True)
     db_node.add_data("ReversCorrelationPredictedValidationActivities+TF",glm_pred_val_act_t,force=True)
 
+
+def analyseStoredGLM():
+    res = contrib.dd.loadResults("results.dat")
+    node = res.children[1].children[0]	
+    history_set = node.data["training_set"][0:-1,:]
+    history_validation_set = node.data["validation_set"][0:-1,:]
+    training_set = node.data["training_set"][1:,:]
+    validation_set = node.data["validation_set"][1:,:]
+    training_inputs = node.data["training_inputs"][1:,:]
+    validation_inputs = node.data["validation_inputs"][1:,:]
+    raw_validation_set = node.data["raw_validation_set"]
+    for i in xrange(0,len(raw_validation_set)):
+	raw_validation_set[i] = raw_validation_set[i][1:,:]
+    
+    K = node.children[0].data["Kernels"]
+    glm = node.children[0].data["GLM"]
+    
+	
+    rpi = numpy.linalg.pinv(numpy.mat(training_inputs).T*numpy.mat(training_inputs) + __main__.__dict__.get('RPILaplaceBias',0.0001)*laplaceBias(numpy.sqrt(numpy.shape(training_inputs)[1]),numpy.sqrt(numpy.shape(training_inputs)[1]))) * numpy.mat(training_inputs).T * numpy.mat(training_set)	
+    
+    analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,training_set,raw_validation_set,history_set,history_validation_set,contrib.dd.DB(None),numpy.shape(training_set)[1])	
+	
 
 def laplaceBias(sizex,sizey):
 	S = numpy.zeros((sizex*sizey,sizex*sizey))
