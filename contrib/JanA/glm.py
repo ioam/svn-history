@@ -181,7 +181,7 @@ def runGLM():
     
     num_pres,num_neurons = numpy.shape(training_set)
     num_pres,kernel_size = numpy.shape(training_inputs)
-    num_neurons_to_run=1#num_neurons
+    num_neurons_to_run=num_neurons
     
     [K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),history_set,params["LaplacaBias"],params["HistBias"],params["SparseBias"],params["Norm"],params["OF"],params["Lateral"],num_neurons_to_run)
 	    
@@ -224,8 +224,8 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
 	glm_pred_val_act = glm.response(validation_inputs,history_validation_set,K)
     else:
 	if history_set != None:    
-       		glm_pred_act =  numpy.hstack([ glm.response(training_inputs,numpy.hstack(history_set,numpy.delete(training_set,[i])),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
-		glm_pred_val_act =  numpy.hstack([ glm.response(validation_inputs,numpy.hstack(history_validation_set,numpy.delete(validation_set,[i])),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
+       		glm_pred_act =  numpy.hstack([ glm.response(training_inputs,numpy.vstack((history_set,numpy.delete(training_set,[i]))),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
+		glm_pred_val_act =  numpy.hstack([ glm.response(validation_inputs,numpy.vstack((history_validation_set,numpy.delete(validation_set,[i]))),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
         else:
        		glm_pred_act =  numpy.hstack([ glm.response(training_inputs,numpy.delete(training_set,[i],axis=1),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
 		glm_pred_val_act =  numpy.hstack([ glm.response(validation_inputs,numpy.delete(validation_set,[i],axis=1),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
