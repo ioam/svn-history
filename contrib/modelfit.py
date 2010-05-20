@@ -512,39 +512,7 @@ def clump_low_responses(dataset,threshold):
                        
     return (index,data)
 
-def compute_average_min_max(data_set):
-    avg = numpy.zeros(shape(data_set[0]))
-    var = numpy.zeros(shape(data_set[0]))
-    
-    for d in data_set:
-        avg += d
-    avg = avg/(len(data_set)*1.0)
-    
-    for d in data_set:
-        var += numpy.multiply((d-avg),(d-avg))
-    var = var/(len(data_set)*1.0)
-    return (avg,var)
-    
-def normalize_data_set(data_set,avg,var):
-    print shape(avg)
-    for i in xrange(0,len(data_set)):
-        data_set[i]-=avg
-        data_set[i]=numpy.divide(data_set[i],numpy.sqrt(var)) 
-    return data_set
 
-def compute_average_input(inputs):
-    avgRF = numpy.zeros(shape(inputs[0]))
-
-    for i in inputs:
-        avgRF += i
-    avgRF = avgRF/(len(inputs)*1.0)
-    return avgRF
-
-def normalize_image_inputs(inputs,avgRF):
-    for i in xrange(0,len(inputs)):
-        inputs[i]=inputs[i]-avgRF
-
-    return inputs
 
 
 def runModelFit():
@@ -928,9 +896,9 @@ def run_nonlinearity_detection(activities,predicted_activities,num_bins=20,displ
                 
                 if display:
                    pylab.subplot(13,13,i+1)
-                   pylab.plot(bins[0:-1],ps)
-                   pylab.plot(bins[0:-1],pss)
-                   pylab.plot(bins[0:-1],tf*1000)
+                   #pylab.plot(bins[0:-1],ps)
+                   #pylab.plot(bins[0:-1],pss)
+                   pylab.plot(bins[0:-1],tf)
                 
                 os.append((bins,tf))
             return os
@@ -970,37 +938,46 @@ def apply_output_function(activities,of):
 def fit_sigmoids_to_of(activities,predicted_activities,offset=True,display=True):
 	
     (num_in,num_ne) = numpy.shape(activities)	
-    from scipy import optimize 	
-    pylab.figure()
+    from scipy import optimize
+    rand = UniformRandom(seed=513)
+    if display: 	
+    	pylab.figure()
 
     fitfunc = lambda p, x:  (offset*p[2])+p[3] / (1 + numpy.exp(-p[0]*(x-p[1]))) # Target function
     errfunc = lambda p,x, y: numpy.mean(numpy.power(fitfunc(p, x) - y,2)) # Distance to the target function
     
     params=[]
     for i in xrange(0,num_ne):
-    	p0 = [3.0,0.5,-0.4,2.0] # Initial guess for the parameters
-	(p,success,c)=optimize.fmin_tnc(errfunc,p0[:],bounds=[(-20,20),(-1,1),(-10,10),(0,10)],args=(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0]),approx_grad=True,messages=0)
-        params.append(p)
+	min_err = 10e10
+	best_p = 0
+	for j in xrange(0,100):
+		p0 = [20*rand(),10*(rand()-0.5),20*(rand()-0.5),10*rand()] 
+		(p,success,c)=optimize.fmin_tnc(errfunc,p0[:],bounds=[(0,20),(-5,5),(-10,10),(0,10)],args=(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0]),approx_grad=True,messages=0)
+		err  = errfunc(p,numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0])
+		if err < min_err:
+		   best_p = p 
+	
+        params.append(best_p)
 	if display:
 		pylab.subplot(13,13,i+1)
 	        pylab.plot(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0],'go')
-        	pylab.plot(numpy.array(predicted_activities[:,i].T)[0],fitfunc(p,numpy.array(predicted_activities[:,i].T)[0]),'bo')
+        	pylab.plot(numpy.array(predicted_activities[:,i].T)[0],fitfunc(best_p,numpy.array(predicted_activities[:,i].T)[0]),'bo')
 
     return params
     
-def fit_exponential_to_of(activities,predicted_activities,display=True):
+def fit_exponential_to_of(activities,predicted_activities,offset=True,display=True):
 	
     (num_in,num_ne) = numpy.shape(activities)	
     from scipy import optimize 	
     pylab.figure()
 
-    fitfunc = lambda p, x: p[0] + p[1] * numpy.exp(p[2]*(x-p[3])) # Target function
+    fitfunc = lambda p, x: offset*p[0] + p[1] * numpy.exp(p[2]*(x-p[3])) # Target function
     errfunc = lambda p,x, y: numpy.mean(numpy.power(fitfunc(p, x) - y,2)) # Distance to the target function
     
     params=[]
     for i in xrange(0,num_ne):
     	p0 = [0.0,1.0,0.1,0.0] # Initial guess for the parameters
-	(p,success,c)=optimize.fmin_tnc(errfunc,p0[:],bounds=[(-20,20),(-1,1),(0,1),(-1,1)],args=(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0]),approx_grad=True,messages=0)
+	(p,success,c)=optimize.fmin_tnc(errfunc,p0[:],bounds=[(-20,20),(-10,10),(0,10),(-5,5)],args=(numpy.array(predicted_activities[:,i].T)[0],numpy.array(activities[:,i].T)[0]),approx_grad=True,messages=0)
         params.append(p)
 	if display:
 		pylab.subplot(13,13,i+1)
@@ -1041,8 +1018,8 @@ def apply_sigmoid_output_function(activities,of,offset=True):
 	new_acts[:,i] = sig(of[i],numpy.array(activities[:,i].T)[0]).T
     return new_acts
 
-def apply_exponential_output_function(activities,of):
-    sig = lambda p, x: p[0] + p[1] * numpy.exp(p[2]*(x-p[3])) 
+def apply_exponential_output_function(activities,of,offset=True):
+    sig = lambda p, x: offset*p[0] + p[1] * numpy.exp(p[2]*(x-p[3])) 
     (x,y) = numpy.shape(activities)	
     new_acts = numpy.zeros((x,y))
     
@@ -1185,7 +1162,7 @@ def runRFinference():
     	    params={}
     	    params["alpha"] = __main__.__dict__.get('Alpha',x)
             db_node = db_node.get_child(params)
-            (e1,te1,c1,tc1,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,x,validation_inputs,validation_set,db_node,False)
+            (e1,te1,c1,tc1,RFs,pa,pva,corr_coef,corr_coef_tf) = regulerized_inverse_rf(training_inputs,training_set,sizex,sizey,x,validation_inputs,validation_set,db_node,True)
             e.append(e1)
             c.append(c1)
             b.append(x)
@@ -5007,7 +4984,26 @@ def rot90_around_center_of_gravity(rf):
     res = numpy.zeros((sx,sy))
     res[cx-z:cx+z,cy-z:cy+z] = numpy.rot90(rf[cx-z:cx+z,cy-z:cy+z])
     return res
-	
-	
 
 
+def performance_analysis(training_set,validation_set,pred_act,pred_val_act,raw_validation_set):
+    raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
+    
+    signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power,signal_power_variance  = signal_power_test(raw_validation_data_set, numpy.array(training_set), numpy.array(validation_set), numpy.array(pred_act), numpy.array(pred_val_act))
+    
+    print 'Using all neurons:'
+    (ranks,correct,pred) = performIdentification(validation_set,pred_val_act)
+    	
+    print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power) , " / " , numpy.mean(validation_prediction_power)
+    print "Correctly prediced:", correct ,'(', (correct*1.0)/numpy.shape(validation_set)[0]*100 ,'%)' ,  "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set - pred_val_act,2))
+		
+		
+    significant = numpy.mat(numpy.nonzero(((numpy.array(signal_power) - 0.5*numpy.array(signal_power_variance)) > 0.0)*1.0)).getA1() 		
+    print 'Using significant neurons:','(', len(significant) ,')'
+    (ranks,correct,pred) = performIdentification(validation_set[:,significant],pred_val_act[:,significant])
+    
+    print "Prediction power on training set / validation set: ", numpy.mean(training_prediction_power[significant]) , " / " , numpy.mean(validation_prediction_power[significant])
+    print "Correctly prediced:", correct ,'(', (correct*1.0)/numpy.shape(validation_set)[0]*100 ,'%)' ,  "Mean rank:", numpy.mean(ranks) , "MSE", numpy.mean(numpy.power(validation_set[:,significant] - pred_val_act[:,significant],2))
+    
+    return (signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power,signal_power_variance)
+	
