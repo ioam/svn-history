@@ -133,17 +133,6 @@ def runGLM():
     dataset = contrib.JanA.dataimport.averageRepetitions(dataset)
     history_validation_set = contrib.JanA.dataimport.generateTrainingSet(dataset)
     
-    
-    # creat history
-    training_set = training_set[1:,:]
-    validation_set = validation_set[1:,:]
-    training_inputs= training_inputs[1:,:]
-    validation_inputs= validation_inputs[1:,:]
-    
-    for i in xrange(0,len(raw_validation_set)):
-	raw_validation_set[i] = raw_validation_set[i][1:,:]
-    
-    
     print numpy.shape(training_inputs[0])
     
     params={}
@@ -176,12 +165,23 @@ def runGLM():
  	history_set=None
 	history_validation_set=None
  
+    # creat history
+    training_set = training_set[1:,:]
+    validation_set = validation_set[1:,:]
+    training_inputs= training_inputs[1:,:]
+    validation_inputs= validation_inputs[1:,:]
+    
+    for i in xrange(0,len(raw_validation_set)):
+	raw_validation_set[i] = raw_validation_set[i][1:,:]
+
+
+ 
     db_node1 = db_node
     db_node = db_node.get_child(params)
     
     num_pres,num_neurons = numpy.shape(training_set)
     num_pres,kernel_size = numpy.shape(training_inputs)
-    num_neurons_to_run=num_neurons
+    num_neurons_to_run=1#num_neurons
     
     [K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),history_set,params["LaplacaBias"],__main__.__dict__.get('HistBias',0),params["SparseBias"],params["Norm"],params["OF"],params["Lateral"],num_neurons_to_run)
 	    
