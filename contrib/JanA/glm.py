@@ -32,16 +32,16 @@ class GLM(object):
 	    
 	    if self.history:
                (self.num_pres,self.history_size) = numpy.shape(HH)
-	       self.H = theano.shared(HH)		    
+	       self.H = theano.shared(numpy.mat(HH))		    
 	       self.h = self.K[self.kernel_size+2:self.kernel_size+2+self.history_size]		    
         
 	def model_output(self):
-	    self.lin = T.dot(self.X,self.k.T) 
+	    lin = T.dot(self.X,self.k.T) 
 	    
 	    if self.history:
-	       self.lin = self.lin + T.dot(self.H,self.h.T)
+	       lin = lin + T.dot(self.H,self.h.T)
 	    
-	    return self.construct_of(self.lin - self.n)
+	    return self.construct_of(lin - self.n)
 	
 	def log_likelyhood(self):
 	    mo = self.model_output()	
@@ -53,7 +53,7 @@ class GLM(object):
 	    	ll = ll + self.afferent_bias*T.sum(abs(self.k))
 	     
 	    if self.history and (self.history_bias != 0):
-	       ll = ll + history_bias*T.sum(abs(self.h))
+	       ll = ll + self.history_bias*T.sum(abs(self.h))
 	    return ll	
 	
 	def func(self):
@@ -107,14 +107,14 @@ def fitGLM(X,Y,H,l,hl,sp,norm,of,lateral,num_neurons_to_estimate):
 	print i
 	k0 = rpi[:,i].getA1().tolist()+[0,0] + numpy.zeros((1,hist_size)).flatten().tolist()  + numpy.zeros((1,lateral*(num_neurons-1))).flatten().tolist()
 	if lateral and H != None:
-	   print numpy.shape(H)
-	   print numpy.shape(Y)
-	   H = numpy.hstack((H,Y[:,:i],Y[:,i+1:]))
+	   HH = numpy.hstack((H,Y[:,:i],Y[:,i+1:]))
 	elif lateral:
-	   H = numpy.hstack((Y[:,:i],Y[:,i+1:]))
-	   	
-	glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,numpy.mat(H),hl,sp,norm,of=of)
-	K = fmin_ncg(glm.func(),numpy.array(k0),glm.der(),fhess = glm.hess(),avextol=0.00001)
+	   HH = numpy.hstack((Y[:,:i],Y[:,i+1:]))
+	else:
+	   HH = H
+	
+	glm = GLM(numpy.mat(X),numpy.mat(Y[:,i]),l*laplace,HH,hl,sp,norm,of=of)
+	K = fmin_ncg(glm.func(),numpy.array(k0),glm.der(),fhess = glm.hess(),avextol=0.00001,maxiter=200)
 	Ks[i,:] = K
 	
     return [Ks,rpi,glm]
@@ -183,7 +183,7 @@ def runGLM():
     num_pres,kernel_size = numpy.shape(training_inputs)
     num_neurons_to_run=num_neurons
     
-    [K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),history_set,params["LaplacaBias"],params["HistBias"],params["SparseBias"],params["Norm"],params["OF"],params["Lateral"],num_neurons_to_run)
+    [K,rpi,glm]=  fitGLM(numpy.mat(training_inputs),numpy.mat(training_set),history_set,params["LaplacaBias"],__main__.__dict__.get('HistBias',0),params["SparseBias"],params["Norm"],params["OF"],params["Lateral"],num_neurons_to_run)
 	    
     analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,training_set,raw_validation_set,history_set,history_validation_set,db_node,num_neurons_to_run)
     
@@ -224,8 +224,10 @@ def analyseGLM(K,rpi,glm,validation_inputs,training_inputs,validation_set,traini
 	glm_pred_val_act = glm.response(validation_inputs,history_validation_set,K)
     else:
 	if history_set != None:    
-       		glm_pred_act =  numpy.hstack([ glm.response(training_inputs,numpy.vstack((history_set,numpy.delete(training_set,[i]))),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
-		glm_pred_val_act =  numpy.hstack([ glm.response(validation_inputs,numpy.vstack((history_validation_set,numpy.delete(validation_set,[i]))),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
+		print numpy.shape(history_set)
+		print numpy.shape(numpy.delete(training_set,[i],axis=1))
+       		glm_pred_act =  numpy.hstack([ glm.response(training_inputs,numpy.vstack((history_set,numpy.delete(training_set,[i],axis=1))),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
+		glm_pred_val_act =  numpy.hstack([ glm.response(validation_inputs,numpy.vstack((history_validation_set,numpy.delete(validation_set,[i],axis=1))),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
         else:
        		glm_pred_act =  numpy.hstack([ glm.response(training_inputs,numpy.delete(training_set,[i],axis=1),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
 		glm_pred_val_act =  numpy.hstack([ glm.response(validation_inputs,numpy.delete(validation_set,[i],axis=1),numpy.array([K[i]])) for i in xrange(0,num_neurons)])
