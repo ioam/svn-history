@@ -797,6 +797,26 @@ progressbar-uninstall:
 	rm -rf progressbar ${foreach f,${PROGRESSBAR_UNINSTALL}, ${PREFIX}/${f}}
 
 
+#############################################################
+# GNU MP
+M4 = m4-1.4.9
+
+M4_UNINSTALL += share/info/m4*
+M4_UNINSTALL += share/man/man1/m4*
+
+m4: ${M4}.tar.gz 
+	tar -xzf ${M4}.tar.gz
+	cd ${M4}; ./configure --prefix=${PREFIX} 
+	make -C ${M4}
+	make -C ${M4} install
+	touch m4
+
+m4-clean: 
+	rm -rf ${M4} 
+m4-uninstall:
+	rm -rf m4 $(foreach f, ${M4_UNINSTALL}, ${PREFIX}/${f})
+
+
 
 #############################################################
 # GNU MP
@@ -806,12 +826,12 @@ GMP_UNINSTALL += lib/libgmp.*
 GMP_UNINSTALL += include/gmp.h
 
 
-gmp: ${GMP}.tar.gz
+gmp: ${GMP}.tar.gz m4
 	tar -xzf ${GMP}.tar.gz
-	cd ${GMP}; ./configure --prefix=${PREFIX} 
-	make -C ${GMP}
-	make -C ${GMP} check
-	make -C ${GMP} install
+	cd ${GMP}; env PATH=${PREFIX}/bin:${PATH} ./configure --prefix=${PREFIX} 
+	env PATH=${PREFIX}/bin:${PATH} make -C ${GMP}
+	env PATH=${PREFIX}/bin:${PATH} make -C ${GMP} check
+	env PATH=${PREFIX}/bin:${PATH} make -C ${GMP} install
 	touch gmp
 
 gmp-clean: 
