@@ -111,7 +111,12 @@ class GaussianRandom(RandomGenerator):
         return p.offset+p.scale*p.random_generator.standard_normal(shape)
 
 
-
+# CEBALERT: in e.g. script_repr, an instance of this class appears to
+# have only pattern.Constant() in its list of generators, which might
+# be confusing. The Constant pattern has no effect because the
+# generators list is overridden in __call__. Shouldn't the generators
+# parameter be hidden for this class (and possibly for others based on
+# pattern.Composite)?
 class GaussianCloud(Composite):
     """Uniform random noise masked by a circular Gaussian."""
 
