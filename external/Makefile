@@ -196,15 +196,42 @@ freetype-uninstall:
 
 
 #############################################################
-# libpng 
+# zlib (dependency of libpng)
+
+ZLIB = zlib-1.2.5
+
+ZLIB_UNINSTALL += lib/libz*
+ZLIB_UNINSTALL += share/man/man3/zlib*
+ZLIB_UNINSTALL += lib/pkgconfig/zlib*
+ZLIB_UNINSTALL += include/zlib*
+
+zlib: ${ZLIB}.tar.gz
+	tar -xzf ${ZLIB}.tar.gz
+	cd ${ZLIB}; ./configure --prefix=${PREFIX} 
+	make -C ${ZLIB} install
+	touch zlib
+
+zlib-clean: 
+	rm -rf ${ZLIB} 
+zlib-uninstall:
+	rm -rf zlib $(foreach f, ${ZLIB_UNINSTALL}, ${PREFIX}/${f})
+
+
+#############################################################
+# libpng
 
 LIBPNG = libpng-1.2.40
-# CEBALERT: stuff missing, probably
-LIBPNG_UNINSTALL += lib/liblibpng.* 
 
-libpng: ${LIBPNG}.tar.gz
+LIBPNG_UNINSTALL += lib/libpng* 
+LIBPNG_UNINSTALL += include/libpng*
+LIBPNG_UNINSTALL += include/png* 
+LIBPNG_UNINSTALL += share/man/man5/png* 
+LIBPNG_UNINSTALL += lib/pkgconfig/libpng*
+
+
+libpng: ${LIBPNG}.tar.gz zlib
 	tar -xzf ${LIBPNG}.tar.gz
-	cd ${LIBPNG}; ./configure --prefix=${PREFIX} 
+	cd ${LIBPNG}; env CFLAGS="-I${PREFIX}/include" LDFLAGS="-L${PREFIX}/lib" ./configure --prefix=${PREFIX} --includedir=${PREFIX}/include --libdir=${PREFIX}/lib
 	make -C ${LIBPNG}
 	make -C ${LIBPNG} install
 	touch libpng
@@ -257,6 +284,7 @@ pil: ${PIL}.tgz jpeg python
 #
 # Apply OS-specific patches:
 ifeq ("$(shell uname -m)","x86_64")
+# CEBALERT: patch below might no longer be necessary, now we include zlib
 #       # Tell 64-bit Linux machines where to find zlib, to prevent "encoder zip not available" problems
 	cd ${PIL}; patch < ../Imaging.diff
 endif
