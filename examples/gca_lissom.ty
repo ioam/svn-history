@@ -34,7 +34,7 @@ import topo.responsefn.optimized
 import topo.sheet.lissom
 import topo.sheet.optimized
 
-from topo.base.arrayutil import divide_with_constant
+from topo.base.arrayutil import DivideWithConstant
 
 
 # Parameters that can be passed on the command line using -p
@@ -69,40 +69,25 @@ p.add(
         inclusive_bounds=(False,True),doc="""
         The nominal_density to use for V1."""),
 
-    scale=param.Number(default=1.0,inclusive_bounds=(False,True),doc="""
+    scale=param.Number(default=0.7,inclusive_bounds=(False,True),doc="""
         Brightness of the input patterns"""),
 
-    smoothing=param.Number(default=0.999,bounds=(0.0,1.0),doc="""
-        Weighting of previous activity vs. current activity when calculating the
-        average for homeostatic plasticity."""),
-    
-    V1_smoothing=param.Number(default=0.999,bounds=(0.0,1.0),doc="""
-        Same as smoothing but specifically for V1."""),
-
-    io_ratio=param.Number(default=3.6,bounds=(0.0,None),doc="""
-        The ratio between the average input and output activity."""),
-
-    eta=param.Number(default=0.001,bounds=(0.0,None),doc="""
-        Learning rate for homeostatic plasticity."""),
-
-
-    aff_strength=param.Number(default=25.0,bounds=(0.0,None),doc="""
+    aff_strength=param.Number(default=1.5,bounds=(0.0,None),doc="""
         Overall strength of the afferent projection to V1."""),
 
-    exc_strength=param.Number(default=2.5,bounds=(0.0,None),doc="""
+    exc_strength=param.Number(default=1.7,bounds=(0.0,None),doc="""
         Overall strength of the lateral excitatory projection to V1."""),
 
-    inh_strength=param.Number(default=2.5,bounds=(0.0,None),doc="""
+    inh_strength=param.Number(default=1.4,bounds=(0.0,None),doc="""
         Overall strength of the lateral inhibitory projection to V1."""),
 
-
-    aff_lr=param.Number(default=2.0,bounds=(0.0,None),doc="""
+    aff_lr=param.Number(default=0.1,bounds=(0.0,None),doc="""
         Learning rate for the afferent projection to V1."""),
 
     exc_lr=param.Number(default=0.0,bounds=(0.0,None),doc="""
         Learning rate for the lateral excitatory projection to V1."""),
 
-    inh_lr=param.Number(default=0.5,bounds=(0.0,None),doc="""
+    inh_lr=param.Number(default=0.3,bounds=(0.0,None),doc="""
         Learning rate for the lateral inhibitory projection to V1."""))
 
 
@@ -128,8 +113,10 @@ if p.dataset=="Gaussian":
     inputs=[input_type(x=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
                                                  ubound= (p.area/2.0+0.25),seed=12+i),
                        y=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
-                                                 ubound= (p.area/2.0+0.25),seed=34+i),
+                                                 ubound= (p.area/2.0+0.25),seed=35+i),
                        orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
+                       # CEBALERT: is this used?
+                       bounds=sheet.BoundingBox(radius=1.125),
                        size=0.088388, aspect_ratio=4.66667, scale=p.scale)
             for i in xrange(total_num_inputs)]
     
@@ -157,34 +144,27 @@ topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=p.retina_density,
 
 # LGN has lateral connections for divisive normalization
 for s in ['LGNOn','LGNOff']:
-    topo.sim[s]=sheet.lissom.LISSOM(nominal_density=p.lgn_density,
+    topo.sim[s]=sheet.optimized.LISSOM_Opt(nominal_density=p.lgn_density,
         nominal_bounds=sheet.BoundingBox(radius=p.area/2.0+0.25+0.5),
         output_fns=[transferfn.HalfRectify()],
         tsettle=2,strict_tsettle=1,measure_maps=False)
 
-    lgn_surroundg = pattern.Gaussian(size=0.5,aspect_ratio=1.0,
+    lgn_surroundg = pattern.Gaussian(size=0.25,aspect_ratio=1.0,
         output_fns=[transferfn.DivisiveNormalizeL1()])
 
-    topo.sim.connect(s,s,delay=0.05,name='LateralGC',
-                     dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
+    topo.sim.connect(s,s,delay=0.05,name='LateralGC',                       
+                     dest_port=('Activity'),activity_group=(0.6,DivideWithConstant(c=0.11)),
                      connection_type=projection.SharedWeightCFProjection,
-                     strength=135,weights_generator=lgn_surroundg,
-                     nominal_bounds_template=sheet.BoundingBox(radius=0.5))
+                     strength=0.6,weights_generator=lgn_surroundg,
+                     nominal_bounds_template=sheet.BoundingBox(radius=0.25))
 
-
-AH = transferfn.Hysteresis(time_constant=0.5) 
-
-V1_OF=transferfn.HomeostaticResponse(smoothing=p.V1_smoothing,eta=p.eta,
-                                     input_output_ratio=p.io_ratio,t_init=0.15)
 
 topo.sim['V1'] = sheet.lissom.JointScaling(nominal_density=p.cortex_density,
-    tsettle=16, plastic=True, apply_scaling=False, smoothing=p.smoothing,
+    tsettle=16, plastic=True, apply_scaling=False, 
     nominal_bounds=sheet.BoundingBox(radius=p.area/2.0),
-    output_fns=[AH,V1_OF])
+    output_fns=[transferfn.HomeostaticResponse()])
 
-#make sure that activity is reset at the beginning of iteration
-topo.sim['V1'].beginning_of_iteration.append(AH.reset)
-
+topo.sim['V1'].joint_norm_fn=topo.sheet.optimized.compute_joint_norm_totals_opt
 
 
 ### Connections
@@ -220,7 +200,7 @@ topo.sim.connect(
     connection_type=projection.CFProjection,learning_rate=p.aff_lr,
     nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
     weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083),
-    learning_fn=learningfn.optimized.CFPLF_Hebbian_opt())
+    learning_fn=learningfn.optimized.CFPLF_Scaled_opt())
                      
 topo.sim.connect(
     'LGNOff','V1',delay=0.05,strength=p.aff_strength,name='LGNOffAfferent',
@@ -228,7 +208,7 @@ topo.sim.connect(
     connection_type=projection.CFProjection,learning_rate=p.aff_lr,
     nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
     weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083),
-    learning_fn=learningfn.optimized.CFPLF_Hebbian_opt())
+    learning_fn=learningfn.optimized.CFPLF_Scaled_opt())
 
 topo.sim.connect(
     'V1','V1',delay=0.05,strength=p.exc_strength,name='LateralExcitatory',
@@ -251,6 +231,7 @@ topo.sim.grid_layout([[None,    'V1',     None],
 ### Set up appropriate defaults for analysis
 
 import topo.analysis.featureresponses
-topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
+topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=2.0
 topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
 topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":10},{"contrast":30},{"contrast":50},{"contrast":100}]
+

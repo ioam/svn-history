@@ -913,19 +913,21 @@ class ScalingTF(TransferFnWithState):
 class HomeostaticResponse(TransferFnWithState):
     """
     Adapts the parameters of a linear threshold function to maintain a
-    constant desired ratio between input and output.
+    constant desired average activity.
     """
+    target_activity = param.Number(default=0.024,doc="""
+        The target average activity.""")
 
-    input_output_ratio = param.Number(default=3.6,doc="""
-        The desired ratio between the average input and output activity.""")
+    linear_slope = param.Number(default=1.0,doc="""
+        Linear slope parameter.""")
     
-    t_init = param.Number(default=0.0,doc="""
+    t_init = param.Number(default=0.15,doc="""
         Initial value of the threshold.""")
     
-    eta = param.Number(default=0.0002,doc="""
+    learning_rate = param.Number(default=0.001,doc="""
         Learning rate for homeostatic plasticity.""")
     
-    smoothing = param.Number(default=0.9997,doc="""
+    smoothing = param.Number(default=0.999,doc="""
         Weighting of previous activity vs. current activity when
         calculating the average.""")
     
@@ -942,26 +944,28 @@ class HomeostaticResponse(TransferFnWithState):
         super(HomeostaticResponse,self).__init__(**params)
         self.first_call = True
         self.__current_state_stack=[]
-        self.mu = 0
 
     def __call__(self,x):
         if self.first_call:
             self.first_call = False
             if self.randomized_init:
+                # CEBALERT: Jan's version fixes the UniformRandom's
+                # seed. Does it need to be available as a parameter?
                 self.t = ones(x.shape, x.dtype.char) * self.t_init + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitude*2
             else:
                 self.t = ones(x.shape, x.dtype.char) * self.t_init
             
-            self.y_avg = zeros(x.shape, x.dtype.char)
+            self.y_avg = ones(x.shape, x.dtype.char) * self.target_activity
 
         x_orig = copy.copy(x)
         x -= self.t
         clip_lower(x,0)
-        self.mu = topo.sim[self.sheet_name].x_avg/self.input_output_ratio
+        x *= self.linear_slope
+        
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
-            self.t += self.eta * (self.y_avg - self.mu)
-        # recalculate the mu based on the input/ output ratio
+            self.t += self.learning_rate * (self.y_avg - self.target_activity)
+
 
     def state_push(self):
         self.__current_state_stack.append((copy.copy(self.t), copy.copy(self.y_avg), copy.copy(self.first_call)))
@@ -971,6 +975,7 @@ class HomeostaticResponse(TransferFnWithState):
     def state_pop(self):
         self.t, self.y_avg, self.first_call = self.__current_state_stack.pop()
         super(HomeostaticResponse, self).state_pop()
+
 
 
 class Hysteresis(TransferFnWithState):

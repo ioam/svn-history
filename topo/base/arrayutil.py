@@ -8,9 +8,12 @@ __version__ = "$Revision$"
 import re
 
 from numpy import sqrt,dot,arctan2,array2string,fmod,floor,array, \
-     unravel_index,concatenate,set_printoptions,divide,maximum,minimum
+     unravel_index,concatenate,set_printoptions,divide,maximum,minimum, \
+     clip,divide
 from numpy import abs # pylint: disable-msg=W0622
 from numpy import ufunc
+
+import param
 
 # Ask numpy to print even relatively large arrays by default
 set_printoptions(threshold=200*200)
@@ -159,9 +162,17 @@ def array_argmax(arr):
     return unravel_index(arr.argmax(),arr.shape)
 
 
-def divide_with_constant(x,y):
+# CEBALERT: this function still needs to be cleaned up, or at least
+# documented better (e.g. the clipping).
+class DivideWithConstant(param.Parameterized):
     """
-    Divide two scalars or arrays with a constant (1.0) offset on the
-    denominator to avoid divide-by-zero issues.
-    """ 
-    return divide(x,y+1.0)
+    Divide two scalars or arrays with a constant (c) offset on the
+    denominator to allow setting the gain or to avoid divide-by-zero
+    issues.
+    """    
+    c = param.Number(default=1.0)
+
+    def __call__(self, x, y):
+        y = clip(y, 0, 10000)
+        x = clip(x, 0, 10000)
+        return divide(x, y+self.c)
