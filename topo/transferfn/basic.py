@@ -915,11 +915,12 @@ class HomeostaticResponse(TransferFnWithState):
     Adapts the parameters of a linear threshold function to maintain a
     constant desired average activity.
     """
+    
     target_activity = param.Number(default=0.024,doc="""
         The target average activity.""")
 
     linear_slope = param.Number(default=1.0,doc="""
-        Linear slope parameter.""")
+        Slope of the linear portion above threshold.""")
     
     t_init = param.Number(default=0.15,doc="""
         Initial value of the threshold.""")
@@ -938,8 +939,6 @@ class HomeostaticResponse(TransferFnWithState):
         The magnitude of the additive noise to apply to the t_init
         parameter at initialization.""")
 
-    sheet_name = param.String(default="V1", doc="""The name of the sheet to which the output function belongs""")
-            
     def __init__(self,**params):
         super(HomeostaticResponse,self).__init__(**params)
         self.first_call = True
@@ -951,7 +950,10 @@ class HomeostaticResponse(TransferFnWithState):
             if self.randomized_init:
                 # CEBALERT: Jan's version fixes the UniformRandom's
                 # seed. Does it need to be available as a parameter?
-                self.t = ones(x.shape, x.dtype.char) * self.t_init + (topo.pattern.random.UniformRandom()(xdensity=x.shape[0],ydensity=x.shape[1])-0.5)*self.noise_magnitude*2
+                self.t = ones(x.shape, x.dtype.char) * self.t_init + \
+                         (topo.pattern.random.UniformRandom() \
+                          (xdensity=x.shape[0],ydensity=x.shape[1]) \
+                          -0.5)*self.noise_magnitude*2
             else:
                 self.t = ones(x.shape, x.dtype.char) * self.t_init
             
@@ -968,7 +970,9 @@ class HomeostaticResponse(TransferFnWithState):
 
 
     def state_push(self):
-        self.__current_state_stack.append((copy.copy(self.t), copy.copy(self.y_avg), copy.copy(self.first_call)))
+        self.__current_state_stack.append((copy.copy(self.t),
+                                           copy.copy(self.y_avg),
+                                           copy.copy(self.first_call)))
         super(HomeostaticResponse, self).state_push()
 
         
