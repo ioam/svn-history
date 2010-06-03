@@ -943,7 +943,9 @@ class HomeostaticResponse(TransferFnWithState):
         super(HomeostaticResponse,self).__init__(**params)
         self.first_call = True
         self.__current_state_stack=[]
-
+        self.t=None     # To allow state_push at init
+        self.y_avg=None # To allow state_push at init
+        
     def __call__(self,x):
         if self.first_call:
             self.first_call = False
