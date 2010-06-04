@@ -990,18 +990,43 @@ def reset_cc_lissom():
     return (s,a)
 
 def measure_map_position_and_MR_correlations():
-    a =1.0
+    import contrib.surround_analysis
+    import matplotlib.ticker as mticker
+    import operator
+    import matplotlib
+    matplotlib.rc('xtick', labelsize=15)
+    matplotlib.rc('ytick', labelsize=15)
     
+    lhi = contrib.surround_analysis.compute_local_homogeneity_index(topo.sim["V1Complex"].sheet_views['OrientationPreference'].view()[0]*pi,5)
+    pylab.figure()
+    ax = pylab.subplot(111)
+    b = zip(lhi.flatten(),topo.sim["V1Complex"].sheet_views['ComplexSelectivity'].view()[0].flatten())
+    b_sorted = sorted(b, key=operator.itemgetter(0))
+    c,d=zip(*b_sorted)
+    pylab.plot(c,d,'ro')
+    pylab.plot(c,contrib.jacommands.weighted_local_average(c,d,0.05),linewidth=5)
+    ax.xaxis.set_major_locator(mticker.MaxNLocator(5))
+    pylab.yticks([0,0.25,0.5,0.75,1.0], ['0','0.5','1.0','1.5','2.0'])
+    ax.set_xlabel('Local homogenity index', fontsize=15)
+    ax.set_ylabel('Modulation ratio', fontsize=15)
+    pylab.show()
+
 def weighted_local_average(x,y,s):
     z = []
     for a in x:
-        tmp = 0
-        num = 0
-        for i in xrange(0,len(x)):
-            # 1/(numpy.sqrt(2*numpy.pi*s*s))  
-            #c = 1/(numpy.sqrt(2*numpy.pi*s*s)) * numpy.exp(-numpy.abs(x[i]-a)/(2*s*s))
-            if numpy.abs(x[i]-a) < s:
-                tmp+=y[i]
-                num+=1
-        z.append(tmp/num)
+        tmp = 0.0
+        num = 0.0
+	b = (numpy.abs(x-a) < s) *1.0
+	z.append(numpy.sum(numpy.multiply(y,b))/numpy.sum(b))
     return z
+
+def weighted_local_std(x,y,s):
+    z = []
+    for a in x:
+        tmp = 0.0
+        num = 0.0
+	b = (numpy.abs(x-a) < s) *1.0
+	av = numpy.sum(numpy.multiply(y,b))/numpy.sum(b)
+	z.append(numpy.sqrt(numpy.sum(numpy.power(numpy.multiply(y-av,b),2))/numpy.sum(b)))
+    return z
+
