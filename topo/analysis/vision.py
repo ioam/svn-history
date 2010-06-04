@@ -93,7 +93,7 @@ def complexity(full_matrix):
                 res = res + abs(full_matrix.full_matrix[tuple(iindex.tolist())][x][y] - average)
                 complex_matrix[x,y] = complex_matrix[x,y] + [full_matrix.full_matrix[tuple(iindex.tolist())][x][y]]
 
-            if x==0 and y==0:
+            if x==43 and y==43:
                 pylab.figure()
 		ax = pylab.subplot(111)
 		z = complex_matrix[x,y][:]
@@ -102,8 +102,9 @@ def complexity(full_matrix):
 		pylab.axis(xmin=0.0,xmax=numpy.pi)
 		ax.yaxis.set_major_locator(mticker.MaxNLocator(4))
 		pylab.xticks([0,len(z)/2,len(z)-1], ['0','pi/2','pi'])
+		pylab.savefig(normalize_path(str(topo.sim.time()) + str(complex_matrix[x,y][0])+ 'modulation_response[43,43].png'))
 
-            if x==26 and y==26:
+            if x==45 and y==45:
                 pylab.figure()
 		ax = pylab.subplot(111)
 		z = complex_matrix[x,y][:]
@@ -112,6 +113,7 @@ def complexity(full_matrix):
 		pylab.axis(xmin=0.0,xmax=numpy.pi)
 		ax.yaxis.set_major_locator(mticker.MaxNLocator(4))
 		pylab.xticks([0,len(z)/2,len(z)-1], ['0','pi/2','pi'])
+		pylab.savefig(normalize_path(str(topo.sim.time()) + str(complex_matrix[x,y][0])+ 'modulation_response[45,45].png'))
 		
             fft = numpy.fft.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
             first_har = 2048/len(complex_matrix[0,0])
