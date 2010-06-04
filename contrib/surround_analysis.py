@@ -70,15 +70,14 @@ class surround_analysis():
        
 
 
-    def analyse(self,steps=1,ns=10,step_size=1):
+    def analyse(self,steps=[],ns=10,offset_x=0,offset_y=0):
         
         save_plotgroup("Orientation Preference and Complexity")
 
         #save_plotgroup("Position Preference")
-        for x in xrange(0,steps*2+1):
-            for y in xrange(0,steps*2+1):
-                xindex = self.center_r+(x-steps)*step_size
-                yindex = self.center_c+(y-steps)*step_size
+        for (x,y) in steps:
+                xindex = self.center_r+offset_x+x
+                yindex = self.center_c+offset_y+y
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
                 topo.command.pylabplots.measure_size_response.instance(sheet=self.sheet,num_phase=4,num_sizes=ns,max_size=3.0,coords=[(xcoor,ycoor)])(coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)])        
                 
@@ -90,7 +89,10 @@ class surround_analysis():
                 self.plot_orientation_contrast_tuning(xindex,yindex)
                 self.plot_orientation_contrast_tuning_abs(xindex,yindex)
                 
-                
+                f = open(normalize_path("dict.dat"),'wb')
+	        import pickle
+        	pickle.dump(self.data_dict,f)
+		f.close()
         
         self.plot_histograms_of_measures()
         lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,0.5)                
@@ -98,9 +100,6 @@ class surround_analysis():
         self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationSelectivity'].view()[0],"OrientationSelectivity")
         self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationPreference'].view()[0]*numpy.pi,"OrientationPreference")
 
-        f = open(normalize_path("dict.dat"),'wb')
-        import pickle
-        pickle.dump(self.data_dict,f)
         
 
     def perform_orientation_contrast_analysis(self,data,xcoor,ycoor,xindex,yindex):
@@ -133,8 +132,8 @@ class surround_analysis():
                                                              size=0.0,
                                                              display=True,
                                                              contrastcenter=self.low_contrast,
-                                                             thickness=4.0-lc_curve["measures"]["peak_near_facilitation"]-0.2,
-                                                             num_phase=12,
+                                                             thickness=4.0-lc_curve["measures"]["peak_near_facilitation"],
+                                                             num_phase=8,
 							     frequencies=[__main__.__dict__.get('FREQ',2.4)],
                                                              curve_parameters=[{"contrastsurround":self.low_contrast},{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
         
@@ -254,8 +253,11 @@ class surround_analysis():
         for curve_label in measurment.keys():
             curve =  measurment[curve_label]["data"]
             x_values = sorted(curve.keys())
-            print x_values
             y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
+	    
+	    print "ADSAAAAAAAAAAAAAAAAAAADASDA"
+	    print x_values
+	    print y_values
 
             f.plot(x_values, y_values, lw=3, color=colors[i])
             f.axvline(x=orientation,linewidth=4, color='r')
@@ -364,13 +366,16 @@ class surround_analysis():
                 f.set_xlabel(str(key))
                 f.set_ylabel(map_feature_name)
                 try:
-                    correlation = numpy.corrcoef(raster_plots_hc[key][0],raster_plots_hc[key][1])[0,1]
+                    #correlation = numpy.corrcoef(raster_plots_hc[key][0],raster_plots_hc[key][1])[0,1]
+		    import scipy.stats
+		    correlation = scipy.stats.pearsonr(raster_plots_hc[key][0],raster_plots_hc[key][1])[0]
+		    pval= scipy.stats.pearsonr(raster_plots_hc[key][0],raster_plots_hc[key][1])[1] 
                 except FloatingPointError:
                       correlation = 0
                 m,b = numpy.polyfit(raster_plots_hc[key][0],raster_plots_hc[key][1],1)
                 f.plot(raster_plots_hc[key][0],raster_plots_hc[key][1],'ro')
                 f.plot(raster_plots_hc[key][0],m*numpy.array(raster_plots_hc[key][0])+b,'-k',linewidth=2)
-                release_fig("RasterHC<" + map_feature_name + ","+ key +  " Corr:"+ str(correlation) + ">")
+                release_fig("RasterHC<" + map_feature_name + ","+ key +  " Corr:"+ str(correlation) + '|'+ str(pval) + ">")
                 
 
         for key in raster_plots_lc.keys():
@@ -380,12 +385,15 @@ class surround_analysis():
                 f.set_ylabel(map_feature_name)
                 m,b = numpy.polyfit(raster_plots_lc[key][0],raster_plots_lc[key][1],1)
                 try:
-                    correlation = numpy.corrcoef(raster_plots_lc[key][0],raster_plots_lc[key][1])[0,1]
+                    #correlation = numpy.corrcoef(raster_plots_lc[key][0],raster_plots_lc[key][1])[0,1]
+		    import scipy.stats
+		    correlation = scipy.stats.pearsonr(raster_plots_hc[key][0],raster_plots_hc[key][1])[0]
+		    pval= scipy.stats.pearsonr(raster_plots_hc[key][0],raster_plots_hc[key][1])[1] 
                 except FloatingPointError:
                       correlation = 0
                 f.plot(raster_plots_lc[key][0],raster_plots_lc[key][1],'ro')
                 f.plot(raster_plots_lc[key][0],m*numpy.array(raster_plots_lc[key][0])+b,'-k',linewidth=2)
-                release_fig("RasterLC<" + map_feature_name + ","+ key + " Corr:"+ str(correlation) + ">")
+                release_fig("RasterLC<" + map_feature_name + ","+ key + " Corr:"+ str(correlation)+ '|'+ str(pval) + ">")
 
             
     def plot_histograms_of_measures(self):
@@ -441,9 +449,9 @@ def compute_local_homogeneity_index(or_map,sigma):
                 for ty in xrange(0,ysize):
                     lhi_current[0]+=numpy.exp(-((sx-tx)*(sx-tx)+(sy-ty)*(sy-ty))/(2*sigma*sigma))*numpy.cos(2*or_map[tx,ty])
                     lhi_current[1]+=numpy.exp(-((sx-tx)*(sx-tx)+(sy-ty)*(sy-ty))/(2*sigma*sigma))*numpy.sin(2*or_map[tx,ty])
-           # print sx,sy
-           # print lhi.shape
-           # print lhi_current        
+            # print sx,sy
+            # print lhi.shape
+            # print lhi_current        
             lhi[sx,sy]= numpy.sqrt(lhi_current[0]*lhi_current[0] + lhi_current[1]*lhi_current[1])/(2*numpy.pi*sigma*sigma)
                     
     return lhi       
@@ -530,3 +538,170 @@ def run_dynamics_analysis(x,y,cs,scale):
     pg = OrientationContrast(orientationcenter=orr,orientationsurround=orr+numpy.pi/2,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs-0.2,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
     
     plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg,"ortogonal")
+
+def test(x,y,cs,scale):
+    from topo.pattern.basic import OrientationContrast
+    from topo.command.basic import pattern_present
+    from topo.base.functionfamily import PatternDrivenAnalysis
+    from topo.pattern.basic import OrientationContrast
+    from topo.analysis.featureresponses import PatternPresenter
+    from topo.base.sheet import Sheet
+
+    (xx,yy) = topo.sim["V1Complex"].sheet2matrixidx(x,y)
+    
+    orr=numpy.pi*topo.sim["V1Complex"].sheet_views["OrientationPreference"].view()[0][xx][yy]
+    
+    pg1 = OrientationContrast(orientationcenter=orr,orientationsurround=orr,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
+
+    pg2 = OrientationContrast(orientationcenter=orr,orientationsurround=orr+numpy.pi/2,sizecenter=cs,sizesurround=2.0,thickness=2.0-cs,scalecenter=scale,scalesurround=scale,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
+
+    pp = PatternPresenter(pattern_generator=pg1,duration=4.0,contrast_parameter="weber_contrast")
+        
+    for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
+    topo.sim.state_push()
+    for f in PatternDrivenAnalysis.pre_presentation_hooks: f()
+        
+    pp({},{})
+    topo.guimain.refresh_activity_windows()
+    
+    LongEI = topo.sim["V1ComplexInh"].projections()["LongEI"].cfs[xx,yy].weights
+    LongEIAct = topo.sim["V1ComplexInh"].projections()["LongEI"].activity[xx,yy]
+    V1CActivity = topo.sim["V1Complex"].activity
+
+    for f in PatternDrivenAnalysis.post_presentation_hooks: f()
+    topo.sim.state_pop()
+    for f in PatternDrivenAnalysis.post_analysis_session_hooks: f()
+	
+    pp = PatternPresenter(pattern_generator=pg2,duration=4.0,contrast_parameter="weber_contrast")
+        
+    for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
+    topo.sim.state_push()
+    for f in PatternDrivenAnalysis.pre_presentation_hooks: f()
+        
+    pp({},{})
+    topo.guimain.refresh_activity_windows()
+    
+    LongEIOrt = topo.sim["V1ComplexInh"].projections()["LongEI"].cfs[xx,yy].weights
+    LongEIActOrt = topo.sim["V1ComplexInh"].projections()["LongEI"].activity[xx,yy]
+    V1CActivityOrt = topo.sim["V1Complex"].activity
+
+    for f in PatternDrivenAnalysis.post_presentation_hooks: f()
+    topo.sim.state_pop()
+    for f in PatternDrivenAnalysis.post_analysis_session_hooks: f()
+	
+    print numpy.shape(LongEIOrt)
+    print numpy.shape(V1CActivityOrt)
+    
+    print "colinear:", LongEIAct
+    print "orthogonal:", LongEIActOrt
+    
+    print "cross colinear:", numpy.sum(numpy.multiply(numpy.mat(LongEI),numpy.mat(V1CActivity)))
+    print "cross orthogonal:", numpy.sum(numpy.multiply(numpy.mat(LongEIOrt),numpy.mat(V1CActivityOrt)))
+    
+    
+    pylab.figure()
+    pylab.subplot(1,3,1)
+    pylab.imshow(LongEI)
+    pylab.subplot(1,3,2)
+    pylab.imshow(V1CActivity)
+    pylab.subplot(1,3,3)
+    pylab.imshow(numpy.array(numpy.multiply(numpy.mat(LongEI),numpy.mat(V1CActivity))))
+		
+    pylab.figure()
+    pylab.subplot(1,3,1)
+    pylab.imshow(LongEIOrt)
+    pylab.subplot(1,3,2)
+    pylab.imshow(V1CActivityOrt)
+    pylab.subplot(1,3,3)
+    pylab.imshow(numpy.array(numpy.multiply(numpy.mat(LongEIOrt),numpy.mat(V1CActivityOrt))))
+	
+		
+from topo.pattern.basic import SineGrating, Disk
+class SineGratingDiskTemp(SineGrating):
+      mask_shape = param.Parameter(default=Disk(smoothing=0,size=1.0))
+		
+		
+def size_tining_activity_evolution(x,y,cs,scale):
+    from topo.pattern.basic import OrientationContrast
+    from topo.command.basic import pattern_present
+    from topo.base.functionfamily import PatternDrivenAnalysis
+    from topo.pattern.basic import OrientationContrast
+    from topo.analysis.featureresponses import PatternPresenter
+    from topo.base.sheet import Sheet
+
+    (xx,yy) = topo.sim["V1Complex"].sheet2matrixidx(x,y)
+    orr=numpy.pi*topo.sim["V1Complex"].sheet_views["OrientationPreference"].view()[0][xx][yy]
+    
+    pg1 = SineGratingDiskTemp(orientation=orr,phase=4.5,size=0.3,scale=3.0,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
+    pg2 = SineGratingDiskTemp(orientation=orr,phase=4.5,size=0.8,scale=scale,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
+    pg3 = SineGratingDiskTemp(orientation=orr,phase=4.5,size=1.1,scale=scale,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
+    
+    pp = PatternPresenter(pattern_generator=pg1,duration=4.0,contrast_parameter="weber_contrast")
+        
+    for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
+    topo.sim.state_push()
+    for f in PatternDrivenAnalysis.pre_presentation_hooks: f()
+
+    pp({},{})
+    topo.guimain.refresh_activity_windows()
+    
+    V1CActivity1 = topo.sim["V1Complex"].activity.copy()
+
+    for f in PatternDrivenAnalysis.post_presentation_hooks: f()
+    topo.sim.state_pop()
+    for f in PatternDrivenAnalysis.post_analysis_session_hooks: f()
+	
+    pp = PatternPresenter(pattern_generator=pg2,duration=4.0,contrast_parameter="weber_contrast")
+        
+    for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
+    topo.sim.state_push()
+    for f in PatternDrivenAnalysis.pre_presentation_hooks: f()
+        
+    pp({},{})
+    topo.guimain.refresh_activity_windows()
+    
+    V1CActivity2 = topo.sim["V1Complex"].activity.copy()
+
+    for f in PatternDrivenAnalysis.post_presentation_hooks: f()
+    topo.sim.state_pop()
+    for f in PatternDrivenAnalysis.post_analysis_session_hooks: f()
+	
+    pp = PatternPresenter(pattern_generator=pg3,duration=4.0,contrast_parameter="weber_contrast")
+        
+    for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
+    topo.sim.state_push()
+    for f in PatternDrivenAnalysis.pre_presentation_hooks: f()
+        
+    pp({},{})
+    topo.guimain.refresh_activity_windows()
+    
+    V1CActivity3 = topo.sim["V1Complex"].activity.copy()
+
+    for f in PatternDrivenAnalysis.post_presentation_hooks: f()
+    topo.sim.state_pop()
+    for f in PatternDrivenAnalysis.post_analysis_session_hooks: f()
+    
+    pylab.figure()
+    pylab.subplot(1,3,1)
+    pylab.imshow(V1CActivity1,vmin=0.1,vmax=1.3,interpolation='nearest')
+    pylab.ylabel('L2/3 activity',fontsize=30)
+    pylab.xlabel('size = 0.15',fontsize=25)
+    pylab.xticks([], [])  
+    pylab.yticks([], [])
+    pylab.colorbar(shrink=0.4)
+    pylab.subplot(1,3,2)
+    pylab.imshow(V1CActivity2,vmin=0.1,vmax=1.3,interpolation='nearest')
+    pylab.xticks([], [])
+    pylab.yticks([], [])
+    pylab.xlabel('size = 0.8',fontsize=25)
+    pylab.colorbar(shrink=0.4)
+    pylab.subplot(1,3,3)
+    pylab.imshow(V1CActivity3,vmin=0.1,vmax=1.3,interpolation='nearest')
+    pylab.xticks([], [])
+    pylab.yticks([], [])
+    pylab.xlabel('size = 1.1',fontsize=25)
+    pylab.colorbar(shrink=0.4)
+    
+    
+	
+				
