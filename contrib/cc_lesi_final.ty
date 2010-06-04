@@ -91,8 +91,7 @@ ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-r
 
  
 
-retinal_waves=Expander(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
-
+retinal_waves=Expander(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02),size=locals().get('InitRingSize',0.5))
 
 zeroInput = topo.pattern.basic.Null();
 
