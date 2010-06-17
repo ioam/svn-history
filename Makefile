@@ -469,7 +469,7 @@ deb-svn:
 # CEBALERT: change to use UBUNTU_BACKPORTS list
 # KARMIC
 	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
-	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~jaunty" --force-distribution --distribution jaunty "Backport to 9.10 (Karmic)."
+	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~karmic" --force-distribution --distribution karmic "Backport to 9.10 (Karmic)."
 	cd ${UBUNTU_DIR}; ${DEBUILD} 
 	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 # JAUNTY
@@ -496,6 +496,7 @@ deb-svn-ppa:
 # CEBALERT: Requires that you have first run "make RELEASE=0.9.7 deb-svn"
 	cd ${DIST_TMPDIR}; dput topographica-unstable-force-${UBUNTU_TARGET} topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_source.changes
 # CEBALERT: use UBUNTU_BACKPORTS list here
+	cd ${DIST_TMPDIR}; dput topographica-unstable-force-karmic topographica_${UBUNTU_RELEASE}~karmic_source.changes
 	cd ${DIST_TMPDIR}; dput topographica-unstable-force-jaunty topographica_${UBUNTU_RELEASE}~jaunty_source.changes
 	cd ${DIST_TMPDIR}; dput topographica-unstable-force-hardy topographica_${UBUNTU_RELEASE}~hardy_source.changes
 
