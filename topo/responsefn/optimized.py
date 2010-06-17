@@ -18,7 +18,9 @@ from topo.responsefn.projfn import CFPRF_EuclideanDistance
 
     
 
-    
+# CEBALERT: the "only works for 1D array" doc is out of date, right?
+# Should remove from here and other optimized fns that have been
+# flattened.
 class CFPRF_DotProduct_opt(CFPResponseFn):
     """
     Dot-product response function.

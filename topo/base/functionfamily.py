@@ -123,8 +123,12 @@ class DotProduct(ResponseFn):
     arrays.  
     """
     def __call__(self,m1,m2):
+        # CBENHANCEMENT: numpy.vdot(m1,m2)?
+        # Early tests indicated that
+        # vdot(a,b)=dot(a.ravel(),b.ravel()) but was slower. Should
+        # check that.
         return numpy.dot(m1.ravel(),m2.ravel())
-
+        
 
 
 class CoordinateMapperFn(param.Parameterized):
