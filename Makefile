@@ -445,8 +445,8 @@ UBUNTU_DIR = ${DIST_TMPDIR}/topographica-${UBUNTU_RELEASE}
 UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
 UBUNTU_ENV = env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7
 DEBUILD = ${UBUNTU_ENV} debuild
-UBUNTU_TARGET = karmic
-UBUNTU_BACKPORTS = jaunty hardy
+UBUNTU_TARGET = lucid
+UBUNTU_BACKPORTS = karmic jaunty hardy 
 
 # Make binary and source deb files for UBUNTU_TARGET and
 # UBUNTU_BACKPORTS
@@ -467,6 +467,11 @@ deb-svn:
 # sudo pbuilder build topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}.dsc 
 	cd ${UBUNTU_DIR}/debian; cp changelog ../../changelog.orig
 # CEBALERT: change to use UBUNTU_BACKPORTS list
+# KARMIC
+	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
+	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~jaunty" --force-distribution --distribution jaunty "Backport to 9.10 (Karmic)."
+	cd ${UBUNTU_DIR}; ${DEBUILD} 
+	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 # JAUNTY
 	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
 	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~jaunty" --force-distribution --distribution jaunty "Backport to 9.04 (Jaunty)."
