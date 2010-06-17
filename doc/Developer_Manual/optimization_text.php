@@ -40,7 +40,7 @@ total memory is considered separately under
 <A href="memuse.html">Memory usage</a>.  On the other hand, the
 <i>patterns</i> of access to memory are crucially important for
 performance in large simulations.  For a good overview of how to
-optimize memory usage patterns,
+optimize memory usage patterns, see
 <A href="http://lwn.net/Articles/250967/">Ulrich Drepper's
 article</A>.  If you are ambitious, even the most optimized components
 in Topographica could be further improved using these techniques,
@@ -52,8 +52,10 @@ possibly substantially.
 <P>Although dramatic speedups usually require big changes as described
 below, sometimes all you need is minor tweaks to Python code to get it
 to have reasonable performance.  Usually this involves avoiding
-unnecessary attribute lookup, as described
-<A href="http://www.informit.com/articles/article.asp?p=453682&rl=1">here</A>.
+unnecessary attribute lookup, as described in various collections of
+<a
+href="http://wiki.python.org/moin/PythonSpeed/PerformanceTips">Python
+performance tips</a>.
 
 <P>What is usually more important to ensure is that anything that can
 use the array-based primitives provided by
@@ -66,8 +68,6 @@ maintain than e.g. explicitly writing <code>for</code> loops).
 
 
 <H2>Providing optimized versions of Topographica objects</H2>
-
-<!-- CB: update to numpy! & cleanup numpy/Numeric in following section!-->
 
 However, there are certain cases where the performance of numpy is
 not sufficient, or where numpy is unsuitable (for example, some
@@ -128,8 +128,8 @@ instance the <code>CFProjection</code> has a learning function of
 <code>lissom_oo_or.ty</code> simply creates the network but does not run
 the simulation.
 
-In order to see how basic optimisation could be applied lets first roll this
-script back to the unoptimised version. You can do this by editing 
+In order to see how basic optimization could be applied, let us first roll this
+script back to the unoptimized version. You can do this by editing 
 <code>examples/lissom_oo_or.ty</code>. Replace code at line 76 with the following:
 <code>projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct()</code> 
 
@@ -236,7 +236,7 @@ class DotProduct(ResponseFn):
 </pre>
 
 Here the Numpy's <code>dot</code> function is called in order to calculate 
-the dot-product for two matrices. Numpy offers a very good level of optimisation 
+the dot-product for two matrices. Numpy offers a very good level of optimization 
 as far as Python goes. However, we can get even better results by using C++. 
 
 <H3>Considering optimizations with C++ (weave)</H3>
@@ -259,7 +259,7 @@ the code at line 76 with
 <code>projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()</code> </P>
 
 <P>Now, instead of computing <code>DotProduct()</code> in <code>functionfamily.py</code> topographica
-will call a different method located in <code>responsefn.optimised.py</code>:</P>
+will call a different method located in <code>responsefn.optimized.py</code>:</P>
 
 <pre>
 class CFPRF_DotProduct_opt(CFPResponseFn):
