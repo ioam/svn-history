@@ -16,7 +16,7 @@ IMPORT_WEAVE = 1
 TESTDP = 7
 
 # see topographica-other-python target
-OTHER_PYTHON = "/usr/bin/env python"
+OTHER_PYTHON = /usr/bin/env python
 
 SVNVERSION = ${shell svnversion}
 
@@ -104,7 +104,7 @@ topographica: external Makefile topo/*/*.py examples/*.ty
 
 
 topographica-other-python:
-	${OTHER_PYTHON} ${PREFIX}/create_topographica_script.py ${OTHER_PYTHON} ${RELEASE} ${SVNVERSION}
+	${OTHER_PYTHON} ${PREFIX}/create_topographica_script.py "${OTHER_PYTHON}" ${RELEASE} ${SVNVERSION}
 
 
 # CB: experimental
