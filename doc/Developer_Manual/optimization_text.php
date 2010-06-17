@@ -117,6 +117,9 @@ time. <code>topo.misc.util</code> contains the
 <code>profile()</code> function, providing a simple way to do
 this.
 
+<!--CEBENHANCEMENT: would be nice to have a Python-only version first
+(i.e. no numpy). -->
+
 <P>In order to see how basic optimization could be applied, we now
 show how optimizing one component can lead to a dramatic
 improvement. We will use <code>examples/lissom_oo_or.ty</code> without
