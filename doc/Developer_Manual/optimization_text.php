@@ -117,23 +117,15 @@ time. <code>topo.misc.util</code> contains the
 <code>profile()</code> function, providing a simple way to do
 this.
 
-<P>For instance, if we have a simple simulation consisting of a
-SOM-based sheet connected to a <code>GeneratorSheet</code>
-with a <code>CFProjection</code>, we might wish to find out if there
-is an obvious bottleneck that could be eliminated, speeding up the
-network's performance. For concreteness, let us say that in this
-instance the <code>CFProjection</code> has a learning function of
-<code>CFPLF_HebbianSOM()</code>, and a response function of
-<code>CFPRF_Plugin()</code>, and that the script
-<code>lissom_oo_or.ty</code> simply creates the network but does not run
-the simulation.
+<P>In order to see how basic optimization could be applied, we now
+show how optimizing one component can lead to a dramatic
+improvement. We will use <code>examples/lissom_oo_or.ty</code> without
+its optimized response function, by replacing
+<code>projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()</code>
+with
+<code>projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct()</code>.
 
-In order to see how basic optimization could be applied, let us first roll this
-script back to the unoptimized version. You can do this by editing 
-<code>examples/lissom_oo_or.ty</code>. Replace code at line 76 with the following:
-<code>projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct()</code> 
-
-<P>We can run topographica as follows, using the
+<P>Now we can run topographica as follows, using the
 <code>profile()</code> function to give us information about the 
 performance:
 
@@ -141,32 +133,32 @@ performance:
 $ ./topographica examples/lissom_oo_or.ty -c "from topo.misc.util import profile; \
 profile('topo.sim.run(99)',n=20)"  
 
-         28115548 function calls (28112974 primitive calls) in 74.199 CPU seconds
+         28148082 function calls (28145508 primitive calls) in 81.806 CPU seconds
 
    Ordered by: cumulative time, internal time
-   List reduced from 257 to 20 due to restriction <20>
+   List reduced from 245 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000   74.201   74.201 <string>:1(<module>)
-        1    0.042    0.042   74.201   74.201 simulation.py:1120(run)
-     2178    0.007    0.000   72.330    0.033 simulation.py:436(__call__)
-     2178    0.022    0.000   72.305    0.033 projection.py:391(input_event)
-     2178    0.003    0.000   72.255    0.033 projection.py:519(present_input)
-     2178    0.050    0.000   72.251    0.033 cf.py:725(activate)
-     1980    0.012    0.000   72.199    0.036 lissom.py:95(input_event)
-     1980   13.755    0.007   72.048    0.036 cf.py:339(__call__)
-  4561920    8.581    0.000   35.867    0.000 functionfamily.py:125(__call__)
-  9124434   14.049    0.000   14.049    0.000 {method 'ravel' of 'numpy.ndarray' objects}
-  4561920   13.642    0.000   13.642    0.000 sheetcoords.py:387(submatrix)
-  4561920   13.237    0.000   13.237    0.000 {numpy.core.multiarray.dot}
-  4563900    8.758    0.000    8.780    0.000 cf.py:809(__call__)
-     1188    0.012    0.000    1.150    0.001 lissom.py:113(process_current_time)
-     1094    0.006    0.000    0.871    0.001 inlinec.py:72(inline_weave)
-     1094    0.018    0.000    0.859    0.001 inline_tools.py:130(inline)
-     1094    0.647    0.001    0.826    0.001 {apply}
-       99    0.001    0.000    0.685    0.007 basic.py:290(learn)
-      100    0.003    0.000    0.560    0.006 basic.py:266(_normalize_weights)
-       99    0.000    0.000    0.466    0.005 simulation.py:510(__call__)
+        1    0.041    0.041   81.806   81.806 topo/base/simulation.py:1121(run)
+     2178    0.006    0.000   79.951    0.037 topo/base/simulation.py:437(__call__)
+     2178    0.021    0.000   79.925    0.037 topo/base/projection.py:399(input_event)
+     2178    0.003    0.000   79.879    0.037 topo/base/projection.py:527(present_input)
+     2178    0.052    0.000   79.875    0.037 topo/base/cf.py:696(activate)
+     1980    0.013    0.000   79.816    0.040 topo/sheet/lissom.py:95(input_event)
+     1980   19.207    0.010   79.640    0.040 topo/base/cf.py:348(__call__)
+  4561920    8.435    0.000   34.585    0.000 topo/base/functionfamily.py:125(__call__)
+  4561920   19.912    0.000   19.912    0.000 topo/base/sheetcoords.py:387(submatrix)
+  9124038   13.639    0.000   13.639    0.000 {method 'ravel' of 'numpy.ndarray' objects}
+  4561920   12.512    0.000   12.512    0.000 {numpy.core._dotblas.dot}
+  4563900    5.848    0.000    5.932    0.000 topo/base/cf.py:861(__call__)
+     1188    0.010    0.000    1.133    0.001 topo/sheet/lissom.py:113(process_current_time)
+     1094    0.005    0.000    0.866    0.001 topo/misc/inlinec.py:72(inline_weave)
+     1094    0.017    0.000    0.855    0.001 lib/python2.6/site-packages/weave/inline_tools.py:130(inline)
+     1094    0.658    0.001    0.831    0.001 {apply}
+       99    0.001    0.000    0.684    0.007 topo/sheet/basic.py:284(learn)
+      100    0.002    0.000    0.546    0.005 topo/sheet/basic.py:263(_normalize_weights)
+       99    0.000    0.000    0.469    0.005 topo/base/simulation.py:511(__call__)
+       99    0.002    0.000    0.469    0.005 topo/sheet/basic.py:140(generate)
 </pre>
 
 The <code>n=20</code> argument restricts the list to the top 20
@@ -211,18 +203,24 @@ class CFPRF_Plugin(CFPResponseFn):
 
 About 97% of the total run time is spent in this method, so if we were
 able to optimize it, this would lead to good optimization of the
-simulation in total. Looking further down the list, we can see
-functions associated with learning, and that these account for about
-half as much of the run time. So, optimizing the response function
-will be approximately twice as beneficial as optimizing the learning
-function in this case; only if it were much easier to optimize the learning
-function would it be worthwhile to begin with that.
+simulation in total.
 
-<P>How do we begin to optimize the response function?  We have more
-fine-grained information about the occupation of the CPU while
-executing the response function; the subsequent line in the output
-shows that about 50% of the time spent running the response function
-is spent in <code>functionfamily.py:151(__call__)</code>,
+<P>How do we begin to optimize this method? In the first section of
+profile()'s output, we have more fine-grained information about the
+occupation of the CPU while executing this method:
+
+<pre>
+Function                       called...
+                                    ncalls  tottime  cumtime
+...
+topo/base/cf.py:348(__call__)  ->    1980    0.003    0.004  param/parameterized.py:339(__get__)
+                                  4563900    5.848    5.932  topo/base/cf.py:861(__call__)
+                                  4561920    8.435   34.585  topo/base/functionfamily.py:125(__call__)
+                                  4561920   19.912   19.912  topo/base/sheetcoords.py:387(submatrix)
+</pre>
+
+Over 40% of the time is spent running 
+<code>functionfamily.py:151(__call__)</code>,
 <code>CFPRF_Plugin</code>'s default <code>single_cf_fn</code>:
 
 <pre>
@@ -235,31 +233,29 @@ class DotProduct(ResponseFn):
         return numpy.dot(m1.ravel(),m2.ravel())
 </pre>
 
-Here the Numpy's <code>dot</code> function is called in order to calculate 
-the dot-product for two matrices. Numpy offers a very good level of optimization 
-as far as Python goes. However, we can get even better results by using C++. 
+Optimizing this dot product is evidently important, but it is not the
+only significant component. About 25% of the time is spent in the call
+to submatrix(), which is simply returning a section of the input
+activity array. Following this, the next most significant component is
+unlisted: about 20% of the time in the CFPRF's __call__ is spent not
+calling other functions, i.e. inside this function itself. 
+
+<P>We could simply replace the dot product with an optimized version,
+but that would still leave other parts of this function as the
+speed-limiting factors. Line-by-line profiling could indicate exactly
+where the problems are, but a component such as this is a good
+candidate for replacement with an optimized version; we will describe
+this in the following section. Line-by-line profiling is described in
+a later section.
 
 <H3>Considering optimizations with C++ (weave)</H3>
+
 Topographica makes it reasonably easy to re-write functions in C++ and
-offer them as optimized alternatives. We might wonder if it would help
-in this case, or does <code>numpy</code> already do a good job? We
-could replace <code>DotProduct</code> with a version written in 
-C++, or we could replace the entire <code>CFPRF_Plugin</code> class
-with one written in C++. As at 02/2007, we find that simply re-writing
-the <code>single_cf_fn</code> in C++ provides little performance improvement,
-but that re-writing the entire CFP function provides a big performance
-improvement.
-<!-- CB: presumably because of the increased speed of looping through
-all the CFs and having the slice_arrays available, all in C++, etc-
-should add this explanation somewhere -->
-<!-- CB: certainly for the response function, anyway.-->
+offer them as optimized alternatives. We have done this for the
+CFPResponseFn described in the previous section, resulting in this
+code:
 
-<P>Let us edit the <code>examples/lissom_oo_or.ty</code> file once again and replace
-the code at line 76 with 
-<code>projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()</code> </P>
-
-<P>Now, instead of computing <code>DotProduct()</code> in <code>functionfamily.py</code> topographica
-will call a different method located in <code>responsefn.optimized.py</code>:</P>
+<!-- CB: had to put some spaces in to avoid < being intepreted as a tag -->
 
 <pre>
 class CFPRF_DotProduct_opt(CFPResponseFn):
@@ -276,13 +272,13 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     def __call__(self, iterator, input_activity, activity, strength, **params):
        
         temp_act = activity
-        rows,cols = activity.shape
         irows,icols = input_activity.shape
         X = input_activity.ravel()
-        cfs = iterator.proj._cfs
-        mask = iterator.proj.dest.mask.data
+        cfs = iterator.flatcfs
+        num_cfs = len(cfs)
+        mask = iterator.mask.data
 
-        cf_type = iterator.proj.cf_type
+        cf_type = iterator.cf_type
     
         code = c_header + """
             DECLARE_SLOT_OFFSET(weights,cf_type);
@@ -290,97 +286,94 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 
             npfloat *tact = temp_act;
 
-            for (int r=0; r<rows; ++r) {
-                PyObject *cfsr = PyList_GetItem(cfs,r);
-                for (int l=0; l<cols; ++l) {
-                    if((*mask++) == 0.0)
-                        *tact = 0;
-                    else {
-                        PyObject *cf = PyList_GetItem(cfsr,l);
+            for (int r=0; r < num_cfs; ++r) {
+                if((*mask++) == 0.0)
+                    *tact = 0;
+                else {
+                    PyObject *cf = PyList_GetItem(cfs,r);
 
-                        CONTIGUOUS_ARRAY_FROM_SLOT_OFFSET(float,weights,cf)
-                        LOOKUP_FROM_SLOT_OFFSET(int,input_sheet_slice,cf);
-                        
-                        UNPACK_FOUR_TUPLE(int,rr1,rr2,cc1,cc2,input_sheet_slice);
-                        
-                        double tot = 0.0;
-                        npfloat *xj = X+icols*rr1+cc1;
-    
-                        // computes the dot product
-                        for (int i=rr1; i<rr2; ++i) {
-                            npfloat *xi = xj;
-                            float *wi = weights;                       
-                            for (int j=cc1; j<cc2; ++j) {
-                                tot += *wi * *xi;
-                                ++wi;
-                                ++xi;
-                            }
-                            xj += icols;
-                            weights += cc2-cc1;
-                        }  
-                        *tact = tot*strength;
+                    CONTIGUOUS_ARRAY_FROM_SLOT_OFFSET(float,weights,cf)
+                    LOOKUP_FROM_SLOT_OFFSET(int,input_sheet_slice,cf);
 
-                        DECREF_CONTIGUOUS_ARRAY(weights);
-                    }
-                    ++tact;    
+                    UNPACK_FOUR_TUPLE(int,rr1,rr2,cc1,cc2,input_sheet_slice);
+
+                    double tot = 0.0;
+                    npfloat *xj = X+icols*rr1+cc1;
+
+                    // computes the dot product
+                    for (int i=rr1; i < rr2; ++i) {
+                        npfloat *xi = xj;
+                        float *wi = weights;     
+                        for (int j=cc1; j < cc2; ++j) {
+                            tot += *wi * *xi;
+                            ++wi;
+                            ++xi;
+                        }
+                        xj += icols;
+                        weights += cc2-cc1;
+                    }  
+                    *tact = tot*strength;
+
+                    DECREF_CONTIGUOUS_ARRAY(weights);
                 }
+                ++tact;    
             }
         """
-        inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','cols','rows','cf_type'], local_dict=locals(), headers=['<structmember.h>'])
-	
+        inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','num_cfs','cf_type'], 
+               local_dict=locals(), headers=['<structmember.h>'])
 </pre>
 
-<P>Replacing the CFP function with one written entirely in C++, we
-get the following profile:
+<P>
+Replacing the CFP function with one written entirely in C++ (by reverting
+the line previously edited), we get the following profile:
+
 <pre>
 ./topographica examples/lissom_oo_or.ty -c "from topo.misc.util import profile; profile('topo.sim.run(99)',n=20)"  
-         
-         751948 function calls (749374 primitive calls) in 4.649 CPU seconds
+     
+         778542 function calls (775968 primitive calls) in 4.691 CPU seconds
 
    Ordered by: cumulative time, internal time
-   List reduced from 252 to 20 due to restriction <20>
+   List reduced from 239 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000    4.651    4.651 <string>:1(<module>)
-        1    0.042    0.042    4.651    4.651 simulation.py:1120(run)
-     3074    0.019    0.000    3.306    0.001 inlinec.py:72(inline_weave)
-     3074    0.049    0.000    3.272    0.001 inline_tools.py:130(inline)
-     3074    3.024    0.001    3.212    0.001 {apply}
-     2178    0.006    0.000    2.755    0.001 simulation.py:436(__call__)
-     2178    0.021    0.000    2.731    0.001 projection.py:391(input_event)
-     2178    0.003    0.000    2.681    0.001 projection.py:519(present_input)
-     2178    0.055    0.000    2.678    0.001 cf.py:725(activate)
-     1980    0.011    0.000    2.624    0.001 lissom.py:95(input_event)
-     2178    0.027    0.000    2.581    0.001 optimized.py:33(__call__)
-     1188    0.012    0.000    1.166    0.001 lissom.py:113(process_current_time)
-       99    0.001    0.000    0.691    0.007 basic.py:290(learn)
-      100    0.002    0.000    0.573    0.006 basic.py:266(_normalize_weights)
-       99    0.000    0.000    0.469    0.005 simulation.py:510(__call__)
-       99    0.002    0.000    0.469    0.005 basic.py:140(generate)
-     1089    0.117    0.000    0.465    0.000 projection.py:454(activate)
-   297/99    0.016    0.000    0.451    0.005 patterngenerator.py:116(__call__)
-       99    0.012    0.000    0.404    0.004 basic.py:582(function)
-      400    0.002    0.000    0.340    0.001 cf.py:744(apply_learn_output_fns)
+        1    0.039    0.039    4.691    4.691 topo/base/simulation.py:1121(run)
+     3074    0.018    0.000    3.359    0.001 topo/misc/inlinec.py:72(inline_weave)
+     3074    0.045    0.000    3.326    0.001 lib/python2.6/site-packages/weave/inline_tools.py:130(inline)
+     3074    3.101    0.001    3.273    0.001 {apply}
+     2178    0.006    0.000    2.838    0.001 topo/base/simulation.py:437(__call__)
+     2178    0.019    0.000    2.814    0.001 topo/base/projection.py:399(input_event)
+     2178    0.003    0.000    2.770    0.001 topo/base/projection.py:527(present_input)
+     2178    0.055    0.000    2.767    0.001 topo/base/cf.py:696(activate)
+     1980    0.012    0.000    2.703    0.001 topo/sheet/lissom.py:95(input_event)
+     2178    0.021    0.000    2.642    0.001 topo/responsefn/optimized.py:35(__call__)
+     1188    0.010    0.000    1.135    0.001 topo/sheet/lissom.py:113(process_current_time)
+       99    0.001    0.000    0.680    0.007 topo/sheet/basic.py:284(learn)
+      100    0.003    0.000    0.545    0.005 topo/sheet/basic.py:263(_normalize_weights)
+       99    0.000    0.000    0.469    0.005 topo/base/simulation.py:511(__call__)
+       99    0.002    0.000    0.468    0.005 topo/sheet/basic.py:140(generate)
+   297/99    0.016    0.000    0.451    0.005 topo/base/patterngenerator.py:116(__call__)
+     1089    0.112    0.000    0.446    0.000 topo/base/projection.py:462(activate)
+       99    0.013    0.000    0.403    0.004 topo/pattern/basic.py:589(function)
+      400    0.002    0.000    0.327    0.001 topo/base/cf.py:719(apply_learn_output_fns)
+      400    0.003    0.000    0.318    0.001 topo/transferfn/optimized.py:33(__call__)
 </pre>
 
-<P>The simulation now takes about 20 times less time than the Numpy
-version took. 
+<P>The simulation is now almost 20 times faster than the Numpy version. 
 
 <P>The C++ code adds extra work: for maintenance, for deployment on
-different platforms, and for user understanding --- so it has to be 
-justified, meaning it should provide large speedups. In this
-case, the performance improvement justifies the additional costs
-(which have been substantial in terms of maintenance and platform
-support --- although platform support cost is diluted by all such C++
-functions, and any added in the future).
+different platforms, and for user understanding --- so it has to be
+justified, meaning it should provide large speedups. In this case, the
+performance improvement justifies the additional costs (which have
+been substantial in terms of maintenance and platform support ---
+although platform support cost is diluted by all such C++ functions,
+and any added in the future).
 
-<P>While making this kind of investigation, you should check that
-simulations run with different versions of a function are producing 
-the same results. In particular, when working with optimized C++ functions, 
-it is possible for one version to appear much faster than another when in fact 
-the computations being performed are not
-equivalent. You could make a simple check by adding a print statement after
-profiling to show the sum of V1 activity, or some similar indicator.
+<P>While making this kind of investigation, you must check that
+simulations run with different versions of a function are producing
+the same results. In particular, when working with optimized C++
+functions, it is possible for one version to appear much faster than
+another when in fact the computations being performed are not
+equivalent.
 
 <P>A final consideration is to ensure that the profile run times are
 long enough to obtain reliable results. For shorter runs, it would be
@@ -388,91 +381,9 @@ necessary to repeat them to find a reasonable estimate of the minimum
 time.
 
 
-<!--CB:
-These timings come from 2007/02/21 13:27:26 on the numpy_test_branch, 
-using the numpy libraries ?.
-
-
-Note that numpy has vdot(a,b)=dot(a.ravel(),b.ravel()), but it
-is slower than the dot & ravel version. However, the timing 
-functions appear to be a little inconsistent, so once we upgrade
-to Python 2.5 and use cProfile, that should be checked. If vdot
-is actually as fast as dot & ravel, then vdot would be a complete
-replacement for DotProduct:
-
-<pre>
-from numpy import vdot
-class CFPRF_Plugin(CFPResponseFn):
-    """
-    Generic large-scale response function based on a simple single-CF function.
-
-    Applies the single_cf_fn to each CF in turn.  For the default
-    single_cf_fn of vdot, does a basic dot product of each CF with the
-    corresponding slice of the input array.  This function is likely
-    to be slow to run, but it is easy to extend with any arbitrary
-    single-CF response function.
-
-    The single_cf_fn must be a function f(X,W) that takes two
-    identically shaped matrices X (the input) and W (the
-    ConnectionField weights) and computes a scalar activation value
-    based on those weights.
-    """
-    single_cf_fn = ResponseFnParameter(vdot,
-        doc="Accepts a ResponseFn that will be applied to each CF individually.")
-    
-    def __call__(self, cfs, input_activity, activity, strength):
-        rows,cols = activity.shape
-
-        single_cf_fn = self.single_cf_fn
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice_array
-                X = input_activity[r1:r2,c1:c2]
-                #if (X.shape != cf.weights.shape):
-                #  self.warning("Shapes %s and %s are not compatible" % (X.shape,cf.weights.shape))
-                activity[r,c] = single_cf_fn(X,cf.weights)
-        activity *= strength
-</pre>
-
-However, vdot wouldn't show up in GUI menus etc because it's not
-actually a ResponseFn.
-
-The last couple of times I ran this vdot version, I was getting
-<pre>
-         516656 function calls (508256 primitive calls) in 34.597 CPU seconds
-
-   Ordered by: cumulative time, internal time
-   List reduced from 108 to 20 due to restriction <20>
-
-   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000   34.597   34.597 <string>:1(?)
-        1    0.053    0.053   34.597   34.597 simulation.py:626(run)
-      400    0.006    0.000   17.882    0.045 simulation.py:452(__call__)
-      200    0.017    0.000   13.440    0.067 projection.py:122(input_event)
-      200    0.001    0.000   13.403    0.067 projection.py:182(present_input)
-      200    0.011    0.000   13.401    0.067 cf.py:786(activate)
-      200   13.381    0.067   13.381    0.067 cf.py:352(__call__)
-      400    0.005    0.000   13.180    0.033 projection.py:151(process_current_time)
-      200    0.009    0.000   13.023    0.065 cfsom.py:58(learn)
-      200    0.008    0.000   12.943    0.065 cf.py:793(learn)
-      200    5.704    0.029   12.930    0.065 som.py:66(__call__)
-    52303    6.103    0.000    6.103    0.000 arrayutil.py:18(L2norm)
-      400    0.048    0.000    4.611    0.012 patterngenerator.py:92(__call__)
-      200    0.021    0.000    4.432    0.022 generatorsheet.py:106(input_event)
-20600/19400    0.141    0.000    4.030    0.000 parameterclasses.py:179(__get__)
-    58400    0.856    0.000    3.983    0.000 parameterizedobject.py:307(get_name)
-      600    0.010    0.000    3.802    0.006 parameterclasses.py:386(__get__)
-      400    0.009    0.000    3.417    0.009 simulation.py:455(__repr__)
- 7600/400    0.563    0.000    3.386    0.008 parameterizedobject.py:642(__repr__)
-    79328    1.508    0.000    3.111    0.000 parameterizedobject.py:513(get_param_descriptor)
-</pre>
--->
-
-
 <H3><A name="line-by-line">Line-by-line profiling</A></H3>
 
-<P> The profile function described above (which uses Python's inbuilt
+<P>The profile function described above (which uses Python's inbuilt
 profiling) only reports time spent inside functions, but gives no
 information about how that time is spent. There is also an optional
 line-by-line profiling package available that gives
