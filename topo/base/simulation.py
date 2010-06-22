@@ -989,6 +989,8 @@ class Simulation(param.Parameterized,OptionalSingleton):
             raise AttributeError("Simulation doesn't contain '"+item_name+"'.")
 
 
+    # CEBALERT: should this at least give a warning when an existing
+    # EP is replaced?
     def __setitem__(self,ep_name,ep):
         """
         Add ep to the simulation, setting its name to ep_name.

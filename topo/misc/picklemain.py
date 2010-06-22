@@ -122,7 +122,8 @@ def save_classobj(self, obj):
     if obj.__module__ == '__main__':
         args = (obj.__name__, obj.__bases__, obj.__dict__)
         self.save_reduce(new.classobj, args, obj=obj)
-    else:
+    else:  # CEBALERT: clearly wrong ('name' not defined). This code
+           # never activated?
         pickle.Pickler.save_global(self, obj, name)
 
 def save_instancemethod(self, obj):

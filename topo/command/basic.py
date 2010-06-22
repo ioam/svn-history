@@ -205,6 +205,7 @@ def save_snapshot(snapshot_name=None,xml=False):
     
     to_save = (_VersionPrinter(topo.release,topo.version),PickleMain(),global_params,topoPOclassattrs,topo.sim)
 
+    # CEBALERT: not specifying 'wb' (i.e. binary) is an error on Windows?
     if not xml:
         try:
             snapshot_file=gzip.open(normalize_path(snapshot_name),'w',compresslevel=5)
