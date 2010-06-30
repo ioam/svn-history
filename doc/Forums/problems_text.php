@@ -21,7 +21,7 @@ a certain date by looking at ... -->
 
 <p><li>If the problem is still present in the current version, you can
 search the list of
-<a href="http://sourceforge.net/tracker/?group_id=53602&atid=470929">bug
+<a href="https://sourceforge.net/tracker/?words=tracker_browse&sort=priority&sortdir=desc&offset=0&group_id=53602&atid=470929&assignee=&status=1&category=&artgroup=&keyword=&submitter=&artifact_id=">bug
 reports</a> on our project pages at SourceForge to see if we already
 know about the problem. If you find the problem, please feel free to
 add additional comments to the report.</li>
