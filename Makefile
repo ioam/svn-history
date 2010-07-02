@@ -507,7 +507,7 @@ deb-backports: ${subst ^,_DEB_BACKPORTS,${UBUNTU_BACKPORTS}}
 deb-ppa: ${subst ^,_DPUT,${UBUNTU_BACKPORTS} ${UBUNTU_TARGET}^}
 
 %_DPUT:
-	cd ${DIST_TMPDIR}; dput topographica${DEBSTATUS}-force-$* topographica_${UBUNTU_RELEASE}_$*_source.changes
+	cd ${DIST_TMPDIR}; dput topographica${DEBSTATUS}-force-$* topographica_${UBUNTU_RELEASE}~$*_source.changes
 
 
 ## CEBALERT: need to clean up this section, and rpm is totally untested
