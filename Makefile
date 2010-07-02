@@ -23,8 +23,8 @@ SVNVERSION = ${shell svnversion}
 # if 0, skips building tk and related external packages
 GUI = 1
 
-# set to empty ("") when building 'release' debs.
-DEBSTATUS = "-unstable"
+# set to empty when building 'release' debs.
+DEBSTATUS = -unstable
 
 # CEBALERT: tied to exact windows version!
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
