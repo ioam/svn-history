@@ -23,6 +23,8 @@ SVNVERSION = ${shell svnversion}
 # if 0, skips building tk and related external packages
 GUI = 1
 
+# set to empty ("") when building 'release' debs.
+DEBSTATUS = "-unstable"
 
 # CEBALERT: tied to exact windows version!
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
@@ -382,7 +384,7 @@ ChangeLog.txt: FORCE
 # Create public distribution suitable for creating setup.py-based
 # packages (e.g. debs)
 
-dist-setup.py: doc distdir reference-manual FORCE
+dist-setup.py: doc distdir reference-manual
 # clean dir but keep setup.py-related files
 	${CD} ${DIST_DIR}; ${PREFIX}/bin/python create_topographica_script.py None ${RELEASE} ${SVNVERSION}
 	${CD} ${DIST_DIR}; ${MV} setup.py TMPsetup.py; mv MANIFEST.in tmpMANIFEST.in; mv topographica TMPtopographica
@@ -402,30 +404,31 @@ dist-setup.py: doc distdir reference-manual FORCE
 # (Archives don't include doc/ because of its size.)
 
 # generate Topographica-xxx.tar.gz (i.e. source suitable for python setup.py install)
-setup.py-sdist: 
+dist-setup.py-sdist: 
 # should automatically update version number in setup.py
 	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py sdist
 
 # generate windows exe (like the exe you get for numpy or matplotlib)
-setup.py-bdist_wininst: 
+dist-setup.py-bdist_wininst: 
 # should automatically update version number in setup.py
 	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py bdist_wininst
 # should add --install-script option including create_shortcut() call, etc
 
-pypi-upload:
+dist-pypi-upload:
 	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py register sdist upload
 # + bdist_wininst
+
 
 ######################################################################
 # Ubuntu packages
 #
-# To create an environment suitable for deb-svn and related entries
-# (Ubuntu 9.04 upward):
-# 
+# (1)
+# To create build environment:
+#
 # sudo apt-get install devscripts fakeroot cdbs dput pbuilder alien
 # sudo pbuilder create
 #
-# cp doc/buildbot/dot-dput.cf ~/.dput.cf
+# ln -s doc/buildbot/dot-dput.cf ~/.dput.cf
 #
 # Set up GPG key, sign Launchpad code of conduct.
 # gpg key agent to avoid password requests:
@@ -434,128 +437,81 @@ pypi-upload:
 # killall -q gpg-agent
 # eval $(gpg-agent --daemon)
 #
+# See https://wiki.ubuntu.com/PackagingGuide/Complete for more info.
 #
-# NOTE: These commands must be run with no diffs, and having done "svn
+# (2)
+# These commands must be run with no diffs, and having done "svn
 # update" following any commits (so svnversion doesn't end in M or
-# have a colon in it). Also, you should pass RELEASE, making it 0.0.1 
-# higher than RELEASE as currently set in this file.
+# have a colon in it).
+#
+# (3)
+# Make the debs, upload, etc. Buildbot's master.cfg is the reference
+# for this.
+#
+# These commands can take a while to run. There's probably some 
+# redundancy in the creation of the backports.
 
-UBUNTU_RELEASE = ${RELEASE}~r${SVNVERSION}-0ubuntu0
-UBUNTU_DIR = ${DIST_TMPDIR}/topographica-${UBUNTU_RELEASE}
-UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
 UBUNTU_ENV = env DEBFULLNAME='C. E. Ball' DEBEMAIL='ceball@gmail.com' GPGKEY=4275E3C7
 DEBUILD = ${UBUNTU_ENV} debuild
 UBUNTU_TARGET = lucid
-UBUNTU_BACKPORTS = karmic jaunty hardy 
+UBUNTU_BACKPORTS = karmic^ jaunty^ hardy^ 
 
-# Make binary and source deb files for UBUNTU_TARGET and
-# UBUNTU_BACKPORTS
-deb-svn: 
-# CEBALERT: Requires that you have first run "make RELEASE=0.9.7 dist-setup.py"
-	cd ${DIST_TMPDIR}; mv topographica-${RELEASE}.tar.gz topographica_${UBUNTU_RELEASE}.orig.tar.gz
+ifeq (${DEBSTATUS},"-unstable")
+	UBUNTU_RELEASE = ${RELEASE}~r${SVNVERSION}-0ubuntu0
+	LOG_TEXT = "  * Pre-release version ${RELEASE} from SVN; see Changelog.txt for details."
+else
+	UBUNTU_RELEASE = ${RELEASE}-0ubuntu0
+	LOG_TEXT = "  * Version ${RELEASE}; see Changelog.txt for details."
+endif
+
+UBUNTU_DIR = ${DIST_TMPDIR}/topographica-${UBUNTU_RELEASE}
+UBUNTU_CHANGELOG = ${UBUNTU_DIR}/debian/changelog
+
+
+deb: dist-setup.py
+	cd ${DIST_TMPDIR}; cp topographica-${RELEASE}.tar.gz topographica_${UBUNTU_RELEASE}.orig.tar.gz
 	cd ${DIST_TMPDIR}; mv topographica-${RELEASE} topographica-${UBUNTU_RELEASE}
 	cp -R debian ${UBUNTU_DIR}/debian
 	rm -rf ${UBUNTU_DIR}/debian/.svn
 	echo "topographica (${UBUNTU_RELEASE}~${UBUNTU_TARGET}) ${UBUNTU_TARGET}; urgency=low" > ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
-	echo "  * Pre-release version 0.9.7 from SVN; see Changelog.txt for details." >> ${UBUNTU_CHANGELOG}
+	echo ${LOG_TEXT} >> ${UBUNTU_CHANGELOG}
 	echo "" >> ${UBUNTU_CHANGELOG}
 	echo " -- C. E. Ball <ceball@gmail.com>  ${shell date -R}" >> ${UBUNTU_CHANGELOG}
 	cd ${UBUNTU_DIR}; ${DEBUILD} 
 	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 # CEBALERT: should put this line in to test the build
 # sudo pbuilder build topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}.dsc 
+
+# You must first have run 'make deb'
+deb-backports: ${subst ^,_DEB_BACKPORTS,${UBUNTU_BACKPORTS}}
+
+%_DEB_BACKPORTS:
 	cd ${UBUNTU_DIR}/debian; cp changelog ../../changelog.orig
-# CEBALERT: change to use UBUNTU_BACKPORTS list
-# KARMIC
+	cd ${UBUNTU_DIR}/debian; cp control ../../control.orig;
+
+# special case for hardy, which has only tk 8.4
+	if [ "$*" = hardy ]; then \
+		cd ${UBUNTU_DIR}/debian; sed -e 's/python-tk/python-tk, tk-tile/' ../../control.orig > control; \
+	fi;
+
 	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
-	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~karmic" --force-distribution --distribution karmic "Backport to 9.10 (Karmic)."
-	cd ${UBUNTU_DIR}; ${DEBUILD} 
-	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
-# JAUNTY
-	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
-	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~jaunty" --force-distribution --distribution jaunty "Backport to 9.04 (Jaunty)."
-	cd ${UBUNTU_DIR}; ${DEBUILD} 
-	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
-### HARDY
-	cd ${UBUNTU_DIR}/debian; rm changelog*; cp ../../changelog.orig changelog	
-# hardy requires tile because it has tk 8.4
-	cd ${UBUNTU_DIR}/debian; cp control ../../control.orig; 
-	cd ${UBUNTU_DIR}/debian; sed -e 's/python-tk/python-tk, tk-tile/' ../../control.orig > control
-	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~hardy" --force-distribution --distribution hardy "Backport to 8.04 LTS (Hardy)."
+	cd ${UBUNTU_DIR}; ${UBUNTU_ENV} debchange --force-bad-version --newversion "${UBUNTU_RELEASE}~$*" --force-distribution --distribution $* "Backport to $*."
 	cd ${UBUNTU_DIR}; ${DEBUILD} 
 	cd ${UBUNTU_DIR}; ${DEBUILD} -S -sa
 # restore changes made for backports
 	cd ${UBUNTU_DIR}/debian; cp ../../control.orig control
 	cd ${UBUNTU_DIR}/debian; cp ../../changelog.orig changelog
 
+# Requires that you have first run make deb, deb-backports
+deb-ppa: ${subst ^,_DPUT,${UBUNTU_BACKPORTS} ${UBUNTU_TARGET}^}
 
-# Upload to PPA for UBUNTU_TARGET and UBUNTU_BACKPORTS
-#
-deb-svn-ppa:
-# CEBALERT: Requires that you have first run "make RELEASE=0.9.7 deb-svn"
-	cd ${DIST_TMPDIR}; dput topographica-unstable-force-${UBUNTU_TARGET} topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_source.changes
-# CEBALERT: use UBUNTU_BACKPORTS list here
-	cd ${DIST_TMPDIR}; dput topographica-unstable-force-karmic topographica_${UBUNTU_RELEASE}~karmic_source.changes
-	cd ${DIST_TMPDIR}; dput topographica-unstable-force-jaunty topographica_${UBUNTU_RELEASE}~jaunty_source.changes
-	cd ${DIST_TMPDIR}; dput topographica-unstable-force-hardy topographica_${UBUNTU_RELEASE}~hardy_source.changes
-
-# Create rpm
-#
-# CEBALERT: untested
-rpm-svn:
-# CEBALERT: Requires that you have first run "make RELEASE=0.9.7 deb-svn"
-# Does it need sudo?
-	cd ${DIST_TMPDIR}; alien -r topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_all.deb
+%_DPUT:
+	cd ${DIST_TMPDIR}; dput topographica${DEBSTATUS}-force-$* topographica_${UBUNTU_RELEASE}_$*_source.changes
 
 
-# CEBALERT: still need to add procedure for creating release packages...
-#
-# https://wiki.ubuntu.com/PackagingGuide/Complete
-#
-# - need to add steps at beginning to get suitable dir
-# - need to change upload location to a topographica ppa
-# - need to add .desktop
-#
-# $ export DEBFULLNAME='C. E. Ball'
-# $ export DEBEMAIL='ceball@gmail.com'
-# set up GPG key, sign various ubuntu agreements on launchpad, ...
-# $ export GPGKEY=4275E3C7
-#
-# ceball@fiver:~/working/topographica3$ make dist-setup.py
-#
-# ceball@fiver:~/pkg$ ls
-# topographica-0.9.6  topographica_0.9.6.orig.tar.gz
-#
-# ceball@fiver:~/pkg/topographica-0.9.6$ ls
-# ChangeLog.txt  debian  images      _setup.py  topo
-# COPYING.txt    etc     README.txt  setup.py   topographica
-#
-# ceball@fiver:~/pkg/topographica-0.9.6$ ls debian/
-# changelog  python-scrodget.debhelper.log
-# compat     python-scrodget.postinst.debhelper
-# control    python-scrodget.preinst.debhelper
-# copyright  python-scrodget.prerm.debhelper
-# docs       python-scrodget.substvars
-# pycompat   rules
-# 
-#
-# ceball@fiver:~/pkg/topographica-0.9.6$ dch -i
-#
-# ceball@fiver:~/pkg/topographica-0.9.6$ debuild -S -sa
-#
-# * Test it builds
-# 
-# Not sure, something like this...
-# set up (first time only):
-# $ sudo pbuilder create --distribution jaunty  
-# then for testing:
-# $ sudo pbuilder build topographica_0.9.6-0ubuntu2.dsc
-#
-#
-# * Upload to PPA
-# 
-# ceball@fiver:~/pkg$ dput ppa:ceball/ppa topographica_0.9.6-0ubuntu3_source.changes
-
-
+## CEBALERT: need to clean up this section, and rpm is totally untested
+#rpm-svn:
+## Does it need sudo?
+#	cd ${DIST_TMPDIR}; alien -r topographica_${UBUNTU_RELEASE}~${UBUNTU_TARGET}_all.deb
 
