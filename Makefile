@@ -456,7 +456,7 @@ DEBUILD = ${UBUNTU_ENV} debuild
 UBUNTU_TARGET = lucid
 UBUNTU_BACKPORTS = karmic^ jaunty^ hardy^ 
 
-ifeq (${DEBSTATUS},"-unstable")
+ifeq (${DEBSTATUS},-unstable)
 	UBUNTU_RELEASE = ${RELEASE}~r${SVNVERSION}-0ubuntu0
 	LOG_TEXT = "  * Pre-release version ${RELEASE} from SVN; see Changelog.txt for details."
 else
