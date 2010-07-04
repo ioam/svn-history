@@ -158,7 +158,7 @@ rm tmp
 <code>svn:ignore</code> property so that unused files become apparent
 to all users.
 
-<H2>Other Notes</H3>
+<H2>Other Notes</H2>
 
 <P>Mac users: when adding a directory, please be sure not to add
 all the temporary files that OS X creates (i.e. ones beginning <code>.DS_</code>
