@@ -186,6 +186,9 @@ from external import Combobox,OrderedDict
 from . import Boolean,String,Number,Selector,ClassSelector,\
      ObjectSelector,Callable,Dynamic,Parameter,List,HookList
 
+# CEBALERT: Filename param is part of Topographica, not param, so this
+# should probably be installed by Topographica.
+from topo.misc.filepath import Filename
 
 _last_one_set = None
 
@@ -1193,7 +1196,8 @@ class TkParameterized(TkParameterizedBase):
         self.param_immediately_apply_change = {Boolean:True,
                                                Selector:True,
                                                Number:False,
-                                               Parameter:False}
+                                               Parameter:False,
+                                               Filename:True}
 
         TkParameterizedBase.__init__(self,extraPO=extraPO,
                                      self_first=self_first,
@@ -1212,7 +1216,8 @@ class TkParameterized(TkParameterizedBase):
             String:self._create_string_widget,
             Selector:self._create_selector_widget,
             List:self._create_list_widget,
-            HookList:self._create_list_widget
+            HookList:self._create_list_widget,
+            Filename:self._create_fileselector_widget,
             }
         
         self.representations = {}  
@@ -1669,6 +1674,12 @@ class TkParameterized(TkParameterizedBase):
         button.config(**widget_options) # widget_options override things from parameter
         return button
 
+
+    def _create_fileselector_widget(self,frame,name,widget_options):
+        widget = HackFileEntry(frame,self._tkvars[name])
+        return widget
+
+
     def update_selector(self,name):
 
         if name in self.representations:
@@ -1925,6 +1936,21 @@ class TkParameterized(TkParameterizedBase):
             return n
 
 
+# CEBALERT: is there no "file entry" widget for Tkinter?  I see there
+# is one for Tix, but while that is listed as being in Python's
+# standard library, it's rarely actually included...
+import tkFileDialog
+class HackFileEntry(T.Frame):
+    def __init__(self,master,var,**config):
+        T.Frame.__init__(self,master)
+        self.var = var
+        self.button = T.Button(self,textvariable=self.var,command=self.cmd)
+        self.button.pack()
+
+    def cmd(self):
+        filename = tkFileDialog.askopenfilename()
+        if filename!="":
+            self.var.set(filename)
 
 
 ######################################################################
