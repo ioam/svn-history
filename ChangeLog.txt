@@ -1,3 +1,1311 @@
+2010-07-02  ceball
+
+	* [r11099] Makefile:
+	  Fixed typo.
+
+	* [r11098] Makefile:
+	  Should have been included in the previous commit.
+
+	* [r11097] Makefile:
+	  Fixed quotation marks error.
+
+	* [r11096] Makefile:
+	  Cleaned up deb generation, adding support for 'release' debs.
+
+2010-07-01  ceball
+
+	* [r11095] debian/control:
+	  Added python-dev dependency to Ubuntu package.
+
+2010-06-30  ceball
+
+	* [r11094] doc/Forums/index_text.php,
+	  doc/Forums/problems_text.php:
+	  Removed out-of-date link to Windows Forum, and improved links to
+	  bug reports and feature requests.
+
+2010-06-29  ceball
+
+	* [r11093] /branches/kkudryavtsev_branch:
+	  Removed Konstantin's aborted MPI branch (latest version is
+	  http://gitorious.org/topographica, mpi2 branch).
+
+	* [r11092] doc/buildbot/master.cfg:
+	  Doozy was upgraded to Ubuntu 10.04.
+
+2010-06-23  ceball
+
+	* [r11091] doc/buildbot/master.cfg:
+	  Added Lucid to list of debs to be uploaded.
+
+2010-06-22  ceball
+
+	* [r11090] topo/base/simulation.py,
+	  topo/command/basic.py,
+	  topo/misc/picklemain.py:
+	  Added ALERTs.
+
+2010-06-20  ceball
+
+	* [r11089] doc/buildbot/master.cfg:
+	  Added generation of Reference Manual to one builder (also
+	  uploaded to buildbot.topographica.org/doc/).
+
+2010-06-17  ceball
+
+	* [r11088] topo/base/functionfamily.py,
+	  topo/responsefn/optimized.py:
+	  Added comments.
+
+	* [r11087] external/zlib-1.2.5.tar.gz:
+	  Identical version of zlib, but extracted and recompressed on a
+	  linux machine (apparently there is some problem with gzip on
+	  recent linux;
+	  https://bugs.launchpad.net/ubuntu/+source/gzip/+bug/524366).
+	  Fixes bug #3015804.
+
+	* [r11086] Makefile:
+	  Fixed Ubuntu version name errors.
+
+	* [r11085] Makefile:
+	  Fixed quoting mistake.
+
+	* [r11084] Makefile:
+	  Ubuntu package moved to 'Lucid' (10.04 LTS). Not yet tested.
+
+	* [r11083]
+	  doc/Developer_Manual/optimization_text.php:
+	  Added comment.
+
+	* [r11082]
+	  doc/Developer_Manual/optimization_text.php:
+	  Updated optimization page and tried to make the example coherent.
+
+	* [r11081]
+	  doc/Developer_Manual/optimization_text.php:
+	  Fixed various typos and updated a link.
+
+2010-06-13  ceball
+
+	* [r11080] external:
+	  More to ignore.
+
+2010-06-04  antolikjan
+
+	* [r11079] contrib/cc_lesi_final.ty:
+	  small optimization
+
+	* [r11078] contrib/cc_lesi_final.ty:
+	  add init ring size parameter
+
+	* [r11077] contrib/surround_analysis.py:
+	  multiple plotting changes
+
+	* [r11076] contrib/pybrainstuff.py:
+	  changes
+
+	* [r11075] contrib/jacommands.py:
+	  small changes
+
+	* [r11074] topo/analysis/vision.py:
+	  small changes to complexity analysis
+
+2010-06-03  jbednar
+
+	* [r11073] topo/transferfn/basic.py:
+	  Made HomeostaticResponse picklable even before first use, so that
+	  run_batch (which presents an initial test pattern) would work for
+	  gca_lissom.ty
+
+2010-05-28  jbednar
+
+	* [r11072] examples/gca_lissom.ty:
+	  Added ALERT
+
+	* [r11071] topo/transferfn/basic.py:
+	  Minor doc and formatting cleanup. Removed unused sheet_name
+	  parameter
+
+2010-05-27  ceball
+
+	* [r11070] topo/pattern/random.py:
+	  Added ALERT.
+
+	* [r11069] examples/gca_lissom.ty,
+	  topo/base/arrayutil.py,
+	  topo/tests/gca_lissom.ty_DATA,
+	  topo/transferfn/basic.py:
+	  New version to match GCA paper. Intermediate checkin - some
+	  documentation and minor changes to come.
+
+	* [r11068] external/Makefile,
+	  external/zlib-1.2.5.tar.gz:
+	  Added zlib (a not-always-available dependency of libpng).
+
+	* [r11067] external/Makefile,
+	  external/m4-1.4.9.tar.gz:
+	  Added M4 (a not-always-available dependency of GMP).
+
+2010-05-24  antolikjan
+
+	* [r11066] contrib/JanA/glm.py:
+	  update
+
+	* [r11065] contrib/JanA/glm.py:
+	  update
+
+2010-05-20  antolikjan
+
+	* [r11064] contrib/JanA/glm.py:
+	  update
+
+	* [r11063] contrib/JanA/glm.py:
+	  update
+
+	* [r11062] contrib/JanA/noiseEstimation.py:
+	  update
+
+	* [r11061] contrib/modelfit.py:
+	  update
+
+2010-05-18  antolikjan
+
+	* [r11060] contrib/JanA/glm.py:
+	  update
+
+2010-05-18  ceball
+
+	* [r11059] topo/tests/utils.py:
+	  Added note.
+
+2010-05-17  antolikjan
+
+	* [r11058] contrib/JanA/glm.py:
+	  update
+
+	* [r11057] contrib/JanA/glm.py:
+	  update
+
+	* [r11056] contrib/JanA/glm.py:
+	  update
+
+	* [r11055] contrib/JanA/dataimport.py:
+	  update
+
+	* [r11054] contrib/JanA/glm.py:
+	  update
+
+2010-05-14  antolikjan
+
+	* [r11053] contrib/JanA/glm.py:
+	  update
+
+	* [r11052] contrib/JanA/glm.py:
+	  update
+
+	* [r11051] contrib/JanA/glm.py:
+	  update
+
+2010-05-13  antolikjan
+
+	* [r11050] contrib/JanA/dataimport.py:
+	  corrected cutoff
+
+	* [r11049] contrib/JanA/dataimport.py:
+	  corrected cutoff
+
+	* [r11048] contrib/JanA/glm.py:
+	  corrected bug with number of subplots
+
+2010-05-12  antolikjan
+
+	* [r11047] contrib/JanA/glm.py:
+	  update
+
+	* [r11046] contrib/modelfit.py:
+	  update
+
+	* [r11045] contrib/dd.py:
+	  update
+
+	* [r11044] contrib/JanA/LSCSM.py,
+	  contrib/JanA/dataimport.py,
+	  contrib/JanA/glm.py,
+	  contrib/JanA/noiseEstimation.py,
+	  contrib/JanA/sparsness_analysis.py,
+	  contrib/JanA/stim_comparison.py:
+	  reorganization of the fitting code
+
+2010-05-10  antolikjan
+
+	* [r11043] contrib/JanA/noiseEstimation.py:
+	  got rid of dependency
+
+2010-05-09  ceball
+
+	* [r11042] doc/buildbot/master.cfg:
+	  Added Ubuntu server buildslave (no X server installed).
+
+2010-05-07  antolikjan
+
+	* [r11041] contrib/JanA/glm.py:
+	  improvements
+
+2010-05-07  ceball
+
+	* [r11040]
+	  topo/tests/testparametersframe_tk.py:
+	  Change missed from r11038.
+
+2010-05-06  ceball
+
+	* [r11039] Makefile,
+	  external/Makefile:
+	  Added variable 'GUI' to control whether or not to build tk and
+	  related packages.
+
+	* [r11038] topo/tests/__init__.py,
+	  topo/tests/testmatplotlib_tk.py,
+	  topo/tests/testmatplotlibtk.py,
+	  topo/tests/testparameterizedobject_tk.py,
+	  topo/tests/testparametersframe.py,
+	  topo/tests/testparametersframe_tk.py,
+	  topo/tests/testtkparameterizedobject.py:
+	  Test files that import Tkinter now have a name that ends in '_tk'
+	  so that importing them can be avoided if tk is not available.
+
+	* [r11037] param/external.py:
+	  Removed dependency of param.external on Tkinter.
+
+2010-05-06  antolikjan
+
+	* [r11036] contrib/modelfit.py:
+	  changes
+
+	* [r11035] contrib/helper.py:
+	  image preprocessing
+
+	* [r11034] contrib/dd.py:
+	  module for organazing my analysis results
+
+2010-05-05  antolikjan
+
+	* [r11033] contrib/JanA/glm.py:
+	  correction
+
+	* [r11032] contrib/JanA/glm.py:
+	  small changes
+
+	* [r11031] contrib/JanA,
+	  contrib/JanA/__init__.py,
+	  contrib/JanA/__init__.pyc,
+	  contrib/JanA/glm.py,
+	  contrib/JanA/glm.pyc,
+	  contrib/JanA/noiseEstimation.py,
+	  contrib/JanA/noiseEstimation.pyc,
+	  contrib/JanA/stim_comparison.py,
+	  contrib/JanA/stim_comparison.pyc:
+	  with the increasing number of analysis files I added I decided to
+	  make a subdirectory for them
+
+	* [r11030] contrib/modelfit.py:
+	  lot of changes
+
+2010-04-14  antolikjan
+
+	* [r11029] contrib/modelfit.py:
+	  lot of changes
+
+2010-04-10  ceball
+
+	* [r11028] topo/command/basic.py:
+	  When snapshot fails to load, show original error as well the one
+	  raised after legacy support has been loaded.
+
+2010-04-10  bilalkhancnsg
+
+	* [r11027] contrib/lissom_audio.ty,
+	  topo/command/analysis.py:
+	  Removed svn tagging accidentally left in command.analysis
+
+	* [r11026] contrib/lissom_audio.ty:
+	  Updated connections to to calibrated values, put a HalfRectify on
+	  MGB.
+
+	* [r11025] contrib/lissom_audio.ty:
+	  Added calibration sheet to test out STRFs, resized all other
+	  sheets to calibrated dimensions, cochlea now 100 msecs by 10
+	  octaves.
+
+	* [r11024] contrib/lissom_audio.ty:
+	  Changed command line params (densities) to more appropraite
+	  values.
+
+	* [r11023] contrib/lissom_audio.ty:
+	  Updated audio input pattern to millsecond increments per
+	  timestep, cleaned up to use latest version of audio pattern
+	  generator.
+
+	* [r11022] contrib/lissom_audio.ty:
+	  Moved log gaussian and sigmoided difference of log gaussian to
+	  lissom_audio till the quirks can be worked out of them.
+
+	* [r11021] sounds/sine_waves/00020hz.wav,
+	  sounds/sine_waves/*.wav,
+	  sounds/square_waves/*.wav,
+	  Old sound files deleted.
+
+	* [r11020] sounds/complex/ReadMe.txt,
+	  sounds/complex/daisy.wav,
+	  sounds/sine_waves/ReadMe.txt,
+	  sounds/sine_waves/normalized,
+	  sounds/sine_waves/normalized/*_sine.wav,
+	  sounds/sine_waves/raw,
+	  sounds/sine_waves/raw/*_sine.wav,
+	  sounds/square_waves/ReadMe.txt,
+	  sounds/square_waves/normalized,
+	  sounds/square_waves/normalized/*_square.wav,
+	  sounds/square_waves/raw,
+	  sounds/square_waves/raw/*_square.wav,
+	  Added normalised versions of sine and square waves, updated
+	  ReadMe files accordingly.
+
+	* [r11019] topo/analysis/featureresponses.py,
+	  topo/pattern/audio.py,
+	  topo/pattern/basic.py:
+	  Minor spacing corrections.
+
+	* [r11018] topo/command/analysis.py:
+	  Modified frequency map measurement to use Line instead of
+	  RawRectangle, added a selectivity as well as preference output
+
+	* [r11017] topo/pattern/audio.py:
+	  Added ability to multiplicatively amplify a frequency range.
+	  Changed AudioFolder to employ AudioFile, previous concat of audio
+	  signal behavior does not scale.
+
+	* [r11016] topo/pattern/audio.py:
+	  Updated AudioFile to use new Spectrogram/PowerSpectrum structure.
+	  AudioFile now outputs in dB.
+
+	* [r11015] topo/pattern/basic.py:
+	  Segmented PowerSpectrum for cleaner inheritance, fixed window
+	  overlap bug where sample window shrunk instead of overlapping.
+	  Updated Spectrogram to use new PowerSpectrum
+
+	* [r11014] topo/pattern/basic.py:
+	  Added precendence values for sigmoidedDoG pattern params, removed
+	  eroneous sigmoid x offset from sigmoidedDog.
+
+2010-04-09  bilalkhancnsg
+
+	* [r11013] topo/pattern/basic.py:
+	  Added dedicted difference of gaussians pattern
+
+	* [r11012] topo/pattern/basic.py:
+	  Replaced rectangular smoothing window with a simpler
+	  implementation.
+
+	* [r11011] topo/pattern/basic.py:
+	  Removed log gaussian and difference of log gaussians, they don't
+	  work predictably
+
+	* [r11010] topo/misc/patternfn.py:
+	  Removed log gaussian function, it doesnt work predictably
+
+2010-04-05  ceball
+
+	* [r11009] topo/transferfn/basic.py:
+	  Added comment about ActivityAveragingTF.
+
+2010-03-31  ceball
+
+	* [r11008] topo/base/simulation.py:
+	  Added enhancement note.
+
+2010-03-26  ceball
+
+	* [r11007] topo/base/arrayutil.py:
+	  No visible change (renamed internal variable).
+
+	* [r11006] topo/base/arrayutil.py:
+	  Simplified array_argmax(). Should be no change to results.
+
+	* [r11005] topo/base/arrayutil.py:
+	  Simplified clip_lower() and clip_upper(). New implementation is
+	  presumably faster, but I have not verified that. Should be no
+	  change to any results.
+
+	* [r11004] topo/pattern/image.py:
+	  Simpified PatternSampler.__call__() (no longer any need to create
+	  'empty' pattern sample in advance). Should be no change to
+	  results.
+
+	* [r11003] topo/pattern/image.py:
+	  Simplified image sampling (also gives vast speedup for presenting
+	  images). Should cause no change to results.
+
+2010-03-19  aplebe
+
+	* [r11002] topo/command/key_angles.png:
+	  initial static image for angle prefernce map
+
+	* [r11001] topo/command/analysis.py:
+	  Added preference map for angle between two segments,
+	  independently from the
+	  segment orientations, and related image with hue coding of the
+	  angles
+
+2010-03-18  ceball
+
+	* [r11000] COPYING.txt,
+	  LICENSE.txt, README.txt,
+	  debian/copyright,
+	  doc/Team_Members/index_text.php,
+	  setup.py,
+	  topo/__init__.py:
+	  Changed from GPL to BSD license. Changed copyright statement to
+	  refer to 'Topographica Developers' (individuals are listed on the
+	  Team Members page).
+
+2010-03-15  jbednar
+
+	* [r10999] sounds/sine_waves/ReadMe.txt,
+	  sounds/square_waves/ReadMe.txt:
+	  Fixed missing newlines
+
+2010-03-14  ceball
+
+	* [r10998] topo/misc/legacy.py:
+	  Leagacy support for OneDPowerSpectrum->Spectrogram.
+
+	* [r10997] topo/misc/commandline.py:
+	  Fixed typo (resulting in IPython being unavailable; sf.net bug
+	  #2969832).
+
+2010-03-14  bilalkhancnsg
+
+	* [r10996] topo/pattern/audio.py:
+	  Corrected typo.
+
+	* [r10995] contrib/lissom_audio.ty,
+	  topo/pattern/audio.py:
+	  Added ability for pattern.audio to load a folder of sound files
+	  back to back, sample rates must be consistent between files. Can
+	  also specify a length of gap to insert between each consecutive
+	  sound file. Updated lissom_audio to use new audio load methods.
+
+	* [r10994] topo/pattern/basic.py:
+	  Changed the 'fft results to sheet mapping' so it takes into
+	  account ALL amplitudes when drawing on the sheet, this fixes the
+	  previous erroneous behaviour where only a tiny subset of
+	  amplitudes were employed which caused the bulk of information to
+	  be lost, hence distinct bands were seen even on pure tone ffts.
+	  It also fixes the problem where the sheet needed normalisation
+	  before anything was visible. Lastly it fixes corollary discrete
+	  frequency problems since the frequency is now continuous along
+	  the sheet (the resolution is directly proportional to the density
+	  of the sheet). As a consequence changed lin and logspace mapping
+	  such that it now returns all possible frequency indices between
+	  user specified min and max (unconstrained by sheet divisions). It
+	  also now rounds properly (used to use floor to get int index
+	  values). Made some commenting clearer.
+
+	* [r10993] topo/command/analysis.py:
+	  Added class to measure frequency preference maps in mgb and a1.
+
+	* [r10992] contrib/lissom_audio.ty:
+	  Added imports and code for swapping window functions in
+	  lissom_audio
+
+2010-03-13  ceball
+
+	* [r10991] Makefile:
+	  Fixed bug where system python was being used to create
+	  topographica script, rather than Topographica's python. Changed
+	  'other python' target to use the 'other python' to create the
+	  topographica script.
+
+2010-03-13  bilalkhancnsg
+
+	* [r10990] topo/pattern/basic.py:
+	  Removed the overridden size parameter from LogGaussian.
+
+	* [r10989] topo/misc/patternfn.py:
+	  Added a line to sigmoid to explain what is meant by axis.
+
+	* [r10988] contrib/lissom_audio.ty:
+	  updated lissom_audio to use new square wave files.
+
+	* [r10987] sounds/sine_waves/ReadMe.txt,
+	  sounds/square_waves/*.wav,
+	  sounds/square_waves/ReadMe.txt:
+	  Added ReadMe files to the sine and square wave sound file folders
+	  explaining the format and how they were generated. Added square
+	  waves for each frequency currently in sine waves.
+
+	* [r10986] contrib/lissom_audio.ty:
+	  Corrected sheet dimensions such that mgb and a1 aren't so small
+	  they only cover half the sheet below them. Each sheet is now
+	  smaller than the one below it by a perimeter of half a connection
+	  field. Updated so the new Audio function from topo.pattern.audio
+	  is employed. Removed cochlea aspect ratio code as its not useful.
+
+	* [r10985] topo/pattern/basic.py:
+	  Defined a new kind of smoothing window, rectangular, which
+	  actually means no smoothing is applied. Set this to be the
+	  default.
+
+	* [r10984] topo/pattern/audio.py:
+	  Changed class name from Spectrogram back to Audio (Audio now
+	  inherits from Spectrogram). Removed all spectrogram specific
+	  code, retaining only that relevant to the importing of audio
+	  files.
+
+	* [r10983] topo/pattern/basic.py:
+	  Moved Spectrogram from topo.pattern.audio to topo.pattern.basic.
+	  Spectrogram inherits from new PowerSpectrum, so code content
+	  remains largely unchanged, merely restructured to fit the new
+	  PowerSpectrum. The changes that have occurred: Spectrogram now
+	  pushes new data onto the left side, with older information on the
+	  right, and frequencies go from lowest at the bottom to highest at
+	  the top - this is how it should have been all along.
+
+	* [r10982] topo/pattern/basic.py:
+	  Renamed class OneDPowerSpectrum to PowerSpectrum. Combined its
+	  methods _generate_frequency_indices and _create_indices. Shifted
+	  fft calculation into its own function for cleaner inheritance.
+	  Commented everything, as a result found and corrected bug where
+	  default window parameters were not being overridden in
+	  PowerSpectrum.
+
+	* [r10981] topo/plotting/plotgroup.py:
+	  Minor typo correction
+
+2010-03-12  ceball
+
+	* [r10980] external/Makefile:
+	  Removed unused variable (was for building via msys on Windows,
+	  which does not work).
+
+	* [r10979] MANIFEST.in,
+	  Makefile,
+	  create_topographica_script.py,
+	  setup.py:
+	  Fixed some recently introduced bugs in setup.py-related commands.
+
+2010-03-11  jbednar
+
+	* [r10978] topo/misc/patternfn.py:
+	  Minor updates and fixes to messages and documentation
+
+	* [r10977] topo/misc/commandline.py,
+	  topo/misc/patternfn.py:
+	  Minor updates and fixes to messages and documentation
+
+	* [r10976] Makefile,
+	  topo/__init__.py:
+	  Minor updates and fixes to messages and documentation
+
+2010-03-11  bilalkhancnsg
+
+	* [r10975] contrib/lissom_audio.ty,
+	  topo/pattern/audio.py:
+	  Modified paths in lissom audio to reflect new sounds folder
+	  structure, modified pattern.audio to use a log space for
+	  spctrogram.
+
+	* [r10974] topo/pattern/basic.py:
+	  Added class for Sigmoided Difference of Log Gaussians.
+
+	* [r10973] sounds/multipletones,
+	  sounds/puretones,
+	  sounds/sine_waves,
+	  sounds/sine_waves/*.wav,
+	  sounds/square_waves,
+	  sounds/square_waves/sqr-100Hz.wav,
+	  sounds/square_waves/sqr-1kHz.wav:
+	  Could not locate the original source to credit for the pure tone
+	  sound files so i generated a new one of each. The waveforms of
+	  mine appear to be a little cleaner also. Renamed pure tone to
+	  sine wave and multiple tone to square wave as this is far
+	  clearer.
+
+	* [r10972] topo/misc/patternfn.py,
+	  topo/pattern/basic.py:
+	  Added class for logarithmic gaussian pattern in
+	  topo.pattern.basic. Added log_gaussian function to
+	  topo.misc.patternfn
+
+	* [r10971] topo/misc/patternfn.py,
+	  topo/pattern/audio.py,
+	  topo/pattern/basic.py:
+	  Removed spectrogram code from OneDPowerSpectrum, as the name
+	  implies it should only return a one dimensional structure.
+	  Spectrogram code is now in pattern/audio. Fft no longer employs a
+	  smoothing function (i.e. it operates on a rectangualr window)
+	  which produces slightly better results. Moved fft calculation to
+	  its own method to make inheritence cleaner. In pattern/audio
+	  renamed class Audio to class Spectrogram as this is really what
+	  it should have been doing all along (and is now doing). Moved the
+	  function aspect of the sigmoid pattern to topo/patternfn as this
+	  is conforms to how every other class is doing it.
+
+2010-03-10  jbednar
+
+	* [r10970]
+	  doc/Developer_Manual/optimization_text.php:
+	  Minor fixes
+
+2010-03-10  ceball
+
+	* [r10969] setup.py:
+	  Minor alterations to setup.py
+
+	* [r10968] setup.py:
+	  Fixed typo.
+
+	* [r10967] setup.py:
+	  Minor updates to docs.
+
+	* [r10966] setup.py:
+	  Remove capitalization of 'topographica' package name.
+
+	* [r10965] setup.py:
+	  Uncommented code that was disabled for testing (should have been
+	  part of previous commit).
+
+	* [r10964] setup.py:
+	  Support easy_install without depending on setuptools.
+
+	* [r10963] Makefile,
+	  create_topographica_script.py:
+	  Fixed bugs with svnversion variables.
+
+2010-03-10  bilalkhancnsg
+
+	* [r10962] sounds/complex,
+	  sounds/complex/daisy.wav,
+	  sounds/daisy.wav,
+	  sounds/multipletones,
+	  sounds/multipletones/sqr-100Hz.wav,
+	  sounds/multipletones/sqr-1kHz.wav,
+	  sounds/puretones,
+	  sounds/puretones/*.wav,
+	  sounds/sqr-1kHz.wav,
+	  sounds/test.wav:
+	  Added 20 sound files of pure tones of ascending frequency ranging
+	  from 20Hz to 20000Hz to a folder named 'puretones', added 2 sound
+	  files of square waves (test of multiple frequencies) to the
+	  'multipletones' folder, and finally, created a folder named
+	  'complex' to house the spectral and termporally variant rich test
+	  sound (daisy).
+
+2010-03-07  ceball
+
+	* [r10961] setup.py:
+	  Added description for pypi page.
+
+	* [r10960] MANIFEST.in,
+	  Makefile, setup.py:
+	  More minor packaging cleanup.
+
+	* [r10959] Makefile,
+	  setup.py:
+	  Packaging cleanup.
+
+	* [r10958] topo/__init__.py,
+	  topo/misc/commandline.py,
+	  topo/tests/__init__.py:
+	  Allow Topographica to run without gmpy or fixedpoint.
+
+	* [r10957] external/Makefile:
+	  fixedpoint-uninstall was leaving files behind.
+
+	* [r10956] MANIFEST.in,
+	  Makefile,
+	  create_topographica_script.py,
+	  setup.py:
+	  Simplified distutils pypi commands.
+
+2010-03-06  ceball
+
+	* [r10955] topo/misc/commandline.py:
+	  Made IPython be optional.
+
+	* [r10954] MANIFEST.in:
+	  Added missing file.
+
+	* [r10953] MANIFEST.in,
+	  Makefile, _setup.py,
+	  external/Makefile,
+	  setup.py, setup_app.py,
+	  setup_exe.py,
+	  setup_ez.py:
+	  Focus on Python's distutils only: drop setuptools, easy_install,
+	  py2exe, and py2app (all of which are incompatible with code in
+	  Topographica or at least one of its dependencies in various
+	  ways). Also, removed incomplete support for building via MSYS on
+	  Windows.
+
+2010-03-03  bilalkhancnsg
+
+	* [r10952] contrib/lissom_audio.ty:
+	  Modified the mgb afferent strength so a1 isn't flooded with
+	  input. Changed the mgb's weights on the cochlea so it better
+	  resembles known strf data.
+
+	* [r10951] sounds/daisy.wav:
+	  Added a new test sound: the song Daisy Bell, this allows us to
+	  see how the audio pattern generator holds up to a more complex
+	  spectrogram. (Daisy Bell in tribute to the IBM 704 which in 1962
+	  became the first ever computer to 'sing')
+
+	* [r10950] topo/command/analysis.py:
+	  Modified the _feature_list method of class measure_rfs such that
+	  it no longer assumes a square sheet
+
+2010-03-02  bilalkhancnsg
+
+	* [r10949] topo/pattern/basic.py:
+	  Commented out Gamma for now, it't not presently needed and
+	  requires more time to fix than i can currently give it.
+
+2010-03-02  jbednar
+
+	* [r10948] topo/pattern/basic.py:
+	  Cleaned up docstrings
+
+2010-03-02  bilalkhancnsg
+
+	* [r10947] topo/command/basic.py:
+	  Added an extra section to the documentation of method
+	  pattern_present explaining the back arrow history mechanism
+	  availible in the gui to view just presented patterns. Removed the
+	  time.sleep command added to pattern_present which attempted to
+	  achieve similar functionality.
+
+	* [r10946] topo/analysis/featureresponses.py:
+	  Reverted class Feature to its previous state, the modification of
+	  parameter 'range' was duplication of the functionality provided
+	  by the parameter 'value'.
+
+	* [r10945] contrib/lissom_audio.ty:
+	  Changed the density parameter to density_multiplier so as to
+	  better convey its purpose. Changed the value of
+	  density_multiplier to 1.0 and the densities of the cochlea, mgbv
+	  and a1 sheets to reasonable values
+
+	* [r10944] topo/pattern/basic.py:
+	  Changed the name of GammaDistribution to Gamma. Gamma now
+	  utilises the SciPy implementation for the generalised gamma
+	  distribution. Accordingly much improved the documentation for
+	  Gamma.
+
+	* [r10943] topo/misc/patternfn.py:
+	  Removed my implementations of gamma and factorial in favour of
+	  those from scipy, the scipy versions are one liners so they're
+	  now placed directly in topo.pattern.basic where they're utilised.
+
+2010-03-01  jbednar
+
+	* [r10942] topo/misc/patternfn.py,
+	  topo/pattern/basic.py:
+	  Cleaned up docstrings and comments
+
+2010-03-01  bilalkhancnsg
+
+	* [r10941] topo/command/analysis.py,
+	  topo/command/basic.py,
+	  topo/misc/patternfn.py:
+	  CORRECTION TO REVISION 10936: misunderstood the CEBENHANCEMENT
+	  about visualising motion, changed the code to reflect this
+
+	* [r10940] contrib/lissom_audio.ty:
+	  Added a density parameter such that cochlea, mgbv and a1
+	  densities can all be multiplicatively modified through a single
+	  parameter on the command line. Changed cochlea, mgbv and a1
+	  densities to unit densities relative to each other. Changed
+	  dimensions of mgbv and a1 sheets to be rectangular and congruent
+	  to the cochlea. Added a SigmoidedDoG weights generator to the
+	  cochlea afferent connection and oriented and scaled it correctly
+
+	* [r10939] topo/pattern/basic.py:
+	  Added a Gamma Distribution class to utilise the gamma function
+	  from topo.misc.patternfn. Changed the default x position of
+	  SigmoidedDoG from -1.5 to 0. Changed the gaussians such that
+	  modifying the global size parameter multiplies the individual
+	  size of both.
+
+	* [r10938] topo/misc/patternfn.py:
+	  Added new definitions for gamma and recursive factorial (which is
+	  employed by gamma). Note that gamma is one dimensional.
+
+	* [r10937] topo/misc/patternfn.py:
+	  Added new definitions for gamma and recursive factorial (which is
+	  employed by gamma). Note that gamma is one dimensional.
+
+	* [r10936] topo/command/basic.py:
+	  Added ability to slow down presentation of patterns in
+	  pattern_present so as to be able to visualise them
+
+	* [r10935] topo/analysis/featureresponses.py:
+	  Added ability for the class FeatureMaps to accept single values
+	  for its range
+
+2010-02-25  jbednar
+
+	* [r10934] topo/coordmapper/basic.py:
+	  Fixed ConstantMapper parameter bounds and documentation
+
+2010-02-23  jbednar
+
+	* [r10933] examples/obermayer_pnas90.ty:
+	  Removed outdated reference to topo.param that prevented it from
+	  being run
+
+2010-02-23  ceball
+
+	* [r10932] external/Cython-0.12.1.tar.gz,
+	  external/Cython-0.9.8.1.1.tar.gz,
+	  external/Makefile:
+	  Upgraded Cython to 0.12.1.
+
+2010-02-22  antolikjan
+
+	* [r10931] contrib/jacommands.py:
+	  further changes to measre_histogram
+
+2010-02-21  antolikjan
+
+	* [r10930] contrib/jacommands.py:
+	  various changes to measure activity histogram
+
+2010-02-21  ceball
+
+	* [r10929] debian/install.ex,
+	  debian/menu.ex,
+	  debian/topographica.desktop:
+	  (Ubuntu package) Added files for creating menu entry in the
+	  future - currently unused.
+
+	* [r10928] Makefile:
+	  (Ubuntu package) Add tk-tile as dependency for Ubuntu 8.04.
+
+2010-02-18  ceball
+
+	* [r10927] contrib/lissom_audio.ty:
+	  Added normal svn properties.
+
+	* [r10926] doc/buildbot/master.cfg:
+	  (Buildbot) Fixed another typo.
+
+	* [r10925] doc/buildbot/master.cfg:
+	  (buildbot) Fixed typos.
+
+2010-02-17  ceball
+
+	* [r10924] doc/buildbot/master.cfg:
+	  (Buildbot) Fixed package uploading.
+
+2010-02-16  ceball
+
+	* [r10923] Makefile:
+	  (Ubuntu package) Fixed path error for rpm creation.
+
+	* [r10922] doc/buildbot/master.cfg:
+	  Added deb and rpm generation.
+
+2010-02-16  antolikjan
+
+	* [r10921] topo/command/pylabplots.py:
+	  improved plotting of modulation ratios
+
+	* [r10920] topo/analysis/vision.py:
+	  improved plotting of modulation ratio histograms
+
+2010-02-16  ceball
+
+	* [r10919] Makefile:
+	  (Ubuntu package) Renamed a target.
+
+	* [r10918] Makefile:
+	  (Ubuntu package) Removed 'PRERELEASE' variable.
+
+2010-02-15  ceball
+
+	* [r10917] Makefile:
+	  (Ubuntu package) debuild source after binaries, so checksums
+	  match for subsequent dput.
+
+	* [r10916] Makefile:
+	  (Ubuntu package) Restored hardy deb.
+
+	* [r10915] debian/pyversions:
+	  (Ubuntu package) File removed from previous commit.
+
+	* [r10914] debian/control:
+	  (Ubuntu package) Fix python dependency confusion.
+
+	* [r10913] Makefile:
+	  Added some notes.
+
+	* [r10912] Makefile:
+	  Fixed typo.
+
+	* [r10911] Makefile:
+	  (Ubuntu package) Commented out Hardy package building.
+
+	* [r10910] Makefile,
+	  doc/buildbot/dot-dput.cf:
+	  (Ubuntu package) Cleanup plus generation of rpm files.
+
+2010-02-13  ceball
+
+	* [r10909] debian/control:
+	  (Ubuntu package) Attempt to allow building on Hardy (LTS).
+
+	* [r10908] Makefile:
+	  (Ubuntu package) Continued attempt to upload debs for multiple
+	  versions of Ubuntu.
+
+	* [r10907] Makefile:
+	  (Ubuntu package) Attempt to upload debs for multiple versions of
+	  Ubuntu.
+
+	* [r10906] Makefile:
+	  (Ubuntu package) Automated process now working for Ubuntu Jaunty
+	  target.
+
+	* [r10905] Makefile:
+	  (Ubuntu package) Attempt to create Ubuntu Jaunty deb.
+
+	* [r10904] Makefile:
+	  (Ubuntu package) Continued attempting to get automatic PPA upload
+	  to work.
+
+	* [r10903] Makefile:
+	  (Ubuntu package) Testing PPA.
+
+	* [r10902] Makefile:
+	  (Ubuntu package) Simplified the commands.
+
+	* [r10901] Makefile:
+	  (Ubuntu package) Create valid changelog.
+
+	* [r10900] Makefile:
+	  (Ubuntu package) Fixed mistake in previous commit.
+
+	* [r10899] Makefile,
+	  debian/changelog:
+	  (Ubuntu package) Continued attempting to automate deb creation.
+
+	* [r10898] debian/control,
+	  debian/rules:
+	  Reverted earlier confused change of pycentral to pysupport.
+
+2010-02-12  ceball
+
+	* [r10897] debian/pyversions:
+	  (Ubuntu packaging) Fixed syntax error.
+
+	* [r10896] Makefile,
+	  debian/pyversions:
+	  More deb packaging updates.
+
+	* [r10895] Makefile,
+	  debian/control:
+	  More updates for Karmic Koala build machine.
+
+	* [r10894] create_topographica_script.py:
+	  Fixed typo in previous commit.
+
+	* [r10893] Makefile,
+	  create_topographica_script.py:
+	  Began implementing deb creation via Makefile.
+
+	* [r10892] debian/compat,
+	  debian/rules:
+	  Updates for Ubuntu Karmic Koala (as the packaging machine).
+
+2010-02-10  jbednar
+
+	* [r10891] contrib/lissom_audio.ty,
+	  topo/pattern/audio.py,
+	  topo/pattern/basic.py:
+	  Cleaned up formatting and docstrings to match Topographica
+	  conventions. Should be no change in behavior apart from the
+	  arrangement in the Model Editor
+
+2010-02-10  bilalkhancnsg
+
+	* [r10890] contrib/lissom_audio.ty,
+	  topo/pattern/basic.py:
+	  SigmoidedDoG now with doc info, which lissom audio now employs as
+	  its weights generator
+
+	* [r10889] contrib/lissom_audio.ty,
+	  topo/pattern/basic.py:
+	  lissom audio sans happyface, and SigmoidedDoG pattern working
+
+	* [r10888] topo/pattern/basic.py:
+	  SigmoidedDoGs changed to SigmoidedDoG since it now only employs
+	  one diff of gaussians
+
+2010-02-09  ceball
+
+	* [r10887]
+	  topo/tests/reference/lissom_oo_or_reference.ty:
+	  Change missed from previous commit.
+
+	* [r10886]
+	  topo/tests/reference/lissom_oo_dr_reference.ty,
+	  topo/tests/reference/lissom_or_reference.ty,
+	  topo/tests/reference/topo_or_defs.py:
+	  Changes missed when converting CFProjection's n_units() method to
+	  an attribute.
+
+2010-02-05  ceball
+
+	* [r10885] doc/Downloads/git_text.php:
+	  Some updates about sharing work.
+
+2010-02-04  ceball
+
+	* [r10884] external:
+	  Updated ignore list.
+
+2010-02-04  jbednar
+
+	* [r10883]
+	  doc/Developer_Manual/revisioncontrol_text.php:
+	  Fixed apparent typo
+
+2010-02-04  ceball
+
+	* [r10882] external/Makefile:
+	  Added Python 2.5 directories to clean and uninstall.
+
+	* [r10881] doc/buildbot/index.html,
+	  doc/buildbot/master.cfg:
+	  Made current svn documentation available from buildbot.
+
+2010-02-03  bilalkhancnsg
+
+	* [r10880] topo/pattern/basic.py:
+	  Updated doc info for Sigmoid and SigmoidedDoGs, changed param
+	  names in SigmoidedDoGs to be generic and also changed soft and
+	  hard bounds to reasonable values
+
+	* [r10879] contrib/lissom_audio.ty,
+	  topo/misc/patternfn.py,
+	  topo/pattern/basic.py:
+	  Added new pattern (Sigmoid) for generating sigmoids along the
+	  horizontal, and added a new pattern (SigmoidedDoGs) consisting of
+	  two differences of gaussians summed and subsequently multiplied
+	  by a sigmoid
+
+2010-02-02  ceball
+
+	* [r10878] doc/buildbot/master.cfg:
+	  New Mac buildslave does not yet have necessary tools installed to
+	  build docs, so stop warning (it's not a failure of docs to build
+	  on Mac). No slow-tests on Windows, because msys shell interacts
+	  badly with buildbot, giving false failures.
+
+	* [r10877] doc/buildbot/index.html:
+	  Updated links.
+
+2010-02-01  ceball
+
+	* [r10876] param/tk.py:
+	  Restored compatibility setting for Tk versions less than 8.5 (for
+	  Windows).
+
+	* [r10875] external/Makefile:
+	  Try to address mysterious, intermittent buildbot error by
+	  avoiding pipe in matplotlib unpacking.
+
+	* [r10874] topo/misc/legacy.py:
+	  Added legacy support for CFProjection's n_units() method being
+	  removed (r10871).
+
+2010-01-31  ceball
+
+	* [r10873] topo/projection/basic.py:
+	  Fixed bug in n_bytes() (hadn't been updated after flattening cfs
+	  list.
+
+	* [r10872] topo/base/cf.py,
+	  topo/base/projection.py:
+	  Minor changes to comments.
+
+	* [r10871] topo/base/cf.py,
+	  topo/sheet/lissom.py:
+	  Made CFProjection's n_units() method into an attribute, since the
+	  number of units is fixed (should make distribution easier).
+	  ResizableCFProjection's n_units is updated when the bounds are
+	  changed.
+
+	* [r10870] topo/base/cf.py:
+	  CFProjection.n_units() uses the mask template to count the number
+	  of units, rather than the mask of the central CF. Should be no
+	  change to existing simulations.
+
+	* [r10869] topo/projection/basic.py:
+	  Fixed bug where incorrect mask was being stored on shared cf;
+	  this resulted in n_units() returning the wrong value (but this
+	  had no effect on existing simulations because learning is not
+	  implemented for shared weight CFPs).
+
+	* [r10868] topo/base/cf.py:
+	  Removed proj from CFIter.
+
+	* [r10867] topo/base/cf.py,
+	  topo/learningfn/optimized.py,
+	  topo/learningfn/projfn.py,
+	  topo/responsefn/optimized.py,
+	  topo/responsefn/projfn.py,
+	  topo/transferfn/optimized.py:
+	  Use flatcfs and flattened activity array (see svn r10838). Use
+	  cf_type stored in CFIter rather than from projection.
+
+	* [r10866] topo/base/cf.py,
+	  topo/learningfn/optimized.py,
+	  topo/learningfn/projfn.py:
+	  CFPLearningFn.constant_sum_connection_rate() takes n_units
+	  directly, rather than proj then accessing proj.n_units(), so that
+	  CFIter only needs to store n_units.
+
+	* [r10865] topo/base/cf.py:
+	  Made CFIter store activity, flatcfs, and mask (in preparation for
+	  it no longer storing the projection).
+
+	* [r10864] topo/base/cf.py:
+	  Fixed CFPLearningFn call signature.
+
+2010-01-29  antolikjan
+
+	* [r10863] contrib/modelfit.py:
+	  changes
+
+2010-01-28  ceball
+
+	* [r10862] Makefile:
+	  Pylint warnings should not appear as errors until we have
+	  eliminated all of the invalid warnings.
+
+2010-01-27  ceball
+
+	* [r10861] _setup.py,
+	  external/Makefile,
+	  external/Python-2.5.1.tgz,
+	  external/Python-2.6.4.tgz,
+	  external/Python_64bit_pickle.diff,
+	  external/Tkinter_bool_none.diff,
+	  external/freetype-2.3.9.tar.gz,
+	  external/idle_tk8.5.patch,
+	  external/libpng-1.2.40.tar.gz,
+	  external/numpy-1.2.1.tar.gz,
+	  external/numpy-1.3.0.tar.gz,
+	  setup_app.py,
+	  setup_exe.py,
+	  setup_ez.py:
+	  Upgraded to Python 2.6. Includes: upgrade to numpy 1.3 (necessary
+	  for Windows and Mac); freetype and libpng so they are no longer
+	  dependencies that must be installed from elsewhere.
+	  
+	  (I.e. merge branch 'python26' from ceball_fiver.)
+
+2010-01-24  antolikjan
+
+	* [r10860]
+	  contrib/cc_lissom_oo_or_simple_rv.ty:
+	  correction of standard retinal waves
+
+2010-01-16  bilalkhancnsg
+
+	* [r10859] contrib/lissom_audio.ty,
+	  topo/pattern/audio.py,
+	  topo/pattern/basic.py:
+	  the audio pattern generator now populates a sheet with a
+	  spectrogram, new signal transforms are pushed to the right,
+	  oldest fall off the left, size of history is dictated by sheet
+	  size
+
+2010-01-15  aplebe
+
+	* [r10858] topo/transferfn/optimized.py:
+	  Added a check on the cumulative weight value in
+	  CFPOF_DivisiveNormalizeL1_opt
+	  and CFPOF_DivisiveNormalizeL1, to avoid dividing by 0 - it is
+	  especially
+	  deceitful for the optimized version, because no error is issued
+	  and "NaN"
+	  non-value are stored in the weights
+
+2010-01-14  jbednar
+
+	* [r10857]
+	  topo/tests/lissom_oo_or_t000100.00_Size_Tuning.data:
+	  Checked in new data for buildbot to pass; must be verified by J.
+	  Antolik
+
+	* [r10856] doc/Home/index_text.php:
+	  Removed outdated qualifier
+
+	* [r10855] doc/Home/news_text.php,
+	  doc/News/index_text.php:
+	  Cleaned up news for publishing
+
+	* [r10854] topo/base/simulation.py:
+	  Added alert
+
+	* [r10853] topo/pattern/audio.py:
+	  Clarified how Audio differs from OneDPowerSpectrum
+
+2010-01-13  jbednar
+
+	* [r10852] doc/News/index_text.php:
+	  First pass at list of recent post-0.9.6 features
+
+	* [r10851] ChangeLog.txt:
+	  Brought up to date as of 9 Jan 2010
+
+2010-01-11  bilalkhancnsg
+
+	* [r10850] examples/run.py:
+	  Commented a path check in examples/run.py when debugging on my
+	  system, accidently uploaded it in that state. Now back to as it
+	  should be
+
+2010-01-10  bilalkhancnsg
+
+	* [r10849] contrib/lissom_audio.ty,
+	  examples/run.py,
+	  sounds/sqr-1kHz.wav:
+	  1. Connected Cochlea to MGBv with correct edge adjustments,
+	  connected MGBv to A1 with correct edge adjustments, put in
+	  lateral excitory and inhibitory connections in A1 as in V1, not
+	  sure about these entirely at this stage. 2. Sounds can now be
+	  placed in the sounds folder and loaded into the file, currently
+	  there is a 1kHz square wave and a small drumbeat in there. 3.
+	  Cochlea sheet gets populated with the frequency bands (fourier
+	  analysis), these are passed up to the MGBv and from there to A1 -
+	  i see the patterns of activity pass up but am not sure its 100%
+	  correct at this stage (not quite sure how it should look)
+
+2010-01-09  bilalkhancnsg
+
+	* [r10848] contrib/lissom_audio.ty:
+	  Added connections (afferent from mgb) and AI sheet based on
+	  lissom, not accurate to AI yet, currently commented out till
+	  discussion as to most appropriate parameters
+
+	* [r10847] contrib/lissom_audio.ty:
+	  Dimensions of cochlea are now accurate, errors in cochlea
+	  orientation and connection corrected.
+
 2010-01-09  jbednar
 
 	* [r10846] ChangeLog.txt:
@@ -48029,7 +49337,7 @@
 2005-11-10  jbednar
 
 	* [r1377] topo/base/__init__.py:
-	  Upated __all__ list
+	  Updated __all__ list
 
 2005-11-09  ceball
 
