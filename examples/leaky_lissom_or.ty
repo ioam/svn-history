@@ -25,7 +25,7 @@ from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1
 from topo.learningfn.projfn import CFPLF_OutstarHebbian
-from topo.misc.numbergenerator import UniformRandom
+from topo import numbergen
 
 
 # Parameters that can be passed on the command line using -p
@@ -55,9 +55,9 @@ GeneratorSheet.nominal_bounds = BoundingBox(radius=0.72)
 input_pattern = topo.pattern.basic.Gaussian(
     scale=1.0,size=2*0.0468,aspect_ratio=4.0,
     bounds=BoundingBox(radius=0.72),
-    x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
-    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
-    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
+    x=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
+    y=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
+    orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
 # YC use test pattern
 input_pattern = topo.pattern.basic.TwoRectangles(scale=1.0)

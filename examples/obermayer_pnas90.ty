@@ -28,11 +28,12 @@ import topo
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
 from topo.learningfn.projfn import CFPLF_EuclideanHebbian
-from topo.misc.numbergenerator import UniformRandom,BoundedNumber
 from topo.transferfn.basic import DivisiveNormalizeL1
 from topo.transferfn.basic import KernelMax
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.sheet import GeneratorSheet
+
+from topo import numbergen
 
 import topo.pattern.basic
 import topo.pattern.random
@@ -96,9 +97,9 @@ gaussian_width = 0.23/sqrt(2)
 gaussian_height = 0.09/sqrt(2)
 
 input_pattern = topo.pattern.basic.Gaussian(
-    x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
-    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
-    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),
+    x=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
+    y=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
+    orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),
     size=2*gaussian_height,aspect_ratio=gaussian_width/gaussian_height,
     bounds=BoundingBox(radius=0.5))
 

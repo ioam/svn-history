@@ -176,7 +176,7 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.command.analysis import PatternPresenter, Subplotting
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.coordmapper.basic import Grid
-from topo.misc.numbergenerator import UniformRandom, ExponentialDecay, VonMisesRandom
+from topo import numbergen
 
 import topo
 
@@ -184,7 +184,7 @@ import topo
 
 global_seed=locals().get("global_seed",1)
 
-random_seed_generator=UniformRandom(lbound=0.0,ubound=1000,seed=global_seed*25)
+random_seed_generator=numbergen.UniformRandom(lbound=0.0,ubound=1000,seed=global_seed*25)
 
 
 plot_deflections_on=param.Boolean(default=False)
@@ -444,7 +444,6 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import DivisiveNormalizeL1
-from topo.misc.numbergenerator import UniformRandom, ExponentialDecay, VonMisesRandom
                                
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((global_seed*3,global_seed*3))
@@ -474,8 +473,8 @@ von_kappa=0.0
 
 topo.sim['Ganglia0']=GeneratorSheet(nominal_density=WhiskerArray.num_ganglion_cells,
                                              input_generator=WhiskerArray(num_ganglion_cells=num_ganglion_cells,
-                                                deflection=VonMisesRandom(mu=von_mu,kappa=von_kappa,seed=global_seed*76),
-                                                tilt=locals().get('tilt',UniformRandom(lbound=0.0,ubound=1.0,seed=global_seed*123)),
+                                                deflection=numbergen.VonMisesRandom(mu=von_mu,kappa=von_kappa,seed=global_seed*76),
+                                                tilt=locals().get('tilt',numbergen.UniformRandom(lbound=0.0,ubound=1.0,seed=global_seed*123)),
                                                 w_x=w_x, w_y=w_y,
                                                 flipped_whisker_convergence=locals().get('flipped_convergence',1e7),
                                                 flipped_whisker=locals().get('flipped_whisker',[None,None]),
@@ -497,7 +496,7 @@ topo.sim.connect('Ganglia0','S1',delay=FixedPoint("0.05"),dest_port=('Activity',
 topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=ResizableCFProjection,strength=1.0,
                  weights_generator=topo.pattern.random.UniformRandom(),
-                 nominal_bounds_template=BoundingBox(radius=locals().get("ex_radius",0.3)), learning_rate=1.0) #ExponentialDecay(starting_value=1.0, time_constant=1000.0))
+                 nominal_bounds_template=BoundingBox(radius=locals().get("ex_radius",0.3)), learning_rate=1.0) #numbergen.ExponentialDecay(starting_value=1.0, time_constant=1000.0))
                            
    
 topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralInhibitory',

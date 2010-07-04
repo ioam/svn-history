@@ -29,7 +29,7 @@ from topo.sheet.saccade import ShiftingGeneratorSheet, SaccadeController
 from topo.projection.basic import SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.coordmapper.basic import OttesSCMotorMapper
-from topo.misc.numbergenerator import UniformRandom
+from topo import numbergen
 
 import topo.pattern.image
 
@@ -62,8 +62,8 @@ saccade_generator = topo.pattern.basic.Gaussian(
     # y=cycle([0.3,-0.3, -0.3, 0.3,  0.3,-0.3, -0.3, 0.3]),
 
     # random saccades
-    x = UniformRandom(lbound=-0.5,ubound=0.5),
-    y = UniformRandom(lbound=-0.4,ubound=0.4),
+    x = numbergen.UniformRandom(lbound=-0.5,ubound=0.5),
+    y = numbergen.UniformRandom(lbound=-0.4,ubound=0.4),
 
     # constant 'still' saccade: will produce random walk if using
     # SaccadeController.decode_method = 'sample'
