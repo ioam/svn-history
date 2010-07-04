@@ -102,11 +102,13 @@ clean-ext-packages:
 # Build the Python startup script.  Rebuilt whenever a file changes in
 # topo/ or examples, to make sure that topo.version is up to date.
 topographica: external Makefile topo/*/*.py examples/*.ty
-	${PREFIX}/bin/python ${PREFIX}/create_topographica_script.py ${PREFIX}bin/python ${RELEASE} ${SVNVERSION}
+# site.USER_SITE is ignored to stop Python finding packages in
+# ~/.local instead of Topographica's own packages.
+	${PREFIX}/bin/python ${PREFIX}/create_topographica_script.py ${PREFIX}bin/python ${RELEASE} ${SVNVERSION} 0
 
 
 topographica-other-python:
-	${OTHER_PYTHON} ${PREFIX}/create_topographica_script.py "${OTHER_PYTHON}" ${RELEASE} ${SVNVERSION}
+	${OTHER_PYTHON} ${PREFIX}/create_topographica_script.py "${OTHER_PYTHON}" ${RELEASE} ${SVNVERSION} 1
 
 
 # CB: experimental

@@ -8,13 +8,18 @@ import os
 
 DEFAULTS = dict(python_bin="/usr/bin/env python",
                 release = None,
-                version = None)
+                version = None,
+                usersite = 1)
 
-def write(python_bin=None,release=None,version=None):
+def write(python_bin=None,release=None,version=None,usersite=None):
 
     python_bin = python_bin or DEFAULTS['python_bin']
     release = release or DEFAULTS['release']
     version = version or DEFAULTS['version']
+    usersite = DEFAULTS['usersite'] if usersite is None else int(usersite)
+
+    if usersite==0:
+        python_bin+=" -s"
 
     script = """#!%s
 # Startup script for Topographica
@@ -41,16 +46,18 @@ if __name__=='__main__':
     print "creating topographica script..."
 
     args = sys.argv[1::]
-    assert len(args)==3, "Pass python_bin, release, version (any of which may be None)"
+    assert len(args)==4, "Pass python_bin, release, version, usersite (any of which may be 'None' to get the default value)"
 
     python_bin = args[0] if args[0]!='None' else DEFAULTS['python_bin']
     release = args[1] if args[1]!='None' else DEFAULTS['release']
     version = args[2] if args[2]!='None' else DEFAULTS['version']
+    usersite = args[3] if args[3]!='None' else DEFAULTS['usersite']
 
     print "python: %s"%python_bin
     print "release: %s"%release
     print "version: %s"%version
+    print "usersite: %s"%usersite
 
-    write(python_bin,release,version)
+    write(python_bin,release,version,usersite)
 
 
