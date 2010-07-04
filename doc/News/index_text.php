@@ -1,6 +1,13 @@
-<p><b>14 January 2010:</b> Version 0.9.7 is being prepared for
+<p><b>4 July 2010:</b> Version 0.9.7 is being prepared for
 release.  Changes and new features, already available in the
 <A HREF="../Downloads/cvs.html">SVN</A> version, include:
+
+<!-- ALERT: Need to add SigmoidedDoLG, LogGaussian, when moved
+  from contrib/lissom_audio.ty.  Do we need DifferenceOfGaussians?
+  Clean up and rename measure_frequency_pref.
+
+  Move patterns from contrib/hegdeessen.py to topo.pattern
+-->
 
 <!-- Updated to r10814 -->
 <center>
@@ -11,6 +18,8 @@ release.  Changes and new features, already available in the
 <font size="-1">
 <dt>General improvements:</dt>
 <dd>
+  <div class="i2">- now released under less-restrictive BSD license
+  instead of GPL, to facilitate commercial use of components</div>
   <div class="i2">- now supports Python 2.6</div>
   <div class="i2">- significantly reduced memory consumption (35% less for lissom.ty)</div>
   <div class="i2">- minor bugfixes</div>
@@ -54,7 +63,7 @@ release.  Changes and new features, already available in the
 <dt>Plotting:</dt>
 <dd>
   <div class="i2">- more joint normalization options
-  ("JointProjections", "AllTogether", "Individually"), to show 
+  (JointProjections, AllTogether, Individually), to show 
   relative differences in weight strength and activity</div>
   <div class="i2">- PhaseDisparity plot</div>
 </dd>
@@ -68,8 +77,12 @@ release.  Changes and new features, already available in the
   <?php classref('topo.pattern.basic','Curve')?>, 
   <?php classref('topo.pattern.basic','Rectangle')?> (now with smoothing),
   <?php classref('topo.pattern.basic','RawRectangle')?> (no smoothing),
-  <?php classref('topo.pattern.basic','OneDPowerSpectrum')?> (for frequency decomposition),
-  <?php classref('topo.pattern.audio','Audio')?> (for audio spectrograms)
+  <?php classref('topo.pattern.basic','Sigmoid')?>,
+  <?php classref('topo.pattern.basic','SigmoidedDoG')?> (for audio STRFs),
+  <?php classref('topo.pattern.basic','PowerSpectrum')?> (for frequency decomposition),
+  <?php classref('topo.pattern.basic','Spectrogram')?> (for frequency decomposition over time),
+  <?php classref('topo.pattern.audio','Audio')?> (for audio files)
+  <?php classref('topo.pattern.audio','AudioFolder')?> (for directories of audio files)
   </div>
   <div class="i2">- SpiralGrating, HyperbolicGrating, RadialGrating,
   ConcentricRings, and ArcCentered pattern families are temporarily in
@@ -80,6 +93,12 @@ release.  Changes and new features, already available in the
   <div class="i2">- misc:
   <?php fnref('topo.misc.util','linearly_interpolate')?>,
   <?php fnref('topo.base.arrayutil','clip_upper')?></div>
+</dd>
+<br>
+<dt>Example scripts:</dt>
+<dd>
+  <div class="i2">- gca_lissom.ty improved</div>
+  <div class="i2">- lissom_audio.py example of auditory pathway</div>
 </dd>
 </font>
 </dl>
