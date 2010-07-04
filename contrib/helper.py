@@ -1,6 +1,6 @@
 import numpy
 import pylab
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
+from topo import numbergen
 
 def flatten(x):
     """flatten(sequence) -> list
@@ -165,7 +165,7 @@ def generateSparseNoiseStimuli(square_in_deg,steps,num_inputs,density):
     	
     print 'View angle:',view_angle	
     #how many pairs of dots will be presented in the whole image	
-    rand=UniformRandom()
+    rand=numbergen.UniformRandom()
     
     #generate inputs one by one
     for i in xrange(0,num_inputs):

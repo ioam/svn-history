@@ -38,7 +38,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import PiecewiseLinear
-from topo.misc.numbergenerator import UniformRandom
+from topo import numbergen
 from topo.transferfn.basic import HomeostaticMaxEnt
 from topo.pattern.basic import Gaussian
 
@@ -91,9 +91,9 @@ class Activity_based(CFPResponseFn):
 
 input_pattern = topo.pattern.basic.Gaussian(
           scale=1.0, size=2*0.0468, aspect_ratio=4.0,
-          x=UniformRandom(lbound=-0.775,ubound=0.775,seed=12),
-          y=UniformRandom(lbound=-0.775,ubound=0.775,seed=34),
-          orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
+          x=numbergen.UniformRandom(lbound=-0.775,ubound=0.775,seed=12),
+          y=numbergen.UniformRandom(lbound=-0.775,ubound=0.775,seed=34),
+          orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
                                  
 # Specify weight initialization, response function, and learning function

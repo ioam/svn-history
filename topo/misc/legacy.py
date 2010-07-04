@@ -729,6 +729,15 @@ def renamed_projfns():
 
 S.append(renamed_projfns)
 
+# CEBALERT: what's going on with the order in this file? Should have
+# maintained a consistent order, processing most recent changes first.
+def removed_numbergenerator():
+    import topo.numbergen
+    module_redirect('numbergenerator',topo.misc,topo.numbergen)
+
+S.append(removed_numbergenerator)
+
+
 def renamed_numbergenerators():
     # rXXXX renamed topo.misc.numbergenerators
     import topo.misc.numbergenerator
@@ -808,6 +817,7 @@ S.append(teststimuli_removed)
 def moved_homeostatic():
     # rXXXX homeostatic of moved into basic
     import topo.outputfns
+    # CEBALERT: surely a typo here?
     module_redirect('homeostatic',topo.outputfns,topo.outputfns)
 
 S.append(moved_homeostatic)
@@ -963,3 +973,7 @@ def cfproj_add_n_units():
             
 
 S.append(cfproj_add_n_units)
+
+
+
+

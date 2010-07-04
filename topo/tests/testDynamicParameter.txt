@@ -1,12 +1,12 @@
 >>> import param
->>> from topo.misc.numbergenerator import UniformRandom
+>>> from topo import numbergen
 
 
 ## Basic tests of Dynamic parameters (__get__ & __set__,
 ## and that inspect_value() and get_value_generator() work).
 
 >>> class TestPO1(param.Parameterized):
-...    x = param.Dynamic(default=UniformRandom(lbound=-1,ubound=1,seed=1),doc="nothing")
+...    x = param.Dynamic(default=numbergen.UniformRandom(lbound=-1,ubound=1,seed=1),doc="nothing")
 ...    y = param.Dynamic(default=1)
 
 
@@ -29,12 +29,12 @@ False
 
 
 
->>> t2 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
+>>> t2 = TestPO1(x=numbergen.UniformRandom(lbound=-1,ubound=1,seed=10))
 >>> t2.set_dynamic_time_fn(None)
->>> t3 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
+>>> t3 = TestPO1(x=numbergen.UniformRandom(lbound=-1,ubound=1,seed=10))
 >>> t3.set_dynamic_time_fn(None)
 
->>> isinstance(t2.get_value_generator('x'),UniformRandom)  
+>>> isinstance(t2.get_value_generator('x'),numbergen.UniformRandom)  
 True
 
 >>> t2.x==t3.x  # check that t2 and t3 have identical streams
@@ -56,7 +56,7 @@ False
 ## Check instantiation of Dynamic parameter
 
 >>> class TestPO3(param.Parameterized):
-...    x = param.Dynamic(default=UniformRandom(lbound=-1,ubound=1,seed=30))
+...    x = param.Dynamic(default=numbergen.UniformRandom(lbound=-1,ubound=1,seed=30))
 ...    y = param.Dynamic(default=1.0)
 
 
@@ -74,13 +74,13 @@ False
 >>> t7.y  # non-dynamic value not instantiated
 4
 
->>> t6.y = UniformRandom()
+>>> t6.y = numbergen.UniformRandom()
 >>> t8 = TestPO3()
 >>> TestPO3.y = 10
 >>> t8.y==10 # t6 got a dynamic value, but shouldn't have changed Parameter's instantiate
 True
 
->>> TestPO3.y=UniformRandom()  # now the Parameter instantiate should be true
+>>> TestPO3.y=numbergen.UniformRandom()  # now the Parameter instantiate should be true
 >>> t9 = TestPO3()
 >>> '_y_param_value' in t9.__dict__
 True
@@ -128,7 +128,7 @@ False
 >>> q.set_dynamic_time_fn(None)
 >>> assert q.x!=q.x
 >>> assert q.y==q.y
->>> q.y = UniformRandom()
+>>> q.y = numbergen.UniformRandom()
 >>> assert q.y!=q.y # time_fn set on the UniformRandom() when q.y was set
 
 >>> class TestPO4(TestPO1):
@@ -142,7 +142,7 @@ False
 
 # Not yet possible to set time_fn for a Parameter instance
 ## >>> class TestPO5(param.Parameterized):
-## ...    x = param.Dynamic(default=UniformRandom(),dynamic_time_fn=None)
+## ...    x = param.Dynamic(default=numbergen.UniformRandom(),dynamic_time_fn=None)
 
 
 
@@ -157,7 +157,7 @@ False
 
 ## Check shared generator
 
->>> u = UniformRandom(lbound=-1,ubound=1,seed=20)
+>>> u = numbergen.UniformRandom(lbound=-1,ubound=1,seed=20)
 >>> t11 = TestPO1(x=u)
 >>> t12 = TestPO1(x=u)
 >>> topo.sim.run(1)

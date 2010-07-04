@@ -1,8 +1,8 @@
 >>> import param
->>> from topo.misc.numbergenerator import UniformRandom
+>>> from topo import numbergen
 
 >>> class TestPO1(param.Parameterized):
-...    x = param.Number(default=UniformRandom(lbound=-1,ubound=1,seed=1),bounds=(-1,1))
+...    x = param.Number(default=numbergen.UniformRandom(lbound=-1,ubound=1,seed=1),bounds=(-1,1))
 ...    y = param.Number(default=1,bounds=(-1,1))
 
 >>> t1 = TestPO1()
@@ -18,7 +18,7 @@
 
 
 ### Test bounds (dynamic number)
->>> t1.x = UniformRandom(lbound=2,ubound=3)  # bounds not checked on set 
+>>> t1.x = numbergen.UniformRandom(lbound=2,ubound=3)  # bounds not checked on set 
 >>> try:
 ...     v1 = t1.x
 ... except ValueError:

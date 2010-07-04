@@ -27,8 +27,8 @@ from topo.base.arrayutil import wrap
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,sigmoid
 from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,float_error_ignore
-from topo.misc.numbergenerator import UniformRandom
 
+from topo import numbergen
 # BKALERT: Why can we not do a from topo.transferfn import DivisiveNormalizeL1?
 
 
@@ -694,7 +694,7 @@ class Selector(PatternGenerator):
     size = param.Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
 
     # CB: needs to have time_fn=None
-    index = param.Number(default=UniformRandom(lbound=0,ubound=1.0,seed=76),
+    index = param.Number(default=numbergen.UniformRandom(lbound=0,ubound=1.0,seed=76),
         bounds=(-1.0,1.0),precedence=0.20,doc="""
         Index into the list of pattern generators, on a scale from 0
         (start of the list) to 1.0 (end of the list).  Typically a

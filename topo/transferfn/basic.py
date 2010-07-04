@@ -34,7 +34,6 @@ from topo.base.sheetcoords import SheetCoordinateSystem
 # Imported here so that all TransferFns will be in the same package
 from topo.base.functionfamily import IdentityTF
 from topo.pattern.basic import Gaussian
-from topo.misc.numbergenerator import NormalRandom
 
 
 # CEBHACKALERT: these need to respect the mask - which will be passed in.

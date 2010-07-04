@@ -243,10 +243,10 @@ class scatter_plot_phase_preference_simple_cell(PylabPlotCommand):
     def __call__(self, sheet_name, num_of_pairs=66, diameter=0.39, **params):
         p=ParamOverrides(self,params)
 
-        from topo.misc.numbergenerator import UniformRandom
+        from topo import numbergen
 
         # init random generator
-        r = UniformRandom(seed=1023)
+        r =numbergen.UniformRandom(seed=1023)
         # get the sheet object
         try:
             sheet=topo.sim.objects()[sheet_name]

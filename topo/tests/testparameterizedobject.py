@@ -136,8 +136,8 @@ class TestParameterized(unittest.TestCase):
 
 
     def test_state_saving(self):
-        from topo.misc.numbergenerator import UniformRandom
-        t = TestPO(dyn=UniformRandom())
+        from topo import numbergen
+        t = TestPO(dyn=numbergen.UniformRandom())
         g = t.get_value_generator('dyn')
         g._Dynamic_time_fn=None
         assert t.dyn!=t.dyn

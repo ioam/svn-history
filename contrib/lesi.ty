@@ -33,7 +33,7 @@ from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, HomeostaticMaxEnt, ActivityAveragingTF, AttributeTrackingTF
 from topo.transferfn.basic import GeneralizedLogistic, Sigmoid, HalfRectify
 from topo.pattern.basic import Gaussian, Composite, SeparatedComposite
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
+from topo import numbergen
 
 import contrib.jsldefs
 from contrib.jsldefs import lesi_analysis_function
@@ -41,9 +41,9 @@ from contrib.jsldefs import lesi_analysis_function
 
 input_type=Gaussian
 num_inputs=locals().get('num_inputs',2) #in the case where dataset=Gaussian, must also set the number of Gaussians per iteration, default is 2
-inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-                   y=UniformRandom(lbound=-0.75,ubound=0.75,seed=35+i),
-                   orientation=UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
+inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+                   y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=35+i),
+                   orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
                    size=0.088388, aspect_ratio=4.66667, scale= locals().get('scale', 1.0), bounds=BoundingBox(radius=0.8))
         #Set the contrast of the gaussian patterns by setting the scale parameter.
         for i in xrange(num_inputs)]

@@ -20,7 +20,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt,CFPLF_BCMFixed_opt,CFPLF_AntiHebbian_opt,CFPLF_AntiBCMFixed_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import PiecewiseLinear,HalfRectifyAndPower,HalfRectify,DivisiveNormalizeL1
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, Choice
+from topo import numbergen
 from topo.transferfn.basic import HomeostaticMaxEnt,PipelineTF
 from topo.pattern.basic import Gaussian,Composite,SeparatedComposite
 from contrib.jacommands import ActivityHysteresis, Translator,Habituation,SimpleHomeo
@@ -33,7 +33,7 @@ tbound = cs +0.25
 dataset=locals().get('dataset',"Line") #set the input type by choosing the dataset parameter
 
 if dataset=="Line":
-    input= Translator(generator=topo.pattern.basic.Line(   x=UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=1023),   y=UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.6,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
+    input= Translator(generator=topo.pattern.basic.Line(   x=numbergen.UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=1023),   y=numbergen.UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=53),size=1.0, offset=0.5,scale=numbergen.Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.6,smoothing=0.0),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 elif dataset=="Natural":
     import topo.pattern.image 
     input_type=topo.pattern.image.Image
@@ -45,17 +45,17 @@ elif dataset=="Natural":
                 y=0,
                 orientation=0)
             for f in image_filenames]   
-    input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),jitter_magnitude=locals().get('JM',0.01))
+    input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),jitter_magnitude=locals().get('JM',0.01))
 
 
-ring=topo.pattern.basic.Ring(x=UniformRandom(lbound=-1.1,ubound=1.1,seed=1023),
-                                                            y=UniformRandom(lbound=-1.1,ubound=1.1,seed=511),
+ring=topo.pattern.basic.Ring(x=numbergen.UniformRandom(lbound=-1.1,ubound=1.1,seed=1023),
+                                                            y=numbergen.UniformRandom(lbound=-1.1,ubound=1.1,seed=511),
                                                             size=2, aspect_ratio=1.0, scale=0.8,thickness=locals().get('Thickness',0.03),
                                                             offset=0.0,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.02)
 
 
-retinal_waves=Translator(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
+retinal_waves=Translator(generator=ring,orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 
 
 # Specify weight initialization, response function, and learning function
@@ -77,8 +77,8 @@ class Jitter(CoordinateMapperFn):
     def __call__(self,x,y):
         return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
 
-jitterOn = Jitter(rand =UniformRandom(seed=1023))
-jitterOff = Jitter(rand =UniformRandom(seed=1023))
+jitterOn = Jitter(rand =numbergen.UniformRandom(seed=1023))
+jitterOff = Jitter(rand =numbergen.UniformRandom(seed=1023))
 
 # DoG weights for the LGN
 
@@ -151,8 +151,8 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.03,dest_port=('Activity','JointNorma
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.pattern.random.UniformRandom(lbound=0.5),topo.pattern.random.BinaryUniformRandom(on_probability=1.0)]),
                  nominal_bounds_template=BoundingBox(radius=0.2),
-                 learning_rate=BoundedNumber(bounds=(0.137,None),
-                                             generator=ExponentialDecay(starting_value=locals().get('afferent_lr',0.1),
+                 learning_rate=numbergen.BoundedNumber(bounds=(0.137,None),
+                                             generator=numbergen.ExponentialDecay(starting_value=locals().get('afferent_lr',0.1),
                                                                         time_constant=9600/num_inputs)))
 
 topo.sim.connect('LGNOff','V1Simple',delay=0.03,dest_port=('Activity','JointNormalize', 'Afferent'),
@@ -161,8 +161,8 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.03,dest_port=('Activity','JointNorm
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.pattern.random.UniformRandom(lbound=0.5),topo.pattern.random.BinaryUniformRandom(on_probability=1.0)]),
                  nominal_bounds_template=BoundingBox(radius=0.2),
-                 learning_rate=BoundedNumber(bounds=(0.137,None),
-                                             generator=ExponentialDecay(starting_value=locals().get('afferent_lr',0.1),
+                 learning_rate=numbergen.BoundedNumber(bounds=(0.137,None),
+                                             generator=numbergen.ExponentialDecay(starting_value=locals().get('afferent_lr',0.1),
                                                                         time_constant=9600/num_inputs)))
 
 
@@ -172,8 +172,8 @@ topo.sim.connect('LGNOn','V1Inh',delay=0.03,dest_port=('Activity','JointNormaliz
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.pattern.random.UniformRandom(lbound=0.5),topo.pattern.random.BinaryUniformRandom(on_probability=1.0)]),
                  nominal_bounds_template=BoundingBox(radius=0.2),
-                 learning_rate=BoundedNumber(bounds=(0.137,None),
-                                             generator=ExponentialDecay(starting_value=locals().get('afferent_lr',0.1),
+                 learning_rate=numbergen.BoundedNumber(bounds=(0.137,None),
+                                             generator=numbergen.ExponentialDecay(starting_value=locals().get('afferent_lr',0.1),
                                                                         time_constant=9600/num_inputs)))
 
 
@@ -183,8 +183,8 @@ topo.sim.connect('LGNOff','V1Inh',delay=0.03,dest_port=('Activity','JointNormali
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.pattern.random.UniformRandom(lbound=0.5),topo.pattern.random.BinaryUniformRandom(on_probability=1.0)]),
                  nominal_bounds_template=BoundingBox(radius=0.2),
-                 learning_rate=BoundedNumber(bounds=(0.137,None),
-                                             generator=ExponentialDecay(starting_value=locals().get('afferent_lr',0.1),
+                 learning_rate=numbergen.BoundedNumber(bounds=(0.137,None),
+                                             generator=numbergen.ExponentialDecay(starting_value=locals().get('afferent_lr',0.1),
                                                                         time_constant=9600/num_inputs)))
 
 

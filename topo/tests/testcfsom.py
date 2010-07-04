@@ -20,9 +20,9 @@ from topo.base.sheet import Sheet, BoundingBox
 from topo.base.simulation import *
 from topo.base import patterngenerator
 from topo.base.cf import CFProjection, CFSheet
-from topo.misc.numbergenerator import UniformRandom
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.sheet import *
+from topo import numbergen
 
 ### Only for ImageSaver
 from numpy.oldnumeric import resize,array,zeros
@@ -141,9 +141,9 @@ class TestCFSom(unittest.TestCase):
             bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
             scale=gaussian_height,
             aspect_ratio=gaussian_width/gaussian_height,
-            x=UniformRandom(lbound=-0.5,ubound=0.5,seed=100),
-            y=UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
-            orientation=UniformRandom(lbound=-pi,ubound=pi,seed=300))
+            x=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=100),
+            y=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
+            orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=300))
 
         
         # input generation params

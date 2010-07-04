@@ -1,5 +1,4 @@
 >>> import param
->>> from topo.misc.numbergenerator import UniformRandom
 >>> from gmpy import mpq
 
 >>> class TestPO1(param.Parameterized):

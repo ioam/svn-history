@@ -23,10 +23,12 @@ import topo
 from topo.base.cf import CFSheet
 from topo.base.sheetview import SheetView
 from topo.misc.filepath import normalize_path
-from topo.misc.numbergenerator import UniformRandom
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.command.analysis import measure_sine_pref
 import matplotlib.ticker as mticker
+
+from topo import numbergen
+
 max_value = 0
 global_index = ()
 
@@ -166,7 +168,7 @@ def compute_ACDC_orientation_tuning_curves(full_matrix,curve_label,sheet):
 
 
 def phase_preference_scatter_plot(sheet_name,diameter=0.39):
-    r = UniformRandom(seed=1023)
+    r = numbergen.UniformRandom(seed=1023)
     preference_map = topo.sim[sheet_name].sheet_views['PhasePreference']
     offset_magnitude = 0.03
     datax = []

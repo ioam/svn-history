@@ -27,7 +27,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import HalfRectify,PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt,AttributeTrackingTF,Sigmoid,PatternCombine
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, Choice
+from topo import numbergen
 from topo.pattern.basic import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
 from topo.base.functionfamily import CoordinateMapperFn
@@ -46,7 +46,7 @@ dataset=locals().get('dataset',"Natural") #set the input type by choosing the da
 
 
 if dataset=="Line":
-        input= Translator(generator=topo.pattern.basic.Line(   x=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=1023),   y=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.04,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
+        input= Translator(generator=topo.pattern.basic.Line(   x=numbergen.UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=1023),   y=numbergen.UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=53),size=1.0, offset=0.5,scale=numbergen.Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.04,smoothing=0.0),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
 elif dataset=="Natural":
     import topo.pattern.image 
     input_type=topo.pattern.image.FileImage
@@ -77,13 +77,13 @@ elif dataset=="Natural":
                        orientation=0)
                     for f in image_filenames]
 
-    input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02),seed=5013)
+    input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02),seed=5013)
 
 disk_scale=locals().get('diskscale',0.35)
 reg=locals().get('Region',1.0)
 
-ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-reg,ubound=reg,seed=12),
-                                                            y=UniformRandom(lbound=-reg,ubound=reg,seed=36),
+ring = topo.pattern.basic.Composite(operator=numpy.add,x=numbergen.UniformRandom(lbound=-reg,ubound=reg,seed=12),
+                                                            y=numbergen.UniformRandom(lbound=-reg,ubound=reg,seed=36),
                        generators=[topo.pattern.basic.Ring(size=0.5, aspect_ratio=1.0, scale=locals().get('RingScale',0.25),thickness=locals().get('Thickness',0.01),
                                                             offset=0.0,
                                                             bounds=BoundingBox(radius=2.125), smoothing=locals().get('Smoothing',0.03)),
@@ -91,7 +91,7 @@ ring = topo.pattern.basic.Composite(operator=numpy.add,x=UniformRandom(lbound=-r
 
  
 
-retinal_waves=Expander(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02),size=locals().get('InitRingSize',0.5))
+retinal_waves=Expander(generator=ring,orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02),size=locals().get('InitRingSize',0.5))
 
 zeroInput = topo.pattern.basic.Null();
 
@@ -105,8 +105,8 @@ class Jitter(CoordinateMapperFn):
     def __call__(self,x,y):
         return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
 
-jitterOn = Jitter(rand =UniformRandom(seed=1023))
-jitterOff = Jitter(rand =UniformRandom(seed=1023))
+jitterOn = Jitter(rand =numbergen.UniformRandom(seed=1023))
+jitterOff = Jitter(rand =numbergen.UniformRandom(seed=1023))
 
 # Specify weight initialization, response function, and learning function
 CFProjection.weights_generator=topo.pattern.random.UniformRandom(seed=1023)
@@ -213,9 +213,9 @@ else:
 
 
 
-g1 = Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.8,ubound=0.8,seed=56))
+g1 = Gaussian(aspect_ratio=1.0,scale=1.0,size=numbergen.UniformRandom(lbound=0.8,ubound=0.8,seed=56))
 g1._Dynamic_time_fn = None
-g2 = Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.8,ubound=0.8,seed=56))
+g2 = Gaussian(aspect_ratio=1.0,scale=1.0,size=numbergen.UniformRandom(lbound=0.8,ubound=0.8,seed=56))
 g2._Dynamic_time_fn = None
 
 #V1 Simple

@@ -15,7 +15,7 @@ from math import pi, sqrt, exp, pow
 from numpy.oldnumeric import zeros, Float, sum
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.base.boundingregion import BoundingBox 
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
+from topo import numbergen
 from topo.pattern.basic import Gaussian, Selector, Null
 from topo.transferfn.basic import DivisiveNormalizeL1, HomeostaticMaxEnt, TransferFnWithState, Sigmoid, PiecewiseLinear
 from topo.base.arrayutil import clip_lower
@@ -213,9 +213,9 @@ def AddV2():
                                        topo.pattern.basic.Gaussian(scale=1, size=0.04, orientation=0, aspect_ratio=9, x=0.2),
                                        topo.pattern.basic.Gaussian(scale=1, size=0.04, orientation=pi / 2, aspect_ratio=9, y=0.2)],
                     scale=1.0, bounds=BoundingBox(radius=0.5),
-                    x=UniformRandom(lbound= - (__main__.__dict__.get('BS', 0.5)), ubound=(__main__.__dict__.get('BS', 0.5)), seed=12),
-                    y=UniformRandom(lbound= - (__main__.__dict__.get('BS', 0.5)), ubound=(__main__.__dict__.get('BS', 0.5)), seed=34),
-                    orientation=UniformRandom(lbound= - pi, ubound=pi, seed=56))
+                    x=numbergen.UniformRandom(lbound= - (__main__.__dict__.get('BS', 0.5)), ubound=(__main__.__dict__.get('BS', 0.5)), seed=12),
+                    y=numbergen.UniformRandom(lbound= - (__main__.__dict__.get('BS', 0.5)), ubound=(__main__.__dict__.get('BS', 0.5)), seed=34),
+                    orientation=numbergen.UniformRandom(lbound= - pi, ubound=pi, seed=56))
                 for i in xrange(1)]
     #combined_corners = topo.pattern.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=corners)
     combined_corners = corners[0]
@@ -549,7 +549,7 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
     lgn_on_proj = topo.sim[sheet_name].in_connections[0]
     lgn_off_proj = topo.sim[sheet_name].in_connections[1]
     
-    rand = UniformRandom(seed=513)
+    rand =numbergen.UniformRandom(seed=513)
     
     rows, cols = lgn_on_proj.cfs.shape
     for r in xrange(rows):
@@ -809,7 +809,7 @@ class Jitterer(PatternGenerator):
     def __init__(self, **params):
         super(Jitterer, self).__init__(**params)
         self.orientation = params.get('orientation', self.orientation)
-        self.r = UniformRandom(seed=1023)
+        self.r =numbergen.UniformRandom(seed=1023)
         self.index = 0
         
     def __call__(self, **params):

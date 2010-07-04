@@ -32,7 +32,7 @@ from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, HomeostaticMaxEnt, ActivityAveragingTF, AttributeTrackingTF, PipelineTF
 from topo.transferfn.basic import GeneralizedLogistic, Sigmoid, HalfRectify
 from topo.pattern.basic import Gaussian, Composite, SeparatedComposite
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, VonMisesRandom
+from topo import numbergen
 from topo.analysis.featureresponses import Feature, FeatureMaps
 
 import contrib.jsldefs
@@ -169,12 +169,11 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.command.analysis import PatternPresenter, Subplotting
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.coordmapper.basic import Grid
-from topo.misc.numbergenerator import UniformRandom, ExponentialDecay, VonMisesRandom
 
 import topo
 
 global_seed=locals().get("global_seed",1)
-random_seed_generator=UniformRandom(lbound=0.0,ubound=1000,seed=global_seed*25)
+random_seed_generator=numbergen.UniformRandom(lbound=0.0,ubound=1000,seed=global_seed*25)
 plot_deflections_on=param.Boolean(default=False)
 
 ###############################################################################
@@ -210,16 +209,16 @@ class WhiskerArray(PatternGenerator):
                                                                                                     
     def function(self,params):
         self.sequence_angle = params.get('deflection',self.deflection)
-        self.deflection_angles = VonMisesRandom(mu=self.sequence_angle,kappa=params.get('anglotopy',self.anglotopy))
+        self.deflection_angles =numbergen.VonMisesRandom(mu=self.sequence_angle,kappa=params.get('anglotopy',self.anglotopy))
         self.deflection_angle=self.deflection_angles()
         
         self.gens=numpy.ones(shape=(self.w_x,self.w_y),dtype=object)
         for i in range(self.w_x):
                 for j in range(self.w_y):
                                 if [i,j]==params.get('flipped_whisker',self.flipped_whisker):
-                                        self.gens[i,j]=VonMisesRandom(mu=self.deflection_angle,kappa=params.get('flipped_convergence',self.flipped_whisker_convergence),seed=random_seed_generator())
+                                        self.gens[i,j]=numbergen.VonMisesRandom(mu=self.deflection_angle,kappa=params.get('flipped_convergence',self.flipped_whisker_convergence),seed=random_seed_generator())
                                 else:
-                                        self.gens[i,j]=VonMisesRandom(mu=self.deflection_angle,kappa=params.get('convergence',self.whisker_convergence),seed=random_seed_generator())
+                                        self.gens[i,j]=numbergen.VonMisesRandom(mu=self.deflection_angle,kappa=params.get('convergence',self.whisker_convergence),seed=random_seed_generator())
         
         self.whisker_deflections=numpy.ones(shape=(self.w_x,self.w_y))
         for i in range(self.w_x):
@@ -519,7 +518,7 @@ barrel_density = 21.0
 
 topo.sim['Ganglia0']=GeneratorSheet(nominal_density=WhiskerArray.num_ganglion_cells,
                                              input_generator=WhiskerArray(num_ganglion_cells=num_ganglion_cells,
-                                                deflection=VonMisesRandom(mu=von_mu,kappa=von_kappa,seed=global_seed*76),
+                                                deflection=numbergen.VonMisesRandom(mu=von_mu,kappa=von_kappa,seed=global_seed*76),
                                                 tilt=locals().get('tilt',UniformRandom(lbound=0.0,ubound=1.0,seed=global_seed*123)),
                                                 w_x=w_x, w_y=w_y,
                                                 flipped_whisker_convergence=locals().get('flipped_convergence',1e7),

@@ -14,7 +14,6 @@ from math import pi, sqrt, exp, pow
 from numpy.oldnumeric import zeros, Float, sum
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.base.boundingregion import BoundingBox 
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.basic import Gaussian, Selector, Null
 from topo.transferfn.basic import DivisiveNormalizeL1, HomeostaticMaxEnt, TransferFnWithState, Sigmoid, PiecewiseLinear
 from topo.base.arrayutil import clip_lower

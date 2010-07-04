@@ -20,7 +20,7 @@ from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Scaled_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, AttributeTrackingTF,PatternCombine 
 from topo.transferfn.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
+from topo import numbergen
 from topo.pattern.image import Image
 from contrib.jacommands import SimpleHomeoLinearRelative, AddGC, ActivityHysteresis,SimpleHomeoLinear
 
@@ -34,9 +34,9 @@ dataset=locals().get('dataset',"Gaussian") #set the input type by choosing the d
 if dataset=="Gaussian":
     input_type=Gaussian
     num_inputs=locals().get('num_inputs',2) #in the case where dataset=Gaussian, must also set the number of Gaussians per iteration, default is 2
-    inputs=[input_type(x=UniformRandom(lbound=-locals().get('bound', 0.75),ubound=locals().get('bound', 0.75),seed=12+i),
-                       y=UniformRandom(lbound=-locals().get('bound', 0.75),ubound=locals().get('bound', 0.75),seed=35+i),
-                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
+    inputs=[input_type(x=numbergen.UniformRandom(lbound=-locals().get('bound', 0.75),ubound=locals().get('bound', 0.75),seed=12+i),
+                       y=numbergen.UniformRandom(lbound=-locals().get('bound', 0.75),ubound=locals().get('bound', 0.75),seed=35+i),
+                       orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
                        size=0.088388, aspect_ratio=4.66667, scale= locals().get('scale', 1.0), bounds=BoundingBox(radius=1.125))
             #Set the contrast of the gaussian patterns by setting the scale parameter.
             for i in xrange(num_inputs)]
@@ -50,25 +50,25 @@ elif dataset=="Natural":
             image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
             inputs=[input_type(filename=f,
                        size=10.0,  #size_normalization='original',(size=10.0)
-                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
-                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
-                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+                       x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=65))
                     for f in image_filenames]
                 
     elif locals().get('imageset',"Shouval") == 'Konig':
         image_filenames=["images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
         inputs=[input_type(filename=f,
                         size=10.0,  #size_normalization='original',(size=10.0)
-                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
-                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
-                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+                       x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=65))
                     for f in image_filenames]
     elif locals().get('imageset',"Shouval") == 'NPS':
         image_filenames=os.listdir("images/NPS")
         inputs=[input_type(filename="images/NPS/"+f,
                         size=10.0,  #size_normalization='original',(size=10.0)
-                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
-                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
                        orientation=0)
                     for f in image_filenames]
     
@@ -78,8 +78,8 @@ elif dataset=="NoisyDisks":
     #Set the contrast of the disk pattern by setting the disk_scale parameter, map development also depends on the contrast of the disk edges.
     input_type=topo.pattern.basic.Composite
     inputs=[input_type(operator=numpy.add,
-                       generators=[topo.pattern.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
-                                                            y=UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
+                       generators=[topo.pattern.basic.Disk(x=numbergen.UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
+                                                            y=numbergen.UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
                                                             size=2.0, aspect_ratio=1.0, scale=disk_scale,
                                                             offset=0.5,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.1),
@@ -90,8 +90,8 @@ elif dataset=="NoisyDisks":
 elif dataset=="Disks":
     disk_scale=locals().get('diskscale',0.5)
     input_type=topo.pattern.basic.Disk
-    inputs=[input_type(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
-                       y=UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
+    inputs=[input_type(x=numbergen.UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
+                       y=numbergen.UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
                        size=2.0, aspect_ratio=1.0, scale=disk_scale,
                        offset=0.5,
                        bounds=BoundingBox(radius=1.125), smoothing=0.1)]
@@ -103,8 +103,8 @@ elif dataset=="NoisyDiskstoNatural":
     disk_scale=locals().get('diskscale',0.35)
     disks_input_type=topo.pattern.basic.Composite
     disks_inputs=[disks_input_type(operator=numpy.add,
-                       generators=[topo.pattern.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
-                                                            y=UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
+                       generators=[topo.pattern.basic.Disk(x=numbergen.UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
+                                                            y=numbergen.UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
                                                             size=2.0, aspect_ratio=1.0, scale=disk_scale,
                                                             offset=0.5,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.1),
@@ -117,9 +117,9 @@ elif dataset=="NoisyDiskstoNatural":
     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
     natural_inputs=[natural_input_type(filename=f,
                        size=10.0,  #size_normalization='original',(size=10.0)
-                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
-                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
-                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+                       x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=65))
         for f in image_filenames]
 
     natural_combined_inputs =topo.pattern.basic.Selector(generators=natural_inputs)

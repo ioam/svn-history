@@ -3,14 +3,14 @@
 >>> from numpy import array
 >>> from numpy.testing import assert_array_equal
 >>> from topo.tests.utils import assert_array_not_equal, new_simulation
->>> from topo.misc.numbergenerator import UniformRandom
+>>> from topo import numbergen
 >>> from topo.command.basic import pattern_present,save_input_generators,restore_input_generators
 >>> import topo
 
 
 >>> ignore=new_simulation()
 >>> R = topo.sim['GS']
->>> ig=Gaussian(x=UniformRandom())
+>>> ig=Gaussian(x=numbergen.UniformRandom())
 >>> R.set_input_generator(ig)
 
 >>> topo.sim.time()==0
@@ -103,7 +103,7 @@ False
 True
 
 >>> R = topo.sim['GS']
->>> ig=Gaussian(x=UniformRandom())
+>>> ig=Gaussian(x=numbergen.UniformRandom())
 >>> R.set_input_generator(ig)
 
 # CB: need to add test for bug

@@ -23,7 +23,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt # CFPLF_Trace_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import HalfRectify,DivisiveNormalizeL1, Sigmoid, Hysteresis
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, Choice
+from topo import numbergen
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.pattern import Gaussian
 
@@ -106,9 +106,9 @@ def pat_line():
 def pat_trans(input):
     return pattern.Translator(
         reset_period=p.period, speed=p.speed, episode_interval=1,
-        x=UniformRandom(lbound=-(p.core_size+0.4), ubound=(p.core_size+0.4),seed=31),
-        y=UniformRandom(lbound=-(p.core_size+0.4), ubound=(p.core_size+0.4),seed=1892),
-        direction=UniformRandom(lbound=-pi,ubound=pi,seed=56),
+        x=numbergen.UniformRandom(lbound=-(p.core_size+0.4), ubound=(p.core_size+0.4),seed=31),
+        y=numbergen.UniformRandom(lbound=-(p.core_size+0.4), ubound=(p.core_size+0.4),seed=1892),
+        direction=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),
         generator=input)
 # Compositor
 def pat_comp(list):
@@ -157,9 +157,9 @@ if p.second_stage != 0:
         connection_type=OneToOneProjection,
         nominal_bounds=BoundingBox(radius=0.375),name='OnAfferentFakeRetina')
 
-g1 = pattern.Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.4,ubound=0.4,seed=56))
+g1 = pattern.Gaussian(aspect_ratio=1.0,scale=1.0,size=numbergen.UniformRandom(lbound=0.4,ubound=0.4,seed=56))
 g1._Dynamic_time_fn = None
-g2 = pattern.Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.4,ubound=0.4,seed=56))
+g2 = pattern.Gaussian(aspect_ratio=1.0,scale=1.0,size=numbergen.UniformRandom(lbound=0.4,ubound=0.4,seed=56))
 g2._Dynamic_time_fn = None
 
 #V1 LGN afferrent
@@ -298,10 +298,10 @@ if p.second_stage==0:
 from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand
 SinusoidalMeasureResponseCommand.num_orientation=12
 
-topo.sim['V1 23'].projections()['LGNOnAfferentC'].learning_rate=(BoundedNumber(bounds=(0.35,None),generator=ExponentialDecay(starting_value =2,time_constant=6000)))
-topo.sim['V1 23'].projections()['LGNOffAfferentC'].learning_rate=(BoundedNumber(bounds=(0.35,None),generator=ExponentialDecay(starting_value =2,time_constant=6000)))
-topo.sim['V1 4C'].projections()['LGNOffAfferent'].learning_rate=(BoundedNumber(bounds=(0.35,None),generator=ExponentialDecay(starting_value =5,time_constant=6000)))
-topo.sim['V1 4C'].projections()['LGNOnAfferent'].learning_rate=(BoundedNumber(bounds=(0.35,None),generator=ExponentialDecay(starting_value =5,time_constant=6000)))
+topo.sim['V1 23'].projections()['LGNOnAfferentC'].learning_rate=(BoundedNumber(bounds=(0.35,None),generator=numbergen.ExponentialDecay(starting_value =2,time_constant=6000)))
+topo.sim['V1 23'].projections()['LGNOffAfferentC'].learning_rate=(BoundedNumber(bounds=(0.35,None),generator=numbergen.ExponentialDecay(starting_value =2,time_constant=6000)))
+topo.sim['V1 4C'].projections()['LGNOffAfferent'].learning_rate=(BoundedNumber(bounds=(0.35,None),generator=numbergen.ExponentialDecay(starting_value =5,time_constant=6000)))
+topo.sim['V1 4C'].projections()['LGNOnAfferent'].learning_rate=(BoundedNumber(bounds=(0.35,None),generator=numbergen.ExponentialDecay(starting_value =5,time_constant=6000)))
 topo.sim['V1 23'].projections()['LateralLongRange'].learning_rate=2
 topo.sim['V1 4C'].projections()['LateralLongRange4C'].learning_rate=2
 

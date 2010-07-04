@@ -4,7 +4,7 @@ import numpy
 import pylab
 import matplotlib
 from numpy import array, size, mat, shape, ones, arange
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
+from topo import numbergen
 #from topo.base.functionfamily import IdentityTF
 from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, AttributeTrackingTF,PatternCombine,Sigmoid, HalfRectify
 from topo.base.cf import CFSheet
@@ -17,7 +17,6 @@ from topo.base.boundingregion import BoundingBox
 from topo.pattern.image import FileImage
 import contrib.jacommands
 from topo.misc.filepath import normalize_path, application_path
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 import contrib.dd
 from matplotlib.ticker import MaxNLocator
 from contrib.JanA.noiseEstimation import signal_power_test
@@ -939,7 +938,7 @@ def fit_sigmoids_to_of(activities,predicted_activities,offset=True,display=True)
 	
     (num_in,num_ne) = numpy.shape(activities)	
     from scipy import optimize
-    rand = UniformRandom(seed=513)
+    rand =numbergen.UniformRandom(seed=513)
     if display: 	
     	pylab.figure()
 
@@ -1462,7 +1461,7 @@ def fitGabor(weights):
 	#pylab.figure()
 	#gab([x,y,0.2,freqor[j][1],freqor[j][0],freqor[j][2],1.0,0.001],weights[j]/numpy.sum(numpy.abs(weights[j])),display=True)
 	
-	rand = UniformRandom(seed=513)
+	rand =numbergen.UniformRandom(seed=513)
 	
 	min_x = []
 	min_err = 100000000000000
@@ -1824,7 +1823,7 @@ def tiling():
     from matplotlib.patches import Circle
     dd = pickle.load(f)
     
-    rand = UniformRandom()
+    rand =numbergen.UniformRandom()
    
     rfs = [dd.children[0].children[0].data["ReversCorrelationRFs"],
     	   dd.children[1].children[0].data["ReversCorrelationRFs"],
@@ -3482,7 +3481,7 @@ def performIdentification(responses,model_responses):
 		#r1 = self.training_inputs * g.flatten().T
 		#return numpy.mean(numpy.power(r1-self.training_set,2))  
 
-#rand = UniformRandom(seed=513)
+#rand =numbergen.UniformRandom(seed=513)
 #class CCGene(FloatGene):
       #randMin=0.0
       #randMax=1.0
@@ -4074,7 +4073,7 @@ def AdaptationAnalysis():
 	xs = []
 	err = []
 	for i in xrange(0,158):
-	    rand = UniformRandom(seed=513)
+	    rand =numbergen.UniformRandom(seed=513)
 	    x0 = [0.7,-1.0,1.6,-1.0]
        	    xopt = leastsq(history_error, x0[:], args=(numpy.array(hist)[i],numpy.array(pred_act)[kl:,i],numpy.array(training_set)[kl:,i]),ftol=0.0000000000000000001,xtol=0.0000000000000001,warning=False)
 	    xs.append(xopt[0])
@@ -4531,7 +4530,7 @@ def SuperModel():
 	    min_err = 100000000000000000
 	    xo=True
 	    for r in xrange(0,10):
-		rand = UniformRandom(seed=513)
+		rand =numbergen.UniformRandom(seed=513)
 		r0 = (numpy.array([rand(),rand(),rand(),rand(),rand()])-0.5)*2.0
 		x0 = [0.0,0.0,0.0,0.0,1.0]
 		rand_scale = [3.0,3.0,3.0,3.0,3.0]

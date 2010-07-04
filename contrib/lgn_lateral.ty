@@ -28,14 +28,14 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, Sigmoid
-from topo.misc.numbergenerator import UniformRandom
+from topo import numbergen
 
 
 #num_inputs=2
 #input_type=Gaussian
-#inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-#                   y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-#                   orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
+#inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+#                   y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
+#                   orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
 #                   size=0.088388, aspect_ratio=4.66667, scale=1.0,
 #                   bounds=BoundingBox(radius=0.8)) # JABALERT: What does this bounds do?
 #        for i in xrange(num_inputs)]
@@ -45,9 +45,9 @@ from topo.misc.numbergenerator import UniformRandom
 
 combined_inputs = topo.pattern.basic.Gaussian(
           scale=1.0, size=0.08333, aspect_ratio=4.6666,
-          x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
-          y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
-          orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
+          x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+          y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
+          orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
 # Default for tutorial
 topo.pattern.basic.Line.scale=0.9

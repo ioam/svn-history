@@ -30,16 +30,16 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import PiecewiseLinear
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
+from topo import numbergen
 from topo.transferfn.basic import HomeostaticMaxEnt
 from topo.pattern.basic import Gaussian,Composite,SeparatedComposite
 
 
 num_inputs=2
 input_type=topo.pattern.basic.Gaussian
-inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-                   y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-                   orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
+inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+                   y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
+                   orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
                    size=0.088388, aspect_ratio=4.66667, scale=1.0,
                    bounds=BoundingBox(radius=0.8))
                 for i in xrange(num_inputs)]
@@ -74,8 +74,8 @@ topo.sim.connect('Retina','V1',delay=0.05,
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
-                 learning_rate=BoundedNumber(bounds=(0.137,None),
-                                             generator=ExponentialDecay(starting_value=locals().get('afferent_lr',0.9590),
+                 learning_rate=numbergen.BoundedNumber(bounds=(0.137,None),
+                                             generator=numbergen.ExponentialDecay(starting_value=locals().get('afferent_lr',0.9590),
                                                                         time_constant=3200/num_inputs)))
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',

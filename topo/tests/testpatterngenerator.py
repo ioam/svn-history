@@ -16,8 +16,8 @@ from topo.base.patterngenerator import Constant,PatternGenerator
 from topo.base.boundingregion import BoundingBox
 
 from topo.pattern.basic import Rectangle,Gaussian,Composite,Selector
+from topo import numbergen
 
-from topo.misc.numbergenerator import UniformRandom
 
 class TestPatternGenerator(unittest.TestCase):
 
@@ -205,10 +205,9 @@ class TestPatternGenerator(unittest.TestCase):
     def test_bug__dynamic_param_advanced_by_repr(self):
         """Check for bug where repr of a PatternGenerator causes a DynamicNumber to change."""
         # CEB: can probably remove this test now we have time-controlled dynamic parameters
-        from topo.misc.numbergenerator import UniformRandom
         import topo
 
-        p=PatternGenerator(x=UniformRandom(lbound=-1,ubound=1,seed=1))
+        p=PatternGenerator(x=numbergen.UniformRandom(lbound=-1,ubound=1,seed=1))
 
         x0 = p.x
         topo.sim.run(1)
@@ -226,8 +225,8 @@ class TestPatternGenerator(unittest.TestCase):
 class TestSelector(unittest.TestCase):
 
     def setUp(self):
-        self.g1 = Gaussian(x=UniformRandom())
-        self.g2 = Gaussian(x=UniformRandom())
+        self.g1 = Gaussian(x=numbergen.UniformRandom())
+        self.g2 = Gaussian(x=numbergen.UniformRandom())
         self.s = Selector(generators=[self.g1,self.g2])
         self.s.set_dynamic_time_fn(None,'generators')
         

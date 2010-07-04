@@ -31,7 +31,7 @@ from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Scaled_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, AttributeTrackingTF, BinaryThreshold, Threshold
 from topo.transferfn.basic import Sigmoid, HalfRectify,HalfRectifyAndPower, HomeostaticMaxEnt
-from topo.misc.numbergenerator import UniformRandom, BoundedNumber, NormalRandom
+from topo import numbergen
 from topo.pattern.image import Image
 from topo.coordmapper.basic import Jitter, NormalJitter
 #import contrib.jsldefs
@@ -186,9 +186,9 @@ if dataset=="Gaussian":
         gauss_size=1.04
         aspect_ratio=4.0
     #in the case where dataset=Gaussian, must also set the number of Gaussians per iteration, default is 2
-    inputs=[input_type(x=UniformRandom(lbound=-input_bounds,ubound=input_bounds,seed=12+i),
-                       y=UniformRandom(lbound=-input_bounds,ubound=input_bounds,seed=35+i),
-                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
+    inputs=[input_type(x=numbergen.UniformRandom(lbound=-input_bounds,ubound=input_bounds,seed=12+i),
+                       y=numbergen.UniformRandom(lbound=-input_bounds,ubound=input_bounds,seed=35+i),
+                       orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
                        size=gauss_size, aspect_ratio=aspect_ratio, scale=1.0, bounds=BoundingBox(radius=input_bounds))
             #Set the contrast of the gaussian patterns by setting the scale parameter.
             for i in xrange(num_inputs)]
@@ -201,9 +201,9 @@ elif dataset=="Natural":
     image_filenames=["/group/project/csng/images/mcgill_img/foliage/%02d.png"%(i+1) for i in xrange(98)]
     inputs=[input_type(filename=f,
                        size=nat_size, size_normalization='original',
-                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
-                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
-                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+                       x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=65))
                 for f in image_filenames]
 
     combined_inputs =topo.pattern.basic.Selector(generators=inputs)
@@ -274,13 +274,13 @@ if jitter==True:
     retina_jitter_off=NormalJitter(gen=NormalRandom(seed=10 ,mu=0.0, sigma=lgn_sigma))
     
 else:
-    retina_jitter_on=Jitter(gen=UniformRandom(seed=21), scale=0.0)
-    retina_jitter_off=Jitter(gen=UniformRandom(seed=13), scale=0.0)
+    retina_jitter_on=Jitter(gen=numbergen.UniformRandom(seed=21), scale=0.0)
+    retina_jitter_off=Jitter(gen=numbergen.UniformRandom(seed=13), scale=0.0)
 
-lgn_jitter_on=Jitter(gen=UniformRandom(seed=37), scale=max_jitter)
-lgn_jitter_off=Jitter(gen=UniformRandom(seed=37), scale=max_jitter)
-cell_jitter_exc=Jitter(gen=UniformRandom(seed=37), scale=max_jitter)
-cell_jitter_inh=Jitter(gen=UniformRandom(seed=37), scale=max_jitter)
+lgn_jitter_on=Jitter(gen=numbergen.UniformRandom(seed=37), scale=max_jitter)
+lgn_jitter_off=Jitter(gen=numbergen.UniformRandom(seed=37), scale=max_jitter)
+cell_jitter_exc=Jitter(gen=numbergen.UniformRandom(seed=37), scale=max_jitter)
+cell_jitter_inh=Jitter(gen=numbergen.UniformRandom(seed=37), scale=max_jitter)
 
 
 ###########################################
