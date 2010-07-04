@@ -965,6 +965,7 @@ class SigmoidedDoG(PatternGenerator):
         return Composite(generators=[dog, sigmoid], operator=numpy.multiply,
                          xdensity=p.xdensity, ydensity=p.ydensity, bounds=p.bounds)()
    
+
                              
 def rectangular(signal_size):
     """
@@ -972,6 +973,7 @@ def rectangular(signal_size):
     """
     return [1.0]*int(signal_size)
     
+
     
 class PowerSpectrum(PatternGenerator):
     """
@@ -1132,6 +1134,7 @@ class PowerSpectrum(PatternGenerator):
         return self._get_amplitudes(p)
     
     
+
 class Spectrogram(PowerSpectrum):
     """
     Returns the spectral density of a rolling window of the input
