@@ -641,7 +641,7 @@ combined_preference_maps = {
         doc='Plot the orientation preference overlaid with hue preference boundaries.',
         pre_plot_hooks=[],
         plot_hooks=[overlaid_plots.instance(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")],normalize=True)],
-        normalize='Independent'),
+        normalize='Individually'),
 
     ('or','od','dr'):dict(
         name='Orientation, Ocular and Direction Preference',
@@ -655,7 +655,7 @@ combined_preference_maps = {
         doc='Plot the ocular preference overlaid with hue preference boundaries.',
         pre_plot_hooks=[],
         plot_hooks=[overlaid_plots.instance(plot_template=[{"Hue":"OcularPreference","Confidence":"OcularSelectivity"},{"Strength":"OcularSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")],normalize=True)],
-        normalize='Independent')
+        normalize='Individually')
     }
 
 
