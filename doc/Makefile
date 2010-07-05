@@ -42,11 +42,11 @@ all: ${PHPHTML}
 # Extra dependency
 Home/index.html: Home/news_text.php
 
-# Can also add --graph=classtree for graphical class diagrams
+# Can also add --graph=callgraph to show who called what, but only for a specific simulation run
 reference-manual: Reference_Manual/toc.html
 Reference_Manual/toc.html: ../topo/*.py ../topo/*/*.py Reference_Manual/index_text.php
 	-mv ../topo/tests ../topo-tests-tmp
-	cd .. ; bin/epydoc --inheritance=listed --docformat=ReStructuredText --show-sourcecode --html -o doc/Reference_Manual --name=Topographica --url=http://topographica.org topo
+	cd .. ; bin/epydoc --graph=classtree --inheritance=listed --docformat=ReStructuredText --show-sourcecode --html -o doc/Reference_Manual --name=Topographica --url=http://topographica.org topo
 	mv ../topo-tests-tmp ../topo/tests 
 	mv Reference_Manual/index.html Reference_Manual/topo.html
 	make Reference_Manual/index.html
