@@ -596,6 +596,7 @@ class ObjectSelector(Selector):
         self.allow_None = (default is None or allow_None)
         self.compute_default_fn = compute_default_fn
         self.check_on_set=check_on_set
+
         self._check_value(default)
         super(ObjectSelector,self).__init__(default=default,instantiate=instantiate,**params)
         
@@ -626,8 +627,13 @@ class ObjectSelector(Selector):
         val must be None or one of the objects in self.objects.
         """
         if not (val in self.objects) and not (val is None and self.allow_None):
+            # CEBALERT: can be called before __init__ has called super's __init__
+            try:
+                attrib_name = self._attrib_name
+            except AttributeError:
+                attrib_name = ""
             raise ValueError("%s not in Parameter %s's list of possible objects" \
-                             %(val,self._attrib_name))
+                             %(val,attrib_name))
 
 # CBNOTE: I think it's not helpful to do a type check for the value of
 # an ObjectSelector. If we did such type checking, any user
