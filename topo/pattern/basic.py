@@ -726,8 +726,10 @@ class Selector(PatternGenerator):
 ### is just a specialized version of Composite, and should be
 ### implementable directly using what is already in Composite.    
 class GaussiansCorner(PatternGenerator):
-    """Two Gaussian pattern generators arranged into a cross, with variable
-    intersection point, that can appear also as a corner shape."""
+    """
+    Two Gaussian pattern generators with a variable intersection point, 
+    appearing as a corner or cross.
+    """
     
     x = param.Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="X center of the corner")
@@ -745,7 +747,7 @@ class GaussiansCorner(PatternGenerator):
                 doc="The angle of the corner")
                 
     cross = param.Number(default=0.4, bounds=(0,1), softbounds=(0,1),
-                doc="Where the two Gaussians cross, as fraction over their half length")
+                doc="Where the two Gaussians cross, as a fraction of their half length")
     
 
     def __call__(self,**params_to_override):
@@ -977,8 +979,15 @@ def rectangular(signal_size):
 class PowerSpectrum(PatternGenerator):
     """
     Outputs the spectral density of a rolling window of the input
-    signal each time it is called. Over time, generates a spectrogram.
+    signal each time it is called. Over time, the results could be
+    arranged into a spectrogram, e.g. for an audio signal.
     """
+    # Can be instantiated by hand, but it makes little sense to do so
+    # in e.g. a GUI, since it requires a "signal" array parameter to
+    # do anything useful.  Alternatively, could provide a useful
+    # default for "signal" (and presumably make it a parameter), so
+    # that it could be instantiated at least as an example.
+    __abstract=True 
     
     window_increment = param.Number(default=1,constant=True,doc="""
         The most recent portion of the signal on which to perform the Fourier
@@ -989,7 +998,7 @@ class PowerSpectrum(PatternGenerator):
         for matrix sizes that are powers of 2, or that can be
         decomposed into small prime factors; see numpy.fft.rfft.""" )
         
-    window_length = param.Number(default=0,constant=True,doc="""
+    window_length = param.Number(default=0.0001,constant=True,doc="""
         The amount of overlap between each window, in units of 1/sample_rate.""")
 
     sample_rate = param.Number(default=44100,constant=True,doc="""
@@ -1018,7 +1027,7 @@ class PowerSpectrum(PatternGenerator):
         Largest frequency for which to return an amplitude.""")
 
                 
-    def __init__(self, signal=[1]*24, **params):
+    def __init__(self, signal, **params):
         super(PowerSpectrum, self).__init__(**params)
         self._initialize_window_parameters(signal, **params)
 
@@ -1040,6 +1049,8 @@ class PowerSpectrum(PatternGenerator):
         self._samples_per_window = int(self.window_length*self.sample_rate)
         self._smoothing_window = self.windowing_function(self._samples_per_window)  
 
+        assert self._samples_per_window > 0
+        
         # calculate the discrete frequency bins possible for the given sample rate.
         # (discarding the negative frequencies)
         self._all_frequencies = fft.fftfreq(self._samples_per_window, d=1.0/self.sample_rate)[0:self._samples_per_window/2]
@@ -1136,10 +1147,13 @@ class PowerSpectrum(PatternGenerator):
 
 class Spectrogram(PowerSpectrum):
     """
-    Returns the spectral density of a rolling window of the input
-    audio signal each time it is called. Over time, outputs an audio
-    spectrogram.
+    Extends PowerSpectrum to provide a temporal buffer, yielding
+    a 2D representation of a fixed-width spectrogram.
     """
+    # See comments on PowerSpectrum; this could be instantiated by
+    # hand, but in a GUI it would not be useful at present due to the
+    # signal parameter.
+    __abstract=True
     
     seconds_per_timestep=param.Number(default=1.0,doc="""
         Number of seconds represented by 1 simulation time step.""")
