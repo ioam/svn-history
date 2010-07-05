@@ -14,7 +14,7 @@ __version__='$Revision$'
 # - test repositioning
 
 
-### You might want to use topo.command.pylabplots.matrixplot to
+### You might want to use topo.command.pylabplot.matrixplot to
 ### visualize matrices during debugging.
 
 import unittest

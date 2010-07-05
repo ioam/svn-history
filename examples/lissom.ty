@@ -613,7 +613,7 @@ MeasureResponseCommand.apply_output_fns=False
 # in topo.command.analysis...but not create the objects there. We
 # already do that elsewhere with plotgrouptemplates for
 # templateplotgroups, right?
-from topo.command.pylabplots import overlaid_plots
+from topo.command.pylabplot import overlaid_plots
 combined_preference_maps = {
     ('or','od'):dict(
         name='Orientation and Ocular Preference',

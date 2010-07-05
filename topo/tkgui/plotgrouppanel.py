@@ -30,7 +30,7 @@ from topo.base.cf import CFSheet
 
 from topo.plotting.plotgroup import PlotGroup,SheetPlotGroup
 
-from topo.command.pylabplots import matrixplot
+from topo.command.pylabplot import matrixplot
 
 from topo.misc.generatorsheet import GeneratorSheet
 
@@ -916,7 +916,7 @@ class SheetPanel(PlotGroupPanel):
             r,c = self._right_click_info['coords'][0]
 
             try:
-                from topo.command.pylabplots import cyclic_tuning_curve
+                from topo.command.pylabplot import cyclic_tuning_curve
                 cyclic_tuning_curve(x_axis="orientation",coords=[(center_x,center_y)],sheet=sheet)
             except AttributeError:
                 topo.sim.warning("No orientation tuning curve measurements are available yet for sheet %s; run the Orientation Tuning (Fullfield) command and try again."%sheet.name)

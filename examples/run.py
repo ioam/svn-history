@@ -75,7 +75,7 @@ def or_analysis():
     """Return a command for orientation analysis."""
     return """
 from topo.command.analysis import measure_or_pref; \
-from topo.command.pylabplots import measure_position_pref,measure_cog,measure_or_tuning_fullfield; \
+from topo.command.pylabplot import measure_position_pref,measure_cog,measure_or_tuning_fullfield; \
 measure_or_pref(); \
 #measure_position_pref(); \
 measure_cog(); \
@@ -84,7 +84,7 @@ measure_cog(); \
 
 def retinotopy_analysis():
     """Return a command for retinotopy analysis."""
-    return "from topo.command.pylabplots import measure_position_pref,measure_cog ;\
+    return "from topo.command.pylabplot import measure_position_pref,measure_cog ;\
 measure_position_pref(); \
 measure_cog()"
 ###

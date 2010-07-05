@@ -985,3 +985,10 @@ def transferfn_misc():
 
 S.append(transferfn_misc)
 
+
+def renamed_pylabplots():
+    import topo.command.pylabplot
+    module_redirect('pylabplots',topo.command,topo.command.pylabplot)
+
+S.append(renamed_pylabplots)
+

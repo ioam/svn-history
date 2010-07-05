@@ -26,7 +26,7 @@ import topo
 
 from topo.misc.filepath import resolve_path, normalize_path
 from topo.command.analysis import *
-from topo.command.pylabplots import *
+from topo.command.pylabplot import *
 from topo.plotting.plotgroup import plotgroups
 
 # CEBALERT: change to be the all-in-one model eventually, and

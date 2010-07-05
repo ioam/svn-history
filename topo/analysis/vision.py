@@ -213,7 +213,7 @@ def phase_preference_scatter_plot(sheet_name,diameter=0.39):
 
 ###############################################################################
 # JABALERT: Should we move this plot and command to analysis.py or
-# pylabplots.py, where all the rest are?
+# pylabplot.py, where all the rest are?
 #
 # In any case, it requires generalization; it should not be hardcoded
 # to any particular map name, and should just do the right thing for
@@ -255,8 +255,8 @@ def analyze_complexity(full_matrix,simple_sheet_name,complex_sheet_name,filename
         complx = array(complexity(full_matrix[sheet]))/2.0 
         # Should this be renamed to ModulationRatio?
         sheet.sheet_views['ComplexSelectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time(),sheet.row_precedence)
-    import topo.command.pylabplots
-    topo.command.pylabplots.plot_modulation_ratio(full_matrix,simple_sheet_name=simple_sheet_name,complex_sheet_name=complex_sheet_name,filename=filename)
+    import topo.command.pylabplot
+    topo.command.pylabplot.plot_modulation_ratio(full_matrix,simple_sheet_name=simple_sheet_name,complex_sheet_name=complex_sheet_name,filename=filename)
 
     # Avoid error if no simple sheet exists
     try:
