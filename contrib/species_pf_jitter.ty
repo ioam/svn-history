@@ -29,8 +29,10 @@ from topo.base.cf import CFSheet, CFPOF_Plugin
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Scaled_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, AttributeTrackingTF, BinaryThreshold, Threshold
-from topo.transferfn.basic import Sigmoid, HalfRectify,HalfRectifyAndPower, HomeostaticMaxEnt
+from topo.transferfn.misc import AttributeTrackingTF
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, BinaryThreshold, Threshold
+from topo.transferfn.misc import HalfRectify
+from topo.transferfn.basic import Sigmoid, HalfRectifyAndPower, HomeostaticMaxEnt
 from topo import numbergen
 from topo.pattern.image import Image
 from topo.coordmapper.basic import Jitter, NormalJitter

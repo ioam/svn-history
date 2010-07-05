@@ -28,7 +28,7 @@ from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,s
 import topo.learningfn.projfn 
 import topo.pattern.random
 import topo.responsefn.optimized 
-
+import topo.transferfn.misc
 
 # Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
@@ -76,7 +76,7 @@ topo.sim['Retina'] = sheet.GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1'] = sheet.CFSheet(
     nominal_density = p.cortex_density,
     # Original CMVC simulation used an initial radius of 13.3/40.0 (~0.33)
-    output_fns=[transferfn.KernelMax(density=p.cortex_density,
+    output_fns=[transferfn.misc.KernelMax(density=p.cortex_density,
         kernel_radius=numbergen.BoundedNumber(
             bounds=(0.5/40,None),
             generator=numbergen.ExponentialDecay(

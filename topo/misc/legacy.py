@@ -974,6 +974,14 @@ def cfproj_add_n_units():
 
 S.append(cfproj_add_n_units)
 
+def transferfn_misc():
+    import topo.transferfn.misc as ttm
+    import topo.transferfn.basic as ttb
+    ttb.HalfRectify=ttm.HalfRectify
+    ttb.PatternCombine=ttm.PatternCombine
+    ttb.AttributeTrackingTF=ttm.AttributeTrackingTF
+    ttb.HomeostaticResponse=ttm.HomeostaticResponse
+    ttb.KernelMax=ttm.KernelMax
 
-
+S.append(transferfn_misc)
 

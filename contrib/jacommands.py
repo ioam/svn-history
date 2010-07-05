@@ -575,7 +575,7 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
 
 import topo.transferfn.basic
 ActivityHysteresis = topo.transferfn.basic.Hysteresis
-SimpleHomeoLinearRelative = topo.transferfn.basic.HomeostaticResponse
+SimpleHomeoLinearRelative = topo.transferfn.misc.HomeostaticResponse
 
 def _divide_with_constant(x, y):
     y = numpy.clip(y, 0, 10000)

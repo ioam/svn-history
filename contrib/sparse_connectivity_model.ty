@@ -19,7 +19,8 @@ from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt,CFPLF_BCMFixed_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.transferfn.basic import PiecewiseLinear,HalfRectifyAndPower,HalfRectify,DivisiveNormalizeL1
+from topo.transferfn.misc import HalfRectify
+from topo.transferfn.basic import PiecewiseLinear,HalfRectifyAndPower,DivisiveNormalizeL1
 from topo import numbergen
 from topo.transferfn.basic import HomeostaticMaxEnt,PipelineTF
 from topo.pattern.basic import Gaussian,Composite,SeparatedComposite

@@ -29,7 +29,6 @@ from topo.misc.patternfn import gaussian,exponential,gabor,line,disk,ring,sigmoi
 from topo.misc.patternfn import arc_by_radian,arc_by_center,smooth_rectangle,float_error_ignore
 
 from topo import numbergen
-# BKALERT: Why can we not do a from topo.transferfn import DivisiveNormalizeL1?
 
 
 # Could add a Gradient class, where the brightness varies as a

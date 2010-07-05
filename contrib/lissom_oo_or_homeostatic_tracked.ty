@@ -57,7 +57,8 @@ from topo.learningfn.projfn import CFPLF_PluginScaled
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Scaled_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineTF, IdentityTF, ActivityAveragingTF, AttributeTrackingTF 
-from topo.transferfn.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
+from topo.transferfn.misc import HalfRectify
+from topo.transferfn.basic import Sigmoid, HomeostaticMaxEnt
 from topo import numbergen
 from topo.pattern.image import Image
 

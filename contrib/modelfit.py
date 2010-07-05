@@ -6,7 +6,10 @@ import matplotlib
 from numpy import array, size, mat, shape, ones, arange
 from topo import numbergen
 #from topo.base.functionfamily import IdentityTF
-from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, AttributeTrackingTF,PatternCombine,Sigmoid, HalfRectify
+from topo.transferfn.misc import PatternCombine
+from topo.transferfn.misc import AttributeTrackingTF
+from topo.transferfn.misc import HalfRectify
+from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, Sigmoid
 from topo.base.cf import CFSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from fixedpoint import FixedPoint

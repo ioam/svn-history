@@ -25,7 +25,9 @@ from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.transferfn.basic import HalfRectify,PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt,AttributeTrackingTF,Sigmoid
+from topo.transferfn.misc import HalfRectify
+from topo.transferfn.misc import AttributeTrackingTF
+from topo.transferfn.basic import PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt,Sigmoid
 from topo import numbergen
 from topo.pattern.basic import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
