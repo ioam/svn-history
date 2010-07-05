@@ -66,7 +66,7 @@ class PatternSampler(ImageSampler):
 
     size_normalization = param.ObjectSelector(default='original',
         objects=['original','stretch_to_fit','fit_shortest','fit_longest'],
-        check_on_set=True,doc="""
+        doc="""
         Determines how the pattern is scaled initially, relative to the
         default retinal dimension of 1.0 in sheet coordinates:
             

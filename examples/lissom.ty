@@ -134,8 +134,7 @@ from topo.misc.commandline import global_params as p
 p.add(
 
     dataset=param.ObjectSelector(default='Gaussian',objects=
-        ['Gaussian','Nature','FoliageA','FoliageB'],
-	check_on_set=True,doc="""
+        ['Gaussian','Nature','FoliageA','FoliageB'],doc="""
         Set of input patterns to use::
 
           :'Gaussian': Two-dimensional Gaussians

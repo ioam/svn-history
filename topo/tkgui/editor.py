@@ -1311,8 +1311,7 @@ class EditorSheet(EditorEP):
     """
     normalize = param.Boolean(default=False)
     show_density = param.Boolean(default=False)
-    view = param.ObjectSelector(default='activity',check_on_set=True,
-                                objects=['normal','activity'])
+    view = param.ObjectSelector(default='activity',objects=['normal','activity'])
     
     def __init__(self, canvas, simobj, pos, name):
         # Should call EditorEP's constructor instead

@@ -218,7 +218,7 @@ class SheetPlotGroup(PlotGroup):
     # suspect I put in a hack for these parameters in parametersframe,
     # sp when used outside of a parametersframe, they don't get the
     # help text.
-    normalize = param.ObjectSelector(default='None',check_on_set=True,
+    normalize = param.ObjectSelector(default='None',
                                      objects=['None','Individually'],
                                   doc="""
         'Individually': scale each plot so that the peak value will be white

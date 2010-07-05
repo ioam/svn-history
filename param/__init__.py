@@ -584,24 +584,41 @@ class Selector(Parameter):
     
 class ObjectSelector(Selector):
     """
-    Parameter whose value is set to an object from its list of possible objects.
+    Parameter whose value is set to an object from its list of
+    possible objects.
+
+    check_on_set restricts the value to be among the current list of
+    objects. By default, if objects are initially supplied,
+    check_on_set is True, whereas if no objects are initially
+    supplied, check_on_set is False. This can be overridden by
+    explicitly specifying check_on_set initially.
+
+    If check_on_set is True (either because objects are supplied
+    initially, or because it is explicitly specified), the default
+    (initial) value must be among the list of objects (unless the
+    default value is None).
     """
-    __slots__ = ['objects','allow_None','compute_default_fn','check_on_set']
+    __slots__ = ['objects','compute_default_fn','check_on_set']
 
     # ObjectSelector is usually used to allow selection from a list of
     # existing objects, therefore instantiate is False by default.
-    def __init__(self,default=None,objects=[],instantiate=False,allow_None=False,
-                 compute_default_fn=None,check_on_set=False,**params):
+    def __init__(self,default=None,objects=[],instantiate=False,
+                 compute_default_fn=None,check_on_set=None,**params):
         self.objects = objects
-        self.allow_None = (default is None or allow_None)
         self.compute_default_fn = compute_default_fn
-        self.check_on_set=check_on_set
 
-        self._check_value(default)
+        if check_on_set is not None:
+            self.check_on_set=check_on_set
+        elif len(objects)==0:
+            self.check_on_set=False
+        else:
+            self.check_on_set=True
+
+        if default is not None and self.check_on_set is True:
+            self._check_value(default)
+            
         super(ObjectSelector,self).__init__(default=default,instantiate=instantiate,**params)
         
-        if default not in self.objects:
-            self.objects.append(default)
 
     # CBNOTE: if the list of objects is changed, the current value for
     # this parameter in existing POs could be out of the new range.
@@ -618,16 +635,15 @@ class ObjectSelector(Selector):
             self.default=self.compute_default_fn() 
             if self.default not in self.objects:
                 self.objects.append(self.default)
-            # remove None 
-            if self.default is not None and None in self.objects:
-                self.objects.remove(None)
+
 
     def _check_value(self,val,obj=None):
         """
         val must be None or one of the objects in self.objects.
         """
-        if not (val in self.objects) and not (val is None and self.allow_None):
-            # CEBALERT: can be called before __init__ has called super's __init__
+        if not val in self.objects:
+            # CEBALERT: can be called before __init__ has called
+            # super's __init__, i.e. before attrib_name has been set.
             try:
                 attrib_name = self._attrib_name
             except AttributeError:
@@ -657,11 +673,9 @@ class ObjectSelector(Selector):
         # Parameterized instances. Think this is an sf.net bug/feature
         # request. Temporary fix: don't use obj.name if unavailable.
         try:
-            d=dict([(obj.name,obj) for obj in self.objects if obj is not None])
+            d=dict([(obj.name,obj) for obj in self.objects])
         except AttributeError:
-            d=dict([(obj,obj) for obj in self.objects if obj is not None])
-        if self.allow_None:
-            d['None']=None
+            d=dict([(obj,obj) for obj in self.objects])
         return d
 
     

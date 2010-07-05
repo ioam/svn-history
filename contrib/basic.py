@@ -393,7 +393,7 @@ class Curve(Arc):
 
     size_type = param.ObjectSelector(default='constant_length',
         objects=['constant_length','constant_width'],precedence=0.61,
-        check_on_set=True,doc="""
+        doc="""
         For a given size, whether to draw a curve with that total length, 
         or with that width, keeping it constant as curvature is varied.""")
 
