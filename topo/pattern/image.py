@@ -64,9 +64,9 @@ class PatternSampler(ImageSampler):
         Function to compute an appropriate background value. Must accept
         an array and return a scalar.""")
 
-    size_normalization = param.Enumeration(default='original',
-        available=['original','stretch_to_fit','fit_shortest','fit_longest'],
-        doc="""
+    size_normalization = param.ObjectSelector(default='original',
+        objects=['original','stretch_to_fit','fit_shortest','fit_longest'],
+        check_on_set=True,doc="""
         Determines how the pattern is scaled initially, relative to the
         default retinal dimension of 1.0 in sheet coordinates:
             

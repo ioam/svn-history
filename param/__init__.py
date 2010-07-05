@@ -24,42 +24,6 @@ import types
 from parameterized import Parameterized, Parameter, String, \
      descendents, ParameterizedFunction
 
-class Enumeration(Parameter):
-    """
-    Enumeration is a Parameter with a list of available values.
-
-    An Enumeration's value is always one from its list of available values.
-    """
-    __slots__ = ['available']
-
-    def __init__(self, default=None, available=[], **params):
-        """
-        Create an Enumeration, checking that 'default' is in 'available'.
-        """
-        try:
-            default in available
-        except TypeError, te:
-            raise TypeError("Enumeration's 'available' argument must be iterable ('%s' is not iterable)."%available)
-
-        Parameter.__init__(self,default=default,**params)        
-        self.available = available
-        self.__check_value(default) 
-        
-    def __set__(self,obj,val):
-        """
-        Set to the given value, raising an exception if that value is
-        not in the list of available ones.
-        """
-        self.__check_value(val)
-        super(Enumeration,self).__set__(obj,val)
-
-    def __check_value(self,val):
-        """
-        Raises an error if the given value isn't in the list of available ones.
-        """
-        if val not in self.available:
-            raise ValueError("%s not in %s's list of available values."%(val,self._attrib_name))
-
 
 def produce_value(value_obj):
     """

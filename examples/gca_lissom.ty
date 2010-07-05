@@ -44,8 +44,8 @@ from topo.base.arrayutil import DivideWithConstant
 from topo.misc.commandline import global_params as p
 p.add(
 
-    dataset=param.Enumeration(default='Gaussian',available=
-        ['Gaussian','Nature'],doc="""
+    dataset=param.ObjectSelector(default='Gaussian',objects=
+        ['Gaussian','Nature'],check_on_set=True,doc="""
         Set of input patterns to use::
 
           :'Gaussian': Two-dimensional Gaussians

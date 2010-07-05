@@ -391,8 +391,9 @@ class Curve(Arc):
     arc_length = param.Number(precedence=-1.0)
     aspect_ratio = param.Number(default=1.0, precedence=-1.0)
 
-    size_type = param.Enumeration(default='constant_length',
-        available=['constant_length','constant_width'],precedence=0.61,doc="""
+    size_type = param.ObjectSelector(default='constant_length',
+        objects=['constant_length','constant_width'],precedence=0.61,
+        check_on_set=True,doc="""
         For a given size, whether to draw a curve with that total length, 
         or with that width, keeping it constant as curvature is varied.""")
 

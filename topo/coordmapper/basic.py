@@ -282,8 +282,8 @@ class SingleDimensionMapper(CoordinateMapperFn):
        The maximum range of the mapping input.""")
     out_range = param.Number(default=0.5*sqrt(2),bounds=(0,None), doc="""
        The maximum range of the output.""")
-    remap_dimension = param.Enumeration(default='radius',
-        available=['radius','x','y','xy'],doc="""
+    remap_dimension = param.ObjectSelector(default='radius',
+        objects=['radius','x','y','xy'],check_on_set=True,doc="""
         The dimension to remap. ('xy' remaps x and y independently.)""")
 
 

@@ -240,6 +240,38 @@ def install_legacy_support():
 S=supporters=DuplicateCheckingList()
 # in general, newest changes should go at the start of the list.
 
+
+
+def removed_Enumeration():
+
+    import param
+
+    class Enumeration(object):
+        """
+        Provide support for existing code that uses Enumeration.
+        """
+        @staticmethod
+        def _transform(kw):
+            if 'available' in kw:
+                kw['objects']=kw['available']
+                del kw['available']
+            kw['check_on_set']=True            
+
+        def __new__(cls,*args,**kw): 
+            print "no way!"
+            Enumeration._transform(kw)
+            n = param.ObjectSelector(*args,**kw)
+            return n
+
+        def __init__(self,*args,**kw):
+            Enumeration._transform(kw)
+            super(param.ObjectSelector,self).__init__(self,*args,**kw)
+
+    param.Enumeration = Enumeration
+
+S.append(removed_Enumeration)
+
+
 def bye_bye_param():
     import param
     import topo
@@ -991,4 +1023,6 @@ def renamed_pylabplots():
     module_redirect('pylabplots',topo.command,topo.command.pylabplot)
 
 S.append(renamed_pylabplots)
+
+
 
