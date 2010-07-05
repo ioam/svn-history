@@ -2863,7 +2863,7 @@ class Menu(T.Menu):
     def entryconfigure(self, index, cnf=None, **kw):
         """Configure a menu item at INDEX."""
         i = self.get_tkinter_index(index)
-        T.Menu.entryconfigure(self,i,cnf,**kw)
+        return T.Menu.entryconfigure(self,i,cnf,**kw)
         
     entryconfig = entryconfigure
 
