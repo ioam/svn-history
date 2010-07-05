@@ -1,7 +1,8 @@
+# CEBALERT: incomplete tests of object selector
 >>> import param
 
 >>> class P(param.Parameterized):
-...     e = param.Enumeration(default=5,available=[5,6,7])
+...     e = param.ObjectSelector(default=5,objects=[5,6,7],check_on_set=True)
 
 >>> p = P(e=6)
 >>> p.e
@@ -15,14 +16,16 @@
 ...     raise AssertionError("Enumeration set outside range.")
 
 >>> try:
-...     q = param.Enumeration(5,[4])
+...     class Q(param.Parameterized):
+...         q = param.ObjectSelector(5,objects=[4],check_on_set=True)
 ... except ValueError:
 ...     pass
 ... else:
 ...     raise AssertionError("Enumeration created outside range.")
 
 >>> try:
-...     q = param.Enumeration(5,10)
+...     class Q(param.Parameterized):
+...         q = param.ObjectSelector(5,10,check_on_set=True)
 ... except TypeError:
 ...     pass
 ... else:
