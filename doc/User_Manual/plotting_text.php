@@ -226,8 +226,8 @@ available; hovering the mouse over a parameter name gives a brief
 description. More detail about various commands is available in <A
 HREF="../Reference_Manual/topo.command.analysis-module.html">
 topo/command/analysis.py</A> and <A
-HREF="../Reference_Manual/topo.command.pylabplots-module.html">
-topo/command/pylabplots.py</A>.
+HREF="../Reference_Manual/topo.command.pylabplot-module.html">
+topo/command/pylabplot.py</A>.
 
 <P>Some plots also use "Plot hooks", called after the "Pre plot
 hooks", to actually visualize the results.  For instance, some

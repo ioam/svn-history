@@ -45,13 +45,12 @@ location:
 
 <pre>
 $ ./topographica -g
-Topographica&gt; from topo import pattern
-Topographica&gt; from topo.misc.numbergenerator import UniformRandom
+Topographica&gt; from topo import pattern, numbergen
 Topographica&gt; input_pattern = pattern.Gaussian(size=0.08, aspect_ratio=4,
                  xdensity=60,ydensity=60,
-                 x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
-                 y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
-                 orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
+                 x=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
+                 y=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
+                 orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56))
 Topographica&gt; matrixplot(input_pattern())
 Topographica&gt; matrixplot(input_pattern())
 </pre>
@@ -156,11 +155,11 @@ random from a set of four different pattern generators:
 
 <pre>
 CFProjection.weights_generator=pattern.Selector(generators=[
-    pattern.Gaussian(orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99)),
+    pattern.Gaussian(orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=99)),
     pattern.Gaussian(aspect_ratio=1.0,
-                     x=UniformRandom(lbound=-0.2,ubound=0.2,seed=12),
-                     y=UniformRandom(lbound=-0.2,ubound=0.2,seed=34)),
-    pattern.Rectangle(orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99),
+                     x=numbergen.UniformRandom(lbound=-0.2,ubound=0.2,seed=12),
+                     y=numbergen.UniformRandom(lbound=-0.2,ubound=0.2,seed=34)),
+    pattern.Rectangle(orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=99),
                       size0.3=),
     pattern.Disk(size=0.2)])
 </pre>

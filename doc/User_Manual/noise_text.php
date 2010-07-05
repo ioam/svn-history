@@ -27,9 +27,9 @@ again just append the new output_function to the list. Suitable
 transfer functions for noise include variants of:
 
 <blockquote><small>
-  transferfn.PatternCombine(generator=pattern.random.UniformRandom(scale=1.0,offset=1.0),operator=numpy.multiply)<br>
+  transferfn.misc.PatternCombine(generator=pattern.random.UniformRandom(scale=1.0,offset=1.0),operator=numpy.multiply)<br>
 
-  transferfn.PatternCombine(generator=pattern.random.GaussianRandom(scale=0.1,offset=-0.05),operator=numpy.add))
+  transferfn.misc.PatternCombine(generator=pattern.random.GaussianRandom(scale=0.1,offset=-0.05),operator=numpy.add))
 </small></blockquote>
 
 where the offset and scale parameters determine the mean value and the
@@ -64,7 +64,7 @@ into the LateralExcitatory Projection of a LISSOM-based model, just change e.g.
 (if output_fns are specified) to e.g.:
 
 <pre>
-  output_fns=[transferfn.PatternCombine(generator=pattern.random.\
+  output_fns=[transferfn.misc.PatternCombine(generator=pattern.random.\
       UniformRandom(scale=0.1,offset=-0.05),operator=numpy.add)]
 </pre>
 

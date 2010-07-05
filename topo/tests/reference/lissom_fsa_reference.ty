@@ -34,7 +34,7 @@ from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.basic import DivisiveNormalizeL1, PiecewiseLinear
 #from topo.responsefn.optimized import CFPRF_SharedWeightDotProduct_opt
 from topo.base.patterngenerator import PatternGenerator
-from topo.misc.numbergenerator import UniformRandom, NormalRandom, Choice
+from topo.numbergen import UniformRandom, NormalRandom, Choice
 from topo.base.parameterclasses import DynamicNumber, Number, ListParameter
 from topo.param import Parameter
 from topo.pattern.basic import Composite, SeparatedComposite, Gaussian, Disk, Constant

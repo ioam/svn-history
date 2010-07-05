@@ -213,7 +213,7 @@ producing 2D patterns is provided, as described on
     <li><?php classref('topo.transferfn.basic','DivisiveNormalizeL2')?>
     <li><?php classref('topo.transferfn.basic','PiecewiseLinear')?>
     <li><?php classref('topo.transferfn.basic','Pipeline')?>
-    <li><?php classref('topo.transferfn.basic','PatternCombine')?>
+    <li><?php classref('topo.transferfn.misc','PatternCombine')?>
     <li><?php classref('topo.base.functionfamily','IdentityTF')?>
     </ul>
 </ul>

@@ -130,7 +130,7 @@ SOM network like examples/som_retinotopy.ty is simply built from:
 <li>A general-purpose array of units
   <?php classref('topo.base.cf','CFSheet')?> 
 <li>A specialized transfer function 
-  (<?php classref('topo.transferfn.basic','KernelMax')?>) that picks a
+  (<?php classref('topo.transferfn.misc','KernelMax')?>) that picks a
   winning unit and activates the rest according to a user-specified
   kernel function.
 </ol>

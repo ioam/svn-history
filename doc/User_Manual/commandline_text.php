@@ -180,7 +180,7 @@ program:</A>
 <pre>
 $ ./topographica -g examples/tiny.ty
 Topographica&gt; topo.sim.run(1)
-Topographica&gt; from topo.command.pylabplots import *
+Topographica&gt; from topo.command.pylabplot import *
 Topographica&gt; V1 = topo.sim['V1']
 Topographica&gt; matrixplot(V1.activity)
 Topographica&gt; vectorplot(V1.activity[0])
