@@ -602,8 +602,10 @@ class ObjectSelector(Selector):
 
     # ObjectSelector is usually used to allow selection from a list of
     # existing objects, therefore instantiate is False by default.
-    def __init__(self,default=None,objects=[],instantiate=False,
+    def __init__(self,default=None,objects=None,instantiate=False,
                  compute_default_fn=None,check_on_set=None,**params):
+        if objects is None:
+            objects = []
         self.objects = objects
         self.compute_default_fn = compute_default_fn
 
