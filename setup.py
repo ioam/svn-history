@@ -2,6 +2,10 @@
 
 import sys
 from distutils.core import setup
+import glob
+
+examples = glob.glob('examples/*.ty')
+
 
 ### TOPOGRAPHICA DEPENDENCIES ########################################
 required = {'PIL':">=1.1.6",
@@ -148,6 +152,8 @@ of `SciPy`_) for optimum performance.
         'topo.tkgui': ['icons/*.*'],
         'topo.command':['*.png','*.pdf'],
         'topo.tests':['*.txt','*.jpg','*.pgm']},
+
+    data_files=[('share/topographica/examples',examples)],
 
     scripts = ['topographica']))
 
