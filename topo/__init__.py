@@ -55,6 +55,24 @@ release = ''
 version = ''
 
 
+import param 
+import os
+
+
+# Default location in which to create files
+_default_output_path = os.path.join(os.path.expanduser("~"),'topographica')
+if not os.path.exists(_default_output_path):
+    os.mkdir(_default_output_path)
+
+# Location of topo/ package. This kind of thing won't work with py2exe
+# etc. Need to see if we can get rid of it.
+_package_path = os.path.split(__file__)[0]
+
+param.normalize_path.prefix = _default_output_path
+param.resolve_path.search_paths+=([_default_output_path] + [_package_path])
+
+
+
 # CEBALERT: (about PIL)
 # PIL (i.e. the Imaging package) can be installed so that it's
 # e.g. "from PIL import Image" or just "import Image".
@@ -141,12 +159,11 @@ def _instance_method_pickle_support():
 _instance_method_pickle_support()
 
 
-# Set the default value of Simulation.time_type to gmpy.mpq. If gmpy is
-# unavailable, use the slower fixedpoint.FixedPoint. Also, in that
+# Set the default value of Simulation.time_type to gmpy.mpq. If gmpy
+# is unavailable, use the slower fixedpoint.FixedPoint. Also, in that
 # case, provide a fake gmpy.mpq (to allow e.g. pickled test data to be
 # loaded). If neither gmpy nor fixedpoint is available, the default
-# will be float. Consider making that be decimal.Decimal.
-import param
+# will be float. Python 2.7 has suitable fraction.Fraction()
 time_type = None
 try:
     import gmpy

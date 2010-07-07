@@ -125,7 +125,7 @@ def v2_analysis_function():
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
-    from topo.misc.filepath import normalize_path
+    from param import normalize_path
 
     topo.sim["V1Simple"].measure_maps = True
     topo.sim["V1Complex"].measure_maps = True
@@ -162,7 +162,7 @@ def rf_analysis():
     from topo.sheet.generator import GeneratorSheet
     from topo.command.analysis import measure_or_tuning_fullfield, measure_or_pref
     from topo.command.pylabplots import cyclic_tuning_curve
-    from topo.misc.filepath import normalize_path    
+    from param import normalize_path    
     
     if(float(topo.sim.time()) <=20010): 
         save_plotgroup("Orientation Preference")

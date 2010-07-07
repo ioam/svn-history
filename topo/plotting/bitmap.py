@@ -31,8 +31,7 @@ import numpy.oldnumeric as Numeric
 import numpy
 
 import param
-
-from topo.misc.filepath import resolve_path
+from param import resolve_path
 
 
 ######################################################################

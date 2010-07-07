@@ -18,11 +18,11 @@ except ImportError:
     print "Warning: Could not import matplotlib; pylab plots will not work."
 
 import param
+from param import normalize_path
 
 import topo
 from topo.base.cf import CFSheet
 from topo.base.sheetview import SheetView
-from topo.misc.filepath import normalize_path
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.command.analysis import measure_sine_pref
 import matplotlib.ticker as mticker

@@ -386,10 +386,13 @@ topo_parser.add_option("-p","--set-parameter",action = "callback",callback=p_act
 def auto_import_commands():
     """Import the contents of all files in the topo/command/ directory."""
     import re,os
-    from filepath import package_path
+    import topo
     import __main__
 
-    for f in os.listdir(os.path.join(package_path,"command")):
+    # CEBALERT: this kind of thing (topo.__file__) won't work with
+    # py2exe and similar tools
+    topo_path = os.path.join(os.path.split(topo.__file__)[0],"command")
+    for f in os.listdir(topo_path):
         if re.match('^[^_.].*\.py$',f):
             modulename = re.sub('\.py$','',f)
             exec "from topo.command."+modulename+" import *" in __main__.__dict__

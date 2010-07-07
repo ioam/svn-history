@@ -13,7 +13,6 @@ import os
 from param.parameterized import ParamOverrides
 from topo.base.sheetcoords import SheetCoordinateSystem
 
-from topo.misc.filepath import Filename
 from topo.pattern.basic import Spectrogram
 from numpy import float32, multiply, round, shape, hstack
 from numpy import hanning, fft, log10, logspace
@@ -33,7 +32,7 @@ class AudioFile(Spectrogram):
     of a rolling window of the input audio signal.
     """
  
-    filename=Filename(default='sounds/complex/daisy.wav', doc="""
+    filename=param.Filename(default='sounds/complex/daisy.wav', doc="""
         File path (can be relative to Topographica's base path) to an
         audio file. The audio can be in any format accepted by pyaudiolab, 
         e.g. WAV, AIFF, or FLAC.""")

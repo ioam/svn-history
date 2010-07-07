@@ -18,7 +18,6 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.transferfn.basic import DivisiveNormalizeLinf,TransferFn
-from topo.misc.filepath import Filename
 
 
 class ImageSampler(param.Parameterized):
@@ -354,7 +353,7 @@ class FileImage(GenericImage):
     details of supported image file formats.
     """
 
-    filename = Filename(default='images/ellen_arthur.pgm',precedence=0.9,doc="""
+    filename = param.Filename(default='images/ellen_arthur.pgm',precedence=0.9,doc="""
         File path (can be relative to Topographica's base path) to a bitmap image.
         The image can be in any format accepted by PIL, e.g. PNG, JPG, TIFF, or PGM.
         """)

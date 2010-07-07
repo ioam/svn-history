@@ -19,7 +19,6 @@ from topo.sheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
 from topo.pattern.image import FileImage
 import contrib.jacommands
-from topo.misc.filepath import normalize_path, application_path
 import contrib.dd
 from matplotlib.ticker import MaxNLocator
 from contrib.JanA.noiseEstimation import signal_power_test

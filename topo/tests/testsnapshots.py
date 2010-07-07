@@ -7,6 +7,7 @@ __version__='$Revision$'
 import unittest, copy, shutil, tempfile
 from numpy.testing import assert_array_equal
 
+from param import normalize_path,resolve_path
 import topo
 import __main__
 
@@ -15,7 +16,6 @@ from topo.sheet import GeneratorSheet
 from topo.command.basic import save_snapshot,load_snapshot
 from topo.pattern.basic import Gaussian, Line
 from topo.base.simulation import Simulation,SomeTimer
-from topo.misc.filepath import resolve_path
 
 
 SNAPSHOT_NAME = "testsnapshot.typ"
@@ -30,12 +30,12 @@ class TestSnapshots(unittest.TestCase):
         to topo.sim by other tests).
         """
         Simulation(register=True,name=SIM_NAME)
-        self.original_output_path = topo.misc.filepath.output_path
-        topo.misc.filepath.output_path = tempfile.mkdtemp()
+        self.original_output_path = normalize_path.prefix
+        normalize_path.prefix = tempfile.mkdtemp()
 
     def tearDown(self):
-        shutil.rmtree(topo.misc.filepath.output_path)
-        topo.misc.filepath.output_path=self.original_output_path
+        shutil.rmtree(normalize_path.prefix)
+        normalize_path.prefix=self.original_output_path
         
     def basic_save_load_snapshot(self,xml=False):
         """
@@ -61,7 +61,7 @@ class TestSnapshots(unittest.TestCase):
         topo.sim['R'].set_input_generator(Line())
         topo.sim.run(1)
 
-        load_snapshot(resolve_path(SNAPSHOT_NAME,search_paths=[topo.misc.filepath.output_path]))
+        load_snapshot(resolve_path(SNAPSHOT_NAME,search_paths=[normalize_path.prefix]))
 
         
         # CEBALERT: should also test that unpickling order is correct

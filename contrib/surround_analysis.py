@@ -22,7 +22,7 @@ from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.plotting.plotfilesaver import * 
 from topo.command.pylabplots import cyclic_tuning_curve, matrixplot
 from topo.command.analysis import save_plotgroup
-from topo.misc.filepath import normalize_path, application_path
+from param import normalize_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap

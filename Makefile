@@ -252,10 +252,11 @@ map-tests:
 generate-map-tests-data:
 	./topographica -c "cortex_density=8" examples/lissom_oo_or.ty -c "topo.sim.run(100);from topo.tests.test_map_measurement import *; generate(plotgroups_to_test)" 
 
+TESTTMPDIR := $(shell mktemp -d)
 script-repr-tests:
-	./topographica examples/hierarchical.ty -a -c "save_script_repr('topo/tests/script_repr_test.ty')"
-	./topographica topo/tests/script_repr_test.ty
-	rm topo/tests/script_repr_test.ty
+	./topographica examples/hierarchical.ty -a -c "import param;param.normalize_path.prefix='${TESTTMPDIR}'" -c "save_script_repr('script_repr_test.ty')"
+	./topographica ${TESTTMPDIR}/script_repr_test.ty
+	rm -rf ${TESTTMPDIR}
 
 gui-tests: basic-gui-tests detailed-gui-tests
 

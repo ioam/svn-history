@@ -23,10 +23,12 @@ from numpy.testing import assert_array_almost_equal
 from numpy.oldnumeric import array,Float,pi
 ## from numpy.oldnumeric.mlab import rot90
 
+from param import resolve_path
+
 from topo.base.boundingregion import BoundingBox
 from topo.pattern.image import FileImage
 from topo.transferfn.basic import IdentityTF
-from topo.misc.filepath import resolve_path
+
 
 
 class TestImage(unittest.TestCase):

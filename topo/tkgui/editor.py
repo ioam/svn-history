@@ -21,13 +21,12 @@ from tkFileDialog import asksaveasfilename
 
 
 import param
-from param import tk,parameterized
+from param import tk,parameterized,normalize_path
 from param.external import Combobox
 
 import topo
 from topo.command.analysis import update_activity
 from topo.misc.util import shortclassname
-from topo.misc.filepath import normalize_path
 from topo.base.simulation import EventProcessor
 
 # Make sure at least some sheets or projections are available to

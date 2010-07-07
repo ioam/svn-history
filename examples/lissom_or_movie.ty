@@ -21,7 +21,11 @@ from numpy import arange
 
 from topo.plotting.bitmap import MontageBitmap
 from topo.misc.trace import ActivityMovie,InMemoryRecorder
-from topo.misc.filepath import application_path
+
+### CEBALERT
+import sys,os
+application_path = os.path.split(os.path.split(sys.executable)[0])[0]
+###
 
 # Can use any TrueType font on your system
 #title_font = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)

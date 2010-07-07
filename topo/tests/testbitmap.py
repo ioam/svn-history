@@ -18,7 +18,7 @@ from topo.plotting.bitmap import *
 import Image
 import numpy.oldnumeric as Numeric
 import unittest
-from topo.misc.filepath import resolve_path
+from param import resolve_path
 
 class TestBitmap(unittest.TestCase):
 

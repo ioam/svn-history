@@ -13,7 +13,7 @@ import pickle, copy, __main__, timeit
 
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 
-from topo.misc.filepath import resolve_path, normalize_path
+from param import resolve_path, normalize_path
 
 import topo
 

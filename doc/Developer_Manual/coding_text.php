@@ -308,9 +308,9 @@ from within its own directory, and the current working directory has
 not subsequently been changed).
 
 <P>To avoid this problem, simply use the functions
-<code>topo.misc.filepath.resolve_path()</code> (to locate an
+<code>param.resolve_path()</code> (to locate an
 existing file) or
-<code>topo.misc.filepath.normalize_path()</code> (to prepare a
+<code>param.normalize_path()</code> (to prepare a
 path for writing). The example above would become
 <code>open(resolve_path('topo/tkgui/icons/topo.xbm'))</code>; to
 create a file for writing, one could write
@@ -328,8 +328,8 @@ on all platforms:
 <ol>
 <li>Do not attempt to perform operations such as <code>open</code> on
 'raw' linux-style paths. Instead, use one of the functions
-<code>topo.misc.filepath.normalize_path()</code> or
-<code>topo.misc.filepath.resolve_path()</code> (as described
+<code>param.normalize_path()</code> or
+<code>param.resolve_path()</code> (as described
 above).</li>
 <li>(For Windows developers) Never use Windows-style paths within the
 code: always specify paths in linux format. The above-mentioned

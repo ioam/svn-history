@@ -41,12 +41,11 @@ from topo.base.sheetview import SheetView
 from topo.base.arrayutil import octave_output, centroid, wrap
 from topo.base.sheet import Sheet
 from topo.base.arrayutil import wrap
-from topo.misc.filepath import normalize_path
 from topo.misc.util import frange
 import topo.analysis.vision
 from topo.plotting.plot import make_template_plot, Plot
 import param
-from param import ParameterizedFunction
+from param import ParameterizedFunction,normalize_path
 from param.parameterized import ParamOverrides
 from topo.pattern.basic import SineGrating, RawRectangle, OrientationContrast
 from topo.plotting.plotgroup import create_plotgroup, plotgroups

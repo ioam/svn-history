@@ -55,7 +55,7 @@ from topo.plotting.plotgroup import create_plotgroup, plotgroups, ConnectionFiel
 from topo.plotting.plotgroup import UnitMeasurementCommand,ProjectionSheetMeasurementCommand,default_input_sheet
 from topo.analysis.featureresponses import Feature, PatternPresenter, Subplotting
 from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand, PositionMeasurementCommand, SingleInputResponseCommand
-from topo.misc.filepath import Filename
+
 
 # Helper function for save_plotgroup
 def _equivalent_for_plotgroup_update(p1,p2):
@@ -690,7 +690,7 @@ class measure_corner_angle_pref(PositionMeasurementCommand):
     num_angle=param.Integer(default=4,bounds=(1,None),softbounds=(1,12),doc=
         "Number of angles to test.")
 
-    key_img_fname=Filename(default='command/key_angles.png',doc=
+    key_img_fname=param.Filename(default='command/key_angles.png',doc=
         "Name of the file with the image used to code angles with hues.")
 
     pattern_presenter=PatternPresenter(GaussiansCorner(aspect_ratio=4.0,cross=0.85),apply_output_fns=False,duration=1.0) 

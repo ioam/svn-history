@@ -16,10 +16,9 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
 from tkFileDialog import asksaveasfilename
 
 import param
-from param import tk
+from param import tk,normalize_path
 
 import topo.command.pylabplot
-from topo.misc.filepath import normalize_path
 from topo.plotting.plotgroup import TemplatePlotGroup
 
 from plotgrouppanel import SheetPanel

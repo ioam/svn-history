@@ -19,7 +19,7 @@ from numpy.fft.fftpack import fft2, ifft2
 from numpy.fft.helper import fftshift, fftfreq
 from numpy import abs
 import numpy.oldnumeric as Numeric
-from topo.misc.filepath import normalize_path
+from param import normalize_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.cf import CFPOutputFn
 import param
@@ -30,10 +30,8 @@ from topo.base.patterngenerator import PatternGenerator
 import string
 import time
 import re
-from topo.misc import filepath
 from topo.analysis.featureresponses import Feature, SinusoidalMeasureResponseCommand, MeasureResponseCommand, SingleInputResponseCommand, PatternPresenter, ReverseCorrelation
 from topo.command.pylabplots import matrixplot
-from topo.misc.filepath import normalize_path
 from topo.plotting.plotgroup import default_input_sheet, create_plotgroup
 
 
@@ -865,17 +863,17 @@ def run_lesi_batch(script_file,filename,chunk,sheet,value,endtime,rfs,snapshot,o
     if not os.path.isdir(normalize_path(output_directory)):
         os.mkdir(normalize_path(output_directory))
 
-    filepath.output_path = normalize_path(os.path.join(output_directory,prefix))
+    normalize_path.prefix = normalize_path(os.path.join(output_directory,prefix))
     
-    if os.path.isdir(filepath.output_path):
+    if os.path.isdir(normalize_path.prefix):
         print "Batch run: Warning -- directory: " +  \
-              filepath.output_path + \
+              normalize_path.prefix + \
               " already exists! Run aborted; rename directory or wait one minute before trying again."
         import sys
         sys.exit(-1)
     else:
-        os.mkdir(filepath.output_path)
-        print "Batch run output will be in " + filepath.output_path
+        os.mkdir(normalize_path.prefix)
+        print "Batch run output will be in " + normalize_path.prefix
 
     ##################################
     # capture stdout
@@ -997,17 +995,17 @@ def run_param_batch(script_file,filename,chunk,sheet,value,endtime,output_direct
     if not os.path.isdir(normalize_path(output_directory)):
         os.mkdir(normalize_path(output_directory))
 
-    filepath.output_path = normalize_path(os.path.join(output_directory,prefix))
+    normalize_path.prefix = normalize_path(os.path.join(output_directory,prefix))
     
-    if os.path.isdir(filepath.output_path):
+    if os.path.isdir(normalize_path.prefix):
         print "Batch run: Warning -- directory: " +  \
-              filepath.output_path + \
+              normalize_path.prefix + \
               " already exists! Run aborted; rename directory or wait one minute before trying again."
         import sys
         sys.exit(-1)
     else:
-        os.mkdir(filepath.output_path)
-        print "Batch run output will be in " + filepath.output_path
+        os.mkdir(normalize_path.prefix)
+        print "Batch run output will be in " + normalize_path.prefix
 
     ##################################
     # capture stdout

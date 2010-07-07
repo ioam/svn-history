@@ -20,9 +20,10 @@ __version__='$Revision$'
 # separate directory and will be a separate package.
 
 import types
+import os.path
 
 from parameterized import Parameterized, Parameter, String, \
-     descendents, ParameterizedFunction
+     descendents, ParameterizedFunction, ParamOverrides
 
 
 def produce_value(value_obj):
@@ -805,6 +806,134 @@ class Dict(ClassSelector):
 
 
 
+# For portable code:
+#   - specify paths in unix (rather than Windows) style;
+#   - use resolve_path() for paths to existing files to be read, 
+#     and normalize_path() for paths to new files to be written.
+
+class resolve_path(ParameterizedFunction):
+    """
+    Find the path to an existing file, searching the paths specified
+    in the search_paths parameter if the filename is not absolute, and
+    converting a UNIX-style path to the current OS's format if
+    necessary.
+
+    To turn a supplied relative path into an absolute one, the path is
+    appended to paths in the search_paths parameter, in order, until
+    the file is found.
+
+    An IOError is raised if the file is not found.
+
+    Similar to Python's os.path.abspath(), except more search paths
+    than just os.getcwd() can be used, and the file must exist.
+    """
+
+    search_paths = List(default=[os.getcwd()],doc="""
+        Prepended to a non-relative path, in order, until a file is
+        found.""")
+
+    def __call__(self,path,**params):
+        p = ParamOverrides(self,params)
+
+        path = os.path.normpath(path)
+
+        if os.path.isabs(path):
+            if os.path.isfile(path):
+                return path
+            else:
+                raise IOError('File "%s" not found.'%path)
+        else:
+            paths_tried = []
+            for prefix in p.search_paths:
+                try_path = os.path.join(os.path.normpath(prefix),path)
+                if os.path.isfile(try_path): 
+                    return try_path
+                paths_tried.append(try_path)
+
+            raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
+
+
+
+class normalize_path(ParameterizedFunction):
+    """
+    Convert a UNIX-style path to the current OS's format,
+    typically for creating a new file or directory.
+
+    If the path is not already absolute, it will be made absolute
+    (using the prefix parameter).
+
+    Should do the same as Python's os.path.abspath(), except using
+    prefix rather than os.getcwd).
+    """
+
+    prefix = String(default="",doc="""
+        Prepended to the specified path, if that path is not
+        absolute.""")
+
+    def __call__(self,path="",**params):
+        p = ParamOverrides(self,params)
+
+        if not os.path.isabs(path):
+            path = os.path.join(os.path.normpath(p.prefix),path)
+
+        return os.path.normpath(path)
+
+
+class Filename(Parameter):
+    """
+    Parameter that can be set to a string specifying the
+    path of a file (in unix style); returns it in the format of
+    the user's operating system.  
+
+    The specified path can be absolute, or relative to either:
+
+    * any of the paths specified in the search_paths attribute (if
+      search_paths is not None); 
+    or
+    
+    * any of the paths searched by resolve_path() (if search_paths
+      is None).
+    """
+    __slots__ = ['search_paths'] 
+
+    def __init__(self,default=None,search_paths=None,**params):
+        if search_paths is None:
+            search_paths = []
+        self.search_paths = search_paths
+        super(Filename,self).__init__(default,**params)
+
+    def _resolve(self,pth):
+        if self.search_paths:
+            return resolve_path(pth,search_paths=self.search_paths)
+        else:
+            return resolve_path(pth)                               
+        
+    def __set__(self,obj,val):
+        """
+        Call Parameter's __set__, but warn if the file cannot be found.
+        """
+        try:
+            self._resolve(val)
+        except IOError, e:
+            param.Parameterized(name="%s.%s"%(obj.name,self._attrib_name)).warning('%s'%(e.args[0]))
+
+        super(Filename,self).__set__(obj,val)
+        
+    def __get__(self,obj,objtype):
+        """
+        Return an absolute, normalized path (see resolve_path).
+        """
+        raw_path = super(Filename,self).__get__(obj,objtype)
+        return self._resolve(raw_path)
+
+    def __getstate__(self):
+        # don't want to pickle the search_paths        
+        state = super(Filename,self).__getstate__()
+        # CBALERT: uncommenting gives an error on make tests (testsnapshots.py).
+        # Testsnapshots.py runs fine on its own, and the snapshot-tests pass.
+        # Must be a test interaction? Needs investigating.
+        #del state['search_paths']
+        return state
 
 
 

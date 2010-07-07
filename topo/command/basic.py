@@ -22,6 +22,7 @@ import param
 from param.parameterized import PicklableClassAttributes, ParameterizedFunction
 from param.parameterized import ParamOverrides
 from param.external import OrderedDict
+from param import normalize_path
 
 import topo
 from topo.base.functionfamily import TransferFn
@@ -30,8 +31,6 @@ from topo.base.projection import Projection, ProjectionSheet
 from topo.sheet import GeneratorSheet
 from topo.misc.util import MultiFile
 from topo.misc.picklemain import PickleMain
-from topo.misc.filepath import normalize_path
-from topo.misc import filepath
 from topo.base.functionfamily import PatternDrivenAnalysis
 
 try:
@@ -317,22 +316,34 @@ def save_script_repr(script_name=None):
     script_file.write(script)
 
 
-# decorator that changes to filepath.application_path for duration of fn
-def in_application_path(fn):
+# Location of the version-controlled topographica directory (i.e. path
+# of topo/ but up a level). Could be None. Nothing should assume that
+# there is a version control system available.
+try:
+    vc_topographica_dir = os.path.split(os.path.split(topo.__file__)[0])[0]
+except:
+    vc_topographica_dir = None
+
+
+# decorator that changes to vc_topographica_dir for duration of fn,
+# if there is such a directory. Otherwise, doesn't change directory.
+def in_vc_topographica_dir(fn):
     import os
-    def temporarily_change_to_application_path(*args,**kw):
+    def temporarily_change_to_vc_topographica_dir(*args,**kw):
         orig_path = os.getcwd()
-        os.chdir(filepath.application_path)
+        if vc_topographica_dir is not None:
+            os.chdir(vc_topographica_dir)
         try:
             result = fn(*args,**kw)
         finally:
             # ensure dir put back even if there's an error calling fn
-            os.chdir(orig_path)
+            if os.getcwd()!=orig_path:
+                os.chdir(orig_path)
         return result
-    return temporarily_change_to_application_path
+    return temporarily_change_to_vc_topographica_dir
 
 
-@in_application_path
+@in_vc_topographica_dir
 def _get_vc_commands():
     # return name of version control system (None if no vc could be
     # detected)
@@ -344,7 +355,7 @@ def _get_vc_commands():
         if os.path.exists(".%s"%vc_type):
             return vc_type,commands
 
-@in_application_path
+@in_vc_topographica_dir
 def _print_vc_info(filename):
     """Save the version control status of the current code to the specified file."""
     try:
@@ -371,7 +382,7 @@ def _print_vc_info(filename):
     finally:
         file.close()
 
-@in_application_path
+
 def _save_parameters(p,filename):
     from topo.misc.commandline import global_params
     
@@ -590,18 +601,18 @@ class run_batch(ParameterizedFunction):
     
         
         dirname = self._truncate(p,p.dirname_prefix+prefix)
-        filepath.output_path = normalize_path(os.path.join(p['output_directory'],dirname))
+        normalize_path.prefix = normalize_path(os.path.join(p['output_directory'],dirname))
         
-        if os.path.isdir(filepath.output_path):
+        if os.path.isdir(normalize_path.prefix):
             print "Batch run: Warning -- directory already exists!"
             print "Run aborted; wait one minute before trying again, or else rename existing directory: \n" + \
-                  filepath.output_path
+                  normalize_path.prefix
     
             import sys
             sys.exit(-1)
         else:
-            os.mkdir(filepath.output_path)
-            print "Batch run output will be in " + filepath.output_path
+            os.mkdir(normalize_path.prefix)
+            print "Batch run output will be in " + normalize_path.prefix
     
     
         if p['vc_info']:
@@ -639,7 +650,7 @@ class run_batch(ParameterizedFunction):
         param.parameterized.script_repr_suppress_defaults=False
     
         # Save a copy of the script file for reference
-        shutil.copy2(script_file, filepath.output_path)
+        shutil.copy2(script_file, normalize_path.prefix)
         shutil.move(normalize_path(scriptbase+".ty"),
                     normalize_path(simname+".ty"))
     

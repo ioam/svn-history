@@ -25,13 +25,12 @@ from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
 from tkFileDialog import asksaveasfilename,askopenfilename
 
 import param
-from param import tk
+from param import tk,normalize_path,resolve_path
 from param.external import Notebook
 
 import topo
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 from topo.misc.keyedlist import KeyedList
-from topo.misc.filepath import resolve_path,normalize_path
 from topo.misc.commandline import sim_name_from_filename
 import topo.command.basic
 

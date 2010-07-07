@@ -11,10 +11,10 @@ import tempfile
 import shutil
 import glob
 
+from param import normalize_path
+
 from topo.base.simulation import Simulation
 from topo.base.cf import CFSheet, CFProjection
-import topo.misc.filepath
-
 from topo.sheet import GeneratorSheet
 
 from topo.plotting.plotfilesaver import PlotGroupSaver
@@ -31,23 +31,23 @@ exec "from topo.command.analysis import *" in __main__.__dict__
 class TestPlotGroupSaverBase(unittest.TestCase):
 
     def exists(self,name):
-        target = os.path.join(topo.misc.filepath.output_path,name)
-        files = glob.glob(os.path.join(topo.misc.filepath.output_path,"*"))
+        target = os.path.join(normalize_path.prefix,name)
+        files = glob.glob(os.path.join(normalize_path.prefix,"*"))
         self.assert_(os.path.exists(target),
                      "'%s' not among '%s'"%(os.path.basename(target),
                                             [os.path.basename(f) for f in files]))
 
     def setUp(self):
-        self.original_output_path = topo.misc.filepath.output_path
-        topo.misc.filepath.output_path = tempfile.mkdtemp()
+        self.original_output_path = normalize_path.prefix
+        normalize_path.prefix = tempfile.mkdtemp()
         self.sim = Simulation(register=True,name="testplotfilesaver")
         self.sim['A'] = GeneratorSheet(nominal_density=2)
         self.sim['B'] = CFSheet(nominal_density=2)
         self.sim.connect('A','B',connection_type=CFProjection,name='Afferent')        
 
     def tearDown(self):
-        shutil.rmtree(topo.misc.filepath.output_path)
-        topo.misc.filepath.output_path = self.original_output_path
+        shutil.rmtree(normalize_path.prefix)
+        normalize_path.prefix = self.original_output_path
         
 
 class TestPlotGroupSaver(TestPlotGroupSaverBase):

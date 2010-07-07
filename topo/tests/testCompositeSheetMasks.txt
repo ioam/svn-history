@@ -1,7 +1,7 @@
 #
 # Load the setup script, defining TopRowMask, etc..
 #
->>> from topo.misc.filepath import resolve_path
+>>> from param import resolve_path
 >>> execfile(resolve_path('tests/sheetmask_setup.py'))
 >>> from topo.base.boundingregion import BoundingBox
 >>> ProjectionSheet.nominal_bounds=BoundingBox(radius=0.5)

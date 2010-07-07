@@ -13,8 +13,8 @@ import ImageOps
 import numpy
 
 import param
+from param import normalize_path
 
-from topo.misc.filepath import normalize_path
 import topo
 
 
