@@ -150,6 +150,7 @@ def _stuff(specified_targets):
     ## location of the examples directory
     import topo
     candidate_example_dirs = [
+        os.path.join(os.path.expanduser("~"),'topographica'),
         # version-controlled topographica dir
         os.path.join(topo._package_path,"../examples"),
         # package installed at <some path>/lib/python2.X/site-packages/topo
