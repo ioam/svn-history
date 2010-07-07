@@ -668,47 +668,33 @@ pg.add_plot('Corner Orientation Selectivity',[('Strength','OrientationSelectivit
 class measure_corner_angle_pref(PositionMeasurementCommand):
     """Generate the preference map for angle shapes, by collating the response to patterns."""
     
-    scale		= param.Number(  default=1.0 )
-    size		= param.Number(  default=0.2 )
-    positions		= param.Integer( default=6 )
-    x_range		= param.NumericTuple( (-1.0, 1.0) )
-    y_range		= param.NumericTuple( (-1.0, 1.0) )
-    num_or		= param.Integer(
-    		default		= 4,
-		bounds		= ( 1, None ),
-		softbounds	= ( 1, 24 ),
-		doc		= "Number of orientations to test."
-    )
-    angle_0	= param.Number(
-    		default		= 0.25 * pi,
-		bounds		= ( 0.0, pi ),
-		softbounds	= ( 0.0, 0.5 * pi ),
-                doc		= "First angle to test."
-    )
-    angle_1	= param.Number(
-    		default		= 0.75 * pi,
-		bounds		= ( 0.0, pi ),
-		softbounds	= ( 0.5 * pi, pi ),
-                doc		= "Last angle to test."
-    )
-    num_angle	= param.Integer(
-    		default		= 4,
-		bounds		= ( 1, None ),
-		softbounds	= ( 1, 12 ),
-                doc		= "Number of angles to test."
-    )
-    key_img_fname	= Filename(
-    		default		= 'command/key_angles.png',
-		doc		= "name of the file with the image used to code angles with hues"
-    )
-    pattern_presenter	= PatternPresenter(
-		GaussiansCorner(
-			aspect_ratio	= 4.0,
-			cross		= 0.85
-    		),
-		apply_output_fns=False,
-		duration=1.0
-    )
+    scale = param.Number(default=1.0)
+
+    size = param.Number(default=0.2)
+
+    positions = param.Integer(default=6)
+
+    x_range = param.NumericTuple((-1.0, 1.0))
+
+    y_range = param.NumericTuple((-1.0, 1.0))
+
+    num_or = param.Integer(default=4,bounds=(1,None),softbounds=(1,24),doc=
+        "Number of orientations to test.")
+    
+    angle_0 = param.Number(default=0.25*pi,bounds=(0.0,pi),softbounds=(0.0,0.5*pi),doc=
+        "First angle to test.")
+
+    angle_1 = param.Number(default=0.75*pi,bounds=(0.0,pi),softbounds=(0.5*pi,pi),doc=
+        "Last angle to test.")
+
+    num_angle=param.Integer(default=4,bounds=(1,None),softbounds=(1,12),doc=
+        "Number of angles to test.")
+
+    key_img_fname=Filename(default='command/key_angles.png',doc=
+        "Name of the file with the image used to code angles with hues.")
+
+    pattern_presenter=PatternPresenter(GaussiansCorner(aspect_ratio=4.0,cross=0.85),apply_output_fns=False,duration=1.0) 
+
     static_parameters = param.List( default=[ "size", "scale", "offset" ] )
 
     
@@ -719,22 +705,23 @@ class measure_corner_angle_pref(PositionMeasurementCommand):
         y_step	= ( p.y_range[1]-p.y_range[0] ) / float( p.positions - 1 )
 	o_step	= 2.0*pi / p.num_or
 	if p.angle_0 < p.angle_1:
-		angle_0	= p.angle_0
-		angle_1	= p.angle_1
+            angle_0 = p.angle_0
+            angle_1 = p.angle_1
 	else:
-		angle_0	= p.angle_1
-		angle_1	= p.angle_0
+            angle_0 = p.angle_1
+            angle_1 = p.angle_0
 	a_range	= ( angle_0, angle_1 )
 	a_step	= ( angle_1 - angle_0 ) / float( p.num_angle - 1 )
 	self._make_key_image( p )
         return [
-		Feature( name = "x",           range = p.x_range, step = x_step ),
-                Feature( name = "y",           range = p.y_range, step = y_step ),
-                Feature( name = "orientation", range = (0, 2*pi), step = o_step, cyclic = True ),
-                Feature( name = "angle",       range = a_range,   step = a_step,
-			value_offset     = - angle_0,
-			value_multiplier = 1. / ( angle_1 - angle_0 ) )
+            Feature( name = "x",           range = p.x_range, step = x_step ),
+            Feature( name = "y",           range = p.y_range, step = y_step ),
+            Feature( name = "orientation", range = (0, 2*pi), step = o_step, cyclic = True ),
+            Feature( name = "angle",       range = a_range,   step = a_step,
+                     value_offset     = - angle_0,
+                     value_multiplier = 1. / ( angle_1 - angle_0 ) )
 	]
+
 
     def _make_key_image( self, p ):
     	"""Generate the image with keys to hues used to code angles
