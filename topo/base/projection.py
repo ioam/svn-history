@@ -348,12 +348,6 @@ class ProjectionSheet(Sheet):
     
     src_ports=['Activity']
         
-    multiplicative_constant = param.Number(default = 0.0,doc="""
-        Constant value added to projection activity before combining multiplicatively.""")   
-       
-    divisive_constant = param.Number(default = 1.0,doc="""
-        Constant value added to projection activity before combining divisively.""")  
-
     # CEBALERT: why isn't this a parameter of Sheet?
     # Should be a MaskParameter for safety
     #mask = ClassSelectorParameter(SheetMask,default=SheetMask(),instantiate=True,doc="""
