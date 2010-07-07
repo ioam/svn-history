@@ -15,7 +15,7 @@ import topo.pattern.audio
 class TestAudio(unittest.TestCase):
 
     def setUp(self):
-        self.audio = pattern.audio.Audio(filename="sounds/test.wav")
+        self.audio = pattern.audio.AudioFile(filename="sounds/complex/daisy.wav")
 
     def test_basic(self):
         result = self.audio()
