@@ -1,5 +1,7 @@
 <H2>Developing Topographica with Git</H2>
 
+<!-- CEBALERT: this page should be in Developer_Manual/ -->
+
 <P>The master repository for Topographica code is stored by
 <a href="cvs.html">Subversion</a> (SVN) at SourceForge.net.  It is
 often useful to work on separate copies of the code, either to develop
