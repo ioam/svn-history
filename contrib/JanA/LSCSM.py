@@ -250,7 +250,7 @@ def fitLSCSMEvo(X,Y,num_lgn,num_neurons_to_estimate):
 	pop = ga.getPopulation()
 	#pop.scaleMethod.set(Scaling.SigmaTruncScaling)
 	
-	ga.evolve(freq_stats=100)
+	ga.evolve(freq_stats=1)
 	best = ga.bestIndividual()
 	#print best
 	inp = [v for v in best]
@@ -266,8 +266,26 @@ def fitLSCSMEvo(X,Y,num_lgn,num_neurons_to_estimate):
     return [Ks,rpi,ggevo.lscsm]	
     
 def runLSCSM():
+    import noiseEstimation
+    
     (sizex,sizey,training_inputs,training_set,validation_inputs,validation_set,ff,db_node) = contrib.JanA.dataimport.sortOutLoading(contrib.dd.DB(None))
     raw_validation_set = db_node.data["raw_validation_set"]
+    
+    num_pres,num_neurons = numpy.shape(training_set)
+    num_pres,kernel_size = numpy.shape(training_inputs)
+    size = numpy.sqrt(kernel_size)
+
+    raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
+    
+    normalized_noise_power = [noiseEstimation.signal_and_noise_power(raw_validation_data_set[i])[2] for i in xrange(0,num_neurons)]
+    
+    to_delete = numpy.array(numpy.nonzero((numpy.array(normalized_noise_power) > 85) * 1.0))[0]
+    
+    training_set = numpy.delete(training_set, to_delete, axis = 1)
+    validation_set = numpy.delete(validation_set, to_delete, axis = 1)
+    for i in xrange(0,10):
+        raw_validation_set[i] = numpy.delete(raw_validation_set[i], to_delete, axis = 1)
+    raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)	
     
     # creat history
     history_set = training_set[0:-1,:]
@@ -279,7 +297,6 @@ def runLSCSM():
     
     for i in xrange(0,len(raw_validation_set)):
 	raw_validation_set[i] = raw_validation_set[i][1:,:]
-
     
     print numpy.shape(training_inputs[0])
     
@@ -288,9 +305,8 @@ def runLSCSM():
     db_node1 = db_node
     db_node = db_node.get_child(params)
     
-    num_pres,num_neurons = numpy.shape(training_set)
-    num_pres,kernel_size = numpy.shape(training_inputs)
-    size = numpy.sqrt(kernel_size)
+    
+    
     num_neurons=__main__.__dict__.get('NumNeurons',103)
 
     sx,sy = numpy.shape(training_set)	
@@ -369,8 +385,6 @@ def runLSCSM():
     pylab.ylabel('GLM')
     pylab.savefig(normalize_path('GLM_vs_RPI_MSE.png'))
     
-    
-    raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
     
     print 'RPI \n'
 	
