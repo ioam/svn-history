@@ -1020,7 +1020,7 @@ class PowerSpectrum(PatternGenerator):
         http://docs.scipy.org/doc/numpy/reference/routines.window.html
         You can also supply your own.""")
 
-    min_frequency = param.Number(default=0,doc="""
+    min_frequency = param.Number(default=1,doc="""
         Smallest frequency for which to return an amplitude.""")
 
     max_frequency = param.Number(default=20000,doc="""
