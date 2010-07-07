@@ -22,7 +22,7 @@ try:
     import scikits.audiolab as pyaudiolab
 
 except ImportError:
-    param.Parameterized().warning("Not defining audio.py classes; scikits.audiolab (pyaudiolab) is not available.")
+    param.Parameterized().warning("audio.py classes will not be usable; scikits.audiolab (pyaudiolab) is not available.")
 
 
 # CEBALERT: should make super's window_length, window_overlap, sample_rate, 
