@@ -2,13 +2,6 @@
 release.  Changes and new features, already available in the
 <A HREF="../Downloads/cvs.html">SVN</A> version, include:
 
-<!-- ALERT: Need to add SigmoidedDoLG, LogGaussian, when moved
-  from contrib/lissom_audio.ty.  Do we need DifferenceOfGaussians?
-  Clean up and rename measure_frequency_pref.
-
-  Move patterns from contrib/hegdeessen.py to topo.pattern
--->
-
 <!-- Updated to r10814 -->
 <center>
 <table width="100%" cellpadding="5">
