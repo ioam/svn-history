@@ -156,6 +156,49 @@ guidelines for <a href="../Forums/problems.html">Reporting specific
 problems with Topographica</a>.
   
 <!----------------------------------------------------------------------------->
+
+
+<!----------------------------------------------------------------------------->
+<LI><B>Q:</B> <A NAME="easyinstall"></A><i>easy_install/pip failed while processing
+dependencies. What can I do now?</i>
+
+<P><B>A:</B> 
+
+easy_install and pip can sometimes encounter problems while processing
+dependencies. In such cases, installation will stop at the failed
+dependency, so it is usually straightforward to identify and fix the
+problem. Below we list some possibilities for solving easy_install/pip
+problems:
+
+<ul>
+
+<li>pip dependency-processing problems can sometimes be solved by
+installing the individual dependencies before running <code>pip
+install topographica</code>:
+<code>pip install numpy; pip install PIL</code> (then, optionally,
+other recommended dependencies). Once these are installed, repeat the
+<code>pip install topographica</code> command.</li>
+
+<li>Binaries of Topographica's required dependencies (NumPy and PIL)
+as well as recommended dependencies (MatPlotLib, gmpy) are available
+for many platforms. Once installed, repeat the <code>easy_install
+topographica</code> or <code>pip install topographica</code>
+command.</li>
+
+<li>If a binary is not available for your platform, you should check
+the dependency's installation instructions for your platform. Usually,
+you will need to make sure that you have typical code-building tools
+(e.g. a C/C++ compiler). Your distribution will usually have such
+tools available, e.g. the "build-essential" package on Ubuntu
+or <A HREF="http://developer.apple.com/technologies/tools/xcode.html">Xcode</A>
+on Mac. You will also need the Python headers, for which it might be
+necessary to install your distribution's "python-dev" or
+"python-devel" package.</li>
+
+</ul>
+
+<!----------------------------------------------------------------------------->
+
   
 </OL>
 

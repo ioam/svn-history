@@ -1,10 +1,15 @@
 <H1>Revision control</H1>
 
-<P>Revision control is by SVN.  Please check in changes as soon as
-they are stable, e.g. at least by the end of each significant workday.
-Conversely, be sure to update your checked out code before doing any
-new work.  The goal is to make sure that all developers are always
-working with the latest code.
+<P>Central revision control is by SVN.  Please check in changes as
+soon as they are stable, e.g. at least by the end of each significant
+workday.  Conversely, be sure to update your checked out code before
+doing any new work.  The goal is to make sure that all developers are
+always working with the latest code.
+
+<P>Note that although we describe rules here for SVN, any version
+control system that interacts with SVN can be used instead. The
+guidelines below for using SVN would still apply at the point of
+interaction with the central SVN repository.
 
 <P>Every SVN commit <em>must</em> include an informative log message,
 summarizing the items changed in easily understandable terms, and

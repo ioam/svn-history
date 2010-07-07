@@ -1,4 +1,4 @@
-<H2>Installing Topographica using Subversion</H2>
+<H2>Developing Topographica using Subversion</H2>
 
 <P><A HREF="http://subversion.tigris.org/">Subversion</A> (SVN) is the
 version control system used for managing Topographica development.  SVN
@@ -24,15 +24,13 @@ If you don't need the very latest updates, you can simply
 <a href="index.html">download a released version</a> instead of using
 SVN.
 
-
-<H3>Downloading via Subversion</H3>
-
 <P>Many platforms (e.g. most Linux and other UNIX platforms) already
 have all of the necessary programs and libraries required to obtain
 Topographica by SVN.  If your machine does not have <code>svn</code>
-installed, you will first need to obtain and install it. Instructions
-are given below for obtaining SVN on <A HREF="#mac">Mac</A> and
-<A HREF="#windows">Windows</A> platforms.
+installed, you will first need to <A
+HREF="http://subversion.apache.org/packages.html">install it</A>.
+
+<H3>Downloading via Subversion</H3>
 
 <P>Once you have SVN installed, the location (URL) of the Topographica
 repository to use is
@@ -61,31 +59,11 @@ present directory.
 <P>The checkout process will likely take several minutes (probably
 appearing to hang at certain points), as there are some extremely
 large files involved. Once it has completed, you can return to the
-instructions for <a href="index.html">installing Topographica</a> to
-go through the build process.
+instructions
+for <a href="../Developer_Manual/installation.html">installing
+Topographica</a> to go through the build process.
 
 
-<H4><A NAME="mac">Getting Subversion on Mac OS X</A></H4>
-
-<!-- note that out-of-date X11 instructions were removed in 
-r8900. At that revision, topographica wasn't working with X11.-->
-
-<P>You can download and install a binary version of svn from the <A
-HREF="http://subversion.tigris.org/getting.html">Subversion downloads
-page</A>, or you can use your package manager to install it. We have
-used Fink (installed as described in the list of <A
-HREF="index.html#mac-prerequisites">prerequisites</A> for Mac): in a
-Terminal window, type <code>fink install svn</code>.
-
-
-<H4><A NAME="windows">Getting Subversion on Windows</A></H4>
-
-<P>The easiest way to install Subversion on Windows is to download the
-installer from the <A
-HREF="http://subversion.tigris.org/getting.html">Subversion
-downloads</A> page. Whatever subversion client you get, you need to
-make sure it is in your MSYS path (by typing e.g. <code>export 
-PATH=/c/svnclient:$PATH</code>).
 
 
 <!--
@@ -150,7 +128,7 @@ replace <code>tags/LATEST_STABLE</code> with
 <code>branches/some-branch</code>.  Branches are listed on the 
 <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/branches/">branches
 page</a>, or you can run the command <code>svn ls --verbose
-$TOPOROOT/branchess/</code>.
+$TOPOROOT/branches/</code>.
 
 <P>You can discover if your copy is from the trunk or a particular
 branch or tag by typing <code>svn info | grep URL</code>.  Again, note

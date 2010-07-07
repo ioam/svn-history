@@ -148,9 +148,11 @@ your Git repository. These are discussed in the following sections.
 <H4>Tracking Topographica's SVN repository</H4>
 
 <P>To get updates from the Topographica SVN repository, your own copy
-should have no uncommitted changes. (If you do have uncommitted changes,
-the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-stash.html">git stash</A>
-command allows you to store those changes for later retrieval.)
+should have no uncommitted changes. (If you do have uncommitted
+changes,
+the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-stash.html">git
+stash</A> command allows you to store those changes for later
+retrieval.)
 
 <pre>
 # (git stash if required)
@@ -166,11 +168,11 @@ manual for further explanation.
 
 <H4>Sending your changes to Topographica's SVN trunk</H4>
 
-<P>Changes that you have committed in your local git repository are not
-automatically exported to the main SVN repository for Topographica,
-letting you use version control even for things that are not meant to
-be part of the main Topographica distribution.  If you do want your
-changes to be made public, then run:
+<P>Changes that you have committed in your local git repository are
+not automatically exported to the main SVN repository for
+Topographica, letting you use version control even for things that are
+not meant to be part of the main Topographica distribution.  If you do
+want your changes to be made public, then run:
 
 <pre>
 git svn dcommit
@@ -182,7 +184,8 @@ appears you made each of those changes one after the other in a
 batch. 
 
 <P>If you want to see exactly what is going to happen without making
-any actual changes, you might wish to try a 'dry run' first by specifying <code>-n</code>:
+any actual changes, you might wish to try a 'dry run' first by
+specifying <code>-n</code>:
 
 <P>As with SVN, before committing to the central repository you should
 first check that you have updated and tested your code with changes
@@ -194,6 +197,11 @@ while you were working on it) will stop the <code>dcommit</code>
 process, and the SVN error will be reported. At this point, you can
 use the usual git commands to deal with such merge conflicts.
 
+<P>Finally, note that it is possible to rewrite your history before
+sending your changes to SVN. This can be very useful to turn a large
+number of small changes into a few coherent ones. See the
+documentation of <code>git rebase</code> for more information.
+
 
 <H3>Taking advantage of more of Git's capabilities</H3>
 
@@ -203,19 +211,13 @@ advanced git usage (e.g. <a
 href="http://www-cs-students.stanford.edu/~blynn/gitmagic/">Git
 Magic</a>). Below, we describe a few particular features. 
 
-<P>Before using all of Git's capabilities on your git-svn repository,
-note that the <a
-href="http://www.kernel.org/pub/software/scm/git/docs/git-svn.html">official
-git-svn documentation</a> recommends against pulling changes into a
-git-svn repository (see "Caveats" on that page).
-
 
 <H4>Working on multiple independent features</H4>
 
-One thing that you will probably want to do as soon as you
-are familiar with basic git-svn operation is to use one branch to
-track the svn repository, and then use a new branch for each
-independent set of changes:
+One thing that you will probably want to do as soon as you are
+familiar with basic git-svn operation is to use one branch to track
+the svn repository, and then use a new branch for each independent set
+of changes:
 
 <pre>
 $ git checkout -b testing123
@@ -259,13 +261,51 @@ $ git checkout testing123
 $ git rebase master 
 </pre>
 
+The procedures described above are only suggestions. The only requirement
+is that, at the point of interaction with our SVN repository, you
+
+
 <H4>Sharing your work</H4>
 
 <P>If you are working on a complex new feature over a long period of
 time, you might want to share your work before it is finished. To do
 this, ask one of the Topographica admins to create a git repository
-for the feature on SourceForge.net*. The admin will give you a remote
+for the feature on SourceForge.net. The admin will give you a remote
 repository name (e.g. NAME), which you should tell git about:
+
+<!--
+ssh -t ceball,topographica@shell.sourceforge.net create
+cd /home/scm_git/t/to/topographica
+git --git-dir=ceball_houzi2 init --shared=all --bare
+emacs -nw ceball_houzi2/description
+emacs -nw ceball_houzi2/config # allow fastforwards - see above
+
+[receive]
+        denyNonFastforwards = false
+
+You should NOT do this if others are also actively developing on the
+remote, because the remote's history will be rewritten and they will
+get very confused.
+
+# Backups:
+rsync -av topographica.git.sourceforge.net::gitroot/topographica/* date-topographica-git
+ 
+
+# emails:
+
+create hook email file in hooks directory (copy from another repo on there
+or get ://git.kernel.org/?p=git/git.git;a=blob_plain;f=contrib/hooks/post-receive-email
+chmod a+x post-receive
+
+in git config,
+
+[hooks]
+        mailinglist = "name@address"
+        announcelist =
+        envelopesender =
+        emailprefix = "SF.net Git: "
+        showrev =
+-->
 
 <pre>
 $ git remote add NAME ssh://username@topographica.git.sourceforge.net/gitroot/topographica/NAME
@@ -274,21 +314,12 @@ $ git remote add NAME ssh://username@topographica.git.sourceforge.net/gitroot/to
 Then, you can push your repository to the host:
 
 <pre>
-$ git push NAME --mirror
+$ git push NAME
 </pre>
 
-You can have your commits pushed automatically; this way, the public
-repository will serve as a backup of your work:
-<pre>
-# This assumes you don't already have your own post-commit hooks;
-# if you do, modify the command below appropriately.
-$ echo "git push NAME --mirror" > .git/hooks/post-commit && chmod +x .git/hooks/post-commit
-</pre>
-
-If you are not connected to the network, the post-commit hook will
-fail, but the local commit will still be successful. You can use
-<code>git push NAME --mirror</code> later on to send all your changes
-to the remote repository.
+Note that you should read the documentation for <code>push</code> to
+ensure that you share the branch you are expecting to (you might want
+to use the <code>--all</code> or <code>--mirror</code> options).
 
 <P>
 If your repository is on SourceForge, it will be visible on the web:
@@ -296,10 +327,9 @@ If your repository is on SourceForge, it will be visible on the web:
 http://topographica.git.sourceforge.net/git/gitweb.cgi?p=topographica/NAME
 </pre>
 
-Others can get a copy of your repository using the
-following commands:
+Others can get a copy of your repository using the following command:
+
 <pre>
-# copies your repository into NAME/
 $ git clone git://topographica.git.sourceforge.net/gitroot/topographica/NAME
 </pre>
 
@@ -320,25 +350,18 @@ $ git fetch origin
 $ git rebase origin
 </pre>
 
-CEBALERT: should add doc about how to get someone's work
-as a branch in your existing git repository.
+See e.g. the
+tutorial <A HREF="http://toroid.org/ams/git-central-repo-howto">Using
+Git with a central repository</A> for more information about working
+with a central, shared repository.
 
-<!-- Keeping up to date with svn requires rebase; this will make your
-local repository incompatible with the remote one. Can fix this problem
-by putting the following into the remote's config file:
-
-[receive]
-        denyNonFastforwards = false
-
-You should NOT do this if others are also actively developing on the
-remote, because the remote's history will be rewritten and they will
-get very confused.
-
-http://stackoverflow.com/questions/559917/git-rebase-and-git-push-non-fast-forward-why-use
-http://stackoverflow.com/questions/253055/how-do-i-push-amended-commit-to-the-remote-git-repo
-
--->
-
+<P>One thing to bear in mind is that if you are using git to
+collaborate with others on a feature, you will not easily be able to
+keep your repository up to date with SVN by using <code>rebase</code>,
+since that will change your history, making it difficult to share
+changes with others.  If, however, no other user will be making
+changes to your published repostitory, then there will not be a
+problem.
 
 <P> Finally, once your feature is complete, you can commit all your
 work to the central SVN repository using <code>git svn dcommit</code>
@@ -347,46 +370,11 @@ will be able to continue using the remote repository (because svn does
 not have all the features of git, the "git svn dcommit" command
 necessarily alters the history of your local repository in a way that
 will likely leave it incompatible with that of the copy on the remote
-host). Anyway, you will most likely want to have the remote git
-repository deleted (or otherwise archived). Your local repository will
-of course remain usable, and you can create a new remote copy if you
-begin working on another extended feature.
+host). You will likely want to have the remote git repository archived
+at this point. Your local repository of course remains usable, and you
+can create a new remote copy if you begin working on another extended
+feature.
 
-<!--CEBALERT can't remember how to do footnotes-->
-<P><small>
-* Alternatively, find another host (which could be as simple as a
-networked machine).  You can even share directly from your machine,
-but that way you would lose the advantage of having an external
-backup.</small>
-
-<!--
-ssh -t ceball,topographica@shell.sourceforge.net create
-cd /home/scm_git/t/to/topographica
-git --git-dir=ceball_houzi2 init --shared=all --bare
-emacs -nw ceball_houzi2/description
-emacs -nw ceball_houzi2/config # allow fastforwards - see above
-
-# Backups:
-rsync -av topographica.git.sourceforge.net::gitroot/topographica/* date-topographica-git
- 
-
-# emails:
-
-create hook email file in hooks directory (copy from another repo on there
-or get ://git.kernel.org/?p=git/git.git;a=blob_plain;f=contrib/hooks/post-receive-email
-chmod a+x post-receive
-
-in git config,
-
-[hooks]
-        mailinglist = "name@address"
-        announcelist =
-        envelopesender =
-        emailprefix = "SF.net Git: "
-        showrev =
-
-
--->
 
 <!-- based on http://sourceforge.net/apps/trac/sourceforge/wiki/Git, http://www.naildrivin5.com/daveblog5000/?p=102 and
 http://projects.scipy.org/numpy/wiki/GitMirror to some extent -->
@@ -416,12 +404,15 @@ will have to use the latest svn version of Topographica), and your
 code will be publicly visible. You could use an svn branch to solve
 the first problem (though not the second), but it can be difficult
 later on to merge svn branches (i.e. to recombine your work with other
-people's work in svn).
+people's work in svn). You could also use e.g. rsync to maintain
+identical copies, but this does not have the flexibility of git
+(e.g. of allowing easy machine-specific modifications), and you would
+need to exclude built, binary files.
 
 <P>Assuming your work is already in a git repository (as described
-earlier in this document), you can use <code>git clone</code> on any
-other machine where you'd like to get a copy of your repository. The
-git documentation covers cloning, but here is an example over ssh:
+earlier), you can use <code>git clone</code> on any other machine
+where you'd like to get a copy of your repository. The git
+documentation covers cloning, but here is an example over ssh:
 <pre>
 git clone ssh://user@machine/path/to/repository
 </pre>
@@ -441,16 +432,16 @@ If you only ever make changes to the master copy, =git rebase= will be
 a simple operation and will only ever need to happen 'one way' (from
 the master copy to the other machine). Note, however, that git is very
 flexible, and it is easy to make changes to multiple copies while
-keeping them all in sync (use branches; see git documentation for
-<code>pull</code> or <code>fetch</code>+<code>rebase</code>). 
+keeping them all in sync (use branches and <code>pull</code>
+or <code>fetch</code>+<code>rebase</code>).
 
 <P>
-Additionally, you can use
-git to track modifications that should remain local to one
-machine. For instance, perhaps one copy is on a machine that needs
-special modifications to the code in order to run (e.g. a job
-submission command). You don't want to share such modifications, but
-it is still useful to have them under version control:
+Additionally, you can use git to track modifications that should
+remain local to one machine. For instance, perhaps one copy is on a
+machine that needs special modifications to the code in order to run
+(e.g. a job submission command). You don't want to share such
+modifications, but it is still useful to have them under version
+control:
 
 <pre>
 [oddmachine]$ git checkout -b oddbranch

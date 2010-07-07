@@ -1,6 +1,6 @@
 <H2>Topographica using Bazaar</H2>
 
-<P>** Draft documentation **
+<P>** Draft documentation; likely to be out of date **
 
 <P>The trunk of Topographica's SVN repository is continuously
 mirrored<sup><a href="#footnote-1">1</a></sup> to a public Bazaar
