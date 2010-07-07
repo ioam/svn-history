@@ -125,7 +125,6 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
         the value it would have has been changed.
         """
         # CEBALERT: fix this here and elsewhere
-	import param
         if type(self.single_cf_fn) is not IdentityTF:
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                

@@ -21,7 +21,7 @@ from inspect import getdoc
 
 from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, \
-     NORMAL, Scrollbar, Y, DoubleVar, Widget,Toplevel
+     NORMAL, Scrollbar, Y, DoubleVar, Widget
 from tkFileDialog import asksaveasfilename,askopenfilename
 
 import param

@@ -16,7 +16,7 @@ import math
 from random import Random, random
 
 
-from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST, OptionMenu, StringVar,Toplevel,Canvas,X,GROOVE,RAISED,Checkbutton,Menu,Scrollbar, SUNKEN,YES,Y,END,BOTH
+from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST, OptionMenu, StringVar,Canvas,X,GROOVE,RAISED,Checkbutton,Menu,Scrollbar, SUNKEN,YES,Y,END,BOTH
 from tkFileDialog import asksaveasfilename
 
 
