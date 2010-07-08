@@ -63,12 +63,9 @@ Python.
 Topographica into your system's Python directory, whereas we want to
 use the version-controlled directory. Also, you can delete
 the <code>external</code> directory, since you have already installed
-the external dependencies.
+the external dependencies. Now you can skip to
+the <A HREF="#postinstall">after installation</A> section below.
 
-<P>To launch Topographica, run the <code>topographica</code> script
-from within the version controlled topographica directory. You can
-check that Topographica is working as expected by running <code>make
-tests</code>.
 
 
 <H3>(2) Build all Topographica's dependencies</H3>
@@ -133,16 +130,15 @@ Topographica does not need any special access to your system.  The
 build process will take a while to complete (e.g. about 5-10 minutes
 on a 1.5GHz Pentium IV machine with a local disk).
 
-<P>If all goes well, a script named <code>topographica</code> will be
-created in the <code>topographica/</code> directory. If you have
-problems during the build process, try adding <code>-k</code> to the
-<code>make</code> command, which will allow the make process to skip
-any components that do not build properly on your
-machine. Topographica is highly modular, and most functionality should
-be accessible even without some of those components. 
+<P>If you have problems during the build process, try
+adding <code>-k</code> to the <code>make</code> command, which will
+allow the make process to skip any components that do not build
+properly on your machine. Topographica is highly modular, and most
+functionality should be accessible even without some of those
+components.
 
-<P>If desired, you can also make local copies of the HTML
-documentation from the web site. To do so, you must have the php,
+<P><i>optional</i>: If desired, you can also make local copies of the
+HTML documentation from the web site. To do so, you must have the php,
 bibtex, convert, and fig2dev commands installed; type <code>make
 all</code> instead of (or after) <code>make</code>.  (If you don't
 have those commands, in most distributions you can get them by
@@ -150,7 +146,29 @@ installing the php5-cli, tetex, imagemagick, and transfig
 <!--CEBALERT: tetex not in ubuntu 9.04; not sure what the new package
 is--> packages).  <code>make all</code> will also run the regression
 tests and example files, to ensure that everything is functioning
-properly on your system.  If you do the tests on a machine without a
-functioning DISPLAY, such as a remote text-only session, there will be
-some warnings about GUI tests being skipped.
+properly on your system.
+
+<P>If building was successful, a script
+named <code>topographica</code> will have been created in the
+topographica directory, and you can proceed to
+the <A HREF="#postinstall">after installation</A> section below.
+
+
+<H3><A NAME="postinstall">After installation</A></H3>
+
+<P>You can check that Topographica is working as expected by
+running <code>make tests</code> from within the topographica
+directory. To launch Topographica itself, enter <code>./topographica
+-g</code> (or just <code>./topographica</code> for no GUI) from within
+the version-controlled topographica directory, or else enter the full
+path to the script. (Note that wherever instructions elsewhere say to
+"run <code>topographica</code>", you will need to do this.) You can
+check that Topographica is working as expected by running <code>make
+tests</code>. If you do the tests on a machine without a functioning
+DISPLAY, such as a remote text-only session, there will be some
+warnings about GUI tests being skipped.
+
+
+
+  
 
