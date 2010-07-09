@@ -26,6 +26,7 @@ GUI = 1
 # set to empty when building 'release' debs.
 DEBSTATUS = -unstable
 
+
 # CEBALERT: tied to exact windows version!
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
 	TIMER = 
@@ -68,6 +69,8 @@ default: ext-packages topographica
 
 all: default reference-manual doc tests examples 
 
+# CEBALERT: should be able to remove topo/tests/testsnapshot.typ,
+# topo/tests/testplotfilesaver*.png
 clean: clean-doc clean-ext-packages clean-compiled 
 	${RM} .??*~ *~ */*~ */.??*~ */*/*~ */*/.??*~ */*/*/*~ */*/*/.??*~ *.bak
 	${RM} .#??*.* */.#??*.* */*/.#??*.* */*/*/.#??*.* current_profile ./topo/tests/testsnapshot.typ ./topo/tests/testplotfilesaver*.png
@@ -152,12 +155,12 @@ TRAINDATA =${subst ^,topo/tests/,${subst .ty,.ty_DATA,${TRAINSCRIPTS}}}
 TRAINTESTS=${subst ^,topo/tests/,${subst .ty,.ty_TEST,${TRAINSCRIPTS}}}
 
 SPEEDSCRIPTS=${SCRIPTS}
-SPEEDDATA =${subst ^,topo/tests/,${subst .ty,.ty_SPEEDDATA,${SPEEDSCRIPTS}}}
-SPEEDTESTS=${subst ^,topo/tests/,${subst .ty,.ty_SPEEDTEST,${SPEEDSCRIPTS}}}
+SPEEDDATA =${subst ^,tests/,${subst .ty,.ty_SPEEDDATA,${SPEEDSCRIPTS}}}
+SPEEDTESTS=${subst ^,tests/,${subst .ty,.ty_SPEEDTEST,${SPEEDSCRIPTS}}}
 
 STARTUPSPEEDSCRIPTS= ^lissom_oo_or.ty ^lissom_or.ty  
-STARTUPSPEEDDATA =${subst ^,topo/tests/,${subst .ty,.ty_STARTUPSPEEDDATA,${STARTUPSPEEDSCRIPTS}}}
-STARTUPSPEEDTESTS=${subst ^,topo/tests/,${subst .ty,.ty_STARTUPSPEEDTEST,${STARTUPSPEEDSCRIPTS}}}
+STARTUPSPEEDDATA =${subst ^,tests/,${subst .ty,.ty_STARTUPSPEEDDATA,${STARTUPSPEEDSCRIPTS}}}
+STARTUPSPEEDTESTS=${subst ^,tests/,${subst .ty,.ty_STARTUPSPEEDTEST,${STARTUPSPEEDSCRIPTS}}}
 
 
 # CB: when changing the various targets, don't forget about buildbot. 
@@ -200,10 +203,10 @@ slow-tests: print-info train-tests all-speed-tests map-tests
 
 # General rules for generating test data and running the tests
 %_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",run_for=[1,99,150],look_at="V1",cortex_density=8,retina_density=24,lgn_density=24)'
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/${notdir $*}",data_filename="tests/${notdir $*}_DATA",run_for=[1,99,150],look_at="V1",cortex_density=8,retina_density=24,lgn_density=24)'
 
 %_TEST: %_DATA
-	${TIMER}./topographica -c 'import_weave=${IMPORT_WEAVE}' -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",decimal=${TESTDP})'
+	${TIMER}./topographica -c 'import_weave=${IMPORT_WEAVE}' -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="tests/${notdir $*}_DATA",decimal=${TESTDP})'
 # CB: Beyond 14 dp, the results of the current tests do not match on
 # ppc64 and i686 (using linux).  In the future, decimal=14 might have
 # to be reduced (if the tests change, or to accommodate other
@@ -215,33 +218,33 @@ v_lissom:
 
 
 %_SPEEDDATA:
-	${TIMER}./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/${notdir $*}",iterations=250,data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
+	${TIMER}./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/${notdir $*}",iterations=250,data_filename="tests/${notdir $*}_SPEEDDATA")'
 
 %_SPEEDTEST: %_SPEEDDATA
-	${TIMER}./topographica -c 'from topo.tests.test_script import compare_speed_data; compare_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
+	${TIMER}./topographica -c 'from topo.tests.test_script import compare_speed_data; compare_speed_data(script="examples/${notdir $*}",data_filename="tests/${notdir $*}_SPEEDDATA")'
 
 
 %_STARTUPSPEEDDATA:
-	${TIMER}./topographica -c 'from topo.tests.test_script import generate_startup_speed_data; generate_startup_speed_data(script="examples/${notdir $*}",density=48,data_filename="topo/tests/${notdir $*}_STARTUPSPEEDDATA")'
+	${TIMER}./topographica -c 'from topo.tests.test_script import generate_startup_speed_data; generate_startup_speed_data(script="examples/${notdir $*}",density=48,data_filename="tests/${notdir $*}_STARTUPSPEEDDATA")'
 
 %_STARTUPSPEEDTEST: %_STARTUPSPEEDDATA
-	${TIMER}./topographica -c 'from topo.tests.test_script import compare_startup_speed_data; compare_startup_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_STARTUPSPEEDDATA")'
+	${TIMER}./topographica -c 'from topo.tests.test_script import compare_startup_speed_data; compare_startup_speed_data(script="examples/${notdir $*}",data_filename="tests/${notdir $*}_STARTUPSPEEDDATA")'
 
 .SECONDARY: ${SPEEDDATA} ${TRAINDATA} ${STARTUPSPEEDDATA} # Make sure that *_*DATA is kept around
 
 
 # Special versions for specific scripts:
 topo/tests/lissom.ty_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_DATA",run_for=[1,99,150],look_at="V1",cortex_density=8,retina_density=6,lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom.ty",data_filename="tests/lissom.ty_DATA",run_for=[1,99,150],look_at="V1",cortex_density=8,retina_density=6,lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
 
 topo/tests/lissom.ty_SPEEDDATA:
-	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_SPEEDDATA",iterations=250,cortex_density=8,retina_density=6,lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
+	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/lissom.ty",data_filename="tests/lissom.ty_SPEEDDATA",iterations=250,cortex_density=8,retina_density=6,lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
 
 topo/tests/lissom_fsa.ty_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_fsa.ty",data_filename="topo/tests/lissom_fsa.ty_DATA",run_for=[1,99,150],look_at="FSA",cortex_density=8,retina_density=24,lgn_density=24)'
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_fsa.ty",data_filename="tests/lissom_fsa.ty_DATA",run_for=[1,99,150],look_at="FSA",cortex_density=8,retina_density=24,lgn_density=24)'
 
 topo/tests/lissom_whisker_barrels.ty_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_whisker_barrels.ty",data_filename="topo/tests/lissom_whisker_barrels.ty_DATA",run_for=[1,99,150],look_at="S1")'
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_whisker_barrels.ty",data_filename="tests/lissom_whisker_barrels.ty_DATA",run_for=[1,99,150],look_at="S1")'
 
 
 

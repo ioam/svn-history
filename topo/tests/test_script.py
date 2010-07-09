@@ -17,7 +17,6 @@ from param import resolve_path, normalize_path
 
 import topo
 
-
 ### train-tests
 
 def generate_data(script="examples/lissom_oo_or.ty",data_filename=None,
@@ -50,8 +49,10 @@ def generate_data(script="examples/lissom_oo_or.ty",data_filename=None,
     data['args']=args
     data['run_for']=run_for
     data['look_at']=look_at
-    
-    pickle.dump(data,open(normalize_path(data_filename),'wb'),2)
+
+    locn = normalize_path(data_filename)
+    print "Saving data to %s"%locn
+    pickle.dump(data,open(locn,'wb'),2)
 
 # old name
 GenerateData=generate_data
@@ -85,12 +86,16 @@ def test_script(script="examples/lissom_oo_or.ty",data_filename=None,decimal=Non
     """
     if data_filename==None:
         data_filename=script+"_DATA"
-        
+    
+    locn = resolve_path(data_filename)
     try:
-        data = pickle.load(open(resolve_path(data_filename),"rb"))
+        data = pickle.load(open(locn,"rb"))
     except IOError:
         print "\nData file '"+data_filename+"' could not be opened; run GenerateData() to create a data file before making changes to the script you wish to check."
         raise
+
+    print "Reading data from %s"%locn
+
 
     # retrieve parameters used when script was run
     run_for=data['run_for']
@@ -161,7 +166,10 @@ def generate_speed_data(script="examples/lissom_oo_or.ty",iterations=100,data_fi
                   'iterations':iterations,
                   'how_long':how_long}
 
-    pickle.dump(speed_data,open(normalize_path(data_filename),'wb'),2)
+
+    locn = normalize_path(data_filename)
+    print "Saving data to %s"%locn
+    pickle.dump(speed_data,open(locn,'wb'),2)
 
 
 
@@ -173,7 +181,10 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
     if data_filename==None:
         data_filename=script+"_SPEEDDATA"
 
-    speed_data_file = open(resolve_path(data_filename),'r')
+    locn = resolve_path(data_filename)
+    print "Reading data from %s"%locn
+
+    speed_data_file = open(locn,'r')
 
     try:
         speed_data = pickle.load(speed_data_file)

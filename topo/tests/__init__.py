@@ -133,6 +133,7 @@ __version__='$Revision$'
 
 
 import unittest,doctest,os,re,fnmatch
+import param
 
 # Automatically discover all test*.py files in this directory
 __all__ = [re.sub('\.py$','',f)
@@ -140,12 +141,20 @@ __all__ = [re.sub('\.py$','',f)
 
 all_doctest = sorted(fnmatch.filter(os.listdir(__path__[0]),'test*.txt'))
 
+# location in which to create semi-permanent test data
+output_path = param.normalize_path.prefix
+tests_output_path = os.path.join(output_path,'tests')
+if not os.path.exists(tests_output_path):
+    print "Creating %s"%tests_output_path
+    os.mkdir(tests_output_path)
+
+
+
 try:
     import Tkinter
 except ImportError:
     tk_tests = fnmatch.filter(__all__,'*_tk')
     tk_doctests = fnmatch.filter(all_doctest,'*_tk')
-    import param
     param.Parameterized().warning('no Tkinter module: skipping %s'%str(tk_tests+tk_doctests))
     for t in tk_tests:
         __all__.remove(t)
