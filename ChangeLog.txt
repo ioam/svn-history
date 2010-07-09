@@ -1,3 +1,425 @@
+2010-07-09  jbednar
+
+	* [r11154] topo/command/analysis.py:
+	  Minor cleanup of organization
+
+	* [r11153] examples/lissom_whisker_barrels.ty:
+	  Minor cleanup
+
+2010-07-09  ceball
+
+	* [r11152] Makefile,
+	  topo/tests/__init__.py,
+	  topo/tests/test_script.py:
+	  Semi-permanent test data is stored in 'default output path'/tests
+	  (created if necessary). Locations of test data being read and
+	  saved are now printed. Updated test paths.
+
+	* [r11151] topo/misc/genexamples.py:
+	  Made find_examples() and print_examples() functions.
+
+2010-07-09  jbednar
+
+	* [r11150] examples/lissom_whisker_barrels.ty:
+	  Further cleanup
+
+2010-07-09  ceball
+
+	* [r11149] topo/tests/gca_lissom.ty_SPEEDDATA,
+	  topo/tests/lissom_fsa.ty_SPEEDDATA:
+	  Removed 'speed data', which should not be checked in (it is
+	  machine-specific).
+
+2010-07-09  jbednar
+
+	* [r11148] examples/lissom_whisker_barrels.ty:
+	  Partly cleaned up to match conventions
+
+	* [r11147] examples/lissom_whisker_barrels.ty:
+	  Partly cleaned up to match conventions
+
+	* [r11146] examples/lissom_whisker_barrels.ty:
+	  Slightly corrected version from Stuart
+
+2010-07-09  ceball
+
+	* [r11145] param/parameterized.py:
+	  Added repr() for Parameter, so they are represented reasonably.
+	  When displayed as part of help(parameterized), parameters'
+	  default values, bounds, etc, will be shown.
+
+	* [r11144]
+	  doc/Developer_Manual/imports_text.php,
+	  param/parameterized.py,
+	  topo/analysis/vision.py,
+	  topo/command/basic.py,
+	  topo/command/pylabplot.py,
+	  topo/misc/commandline.py,
+	  topo/tests/__init__.py,
+	  topo/tkgui/topoconsole.py:
+	  Added Command(ParameterizedFunction) class. Commands should
+	  inherit from this class, so that exceptions when calling them can
+	  be handled gracefully. Added mechanism to allow code that depends
+	  on an optional module to create classes etc to be run, deferring
+	  the ImportException to the point of use (allows user to learn
+	  about possibilties even if he/she is missing an optional module).
+	  Made Matplotlib be optional.
+
+	* [r11143] topo/misc/genexamples.py:
+	  Print where the examples were found. Also some cleaning and
+	  corrections.
+
+2010-07-08  ceball
+
+	* [r11142]
+	  doc/Developer_Manual/installation_text.php:
+	  Minor tidying.
+
+2010-07-07  antolikjan
+
+	* [r11141] contrib/JanA/LSCSM.py:
+	  new version
+
+	* [r11140] contrib/JanA/LSCSM.py:
+	  new version
+
+2010-07-07  ceball
+
+	* [r11139] topo/misc/genexamples.py:
+	  Added missing path.
+
+	* [r11138] examples/run.py,
+	  topo/misc/genexamples.py:
+	  Moved examples/run.py to topo/misc/genexamples.py, and made it
+	  work however Topographica was installed.
+
+	* [r11137] Makefile,
+	  contrib/jaanalysis.py,
+	  contrib/jacommands.py,
+	  contrib/jsldefs.py,
+	  contrib/modelfit.py,
+	  contrib/surround_analysis.py,
+	  doc/Developer_Manual/coding_text.php,
+	  examples/lissom_or_movie.ty,
+	  param/__init__.py,
+	  param/tk.py,
+	  topo/__init__.py,
+	  topo/analysis/vision.py,
+	  topo/command/analysis.py,
+	  topo/command/basic.py,
+	  topo/command/pylabplot.py,
+	  topo/misc/__init__.py,
+	  topo/misc/commandline.py,
+	  topo/misc/filepath.py,
+	  topo/misc/trace.py,
+	  topo/pattern/audio.py,
+	  topo/pattern/image.py,
+	  topo/plotting/bitmap.py,
+	  topo/plotting/plotfilesaver.py,
+	  topo/plotting/plotgroup.py,
+	  topo/tests/testCompositeSheetMasks.txt,
+	  topo/tests/test_map_measurement.py,
+	  topo/tests/test_script.py,
+	  topo/tests/testbitmap.py,
+	  topo/tests/testimage.py,
+	  topo/tests/testplotfilesaver.py,
+	  topo/tests/testsnapshots.py,
+	  topo/tkgui/editor.py,
+	  topo/tkgui/templateplotgrouppanel.py,
+	  topo/tkgui/topoconsole.py:
+	  Moved resolve_path, normalize_path, and Filename out of
+	  topo.misc.filepath and into topo.param. Cleaned up 'special
+	  paths' (application_path, output_path, package_path).
+
+	* [r11136] doc/Developer_Manual,
+	  doc/Downloads,
+	  doc/Downloads/git_text.php:
+	  Updated ignore lists and added comment.
+
+	* [r11135] doc/Developer_Manual/index_text.php,
+	  doc/Developer_Manual/installation_text.php,
+	  doc/Developer_Manual/revisioncontrol_text.php,
+	  doc/Downloads/bzr_text.php,
+	  doc/Downloads/cvs_text.php,
+	  doc/Downloads/existingpython_text.php,
+	  doc/Downloads/git_text.php,
+	  doc/Downloads/index_text.php,
+	  doc/FAQ/index_text.php:
+	  Reorganized download documentation. 'Basic' installation page is
+	  supposed to be simpler, but with the chance for developers or
+	  experienced python users to jump to more complex options.
+
+2010-07-07  jbednar
+
+	* [r11134] topo/pattern/audio.py:
+	  Tweaked error message
+
+	* [r11133] topo/pattern/audio.py:
+	  Restored old error handling for when pyaudiolab is not present
+
+	* [r11132] doc/News/index_text.php:
+	  Removed note
+
+	* [r11131] topo/command/analysis.py:
+	  Cleaned up formatting
+
+	* [r11130] topo/pattern/basic.py:
+	  Changed default min_frequency to a nonzero value to make it work
+	  with log10, so that AudioFile can be instantiated with default
+	  parameters
+
+	* [r11129] topo/base/projection.py:
+	  Removed unused parameters
+
+	* [r11128] topo/tests/testaudio.py:
+	  Brought Audio test up to date
+
+	* [r11127] topo/tkgui/editor.py,
+	  topo/tkgui/topoconsole.py,
+	  topo/transferfn/optimized.py:
+	  Removed unused import
+
+2010-07-06  ceball
+
+	* [r11126] setup.py:
+	  setup.py now installs examples to
+	  prefix/share/topographica/examples.
+
+2010-07-05  ceball
+
+	* [r11125] examples/lissom.ty:
+	  Corrected out-of-date name for individual normalization.
+
+	* [r11124] param/__init__.py:
+	  Fixed bug where default value was a list.
+
+2010-07-05  jbednar
+
+	* [r11123] topo/pattern/basic.py:
+	  Cleaned up docs and comments. Marked PowerSpectrum and
+	  Spectrogram abstract for now, as they are not useful in the GUI.
+	  Provided a more useful default for PowerSpectrum.window_length.
+	  Removed default value for the signal argument, as it is not
+	  currently usable with default values anyway. Added sanity check
+	  on window size.
+
+	* [r11122] topo/pattern/audio.py:
+	  Made AudioFile and AudioFolder disappear entirely if pyaudiolab
+	  is not available.
+
+2010-07-05  ceball
+
+	* [r11121] contrib/basic.py,
+	  contrib/lissom_rgb.ty,
+	  examples/gca_lissom.ty,
+	  examples/lissom.ty,
+	  param/__init__.py,
+	  topo/coordmapper/basic.py,
+	  topo/pattern/image.py,
+	  topo/plotting/plotgroup.py,
+	  topo/tests/testEnumerationParameter.txt,
+	  topo/tkgui/editor.py:
+	  Simplified param.ObjectSelector by removing 'allow_None'.
+	  param.ObjectSelector now restricts values to be among specified
+	  objects by default (whereas if no objects are supplied, values
+	  are not restricted).
+
+2010-07-05  jbednar
+
+	* [r11120] doc/Makefile:
+	  Enabled classtrees in reference manual
+
+	* [r11119] topo/command/basic.py:
+	  Force non-XML pickles to be opened in binary mode on all
+	  platforms
+
+2010-07-05  ceball
+
+	* [r11118]
+	  topo/tests/testEnumerationParameter.txt:
+	  Updated test after removing param.Enumeration.
+
+	* [r11117] param/__init__.py:
+	  Temporary fix to ObjectSelector: when check_value() is called as
+	  the parameter is being created, and the default value fails the
+	  check, attrib_name has not yet been set.
+
+	* [r11116] param/tk.py:
+	  Added missing return statement, which had been preventing
+	  topoconsole's 'refresh_plots_menu() from working under some
+	  circumstances.
+
+	* [r11115] contrib/basic.py,
+	  contrib/lissom_rgb.ty,
+	  examples/gca_lissom.ty,
+	  examples/lissom.ty,
+	  param/__init__.py,
+	  topo/coordmapper/basic.py,
+	  topo/misc/legacy.py,
+	  topo/pattern/basic.py,
+	  topo/pattern/image.py,
+	  topo/tkgui/editor.py:
+	  Removed redundant param.Enumeration (replaced with
+	  param.ObjectSelector); SF #2630230.
+
+	* [r11114] topo/command/pylabplot.py:
+	  File missed from previous commit (svn does some strange
+	  things...).
+
+	* [r11113] external/Makefile:
+	  Made python depend on zlib, since we are now including zlib (and
+	  Python skips building some modules if zlib is not available).
+
+	* [r11112] doc/FAQ/index_text.php,
+	  doc/User_Manual/commandline_text.php,
+	  doc/User_Manual/noise_text.php,
+	  doc/User_Manual/overview_text.php,
+	  doc/User_Manual/patterns_text.php,
+	  doc/User_Manual/plotting_text.php,
+	  doc/buildbot/bbanalysis.py,
+	  topo/tests/reference/lissom_fsa_reference.ty:
+	  Updated documentation after recent reorganizations.
+
+	* [r11111] examples/lissom.ty,
+	  examples/run.py,
+	  topo/analysis/vision.py,
+	  topo/command/pylabplots.py,
+	  topo/misc/legacy.py,
+	  topo/sheet/slissom.py,
+	  topo/tests/gui_tests.py,
+	  topo/tests/test_map_measurement.py,
+	  topo/tests/testimage.py,
+	  topo/tkgui/plotgrouppanel.py,
+	  topo/tkgui/templateplotgrouppanel.py:
+	  Renamed topo.command.pylabplots to topo.command.pylabplot (SF
+	  #2631254).
+
+	* [r11110] topo/misc/generatorsheet.py,
+	  topo/sheet/basic.py,
+	  topo/tkgui/plotgrouppanel.py,
+	  topo/tkgui/projectionpanel.py,
+	  topo/tkgui/testpattern.py:
+	  Moved definition of GeneratorSheet from topo.sheet to
+	  topo.misc.generatorsheet so that it can be used independently of
+	  importing topo.sheet library (partially addresses SF #2657028).
+
+	* [r11109] Makefile:
+	  Fixed missing argument from recent change.
+
+	* [r11108] contrib/cc_lesi_final.ty,
+	  contrib/cc_lesi_final_new.ty,
+	  contrib/cc_lesi_oo_or.ty,
+	  contrib/cc_lesi_oo_or_new.ty,
+	  contrib/cc_lissom_oo_or_simple_rv.ty,
+	  contrib/gc_alissom.ty,
+	  contrib/gc_lissom_oo_or_homeostatic_new.ty,
+	  contrib/jacommands.py,
+	  contrib/jm_cc_lissom.ty,
+	  contrib/lesi_whisker_barrels.ty,
+	  contrib/lissom_oo_or_homeostatic.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked_new.ty,
+	  contrib/lissom_oo_or_noshrinking.ty,
+	  contrib/modelfit.py,
+	  contrib/sparse_connectivity_LESI.ty,
+	  contrib/sparse_connectivity_model.ty,
+	  contrib/species_cf_jitter.ty,
+	  contrib/species_lat_jitter.ty,
+	  contrib/species_pf_jitter.ty,
+	  examples/gca_lissom.ty,
+	  examples/obermayer_pnas90.ty,
+	  examples/som_retinotopy.ty,
+	  examples/sullivan_neurocomputing04.ty,
+	  topo/misc/legacy.py,
+	  topo/pattern/basic.py,
+	  topo/transferfn/basic.py,
+	  topo/transferfn/misc.py:
+	  Moved TransferFns with complex dependencies out of
+	  transferfn.basic into transferfn.misc. Fixes SF #2945499.
+
+2010-07-04  ceball
+
+	* [r11107] examples/leaky_lissom_or.ty,
+	  examples/lissom_whisker_barrels.ty,
+	  examples/obermayer_pnas90.ty,
+	  examples/saccade_demo.ty:
+	  Examples missed from previous commit.
+
+	* [r11106] contrib/basic.py,
+	  contrib/cc_lesi_final.ty,
+	  contrib/cc_lesi_final_new.ty,
+	  contrib/cc_lesi_oo_or.ty,
+	  contrib/cc_lesi_oo_or_new.ty,
+	  contrib/cc_lissom_oo_or_simple_rv.ty,
+	  contrib/gc_alissom.ty,
+	  contrib/gc_lissom_oo_or_homeostatic_new.ty,
+	  contrib/helper.py,
+	  contrib/jacommands.py,
+	  contrib/jm_cc_lissom.ty,
+	  contrib/jm_plotting.py,
+	  contrib/lesi.ty,
+	  contrib/lesi_judethesisversion.ty,
+	  contrib/lesi_whisker_barrels.ty,
+	  contrib/lgn_lateral.ty,
+	  contrib/lissom_oo_or_homeostatic.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked_new.ty,
+	  contrib/lissom_oo_or_noshrinking.ty,
+	  contrib/lissom_oo_or_noshrinking_latswitch.ty,
+	  contrib/lissom_or_noshrinking.ty,
+	  contrib/lissom_or_noshrinking_latswitch.ty,
+	  contrib/modelfit.py,
+	  contrib/sparse_connectivity_LESI.ty,
+	  contrib/sparse_connectivity_model.ty,
+	  contrib/species_cf_jitter.ty,
+	  contrib/species_lat_jitter.ty,
+	  contrib/species_pf_jitter.ty,
+	  contrib/surround_analysis.py,
+	  topo/analysis/vision.py,
+	  topo/command/analysis.py,
+	  topo/coordmapper/basic.py,
+	  topo/misc/__init__.py,
+	  topo/misc/legacy.py,
+	  topo/misc/numbergenerator.py,
+	  topo/pattern/basic.py,
+	  topo/tests/gui_tests.py,
+	  topo/tests/testCompositePatternGenerators.txt,
+	  topo/tests/testDynamicParameter.txt,
+	  topo/tests/testNumberParameter.txt,
+	  topo/tests/test_pattern_present.txt,
+	  topo/tests/testcfsom.py,
+	  topo/tests/testgmpynumber.txt,
+	  topo/tests/testparameterizedobject.py,
+	  topo/tests/testpatterngenerator.py,
+	  topo/transferfn/basic.py:
+	  Removed topo.misc.numbergenerator (SF #2631258).
+
+	* [r11105] Makefile,
+	  create_topographica_script.py:
+	  When Topographica and its dependencies are built from source,
+	  Python's site.USER_SITE is ignored by passing '-s' to Python.
+	  Fixes sf.net bug 2965099.
+
+	* [r11104]
+	  doc/Developer_Manual/revisioncontrol_text.php:
+	  Fixed typo.
+
+	* [r11103] param/tk.py:
+	  Added GUI support for Filename parameter. Fixes sf.net bugs
+	  2970815 and 2725796.
+
+2010-07-04  jbednar
+
+	* [r11102] doc/Home/news_text.php,
+	  doc/News/index_text.php:
+	  Brought news up to date
+
+	* [r11101] topo/pattern/basic.py:
+	  Cleaned up whitespace
+
+	* [r11100] ChangeLog.txt:
+	  Updated to r11099
+
 2010-07-02  ceball
 
 	* [r11099] Makefile:
