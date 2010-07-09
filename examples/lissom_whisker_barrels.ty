@@ -1,40 +1,37 @@
 """
-	This topographica scipt (www.topographica.org) generates and then displays a somatotopically
-	aligned map of whisker deflection direction, as measured in layer 2/3 rat somatosensory 
-	cortex, and reported in:
-	
-	Wilson SP, Law JS, Mitchinson B, Prescott TJ, Bednar JA (2010)
-	Modeling the emergence of whisker direction maps in rat barrel cortex. 
-	PLoS ONE 5(1): e8778. doi:10.1371/journal.pone.0008778
-	
-	Running this script with the default parameters will reproduce the
-	main result in Figure 3a of Wilson et al 2010. Run it from a terminal
-	using the following; 
-	
-	$ cd topographica
-	$ ./topographica examples/lissom_whisker_barrels.ty
-	
+Topographica (see topographica.org) model of a somatotopically aligned
+map of whisker deflection direction, as measured in layer 2/3 rat
+somatosensory cortex.  Replicates results from:
+
+  Wilson SP, Law JS, Mitchinson B, Prescott TJ, Bednar JA (2010)
+  Modeling the emergence of whisker direction maps in rat barrel cortex.
+  PLoS ONE 5(1): e8778. doi:10.1371/journal.pone.0008778
+
+Running this script with the default parameters will reproduce the
+main result in Figure 3a of Wilson et al. (2010). Run it from a
+terminal using the following:
+
+$ ./topographica examples/lissom_whisker_barrels.ty
+
 $Id$
 """
 __version__='$Revision$'
 
 
-# Import libraries
+from math import pi, sqrt
+
 import numpy
-from topo import param
+import param
+
+from topo import learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet,coordmapper
+
+import topo.learningfn.optimized
+import topo.learningfn.projfn
+import topo.transferfn.optimized
 import topo.pattern.random
-from math import fmod, sqrt
-from fixedpoint import FixedPoint
-from topo.sheet.lissom import LISSOM
-from topo.sheet.basic import GeneratorSheet
-from topo.projection.basic import CFProjection
-from topo.pattern.basic import Gaussian
-from topo.pattern.random import RandomGenerator
-from topo.base.boundingregion import BoundingBox, BoundingCircle
-from topo.base.functionfamily import CoordinateMapperFn
-from topo.base.patterngenerator import PatternGenerator
-from topo.misc.patternfn import gaussian
-from topo.numbergen import UniformRandom, VonMisesRandom, ExponentialDecay
+import topo.responsefn.optimized
+import topo.sheet.lissom
+
 
 # Global variables
 Wx=5.0 # number of whiskers per col
@@ -48,126 +45,132 @@ assert((int(barrel_density)+1)%2==0)
 MEDs = numpy.tile(numpy.reshape(numpy.linspace(start=0.0,stop=2.0*pi,num=int(barrel_density**2),endpoint=False),[barrel_density,barrel_density]),(Wx,Wy))
 
 # Control the random seed
-random_seed_generator=UniformRandom(lbound=0,ubound=1000,seed=25)
+random_seed_generator=numbergen.UniformRandom(lbound=0,ubound=1000,seed=25)
 
 # Define functions and classes specific to the model of Wilson et al. (2010)
 def whisker_to_barrel(pattern,density):
-	"""
-		Streches a pattern defined in whisker units (i.e., 5x5)
-		to the size of the sheet (i.e., 25x25 or 21x21)
-		"""
-	return numpy.repeat(numpy.repeat(pattern,density,0),density,1)
+    """
+        Streches a pattern defined in whisker units (i.e., 5x5)
+        to the size of the sheet (i.e., 25x25 or 21x21)
+        """
+    return numpy.repeat(numpy.repeat(pattern,density,0),density,1)
 
 def distribute_angles(original_angles,k=1e7):
-	"""
-		Adds noise to each whisker deflection
-		distributed under a	Von Mises distribution
-		See Wilson et al (2010): `Methods; Stimulaing the Whiskers'
-		for details. 
-		"""
-	if numpy.array(original_angles).size==1:
-		return VonMisesRandom(mu=original_angles,kappa=k, seed=random_seed_generator())()
-	else:
-		x = numpy.zeros(original_angles.shape)
-		for i in numpy.arange(original_angles.shape[0]):
-			for j in numpy.arange(original_angles.shape[1]):
-				x[i,j]=VonMisesRandom(mu=original_angles[i,j],kappa=k,seed=random_seed_generator())()
-		return x
-
-class Whiskers(PatternGenerator):
-	"""
-		This class maps a multi-whisker stimulus pattern to activity on the 
-		input sheet, via an array of directionally tuned Layer 4 afferent units.
-		See Wilson et al (2010), equation 1.  
-		"""
-	whisker = param.Integer(default=int(Wx*Wy), doc="Specify an active whisker or Wx*Wy")
-	max_value = param.Number(default=1.0,softbounds=(0.0,1.0), doc="stimulus tilt")
-	kappa = param.Number(default=1e7, doc="inverse of variance applied to each whisker deflection angle separately")
-	
-	def function(self,params):	  
-		if (self.whisker < Wx*Wy):
-			magnitudes = numpy.zeros([Wx,Wy])
-			magnitudes[numpy.floor(self.whisker/Wy)][numpy.fmod(self.whisker,Wy)]=1.0
-			m = whisker_to_barrel(magnitudes,barrel_density)
-			dirs = numpy.ones([Wx,Wy])*self.orientation
-		else:
-			m = whisker_to_barrel(LinearBoundary(xdensity=1.0,ydensity=1.0,x=self.x,y=self.y,bounds=BoundingBox(radius=0.5*Wx),
-												 size=self.size,orientation=self.orientation)(),barrel_density)     
-		
-		dirs = distribute_angles(numpy.ones([Wx,Wy])*self.orientation,self.kappa)
-		directions = whisker_to_barrel(dirs,barrel_density)
-		
-		return m*((1.0+(numpy.cos(abs(directions-MEDs))))/2.0)
-
-class IntegerMapper(CoordinateMapperFn):
-	"""
-		Maps the center of the afferent connection field
-		for each cortical neuron to the center of the 
-		isomorphic `barrel' region on the Layer 4 sheet  
-		"""
-	def __call__(self,x,y):
-		return round(x),round(y)
-
-class LinearBoundary(PatternGenerator):
-	"""
-		Stimulus shape used to stimulate the whiskers. 
-		See Wilson et al (2010): `Methods; Stimulating the Whiskers'
-		for details.
-		"""
-	def function(self,params):
-		self.pattern_x+=self.offset
-		return numpy.where(self.pattern_x<=0.0,1.0,0.0)
+    """
+        Adds noise to each whisker deflection
+        distributed under a    Von Mises distribution
+        See Wilson et al (2010): `Methods; Stimulaing the Whiskers'
+        for details.
+        """
+    if numpy.array(original_angles).size==1:
+        return numbergen.VonMisesRandom(mu=original_angles,kappa=k, seed=random_seed_generator())()
+    else:
+        x = numpy.zeros(original_angles.shape)
+        for i in numpy.arange(original_angles.shape[0]):
+            for j in numpy.arange(original_angles.shape[1]):
+                x[i,j]=numbergen.VonMisesRandom(mu=original_angles[i,j],kappa=k,seed=random_seed_generator())()
+        return x
 
 
-# Build the simulation
-from topo.responsefn.optimized import CFPRF_DotProduct_opt
-from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-CFProjection.cf_shape=topo.pattern.Disk()
-CFProjection.response_fn=CFPRF_DotProduct_opt()
-CFProjection.learning_fn=CFPLF_Hebbian_opt()
-CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
-topo.pattern.random.seed(101)
 
-# The Layer 4 input sheet
-topo.sim['Layer_4']=GeneratorSheet(nominal_density=barrel_density, 
-								   nominal_bounds=BoundingBox(points=[(-Wy/2.0,-Wx/2.0),(Wy/2.0,Wx/2.0)]),
-								   input_generator=Whiskers(orientation=UniformRandom(lbound=0.0,ubound=2.0*pi,seed=64),
-															size=1e7,
-															scale=0.25,
-															kappa=3.0,
-															x = UniformRandom(lbound=-Wx/2.0,ubound=Wx/2.0,seed=73),
-															y = UniformRandom(lbound=-Wx/2.0,ubound=Wx/2.0,seed=74)))
+class Whiskers(pattern.PatternGenerator):
+    """
+        This class maps a multi-whisker stimulus pattern to activity on the
+        input sheet, via an array of directionally tuned Layer 4 afferent units.
+        See Wilson et al (2010), equation 1.
+        """
+    whisker = param.Integer(default=int(Wx*Wy), doc="Specify an active whisker or Wx*Wy")
+    max_value = param.Number(default=1.0,softbounds=(0.0,1.0), doc="stimulus tilt")
+    kappa = param.Number(default=1e7, doc="inverse of variance applied to each whisker deflection angle separately")
 
-# The self-organizing sheet
-topo.sim['Layer2_3'] = LISSOM(nominal_density=21.0,
-							  tsettle=9,
-							  nominal_bounds=BoundingBox(points=[(-Wy/2.0,-Wx/2.0),(Wy/2.0,Wx/2.0)])) 
+    def function(self,params):
+        if (self.whisker < Wx*Wy):
+            magnitudes = numpy.zeros([Wx,Wy])
+            magnitudes[numpy.floor(self.whisker/Wy)][numpy.fmod(self.whisker,Wy)]=1.0
+            m = whisker_to_barrel(magnitudes,barrel_density)
+            dirs = numpy.ones([Wx,Wy])*self.orientation
+        else:
+            m = whisker_to_barrel(LinearBoundary(xdensity=1.0,ydensity=1.0,x=self.x,y=self.y,bounds=sheet.BoundingBox(radius=0.5*Wx),
+                                                 size=self.size,orientation=self.orientation)(),barrel_density)
+
+        dirs = distribute_angles(numpy.ones([Wx,Wy])*self.orientation,self.kappa)
+        directions = whisker_to_barrel(dirs,barrel_density)
+
+        return m*((1.0+(numpy.cos(abs(directions-MEDs))))/2.0)
+
+
+
+class IntegerMapper(coordmapper.CoordinateMapperFn):
+    """
+        Maps the center of the afferent connection field
+        for each cortical neuron to the center of the
+        isomorphic `barrel' region on the Layer 4 sheet
+        """
+    def __call__(self,x,y):
+        return round(x),round(y)
+
+
+
+class LinearBoundary(pattern.PatternGenerator):
+    """
+        Stimulus shape used to stimulate the whiskers.
+        See Wilson et al (2010): `Methods; Stimulating the Whiskers'
+        for details.
+        """
+    def function(self,params):
+        self.pattern_x+=self.offset
+        return numpy.where(self.pattern_x<=0.0,1.0,0.0)
+
+
+
+
+### Specify weight initialization, response function, and learning function
+projection.CFProjection.cf_shape=pattern.Constant()
+projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
+projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
+projection.CFProjection.weights_output_fns=[transferfn.optimized.CFPOF_DivisiveNormalizeL1_opt()]
+
+pattern.random.seed(101)
+
+### Sheets
+
+topo.sim['Layer_4']=sheet.GeneratorSheet(nominal_density=barrel_density,
+    nominal_bounds=sheet.BoundingBox(points=[(-Wy/2.0,-Wx/2.0),(Wy/2.0,Wx/2.0)]),
+    input_generator=Whiskers(orientation=numbergen.UniformRandom(lbound=0.0,ubound=2.0*pi,seed=64),
+			     size=1e7,scale=0.25,kappa=3.0,
+			     x = numbergen.UniformRandom(lbound=-Wx/2.0,ubound=Wx/2.0,seed=73),
+			     y = numbergen.UniformRandom(lbound=-Wx/2.0,ubound=Wx/2.0,seed=74)))
+
+topo.sim['Layer2_3']=sheet.lissom.LISSOM(nominal_density=21.0,tsettle=9,
+    nominal_bounds=sheet.BoundingBox(points=[(-Wy/2.0,-Wx/2.0),(Wy/2.0,Wx/2.0)]))
+
+
+
+### Connections
 
 # Feed-forward (afferent) connections
-topo.sim.connect('Layer_4','Layer2_3',delay=FixedPoint("0.05"),
-				 dest_port=('Activity','JointNormalize', 'Afferent'),
-				 connection_type=CFProjection,strength=1.0,name='Afferent',
-				 weights_generator=topo.pattern.random.UniformRandom(),
-				 cf_shape = topo.pattern.basic.Constant(),
-				 nominal_bounds_template=BoundingBox(radius=0.5),
-				 learning_rate=1.0,
-				 coord_mapper=IntegerMapper())
+topo.sim.connect(
+    'Layer_4','Layer2_3',delay=0.05,strength=1.0,name='Afferent',
+    dest_port=('Activity','JointNormalize', 'Afferent'),
+    connection_type=projection.CFProjection,learning_rate=1.0,
+    nominal_bounds_template=sheet.BoundingBox(radius=0.5),
+    weights_generator=pattern.random.UniformRandom(),
+    coord_mapper=IntegerMapper())
 
 # Short-range lateral excitatory connections
-topo.sim.connect('Layer2_3','Layer2_3',delay=FixedPoint("0.05"),name='LateralExcitatory',
-                 connection_type=CFProjection,strength=1.0,
-                 weights_generator=topo.pattern.random.UniformRandom(),
-                 nominal_bounds_template=BoundingBox(radius=0.05),
-                 learning_rate=0.0) 
+topo.sim.connect(
+    'Layer2_3','Layer2_3',delay=0.05,strength=1.0,name='LateralExcitatory',
+    connection_type=projection.CFProjection,learning_rate=0.0,
+    weights_generator=pattern.random.UniformRandom(),
+    nominal_bounds_template=sheet.BoundingBox(radius=0.05))
 
 # Long-range lateral inhibitory connections
-topo.sim.connect('Layer2_3','Layer2_3',delay=FixedPoint("0.05"),name='LateralInhibitory',
-				 connection_type=CFProjection,strength=-1.0,
-				 weights_generator=topo.pattern.random.UniformRandom(),
-                 cf_shape=topo.pattern.Constant(),
-				 nominal_bounds_template=BoundingBox(radius=2.0),
-                 learning_rate=1.0)
+topo.sim.connect(
+    'Layer2_3','Layer2_3',delay=0.05,strength=-1.0,name='LateralInhibitory',
+    connection_type=projection.CFProjection,learning_rate=1.0,
+    weights_generator=pattern.random.UniformRandom(),
+    nominal_bounds_template=sheet.BoundingBox(radius=2.0))
+
 
 # Add whisker-specific plots to the GUI
 from topo.base.sheetview import SheetView
@@ -177,16 +180,16 @@ from topo.analysis.featureresponses import Feature, FeatureMaps, PatternPresente
 from topo.command.analysis import save_plotgroup
 
 # Color Layer 4 input units by their directional tuning
-def colorMEDs():	
-	sheet = topo.sim['Layer_4']
-	new_view = SheetView((MEDs/(2.0*pi),sheet.bounds), sheet.name,sheet.precedence)
-	sheet.sheet_views['OrientationPreference']=new_view 
+def colorMEDs():
+    sheet=topo.sim['Layer_4']
+    new_view=SheetView((MEDs/(2.0*pi),sheet.bounds), sheet.name,sheet.precedence)
+    sheet.sheet_views['OrientationPreference']=new_view
 
 def measure_deflection_pref(num_deflection=8,
                             scale=0.3,offset=0.0,display=False,weighted_average=False,
                             pattern_presenter=PatternPresenter(pattern_generator=Whiskers(),
                                                                apply_output_fns=False,duration=0.175)):
-    """  
+    """
     Measure deflection maps, by collating the responses to a set of
     whisker deflections in different directions.
     """
@@ -197,10 +200,10 @@ def measure_deflection_pref(num_deflection=8,
     else:
          step_deflection=pi/num_deflection
 
-    feature_values = [Feature(name="whisker",range=(0, (Wx*Wy)-1),step=1,cyclic=False),
-		      Feature(name="orientation",range=(0.0,2*pi),step=step_deflection,cyclic=True)]
-        
-    param_dict = {"scale":scale,"offset":offset}
+    feature_values=[Feature(name="whisker",range=(0, (Wx*Wy)-1),step=1,cyclic=False),
+		    Feature(name="orientation",range=(0.0,2*pi),step=step_deflection,cyclic=True)]
+
+    param_dict={"scale":scale,"offset":offset}
     x=FeatureMaps(feature_values)
     x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
@@ -208,8 +211,8 @@ def measure_deflection_pref(num_deflection=8,
 
 
 pg= create_plotgroup(name='Deflection Preference',category="Preference Maps",
-		     doc='Measure preference for whiskers and their directions.',
-		     pre_plot_hooks=[measure_deflection_pref])
+             doc='Measure preference for whiskers and their directions.',
+             pre_plot_hooks=[measure_deflection_pref])
 pg.add_plot('Direction Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Direction Preference&Selectivity',[('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 pg.add_plot('Direction Selectivity',[('Strength','OrientationSelectivity')])
@@ -224,6 +227,6 @@ colorMEDs()
 
 
 # Use commands like the following to run the model and plot a map
-#topo.sim.run(5000) 
+#topo.sim.run(5000)
 #measure_deflection_pref()
 
