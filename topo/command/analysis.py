@@ -777,14 +777,7 @@ pg.add_plot('Corner Orientation Selectivity',[('Strength','OrientationSelectivit
 pg.add_static_image( 'Hue Code', measure_corner_angle_pref.instance().key_img_fname )
 
 
-import types
-__all__ = list(set([k for k,v in locals().items()
-                    if isinstance(v,types.FunctionType) or 
-                    (isinstance(v,type) and issubclass(v,ParameterizedFunction))
-                    and not v.__name__.startswith('_')]))
-
-
-# Measure frequency preference maps
+# Measure sound frequency preference maps
 class measure_frequency_pref(PositionMeasurementCommand):
     """Measure a frequency preference and selectivity map"""
         
@@ -808,3 +801,12 @@ pg= create_plotgroup(name='Frequency Preference and Selectivity',category="Prefe
 
 pg.add_plot('[Frequency Preference]', [('Strength','YPreference')])
 pg.add_plot('[Frequency Selectivity]', [('Strength','YSelectivity')])
+
+
+import types
+__all__ = list(set([k for k,v in locals().items()
+                    if isinstance(v,types.FunctionType) or 
+                    (isinstance(v,type) and issubclass(v,ParameterizedFunction))
+                    and not v.__name__.startswith('_')]))
+
+
