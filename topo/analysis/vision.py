@@ -12,20 +12,25 @@ from numpy.oldnumeric import Float
 from numpy import zeros, array, size, empty, object_
 #import scipy
 
-try:
-    import pylab
-except ImportError:
-    print "Warning: Could not import matplotlib; pylab plots will not work."
-
 import param
 from param import normalize_path
+
+try:
+    import matplotlib
+    import pylab
+except ImportError:
+    param.Parameterized(name=__name__).warning("Could not import matplotlib; module will not be useable.")
+    from topo.command.basic import ImportErrorRaisingFakeModule
+    pylab = ImportErrorRaisingFakeModule("matplotlib")
+
+# CEBALERT: commands in here should inherit from the appropriate base
+# class (Command or PylabPlotCommand).
 
 import topo
 from topo.base.cf import CFSheet
 from topo.base.sheetview import SheetView
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.command.analysis import measure_sine_pref
-import matplotlib.ticker as mticker
 
 from topo import numbergen
 
@@ -102,7 +107,7 @@ def complexity(full_matrix):
 		z.append(z[0])
                 pylab.plot(z,linewidth=4)
 		pylab.axis(xmin=0.0,xmax=numpy.pi)
-		ax.yaxis.set_major_locator(mticker.MaxNLocator(4))
+		ax.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
 		pylab.xticks([0,len(z)/2,len(z)-1], ['0','pi/2','pi'])
 		pylab.savefig(normalize_path(str(topo.sim.time()) + str(complex_matrix[x,y][0])+ 'modulation_response[43,43].png'))
 
@@ -113,7 +118,7 @@ def complexity(full_matrix):
 		z.append(z[0])
                 pylab.plot(z,linewidth=4)
 		pylab.axis(xmin=0.0,xmax=numpy.pi)
-		ax.yaxis.set_major_locator(mticker.MaxNLocator(4))
+		ax.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
 		pylab.xticks([0,len(z)/2,len(z)-1], ['0','pi/2','pi'])
 		pylab.savefig(normalize_path(str(topo.sim.time()) + str(complex_matrix[x,y][0])+ 'modulation_response[45,45].png'))
 		

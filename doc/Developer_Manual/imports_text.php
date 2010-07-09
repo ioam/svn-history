@@ -11,18 +11,24 @@ functions have been tested by more people on more tasks.
 
 <P>Non-standard external Python libraries should be used where
 appropriate, i.e. for anything reasonably substantial like plotting or
-matrix manipulation.  Including an external package adds an
-approximately fixed cost of tracking future updates and changes to it,
-handling its licensing issues, increasing the size of our download,
-restricting the number of supported platforms, etc.  Including an
-external package just for one or two small, simple functions probably
-doesn't make sense, but including it for non-trivial items like plot
-generation or matrix handling does make sense.  The key question to
-answer for any external package is "would the code I'm using from the
-external package be easier to maintain on its own, or is it easier to
-just include the external package?".  If it's easier just to add those
-couple of functions, just copy them (if the licensing terms allow it);
-otherwise add the external package.
+matrix manipulation. The core external libraries of Topographica are
+NumPy and PIL (Imaging); you can assume that these will always exist
+for any Topographica installation. Other external packages, while
+often very useful, should be considered optional (and their absence
+should be handled gracefully).
+
+<P>Including an external package adds an approximately fixed cost of
+tracking future updates and changes to it, handling its licensing
+issues, increasing the size of our download, restricting the number of
+supported platforms, etc.  Including an external package just for one
+or two small, simple functions probably doesn't make sense, but
+including it for non-trivial items like plot generation or matrix
+handling does make sense.  The key question to answer for any external
+package is "would the code I'm using from the external package be
+easier to maintain on its own, or is it easier to just include the
+external package?".  If it's easier just to add those couple of
+functions, just copy them (if the licensing terms allow it); otherwise
+add the external package.
 
 <P>When importing code, whether from standard libraries or external
 functions, always import only the functions and classes that you are
@@ -68,8 +74,8 @@ order from most general to most specific:
 
 <OL>
 <LI>Python standard library items (such as <CODE>math</CODE>, <CODE>sys</CODE>, <CODE>os</CODE>)
-<LI>Core external packages (such as <CODE>numpy</CODE>)
-<LI>Other external packages (such as <CODE>MLab</CODE>)
+<LI>Core external packages (<CODE>numpy</CODE> and <CODE>Imaging</CODE>)
+<LI>Other external packages (such as <CODE>matplotlib</CODE>)
 <LI>Topographica files not in the current package<BR>
       (with absolute paths like <CODE>topo.base.sheet</CODE>)
 <LI>Topographica files in the current package<BR>

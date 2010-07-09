@@ -16,22 +16,22 @@ import sys, __main__, math, os, re
 import topo
 from param.parameterized import Parameterized,OptionalSingleton
 
-# CEBALERT: should these be using parameterized.warning()?
-matplotlib_imported=False
+
 try:
-    # Import matplotlib, if available, and use a non-GUI backend by default
+    # By default, use a non-GUI backend for matplotlib.
     import matplotlib
-    matplotlib_imported=True
     from matplotlib import rcParams
     rcParams['backend']='Agg'
+    matplotlib_imported=True
 except ImportError:
-    print "Warning: Could not import matplotlib; pylab plots will not work."
+    matplotlib_imported=False
 
-ipython_imported=False
+
 try:
     import IPython
     ipython_imported=True
 except ImportError:
+    ipython_imported=False
     print "Note: IPython is not available; using basic interactive Python prompt instead."
 
 

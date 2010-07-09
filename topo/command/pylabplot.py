@@ -15,16 +15,22 @@ $Id$
 """
 __version__='$Revision$'
 
+# CEBALERT: these aren't being used
 import re
 import os
 import copy
 import errno
 
+import param
+    
 try:
     import matplotlib
     import pylab
 except ImportError:
-    print "Warning: Could not import matplotlib; pylab plots will not work."
+    param.Parameterized(name=__name__).warning("Could not import matplotlib; module will not be useable.")
+    from basic import ImportErrorRaisingFakeModule
+    pylab = ImportErrorRaisingFakeModule("matplotlib")
+
 
 import numpy
 from math import pi
@@ -55,8 +61,13 @@ from topo.analysis.featureresponses import Feature, PatternPresenter, FeatureCur
 from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand, PositionMeasurementCommand, SingleInputResponseCommand, FeatureCurveCommand, UnitCurveCommand
 
 
+from basic import Command
 
-class PylabPlotCommand(ParameterizedFunction):
+
+
+
+
+class PylabPlotCommand(Command):
     """Parameterized command for plotting using Matplotlib/Pylab."""
       
     file_dpi = param.Number(

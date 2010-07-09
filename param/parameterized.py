@@ -1739,6 +1739,11 @@ class ParameterizedFunction(Parameterized):
     """
     __abstract = True
 
+    # CEBALERT: shouldn't this have come from a parent class
+    # somewhere?
+    def __str__(self):
+        return self.__class__.__name__+"()"
+
     @classmethod
     def instance(class_,*args,**params):
         """Return an instance of this class."""

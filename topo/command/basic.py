@@ -41,7 +41,117 @@ except ImportError:
     gnosis_imported = False
 
 
+# Not sure where to put CommandMetaclass, since it doesn't need to be
+# seen or used by anyone. Probably also the import error classes
+# shouldn't be so visible.
+from param.parameterized import ParameterizedMetaclass
+class CommandMetaclass(ParameterizedMetaclass):
+    """
+    A class having this as a metaclass will have its __call__() method
+    automatically wrapped so that any exception occurring inside
+    __call__() will be passed to the class's _except() method.
+    """
+    def __new__(mcs,classname,bases,classdict):        
+        if '__call__' in classdict:
+            classdict['__call__'] = mcs._safecall(classdict['__call__'])
+            #assert '_except' in classdic
+        # else it is probably abstract, or something
+        return ParameterizedMetaclass.__new__(mcs,classname,bases,classdict)
 
+    @classmethod
+    def _safecall(mcs,fn):
+        """
+        Wrap fn with caller, which catches any exception raised inside
+        fn() and passes it to _except().
+        """
+        def caller(self,*args,**kw):
+            try:
+                return fn(self,*args,**kw)
+            except Exception, e:
+                # Mis-invoked call should raise error as normal.
+                if isinstance(e,TypeError):
+                    import inspect
+                    # Is this a hack to detect mis-calling?
+                    if len(inspect.getargspec(fn)[0])!=len(args):
+                        raise
+                try:
+                    return self._except(e)
+                except:
+                    # the _except() method raises an error (or doesn't
+                    # exist). what should happen? programming error,
+                    # so I guess just re-raise
+                    raise
+        return caller
+                
+
+
+class Command(ParameterizedFunction):
+    """
+    Parameterized command: any error when the command is run (called)
+    will not raise an exception, but will instead generate a warning.
+    """
+    __metaclass__ = CommandMetaclass
+    __abstract = True
+
+    def _except(self,e):
+        # import traceback
+        # print traceback.print_exc()
+        self.warning("%s failed: %s"%(self,e)) # or traceback.format_exc()))
+        
+    def __call__(self,*args,**params):
+        return super(Command,self).__call__(*args,**params)
+
+
+class ImportErrorObject(object):
+    """
+    Raises an ImportError on any attempt to access an attribute, call,
+    or get an item.
+
+    Useful to delay an ImportError until the point of use, thus
+    allowing e.g. a class attribute to contain something from a
+    non-core external module (e.g. pylab). 
+
+    Delaying an ImportError until the point of use allows users to be
+    informed of the possibility of having various extra functions on
+    installation of a missing package.
+    """
+    def __init__(self,module_name):
+        self.__module_name = module_name
+    def _raise(self):
+        #param.Parameterized().warning("err:%s"%self.module_name)
+        raise ImportError, "No module named %s. Install %s to get this functionality."%(self.__module_name,self.__module_name)
+        return None
+    def __call__(self,*args,**kw):
+        self._raise()
+    # Might be better to override __getattribute__, special casing the
+    # module_name attribute. Then everything is guaranteed to raise an
+    # error (rather than covering call, getitem, getattr, and maybe
+    # other things I've forgotten about).
+    def __getattr__(self,name):
+        return self._raise()
+    def __getitem__(self,i):
+        self._raise()
+
+
+
+class ImportErrorRaisingFakeModule(object):
+    """
+    Returns an ImportErrorObject for any attribute request.
+
+    Instances of this class can be used in place of a module to delay
+    an import error until the point of use of an attribute of that
+    module.
+
+    See ImportErrorObject for more details.
+    """
+    def __init__(self,module_name):
+        self.__module_name = module_name
+    def __getattr__(self,name):
+        return ImportErrorObject(self.__module_name)
+
+
+# CEBALERT: commands in here should inherit from Command, and make use
+# of _except() to ensure all necessary state is reverted.
 
 def save_input_generators():
     """Save a copy of the active_sim's current input_generators for all GeneratorSheets."""

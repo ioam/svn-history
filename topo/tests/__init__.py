@@ -178,6 +178,17 @@ except ImportError:
     param.Parameterized().message("no scikits.audiolab: testaudio.py skipped")
     __all__.remove('testaudio')
 
+# CEBALERT: should be using python warnings, and having unittest
+# report warnings.
+try:
+    import matplotlib
+except ImportError:
+    import param
+    param.Parameterized().warning("Matplotlib is not available; skipping Matplotlib tests.")
+    __all__.remove('testmatplotlib')
+    __all__.remove('testmatplotlib_tk')
+
+
 __all__.sort()
 
 

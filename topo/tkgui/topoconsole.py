@@ -16,6 +16,7 @@ import copy
 import sys
 import __main__
 import webbrowser
+import string
 
 from inspect import getdoc
 
@@ -233,9 +234,7 @@ def _tkinter_report_exception(widget):
     else:
         topo.guimain.messageBar.error('%s'%msg)
 
-    if param.parameterized.min_print_level>=param.parameterized.DEBUG:
-        import traceback
-        traceback.print_exc()
+    param.Parameterized().warning(msg)
 
 
 import Tkinter
@@ -288,10 +287,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
             self.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
         ##########
 
-
-####################
-# CEBALERT: should use parameterized methods to get formatting and
-# e.g. warnings as errors.
+        # Install warning and message handling
         from param.parameterized import Parameterized        
         self.__orig_P_warning = Parameterized.warning
         self.__orig_P_message = Parameterized.message
@@ -299,19 +295,16 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         type.__setattr__(Parameterized,'message',self.gui_message)
 
     def gui_warning(self,*args):
-        #self.__orig_P_warning(*args)
         stat = self.__get_status_bar()
-        import string
         s = string.join(args,' ')
         stat.warn(s)
+        self.__orig_P_warning(self,*args)
 
     def gui_message(self,*args):
-        #self.__orig_P_message(*args)
         stat = self.__get_status_bar()
-        import string
         s = string.join(args,' ')
         stat.message(s)
-####################
+        self.__orig_P_message(self,*args)
 
 
     def title(self,t=None):
