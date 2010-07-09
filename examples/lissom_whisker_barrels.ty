@@ -69,9 +69,6 @@ class Whiskers(pattern.PatternGenerator):
     whisker = param.Integer(default=p.Wx*p.Wy, doc="""
         Activate either a single whisker by number, or the entire array if Wx*Wy.""")
     
-    max_value = param.Number(default=1.0,softbounds=(0.0,1.0), doc="""
-        Stimulus tilt, i.e. orientation across the whisker array.""")
-    
     kappa = param.Number(default=1e7, doc="""
 	Inverse of variance, applied to each whisker deflection angle separately.""")
     
@@ -100,6 +97,7 @@ class Whiskers(pattern.PatternGenerator):
             return x
 
 
+    # Should probably rename orientation to deflection for clarity
     def function(self,params):
         if (self.whisker < p.Wx*p.Wy):
             magnitudes = numpy.zeros([p.Wx*1.0,p.Wy*1.0])
@@ -130,6 +128,7 @@ class IntegerMapper(coordmapper.CoordinateMapperFn):
 
 
 
+# Should replace this with an equivalent call to pattern.HalfPlane
 class LinearBoundary(pattern.PatternGenerator):
     """
     Stimulus shape used to stimulate the whiskers.
@@ -199,20 +198,13 @@ from topo.plotting.plotgroup import create_plotgroup
 from topo.analysis.featureresponses import Feature,FeatureMaps,PatternPresenter,Subplotting
 from topo.base.sheetview import SheetView
 
-
-# Color Layer 4 input units by their directional tuning
-def colorMEDs():
-    sheet=topo.sim['Layer_4']
-    new_view=SheetView((MEDs/(2.0*pi),sheet.bounds), sheet.name,sheet.precedence)
-    sheet.sheet_views['OrientationPreference']=new_view
-
-
-def measure_deflection_pref(num_deflection=8,
-                            scale=0.3,offset=0.0,display=False,weighted_average=False,
-                            pattern_presenter=PatternPresenter(pattern_generator=Whiskers(),
-                                                               apply_output_fns=False,duration=0.175)):
+def measure_deflection_pref(num_deflection=8,scale=0.3,offset=0.0,display=False,
+                            weighted_average=False,
+                            pattern_presenter=PatternPresenter(
+                                pattern_generator=Whiskers(),
+                                apply_output_fns=False,duration=0.175)):
     """
-    Measure deflection maps, by collating the responses to a set of
+    Measure deflection maps by collating the responses to a set of
     whisker deflections in different directions.
     """
 
@@ -244,11 +236,13 @@ pg.add_static_image('Color Key','topo/command/dfl_key_white_vert.png')
 
 
 
-# Intialize direction map plotting
-colorMEDs()
+# Color Layer 4 input units by their directional tuning
+sheet=topo.sim['Layer_4']
+new_view=SheetView((MEDs/(2.0*pi),sheet.bounds), sheet.name,sheet.precedence)
+sheet.sheet_views['OrientationPreference']=new_view
 
 
 # Use commands like the following to run the model and plot a map
 #topo.sim.run(5000)
 #measure_deflection_pref()
-
+#(or select Direction Preference in the Plotting menu)
