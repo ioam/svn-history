@@ -8,8 +8,11 @@ $Id$
 """
 __version__='$Revision$'
 
+# CEBALERT: this file needs to be cleaned up! In particular,
+# could start by cleaning up the paths. 
 
 import pickle, copy, __main__, timeit
+import os
 
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 
@@ -244,7 +247,9 @@ def generate_startup_speed_data(script="examples/lissom_oo_or.ty",density=24,dat
 
     how_long = time_sim_startup(script,density)
 
-    speed_data_file = open(normalize_path(data_filename),'w')
+    locn = normalize_path(data_filename)
+    print "Saving to %s"%locn
+    speed_data_file = open(locn,'w')
     speed_data_file.write("%s=%s"%(density,how_long))
     speed_data_file.close()
 
@@ -283,7 +288,7 @@ def compare_startup_speed_data(script="examples/lissom_oo_or.ty",data_filename=N
 # can't remember how to do it
 
 def compare_with_and_without_snapshot_NoSnapshot(script="examples/lissom_oo_or.ty",look_at='V1',density=4,run_for=10,break_at=5):
-    data_filename=script+"_PICKLETEST"
+    data_filename=os.path.split(script)[1]+"_PICKLETEST"
     
     # we must execute in main because e.g. scheduled events are run in __main__
     __main__.__dict__['cortex_density']=density
@@ -301,14 +306,19 @@ def compare_with_and_without_snapshot_NoSnapshot(script="examples/lissom_oo_or.t
     data['density']=density
     data['look_at']=look_at
     
-    pickle.dump(data,open(normalize_path(data_filename),'wb'),2)
+    locn = normalize_path(os.path.join("tests",data_filename))
+    print "Writing pickle to %s"%locn
+    pickle.dump(data,open(locn,'wb'),2)
 
 
 def compare_with_and_without_snapshot_CreateSnapshot(script="examples/lissom_oo_or.ty"):
-    data_filename=script+"_PICKLETEST"
+    data_filename=os.path.split(script)[1]+"_PICKLETEST"
+
+    locn = resolve_path(data_filename)
+    print "Loading pickle at %s"%locn
         
     try:
-        data = pickle.load(open(resolve_path(data_filename),"rb"))
+        data = pickle.load(open(locn,"rb"))
     except IOError:
         print "\nData file '"+data_filename+"' could not be opened; run _A() first."
         raise
@@ -328,15 +338,19 @@ def compare_with_and_without_snapshot_CreateSnapshot(script="examples/lissom_oo_
                        err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
 
     from topo.command.basic import save_snapshot
-    save_snapshot(normalize_path(data_filename+'.typ_'))
+    locn = normalize_path(os.path.join('tests',data_filename+'.typ_'))
+    print "Saving snapshot to %s"%locn
+    save_snapshot(locn)
 
 
 def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or.ty"):
-    data_filename=script+"_PICKLETEST"
-    snapshot_filename=script+"_PICKLETEST.typ_"
-        
+    data_filename=os.path.split(script)[1]+"_PICKLETEST"
+    snapshot_filename=os.path.split(script)[1]+"_PICKLETEST.typ_"
+
+    locn = resolve_path(os.path.join('tests',data_filename))
+    print "Loading pickle from %s"%locn
     try:
-        data = pickle.load(open(resolve_path(data_filename),"rb"))
+        data = pickle.load(open(locn,"rb"))
     except IOError:
         print "\nData file '"+data_filename+"' could not be opened; run _A() first"
         raise
@@ -349,8 +363,11 @@ def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or
     
     from topo.command.basic import load_snapshot
 
+    locn = resolve_path(os.path.join('tests',snapshot_filename))
+    print "Loading snapshot at %s"%locn
+
     try:
-        load_snapshot(resolve_path(snapshot_filename))
+        load_snapshot(locn)
     except IOError:
         print "\nPickle file '"+snapshot_filename+"' could not be opened; run _B() first."
         raise
