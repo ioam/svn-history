@@ -10,7 +10,7 @@ E.g.
 
 Runs the 'all_quick' target if called without any arguments: 
 
-  topographica -c 'from topo.misc.genexamples import generate; generate()
+  topographica -c 'from topo.misc.genexamples import generate; generate()'
 
 To add new single targets, add to the targets dictionary;
 for groups of targets, add to the group_targets dictionary.
@@ -21,11 +21,15 @@ $Id$
 
 __version__='$Revision$'
 
-# CB: Not yet fully tested.
 
-### NOTES
+# Note: has none of the Makefile's dependency processing, so just does
+# what you tell it (i.e. over-writes existing files - which might be
+# behavior we actually want).
+
+
+# CB: need to investigate the situation on Windows; old comment:
 #
-# - Tricky to get this to work on Windows because of problems
+#   Tricky to get this to work on Windows because of problems
 #   with quotes, spaces, and so on in cmd.exe:
 #   http://mail.python.org/pipermail/python-bugs-list/2002-March/010393.html
 #   http://support.microsoft.com/kb/191495
@@ -36,10 +40,7 @@ __version__='$Revision$'
 #   something simpler we could do - this script contains the history of
 #   its production in the code (e.g. I probably don't need the full
 #   path to the topographica script in here anymore.)
-#
-# - has none of the Makefile's dependency processing, so just does
-#  what you tell it (i.e. over-writes existing files - which might be
-#  behavior we actually want).
+
 
 import platform 
 import sys
@@ -150,7 +151,7 @@ def _stuff(specified_targets):
     ## location of the examples directory
     import topo
     candidate_example_dirs = [
-        os.path.join(os.path.expanduser("~"),'topographica'),
+        os.path.join(os.path.expanduser("~"),'topographica/examples'),
         # version-controlled topographica dir
         os.path.join(topo._package_path,"../examples"),
         # package installed at <some path>/lib/python2.X/site-packages/topo
@@ -170,7 +171,10 @@ def _stuff(specified_targets):
                 if examples is False:
                     break
 
-    assert examples, "Could not find necessary examples in %s"%candidate_example_dirs 
+    if examples:
+        print "Found examples in %s"%examples
+    else:
+        raise IOError("Could not find examples in %s"%candidate_example_dirs)
 
     # CB: so much repeated typing...
 
