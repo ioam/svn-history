@@ -109,6 +109,65 @@ def run(examples,script_name,density=None,commands=["topo.sim.run(1)"]):
 
 
 
+scripts = {
+    'hierarchical':'hierarchical.ty',
+    'lissom_or'   :'lissom_or.ty',
+    'lissom_oo_or':'lissom_oo_or.ty',
+    'som_retinotopy':'som_retinotopy.ty',
+    'trickysyntax':'hierarchical.ty',
+    'obermayer_pnas90':'obermayer_pnas90.ty',
+    'lissom_fsa':'lissom_fsa.ty',
+    'gca_lissom':'gca_lissom.ty',
+    'lissom_oo_or_10000.typ':'lissom_oo_or.ty',
+    'lissom_fsa_10000.typ':'obermayer_pnas90.ty',
+    'obermayer_pnas90_40000.typ':'obermayer_pnas90.ty',
+    'som_retinotopy_40000.typ':'som_retinotopy.ty',
+    'gca_lissom_10000.typ':'gca_lissom.ty'}
+
+
+
+def print_examples_dir(**kw):
+    examples = find_examples(**kw)
+    if examples:
+        print "Found examples in %s"%examples
+
+def find_examples(specified_examples=None,dirs=None):
+    import topo
+
+    if not specified_examples:
+        # CEBALERT: hack!
+        specified_examples = ["hierarchical","lissom_oo_or","som_retinotopy"]
+        
+
+    if not dirs:
+        candidate_example_dirs = [
+            os.path.join(os.path.expanduser("~"),'topographica/examples'),
+            # version-controlled topographica dir
+            os.path.join(topo._package_path,"../examples"),
+            # package installed at <some path>/lib/python2.X/site-packages/topo
+            os.path.join(topo._package_path,"../../../share/topographica/examples")]
+    else:
+        candidate_example_dirs = dirs
+
+    # CEBALERT: horrible way to find directory that contains all the
+    # examples specified.
+    examples = None
+    for d in candidate_example_dirs:
+        if not examples:
+            for cmd in specified_examples:
+                if os.path.isfile(os.path.join(d,scripts[cmd])):
+                    examples = d
+                else:
+                    examples = False
+
+                if examples is False:
+                    break
+
+    return examples
+
+
+
+
 # CEBALERT: should be rewritten!
 
 def _stuff(specified_targets):
@@ -130,51 +189,14 @@ def _stuff(specified_targets):
         if a in group_targets:
             command_labels+=group_targets[a]
         else:
-            command_labels.append(a)
+            command_labels.append(a)    
 
+    examples = find_examples(specified_examples=command_labels)
 
-    scripts = {
-        'hierarchical':'hierarchical.ty',
-        'lissom_or'   :'lissom_or.ty',
-        'lissom_oo_or':'lissom_oo_or.ty',
-        'som_retinotopy':'som_retinotopy.ty',
-        'trickysyntax':'hierarchical.ty',
-        'obermayer_pnas90':'obermayer_pnas90.ty',
-        'lissom_fsa':'lissom_fsa.ty',
-        'gca_lissom':'gca_lissom.ty',
-        'lissom_oo_or_10000.typ':'lissom_oo_or.ty',
-        'lissom_fsa_10000.typ':'obermayer_pnas90.ty',
-        'obermayer_pnas90_40000.typ':'obermayer_pnas90.ty',
-        'som_retinotopy_40000.typ':'som_retinotopy.ty',
-        'gca_lissom_10000.typ':'gca_lissom.ty'}
-
-    ## location of the examples directory
-    import topo
-    candidate_example_dirs = [
-        os.path.join(os.path.expanduser("~"),'topographica/examples'),
-        # version-controlled topographica dir
-        os.path.join(topo._package_path,"../examples"),
-        # package installed at <some path>/lib/python2.X/site-packages/topo
-        os.path.join(topo._package_path,"../../../share/topographica/examples")]
-
-    # CEBALERT: horrible way to find directory that contains all the
-    # examples specified.
-    examples = None
-    for d in candidate_example_dirs:
-        if not examples:
-            for cmd in command_labels:
-                if os.path.isfile(os.path.join(d,scripts[cmd])):
-                    examples = d
-                else:
-                    examples = False
-
-                if examples is False:
-                    break
-
-    if examples:
-        print "Found examples in %s"%examples
-    else:
+    if not examples:
         raise IOError("Could not find examples in %s"%candidate_example_dirs)
+    else:
+        print "Found examples in %s"%examples
 
     # CB: so much repeated typing...
 
