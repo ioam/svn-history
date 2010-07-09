@@ -21,6 +21,9 @@ from basic import DivisiveNormalizeL1
 DivisiveNormalizeL1_opt=DivisiveNormalizeL1
 
 
+# JABALERT: Need to remove 0.0000000000001 constant;
+# currently needed to avoid divide-by-zero issues
+# in some cases, but should be replaced.
 class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     """
     Performs divisive normalization of the weights of all cfs.

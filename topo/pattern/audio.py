@@ -6,6 +6,8 @@ $Id$
 """
 __version__='$Revision$'
 
+# JABALERT: Needs cleanup so that default parameters, etc. are reasonable
+
 import numpy
 import param
 import os
