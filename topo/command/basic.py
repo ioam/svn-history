@@ -31,6 +31,7 @@ from topo.base.projection import Projection, ProjectionSheet
 from topo.sheet import GeneratorSheet
 from topo.misc.util import MultiFile
 from topo.misc.picklemain import PickleMain
+from topo.misc.genexamples import generate as generate_example
 from topo.base.functionfamily import PatternDrivenAnalysis
 
 try:
