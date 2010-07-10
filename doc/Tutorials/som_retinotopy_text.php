@@ -13,8 +13,7 @@ extensible for models not yet supported.
 
 <p>This tutorial assumes that you have already followed the
 instructions for <a href="../Downloads/index.html">obtaining and
-installing</a> Topographica. Windows users might also need to refer
-to the notes about <A HREF="../Downloads/win32notes.html#unix-commands-on-win">translating Unix commands</A>.</p>
+installing</a> Topographica. 
 
 
 <h2>Self-organization</h2>
@@ -25,32 +24,31 @@ develops a mapping of the dimensions of variance in the input space.
 <ol> 
 <p></p>
 
-<li>First, copy the <code>som_retinotopy.ty</code> example file from
-  wherever the Topographica distribution is installed, into
-  your own directory.  For instance, if Topographica is installed in
-  <code>/home/jbednar/public/topographica/</code> and you would like
-  to work in <code>~/cnv</code> in UNIX, you would type:
-<pre>
-  $ cd ~/cnv/
-  $ cp /home/jbednar/public/topographica/examples/som_retinotopy.ty .
-</pre>
+<li>First, 
+  <A HREF="../User_Manual/scripts.html#copy_examples">get a copy of the
+  example files to work with</A> if you do not have them already, and
+  open a terminal in the examples directory.
 
 <P><li>To start the full simulation from the book using the
   Topographica GUI, you could run:
 <pre>
-  /home/jbednar/public/topographica/topographica \
-  -p retina_density=24 -p cortex_density=40 som_retinotopy.ty -g
+  topographica -p retina_density=24 -p cortex_density=40 \
+    som_retinotopy.ty -g
 </pre>
   (all on one line, with no backslash).  These changes can also be
   made in the .ty file itself, if you do not want to type them each
   time you run the program.
 
   <p>However, the default is to use a much smaller network that is
-  faster to run while getting similar results:
+  faster to run while getting similar results.  To do this, start
+  topographica:
 <pre>
-  /home/jbednar/public/topographica/topographica som_retinotopy.ty -g
+  topographica -g
 </pre>
-	
+
+  Then, from the <code>examples</code> directory, open
+  <code>lissom_oo_or.ty</code>. 
+  
   <P>(The plots below show the results from the full density of the
   book simulation, but results are similar for the default (lower)
   densities.)
@@ -370,14 +368,18 @@ dimensions.
 
 <h2>Exploring further</h2>
 
-<p> Topographica comes with
-additional examples, and more are always being added. Any valid Python code can
-be used to control and extend Topographica; documentation for Python and existing Topographica commands
-can be accessed from the <span class='t_item'>Help</span> menu of the
-<span class='w_title'>Topographica Console</span> window.
-<p>
- Please contact 
+<p> To see how the example works, load the som_retinotopy.ty file into a
+text editor and see how it has been defined, then find the
+corresponding Python code for each module and see how that
+has been defined.   
+
+<P>Topographica comes with additional examples, and more are
+always being added.  
+Any valid Python code can be used to control and extend Topographica;
+documentation for Python and existing Topographica commands can be
+accessed from the <span class='t_item'>Help</span> menu of the <span
+class='w_title'>Topographica Console</span> window.  <p> Please
+contact
 <A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Comments%20on%20Topographica%20tutorial">&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107</a>
 if you have questions or suggestions about the software or this
-tutorial.
-</p>
+tutorial.  </p>
