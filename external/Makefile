@@ -288,6 +288,14 @@ ifeq ("$(shell uname -m)","x86_64")
 #       # Tell 64-bit Linux machines where to find zlib, to prevent "encoder zip not available" problems
 	cd ${PIL}; patch < ../Imaging.diff
 endif
+
+# On Mac, PIL inserts mac-specific locations before user-specified
+# ones (surely a bug) no matter what you try to do ...except hack the
+# setup.py script.
+ifeq ("$(shell uname -s)","Darwin")
+	cd ${PIL}; cp setup.py setup.py~; sed s^'join(prefix, "lib"))'^'join(prefix, "lib"),where=0)'^ setup.py~ > setup.py
+	cd ${PIL}; cp setup.py setup.py~; sed s^'join(prefix, "include"))'^'join(prefix, "include"),where=0)'^ setup.py~ > setup.py
+endif
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
