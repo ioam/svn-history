@@ -1,17 +1,16 @@
 Topographica is a general-purpose neural simulator focusing on
-topographic maps.  This version of the simulator is still under active
-development; an updated version may be available from
-topographica.org.  Subsequent versions are not guaranteed to be able
-to load files saved from this version, and scripts developed using
-this version are likely to need modification when subsequent versions
-are released.
+topographic maps.  The simulator is under continuous development, and 
+scripts developed for one version are likely to need modification to
+run with subsequent versions.  Saved snapshot files will often
+continue to work with new versions, but they are not guaranteed to do
+so. 
 
 This program is free, open-source software available under the BSD
 license (see LICENSE.txt).
 
 
 Before you start, make sure that you have a copy of Topographica in a
-directory where you have at least 800MB of disk space available.
+directory where you have at least 1200MB of disk space available.
 
 
 BUILDING DOCUMENTATION
