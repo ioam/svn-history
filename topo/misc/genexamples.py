@@ -157,7 +157,9 @@ def find_examples(specified_examples=None,dirs=None):
             os.path.join(os.path.expanduser("~"),'topographica/examples'),
             # version-controlled topographica dir
             os.path.join(topo._package_path,"../examples"),
-            # package installed at <some path>/lib/python2.X/site-packages/topo
+            # debian package
+            os.path.join(topo._package_path,"../../../share/topographica/examples")]
+            # setup.py package
             os.path.join(topo._package_path,"../../../../share/topographica/examples")]
     else:
         candidate_example_dirs = dirs
