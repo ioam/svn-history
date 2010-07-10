@@ -298,9 +298,12 @@ doc: FORCE
 
 svn-release: LATEST_STABLE tag-release sf-web-site 
 
-# Update any topographica-win files that keep track of the version number
+# Update any files, including in topographica-win, that keep track of
+# the version number
 # CEBALERT: maintainer must have checked out topographica-win
 new-version: FORCE
+	mv setup.py setup.py~
+	sed -e "s/version=.*,/version='${RELEASE}',/g" setup.py~ > setup.py
 	mv topographica-win/create_installer/topographica.iss topographica-win/create_installer/topographica.iss~
 	sed -e 's/AppVerName=Topographica.*/AppVerName=Topographica '"${RELEASE}"'/g' topographica-win/create_installer/topographica.iss~ > topographica-win/create_installer/topographica.iss
 	mv topographica-win/common/setup.py topographica-win/common/setup.py~
