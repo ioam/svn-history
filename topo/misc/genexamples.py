@@ -15,16 +15,23 @@ Runs the 'all_quick' target if called without any arguments:
 To add new single targets, add to the targets dictionary;
 for groups of targets, add to the group_targets dictionary.
 
-
 $Id$
 """
 
 __version__='$Revision$'
 
+# JABALERT: Should be cut down and simplified; most of what it does is
+# for historical rather than functional reasons.  E.g. the quick
+# options should be in the tests, rather than here, and then the other
+# options need not specify how long they should be run; instead that
+# should be set by a parameter in the .ty file and then respected by
+# this file.  The .ty file could also specify a set of default
+# analysis functions to run, e.g. selecting from some options to be
+# made available in topo.command.basic, and if so this file need not
+# have any handling for specific scripts.  Meanwhile, at least it works.
 
 # Note: has none of the Makefile's dependency processing, so just does
-# what you tell it (i.e. over-writes existing files - which might be
-# behavior we actually want).
+# what you tell it (i.e. over-writes existing files).
 
 
 # CB: need to investigate the situation on Windows; old comment:
