@@ -1,6 +1,4 @@
-<p><b>4 July 2010:</b> Version 0.9.7 is being prepared for
-release.  Changes and new features, already available in the
-<A HREF="../Downloads/cvs.html">SVN</A> version, include:
+<p><b>10 July 2010:</b> Version 0.9.7 released, including:
 
 <!-- Updated to r10814 -->
 <center>
