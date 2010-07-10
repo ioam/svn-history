@@ -125,6 +125,19 @@ scripts = {
     'gca_lissom_10000.typ':'gca_lissom.ty'}
 
 
+def copy_examples():
+# topographica -c "from topo.misc.genexamples import copy_examples; copy_examples()"
+    examples = find_examples()
+    locn = os.path.join(param.normalize_path.prefix,"examples")
+    if os.path.exists(locn):
+        print "%s already exists; delete or rename it if you want to re-copy the examples."%locn
+        return
+    else:
+        print "Creating %s"%locn
+        import shutil
+        print "Copying %s to %s"%(examples,locn)
+        shutil.copytree(examples,locn)
+
 
 def print_examples_dir(**kw):
     examples = find_examples(**kw)
@@ -163,7 +176,7 @@ def find_examples(specified_examples=None,dirs=None):
                 if examples is False:
                     break
 
-    return examples
+    return os.path.normpath(examples)
 
 
 
@@ -257,4 +270,3 @@ class generate(param.ParameterizedFunction):
             print c
             system(c)
         
-    
