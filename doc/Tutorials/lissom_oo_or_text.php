@@ -52,7 +52,7 @@ similar buttons should be provided.
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting
-<code>lissom_oo_or_10000.typ</code> in the <code>examples</code> directory. This small orientation
+<code>lissom_oo_or_10000.typ</code>. This small orientation
 map simulation should load in a few seconds, with a 54x54
 retina, a 36x36 LGN (composed of one 36x36 OFF channel sheet, and one
 36x36 ON channel sheet), and a 48x48 V1 with about two million 
@@ -477,11 +477,11 @@ studied using the LISSOM model in Topographica as follows.
 <p></p><li>First, quit from any existing simulation, and start with a fresh copy:
 
 <blockquote><code class='to_type'>
-  ./topographica examples/lissom_oo_or.ty -g
+  topographica -g
   </code></blockquote>
 <p></p>
 
-
+From the <code>examples</code> directory, open <code>lissom_oo_or.ty</code>.
 <p></p></li><li>Next, open an <span class='w_title'>Activity</span> window 
 and make sure that it has <span class='t_item'>Auto-refresh</span> enabled.  Unless your machine is 
 very slow, also enable <span class='t_item'>Auto-refresh</span> in a
@@ -580,9 +580,16 @@ iterations at a time instead before looking at an
 
 <p><li> If you are <em>really</em> patient, you can change the number
 of units to something closer to real primate cortex, by quitting
-and then restarting with a higher density in V1:
+and then restarting with a higher density in V1. To do this, you will need
+to specify the example script from the commandline. If you are not sure where it is located, you can find out by first running 
+
 <blockquote><code class='to_type'>
-  ./topographica -p cortex_density=142 examples/lissom_oo_or.ty -g
+  topographica -c "from topo.misc.genexamples import print_examples_dir; print_examples_dir()"
+  </code></blockquote>
+
+Then you can use the path to the example, as well as specifying a higher cortex density:
+<blockquote><code class='to_type'>
+  topographica -p cortex_density=142 ~/topographica/examples/lissom_oo_or.ty -g
   </code></blockquote>
 <p></p>
   
