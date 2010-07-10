@@ -44,12 +44,14 @@ when you start Topographica from the terminal, e.g.
   <code>topographica /path/to/some_script.ty -g</code>
 </blockquote>
 
-(Windows users can use
-the <A HREF="../Downloads/win32notes.html">command prompt</A>,
-although it is usually easier to use the GUI menus.) This command will
-run a script located at the specified path. To be able to run the
-examples easily, you will first need to get your own personal copy of
-the example scripts:
+(Windows users can use the 
+<A HREF="../Downloads/win32notes.html">command prompt</A>,
+although on Windows it is usually easier to use the GUI menus.) This
+command will run a script located at the specified path.
+
+<A NAME="copy_examples"><P>To be able to run the examples easily</A>,
+you will first need to get your own personal copy of the example
+scripts:
 
 <blockquote>
   <code>topographica -c "from topo.misc.genexamples import copy_examples; copy_examples()"</code>
