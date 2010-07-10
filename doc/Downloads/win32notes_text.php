@@ -8,7 +8,8 @@ typing <code>cmd</code>, then clicking 'Ok'.
 
 <P>To convert UNIX shell commands to Windows Command Prompt commands:
 <ul>
-<li>Omit any initial '<code>./</code>'</li>
+<li>Replace <code>~</code> in a path with the path to your <code>My Documents</code> folder
+(e.g. <code>~/topographica</code> might become <code>"%HOMEPATH%\My Documents\topographica"</code>)</li>
 <li>Replace any forward slash '<code>/</code>' in a path with a backslash '<code>\</code>'</li>
 <li>Single quotes (<code>'</code>) must appear inside double quotes (<code>"</code>); double quotes cannot appear inside single quotes
 </ul>
@@ -21,8 +22,8 @@ typing <code>cmd</code>, then clicking 'Ok'.
 <TH>Windows equivalent</TH>
 
 <TR>
-<TD><code>./topographica -g examples/lissom_oo_or.ty</code></TD>
-<TD><code>topographica -g examples\lissom_oo_or.ty</code></TD>
+<TD><code>topographica -g ~/topographica/examples/lissom_oo_or.ty</code></TD>
+<TD><code>topographica -g %HOMEPATH%\My Documents\topographica\examples\lissom_oo_or.ty</code></TD>
 
 <TR>
 <TD><code>./topographica -c 'targets=["lissom_oo_or_10000.typ"]' examples/run.py</code></TD>
@@ -33,8 +34,6 @@ typing <code>cmd</code>, then clicking 'Ok'.
 
 <P>There are, additionally, some less-often-needed or more complex translations that might be required:
 <ul>
-<li>Replace <code>~</code> in a path with the path to your <code>My Documents</code> folder
-(e.g. <code>~/cnv</code> might become <code>"%HOMEPATH%\My Documents\cnv"</code>)</li>
 <li>Unix commands such as <code>cp</code> usually have equivalents (<code>copy</code> in this case); see one of the references on the web, e.g. <A HREF="http://www.yolinux.com/TUTORIALS/unix_for_dos_users.html">UNIX for DOS Users</A></li>
 </ul>
 

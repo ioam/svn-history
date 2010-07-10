@@ -12,12 +12,11 @@ extensible for models not yet supported.
 
 <p>This tutorial assumes that you have already followed the
 instructions for <a href="../Downloads/index.html">obtaining and
-installing</a> Topographica.  Also, you will need to generate a saved
-orientation map network (a .typ file), which can be done by running
-<blockquote><code class='to_type'>./topographica -c "targets=['lissom_oo_or_10000.typ']" examples/run.py</code></blockquote>
-
-(on Unix or Mac systems; on Windows, the syntax is slightly different&mdash;see the note about
-<A HREF="../Downloads/win32notes.html#unix-commands-on-win">translating Unix shell commands</A>).
+installing</a> Topographica. Also, you will need to generate a saved
+orientation map network (a .typ file), which can be done from a
+Terminal (<A HREF="../Downloads/win32notes.html">command prompt</A> on
+Windows) by running
+<blockquote><code class='to_type'>topographica -c "from topo.misc.genexamples import generate; generate(targets=['lissom_oo_or_10000.typ'])"</code></blockquote>
 
 <P>Depending on the speed of your machine, you may want to go get a
 snack at this point; on a 3GHz 512MB machine this training process
@@ -30,22 +29,15 @@ currently takes from 7-15 minutes (depending on the amount of level
 <h2>Response of an orientation map</h2>
 
 In this example, we will load a saved network and test its behavior by
-presenting different visual input patterns.  We will assume that
-Topographica is installed in <code>/home/jbednar/public/topographica/</code>.
+presenting different visual input patterns.  
 
 <ol> 
 <p></p>
-<li>First, change to your topographica directory, e.g.:
-
-<blockquote><code class='to_type'>cd /home/jbednar/public/topographica/</code></blockquote>
-<p></p>
-</li>
-
-<li>Next, start the Topographica GUI:
+<li>First, start the Topographica GUI from a terminal:
 <blockquote><code class='to_type'>
-  ./topographica -g
+  topographica -g
   </code></blockquote>
-<p></p>
+<p>(Windows users can instead double click on the desktop Topographica icon.)<br>This will open the Topographica console:</p>
   
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
@@ -60,7 +52,7 @@ similar buttons should be provided.
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting
-<code>lissom_oo_or_10000.typ</code> in the examples/ directory. This small orientation
+<code>lissom_oo_or_10000.typ</code> in the <code>examples</code> directory. This small orientation
 map simulation should load in a few seconds, with a 54x54
 retina, a 36x36 LGN (composed of one 36x36 OFF channel sheet, and one
 36x36 ON channel sheet), and a 48x48 V1 with about two million 

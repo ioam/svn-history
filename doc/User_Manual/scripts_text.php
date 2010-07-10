@@ -14,40 +14,14 @@ HREF="batch.html">separately</A>.
 <H2>Starting Topographica</H2>
 
 <P>To start Topographica with one of our example scripts, on most
-systems (including Linux, Unix, and Mac) just open a terminal window,
-go to your <code>topographica/</code> directory, and type e.g.:
-
-<pre title="Win: topographica -g examples\tiny.ty">
-  ./topographica -g examples/tiny.ty
-</pre>
-
-or
-
-<pre title="Win: topographica -g examples\hierarchical.ty">
-  ./topographica -g examples/hierarchical.ty
-</pre>
-
-or
-
-<pre title="Win: topographica -g examples\som_retinotopy.ty">
-  ./topographica -g examples/som_retinotopy.ty
-</pre>
-
-or
-
-<pre title="Win: topographica -g examples\lissom_oo_or.ty">
-  ./topographica -g examples/lissom_oo_or.ty
-</pre>
-
-(Windows users can type similar commands at a Windows command prompt:
-hold your mouse over a command above to see the Windows equivalent, or
-see our note about <A
-HREF="../Downloads/win32notes.html#unix-commands-on-win">translating Unix shell
-commands to Windows</A>.  Alternatively, Windows users can double
-click on one of the <code>.ty</code> scripts in the examples
-directory; <code>.ty</code> files are associated with Topographica.)
-
-<!--CEBALERT: describe Simulation/Run script GUI?-->
+systems just open a terminal window and type <code>topographica
+-g</code> (Windows: double click on the desktop Topographica
+icon). Once Topographica has loaded, you can then click on Help,
+followed by Examples, to choose an example script to run. We have
+tutorials
+for <A HREF="../Tutorials/lissom_oo_or.html">lissom_oo_or.ty</A>
+and <A HREF="../Tutorials/som_retinotopy.ty">som_retinotopy.ty</A>,
+which make a good starting point for using Topographica.
 
 <P>Note that the first time Topographica is run on a given example,
 there may be a short pause while the program compiles some of the
@@ -62,6 +36,42 @@ only notice such pauses the first time you use a particular component,
 at which time you may also notice various inscrutable messages from
 the compiler. These messages vary depending on platform (because they
 come from the compiler), and may generally be ignored.
+
+<P>Alternatively, you can instead pass the name of a script to run
+when you start Topographica from the terminal, e.g.
+
+<blockquote>
+  <code>topographica /path/to/some_script.ty -g</code>
+</blockquote>
+
+(Windows users can use
+the <A HREF="../Downloads/win32notes.html">command prompt</A>,
+although it is usually easier to use the GUI menus.) This command will
+run a script located at the specified path. To be able to run the
+examples easily, you will first need to get your own personal copy of
+the example scripts:
+
+<blockquote>
+  <code>topographica -c "from topo.misc.genexamples import copy_examples; copy_examples()"</code>
+</blockquote>
+
+(During installation, the Topographica example scripts are installed
+into a location that varies by operating system and installation type;
+this command copies those examples
+to <code>~/topographica/examples/</code>.)
+
+<P>Then, you can run an example script using a command like the
+following:
+
+<blockquote>
+  <code>topographica ~/topographica/examples/som_retinotopy.ty -g</code>
+</blockquote>
+
+<P>Topographica can also be run without the GUI by omitting
+the <code>-g</code> flag from the startup command.
+
+<!--CEBALERT: describe Simulation/Run script GUI?-->
+
 
 
 <H2><a name="ty-files">Topographica Scripts</a></H2>
@@ -140,7 +150,7 @@ sheets, connections-->
 <H2>Startup options</H2>
 
 <P>Topographica accepts a number of startup options. Details are
-available by passing -h to Topographica (<code>./topographica
+available by passing -h to Topographica (<code>topographica
 -h</code>), but a few in particular are often useful. We have already
 seen <code>-g</code>, which starts an interactive session with the
 GUI. To run a script interactively without the GUI, pass
@@ -163,8 +173,8 @@ optionally be set at startup, such as
 <code>retina_density</code>, <code>lgn_density</code>,
 and <code>cortex_density</code>, e.g.:
 
-<pre>./topographica -i -p retina_density=12 -p cortex_density=12 \
-examples/lissom_oo_or.ty 
+<pre>topographica -i -p retina_density=12 -p cortex_density=12 \
+~/topographica/examples/lissom_oo_or.ty 
 </pre>
 
 In this case, we are specifying that the retina and V1 sheets in a
@@ -185,8 +195,8 @@ commands can be specified at the commandline by using the
 <code>-c</code> option. For instance:
 
 <pre>
-./topographica -c 'from topo.command.analysis import measure_sine_pref'\
--c 'measure_sine_pref.num_directions=12' examples/tiny.ty
+topographica -c 'from topo.command.analysis import measure_sine_pref'\
+-c 'measure_sine_pref.num_directions=12' ~/topographica/examples/tiny.ty
 </pre>
 
 would import <code>measure_sine_pref</code> and set its
