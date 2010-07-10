@@ -158,10 +158,12 @@ def find_examples(specified_examples=None,dirs=None):
             # version-controlled topographica dir
             os.path.join(topo._package_path,"../examples"),
             # package installed at <some path>/lib/python2.X/site-packages/topo
-            os.path.join(topo._package_path,"../../../share/topographica/examples")]
+            os.path.join(topo._package_path,"../../../../share/topographica/examples")]
     else:
         candidate_example_dirs = dirs
 
+    ced = [os.path.normpath(d) for d in candidate_example_dirs]
+    candidate_example_dirs = ced
     # CEBALERT: horrible way to find directory that contains all the
     # examples specified.
     examples = None
@@ -175,10 +177,8 @@ def find_examples(specified_examples=None,dirs=None):
 
                 if examples is False:
                     break
-
-    return os.path.normpath(examples)
-
-
+    
+    return examples
 
 
 # CEBALERT: should be rewritten!
