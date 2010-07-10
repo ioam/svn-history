@@ -54,19 +54,30 @@ SAVED_FILETYPES = [('Topographica saved networks',
                     '*'+SAVED_FILE_EXTENSION),
                    ('All files','*')]
 
+turl = "http://topographica.org/"
+userman = "User_Manual/index.html"
+tuts = "Tutorials/index.html"
+refman = "Reference_Manual/index.html"
+plotman = "User_Manual/plotting.html"
 
+# for deb on ubuntu; will need to check others
+pkgdoc = "/usr/share/doc/topographica/doc/" 
 
 # Documentation locations: locally built and web urls.
-user_manual_locations      = ('doc/User_Manual/index.html',
-                              'http://topographica.org/User_Manual/')
-tutorials_locations        = ('doc/Tutorials/index.html',
-                              'http://topographica.org/Tutorials/')
-reference_manual_locations = ('doc/Reference_Manual/index.html',
-                              'http://topographica.org/Reference_Manual/')
+user_manual_locations      = ('doc/'+userman,
+                              pkgdoc+userman,
+                              turl+userman)
+tutorials_locations        = ('doc/'+tuts,
+                              pkgdoc+tuts,  
+                              turl+tuts)
+reference_manual_locations = ('doc/'+refman,
+                              pkgdoc+refman,
+                              turl+refman)
 python_doc_locations = ('http://www.python.org/doc/',)
-topo_www_locations = ('http://www.topographica.org/',)
-plotting_help_locations = ('doc/User_Manual/plotting.html',
-                           'http://topographica.org/User_Manual/plotting.html')
+topo_www_locations = (turl,)
+plotting_help_locations = ('doc/'+plotman,
+                           pkgdoc+plotman,
+                           turl+plotman)
 
 # If a particular plotgroup_template needs (or works better with) a
 # specific subclass of PlotPanel, the writer of the new subclass
@@ -521,7 +532,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
 
         The script is exec'd in __main__.__dict__ (i.e. as if it were specified on the commandline.)
         """
-        script = askopenfilename(filetypes=SCRIPT_FILETYPES)
+        script = askopenfilename(initialdir=normalize_path(),filetypes=SCRIPT_FILETYPES)
         if script in ('',(),None): # (representing the various ways no script was selected in the dialog)
             self.messageBar.response('Run canceled')
         else:
@@ -546,7 +557,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         """
         Dialog to load a user-selected snapshot (see topo.command.basic.load_snapshot() ).
         """
-        snapshot_name = askopenfilename(filetypes=SAVED_FILETYPES)
+        snapshot_name = askopenfilename(initialdir=normalize_path(),filetypes=SAVED_FILETYPES)
 
         if snapshot_name in ('',(),None):
             self.messageBar.response('No snapshot loaded.')
