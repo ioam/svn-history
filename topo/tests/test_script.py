@@ -314,7 +314,7 @@ def compare_with_and_without_snapshot_NoSnapshot(script="examples/lissom_oo_or.t
 def compare_with_and_without_snapshot_CreateSnapshot(script="examples/lissom_oo_or.ty"):
     data_filename=os.path.split(script)[1]+"_PICKLETEST"
 
-    locn = resolve_path(data_filename)
+    locn = resolve_path(os.path.join('tests',data_filename))
     print "Loading pickle at %s"%locn
         
     try:
