@@ -119,9 +119,9 @@ class ParameterMetaclass(type):
         # store the class's docstring in __classdoc
         if '__doc__' in classdict:
             classdict['__classdoc']=classdict['__doc__']
-        # when asking for help on Parameter *object*, return 
-        # the parameter object's repr
-        classdict['__doc__']=property(lambda obj: repr(obj)) 
+        # when asking for help on Parameter *object*, return the doc
+        # slot
+        classdict['__doc__']=property(attrgetter('doc'))
 
         # To get the benefit of slots, subclasses must themselves define
         # __slots__, whether or not they define attributes not present in
@@ -297,7 +297,7 @@ class Parameter(object):
     # Parameterized class owns it. If a Parameter subclass needs
     # to know the owning class, it can declare an 'objtype' slot
     # (which will be filled in by ParameterizedMetaclass)
-          
+                                                   
     def __init__(self,default=None,doc=None,precedence=None,  # pylint: disable-msg=R0913
                  instantiate=False,constant=False,readonly=False): 
         """
@@ -324,23 +324,7 @@ class Parameter(object):
         self.readonly = readonly
         self._set_instantiate(instantiate)
 
-    
-    def __repr__(self):
-        module_name = type(self).__module__
-        class_name = type(self).__name__
-        name = module_name+'.'+class_name
-
-        # simplify this!
-        r = "("
-        for a in get_all_slots(type(self)):
-            if not a.startswith('_') and a!='doc':
-                r+="%s=%s,"%(a,getattr(self,a))
         
-        r+="doc=\"\"\"%s\"\"\")"%self.doc
-
-        return name+r
-
-    
     def _set_instantiate(self,instantiate):
         """Constant parameters must be instantiated."""
         # CB: instantiate doesn't actually matter for read-only
