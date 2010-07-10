@@ -52,7 +52,8 @@ _topographica_devs_email='developers[at]topographica[dot]org'
 setup_args.update(dict(
     name='topographica',
 
-    version='0.9.7a',
+    # CEBALERT: we need one single place with the version number!
+    version='0.9.7',
 
     description='A general-purpose neural simulator focusing on topographic maps.',
 
@@ -113,7 +114,7 @@ of `SciPy`_) for optimum performance.
     classifiers = [
         "License :: OSI Approved :: BSD License",
 # (until packaging tested)
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 2",
         "Operating System :: OS Independent",
         "Intended Audience :: Education",
