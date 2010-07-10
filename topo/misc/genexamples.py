@@ -59,7 +59,7 @@ from param import ParamOverrides
 ### Convenience functions
 def snapshot(filename):
     """Return a command for saving a snapshot named filename."""
-    return "from topo.command.basic import save_snapshot ; save_snapshot(filename)"
+    return "from topo.command.basic import save_snapshot ; save_snapshot('%s')"%filename
     
 def or_analysis():
     """Return a command for orientation analysis."""

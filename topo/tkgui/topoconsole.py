@@ -33,6 +33,7 @@ import topo
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 from topo.misc.keyedlist import KeyedList
 from topo.misc.commandline import sim_name_from_filename
+import topo.misc.genexamples
 import topo.command.basic
 
 import topo.tkgui 
@@ -478,6 +479,9 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
 
         help_menu.add_command(label="Tutorials",
                               command=(lambda x=tutorials_locations: self.open_location(x)))
+
+        help_menu.add_command(label="Examples",
+                              command=self.run_example_script)
         
         help_menu.add_command(label="Reference Manual",
                               command=(lambda x=reference_manual_locations: self.open_location(x)))
@@ -535,6 +539,21 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         script = askopenfilename(initialdir=normalize_path(),filetypes=SCRIPT_FILETYPES)
         if script in ('',(),None): # (representing the various ways no script was selected in the dialog)
             self.messageBar.response('Run canceled')
+        else:
+            execfile(script,__main__.__dict__)
+            self.messageBar.response('Ran ' + script)
+            sim_name_from_filename(script)
+            self.title(topo.sim.name)
+
+    # CEBALERT: duplicates most of run_script()
+    def run_example_script(self):
+
+        
+        script = askopenfilename(initialdir=topo.misc.genexamples.find_examples(),
+                                 filetypes=SCRIPT_FILETYPES)
+
+        if script in ('',(),None): # (representing the various ways no script was selected in the dialog)
+            self.messageBar.response('No example opened')
         else:
             execfile(script,__main__.__dict__)
             self.messageBar.response('Ran ' + script)
