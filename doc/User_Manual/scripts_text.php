@@ -54,7 +54,7 @@ there may be a short pause while the program compiles some of the
 optimized components used in that example.  (Some components,
 generally those with <code>_opt</code> in their names, use code
 written in C++ internally for speed, and this code must be compiled.)
-The compiled versions are stored in <code>~/.python25_compiled/</code>
+The compiled versions are stored in <code>~/.python26_compiled/</code>
 on most systems (or in the temporary directory
 <code>%TEMP%\%USERNAME%</code> on Windows), and they will be reused on
 the next run unless the source files have changed.  Thus you should

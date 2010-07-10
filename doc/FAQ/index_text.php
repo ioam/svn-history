@@ -43,56 +43,6 @@ work around these issues.
 
 <!--CEBALERT: this is out of date, isn't it? -->
   
-<!----------------------------------------------------------------------------->
-<LI><B>Q:</B> <i>When I try to save a snapshot of my network, I get
-  this scary warning:</i> 
-
-<pre>
-Parameterized53371: Warning: ManagedRandomComposite (type <class 
-'param.parameterized.ParameterizedMetaclass'>) has 
-source in __main__; it will only be found on unpickling if the class is 
-explicitly defined (e.g. by running the same script first) before 
-unpickling.
-</pre>
-
-<P><B>A:</B> 
-That doesn't necessarily indicate anything is wrong.  What it is
-saying is that you have defined some variables and/or classes in your
-.ty script file, rather than in a .py module in topo/.  Python knows
-
-<!-- No warning is printed for variables: just functions and classes.
-Do we need to add a warning for variables? (Maybe we could actually
-pickle variables?)  Also, it's not just those functions and classes
-defined in a .ty script file, but also those defined at the command
-prompt. -->
-
-how to restore the state of anything in an imported module, but it has
-
-<!-- 'imported module' = module imported from topo -->
-
-no idea how to find classes defined in regular scripts like those in
-the examples directory (which we name ending in .ty to make the
-difference obvious).  So you can either:
-
-<P>1. Move any classes, functions, etc. that you need from your .ty file
-into somewhere in a .py file that your script then imports.  That's
-usually the best long-term solution, because then anyone can use your
-classes.  If there are very specialized classes or functions in the
-.ty file that are not useful for other people, you can consider
-putting it into the contrib/ subdirectory, with a suitably unique
-filename.  However, this approach may not be appropriate if you find
-it easier to develop the functions in one file.
-
-<P>or
-
-<P>2. Before reloading a saved snapshot, just run your .ty file as you
-did the first time.  That will define all the classes, functions,
-etc., and then reloading the saved snapshot should work fine.
-      
-<P>The warning is just telling you that you need to do option 2; if you
-want to suppress the warning entirely you can do option 1.
-</LI>
-
 
 <!----------------------------------------------------------------------------->
 <LI><B>Q:</B> <i>Topographica seems to build fine, but when I run the
@@ -136,7 +86,7 @@ SOM network like examples/som_retinotopy.ty is simply built from:
 </ol>
 
 <P>This approach makes it simple to change specific aspects of a model
-(e.g. the specific kernel function) without necessarly requiring any
+(e.g. the specific kernel function) without necessarily requiring any
 new code, as long as the new function has already been written for any
 previous model.  For this example, only the KernelMax function (about
 50 lines of Python code) was added specifically for supporting SOM;

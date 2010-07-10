@@ -108,11 +108,10 @@ will be high-level components written in C, such as CFPLF_Hebbian_opt.
 
 
 <!-- JABALERT! This should probably move to its own page. -->
-<H2>External Packages</H2>
+<H2>Required external Packages</H2>
 
-<P>Topographica makes extensive use of external packages included with
-the distribution.  For full use of the features of these packages, see
-their documentation:
+<P>Topographica makes extensive use of the following external
+packages that must be installed to use Topographica:
 
 <!-- Should we make these point to the local copy instead? -->
 <P><DL COMPACT>
@@ -147,6 +146,23 @@ Functions by Category) to learn about the full range of available
 functions.
 </DD>
 
+<P><DT><A href="http://www.pythonware.com/products/pil/">PIL</A></DT>
+<DD>Topographica uses the Python Imaging Library for reading and
+writing bitmap images of various types.  PIL also provides a variety
+of <A HREF="http://www.pythonware.com/library/pil/handbook/index.htm">image
+processing and graphics routines</A>, which are available for use in
+Topographica components and scripts.</DD>
+</DL>
+
+For full use of the features of these packages, see their
+documentation.  
+
+<H2>Typical external Packages</H2>
+
+Most Topographica users will also want these additional packages:
+
+<P><DL COMPACT>
+
 <P><DT><A href="http://matplotlib.sourceforge.net/">MatPlotLib</A></DT>
 <DD>Matplotlib is used for generating 1D (line) and 2D (plane) plots,
 such as topographic grid plots.  It
@@ -155,13 +171,6 @@ a very general Matlab-like interface for creating plots of any
 quantities one might wish to visualize, including any array or vector
 in the program.
 </DD>
-
-<P><DT><A href="http://www.pythonware.com/products/pil/">PIL</A></DT>
-<DD>Topographica uses the Python Imaging Library for reading and
-writing bitmap images of various types.  PIL also provides a variety
-of <A HREF="http://www.pythonware.com/library/pil/handbook/index.htm">image
-processing and graphics routines</A>, which are available for use in
-Topographica components and scripts.</DD>
 
 <P><DT><A href="http://ipython.scipy.org/">IPython</A></DT>
 <DD>IPython provides Topographica with an enhanced Python shell,
@@ -191,19 +200,13 @@ HREF="http://fixedpoint.sourceforge.net/">fixedpoint</A>).
 
 </DL>
 
-
+<P>They are included in the source distribution, or can be installed via
+your regular package manager.
+ 
 <H3>Optional External Packages</H3>
 
-<P>Several packages included with the Topographica distribution are
-not built by default because their build processes are sometimes difficult.
-Often, however, it is reasonably straightforward to build these 
-packages yourself. Individual packages can be built as described in their
-own sections below, or you can attempt to build all the optional packages with 
-<code>make -C external all</code> (though this will stop at the first failure).
-Alternatively, if you want to see which of these packages will build
-without errors, just do <code>make -k -C external all</code>; any
-packages with errors will then be skipped rather than stopping the
-build process.
+<P>A number of other packages are also useful with Topographica, but
+can sometimes be difficult to install.  They include:
 
 <P><DL COMPACT>
 
@@ -217,7 +220,8 @@ such as statistics, linear algebra, image processing, integration and
 differential equation solvers, etc.  However, because of all the
 external libraries that it uses, getting SciPy to work 
 on a particular installation can be difficult. You can try with
-<code>make -C external scipy</code>.</DD>
+<code>make -C external scipy</code> if you installed Topographica from
+source; otherwise install Scipy described in its documentation.</DD>
 
 <P><DT><A name="mlabwrap" href="http://mlabwrap.sourceforge.net/">mlabwrap</A></DT>
 <DD>mlabwrap is a high-level Python-to-Matlab bridge, allowing Matlab to look like
@@ -243,10 +247,11 @@ before using mlabwrap.
 <DD>
 pyaudiolab provides an easy way to read from and write to sound files (it wraps 
 <A href="http://www.mega-nerd.com/libsndfile/">libsndfile</A>).
-On Linux, building should require nothing more than <code>make -C external pyaudiolab</code>.
+On Linux source installations, building should require nothing more than <code>make -C external pyaudiolab</code>.
 <!--Currently: untested on OSX, not present on Windows-->
 </DD>
 
+<!--
 <P><DT><A HREF="http://gnuplot-py.sourceforge.net">gnuplotpy</A></DT>
 <DD>
 You can use the external <code>gnuplot</code> command to generate plots on
@@ -257,8 +262,9 @@ you can e.g. use <code>matrixplot3d_gnuplot()</code> in place of
 <A href="../User_Manual/commandline.html#gnuplotpy"><code>matrixplot3d()</code></A>
 or <code>matrixplot()</code>, or modify
   <code>matrixplot3d_gnuplot()</code> to create any other gnuplot visualization.
-<!--Currently: untested on OSX, not present on Windows-->
 </DD>
+  Currently: untested on OSX, not present on Windows
+-->
 
 <P><DT><A HREF="http://playerstage.sf.net">Player/Stage/Gazebo</A></DT>
 <DD>
@@ -304,17 +310,13 @@ cython</code> from your Topographica directory.
 </DL>
 
 
-
-
-
-<H2>Additional extensions</H2>
-
 <P>Topographica runs on an unmodified version of the Python language,
 and so it can be used with any Python package that you install
 yourself.  To install such a package in Topographica, just run its
-<code>setup.py</code> as usual, but using the copy of Python in
+<code>setup.py</code> as usual, being sure to use whichever copy of
+Python that you use for Topographica
 <code>topographica/bin/python</code>.  For instance, if you are
-currently in the main topographica directory and the new package has
+currently in the main topographica source directory and the new package has
 been unpacked in your home directory <code>/home/user/pkg</code>, just type
 <code>bin/python /home/user/pkg/setup.py</code>.
 Running setup in this way ensures that the package will be installed
