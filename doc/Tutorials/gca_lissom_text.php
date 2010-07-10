@@ -1,4 +1,4 @@
-<H1>GCA-LISSOM Orientation Map</H1>
+<H1>GCA Orientation Map</H1>
 
 <p>
 This tutorial shows how to use the
@@ -6,28 +6,31 @@ This tutorial shows how to use the
 to explore a simple orientation map simulation using test patterns and
 weight plots. 
 
-<P>We will use the <!--CEBALERT: link to
-publication-->GCA-LISSOM model, which is based on the 
-<a href="http://nn.cs.utexas.edu/keyword?rflissom">LISSOM model</a>
-but also includes contrast gain control (GC) in the LGN and
-homeostatic adaptation (A) in V1. Although we focus on one model here,
+<P>We will use the <!--CEBALERT: need to link to publication when it comes out-->
+GCA model (paper to appear), which is related to the
+<a href="http://homepages.inf.ed.ac.uk/jbednar/research.html">LISSOM
+model</a> but works more robustly with fewer parameters thanks to 
+including contrast gain control (GC) in the LGN and homeostatic
+adaptation (A) in V1. Although we focus on one model in this tutorial,
 Topographica already supports many other models and is easily
-extensible for models not yet supported.
+extensible for models not yet included.
 </p>
 
 <p>This tutorial assumes that you have already followed the
 instructions for <a href="../Downloads/index.html">obtaining and
-installing</a> Topographica.  Also, you will need to generate a saved
-orientation map network (a .typ file), which can be done by running
-<blockquote><code class='to_type'>./topographica -c "targets=['gca_lissom_10000.typ']" examples/run.py</code></blockquote>
+installing</a> Topographica. Also, you will need to generate a saved
+orientation map network (a .typ file), which can be done from a
+Unix or Mac  terminal or Windows <A HREF="../Downloads/win32notes.html">command
+prompt</A> by running
+<blockquote><code class='to_type'>topographica -a -c "generate_example(targets=['gca_lissom_10000.typ'])"</code></blockquote>
 
-(on Unix or Mac systems; on Windows, the syntax is slightly different&mdash;see the note about
-<A HREF="../Downloads/win32notes.html#unix-commands-on-win">translating Unix shell commands</A>).
 
 <P>Depending on the speed of your machine, you may want to go get a
-snack at this point; on a 2.66GHz machine this training process
-currently takes about 17 minutes.
-<!--fiver: 17:13 -->
+snack at this point; on a 3GHz machine this training process
+currently takes about 12 minutes.
+<!--cortex: 11:24 -->
+When training completes, the .typ file should be ready in the
+topographica subdirectory of your home directory. 
 </p>
 
 
@@ -35,26 +38,16 @@ currently takes about 17 minutes.
 <h2>Response of an orientation map</h2>
 
 In this example, we will load a saved network and test its behavior by
-presenting different visual input patterns.  We will assume that
-Topographica is installed
-in <code>/home/jbednar/public/topographica/</code>.
+presenting different visual input patterns.
 
 <ol> 
 <p></p>
-<li>First, change to your topographica directory, e.g.:
-
-<blockquote>
-<code class='to_type'>cd /home/jbednar/public/topographica/</code>
-</blockquote>
-<p></p>
-</li>
-
-<li>Next, start the Topographica GUI:
+<li>First, start the Topographica GUI from a terminal:
 <blockquote><code class='to_type'>
-  ./topographica -g
+  topographica -g
   </code></blockquote>
-<p></p>
-  
+<p>(Windows users can instead double click on the desktop Topographica icon.)<br>This will open the Topographica console:</p>
+
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
 align="middle" WIDTH="409" HEIGHT="127">
@@ -68,8 +61,7 @@ similar buttons should be provided.
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting
-<code>gca_lissom_10000.typ</code> in the examples/ directory. 
-<!--CEBALERT: update when sure what size we'll use-->
+<code>gca_lissom_10000.typ</code>. 
 This small orientation map simulation should load in a few seconds,
 with a 78x78 retina, a 60x60 LGN (composed of one 60x60 OFF channel
 sheet, and one 60x60 ON channel sheet), and a 48x48 V1 with about two
@@ -117,8 +109,8 @@ window should then show the result:
 align="middle" WIDTH="668" HEIGHT="360">
 </p>
 
-<P>This window shows the response for each neural area. Please turn on
-<span class='t_item'>Normalize</span>
+<P>This window shows the response for each neural area. For now, please 
+turn on <span class='t_item'>Normalize</span>
 and <span class='t_item'>Strength only</span> (both are usually off by
 default).
 <!--Considering whether to make initial lgn response visible in the model-->
@@ -154,8 +146,8 @@ explained below.
 </li>
 
 <li> To help understand the response patterns in V1, we can look at
-the weights to V1 neurons.  These weights were learned previously, by
-presenting 10000 pairs of oriented Gaussian patterns at random angles
+the weights to V1 neurons.  These weights were learned previously, 
+as a result of presenting 10000 pairs of oriented Gaussian patterns at random angles
 and positions.  To plot a single neuron, select <a
 name="ConnectionFields-plot"><span class='t_item'>Connection
 Fields</span></a> from the <span class='t_item'>Plots</span>
@@ -167,8 +159,8 @@ neuron in the center of the cortex (by default):
 align="middle" WIDTH="668" HEIGHT="421">
 </p>
 
-<P>Again, please make sure for now that <span class='t_item'>Strength
-only</span> is turned on; it is usually off by default.
+<P>Again, for now please turn on <span class='t_item'>Strength
+only</span>; it is usually off by default.
 
 <p> The plot shows the afferent weights to V1 (i.e., connections from
 the ON and OFF channels of the LGN), followed by the lateral
@@ -225,11 +217,11 @@ is the orientation map for V1 in this model.
 Each neuron in the plot is color coded by its preferred orientation,
 according to the key shown to the left of the plot.
 (If viewing a monochrome printout, see web page for the colors).
-Note that phase preference and selectivity are also displayed in
-the window, but these are not analyzed here (and are not shown above).
+Note that phase preference and selectivity are also displayed in the
+window, but these are not analyzed here (and are not shown above).
 </p>
 
-<p> You can see that nearby neurons have similar orientation
+<P> You can see that nearby neurons have similar orientation
 preferences, as found in primate visual cortex. The <span
 class='t_item'>Orientation Selectivity</span> plot shows the relative
 selectivity of each neuron for orientation on an arbitrary scale; you
@@ -253,7 +245,9 @@ Manual</A>) so that the
 Activity window and ensure it has Auto-Refresh turned on, then press
 Refresh by the Orientation Preference window's 'Pre plot hooks'. You
 will see a series of sine gratings presented to the network, and can
-observe the response each time in the LGN and V1 sheets.
+observe the response each time in the LGN and V1 sheets.  When you are
+done, press Refresh on the pre-plot hooks in the Activity window to
+restore the original activity pattern plots.
 </p><p>
 </p></li>
 
@@ -351,7 +345,7 @@ ring shape, because the orientations repeat at a constant spatial
 frequency in all directions. Selecting <span class='t_item'>Hue
 channel: OrientationPreference</span> > <span class='t_item'>Fourier
 transform</span> from the right-click menu allows us to see the same
-is true of the map generated by GCA-LISSOM:
+is true of the map generated by the GCA network:
 
 
 <p class="center">
@@ -443,18 +437,17 @@ the input and the final response after the cortex has settled due to
 the lateral connections.  If you want to understand the settling
 process itself, you can also visualize how the activity propagates
 from the retina to the LGN, from the LGN to V1, and then within V1.
-To do this, first make sure that there is
-an <span class='t_item'>Activity</span> window open, with Auto-refresh
-enabled.  Then go to the console window and hit "Step"
-repeatedly. After an input is presented, you will see the activity
-arrive first in the LGN, then change in the LGN, then appear in V1,
-and then gradually change within V1. (You might want to turn on
-Normalize to see some features more easily, although this can make
-others more difficult to see.)  The Step button moves to the next
-scheduled event in the simulation, which are at even multiples of 0.05
-for this particular simulation.  You can also type in the specific
-duration (e.g. 0.05) to move forward into the "Run for:" box, and hit
-"Go" instead.
+To do this, first make sure that there is an <span
+class='t_item'>Activity</span> window open, with Auto-refresh enabled.  
+Then go to the console window and hit "Step" repeatedly. After an
+input is presented, you will see the activity arrive first in the LGN,
+then change in the LGN, then appear in V1, and then gradually change
+within V1. (You might want to turn on Normalize to see some features
+more easily, although this can make others more difficult to see.)
+The Step button moves to the next scheduled event in the simulation,
+which are at even multiples of 0.05 for this particular simulation.
+You can also type in the specific duration (e.g. 0.05) to move forward
+into the "Run for:" box, and hit "Go" instead.
 
 <P>As explained in the
 <A HREF="../User_Manual/time.html">User Manual</A>,
@@ -465,22 +458,23 @@ input pattern at time 0.05 (the phase of the
 <?php classref('topo.sheet.basic','GeneratorSheet') ?>).  Thus
 the first visible activity occurs in the Retina, at 0.05.  The
 Retina is connected to the LGN with a delay of 0.05, and so the LGN
-responds at 0.10. The LGN has self-connections with a delay of 0.05,
-so the next event is the LGN settling at 0.15 (the gain control step).
-After this step, V1 is initially activated at 0.20. V1 also has self-connections with a
-delay of 0.05, and so V1 is then repeatedly activated every 0.05 timesteps.
-Eventually, the number of V1 activations reaches a fixed limit for GCA-LISSOM
-(usually about 16 timesteps), and no further events are generated or consumed
-until the next input is generated at time 1.05.  Thus the default
-stepsize of 1.0 lets the user see the results after each input pattern
-has been presented and the cortex has come to a steady state, but
-results can also be examined at a finer timescale.  Be sure to leave
-the time clock at an even multiple of 1.0 before you do anything else,
-so that the network will be in a well-defined state.  (To do this,
-just type the fractional part into the "Run for:" box, i.e. 0.95 if
-the time is currently 10002.05, and then press "Go".)
-</li>
-</ol>
+responds at 0.10.
+The LGN has self connections with a delay of 0.05, so the next event
+is the LGN settling at 0.15 (the gain control step).
+After this step, V1 is initially activated at 0.20.
+V1 also has self connections with a delay of 0.05, and so V1 is then
+repeatedly activated every 0.05 timesteps.  Eventually, the number of
+V1 activations reaches a fixed limit for GCA (usually about 16
+timesteps), and no further events are generated or consumed until the
+next input is generated at time 1.05.  Thus the default stepsize of
+1.0 lets the user see the results after each input pattern has been
+presented and the cortex has come to a steady state, but results can
+also be examined at a finer timescale.  Be sure to leave the time
+clock at an even multiple of 1.0 before you do anything else, so that
+the network will be in a well-defined state.  (To do this, just type
+the fractional part into the "Run for:" box, i.e. 0.95 if the time is
+currently 10002.05, press "Go", and then change "Run for:" to 1.0.)
+</li> </ol>
 
 
 
@@ -489,19 +483,22 @@ the time is currently 10002.05, and then press "Go".)
 The previous examples all used a network trained previously, without
 any plasticity enabled.  Many researchers are interested in the
 processes of development and plasticity.  These processes can be
-studied using the GCA-LISSOM model in Topographica as follows.
+studied using the GCA model in Topographica as follows.
 
 <p>
 </p><ol>
 
-<p></p><li>First, quit from any existing simulation, and start with a fresh copy:
+<p></p><li>First, quit from any existing simulation, and
+<A HREF="../User_Manual/scripts.html#copy_examples">get a copy of the
+example files to work with</A> if you do not have them already.  Then
+start a new run of Topographica:
 
 <blockquote><code class='to_type'>
-  ./topographica examples/gca_lissom.ty -g
+  topographica -g
   </code></blockquote>
 <p></p>
 
-
+From the <code>examples</code> directory, open <code>gca_lissom.ty</code>.
 <p></p></li><li>Next, open an <span class='w_title'>Activity</span> window 
 and make sure that it has <span class='t_item'>Auto-refresh</span> enabled.  Unless your machine is 
 very slow, also enable <span class='t_item'>Auto-refresh</span> in a
@@ -525,7 +522,7 @@ have an obvious effect by speeding up learning to a highly implausible
 level.  To do this, open the <span class='w_title'>Model Editor</span>
 window, right click on the LGNOnAfferent projection (the cone-shaped
 lines from LGNOn to V1), select Properties, and change Learning Rate
-from the default 2.0 to 100, press Apply, and then do the same for
+from the default 0.1 to 100, press Apply, and then do the same for
 the LGNOffAfferent projection.
 <!--
 You can also do the same from the
@@ -600,9 +597,17 @@ iterations at a time instead before looking at an
 
 <p><li> If you are <em>really</em> patient, you can change the number
 of units to something closer to real primate cortex, by quitting
-and then restarting with a higher density in V1:
+and then restarting with a higher density in V1. To do this, you will need
+to specify the example script from the commandline. If you are not
+sure where it is located, you can find out by first running
+
 <blockquote><code class='to_type'>
-  ./topographica -p cortex_density=142 examples/gca_lissom.ty -g
+  topographica -c "from topo.misc.genexamples import print_examples_dir; print_examples_dir()"
+  </code></blockquote>
+
+Then you can use the path to the example, as well as specifying a higher cortex density:
+<blockquote><code class='to_type'>
+  topographica -p cortex_density=142 ~/topographica/examples/gca_lissom.ty -g
   </code></blockquote>
 <p></p>
   
@@ -633,17 +638,20 @@ homeost);lissom_oo_or map dev less stable
 
 <h2>Exploring further</h2>
 
-<p> Topographica comes with additional examples, and more are always
-being added.  In particular, the above examples work in nearly the
-same way with the simpler <code>lissom_or.ty</code>
-and <code>lissom_oo_or.ty</code> models.  Any valid Python code can be
-used to control and extend Topographica; documentation for Python and
-existing Topographica commands can be accessed from
-the <span class='t_item'>Help</span> menu of the
-<span class='w_title'>Topographica Console</span> window.
-<p>
- Please contact 
+<p> To see how the example works, load the gca_lissom.ty file into a
+text editor and see how it has been defined, then find the
+corresponding Python code for each module and see how that
+has been defined.   
+
+<p>Topographica comes with additional examples, and more are
+always being added.  In particular, the above examples work
+in nearly the same way with the older <code>lissom_or.ty</code> and
+<code>lissom_oo_or.ty</code> models.
+Any valid Python code can be used to control and extend Topographica;
+documentation for Python and existing Topographica commands can be
+accessed from the <span class='t_item'>Help</span> menu of the <span
+class='w_title'>Topographica Console</span> window.  <p> Please
+contact
 <A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Comments%20on%20Topographica%20tutorial">&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107</a>
 if you have questions or suggestions about the software or this
-tutorial.
-</p>
+tutorial.  </p>
