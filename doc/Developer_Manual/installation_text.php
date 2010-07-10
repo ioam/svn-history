@@ -118,17 +118,16 @@ the <A HREF="#building">Building</A> instructions below.
 
 <P>The instructions below assume you have followed any necessary
 platform-specific instructions described above. You will need a
-writable directory with approximately 800 megabytes of spaces
-available (as of 2/2009).
-<!-- CEBALERT: update that -->
+writable directory with approximately 1.2 GB of space
+available (as of July 2010).
 
 <P>Enter the directory where topographica is located and type
 <code>make</code> (which may be called <code>gmake</code> on some
 systems).  It is best to do this as a regular user in the user's own
 directory, not as a root user with special privileges, because
 Topographica does not need any special access to your system.  The
-build process will take a while to complete (e.g. about 5-10 minutes
-on a 1.5GHz Pentium IV machine with a local disk).
+build process will take a while to complete (e.g. about 10 minutes
+on a 3 GHz Core 2 Duo machine with a local disk).
 
 <P>If you have problems during the build process, try
 adding <code>-k</code> to the <code>make</code> command, which will
