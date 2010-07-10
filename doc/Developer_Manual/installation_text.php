@@ -155,17 +155,25 @@ the <A HREF="#postinstall">after installation</A> section below.
 
 <H3><A NAME="postinstall">After installation</A></H3>
 
-<P>You can check that Topographica is working as expected by
-running <code>make tests</code> from within the topographica
-directory. To launch Topographica itself, enter <code>./topographica
+<P>You can check that Topographica is working as expected by running
+<code>make tests</code> from within the topographica directory. To
+launch Topographica itself, you can enter <code>./topographica
 -g</code> (or just <code>./topographica</code> for no GUI) from within
 the version-controlled topographica directory, or else enter the full
-path to the script. (Note that wherever instructions elsewhere say to
-"run <code>topographica</code>", you will need to do this.) You can
-check that Topographica is working as expected by running <code>make
-tests</code>. If you do the tests on a machine without a functioning
-DISPLAY, such as a remote text-only session, there will be some
-warnings about GUI tests being skipped.
+path to the script.
+
+<P>For actual use, you will probably want to add a symbolic link in a
+directory that is in your regular path, pointing to the topographica
+script. The instructions elsewhere in the documentation assume that
+you have done so, so that you only need to type
+<code>topographica</code> instead of <code>cd /path/to/topographica ;
+./topographica</code>.
+
+<P>You can check that Topographica is working as expected by running
+<code>make tests</code> within the topographica directory. If you do
+the tests on a machine without a functioning DISPLAY, such as a remote
+text-only session, there will be some warnings about GUI tests being
+skipped.
 
 
 
