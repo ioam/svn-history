@@ -29,8 +29,8 @@
 <dt>Command-line and batch:</dt>
 <dd>
   <div class="i2">- -G: dock windows by default</div>
-  <div class="i2">- <?php classref('topo.command.basic','run_batch')?>:
-  name_time_format and dirname_prefix parameters</div>
+  <div class="i2">- <?php classref('topo.command.basic','run_batch')?> accept
+  new name_time_format and dirname_prefix parameters</div>
   <div class="i2">-
   <?php fnref('topo.command.basic','n_bytes')?>,
   <?php fnref('topo.command.basic','n_conns')?>,
@@ -72,13 +72,13 @@
   <?php classref('topo.pattern.basic','SigmoidedDoG')?> (for audio STRFs),
   <?php classref('topo.pattern.basic','PowerSpectrum')?> (for frequency decomposition),
   <?php classref('topo.pattern.basic','Spectrogram')?> (for frequency decomposition over time),
-  <?php classref('topo.pattern.audio','Audio')?> (for audio files)
+  <?php classref('topo.pattern.audio','Audio')?> (for audio files),
   <?php classref('topo.pattern.audio','AudioFolder')?> (for directories of audio files)
   </div>
   <div class="i2">- SpiralGrating, HyperbolicGrating, RadialGrating,
-  ConcentricRings, and ArcCentered pattern families are temporarily in
+  ConcentricRings, and ArcCentered pattern families can be copied from
   <A HREF="../../contrib/hegdeessen.py">contrib/hegdeessen.py</A>; to move
-  to topo.pattern</div>
+  to topo.pattern in next release</div>
   <div class="i2">- minor changes to PatternGenerator parameter
   passing to allow better nesting and composition</div>
   <div class="i2">- misc:
@@ -89,7 +89,7 @@
 <dt>Example scripts:</dt>
 <dd>
   <div class="i2">- gca_lissom.ty improved</div>
-  <div class="i2">- lissom_audio.py example of auditory pathway</div>
+  <div class="i2">- lissom_audio.py: example of auditory pathway</div>
 </dd>
 </font>
 </dl>

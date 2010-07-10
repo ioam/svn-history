@@ -39,8 +39,8 @@ easy_install or pip to choose a different location.
 
 <P>easy_install and pip can sometimes encounter problems while
 installing packages on which Topographica depends. Fixing these
-problems is usually straightforward, and is described in
-a <A HREF="../FAQ/index.html#easyinstall">FAQ</A>.
+problems is usually straightforward, as described in the
+<A HREF="../FAQ/index.html#easyinstall">FAQ</A>.
 
 <P>Once installation has completed, you can proceed to
 the <A HREF="index.html#postinstall">After Installation</A>
@@ -64,7 +64,7 @@ Optionally, install the recommended dependencies
 
 <P>Once the dependencies are installed, download
 the <A HREF="http://pypi.python.org/pypi/topographica/0.9.7">source
-distribution</A>, unpack the archive, and enter <code>python setup.py
+distribution</A>, unpack the archive, and type <code>python setup.py
 install</code>. Alternatively, choose a different installation
 location by passing the appropriate option (e.g. <code>--user</code>
 or <code>--prefix</code>).

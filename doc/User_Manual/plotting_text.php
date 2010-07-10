@@ -242,7 +242,7 @@ of Topographica by putting appropriate lines into the .ty script to
 which they apply.  For instance, the default parameters used in most
 preference map measurement commands present each pattern for only a
 very short duration and turn off the response function, which works
-well with the example files because it results in a linear response
+well with the example files because doing so results in a linear response
 (no threshold function and no lateral interactions) and thus makes the
 results independent of the input scale and offset.  If this approach
 is not valid for your own model, then you can change the duration for
@@ -252,12 +252,13 @@ function by default:
 <pre>
 from topo.analysis.featureresponses import MeasureResponseCommand
 MeasureResponseCommand.duration=1.0
+MeasureResponseCommand.apply_output_fns=True
 </pre>
 
-<P>
-
-<P>Of course, the specific parameters here can be anything you want,
-and you can do it for any plot group.
+<P>These values are actually Topographica's defaults, and thus omitting
+all code in your .ty file to do with MeasureResponseCommand would also
+have the same effect.  In any case, the specific parameters here can
+be anything you want, and you can do it for any plot group.
 
 <P>Similarly, you can change the specific types of data used in each
 plot. For instance, you can remove the default OrientationPreference

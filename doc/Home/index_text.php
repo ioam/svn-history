@@ -52,14 +52,10 @@ motor areas.
 <P>Topographica is freely available for downloading, and is an open
 source project whose capabilities can be extended and modified by any
 user.  We welcome contributions from users, and invite interested
-people to join our globally distributed development team.  Although
-the code is still under very active development, it is in daily use in
-numerous research projects and academic classes.  Given the fast pace
-of current development, being a developer is probably the best way to
-keep up with all of the changes.  
+people to join our globally distributed development team.  
 
 <P>Also see our <A target="_top"
-HREF="http://nn.cs.utexas.edu/area-view.php?RECORD_KEY%28Areas%29=AreaID&AreaID(Areas)=11">
+HREF="http://homepages.inf.ed.ac.uk/jbednar/research.html">
 research pages</a> for results from simulations run with Topographica
 and related tools, and our <A target="_top"
 HREF="http://computationalmaps.org">2005 book</A> for more details.

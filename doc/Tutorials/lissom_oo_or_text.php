@@ -5,7 +5,7 @@ This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> software package to explore a
 simple orientation map simulation using test patterns and weight
 plots.  This particular example uses a <a
-href="http://nn.cs.utexas.edu/keyword?rflissom">LISSOM model</a>
+href="http://homepages.inf.ed.ac.uk/jbednar/research.html">LISSOM model</a>
 cortex, although Topographica supports many other models and is easily
 extensible for models not yet supported.
 </p>
@@ -14,14 +14,20 @@ extensible for models not yet supported.
 instructions for <a href="../Downloads/index.html">obtaining and
 installing</a> Topographica. Also, you will need to generate a saved
 orientation map network (a .typ file), which can be done from a
-Terminal (<A HREF="../Downloads/win32notes.html">command prompt</A> on
-Windows) by running
-<blockquote><code class='to_type'>topographica -c "from topo.misc.genexamples import generate; generate(targets=['lissom_oo_or_10000.typ'])"</code></blockquote>
+Unix or Mac  terminal or Windows <A HREF="../Downloads/win32notes.html">command
+prompt</A> by running
+<!-- JABALERT: Should simplify this command to look like:
+topographica -a -c "generate_example('lissom_oo_or')" -->
+<blockquote><code class='to_type'>topographica -a -c "generate_example(targets=['lissom_oo_or_10000.typ'])"</code></blockquote>
 
 <P>Depending on the speed of your machine, you may want to go get a
 snack at this point; on a 3GHz 512MB machine this training process
 currently takes from 7-15 minutes (depending on the amount of level
 2 cache).<!--lodestar: 15:46 ; cortex: 7:31; fiver: 8:07; jupiter1: 9:00 -->
+<!-- 10 Jul 2010: 6:28 on cortex -->
+When training completes, the .typ file should be ready in the
+topographica subdirectory of your home directory. 
+
 </p>
 
 
@@ -134,8 +140,8 @@ explained below.
 </li>
 
 <li> To help understand the response patterns in V1, we can look at
-the weights to V1 neurons.  These weights were learned previously, by
-presenting 10000 pairs of oriented Gaussian patterns at random angles
+the weights to V1 neurons.  These weights were learned previously, 
+as a result of presenting 10000 pairs of oriented Gaussian patterns at random angles
 and positions.  To plot a single neuron, select <a
 name="ConnectionFields-plot"><span class='t_item'>Connection
 Fields</span></a> from the <span class='t_item'>Plots</span>
@@ -232,7 +238,9 @@ Manual</A>) so that the
 Activity window and ensure it has Auto-Refresh turned on, then press
 Refresh by the Orientation Preference window's 'Pre plot hooks'. You
 will see a series of sine gratings presented to the network, and can
-observe the response each time in the LGN and V1 sheets.
+observe the response each time in the LGN and V1 sheets.  When you are
+done, press Refresh on the pre-plot hooks in the Activity window to
+restore the original activity pattern plots.
 
 </p><p>
 </li>
@@ -375,7 +383,7 @@ controls the ratio between width and height; will be scaled by the
 that this relatively simple model is very sensitive to the scale, and
 scales higher than about 1.2 will result in a broad,
 orientation-unselective response, while low scales will give no
-response.  More complex models (and actual brains!)
+response.  More <a href="gca_lissom.html">complex models</a> (and actual brains!)
 are less sensitive to the scale or contrast.
 </dd><dt><span class='t_item'>offset</span></dt><dd> is added to every pixel
 </dd><dt><span class='t_item'>frequency</span>

@@ -2,8 +2,8 @@
 
 <P>Topographica is based on a suite of commonly used tools for
 scientific software development, including Python, NumPy, and
-PIL. This page describes how to install a scientific Python
-environment along with Topographica.
+PIL. This page describes how to install Topographica and a suitable
+scientific Python environment.
 
 <P>If you already have a Python environment that you wish to use for
 Topographica, or if your platform is not listed below, instead follow
@@ -76,7 +76,7 @@ the <A HREF="#postinstall">After Installation</A> section below.
 <H3><A NAME="postinstall">After installation</A></H3>
 
 <P>Linux and Mac users can run <code>topographica -g</code> from a
-Terminal to start Topographica. Windows users can double click on the
+terminal to start Topographica. Windows users can double click on the
 Topographica icon on the desktop.
 
 <P>Running Topographica interactively is described in detail in
