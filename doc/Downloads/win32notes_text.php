@@ -11,7 +11,10 @@ typing <code>cmd</code>, then clicking 'Ok'.
 <li>Replace <code>~</code> in a path with the path to your <code>My Documents</code> folder
 (e.g. <code>~/topographica</code> might become <code>"%HOMEPATH%\My Documents\topographica"</code>)</li>
 <li>Replace any forward slash '<code>/</code>' in a path with a backslash '<code>\</code>'</li>
-<li>Single quotes (<code>'</code>) must appear inside double quotes (<code>"</code>); double quotes cannot appear inside single quotes
+<li>Single quotes (<code>'</code>) must appear inside double quotes
+(<code>"</code>); double quotes cannot appear inside single quotes 
+<li>Filenames on Windows usually need double quotes, because the
+paths typically contain spaces (e.g. "My Documents" or "Program Files")
 </ul>
 
 <P>Examples:
@@ -23,7 +26,7 @@ typing <code>cmd</code>, then clicking 'Ok'.
 
 <TR>
 <TD><code>topographica -g ~/topographica/examples/lissom_oo_or.ty</code></TD>
-<TD><code>topographica -g %HOMEPATH%\My Documents\topographica\examples\lissom_oo_or.ty</code></TD>
+<TD><code>topographica -g "%HOMEPATH%\My Documents\topographica\examples\lissom_oo_or.ty"</code></TD>
 
 <TR>
 <TD><code>./topographica -c 'targets=["lissom_oo_or_10000.typ"]' examples/run.py</code></TD>
