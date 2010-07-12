@@ -9,8 +9,9 @@ objects to a saved orientation map network, and to visualize and
 analyze the responses.  It also shows how to develop a new simulation
 using different input patterns.</DD><BR>
 
-<DT><A href="gca_lissom.html"><strong>GCA Orientation Map</strong></A></DT>
-<DD>Same tutorial as for LISSOM, but using the newer and more robust GCA model.</DD><BR>
+<DT><A href="gca_lissom.html"><strong>GCAL Orientation Map</strong></A></DT>
+<DD>Same tutorial as for LISSOM, but using the newer GCAL model that
+is simpler yet more robust.</DD><BR>
 
 <!--
 <DT><A href="lissom_or.html"><strong>LISSOM Orientation Map without ON/OFF</strong></A></DT>
