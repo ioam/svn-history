@@ -88,7 +88,7 @@
 <br>
 <dt>Example scripts:</dt>
 <dd>
-  <div class="i2">- gca_lissom.ty improved</div>
+  <div class="i2">- gcal.ty: robust and simple visual map development</div>
   <div class="i2">- lissom_audio.py: example of auditory pathway</div>
 </dd>
 </font>

@@ -124,12 +124,12 @@ scripts = {
     'trickysyntax':'hierarchical.ty',
     'obermayer_pnas90':'obermayer_pnas90.ty',
     'lissom_fsa':'lissom_fsa.ty',
-    'gca_lissom':'gca_lissom.ty',
+    'gcal':'gcal.ty',
     'lissom_oo_or_10000.typ':'lissom_oo_or.ty',
     'lissom_fsa_10000.typ':'obermayer_pnas90.ty',
     'obermayer_pnas90_40000.typ':'obermayer_pnas90.ty',
     'som_retinotopy_40000.typ':'som_retinotopy.ty',
-    'gca_lissom_10000.typ':'gca_lissom.ty'}
+    'gcal_10000.typ':'gcal.ty'}
 
 
 def copy_examples():
@@ -256,10 +256,10 @@ def _stuff(specified_targets):
                                                  retinotopy_analysis(),
                                                  snapshot("som_retinotopy_40000.typ")]),
 
-        "gca_lissom_10000.typ":run(examples,scripts["gca_lissom"],
+        "gcal_10000.typ":run(examples,scripts["gcal"],
                                    commands=["topo.sim.run(10000)",
                                              or_analysis(),
-                                             snapshot("gca_lissom_10000.typ")])
+                                             snapshot("gcal_10000.typ")])
 
         }
 
