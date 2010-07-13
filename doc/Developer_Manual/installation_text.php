@@ -155,9 +155,7 @@ the <A HREF="#postinstall">after installation</A> section below.
 
 <H3><A NAME="postinstall">After installation</A></H3>
 
-<P>You can check that Topographica is working as expected by running
-<code>make tests</code> from within the topographica directory. To
-launch Topographica itself, you can enter <code>./topographica
+<P>To launch Topographica itself, you can enter <code>./topographica
 -g</code> (or just <code>./topographica</code> for no GUI) from within
 the version-controlled topographica directory, or else enter the full
 path to the script.
