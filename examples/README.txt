@@ -11,7 +11,7 @@ Additionally, several other examples are also included:
 
   goodhill_network90.ty        - 2D ocular dominance elastic net model 
 
-  gca_lissom.ty                - LISSOM orientation map with gain 
+  gcal.ty                      - Orientation map with gain 
                                  control and homesotatic plasticity
 
   leaky_lissom_or.ty           - LISSOM with spiking neurons

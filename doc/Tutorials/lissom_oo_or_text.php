@@ -381,7 +381,7 @@ controls the ratio between width and height; will be scaled by the
 that this relatively simple model is very sensitive to the scale, and
 scales higher than about 1.2 will result in a broad,
 orientation-unselective response, while low scales will give no
-response.  More <a href="gca_lissom.html">complex models</a> (and actual brains!)
+response.  More <a href="gcal.html">complex models</a> (and actual brains!)
 are less sensitive to the scale or contrast.
 </dd><dt><span class='t_item'>offset</span></dt><dd> is added to every pixel
 </dd><dt><span class='t_item'>frequency</span>
