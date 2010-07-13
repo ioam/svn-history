@@ -63,25 +63,27 @@ neural maps. The goal is to help researchers understand brain function
 at the level of the topographic maps that make up sensory and motor
 systems.
 
-**Please note that most users will want to use an official Topographica
-release from http://topographica.org/ rather than this
-in-development package.**
+**Please see http://topographica.org/ for more information.**
 
 Installation
 ============
+
+Here we give a brief summary; please see
+http://topographica.org/Downloads for full details.
 
 If you have `easy_install`_ or `pip`_ (or similar), you can use one of
 those to install Topographica and its dependencies automatically
 (e.g. ``easy_install topographica`` or ``pip install topographica``).
 
-Alternatively, you can install Topographica with a command like
-``python setup.py install --user`` (or ``sudo python setup.py
-install`` for a site-wide installation) after downloading and
-unpacking the archive below. You will need to install at least
-`NumPy`_ and `PIL`_ before running Topographica. We also strongly
-recommend that you install `MatPlotLib`_ so you can access all
-Topographica's plots, as well as `Gmpy`_ and Weave (available as part
-of `SciPy`_) for optimum performance.
+Alternatively, you can download and unpack the archive below, and then
+install Topographica with a command like ``python setup.py install``
+(e.g. ``sudo python setup.py install`` for a site-wide installation,
+or ``python setup.py install --user`` to install into
+``~/.local``). You will need to install at least `NumPy`_ and `PIL`_
+before running Topographica. We also recommend that you install
+`MatPlotLib`_ so you can access all Topographica's plots, as well as
+`Gmpy`_ and Weave (available as part of `SciPy`_) for optimum
+performance.
 
 .. _Topographica:
    http://topographica.org/Home/index.html
