@@ -409,10 +409,10 @@ dist-setup.py-bdist_wininst:
 	${CD} ${DIST_DIR}; rm -rf dist/topographica-${RELEASE}.exe
 	${CD} ${DIST_DIR}; mv dist/topographica-${RELEASE}*.exe dist/topographica-${RELEASE}.exe
 
-
-dist-pypi-upload:
-	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py register sdist upload
-# + bdist_wininst
+# CEBALERT: cannot work until .linux-i686 problem above is fixed.
+# Upload manually for now.
+#dist-pypi-upload:
+#	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py register sdist bdist_wininst upload
 
 
 ######################################################################
