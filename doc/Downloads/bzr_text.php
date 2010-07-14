@@ -317,7 +317,7 @@ trunk can be 6-24 hours out of date.
 [<A name="footnote-2">2</A>] Bazaar currently does not support any
 kind of 'history horizon', so all of Topographica's history must be
 downloaded. Additionally, the SVN mirror is of trunk/, which includes
-topographica-win/. Therefore, when creating branches, the waiting
+facespace/. Therefore, when creating branches, the waiting
 times are unnecessarily big. See http://bazaar-vcs.org/HistoryHorizon
 for more information about developments surrounding 'history
 horizons'. Shallow checkouts feature: https://launchpad.net/bzr/+spec/shallow-checkouts

@@ -66,10 +66,10 @@ $ git svn fetch -r10782; git svn rebase
 </pre>
 
 (substituting values appropriate for what you wish to do; e.g. you can
-get more history by changing <code>-r</code>). If you're getting 
-a recent revision of the <code>topographica</code> code (and
-not <code>topographica-win</code> or <code>facespace</code>), the new
-directory will occupy about 124 megabytes (as of February 2008).
+get more history by changing <code>-r</code>). If you're getting a
+recent revision of the <code>topographica</code> code (and not
+<code>facespace</code>), the new directory will occupy about 124
+megabytes (as of February 2008).
 
 <P>If you wished, you <i>could</i> get the complete history of the
 Topographica project, using:

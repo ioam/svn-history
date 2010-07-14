@@ -12,12 +12,6 @@ such a release, the steps we generally follow are:
   does not need to be included in the release, and ensure that none
   of it will be checked in until the release is complete.
 
-<li><P>Make sure you have checked out topographica-win. If not:
-<pre>
-cd topographica/
-svn co $TOPOROOT/trunk/topographica-win topographica-win
-</pre>  
-
 <li><P>Increment the RELEASE number <!--and the RELEASE_TAG--> in ./Makefile,
   and do "make new-version".
    

@@ -298,16 +298,10 @@ doc: FORCE
 
 svn-release: LATEST_STABLE tag-release sf-web-site 
 
-# Update any files, including in topographica-win, that keep track of
-# the version number
-# CEBALERT: maintainer must have checked out topographica-win
+# Update any files that keep track of the version number
 new-version: FORCE
 	mv setup.py setup.py~
 	sed -e "s/version=.*,/version='${RELEASE}',/g" setup.py~ > setup.py
-	mv topographica-win/create_installer/topographica.iss topographica-win/create_installer/topographica.iss~
-	sed -e 's/AppVerName=Topographica.*/AppVerName=Topographica '"${RELEASE}"'/g' topographica-win/create_installer/topographica.iss~ > topographica-win/create_installer/topographica.iss
-	mv topographica-win/common/setup.py topographica-win/common/setup.py~
-	sed -e "s/topo.release='.*'/topo.release='${RELEASE}'"'/g' topographica-win/common/setup.py~ > topographica-win/common/setup.py
 
 
 # Make a new LATEST_STABLE on the web, using the currently checked-out version
@@ -349,16 +343,6 @@ SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_o
 #@@	   ${RM} -r doc/buildbot/
 #@@	   ${RM} -r debian/
 #@@	   find examples/*.ty -maxdepth 1 ${subst ^,! -name ,${SCRIPTS_TO_KEEP_IN_DIST}} -exec rm {} \;
-#@@ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
-#@@else
-#@@	   	${RM} -r topographica-win 
-#@@endif
-
-# need to make sure python_topo isn't cleaned away on Windows
-win-distclean:
-	-mv python_topo TMPpython_topo
-	make distclean
-	mv TMPpython_topo python_topo
 
 
 # Make public distribution archive
