@@ -15,30 +15,19 @@ typing <code>cmd</code>, then clicking 'Ok'.
 (<code>"</code>); double quotes cannot appear inside single quotes 
 <li>Filenames on Windows usually need double quotes, because the
 paths typically contain spaces (e.g. "My Documents" or "Program Files")
+<li>Unix commands such as <code>cp</code> usually have equivalents
+(<code>copy</code> in this case); see one of the references on the
+web, e.g. <A
+HREF="http://www.yolinux.com/TUTORIALS/unix_for_dos_users.html">UNIX
+for DOS Users</A></li>
 </ul>
 
-<P>Examples:
-
-<TABLE BORDER="1">
-<TR>
-<TH>UNIX</TH>
-<TH>Windows equivalent</TH>
-
-<TR>
-<TD><code>topographica -g ~/topographica/examples/lissom_oo_or.ty</code></TD>
-<TD><code>topographica -g "%HOMEPATH%\My Documents\topographica\examples\lissom_oo_or.ty"</code></TD>
-
-<TR>
-<TD><code>./topographica -c 'targets=["lissom_oo_or_10000.typ"]' examples/run.py</code></TD>
-<TD><code>topographica -c "targets=['lissom_oo_or_10000.typ']" examples\run.py</code></TD>
-
-</TABLE>
-
-
-<P>There are, additionally, some less-often-needed or more complex translations that might be required:
-<ul>
-<li>Unix commands such as <code>cp</code> usually have equivalents (<code>copy</code> in this case); see one of the references on the web, e.g. <A HREF="http://www.yolinux.com/TUTORIALS/unix_for_dos_users.html">UNIX for DOS Users</A></li>
-</ul>
+<P>
+Example UNIX command:
+<BR><code>topographica -g ~/topographica/examples/lissom_oo_or.ty</code>
+<BR>
+Windows equivalent:
+<BR><code>topographica -g "%HOMEPATH%\My Documents\topographica\examples\lissom_oo_or.ty"</code>
 
 
 
