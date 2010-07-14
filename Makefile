@@ -409,6 +409,18 @@ dist-pypi-upload:
 	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py register sdist ${BDIST_WININST} upload
 
 
+
+# Or, remove --spec-only to build rpm on your system (but make sure
+# you have python 2.6...I don't).
+dist-rpm:
+	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py bdist_rpm --release=${RELEASE} --requires "python,python-devel,tkinter,numpy,scipy,python-imaging-tk,python-matplotlib,python-matplotlib-tk,ipython" --group="Productivity/Scientific/Other"  --spec-only
+
+# CEBALERT: can't seem to specify python 2.6!
+# CEBALERT: no gmpy on FC13? 
+
+# CB: will use osc from buildbot at some point to update these, as for launchpad.
+
+
 ######################################################################
 # Ubuntu packages
 #
