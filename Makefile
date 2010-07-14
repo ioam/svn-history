@@ -396,23 +396,17 @@ dist-setup.py: doc distdir reference-manual
 # These commands assume you have run "make dist-setup.py".
 # (Archives don't include doc/ because of its size.)
 
-# generate Topographica-xxx.tar.gz (i.e. source suitable for python setup.py install)
+BDIST_WININST = bdist_wininst --install-script windows_postinstall.py --plat-name=win
+
 dist-setup.py-sdist: 
-# should automatically update version number in setup.py
 	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py sdist
 
 # generate windows exe (like the exe you get for numpy or matplotlib)
 dist-setup.py-bdist_wininst: 
-# should automatically update version number in setup.py
-	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py bdist_wininst --install-script windows_postinstall.py
-# bit of a hack; not sure why .linux-i686 is in filename
-	${CD} ${DIST_DIR}; rm -rf dist/topographica-${RELEASE}.exe
-	${CD} ${DIST_DIR}; mv dist/topographica-${RELEASE}*.exe dist/topographica-${RELEASE}.exe
+	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py ${BDIST_WININST}
 
-# CEBALERT: cannot work until .linux-i686 problem above is fixed.
-# Upload manually for now.
-#dist-pypi-upload:
-#	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py register sdist bdist_wininst upload
+dist-pypi-upload:
+	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py register sdist ${BDIST_WININST} upload
 
 
 ######################################################################
