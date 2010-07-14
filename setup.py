@@ -5,7 +5,7 @@ from distutils.core import setup
 import glob
 
 examples = glob.glob('examples/*.ty')
-
+scripts = ['topographica']
 
 ### TOPOGRAPHICA DEPENDENCIES ########################################
 required = {'PIL':">=1.1.6",
@@ -43,6 +43,12 @@ for package_list in packages_to_state:
     requires = []
     requires+=["%s (%s)"%(package,version) for package,version in package_list.items()]
     setup_args['requires']=requires
+
+
+if 'bdist_wininst' in sys.argv:
+    scripts.append('windows_postinstall.py')
+    # CEBALERT: how else to get the ico into a place the postinstall script can find?!
+    scripts.append("topographica.ico")
 
 
 _topographica_devs='Topographica Developers'
@@ -158,7 +164,7 @@ performance.
 
     data_files=[('share/topographica/examples',examples)],
 
-    scripts = ['topographica']))
+    scripts = scripts))
 
 
 

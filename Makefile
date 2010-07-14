@@ -420,8 +420,11 @@ dist-setup.py-sdist:
 # generate windows exe (like the exe you get for numpy or matplotlib)
 dist-setup.py-bdist_wininst: 
 # should automatically update version number in setup.py
-	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py bdist_wininst
-# should add --install-script option including create_shortcut() call, etc
+	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py bdist_wininst --install-script windows_postinstall.py
+# bit of a hack; not sure why .linux-i686 is in filename
+	${CD} ${DIST_DIR}; rm -rf dist/topographica-${RELEASE}.exe
+	${CD} ${DIST_DIR}; mv dist/topographica-${RELEASE}*.exe dist/topographica-${RELEASE}.exe
+
 
 dist-pypi-upload:
 	${CD} ${DIST_DIR}; ${PREFIX}/bin/python setup.py register sdist upload

@@ -26,10 +26,13 @@ SF.net allows you to have files to present to users based on their
 OS. -->
 <H3><A NAME="win">Windows</A></H3>
 
-<P>Install the <A HREF="http://www.pythonxy.com/">Python(x,y)</A>
-or <A HREF="http://www.enthought.com/products/getepd.php">EPD</A>
-scientific Python environment, then run the
-self-installing <a href="https://sourceforge.net/projects/topographica/files/">exe</a>
+<P>Install
+the <A HREF="http://code.google.com/p/pythonxy/wiki/Downloads">Python(x,y)</A>
+or <A HREF="http://www.enthought.com/products/epd.php">EPD</A>
+scientific Python environment, both of which by default include all
+the tools needed by Topographica. Following this, run the
+self-installing
+Topographica <a href="https://sourceforge.net/projects/topographica/files/">exe</a>
 for Windows. Once complete, proceed to the
 <A HREF="#postinstall">After Installation</A> section below.
 
