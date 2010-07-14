@@ -58,20 +58,29 @@ cannot make use of either of these packaging systems should instead
 follow our instructions for <A HREF="existingpython.html">installing
 Topographica into an existing Python environment</A>.
 
-<P><em><A NAME="deb">deb</A></em>: Download the
-appropriate <A HREF="http://sourceforge.net/projects/topographica/files/">deb</A>
-file and then install it with a command like
-<code>sudo dpkg -i topographica.deb</code>; alternatively,
-<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica">add the Topographica PPA</A> to your software sources and
-then run
-<code>sudo apt-get install topographica</code>, which will allow
+<P>If using Ubuntu, you can
+add <A HREF="https://launchpad.net/~topographica-developers/+archive/topographica">Topographica's
+PPA</A> to your software sources and then install Topographica from
+Synaptic (or run
+<code>sudo apt-get install topographica</code>). This allows
 Topographica and its dependencies to be updated automatically for
 future releases.
 
-<P><em><A NAME="rpm">rpm</A></em>: Download the
-<A HREF="http://sourceforge.net/projects/topographica/files/">rpm</A>
-file and then issue a command such as <code>sudo rpm -i
-topographica.rpm</code> to install it.
+<P>Alternatively, download the appropriate deb or rpm for your
+platform (currently
+available: <a href="http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/noarch/topographica-0.9.7-1.1.noarch.rpm">Fedora
+Core 13</a>; Ubuntu
+<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu0~lucid_all.deb">Lucid</A>   
+<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu0~karmic_all.deb">Karmic</A>   
+<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu0~jaunty_all.deb">Jaunty</A>   
+<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu0~hardy_all.deb">Hardy</A>) and install using your graphical software manager, or by
+using a command like
+<code>sudo dpkg -i topographica_0.9.7-0ubuntu0~lucid_all.deb</code> or
+<code>yum install topographica-0.9.7-1.1.noarch.rpm</code> (as root).
+
+Note that if you use the <code>yum</code> command, you might first
+need to add the repository's public key (e.g. <code>rpm --import
+http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/repodata/repomd.xml.key</code>).
 
 <P>Once the package has been installed, you can proceed to
 the <A HREF="#postinstall">After Installation</A> section below.
