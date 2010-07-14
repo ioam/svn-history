@@ -47,7 +47,7 @@ develops a mapping of the dimensions of variance in the input space.
 </pre>
 
   Then, from the <code>examples</code> directory, open
-  <code>lissom_oo_or.ty</code>. 
+  <code>som_retinotopy.ty</code>. 
   
   <P>(The plots below show the results from the full density of the
   book simulation, but results are similar for the default (lower)
