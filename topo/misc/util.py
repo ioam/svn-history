@@ -420,7 +420,7 @@ class gmpyFaker(ModuleFaker):
         code = \
 """
 from __future__ import division
-import fixedpoint
+import topo.misc.fixedpoint as fixedpoint
 import param
 class mpq(object):
     def __new__(self,*args,**kw):

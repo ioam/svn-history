@@ -172,17 +172,14 @@ try:
     time_type_args = ()
     _mpq_pickle_support()
 except ImportError:
-    try:
-        import fixedpoint
-        param.Parameterized().warning('gmpy.mpq not available; using slower fixedpoint.FixedPoint for simulation time.')
-        time_type = fixedpoint.FixedPoint
-        time_type_args = (4,)  # gives precision=4
-    
-        from topo.misc.util import gmpyImporter
-        import sys
-        sys.meta_path.append(gmpyImporter())
-    except ImportError:
-        param.Parameterized().warning('Neither gmpy nor fixedpoint available; simulation time will use float, which may lead to strange behavior.')
+    import topo.misc.fixedpoint as fixedpoint
+    param.Parameterized().warning('gmpy.mpq not available; using slower fixedpoint.FixedPoint for simulation time.')
+    time_type = fixedpoint.FixedPoint
+    time_type_args = (4,)  # gives precision=4
+
+    from topo.misc.util import gmpyImporter
+    import sys
+    sys.meta_path.append(gmpyImporter())
         
 from topo.base.simulation import Simulation
 
