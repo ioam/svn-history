@@ -47,6 +47,9 @@ import_weave = __main__.__dict__.get('import_weave',True)
 # imported (below).
 weave_imported = False
 
+# Variable that will be used to report whether simple compilation test
+# was successful.
+compiled = False
 
 def inline(*params,**nparams): raise NotImplementedError
 
@@ -81,9 +84,19 @@ except ImportError:
     print 'Caution: Unable to import Weave.  Will use non-optimized versions of most components.'
 
 
+if weave_imported:
+    import random
+    try:
+        # to force recompilation each time
+        inline('double x=%s;printf("hi");'%random.random())
+        compiled = True
+    except:
+        # CB: should maybe display error
+        print 'Caution: Unable to use Weave to compile (no C/C++ compiler?). Will use non-optimized versions of most components.'
+
 # Flag available for all to use to test whether to use the inline
 # versions or not.
-optimized = weave_imported
+optimized = weave_imported and compiled
 
 warn_for_each_unoptimized_component = False
 
@@ -177,8 +190,8 @@ typedef double npfloat;
   type i4 = *tuple
 """
 
-
 # Simple test
 if __name__ == '__main__':
     inline('printf("Hello World!!\\n");')
+    
 
