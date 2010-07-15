@@ -474,7 +474,6 @@ def test_runbatch():
     import os
     import param
     import tempfile
-    import glob
     import shutil
 
     original_output_path = param.normalize_path.prefix
@@ -482,11 +481,12 @@ def test_runbatch():
     param.normalize_path.prefix = start_output_path
     
     tiny = os.path.join(find_examples(),"tiny.ty")
-    run_batch(tiny,cortex_density=1,retina_density=1,times=[1],snapshot=True)
+    run_batch(tiny,cortex_density=1,retina_density=1,times=[1],snapshot=True,output_directory="testing123")
 
     new_output_path = param.normalize_path.prefix
 
     assert new_output_path.startswith(start_output_path)
+    assert "testing123" in new_output_path # not perfect test, but better than nothing.
 
     base = os.path.basename(new_output_path).split(",")[0]
 
