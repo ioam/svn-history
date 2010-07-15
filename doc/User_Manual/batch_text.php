@@ -20,11 +20,15 @@ used so that run_batch can be called without importing it explicitly,
 and also so that all commands will be available to the various
 plotting and analysis routines called by run_batch (as described
 below). The result will be a directory with a name like
-<code>200710112056_tiny</code> in the Output subdirectory, where the
-name encodes the date of the run (in year/month/day/hour/minute
-format) plus the name of the script file.  If you want to override any
-of the options accepted by tiny.ty, you can do that when you call
-run_batch:
+<code>200710112056_tiny</code> in the <code>Output</code> subdirectory
+of <code>~/topographica</code> (the value of <A
+HREF="../Reference_Manual/param.normalize_path-class.html">param.normalize_path</A>'s
+<code>prefix</code> parameter). The name encodes the date of the run
+(in year/month/day/hour/minute format) plus the name of the script
+file.
+
+<P>If you want to override any of the options accepted by tiny.ty, you
+can do that when you call run_batch:
 
 <pre>
   topographica -a -c "run_batch('~/topographica/examples/tiny.ty',cortex_density=3)"

@@ -263,6 +263,11 @@ used to present testing images and store the resulting responses.  The
 command save_plotgroup then uses this data to generate the bitmap
 images, and saves them to disk.
 
+<P>By default, all output from Topographica goes into
+<code>~/topographica</code> (the value of <A
+HREF="../Reference_Manual/param.normalize_path-class.html">param.normalize_path</A>'s
+<code>prefix</code>).
+
 <P>Other examples:
 
 <pre>
