@@ -197,7 +197,7 @@ batch-tests:
 
 # CB: snapshot-tests is not part of slow-tests for the moment
 # (until slow-tests split up on buildbot).
-slow-tests: print-info train-tests all-speed-tests map-tests batch_tests
+slow-tests: print-info train-tests all-speed-tests map-tests batch-tests
 #snapshot-tests 
 
 # CB: add notes somewhere about...
