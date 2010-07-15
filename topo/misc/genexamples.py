@@ -41,9 +41,6 @@ from os import system
 from os.path import join
 
 
-## location of the topographica script
-topographica = sys.argv[0]
-
 import param
 from param import ParamOverrides
 
@@ -88,6 +85,7 @@ def run(examples,script_name,density=None,commands=["topo.sim.run(1)"]):
     for c in commands:
         cmds+=' -c "'+c+'"'
 
+    topographica = sys.argv[0]
     script = os.path.join(examples,script_name)
 
     return topographica+density_cmd+script+' '+cmds
