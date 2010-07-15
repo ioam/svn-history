@@ -44,10 +44,11 @@ Home/index.html: Home/news_text.php
 
 # Can also add --graph=callgraph to show who called what, but only for a specific simulation run
 reference-manual: Reference_Manual/toc.html
-Reference_Manual/toc.html: ../topo/*.py ../topo/*/*.py Reference_Manual/index_text.php
+Reference_Manual/toc.html: ../topo/*.py ../topo/*/*.py ../param/*.py Reference_Manual/index_text.php
 	-mv ../topo/tests ../topo-tests-tmp
-	cd .. ; bin/epydoc --graph=classtree --inheritance=listed --docformat=ReStructuredText --show-sourcecode --html -o doc/Reference_Manual --name=Topographica --url=http://topographica.org topo
+	cd .. ; bin/epydoc --graph=classtree --inheritance=listed --docformat=ReStructuredText --show-sourcecode --html -o doc/Reference_Manual --name=Topographica --url=http://topographica.org topo param
 	mv ../topo-tests-tmp ../topo/tests 
+# CEBALERT: shoud topo.html be topographica.html or maybe hierarchy.html?
 	mv Reference_Manual/index.html Reference_Manual/topo.html
 	make Reference_Manual/index.html
 # 	--graph=all
