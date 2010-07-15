@@ -33,22 +33,6 @@ __version__='$Revision$'
 # Note: has none of the Makefile's dependency processing, so just does
 # what you tell it (i.e. over-writes existing files).
 
-
-# CB: need to investigate the situation on Windows; old comment:
-#
-#   Tricky to get this to work on Windows because of problems
-#   with quotes, spaces, and so on in cmd.exe:
-#   http://mail.python.org/pipermail/python-bugs-list/2002-March/010393.html
-#   http://support.microsoft.com/kb/191495
-#   So, currently have to take care over where this script is run from
-#   (covered by an assertion statement), and how to pass in commands
-#   (e.g. strings for printing - see trickysyntax target).
-#   I might have become confused by all this, so there's likely to be
-#   something simpler we could do - this script contains the history of
-#   its production in the code (e.g. I probably don't need the full
-#   path to the topographica script in here anymore.)
-
-
 import platform 
 import sys
 import os.path
@@ -106,13 +90,7 @@ def run(examples,script_name,density=None,commands=["topo.sim.run(1)"]):
 
     script = os.path.join(examples,script_name)
 
-    if platform.system()=="Windows":
-        # CB: extra leading " required!
-        c = '""'+topographica+density_cmd+script+'"'+cmds
-    else:
-        c = topographica+density_cmd+script+' '+cmds
-
-    return c
+    return topographica+density_cmd+script+' '+cmds
 
 
 
