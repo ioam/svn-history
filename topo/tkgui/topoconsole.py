@@ -675,21 +675,24 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         assert isinstance(locations,tuple),"locations must be a tuple."
 
         for location in locations:
-            # a path on the disk might need converting
             try:
-                location = resolve_path(location)
+                existing_location = resolve_path(location)
+                webbrowser.open(existing_location,new=2,autoraise=True)
+                self.messageBar.response('Opened local file '+existing_location+' in browser.')
+                return ###
             except:
                 pass
-            
-            try:
-                webbrowser.open(location,new=True,autoraise=True)
-                self.messageBar.response('Opened '+location+' in browser.')
-                return
-            # Since one of the possible exceptions when opening a
-            # browser appears to be a 'WindowsError' (at least on the
-            # Windows platform), just catch all exceptions.
-            except:
-                self.messageBar.response("Couldn't open "+location+" in browser.")
+
+        for location in locations:
+            if location.startswith('http'):
+                try:
+                    webbrowser.open(location,new=2,autoraise=True)
+                    self.messageBar.response('Opened remote location '+location+' in browser.')
+                    return ###
+                except:
+                    pass
+
+        self.messageBar.response("Could not open any of %s in a browser."%locations)
 
 
     # CEBALERT: need to take care of removing old messages automatically?
