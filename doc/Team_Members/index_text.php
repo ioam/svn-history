@@ -24,9 +24,7 @@ the United Kingdom and the United States.  The principal developers are:
       University of Edinburgh, but also contributes optimizations and
       other code to Topographica.
 
-  <p><dt><a target="_top"
-      href="http://homepages.inf.ed.ac.uk/v1cball/">Chris Ball</a>,
-      September 2005 - </dt>
+  <p><dt>Chris Ball, September 2005 - </dt>
   <dd>Chris has worked on nearly every part of Topographica.  Since
       September 2008 he has been a PhD student in Edinburgh, working on
       modeling the development of color and motion preference maps.
