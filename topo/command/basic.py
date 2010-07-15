@@ -642,6 +642,12 @@ class run_batch(ParameterizedFunction):
     If available and requested by setting vc_info=True, prints
     the revision number and any outstanding diffs from the version
     control system.
+
+    Note that this function alters param.normalize_path.prefix so that
+    all output goes into the same location. The original value of
+    param.normalize_path.prefix is deliberately not restored at the
+    end of the function so that the output of any subsequent commands
+    will go into the same place.
     """
     output_directory=param.String("Output")
 
