@@ -14,13 +14,12 @@
   <div class="i2">- now supports Python 2.6</div>
   <div class="i2">- significantly reduced memory consumption (35% less for lissom.ty)</div>
   <div class="i2">- minor bugfixes</div>
-  <div class="i2">- now available as .deb package for Debian and
-  Ubuntu, in addition to .zip and .tar.gz versions, and via
+  <div class="i2">- now available as .deb package for Ubuntu and .rpm for Fedora Core, in addition to .zip and .tar.gz versions, and via
   'easy_install topographica'</div>
   <div class="i2">- optional
   <A target="_top" href="http://divmod.org/trac/wiki/DivmodPyflakes">PyFlakes</A> package for detecting common Python problems</div>
   <div class="i2">- optional
-  <A target="_top" href="http://mpi4py.scipy.org">mpi4py</A> package using OpenMPI for writing parallel applications</div>
+  <A target="_top" href="http://mpi4py.scipy.org">mpi4py</A> package using MPI for writing parallel applications</div>
 <!--  <div class="i2">- optional (experimental) integration with IDLE; try 'make topographicagui; ./topographicagui'</div> -->
   <div class="i2">- <A HREF="../Downloads/git.html">instructions</A>
   available for checking out Git version of repository</div>
@@ -28,7 +27,8 @@
 <br>
 <dt>Command-line and batch:</dt>
 <dd>
-  <div class="i2">- -G: dock windows by default</div>
+  <!--CEBALERT: dirname_prefix might be changed. We had email discussion but I haven't
+  done anything about it yet.-->
   <div class="i2">- <?php classref('topo.command.basic','run_batch')?> accept
   new name_time_format and dirname_prefix parameters</div>
   <div class="i2">-
