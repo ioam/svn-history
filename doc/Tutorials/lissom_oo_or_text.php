@@ -18,7 +18,7 @@ Unix or Mac  terminal or Windows <A HREF="../Downloads/win32notes.html">command
 prompt</A> by running
 <!-- JABALERT: Should simplify this command to look like:
 topographica -a -c "generate_example('lissom_oo_or')" -->
-<blockquote><code class='to_type'>topographica -a -c "generate_example(targets=['lissom_oo_or_10000.typ'])"</code></blockquote>
+<blockquote><code class='to_type'>topographica -a -c "generate_example('lissom_oo_or_10000.typ')"</code></blockquote>
 
 <P>Depending on the speed of your machine, you may want to go get a
 snack at this point; on a 3GHz 512MB machine this training process

@@ -31,7 +31,7 @@ from topo.base.projection import Projection, ProjectionSheet
 from topo.sheet import GeneratorSheet
 from topo.misc.util import MultiFile
 from topo.misc.picklemain import PickleMain
-from topo.misc.genexamples import generate as generate_example
+from topo.misc.genexamples import generate as _generate
 from topo.base.functionfamily import PatternDrivenAnalysis
 
 try:
@@ -40,6 +40,14 @@ try:
 except ImportError:
     param.Parameterized().message("No 'gnosis' module: xml snapshots unavailable.")
     gnosis_imported = False
+
+
+def generate_example(target):
+    """
+    Generate the saved network target, as defined in
+    topo.misc.genexamples.
+    """
+    _generate(targets=[target])
 
 
 # Not sure where to put CommandMetaclass, since it doesn't need to be

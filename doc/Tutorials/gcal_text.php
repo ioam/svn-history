@@ -22,7 +22,7 @@ installing</a> Topographica. Also, you will need to generate a saved
 orientation map network (a .typ file), which can be done from a
 Unix or Mac  terminal or Windows <A HREF="../Downloads/win32notes.html">command
 prompt</A> by running
-<blockquote><code class='to_type'>topographica -a -c "generate_example(targets=['gcal_10000.typ'])"</code></blockquote>
+<blockquote><code class='to_type'>topographica -a -c "generate_example('gcal_10000.typ')"</code></blockquote>
 
 
 <P>Depending on the speed of your machine, you may want to go get a
