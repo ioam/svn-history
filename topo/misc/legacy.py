@@ -241,6 +241,27 @@ S=supporters=DuplicateCheckingList()
 # in general, newest changes should go at the start of the list.
 
 
+# fixedpoint available as topo.misc.fixedpoint, not fixedpoint
+import topo.misc.fixedpoint as fixedpoint
+from topo.misc.util import ModuleImporter,ModuleFaker
+
+class FixedPointImporter(ModuleImporter):
+
+    def find_module(self, fullname, path=None):
+        if fullname == 'fixedpoint' or fullname.startswith('fixedpoint.'):
+            f = FixedPointFaker()
+            f.path = path
+            return f
+        return None
+
+class FixedPointFaker(ModuleFaker):
+    def create_module(self,name):
+        return fixedpoint
+
+import sys
+sys.meta_path.append(FixedPointImporter())
+
+
 
 def removed_Enumeration():
 
