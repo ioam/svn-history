@@ -20,7 +20,7 @@ when it is called as a function.  For instance, the Gaussian
 PatternGenerator will return Gaussian-shaped patterns:
 
 <pre>
-$ ./topographica -g
+$ topographica -g
 Topographica&gt; from topo import pattern
 Topographica&gt; pg=pattern.Gaussian(xdensity=60,ydensity=60,size=0.3,aspect_ratio=1.0)
 Topographica&gt; 
@@ -44,7 +44,7 @@ input pattern can be specified to have a random orientation and (x,y)
 location:
 
 <pre>
-$ ./topographica -g
+$ topographica -g
 Topographica&gt; from topo import pattern, numbergen
 Topographica&gt; input_pattern = pattern.Gaussian(size=0.08, aspect_ratio=4,
                  xdensity=60,ydensity=60,
@@ -92,7 +92,7 @@ CFProjection.weights_generator=pattern.Composite(
 <P>More complex patterns can be created by combining multiple Composite PatternGenerators:
 
 <pre>
-$ ./topographica -g
+$ topographica -g
 Topographica&gt; from topo import pattern
 Topographica&gt; import numpy
 Topographica&gt; surroundsine   = pattern.SineGrating(frequency=8.0,orientation=0.25*pi,
@@ -120,7 +120,7 @@ Topographica&gt; matrixplot(centersurround())
 rotated, and placed together as a unit:
 
 <pre>
-$ ./topographica -g
+$ topographica -g
 Topographica&gt; from topo import pattern
 Topographica&gt; import numpy
 Topographica&gt; pattern.Disk.smoothing=0.005

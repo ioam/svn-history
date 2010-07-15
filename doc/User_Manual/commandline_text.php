@@ -16,7 +16,7 @@ a Sheet named V1, you can display and change V1's parameters using
 Python commands:
 
 <pre>
-[cloud]v1cball: ./topographica -i examples/tiny.ty 
+[cloud]v1cball: topographica -i ~/topographica/examples/tiny.ty 
 
 Welcome to Topographica!
 
@@ -178,7 +178,7 @@ equivalent to entering its commands manually.
 program:</A>
 
 <pre>
-$ ./topographica -g examples/tiny.ty
+$ topographica -g ~/topographica/examples/tiny.ty
 Topographica&gt; topo.sim.run(1)
 Topographica&gt; from topo.command.pylabplot import *
 Topographica&gt; V1 = topo.sim['V1']
@@ -215,7 +215,7 @@ Topographica&gt; matrixplot3d(V1.activity)
 plotting one might wish to do, a la Matlab:
 
 <pre>
-$ ./topographica -g
+$ topographica -g
 Topographica&gt; from numpy import *
 Topographica&gt; 2*pi*exp(1.6)
 31.120820554943471
@@ -317,7 +317,7 @@ Topographica therefore provides the "-a" command-line option, which
 automatically imports every command in topo/command/*.py.  The "-g"
 option also automatically enables "-a", so that the commands will be
 available in the GUI as well.  Thus if you start Topographica as
-"./topographica -a" or "./topographica -g", then you can omit the
+"topographica -a" or "topographica -g", then you can omit the
 <code>from topo.command... import ...</code> lines above.  Still, it
 is best never to rely on this behavior when writing .ty script files
 or .py code, because of the great potential for confusion, so please
@@ -417,7 +417,7 @@ performs an action.  For instance, you can enable verbose messaging
 by starting Topographica as:
 
 <pre>
-  ./topographica -c "import param" \
+  topographica -c "import param" \
   -c "param.parameterized.min_print_level=param.parameterized.VERBOSE" ...
 </pre>
 

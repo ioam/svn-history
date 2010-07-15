@@ -12,7 +12,7 @@ identifiable directory that records the options used for the run.
 Example:
 
 <pre>
-  ./topographica -a -c "run_batch('examples/tiny.ty')"
+  topographica -a -c "run_batch('~/topographica/examples/tiny.ty')"
 </pre>
 
 <P>Here the <A href="commandline.html#option-a">"-a" option</a> is
@@ -27,7 +27,7 @@ of the options accepted by tiny.ty, you can do that when you call
 run_batch:
 
 <pre>
-  ./topographica -a -c "run_batch('examples/tiny.ty',cortex_density=3)"
+  topographica -a -c "run_batch('~/topographica/examples/tiny.ty',cortex_density=3)"
 </pre>
 
 <p>To help you keep the options straight, they will be encoded into
@@ -58,8 +58,8 @@ after the run_batch call, as usual.  These will be processed before or
 after the batch run, respectively:
 
 <pre>
-  ./topographica -a -c "save_script_repr()" -p cortex_density=3\
-  -c "run_batch('examples/tiny.ty')" \
+  topographica -a -c "save_script_repr()" -p cortex_density=3\
+  -c "run_batch('~/topographica/examples/tiny.ty')" \
   -c "save_snapshot()"
 </pre>
 
