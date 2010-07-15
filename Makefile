@@ -192,9 +192,12 @@ print-info:
 	@echo Running at ${shell date +%s}
 	@echo svnversion ${SVNVERSION}
 
+batch-tests:
+	./topographica -c "from topo.tests.test_script import test_runbatch; test_runbatch()"
+
 # CB: snapshot-tests is not part of slow-tests for the moment
 # (until slow-tests split up on buildbot).
-slow-tests: print-info train-tests all-speed-tests map-tests
+slow-tests: print-info train-tests all-speed-tests map-tests batch_tests
 #snapshot-tests 
 
 # CB: add notes somewhere about...

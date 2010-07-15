@@ -465,3 +465,43 @@ def run_multiple_density_comparisons(ref_script):
     return nerr
 
 
+
+
+# basic test of run batch
+def test_runbatch():
+    from topo.misc.genexamples import find_examples
+    from topo.command import run_batch
+    import os
+    import param
+    import tempfile
+    import glob
+    import shutil
+
+    original_output_path = param.normalize_path.prefix
+    start_output_path = tempfile.mkdtemp()
+    param.normalize_path.prefix = start_output_path
+    
+    tiny = os.path.join(find_examples(),"tiny.ty")
+    run_batch(tiny,cortex_density=1,retina_density=1,times=[1],snapshot=True)
+
+    new_output_path = param.normalize_path.prefix
+
+    assert new_output_path.startswith(start_output_path)
+
+    base = os.path.basename(new_output_path).split(",")[0]
+
+    def exists(endpart):
+        whole = os.path.join(new_output_path,base+endpart)
+        print "Checking for %s"%whole
+        return os.path.isfile(whole)
+    
+    assert exists(".global_params.pickle")
+    assert exists(".out")
+    assert exists("_000001.00_V1_Activity.png")
+    assert exists("_000001.00_script_repr.ty")
+    assert exists("_000001.00.typ")
+
+    print "Deleting %s"%param.normalize_path.prefix
+    shutil.rmtree(param.normalize_path.prefix)
+    param.normalize_path.prefix=original_output_path
+
