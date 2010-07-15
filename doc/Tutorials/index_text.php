@@ -2,7 +2,7 @@ Topographica comes with the following step-by-step guides to running
 simulations: 
 
 <P><DL>
-<DT><A href="lissom.html"><strong>LISSOM Orientation Map</strong></A></DT>
+<DT><A href="lissom_oo_or.html"><strong>LISSOM Orientation Map</strong></A></DT>
 <DD>How to run and test a simple orientation map simulation using the
 LISSOM cortical model.  The tutorial allows you to present various
 objects to a saved orientation map network, and to visualize and
