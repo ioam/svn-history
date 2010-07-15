@@ -866,7 +866,7 @@ class normalize_path(ParameterizedFunction):
     prefix rather than os.getcwd).
     """
 
-    prefix = String(default="",doc="""
+    prefix = String(default=os.getcwd(),doc="""
         Prepended to the specified path, if that path is not
         absolute.""")
 
