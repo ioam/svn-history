@@ -88,7 +88,7 @@ if weave_imported:
     import random
     try:
         # to force recompilation each time
-        inline('double x=%s;printf("hi");'%random.random())
+        inline('double x=%s;'%random.random())
         compiled = True
     except:
         # CB: should maybe display error
