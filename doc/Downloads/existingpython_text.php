@@ -27,20 +27,23 @@ straightforward because we provide an archive and Makefile).-->
 
 <H3>(1) easy_install or pip</H3>
 
-<!-- can actually be made to work without python-->
+<P>Assuming your system already has easy_install or pip,
+typing <code>easy_install topographica</code> or <code>pip install
+topographica</code> (with administrative privileges,
+e.g. with <code>sudo</code>) should install Topographica into your
+system Python directory. Alternatively, you can use the appropriate
+options (e.g. <code>--prefix</code>) for easy_install or pip to choose
+a different location.
 
-<P>If your system does not already have easy_install or pip, download
-and install one of these. Then, typing <code>easy_install
-topographica</code> or <code>pip install topographica</code> (with
-administrative privileges, e.g. with <code>sudo</code>) should install
-Topographica into your system Python directory. Alternatively, you can
-use the appropriate options (e.g. <code>--prefix</code>) for
-easy_install or pip to choose a different location.
+<P>If you want to install Topographica's optional dependencies, you
+can use easy_install or pip to additionally install IPython,
+MatPlotLib, gmpy, and SciPy (e.g. <code>sudo easy_install ipython gmpy
+matplotlib scipy</code>).
 
-<P>easy_install and pip can sometimes encounter problems while
-installing packages on which Topographica depends. Fixing these
-problems is usually straightforward, as described in the
-<A HREF="../FAQ/index.html#easyinstall">FAQ</A>.
+<P>Sometimes, easy_install and pip can encounter problems while
+installing the packages on which Topographica depends. Fixing these
+problems is usually straightforward, as described in the <A
+HREF="../FAQ/index.html#easyinstall">FAQ</A>.
 
 <P>Once installation has completed, you can proceed to
 the <A HREF="index.html#postinstall">After Installation</A>
@@ -56,8 +59,8 @@ platforms, and many package managers also include them (e.g. apt-get
 on Ubuntu or Fink/Macports on Mac). First install the required
 dependencies <A HREF="http://www.scipy.org/Download">NumPy</A>
 and <A HREF="http://www.pythonware.com/products/pil/">PIL</A>.
-Optionally, install the recommended dependencies 
-<A HREF="http://sourceforge.net/projects/matplotlib/files/">MatPlotLib</A>, 
+Optionally, install the other recommended dependencies 
+<A HREF="http://sourceforge.net/projects/matplotlib/files/">MatPlotLib</A>,
 <A HREF="http://code.google.com/p/gmpy/">gmpy</A>, 
 <A HREF="http://www.scipy.org/Download">SciPy</A>, and 
 <A HREF="http://ipython.scipy.org/moin/">IPython</A>.

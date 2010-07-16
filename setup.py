@@ -11,19 +11,14 @@ scripts = ['topographica']
 required = {'PIL':">=1.1.6",
             'numpy':">=1.0"} 
 
-recommended = {'gmpy':'>=1.0', 
-               'matplotlib':'>=0.8',
-               'weave':'>=0.1'}
-
-optional = {'scipy':'>=0.5','ipython':">=0.7"}
+optional = {'gmpy':'>=1.0', 
+            'matplotlib':'>=0.8',
+            'scipy':'>=0.5',
+            'ipython':">=0.7"}
             
-# for easy_install
-packages_to_install = [required,recommended]
-packages_to_install.reverse() # CEBALERT: setuptools processes in
-                              # reverse order; weave's *setup.py* (not
-                              # just weave itself) depends on numpy,
-                              # so we have this hack to ensure numpy
-                              # gets installed before weave
+# for pip/easy_install (just go for the basics until easy_install works better!)
+packages_to_install = [required]
+
 packages_to_state = [required]
 ######################################################################
 
