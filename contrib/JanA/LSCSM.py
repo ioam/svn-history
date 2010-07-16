@@ -1,4 +1,4 @@
-from scipy.optimize import fmin_ncg, anneal, fmin_cg, fmin_bfgs
+from scipy.optimize import fmin_ncg, anneal, fmin_cg, fmin_bfgs, fmin_tnc
 import __main__
 import numpy
 import pylab
@@ -10,6 +10,7 @@ from topo.misc.filepath import normalize_path, application_path
 from contrib.modelfit import *
 import contrib.dd
 import contrib.JanA.dataimport
+
 
 class LSCSM(object):
 	
@@ -28,13 +29,14 @@ class LSCSM(object):
 	    self.x = self.K[0:self.num_lgn]
 	    self.y = self.K[self.num_lgn:2*self.num_lgn]
 	    self.a = self.K[2*self.num_lgn:3*self.num_lgn]
-	    self.s = self.K[3*self.num_lgn:4*self.num_lgn]
-	    self.n = self.K[4*self.num_lgn]
+	    self.s_c = self.K[3*self.num_lgn:4*self.num_lgn]
+	    self.s_s = self.K[4*self.num_lgn:5*self.num_lgn]
+	    self.n = self.K[5*self.num_lgn]
 	    
-	    self.output = T.dot(self.X,T.mul(self.a[0],T.exp(-T.div_proxy(((self.xx - self.x[0])**2 + (self.yy - self.y[0])**2),self.s[0] )).T))
+	    self.output = T.dot(self.X,T.mul(self.a[0],T.exp(-T.div_proxy(((self.xx - self.x[0])**2 + (self.yy - self.y[0])**2),self.s_c[0])).T) - T.mul(self.a[0],T.exp(-T.div_proxy(((self.xx - self.x[0])**2 + (self.yy - self.y[0])**2),self.s_s[0] )).T))
 	    
 	    for i in xrange(1,self.num_lgn):
-		self.output = self.output + T.dot(self.X,T.mul(self.a[i],T.exp(-T.div_proxy(((self.xx - self.x[i])**2 + (self.yy - self.y[i])**2),self.s[i] )).T))
+		self.output = self.output + T.dot(self.X,T.mul(self.a[i],T.exp(-T.div_proxy(((self.xx - self.x[i])**2 + (self.yy - self.y[i])**2),self.s_c[i] )).T) - T.mul(self.a[i],T.exp(-T.div_proxy(((self.xx - self.x[i])**2 + (self.yy - self.y[i])**2),self.s_s[i] )).T))
 	    
 	    self.model = T.exp(self.output-self.n)
 	    self.loglikelyhood = T.sum(self.model) - T.sum(T.dot(self.Y.T,  T.log(self.model))) 
@@ -54,11 +56,11 @@ class LSCSM(object):
 	def response(self,X,kernels):
 	    self.IN = theano.shared(X)	
 	    
-	    self.output = T.dot(self.IN,T.mul(self.a[0],T.exp(-T.div_proxy(((self.xx - self.x[0])**2 + (self.yy - self.y[0])**2),self.s[0] )).T))
+	    self.output = T.dot(self.IN,T.mul(self.a[0],T.exp(-T.div_proxy(((self.xx - self.x[0])**2 + (self.yy - self.y[0])**2),self.s_c[0])).T) - 		T.mul(self.a[0],T.exp(-T.div_proxy(((self.xx - self.x[0])**2 + (self.yy - self.y[0])**2),self.s_s[0] )).T))
 	    
 	    for i in xrange(1,self.num_lgn):
-		self.output = self.output + T.dot(self.IN,T.mul(self.a[i],T.exp(-T.div_proxy(((self.xx - self.x[i])**2 + (self.yy - self.y[i])**2),self.s[i] )).T))
-	        
+		self.output = self.output + T.dot(self.IN,T.mul(self.a[i],T.exp(-T.div_proxy(((self.xx - self.x[i])**2 + (self.yy - self.y[i])**2),self.s_c[i] )).T) - self.X,T.mul(self.a[i],T.exp(-T.div_proxy(((self.xx - self.x[i])**2 + (self.yy - self.y[i])**2),self.s_s[i] )).T))
+			        
 	    self.model = T.exp(self.output-self.n)
 	    	
 	    resp =  theano.function(inputs=[self.K], outputs=self.model)
@@ -86,13 +88,13 @@ class LSCSM(object):
    		x = kernels[j,0:self.num_lgn]
 	        y = kernels[j,self.num_lgn:2*self.num_lgn]
 	        a = kernels[j,2*self.num_lgn:3*self.num_lgn]
-		s = kernels[j,3*self.num_lgn:4*self.num_lgn]
+		sc = kernels[j,3*self.num_lgn:4*self.num_lgn]
+		ss = kernels[j,4*self.num_lgn:5*self.num_lgn]
 		print x
 		print y
 		print a
-		print s
 	    	for i in xrange(0,self.num_lgn):
-		    rfs[j,:] += a[i]*numpy.exp(-((xx - x[i])**2 + (yy - y[i])**2)/s[i])
+		    rfs[j,:] += a[i]*(numpy.exp(-((xx - x[i])**2 + (yy - y[i])**2)/sc[i]) - numpy.exp(-((xx - x[i])**2 + (yy - y[i])**2)/ss[i])) 
 	    
 	    return rfs
 	
@@ -113,28 +115,59 @@ class LSCSM1(object):
 	    #self.KK = theano.printing.Print(message='My mesasge')(self.K)
 	    self.x = self.K[0:self.num_lgn]
 	    self.y = self.K[self.num_lgn:2*self.num_lgn]
-	    self.s = self.K[3*self.num_lgn:4*self.num_lgn]
-	    self.a = T.reshape(self.K[2*self.num_lgn:2*self.num_lgn+num_neurons*self.num_lgn],(self.num_lgn,self.num_neurons))
-	    self.n = self.K[2*self.num_lgn+num_neurons*self.num_lgn:2*self.num_lgn+num_neurons*self.num_lgn+self.num_lgn]
+	    self.s = self.K[2*self.num_lgn:3*self.num_lgn]
+	    self.a = T.reshape(self.K[3*self.num_lgn:3*self.num_lgn+num_neurons*self.num_lgn],(self.num_lgn,self.num_neurons))
+	    self.n = self.K[3*self.num_lgn+num_neurons*self.num_lgn:3*self.num_lgn+num_neurons*self.num_lgn+self.num_neurons]
 	    
-	    lgn_output,updates = theano.scan(lambda i,v: T.dot(self.X,T.exp(-T.div_proxy(((self.xx - self.x[i])**2 + (self.yy - self.y[i])**2),self.s[i] )).T), sequences= T.arange(self.num_lgn), non_sequences=self.K)
+	    lgn_output,updates = theano.scan(lambda i,x,y,s: T.dot(self.X,T.exp(-T.div_proxy(((self.xx - x[i])**2 + (self.yy - y[i])**2),s[i] )).T), sequences= T.arange(self.num_lgn), non_sequences=[self.x,self.y,self.s])
 	    
-	    
-	    
-	    for i in xrange(1,self.num_lgn):
-		self.lgn_output = self.lgn_output + T.dot(self.X,T.exp(-T.div_proxy(((self.xx - self.x[i])**2 + (self.yy - self.y[i])**2),self.s[i] )).T)
-	    
-	    self.output = T.dot(self.a * self.lgn_output.T)
-	    
+	    self.output = T.dot(lgn_output.T,self.a)
 	    self.model = T.exp(self.output-self.n)
-	    self.loglikelyhood = T.sum(self.model) - T.sum(T.dot(self.Y.T,  T.log(self.model))) 
+	    
+	    self.loglikelyhood = T.sum(T.sum(self.model)) - T.sum(T.sum(self.Y * T.log(self.model))) 
+	
+	def func(self):
+	    return theano.function(inputs=[self.K], outputs=self.loglikelyhood) 
+			
+	def der(self):
+	    g_K = T.grad(self.loglikelyhood, self.K)
+	    return theano.function(inputs=[self.K], outputs=g_K)
+	
+	def response(self,X,kernels):
+	    self.X.value = X
+	    
+	    resp = theano.function(inputs=[self.K], outputs=self.model)
+	    return resp(kernels)	
+	
+	def returnRFs(self,K):
+	    x = K[0:self.num_lgn]
+	    y = K[self.num_lgn:2*self.num_lgn]
+	    s = K[2*self.num_lgn:3*self.num_lgn]
+	    a = numpy.reshape(K[3*self.num_lgn:3*self.num_lgn+self.num_neurons*self.num_lgn],(self.num_lgn,self.num_neurons))
+	    n = K[3*self.num_lgn+self.num_neurons*self.num_lgn:3*self.num_lgn+self.num_neurons*self.num_lgn+self.num_neurons]
+
+            rfs = numpy.zeros((self.num_neurons,self.image_size))
+	    
+	    xx = numpy.repeat([numpy.arange(0,self.ss,1)],self.ss,axis=0).T.flatten()	
+	    yy = numpy.repeat([numpy.arange(0,self.ss,1)],self.ss,axis=0).flatten()
+	    			    
+            print x
+	    print y
+	    print s
+	    print a
+	    print n			    
+	    for j in xrange(self.num_neurons):
+	    	for i in xrange(0,self.num_lgn):
+		    rfs[j,:] += a[i,j]*numpy.exp(-((xx - x[i])**2 + (yy - y[i])**2)/s[i])
+	    
+	    return rfs
 	
 	
 def fitLSCSM(X,Y,num_lgn,num_neurons_to_estimate):
     num_pres,num_neurons = numpy.shape(Y)
     num_pres,kernel_size = numpy.shape(X)
     
-    Ks = numpy.zeros((num_neurons,num_lgn*4+1))
+    Ks = numpy.zeros((num_neurons,num_lgn*5+1))
     laplace = 0.0001*laplaceBias(numpy.sqrt(kernel_size),numpy.sqrt(kernel_size))
     
     rpi = numpy.linalg.pinv(X.T*X + 10*laplace) * X.T * Y
@@ -142,22 +175,25 @@ def fitLSCSM(X,Y,num_lgn,num_neurons_to_estimate):
     
     for i in xrange(0,num_neurons_to_estimate): 
 	print i
-	k0 = numpy.zeros((num_lgn*4+1,1)).flatten()
-	z = numpy.reshape(k0[:-1],(4,num_lgn))
+	k0 = numpy.zeros((num_lgn*5+1,1)).flatten()
+	z = numpy.reshape(k0[:-1],(5,num_lgn))
 	l = numpy.ones(numpy.shape(z))
 	u = numpy.ones(numpy.shape(z))
 	z[0,:] = 2+numpy.random.rand(num_lgn)*(numpy.sqrt(kernel_size)-4)
 	z[1,:] = 2+numpy.random.rand(num_lgn)*(numpy.sqrt(kernel_size)-4)
 	z[2,:] = (numpy.random.rand(num_lgn)-0.5)
 	z[3,:] = 2+numpy.random.rand(num_lgn)*5
+	z[4,:] = 2+numpy.random.rand(num_lgn)*5
 	l[0,:] = l[0,:]*2
 	l[1,:] = l[1,:]*2
 	l[2,:] = l[2,:]*-10
 	l[3,:] = l[3,:]*0
+	l[4,:] = l[4,:]*0
 	u[0,:] = u[0,:]*numpy.sqrt(kernel_size)
 	u[1,:] = u[1,:]*numpy.sqrt(kernel_size)
 	u[2,:] = u[2,:]*8
 	u[3,:] = u[3,:]*8
+	u[4,:] = u[4,:]*8
 	l = l.flatten().tolist() + [-10]
 	u = u.flatten().tolist() + [10]
 	
@@ -173,27 +209,44 @@ def fitLSCSM(X,Y,num_lgn,num_neurons_to_estimate):
 	pylab.colorbar()
 	#K = fmin_ncg(lscsm.func(),numpy.array(k0),lscsm.der(),fhess = lscsm.hess(),avextol=0.00001,maxiter=100)
 	#K = fmin_cg(lscsm.func(),numpy.array(k0),lscsm.der(),avextol=0.00001,maxiter=100)
-	K = anneal(lscsm.func(), numpy.array(k0), schedule='fast', lower=numpy.array(l),upper=numpy.array(u),full_output=0, maxiter=10000, boltzmann=1.0, learn_rate=0.5, feps=9.9999999999999995e-07)[0]
-	K = fmin_ncg(lscsm.func(),numpy.array(K),lscsm.der(),fhess = lscsm.hess(),avextol=0.00001,maxiter=100)
-	Ks[i,:] = K
+	#K = anneal(lscsm.func(), numpy.array(k0), schedule='fast', lower=numpy.array(l),upper=numpy.array(u),full_output=0, maxiter=10000, boltzmann=1.0, learn_rate=0.5, feps=9.9999999999999995e-07)[0]
+	#K = fmin_ncg(lscsm.func(),numpy.array(K),lscsm.der(),fhess = lscsm.hess(),avextol=0.00001,maxiter=100)
+	from pybrain.optimization import CMAES
+
+	l = CMAES(lscsm.func(),numpy.array(k0),maxEvaluations=10000,minimize=True)
+	K = l.learn()
+	
+	print K
+	Ks[i,:] = K[0]
 	
     return [Ks,rpi,lscsm]
 
 class GGEvo(object):
-      def __init__(self,XX,YY,num_lgn):
+      def __init__(self,XX,YY,num_lgn,num_neurons,bounds):
 		self.XX = XX
 		self.YY = YY
 		self.num_lgn = num_lgn
-		self.lscsm = LSCSM(numpy.mat(XX),numpy.mat(YY),num_lgn)
-
+		self.num_neurons = num_neurons
+		self.lscsm = LSCSM1(numpy.mat(XX),numpy.mat(YY),num_lgn,num_neurons)
 		self.func = self.lscsm.func() 
 		self.der = self.lscsm.der()
-		self.hess = self.lscsm.hess()
+		self.num_eval = __main__.__dict__.get('NumEval',10)
+		self.bounds = bounds
 		
       def perform_gradient_descent(self,chromosome):
 	  inp = numpy.array([v for v in chromosome])
-	  inp[:-1] = numpy.reshape(inp[:-1],(self.num_lgn,4)).T.flatten()
-	  score = self.func(numpy.array(inp))
+	  #inp[0:3*self.num_lgn] = numpy.reshape(inp[0:3*self.num_lgn],(self.num_lgn,3)).T.flatten()
+	  #new_K = inp 
+	  #for i in xrange(0,self.num_eval):
+	  #    new_K = new_K - 0.001*self.der(new_K)
+	   
+	  if self.num_eval != 0:
+	  	(new_K,success,c)=fmin_tnc(self.func,inp[:],fprime=self.der,bounds=self.bounds,maxfun = self.num_eval,messages=0)
+	  	for i in xrange(0,len(chromosome)):
+	  		chromosome[i] = new_K[i]
+		score = self.func(numpy.array(new_K))			
+	  else:
+	  	score = self.func(numpy.array(inp))
 	  
 	  #K = fmin_bfgs(self.func,numpy.array(inp),fprime=self.der,maxiter=2,full_output=0)
 	  #score = self.func(K)
@@ -214,55 +267,68 @@ def fitLSCSMEvo(X,Y,num_lgn,num_neurons_to_estimate):
     laplace = laplaceBias(numpy.sqrt(kernel_size),numpy.sqrt(kernel_size))
     
     rpi = numpy.linalg.pinv(X.T*X + __main__.__dict__.get('RPILaplaceBias',0.0001)*laplace) * X.T * Y
-    
-    
-    for i in xrange(0,num_neurons_to_estimate):
-	print i
-	ggevo = GGEvo(X,Y[:,i],num_lgn)
 	
-	setOfAlleles = GAllele.GAlleles()
-	
-	for j in xrange(0,num_lgn):
-		setOfAlleles.add(GAllele.GAlleleRange(2,(numpy.sqrt(kernel_size)-4),real=True))
-		setOfAlleles.add(GAllele.GAlleleRange(2,(numpy.sqrt(kernel_size)-4),real=True))
-		setOfAlleles.add(GAllele.GAlleleRange(-2000,2000,real=True))
-		setOfAlleles.add(GAllele.GAlleleRange(3.0,12,real=True))
-	setOfAlleles.add(GAllele.GAlleleRange(-100,100,real=True))
-	
-	genome = G1DList.G1DList(num_lgn*4+1)
-	
-	genome.setParams(allele=setOfAlleles)
-	genome.evaluator.set(ggevo.perform_gradient_descent)
-	genome.mutator.set(Mutators.G1DListMutatorAllele)
-	genome.initializator.set(Initializators.G1DListInitializatorAllele)
-	genome.crossover.set(Crossovers.G1DListCrossoverUniform) 
-	
-	#genome.mutator.set(Mutators.G1DListMutatorRealGaussian)
-	
-	ga = GSimpleGA.GSimpleGA(genome)
-	ga.minimax = Consts.minimaxType["minimize"]
-	#ga.selector.set(Selectors.GRouletteWheel)
-	ga.setElitism(True) 
-	ga.setGenerations(__main__.__dict__.get('GenerationSize',100))
-	ga.setPopulationSize(__main__.__dict__.get('PopulationSize',100))
-	ga.setMutationRate(__main__.__dict__.get('MutationRate',0.05))
-	#ga.setCrossoverRate(0.7) 
-	pop = ga.getPopulation()
-	#pop.scaleMethod.set(Scaling.SigmaTruncScaling)
-	
-	ga.evolve(freq_stats=1)
-	best = ga.bestIndividual()
-	#print best
-	inp = [v for v in best]
-	inp[:-1] = numpy.reshape(inp[:-1],(num_lgn,4)).T.flatten()
-	Ks[i,:] = inp
-	#rf= ggevo.lscsm.returnRFs(numpy.array([Ks[i,:]]))
+    setOfAlleles = GAllele.GAlleles()
+    bounds = []
     	
-	#pylab.figure()
-	#m = numpy.max(numpy.abs(rf[0,0:kernel_size]))
-	#pylab.imshow(numpy.reshape(rf[0],(numpy.sqrt(kernel_size),numpy.sqrt(kernel_size))),vmin=-m,vmax=m,cmap=pylab.cm.RdBu,interpolation='nearest')
-	#pylab.colorbar()
-	#pylab.show()	
+    for j in xrange(0,num_lgn):
+	setOfAlleles.add(GAllele.GAlleleRange(6,(numpy.sqrt(kernel_size)-6),real=True))
+	bounds.append((6,(numpy.sqrt(kernel_size)-6)))
+	setOfAlleles.add(GAllele.GAlleleRange(6,(numpy.sqrt(kernel_size)-6),real=True))
+	bounds.append((6,(numpy.sqrt(kernel_size)-6)))
+	
+    for j in xrange(0,num_lgn):	
+	setOfAlleles.add(GAllele.GAlleleRange(3.0,10,real=True))
+	bounds.append((3,10))
+    
+    for j in xrange(0,num_lgn):		
+	for k in xrange(0,num_neurons_to_estimate):
+	 	setOfAlleles.add(GAllele.GAlleleRange(-2000,2000,real=True))
+		bounds.append((-2000,2000))
+		
+    for k in xrange(0,num_neurons_to_estimate):
+    	setOfAlleles.add(GAllele.GAlleleRange(-100,100,real=True))
+	bounds.append((-100,100))
+    
+    ggevo = GGEvo(X,Y,num_lgn,num_neurons_to_estimate,bounds)	
+    
+    
+    genome = G1DList.G1DList(num_lgn*3+num_neurons_to_estimate*num_lgn+num_neurons_to_estimate)
+    genome.setParams(allele=setOfAlleles)
+    genome.evaluator.set(ggevo.perform_gradient_descent)
+    genome.mutator.set(Mutators.G1DListMutatorAllele)
+    genome.initializator.set(Initializators.G1DListInitializatorAllele)
+    genome.crossover.set(Crossovers.G1DListCrossoverUniform) 
+
+    ga = GSimpleGA.GSimpleGA(genome,1023)
+    ga.minimax = Consts.minimaxType["minimize"]
+    #ga.selector.set(Selectors.GRouletteWheel)
+    ga.setElitism(True) 
+    ga.setGenerations(__main__.__dict__.get('GenerationSize',100))
+    ga.setPopulationSize(__main__.__dict__.get('PopulationSize',100))
+    ga.setMutationRate(__main__.__dict__.get('MutationRate',0.05))
+    ga.setCrossoverRate(__main__.__dict__.get('CrossoverRate',0.9))
+     
+    #pop = ga.getPopulation()
+    #pop.scaleMethod.set(Scaling.SigmaTruncScaling)
+
+    ga.evolve(freq_stats=1)
+    best = ga.bestIndividual()
+    
+    
+    
+    #print best
+    inp = [v for v in best]
+    (new_K,success,c)=fmin_tnc(ggevo.func,inp[:],fprime=ggevo.der,bounds=bounds,maxfun = 1000,messages=0)
+    #inp[:-1] = numpy.reshape(inp[:-1],(num_lgn,4)).T.flatten()
+    Ks = new_K
+    #rf= ggevo.lscsm.returnRFs(numpy.array([Ks[i,:]]))
+
+    #pylab.figure()
+    #m = numpy.max(numpy.abs(rf[0,0:kernel_size]))
+    #pylab.imshow(numpy.reshape(rf[0],(numpy.sqrt(kernel_size),numpy.sqrt(kernel_size))),vmin=-m,vmax=m,cmap=pylab.cm.RdBu,interpolation='nearest')
+    #pylab.colorbar()
+    #pylab.show()	
     return [Ks,rpi,ggevo.lscsm]	
     
 def runLSCSM():
@@ -279,13 +345,13 @@ def runLSCSM():
     
     normalized_noise_power = [noiseEstimation.signal_and_noise_power(raw_validation_data_set[i])[2] for i in xrange(0,num_neurons)]
     
-    to_delete = numpy.array(numpy.nonzero((numpy.array(normalized_noise_power) > 85) * 1.0))[0]
+    #to_delete = numpy.array(numpy.nonzero((numpy.array(normalized_noise_power) > 85) * 1.0))[0]
+    to_delete = [2,3,4,5,6,9,10,11,12,13,14,18,22,26,28,29,30,31,32,34,35,36,37,41,44,50,51,54,55,57,59,60,63,65,67,68,70,71,73,74,76,79,81,82,84,86,87,88,90,91,94,95,97,98,99,100,102]
     
     training_set = numpy.delete(training_set, to_delete, axis = 1)
     validation_set = numpy.delete(validation_set, to_delete, axis = 1)
     for i in xrange(0,10):
         raw_validation_set[i] = numpy.delete(raw_validation_set[i], to_delete, axis = 1)
-    raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)	
     
     # creat history
     history_set = training_set[0:-1,:]
@@ -310,9 +376,20 @@ def runLSCSM():
     num_neurons=__main__.__dict__.get('NumNeurons',103)
 
     sx,sy = numpy.shape(training_set)	
-    [K,rpi,glm]=  fitLSCSMEvo(numpy.mat(training_inputs),numpy.mat(training_set),params["LGN_NUM"],num_neurons)
-    #print K[:num_neurons,:]
-    rfs = glm.returnRFs(K[:num_neurons,:])
+    
+    training_set = training_set[:,:num_neurons]
+    validation_set = validation_set[:,:num_neurons]
+    for i in xrange(0,len(raw_validation_set)):
+	raw_validation_set[i] = raw_validation_set[i][:,:num_neurons]
+    
+    raw_validation_data_set=numpy.rollaxis(numpy.array(raw_validation_set),2)
+    
+    if __main__.__dict__.get('Evo',True):
+    	[K,rpi,glm]=  fitLSCSMEvo(numpy.mat(training_inputs),numpy.mat(training_set),params["LGN_NUM"],num_neurons)
+    	rfs = glm.returnRFs(K)
+    else:
+    	[K,rpi,glm]=  fitLSCSM(numpy.mat(training_inputs),numpy.mat(training_set),params["LGN_NUM"],num_neurons)
+        rfs = glm.returnRFs(K[:num_neurons,:])
  
 
     pylab.figure()
@@ -320,23 +397,20 @@ def runLSCSM():
     for i in xrange(0,num_neurons):
 	pylab.subplot(11,11,i+1)    
     	pylab.imshow(numpy.reshape(rfs[i,0:kernel_size],(size,size)),vmin=-m,vmax=m,cmap=pylab.cm.RdBu,interpolation='nearest')
-    pylab.savefig(normalize_path('GLM_rfs.png'))	
+    pylab.savefig('GLM_rfs.png')	
     
     pylab.figure()
     m = numpy.max(numpy.abs(rpi))
     for i in xrange(0,num_neurons):
 	pylab.subplot(11,11,i+1)
     	pylab.imshow(numpy.reshape(rpi[:,i],(size,size)),vmin=-m,vmax=m,cmap=pylab.cm.RdBu,interpolation='nearest')
-    pylab.savefig(normalize_path('RPI_rfs.png'))
+    pylab.savefig('RPI_rfs.png')
     
     rpi_pred_act = training_inputs * rpi
     rpi_pred_val_act = validation_inputs * rpi
     
     glm_pred_act = glm.response(training_inputs,K)
     glm_pred_val_act = glm.response(validation_inputs,K)
-    
-    print numpy.shape(glm_pred_act)
-    
     
     ofs = run_nonlinearity_detection(numpy.mat(training_set),numpy.mat(rpi_pred_act))
     rpi_pred_act_t = apply_output_function(numpy.mat(rpi_pred_act),ofs)
@@ -352,14 +426,14 @@ def runLSCSM():
     for i in xrange(0,num_neurons):
 	pylab.subplot(11,11,i+1)    
     	pylab.plot(rpi_pred_val_act[:,i],validation_set[:,i],'o')
-    pylab.savefig(normalize_path('RPI_val_relationship.png'))	
+    pylab.savefig('RPI_val_relationship.png')	
 	
     pylab.figure()
     pylab.title('GLM')
     for i in xrange(0,num_neurons):
 	pylab.subplot(11,11,i+1)    
  	pylab.plot(glm_pred_val_act[:,i],validation_set[:,i],'o')   
-    pylab.savefig(normalize_path('GLM_val_relationship.png'))
+    pylab.savefig('GLM_val_relationship.png')
     
     
     pylab.figure()
@@ -367,7 +441,7 @@ def runLSCSM():
     for i in xrange(0,num_neurons):
 	pylab.subplot(11,11,i+1)    
     	pylab.plot(rpi_pred_val_act_t[:,i],validation_set[:,i],'o')
-    pylab.savefig(normalize_path('RPI_t_val_relationship.png'))	
+    pylab.savefig('RPI_t_val_relationship.png')	
 	
 	
     pylab.figure()
@@ -375,15 +449,20 @@ def runLSCSM():
     for i in xrange(0,num_neurons):
 	pylab.subplot(11,11,i+1)    
  	pylab.plot(glm_pred_val_act_t[:,i],validation_set[:,i],'o')   
-    pylab.savefig(normalize_path('GLM_t_val_relationship.png'))
+    pylab.savefig('GLM_t_val_relationship.png')
+    
+    
+    print numpy.shape(validation_set)
+    print numpy.shape(rpi_pred_val_act_t)
+    print numpy.shape(glm_pred_val_act)
     
     pylab.figure()
-    pylab.plot(numpy.mean(numpy.power(validation_set - rpi_pred_val_act_t,2)[:,:num_neurons],0),numpy.mean(numpy.power(validation_set - glm_pred_val_act,2)[:,:num_neurons],0),'o')
+    pylab.plot(numpy.mean(numpy.power(validation_set - rpi_pred_val_act_t,2),0),numpy.mean(numpy.power(validation_set - glm_pred_val_act,2),0),'o')
     pylab.hold(True)
     pylab.plot([0.0,1.0],[0.0,1.0])
     pylab.xlabel('RPI')
     pylab.ylabel('GLM')
-    pylab.savefig(normalize_path('GLM_vs_RPI_MSE.png'))
+    pylab.savefig('GLM_vs_RPI_MSE.png')
     
     
     print 'RPI \n'
@@ -421,7 +500,7 @@ def runLSCSM():
     pylab.plot([0.0,1.0],[0.0,1.0])
     pylab.xlabel('RPI')
     pylab.ylabel('GLM')
-    pylab.savefig(normalize_path('GLM_vs_RPI_prediction_power.png'))
+    pylab.savefig('GLM_vs_RPI_prediction_power.png')
 
     
     db_node.add_data("Kernels",K,force=True)
