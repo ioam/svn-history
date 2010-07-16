@@ -465,6 +465,10 @@ ifeq (${DEBSTATUS},-unstable)
 	UBUNTU_RELEASE = ${RELEASE}~r${SVNVERSION}-0ubuntu0
 	LOG_TEXT = "  * Pre-release version ${RELEASE} from SVN; see Changelog.txt for details."
 else
+# If you want to re-release, need to increment the last digit to
+# upload to launchpad. E.g. 0.9.7-0ubuntu0~lucid is first release of
+# 0.9.7 on lucid, 0.9.7-0ubuntu1~lucid is second, and so
+# on. Presumably there would usually be just one release.
 	UBUNTU_RELEASE = ${RELEASE}-0ubuntu0
 	LOG_TEXT = "  * Version ${RELEASE}; see Changelog.txt for details."
 endif

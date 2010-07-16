@@ -74,12 +74,12 @@ future releases.
 
 <P>Alternatively, download the appropriate deb or rpm for your
 platform (currently
-available: <a href="http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/noarch/topographica-0.9.7-1.1.noarch.rpm">Fedora
+available: <a href="http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/noarch/topographica-0.9.7-5.1.noarch.rpm">Fedora
 Core 13</a>; Ubuntu
-<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu0~lucid_all.deb">Lucid</A>   
-<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu0~karmic_all.deb">Karmic</A>   
-<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu0~jaunty_all.deb">Jaunty</A>   
-<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu0~hardy_all.deb">Hardy</A>) and install using your graphical software manager, or by
+<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu1~lucid_all.deb">Lucid</A>   
+<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu1~karmic_all.deb">Karmic</A>   
+<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu1~jaunty_all.deb">Jaunty</A>   
+<A HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu1~hardy_all.deb">Hardy</A>) and install using your graphical software manager, or by
 using a command like
 <code>sudo dpkg -i topographica_0.9.7-0ubuntu0~lucid_all.deb</code> or
 <code>yum install topographica-0.9.7-1.1.noarch.rpm</code> (as root).
