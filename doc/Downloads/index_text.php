@@ -51,6 +51,11 @@ Mac. Once complete, proceed to the
 
 <H3><A NAME="lin">Linux</A></H3>
 
+<!-- CEBALERT: could say "install EPD" then run our
+install_topographica.sh script. That script would only have to do
+"python setup.py install" with the right python, and create a
+topographica script somewhere runnable -->
+
 <P>We provide packages for Debian-based systems (e.g. Ubuntu), and
 RPM-based systems (e.g. Fedora Core). Installing one of these packages
 with your package manager will install both the necessary Python
