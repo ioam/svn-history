@@ -66,7 +66,7 @@ Optionally, install the other recommended dependencies
 <A HREF="http://ipython.scipy.org/moin/">IPython</A>.
 
 <P>Once the dependencies are installed, download
-the <A HREF="http://pypi.python.org/packages/source/t/topographica/topographica-0.9.7.tar.gz#md5=f9072b25f594aeb93a2a1d78c16030f9">source
+the <A HREF="http://pypi.python.org/packages/source/t/topographica/topographica-0.9.7.tar.gz">source
 distribution</A>, unpack the archive, and type <code>python setup.py
 install</code>. Alternatively, choose a different installation
 location by passing the appropriate option (e.g. <code>--user</code>

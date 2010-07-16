@@ -32,7 +32,7 @@ or <A HREF="http://www.enthought.com/products/epd.php">EPD</A>
 scientific Python environment, both of which by default include all
 the tools needed by Topographica. Following this, run the
 self-installing
-Topographica <a href="http://pypi.python.org/packages/any/t/topographica/topographica-0.9.7.win.exe#md5=2df85fcf10766cfac80ca019519f12a6">exe</a>
+Topographica <a href="http://pypi.python.org/packages/any/t/topographica/topographica-0.9.7.win.exe">exe</a>
 for Windows. Once complete, proceed to the
 <A HREF="#postinstall">After Installation</A> section below.
 
