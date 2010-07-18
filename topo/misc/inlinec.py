@@ -63,6 +63,14 @@ try:
         except ImportError:
             from scipy import weave
 
+        ##########
+        # Hack to allow weave to work when a user name contains a
+        # space (see message at http://gmane...).
+        import weave.catalog
+        original_whoami = weave.catalog.whoami
+        weave.catalog.whoami = lambda: original_whoami().replace(" ","")
+        ##########
+
         weave_imported = True
 
     # Default parameters to add to the inline_weave() call.
