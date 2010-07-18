@@ -1059,7 +1059,6 @@ class Parameterized(object):
 
             
         # Generate import statement
-        cls = self.__class__.__name__
         mod = self.__module__
 
         bits = mod.split('.')
