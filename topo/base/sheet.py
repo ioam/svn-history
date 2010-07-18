@@ -221,7 +221,6 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
         self.__saved_activity.append(array(self.activity))
         EventProcessor.state_push(self)
         for of in self.output_fns:
-            from topo.transferfn.basic import TransferFnWithState
             if hasattr(of,'state_push'):
                 of.state_push()
 
@@ -235,7 +234,6 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
         self.activity = self.__saved_activity.pop()
         EventProcessor.state_pop(self)
         for of in self.output_fns:
-            from topo.transferfn.basic import TransferFnWithState
             if hasattr(of,'state_pop'):
                 of.state_pop()
 
