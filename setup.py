@@ -31,7 +31,7 @@ if 'setuptools' in sys.modules:
     for package_list in packages_to_install:
         install_requires+=["%s%s"%(package,version) for package,version in package_list.items()]
     setup_args['install_requires']=install_requires
-    setup_args['dependency_links']=["http://buildbot.topographica.org/extra/","http://pypi.python.org/simple/"]
+    setup_args['dependency_links']=["http://pypi.python.org/simple/"]
     setup_args['zip_safe']=False
 
 for package_list in packages_to_state:
