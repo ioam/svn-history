@@ -7,8 +7,9 @@ scientific Python environment.
 
 <P>If you already have a Python environment that you wish to use for
 Topographica, or if your platform is not listed below, instead follow
-our instructions for <A HREF="existingpython.html">installing Topographica
-into an existing Python environment</A>.
+our instructions for <A HREF="existingpython.html">installing
+Topographica into an existing Python environment</A>. (Mac OS X 10.6
+includes Python, so this option should be suitable for Mac users.)
 
 <P>Developers, as well as users who wish to access the most recent
 changes or edit the version-controlled source code, should instead
@@ -26,35 +27,17 @@ SF.net allows you to have files to present to users based on their
 OS. -->
 <H3><A NAME="win">Windows</A></H3>
 
-<P>Install
-the <A HREF="http://code.google.com/p/pythonxy/wiki/Downloads">Python(x,y)</A>
-or <A HREF="http://www.enthought.com/products/epd.php">EPD</A>
-scientific Python environment, both of which by default include all
-the tools needed by Topographica. Following this, run the
-self-installing
-Topographica <a href="http://pypi.python.org/packages/any/t/topographica/topographica-0.9.7.win.exe">exe</a>
-for Windows. Once complete, proceed to the
-<A HREF="#postinstall">After Installation</A> section below.
+<P>Install the <A
+HREF="http://code.google.com/p/pythonxy/wiki/Downloads">Python(x,y)</A>
+scientific Python environment, which by default includes all the tools
+needed by Topographica. Following this, run the self-installing
+Topographica <a
+href="http://pypi.python.org/packages/any/t/topographica/topographica-0.9.7.win.exe">exe</a>
+for Windows. Once complete, proceed to the <A
+HREF="#postinstall">After Installation</A> section below.
 
-<H3><A NAME="mac">Mac</H3>
-
-<!-- CEBALERT: discuss people for whom EPD is free? provide link to
-30-day trial?! -->
-<P>Please note that the Mac package for the current release is in
-preparation, and not yet available.
-
-<P>Install
-the <A HREF="http://www.enthought.com/products/getepd.php">EPD</A>
-scientific Python environment, then run the Topographica installer for
-Mac. Once complete, proceed to the
-<A HREF="#postinstall">After Installation</A> section below.
 
 <H3><A NAME="lin">Linux</A></H3>
-
-<!-- CEBALERT: could say "install EPD" then run our
-install_topographica.sh script. That script would only have to do
-"python setup.py install" with the right python, and create a
-topographica script somewhere runnable -->
 
 <P>We provide packages for Debian-based systems (e.g. Ubuntu), and
 RPM-based systems (e.g. Fedora Core). Installing one of these packages
