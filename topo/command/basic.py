@@ -34,13 +34,6 @@ from topo.misc.picklemain import PickleMain
 from topo.misc.genexamples import generate as _generate
 from topo.base.functionfamily import PatternDrivenAnalysis
 
-try:
-    import gnosis.xml.pickle
-    gnosis_imported = True
-except ImportError:
-    param.Parameterized().message("No 'gnosis' module: xml snapshots unavailable.")
-    gnosis_imported = False
-
 
 def generate_example(target):
     """
@@ -332,22 +325,28 @@ def save_snapshot(snapshot_name=None,xml=False):
         pickle.dump(to_save,snapshot_file,2)
     else:
         snapshot_file=open(normalize_path(snapshot_name),'w')
-        gnosis.xml.pickle.dump(to_save,snapshot_file,2,allow_rawpickles=True)
+
+        try:
+            import gnosis.xml.pickle
+            gnosis.xml.pickle.dump(to_save,snapshot_file,2,allow_rawpickles=True)
+        except ImportError:
+            param.Parameterized().warning("Unable to import 'gnosis' module: no snapshot saved (xml snapshots unavailable).")
+
     
     snapshot_file.close()
 
 
 
 def _load_pickle(snapshot):
-    if gnosis_imported:
-        try:
-            gnosis.xml.pickle.load(snapshot,allow_rawpickles=True,class_search=gnosis.xml.pickle.SEARCH_ALL)
-        except ExpatError:
-            snapshot.seek(0) 
-            # If it's not xml, open as a normal pickle.
-            pickle.load(snapshot)
-    else:
+
+    try:
+        import gnosis.xml.pickle
+        gnosis.xml.pickle.load(snapshot,allow_rawpickles=True,class_search=gnosis.xml.pickle.SEARCH_ALL)
+    except ExpatError: # have gnosis.xml but snapshot is not xml
+        snapshot.seek(0) 
         pickle.load(snapshot)
+    except ImportError: # no gnosis.xml; snapshot could still be xml but there's nothing we can do
+        pickle.load(snapshot) 
 
     
 
