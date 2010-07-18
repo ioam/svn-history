@@ -9,7 +9,7 @@ import re
 
 from numpy import sqrt,dot,arctan2,array2string,fmod,floor,array, \
      unravel_index,concatenate,set_printoptions,divide,maximum,minimum, \
-     clip,divide
+     clip
 from numpy import abs # pylint: disable-msg=W0622
 from numpy import ufunc
 
