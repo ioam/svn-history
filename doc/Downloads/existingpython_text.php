@@ -2,14 +2,14 @@
 
 <P>Topographica itself is platform independent, but it depends on
 external packages, the installation of which varies by platform. This
-page assumes you already
-have <A HREF="http://www.python.org/download/releases/2.6.5/">Python
-2.6 installed</A> (with Tkinter, if you wish to use the GUI), so is
-most useful for people who already have a Python environment they want
-to use, or who are using a platform other than
-those <A HREF="index.html">already described</A>, and who do not
-need <A HREF="../Developer_Manual/installation.html">version
-control</A>.
+page assumes you already have <A
+HREF="http://www.python.org/download/releases/2.6.5/">Python
+installed</A> (with Tkinter, if you wish to use the GUI), so is most
+useful for people who already have a Python environment they want to
+use, or who are using a platform other than those <A
+HREF="index.html">already described</A>, and who do not need <A
+HREF="../Developer_Manual/installation.html">version control</A>. We
+have tested Topographica with Python 2.5 and 2.6.
 
 <P>There are two options for ensuring your Python environment has the
 appropriate dependencies and then installing Topographica: the first

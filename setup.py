@@ -118,7 +118,8 @@ performance.
         "License :: OSI Approved :: BSD License",
 # (until packaging tested)
         "Development Status :: 4 - Beta",
-        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.5",
+        "Programming Language :: Python :: 2.6",
         "Operating System :: OS Independent",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
