@@ -55,7 +55,7 @@ its dependencies to be updated automatically for future releases.
 
 <P>Alternatively, download the appropriate deb or rpm for your
 platform (currently available: <a
-href="http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/noarch/topographica-0.9.7-6.1.noarch.rpm">Fedora
+href="http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/noarch/topographica-0.9.7-7.1.noarch.rpm">Fedora
 Core 13</a>; Ubuntu <A
 HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu2~lucid_all.deb">Lucid</A>
 <A
