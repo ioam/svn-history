@@ -31,7 +31,9 @@ clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotl
 uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall svn2cl-uninstall readline-uninstall termcap-uninstall guppy-uninstall pyopenssl-uninstall foolscap-uninstall zope_interface-uninstall twisted-uninstall mpi4py-uninstall openmpi-uninstall pyflakes-clean setuptools-clean freetype-uninstall libpng-uninstall zlib-uninstall m4-uninstall
 
 
-### CEB: working here (testing for buildbot)
+#####
+# CEB: hack apparently necessary to avoid occasional and mysterious
+# "broken pipes" on buildbot
 %.tar.gz_extract: %.tar.gz
 	cp $< $<_tmp.tar.gz
 	gunzip $<_tmp.tar.gz
@@ -43,7 +45,7 @@ uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-unin
 	gunzip -f $<_tmp.tgz
 	tar -xf $<_tmp.tar
 	rm -f $<_tmp.tar
-###
+#####
 
 
 ##############################################################
