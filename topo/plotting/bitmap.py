@@ -34,35 +34,14 @@ import param
 from param import resolve_path
 
 
-######################################################################
-# CEBALERT!! This should instead be using python code to find where is
-# site-packages or dist-packages (i.e. location of matplotlib
-# package).
-MPLVERA = 'matplotlib/mpl-data/fonts/ttf/Vera.ttf'
+# CEBALERT: can we just use load_default()? Do we even need TITLE_FONT
+# at all?
 try:
-    # topographica built from source
-    vera_path = resolve_path('lib/python2.5/site-packages/'+MPLVERA)
+   import matplotlib
+   vera_path = resolve_path(os.path.join(matplotlib.__file__,'matplotlib/mpl-data/fonts/ttf/Vera.ttf'))
+   TITLE_FONT = ImageFont.truetype(vera_path,20)
 except:
-    try:
-        # windows 'binary'
-        vera_path = resolve_path('python_topo/Lib/site-packages/'+MPLVERA)
-    except:
-        try:
-            # windows 'msys'
-            vera_path = resolve_path('Lib/site-packages/'+MPLVERA)
-        except:
-            try:
-                # topo installed as package (should be one level pack 
-                # from package_path)
-                vera_path = resolve_path('../'+MPLVERA)
-            except:
-                vera_path = None
-
-if vera_path is not None:
-    TITLE_FONT = ImageFont.truetype(vera_path,20) 
-else:
-    TITLE_FONT = ImageFont.load_default()
-######################################################################
+   TITLE_FONT = ImageFont.load_default()
 
 
 ### JCALERT: To do:
