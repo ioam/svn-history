@@ -59,7 +59,7 @@ platforms, and many package managers also include them (e.g. apt-get
 on Ubuntu or Fink/Macports on Mac). First install the required
 dependencies <A HREF="http://www.scipy.org/Download">NumPy</A>
 and <A HREF="http://www.pythonware.com/products/pil/">PIL</A>.
-Optionally, install the other recommended dependencies 
+Optionally, then install the other recommended dependencies 
 <A HREF="http://sourceforge.net/projects/matplotlib/files/">MatPlotLib</A>,
 <A HREF="http://code.google.com/p/gmpy/">gmpy</A>, 
 <A HREF="http://www.scipy.org/Download">SciPy</A>, and 
