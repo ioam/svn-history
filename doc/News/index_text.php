@@ -1,4 +1,4 @@
-<p><b>10 July 2010:</b> Version 0.9.7 released, including:
+<p><b>18 July 2010:</b> Version 0.9.7 released, including:
 
 <!-- Updated to r10814 -->
 <center>

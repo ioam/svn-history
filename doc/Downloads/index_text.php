@@ -55,15 +55,15 @@ its dependencies to be updated automatically for future releases.
 
 <P>Alternatively, download the appropriate deb or rpm for your
 platform (currently available: <a
-href="http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/noarch/topographica-0.9.7-5.1.noarch.rpm">Fedora
+href="http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/noarch/topographica-0.9.7-6.1.noarch.rpm">Fedora
 Core 13</a>; Ubuntu <A
-HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu1~lucid_all.deb">Lucid</A>
+HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu2~lucid_all.deb">Lucid</A>
 <A
-HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu1~karmic_all.deb">Karmic</A>
+HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu2~karmic_all.deb">Karmic</A>
 <A
-HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu1~jaunty_all.deb">Jaunty</A>
+HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu2~jaunty_all.deb">Jaunty</A>
 <A
-HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu1~hardy_all.deb">Hardy</A>)
+HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu2~hardy_all.deb">Hardy</A>)
 and install using your graphical software manager (usually launced by
 double clicking on the downloaded package).
 
