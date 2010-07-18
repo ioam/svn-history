@@ -34,7 +34,7 @@ from functionfamily import TransferFn,IdentityTF
 from functionfamily import LearningFn,Hebbian,IdentityLF
 from functionfamily import ResponseFn,DotProduct
 from functionfamily import CoordinateMapperFn,IdentityMF
-from projection import Projection,ProjectionSheet, SheetMask
+from projection import Projection,ProjectionSheet
 from sheetcoords import Slice
 from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
