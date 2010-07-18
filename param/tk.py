@@ -165,7 +165,6 @@ $Id$
 ## logging.info("tkgui logging started for %s"%version)
 
 import __main__
-import sys
 import copy
 import decimal
 import os.path
@@ -790,7 +789,6 @@ class TkParameterizedBase(Parameterized):
             # determining where an error might have originated.
             global _last_one_set
             if hasattr(self,'master'):
-                _old = _last_one_set
                 _last_one_set = self.master
 
             tkvar._on_set()
@@ -1624,8 +1622,7 @@ class TkParameterized(TkParameterizedBase):
             
 
         # and set size from Button
-        size = button_param.size
-        #if size:
+        #if size_param.size:
         #    button['width']=size[0]
         #    button['height']=size[1]
 
@@ -1733,7 +1730,6 @@ class TkParameterized(TkParameterizedBase):
         # when an item is selected, we bind to the
         # <<ComboboxSelected>> event.
         def _combobox_updated(event,name=name):
-            v = self._tkvars[name].get()
             w = self.representations[name]['widget']
             help_text =  getdoc(
                 self._string2object(
@@ -1784,7 +1780,6 @@ class TkParameterized(TkParameterizedBase):
     def _create_list_widget(self,frame,name,widget_options):
         #param = self.get_parameter_object(name)
         #value = self.get_parameter_value(name)
-        tkvar = self._tkvars[name]
 
         X = lambda event=None,x=name: self._list_edit(x)
 
@@ -3885,8 +3880,6 @@ class EditingParametersFrameWithApply(ParametersFrameWithApply):
 
     def _make_representation(self,name):
         super(EditingParametersFrameWithApply,self)._make_representation(name)
-
-        param_obj = self.get_parameter_object(name)
 
         self.representations[name]['list_ctrl']=ListItemCtrlWidget(
             self._params_frame,
