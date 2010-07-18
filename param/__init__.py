@@ -19,7 +19,6 @@ __version__='$Revision$'
 # CEBALERT: we need more documentation above, now that params is a
 # separate directory and will be a separate package.
 
-import types
 import os.path
 
 from parameterized import Parameterized, Parameter, String, \
@@ -915,7 +914,7 @@ class Filename(Parameter):
         try:
             self._resolve(val)
         except IOError, e:
-            param.Parameterized(name="%s.%s"%(obj.name,self._attrib_name)).warning('%s'%(e.args[0]))
+            Parameterized(name="%s.%s"%(obj.name,self._attrib_name)).warning('%s'%(e.args[0]))
 
         super(Filename,self).__set__(obj,val)
         
