@@ -299,18 +299,12 @@ doc: FORCE
 ## Run these from a relatively clean copy of the topographica directory 
 ## (without stray files, especially in doc/).
 
-svn-release: LATEST_STABLE tag-release sf-web-site 
-
 # Update any files that keep track of the version number
 new-version: FORCE
 	mv setup.py setup.py~
 	sed -e "s/version=.*,/version='${RELEASE}',/g" setup.py~ > setup.py
 
-
-# Make a new LATEST_STABLE on the web, using the currently checked-out version
 TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica
-LATEST_STABLE:
-	svn copy ${TOPOROOT}/trunk ${TOPOROOT}/tags/LATEST_STABLE -m "Update LATEST_STABLE."
 
 tag-release: 
 	svn copy ${TOPOROOT}/trunk ${TOPOROOT}/releases/${RELEASE} -m "Create release ${RELEASE}"
@@ -338,7 +332,7 @@ SCRIPTS_TO_KEEP_IN_DIST= ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_o
 #@@	   ${RM} -r images sounds
 #@@	   ${RM} -r info
 #@@	   mkdir images; mv ./TMPellen_arthur.pgm images/ellen_arthur.pgm
-#@@	   ${RM} -r setup.py MANIFEST.in create_topographica_script.py windows_postinstall.py topographica.ico
+#@@	   ${RM} -r setup.py MANIFEST.in windows_postinstall.py topographica.ico
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r contrib/
 #@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn
