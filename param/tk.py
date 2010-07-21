@@ -180,7 +180,7 @@ from parameterized import Parameterized,ParameterizedMetaclass,\
 
 import param
 
-from external import Combobox,OrderedDict
+from external import Combobox,OrderedDict,Progressbar
 
 from . import Boolean,String,Number,Selector,ClassSelector,\
      ObjectSelector,Callable,Dynamic,Parameter,List,HookList,\
@@ -215,9 +215,6 @@ def initialize(external_root=None):
         root = external_root
     
     root.tk.call("lappend","auto_path",externaltk_path)
-
-    if T.TkVersion<8.5:
-        root.tk.call("package","require","tile")
 
 
 
@@ -3148,21 +3145,6 @@ class ScrolledWindow(T.Toplevel):
         self._scrolledframe.sizeright()
 
 
-# CB: temporary - will later be able to import from Tile
-class Progressbar(T.Widget):
-    def __init__(self, master=None, cnf={}, **kw):
-        T.Widget.__init__(self, master, "ttk::progressbar", cnf, kw)
-        
-    def step(self, amount=1.0):
-        """Increments the -value by amount. amount defaults to 1.0 
-        if omitted. """
-        return self.tk.call(self._w, "step", amount)
-        
-    def start(self):
-        self.tk.call("ttk::progressbar::start", self._w)
-        
-    def stop(self):
-        self.tk.call("ttk::progressbar::stop", self._w)
 
 
 

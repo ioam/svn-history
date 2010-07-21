@@ -27,7 +27,7 @@ from tkFileDialog import asksaveasfilename,askopenfilename
 
 import param
 from param import tk,normalize_path,resolve_path
-from param.external import Notebook
+
 
 import topo
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
@@ -162,55 +162,80 @@ class PlotsMenuEntry(param.Parameterized):
         return open_plotgroup_panel(self.class_,new_plotgroup,**kw)
 
 
-class DockManager(Notebook):
-    """Manages windows that can be tabs in a notebook, or toplevels."""
-    def __init__(self, master=None, cnf={}, **kw):
-        Notebook.__init__(self, master, cnf=cnf, **kw)
-        self._tab_ids = {}
+# Notebook only available for Tkinter>=8.5
+try:
+    from param.external import Notebook
+    class DockManager(Notebook):
+        """Manages windows that can be tabs in a notebook, or toplevels."""
+        def __init__(self, master=None, cnf={}, **kw):
+            Notebook.__init__(self, master, cnf=cnf, **kw)
+            self._tab_ids = {}
 
-    def _set_tab_title(self,win,title):
-        self.tab(self._tab_ids[win],text=title)
+        def _set_tab_title(self,win,title):
+            self.tab(self._tab_ids[win],text=title)
 
-    def _set_toplevel_title(self,win,title):
-        prefix = topo.sim.name+": "
-        if not title.startswith(prefix):
-            title=prefix+title
-        self.tk.call("wm","title",win._w,title)
+        def _set_toplevel_title(self,win,title):
+            prefix = topo.sim.name+": "
+            if not title.startswith(prefix):
+                title=prefix+title
+            self.tk.call("wm","title",win._w,title)
 
-    def add(self, child, cnf={}, **kw):
-        self._tab_ids[child]=len(self.tabs())
-        Notebook.add(self,child,cnf=cnf,**kw)
+        def add(self, child, cnf={}, **kw):
+            self._tab_ids[child]=len(self.tabs())
+            Notebook.add(self,child,cnf=cnf,**kw)
 
-##     def unhide(self,win):
-##         if win in self._tab_ids:
-##             self.tab(self._tab_ids[win],state='normal')
+    ##     def unhide(self,win):
+    ##         if win in self._tab_ids:
+    ##             self.tab(self._tab_ids[win],state='normal')
 
-    def new_window(self):
-        win = tk.AppWindow(self,status=True)
-        #self.consume(win)
-        return win
+        def new_window(self):
+            win = tk.AppWindow(self,status=True)
+            #self.consume(win)
+            return win
 
-    def consume(self,win):
-        if win not in self._tab_ids:
-            self.tk.call('wm','forget',win._w)
-            win.title = lambda x: self._set_tab_title(win,x)
-            self.add(win)
-        
-    def eject(self,win):
-        if win in self._tab_ids:
-            self.forget(self._tab_ids[win])
+        def consume(self,win):
+            if win not in self._tab_ids:
+                self.tk.call('wm','forget',win._w)
+                win.title = lambda x: self._set_tab_title(win,x)
+                self.add(win)
 
-            # manage my tab ids (HACK)
-            del self._tab_ids[win]
-            for w in self._tab_ids:
-                self._tab_ids[w]-=1
-                self._tab_ids[w]=max(self._tab_ids[w],0)
-                
-            self.tk.call('wm','manage',win._w)
+        def eject(self,win):
+            if win in self._tab_ids:
+                self.forget(self._tab_ids[win])
+
+                # manage my tab ids (HACK)
+                del self._tab_ids[win]
+                for w in self._tab_ids:
+                    self._tab_ids[w]-=1
+                    self._tab_ids[w]=max(self._tab_ids[w],0)
+
+                self.tk.call('wm','manage',win._w)
+                win.renew()
+                win.title = lambda x: self._set_toplevel_title(win,x)
+                return win
+
+except ImportError:
+    class FakeDockManager(Frame):
+        def _set_tab_title(self,*args):
+            pass
+        def _set_toplevel_title(self,win,title):
+            prefix = topo.sim.name+": "
+            if not title.startswith(prefix):
+                title=prefix+title
+            self.tk.call("wm","title",win._w,title)
+        def add(self,*args):
+            pass
+        def new_window(self):
+            win = tk.AppWindow(self,status=True)
+            return win
+        def consume(self,win):
+            pass
+        def eject(self,win):
             win.renew()
             win.title = lambda x: self._set_toplevel_title(win,x)
             return win
 
+    DockManager = FakeDockManager
 
 
 # This is really a hack. There doesn't seem to be any easy way to tie
@@ -247,6 +272,7 @@ def _tkinter_report_exception(widget):
         topo.guimain.messageBar.error('%s'%msg)
 
     param.Parameterized().warning(msg)
+    #import traceback; traceback.print_exc()
 
 
 import Tkinter

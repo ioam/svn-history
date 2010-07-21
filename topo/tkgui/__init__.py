@@ -161,7 +161,10 @@ def start(mainloop=False,banner=True):
     param.tk.root.configure(menu=param.tk.root.menubar)
     
     # default,clam,alt,classic
-    param.tk.root.tk.call("ttk::style","theme","use","classic")  
+    try:
+        param.tk.root.tk.call("ttk::style","theme","use","classic")  
+    except:
+        pass
 
     # Try to read in options from an options_database file
     # (see http://www.itworld.com/AppDev/1243/UIR000616regex/
