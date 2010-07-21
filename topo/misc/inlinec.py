@@ -54,22 +54,35 @@ compiled = False
 def inline(*params,**nparams): raise NotImplementedError
 
 
+
+##########
+# Windows: hack to allow weave to work when a user name contains a
+# space (see
+# http://thread.gmane.org/gmane.comp.python.scientific.devel/14275)
+if import_weave:
+    import sys
+    if sys.platform.startswith("win"):
+        try:
+            # catch the initial use of USERNAME by weave
+            original_user = os.environ.get("USERNAME")
+            os.environ["USERNAME"]=original_user.replace(" ","")
+            # now dynamically patch weave and restore USERNAME
+            import scipy.weave.catalog
+            iam = scipy.weave.catalog.whoami().replace(" ","")
+            scipy.weave.catalog.whoami = lambda: iam                
+            os.environ["USERNAME"]=original_user        
+        except:
+            pass
+##########
+
 try:
     if import_weave:
-        # CEBALERT: we supply weave separately with the source
-        # distribution, but e.g. the ubuntu package uses scipy.
+        # We supply weave separately with the source distribution, but
+        # e.g. the ubuntu package uses scipy.
         try:
             import weave
         except ImportError:
             from scipy import weave
-
-        ##########
-        # Hack to allow weave to work when a user name contains a
-        # space (see message at http://gmane...).
-        import weave.catalog
-        original_whoami = weave.catalog.whoami
-        weave.catalog.whoami = lambda: original_whoami().replace(" ","")
-        ##########
 
         weave_imported = True
 
