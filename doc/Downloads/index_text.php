@@ -8,8 +8,7 @@ scientific Python environment.
 <P>If you already have a Python environment that you wish to use for
 Topographica, or if your platform is not listed below, instead follow
 our instructions for <A HREF="existingpython.html">installing
-Topographica into an existing Python environment</A>. (Mac OS X 10.6
-includes Python, so this option should be suitable for Mac users.)
+Topographica into an existing Python environment</A>. 
 
 <P>Developers, as well as users who wish to access the most recent
 changes or edit the version-controlled source code, should instead
