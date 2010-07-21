@@ -114,7 +114,6 @@ topo.sim['V1'] = CFSheet(
     nominal_density = p.cortex_density,
     output_fns = [KernelMax(density=p.cortex_density)])
 
-from topo.misc.numbergenerator import ExponentialDecay
 CFProjection.learning_rate=LinearDecay()
 topo.sim.connect('Retina','V1',delay=0.10,connection_type=CFProjection,
                  response_fn = CFPRF_DotProduct_opt(),
