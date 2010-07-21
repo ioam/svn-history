@@ -145,7 +145,11 @@ def find_examples(specified_examples=None,dirs=None):
             # setup.py package
             os.path.join(topo._package_path,"../../../../share/topographica/examples"),
             # egg
-            os.path.join(topo._package_path,"../share/topographica/examples")]
+            os.path.join(topo._package_path,"../share/topographica/examples"),
+            # expected bdist_mpkg location...
+            "/usr/local/share/topographica/examples",
+            # ...but actually this; not sure why 
+            "/usr/local/share/share/topographica/examples"]
     else:
         candidate_example_dirs = dirs
 
