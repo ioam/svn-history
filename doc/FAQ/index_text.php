@@ -1,11 +1,14 @@
 <H1>Frequently Asked Questions about Topographica</H1>
 
-<P>Here we collect together some answers to <A HREF="#general">general
-questions</A> about Topographica. If you have a problem that isn't
-answered below, please feel free to ask us (either in one of our <A
+<P>Here we collect together some answers to general questions about
+Topographica. If you have a problem that isn't answered below, please
+feel free to ask us (either in one of our <A
 HREF="../Forums/index.html">forums</A>, or by email). <!-- address?-->
 
+<!--
 <H3><A NAME='general'>General Questions</A></H3>
+--> 
+
 <OL>
 
 <!----------------------------------------------------------------------------->
@@ -58,6 +61,7 @@ maintainers.  However, if you do encounter something like this, you
 can try rebuilding Topographica while logged in rather than remotely.
 If that works, please let us know that we should continue to suggest
 that people avoid building in a remote session.
+
   
 <!----------------------------------------------------------------------------->
 <LI><B>Q:</B> <i>What models or algorithms does Topographica support?</i>
@@ -91,7 +95,7 @@ new code, as long as the new function has already been written for any
 previous model.  For this example, only the KernelMax function (about
 50 lines of Python code) was added specifically for supporting SOM;
 the other components are all used in a wide variety of other models.
-<BR><BR>
+<BR>
 
 
 <!----------------------------------------------------------------------------->
@@ -147,9 +151,21 @@ necessary to install your distribution's "python-dev" or
 
 </ul>
 
-<!----------------------------------------------------------------------------->
 
-  
+<!----------------------------------------------------------------------------->
+<P></P>
+<LI><B>Q:</B> <A NAME="mactkinter"></A><i>On my Mac, the GUI windows
+take a long time to refresh, seeming to bounce around for a while. Why
+is this?</i>
+
+<P><B>A:</B> 
+
+There is a bug in some versions of Tcl/Tk on OS X that causes Tkinter
+to perform very slowly. You could try installing a newer version of
+Tcl/Tk (e.g. ActiveTcl), but you would need to make sure your copy of
+Python is built against it. Please feel free to contact Topographica's
+developers if you would like more help with this problem.
+
 </OL>
 
 

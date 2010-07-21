@@ -22,9 +22,6 @@ installation guide</A>.
 Topographica on a 64-bit platform.
 -->
 
-<!-- CEBALERT: will need to update filenames and links. Note that
-SF.net allows you to have files to present to users based on their
-OS. -->
 <H3><A NAME="win">Windows</A></H3>
 
 <P>Install the <A
@@ -35,6 +32,19 @@ Topographica <a
 href="http://pypi.python.org/packages/any/t/topographica/topographica-0.9.7.win.exe">exe</a>
 for Windows. Once complete, proceed to the <A
 HREF="#postinstall">After Installation</A> section below.
+
+
+<H3><A NAME="mac">Mac</H3>
+
+<P>Install the <A
+HREF="http://www.enthought.com/products/getepd.php">EPD</A> scientific
+Python environment, then run Topographica's <A
+HREF="https://sourceforge.net/projects/topographica/0.9.7/topographica-0.9.7-py26-macosx10.6.mpkg">installer
+for EPD on Mac</A>. Once complete, proceed to the <A
+HREF="#postinstall">After Installation</A> section below.
+
+<P>Topographica's developers have limited access to OS X, so packaging
+contributions from Mac users are welcome!
 
 
 <H3><A NAME="lin">Linux</A></H3>
@@ -55,20 +65,23 @@ its dependencies to be updated automatically for future releases.
 
 <P>Alternatively, download the appropriate deb or rpm for your
 platform (currently available: <a
-href="http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/noarch/topographica-0.9.7-7.1.noarch.rpm">Fedora
+href="http://download.opensuse.org/repositories/home:/ceball:/topographica/Fedora_13/noarch/topographica-0.9.7-8.1.noarch.rpm">Fedora
 Core 13</a>; Ubuntu <A
-HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu2~lucid_all.deb">Lucid</A>
+HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu3~lucid_all.deb">Lucid</A>
 <A
-HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu2~karmic_all.deb">Karmic</A>
+HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu3~karmic_all.deb">Karmic</A>
 <A
-HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu2~jaunty_all.deb">Jaunty</A>
+HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu3~jaunty_all.deb">Jaunty</A>
 <A
-HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu2~hardy_all.deb">Hardy</A>)
-and install using your graphical software manager (usually launced by
-double clicking on the downloaded package).
+HREF="https://launchpad.net/~topographica-developers/+archive/topographica/+files/topographica_0.9.7-0ubuntu3~hardy_all.deb">Hardy</A>)
+and install using your graphical software manager (usually launched by
+double clicking on the downloaded package). We also recommend that RPM
+users install the "Development Tools" package collection from their
+graphical software manager (to get access to Topographica's optional
+optimized components).
 
-<P>Once the package has been installed, you can proceed to
-the <A HREF="#postinstall">After Installation</A> section below.
+<P>Once the Topographica package has been installed, you can proceed
+to the <A HREF="#postinstall">After Installation</A> section below.
 
 <H3><A NAME="postinstall">After installation</A></H3>
 
