@@ -928,7 +928,8 @@ class Filename(Parameter):
     def __getstate__(self):
         # don't want to pickle the search_paths        
         state = super(Filename,self).__getstate__()
-        del state['search_paths']
+        if 'search_paths' in state:
+            state['search_paths'] = []
         return state
 
 
