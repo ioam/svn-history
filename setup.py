@@ -53,8 +53,15 @@ _topographica_devs_email='developers[at]topographica[dot]org'
 setup_args.update(dict(
     name='topographica',
 
-    # CEBALERT: we need one single place with the version number!
-    version='0.9.7',
+    # CEBALERT: we need one single place with the version number!  
+    #
+    # This release number is usually 1 higher than the Makefile's,
+    # except when the Makefile is updated just prior to release.  This
+    # is because DEBs etc being built between releases have a release
+    # number of the next release combined with the svn revision
+    # number, to match DEB convention. (Whereas for svn copy we are
+    # using the opposite convention...)
+    version='0.9.8',
 
     description='A general-purpose neural simulator focusing on topographic maps.',
 
