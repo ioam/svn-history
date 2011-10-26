@@ -52,7 +52,7 @@ class surround_analysis():
 	
 	
         from topo.analysis.featureresponses import PatternPresenter            
-        PatternPresenter.duration=4.0
+        PatternPresenter.duration=4.0 #!
         import topo.command.pylabplot
         reload(topo.command.pylabplot)
 
@@ -78,8 +78,8 @@ class surround_analysis():
                 xindex = self.center_r+offset_x+x
                 yindex = self.center_c+offset_y+y
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
-                c= topo.command.pylabplot.measure_size_response.instance(sheet=self.sheet,num_phase=8,num_sizes=ns,max_size=3.0,coords=[(xcoor,ycoor)])
-                c.duraton=4.0
+                c= topo.command.pylabplot.measure_size_response.instance(sheet=self.sheet,num_phase=8,num_sizes=ns,max_size=__main__.__dict__.get('MAX_SIZE',3.0),coords=[(xcoor,ycoor)])
+                c.duraton=4.0 #!
                 c(coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)])        
                 
                 self.data_dict[(xindex,yindex)] = {}
@@ -90,13 +90,18 @@ class surround_analysis():
                 self.plot_orientation_contrast_tuning(xindex,yindex)
                 self.plot_orientation_contrast_tuning_abs(xindex,yindex)
                 
-                #f = open(normalize_path("dict.dat"),'wb')
-	        #import pickle
-        	#pickle.dump(self.data_dict,f)
-		#f.close()
+	f = open(normalize_path("dict.dat"),'wb')
+	import pickle
+    	pickle.dump(self.data_dict,f)
+	f.close()
         
         self.plot_histograms_of_measures()
         lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,0.5)                
+        
+        pylab.figure()
+	pylab.imshow(lhi)
+	pylab.colorbar()
+        release_fig("LHI")
         self.plot_map_feature_to_surround_modulation_feature_correlations(lhi,"Local Homogeneity Index")
         self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationSelectivity'].view()[0],"OrientationSelectivity")
         self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationPreference'].view()[0]*numpy.pi,"OrientationPreference")
@@ -104,45 +109,51 @@ class surround_analysis():
         
 
     def perform_orientation_contrast_analysis(self,data,xcoor,ycoor,xindex,yindex):
-    
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!
-        cc = self.low_contrast
-        self.low_contrast=self.high_contrast
-    
+	
+	if __main__.__dict__.get('ContrastCenter','LC') == 'LC':
+		contrast_center = self.low_contrast
+	else:
+		contrast_center = self.high_contrast
+		
         curve_data={}
         hc_curve = data["Contrast = " + str(self.high_contrast) + "%" ]
         lc_curve = data["Contrast = " + str(self.low_contrast) + "%" ]
         
-        topo.command.pylabplot.measure_or_tuning(num_phase=4,num_orientation=12,size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":self.low_contrast}],display=True,coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)])
+        topo.command.pylabplot.measure_or_tuning(num_phase=8,num_orientation=12,size=lc_curve["measures"]["peak_near_facilitation"],curve_parameters=[{"contrast":contrast_center}],display=True,coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)])
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",coords=[(xcoor,ycoor)])
         
-        curve_name_ort = "Contrast = " + str(self.low_contrast) + "%";
+        curve_name_ort = "Contrast = " + str(contrast_center) + "%";
         
         ar = []
         ors = []
+        print self.sheet.curve_dict['orientation'].keys()
+        
         for o in self.sheet.curve_dict['orientation'][curve_name_ort].keys():
             ar.append(self.sheet.curve_dict['orientation'][curve_name_ort][o].view()[0][xindex][yindex])
             ors.append(o)
             
         peak_or_response = max(ar)
         orr=ors[numpy.argmax(ar)]
-        orr_ort = orr + (numpy.pi/2.0)
         
+        if __main__.__dict__.get('OrrFullfield',False):
+            orr = self.sheet.sheet_views['OrientationPreference'].view()[0][xindex][yindex]*pi
+
+        orr_ort = orr + (numpy.pi/2.0)        
         curve_data["ORTC"]={}
         curve_data["ORTC"]["info"]={}
         curve_data["ORTC"]["info"]["pref_or"]=orr
         print "ORIENTATION:", orr 
-        topo.command.pylabplot.measure_orientation_contrast(sizecenter=hc_curve["measures"]["peak_near_facilitation"],
+        topo.command.pylabplot.measure_orientation_contrast(sizecenter=lc_curve["measures"]["peak_near_facilitation"],
                                                              orientation_center=orr,
                                                              sizesurround=4.0,
                                                              size=0.0,
                                                              display=True,
-                                                             contrastcenter=self.low_contrast,
-                                                             thickness=4.0-hc_curve["measures"]["peak_near_facilitation"],
+                                                             contrastcenter=contrast_center,
+                                                             thickness=4.0-lc_curve["measures"]["peak_near_facilitation"]-__main__.__dict__.get('SPACE',0.0),
                                                              duration=4.0,
-                                                             num_phase=8,
+                                                             num_phase=__main__.__dict__.get('NUM_PHASE',8),
 							     frequencies=[__main__.__dict__.get('FREQ',2.4)],
-                                                             curve_parameters=[{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
+                                                             curve_parameters=[{"contrastsurround":self.low_contrast},{"contrastsurround":self.high_contrast}],coords=[(xcoor,ycoor)])
         
         for curve_label in sorted(self.sheet.curve_dict['orientationsurround'].keys()):
             print curve_label
@@ -178,9 +189,7 @@ class surround_analysis():
         curve_data["ORTC"]["measures"]["orcontrast_hc_suppresion_index"] = (peak_or_response - hc_cont_or_resp) / peak_or_response 
         curve_data["ORTC"]["measures"]["orcontrast_lc_suppresion_index"] = (peak_or_response - lc_cont_or_resp) / peak_or_response
         
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!
-        self.low_contrast = cc
-        
+    
         return curve_data 
 
 
@@ -272,7 +281,7 @@ class surround_analysis():
             f.plot(x_values, y_values, lw=3, color=colors[i])
             f.axvline(x=orientation,linewidth=4, color='r')
             i+=1
-        
+        pylab.legend(loc='lower right')
         release_fig("AbsOCTC[" + str(xindex) + "," + str(yindex) + "]")
 
     def plot_orientation_contrast_tuning(self, xindex, yindex):
@@ -729,11 +738,22 @@ def size_tuning_analysis(x,y,scale):
     activities_c = []
     activities_ci = []
     
+    from topo.command.basic import wipe_out_activity,clear_event_queue
+    
     for i in xrange(0,40):
 	pg = SineGratingDiskTemp(orientation=orr,phase=phase,size=(12.0/float(i+1)),scale=1.0,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
-	
 	pp = PatternPresenter(pattern_generator=pg,duration=4.0,contrast_parameter="weber_contrast")
 	    
+	topo.sim['V1Simple'].output_fns[0].old_a*=0
+        topo.sim['V1Complex'].output_fns[0].old_a*=0
+        topo.sim['V1ComplexInh'].output_fns[0].old_a*=0
+        
+        topo.sim["V1Simple"].plastic = False
+        topo.sim["V1Complex"].plastic = False
+        topo.sim["V1ComplexInh"].plastic = False
+        wipe_out_activity()
+        clear_event_queue()
+        
 	for f in PatternDrivenAnalysis.pre_analysis_session_hooks: f()
 	topo.sim.state_push()
 	for f in PatternDrivenAnalysis.pre_presentation_hooks: f()
@@ -744,7 +764,7 @@ def size_tuning_analysis(x,y,scale):
 	activities_c.append(topo.sim["V1Complex"].activity.copy())
 	activities_ci.append(topo.sim["V1ComplexInh"].activity.copy())
 	activities_s.append(topo.sim["V1Simple"].activity.copy())
-
+	
 	for f in PatternDrivenAnalysis.post_presentation_hooks: f()
 	topo.sim.state_pop()
 	for f in PatternDrivenAnalysis.post_analysis_session_hooks: f()
@@ -780,5 +800,33 @@ def size_tuning_analysis(x,y,scale):
     pylab.figure()
     pylab.plot(b,a,'r',label='EXC')
     pylab.plot(b,c,'b',label='INH')
-    release_fig("STC_settling_complex")	
+    pylab.legend()
+    release_fig("STC_settling_complex")
+
+
+def process_distributed_sm_measurement(directory):
+    from topo.command.basic import load_snapshot
+    import cPickle as pickle
+    data_dict = {}
     
+    load_snapshot('snapshot.typ')
+    
+    for a in os.listdir(directory):
+        b = os.path.join(directory,a);
+        b = os.path.join(b,'dict.dat');
+        f = open(b,'r')
+        d = pickle.load(f)
+        data_dict.update(d)
+        
+    sa = surround_analysis()
+    
+    for (x,y) in data_dict.keys():
+            sa.plot_size_tunning(x,y)
+            sa.plot_orientation_contrast_tuning_abs(x,y)
+    
+    self.plot_histograms_of_measures()
+    #lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,0.5)                
+    #self.plot_map_feature_to_surround_modulation_feature_correlations(lhi,"Local Homogeneity Index")
+    #self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationSelectivity'].view()[0],"OrientationSelectivity")
+    #self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationPreference'].view()[0]*numpy.pi,"OrientationPreference")
+	
