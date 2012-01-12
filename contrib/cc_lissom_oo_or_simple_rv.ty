@@ -35,7 +35,7 @@ from topo.pattern.basic import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
 from topo.base.functionfamily import CoordinateMapperFn
 from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeoSigmoid, Jitterer, AddGC, SimpleHomeoLinear, Expander
-
+from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 
 topo.sim.name = "CCSimple"
 
@@ -167,7 +167,7 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
                                 nominal_bounds=BoundingBox(radius=core_size+0.25+0.375+0.25))
 
 topo.sim['FakeRetina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=retinal_waves1,  
+                                  input_generator=retinal_waves,  
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=core_size+0.25+0.25))
 
@@ -203,7 +203,7 @@ on_weights = topo.pattern.basic.Composite(
 off_weights = topo.pattern.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
-if True:
+if False:
     topo.sim.connect('FakeRetina','LGNOn',delay=0.05,
                         connection_type=SharedWeightCFProjection,strength=2.33,
                         nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOnAfferent1',
@@ -215,11 +215,11 @@ if True:
                         weights_generator=off_weights)
 else:
     topo.sim.connect('FakeRetina','LGNOn',delay=0.05,
-                     connection_type=OneToOneProjection,strength=0.5,
+                     connection_type=OneToOneProjection,strength=locals().get('LGNAff',0.5),
                      nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
     
     topo.sim.connect('FakeRetina','LGNOff',delay = 0.05,
-                     connection_type=OneToOneProjection,strength=0.5,
+                     connection_type=OneToOneProjection,strength=locals().get('LGNAff',0.5),
                      nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
 
 
@@ -260,6 +260,8 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.025,dest_port=('Activity','JointNor
                                ExponentialDecay(starting_value = locals().get('S_lr',5),
                                                 time_constant=locals().get('S_tc',12000)))))
 
+
+#randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.1))
 
 simpleLateral  =  locals().get('SL',False)
 if simpleLateral:
@@ -326,25 +328,24 @@ if __main__.__dict__.get('GC',True):
 
 def secondStage():
     topo.sim.connect('Retina','LGNOn',delay=0.05,
-                    connection_type=SharedWeightCFProjection,strength=2.33,
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNAff2',2.33),
                     nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOnAfferent3',
                     weights_generator=on_weights)
     
     topo.sim.connect('Retina','LGNOff',delay = 0.05,
-                    connection_type=SharedWeightCFProjection,strength=2.33,
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNAff2',2.33),
                     nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOffAfferent4',
                     weights_generator=off_weights)
     
     topo.sim['FakeRetina'].set_input_generator(zeroInput)
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
-    #randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.1))
+    randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get('CRS',0.1))
     
 from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand
 FeatureMaps.num_orientation=16
 MeasureResponseCommand.scale=3.0
 MeasureResponseCommand.duration=4.0
-SinusoidalMeasureResponseCommand.frequencies=[4.0]
-FeatureCurveCommand.num_orientation=90
+FeatureCurveCommand.num_orientation=20
 FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":90}]
 
