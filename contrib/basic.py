@@ -1,9 +1,11 @@
-from __future__ import with_statement
 """
 Simple two-dimensional mathematical or geometrical pattern generators.
 
 $Id$
 """
+
+from __future__ import with_statement
+
 __version__='$Revision: 10131 $'
 
 from math import pi, sin, cos, sqrt

@@ -1,4 +1,3 @@
-from __future__ import with_statement
 """
 Grating and contour stimuli according to Hegde and Van Essen works,
 usually composite using basic patterns.
@@ -25,6 +24,9 @@ size and/or spatial frequency.
 
 $Id$
 """
+
+from __future__ import with_statement
+
 __version__ = "$Revision$"
 
 from math import sin, cos, pi
