@@ -1,4 +1,4 @@
-from topo.pattern.basic import Gabor, SineGrating, Gaussian
+from topo.pattern import Gabor, SineGrating, Gaussian
 import __main__
 import numpy
 import pylab
@@ -9,9 +9,9 @@ from topo import numbergen
 from topo.transferfn.misc import PatternCombine
 from topo.transferfn.misc import AttributeTrackingTF
 from topo.transferfn.misc import HalfRectify
-from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, Sigmoid
+from topo.transferfn import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, Sigmoid
 from topo.base.cf import CFSheet
-from topo.projection.basic import CFProjection, SharedWeightCFProjection
+from topo.projection import CFProjection, SharedWeightCFProjection
 from fixedpoint import FixedPoint
 import topo
 

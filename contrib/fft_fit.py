@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from topo.pattern.basic import Ring
+from topo.pattern import Ring
 from topo.misc.numbergenerator import UniformRandom
 import scipy
 import numpy

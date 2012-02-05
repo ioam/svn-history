@@ -24,7 +24,7 @@ import topo.sheet.optimized
 import topo.transferfn.misc
 
 from numpy import hanning
-from topo.pattern.basic import TimeSeriesParam
+from topo.pattern import TimeSeriesParam
 from topo.pattern.audio import AudioFile, LogSpectrogram
 
 

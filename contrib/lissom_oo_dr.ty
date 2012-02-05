@@ -197,5 +197,5 @@ MeasureResponseCommand.scale=0.5 # CB: I set this for the speed-2 network
 # CBALERT: temporary (to get new direction map measurement)
 _new_motion_model=True
 
-import topo.command.basic
-topo.command.basic.default_analysis_plotgroups.append("Direction Preference")
+import topo.command
+topo.command.default_analysis_plotgroups.append("Direction Preference")

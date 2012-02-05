@@ -504,7 +504,7 @@ preference_maps=[
 ]
 pgs = [x for y in [m for n,m in preference_maps if n in dims] for x in y] + \
       ['Position Preference','Activity']
-topo.command.basic.default_analysis_plotgroups=pgs
+topo.command.default_analysis_plotgroups=pgs
     
 
 # By default, measures SF at the sizes of RF used, for speed, but if

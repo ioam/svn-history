@@ -8,14 +8,14 @@ import pdb
 
 import param
 import topo
-import topo.pattern.basic
+import topo.pattern
 import topo.command.analysis
 from math import pi, sqrt, exp, pow
 from numpy.oldnumeric import zeros, Float, sum
-from topo.projection.basic import CFProjection, SharedWeightCFProjection
+from topo.projection import CFProjection, SharedWeightCFProjection
 from topo.base.boundingregion import BoundingBox 
-from topo.pattern.basic import Gaussian, Selector, Null
-from topo.transferfn.basic import DivisiveNormalizeL1, HomeostaticMaxEnt, TransferFnWithState, Sigmoid, PiecewiseLinear
+from topo.pattern import Gaussian, Selector, Null
+from topo.transferfn import DivisiveNormalizeL1, HomeostaticMaxEnt, TransferFnWithState, Sigmoid, PiecewiseLinear
 from topo.base.arrayutil import clip_lower
 from topo.sheet.lissom import LISSOM
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
@@ -27,7 +27,7 @@ from topo.command.pylabplot import plot_tracked_attributes
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
 from topo.base.patterngenerator import PatternGenerator, Constant 
-from topo.transferfn.basic import  Sigmoid
+from topo.transferfn import  Sigmoid
 
 class surround_analysis():
 
@@ -489,9 +489,9 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator,prefix):
     call example : contrib.surround_analysis.plot_neural_dynamics(["V1"],[("V1",(0.0,0.0)),("V1",(0.1,0.1))])
     """
     
-    from topo.command.basic import pattern_present
+    from topo.command import pattern_present
     from topo.base.functionfamily import PatternDrivenAnalysis
-    from topo.pattern.basic import OrientationContrast
+    from topo.pattern import OrientationContrast
     from topo.analysis.featureresponses import PatternPresenter
     from topo.base.sheet import Sheet
     
@@ -543,7 +543,7 @@ def plot_neural_dynamics(sheet_names,neurons,pattern_generator,prefix):
      
      
 def run_dynamics_analysis(x,y,cs,scale):
-    from topo.pattern.basic import OrientationContrast
+    from topo.pattern import OrientationContrast
     
     (xx,yy) = topo.sim["V1Complex"].sheet2matrixidx(x,y)
     
@@ -558,10 +558,10 @@ def run_dynamics_analysis(x,y,cs,scale):
     plot_neural_dynamics(["V1Complex","V1ComplexInh"],[("V1Complex",(x,y)),("V1ComplexInh",(x,y))],pg,"ortogonal")
 
 def test(x,y,cs,scale):
-    from topo.pattern.basic import OrientationContrast
-    from topo.command.basic import pattern_present
+    from topo.pattern import OrientationContrast
+    from topo.command import pattern_present
     from topo.base.functionfamily import PatternDrivenAnalysis
-    from topo.pattern.basic import OrientationContrast
+    from topo.pattern import OrientationContrast
     from topo.analysis.featureresponses import PatternPresenter
     from topo.base.sheet import Sheet
 
@@ -634,16 +634,16 @@ def test(x,y,cs,scale):
     pylab.imshow(numpy.array(numpy.multiply(numpy.mat(LongEIOrt),numpy.mat(V1CActivityOrt))))
 	
 		
-from topo.pattern.basic import SineGrating, Disk
+from topo.pattern import SineGrating, Disk
 class SineGratingDiskTemp(SineGrating):
       mask_shape = param.Parameter(default=Disk(smoothing=0,size=1.0))
 		
 		
 def size_tuning_activity_evolution(x,y,cs,scale):
-    from topo.pattern.basic import OrientationContrast
-    from topo.command.basic import pattern_present
+    from topo.pattern import OrientationContrast
+    from topo.command import pattern_present
     from topo.base.functionfamily import PatternDrivenAnalysis
-    from topo.pattern.basic import OrientationContrast
+    from topo.pattern import OrientationContrast
     from topo.analysis.featureresponses import PatternPresenter
     from topo.base.sheet import Sheet
 
@@ -722,10 +722,10 @@ def size_tuning_activity_evolution(x,y,cs,scale):
     
     
 def size_tuning_analysis(x,y,scale):
-    from topo.pattern.basic import OrientationContrast
-    from topo.command.basic import pattern_present
+    from topo.pattern import OrientationContrast
+    from topo.command import pattern_present
     from topo.base.functionfamily import PatternDrivenAnalysis
-    from topo.pattern.basic import OrientationContrast
+    from topo.pattern import OrientationContrast
     from topo.analysis.featureresponses import PatternPresenter
     from topo.base.sheet import Sheet
   
@@ -738,7 +738,7 @@ def size_tuning_analysis(x,y,scale):
     activities_c = []
     activities_ci = []
     
-    from topo.command.basic import wipe_out_activity,clear_event_queue
+    from topo.command import wipe_out_activity,clear_event_queue
     
     for i in xrange(0,40):
 	pg = SineGratingDiskTemp(orientation=orr,phase=phase,size=(12.0/float(i+1)),scale=1.0,x=x,y=y,frequency=__main__.__dict__.get('FREQ',2.4))
@@ -805,7 +805,7 @@ def size_tuning_analysis(x,y,scale):
 
 
 def process_distributed_sm_measurement(directory):
-    from topo.command.basic import load_snapshot
+    from topo.command import load_snapshot
     import cPickle as pickle
     data_dict = {}
     

@@ -8,11 +8,11 @@ from modelUtils.snapshotUtils import modelIsLoaded, loadModelSnapshot, saveSnapS
 
 # Topographica imports
 import topo
-from topo.transferfn.basic import Hysteresis as Hysteresis 
+from topo.transferfn import Hysteresis as Hysteresis 
 from topo.transferfn.misc import HalfRectify as HalfRectify 
 from topo.transferfn.misc import HomeostaticResponse
 
-from topo.command.basic import load_snapshot
+from topo.command import load_snapshot
 
 ############################################################################
 ############################################################################

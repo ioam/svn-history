@@ -1,7 +1,7 @@
 import pickle, sys
 
 import topo
-from topo.command.basic import load_snapshot, save_snapshot 
+from topo.command import load_snapshot, save_snapshot 
 
 
 def modelIsLoaded(modelName):

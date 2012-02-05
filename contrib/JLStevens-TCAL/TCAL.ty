@@ -6,10 +6,10 @@ from numpy import ones
 
 import topo
 from topo import param, learningfn,numbergen,transferfn,pattern,projection,responsefn,sheet
-from topo.sheet.basic import JointNormalizingCFSheet_Continuous
+from topo.sheet import JointNormalizingCFSheet_Continuous
 
 from topo.transferfn.misc import HomeostaticResponse
-from topo.transferfn.basic import Hysteresis
+from topo.transferfn import Hysteresis
 
 from topo.base.arrayutil import clip_lower
 
@@ -475,15 +475,15 @@ def makeIntoStepPattern(pattern, period=1.0, onsetRatio=0.33,offsetRatio=0.66, a
 def presentLGNCalibrationPattern():
      testPattern = pattern.Disk(size=0.07385, smoothing=0.0)
      testPattern = makeIntoStepPattern(testPattern, **stepParams)
-     topo.command.basic.pattern_present({'Retina':testPattern}, duration=250.0)
+     topo.command.pattern_present({'Retina':testPattern}, duration=250.0)
 
 def presentV1CalibrationPattern():
      testPattern = pattern.SineGrating(frequency=2.9, mask_shape=topo.pattern.Disk(size=0.7, smoothing=0.0))
      testPattern = makeIntoStepPattern(testPattern, **stepParams)
-     topo.command.basic.pattern_present({'Retina':testPattern}, duration=250.0)
+     topo.command.pattern_present({'Retina':testPattern}, duration=250.0)
 
 def presentVSDCalibrationPattern():
      testPattern = pattern.Gabor(size=0.1)
      testPattern = makeIntoStepPattern(testPattern, **stepParams)
-     topo.command.basic.pattern_present({'Retina':testPattern}, duration=250.0)
+     topo.command.pattern_present({'Retina':testPattern}, duration=250.0)
 

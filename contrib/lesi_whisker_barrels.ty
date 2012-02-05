@@ -14,8 +14,8 @@ from fixedpoint import FixedPoint
 from math import pi, sqrt, fmod
 
 from numpy import*
-import topo.pattern.basic
-from topo.pattern.basic import Gaussian,Sweeper
+import topo.pattern
+from topo.pattern import Gaussian,Sweeper
 import topo.pattern.random
 import random
 from random import*
@@ -23,16 +23,16 @@ from random import*
 
 from topo.sheet.lissom import LISSOM, JointScaling
 from topo.sheet import GeneratorSheet
-from topo.projection.basic import CFProjection, SharedWeightCFProjection
+from topo.projection import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.misc import AttributeTrackingTF
-from topo.transferfn.basic import PiecewiseLinear, DivisiveNormalizeL1, HomeostaticMaxEnt, ActivityAveragingTF, PipelineTF
-from topo.transferfn.basic import GeneralizedLogistic, Sigmoid, HalfRectify
-from topo.pattern.basic import Gaussian, Composite, SeparatedComposite
+from topo.transferfn import PiecewiseLinear, DivisiveNormalizeL1, HomeostaticMaxEnt, ActivityAveragingTF, PipelineTF
+from topo.transferfn import GeneralizedLogistic, Sigmoid, HalfRectify
+from topo.pattern import Gaussian, Composite, SeparatedComposite
 from topo import numbergen
 from topo.analysis.featureresponses import Feature, FeatureMaps
 
@@ -169,7 +169,7 @@ import param
 from topo.base.patterngenerator import PatternGenerator
 from topo.command.analysis import PatternPresenter, Subplotting
 from topo.base.functionfamily import CoordinateMapperFn
-from topo.coordmapper.basic import Grid
+from topo.coordmapper import Grid
 
 import topo
 
@@ -386,8 +386,8 @@ class BarrelMapper(CoordinateMapperFn):
                                
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((global_seed*3,global_seed*3))
-CFProjection.cf_shape = topo.pattern.basic.Constant()
-CFProjection.weights_generator = topo.pattern.basic.Constant()
+CFProjection.cf_shape = topo.pattern.Constant()
+CFProjection.weights_generator = topo.pattern.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
@@ -470,7 +470,7 @@ IntoIn_OF = PipelineTF(output_fns=[IntoIn_Avg, IntoIn_Tracker])
 
 #Function for generating Gaussian random initial weights
 def gauss_rand(size):
-    return topo.pattern.basic.Composite(operator=numpy.multiply, 
+    return topo.pattern.Composite(operator=numpy.multiply, 
                                          generators=[Gaussian(aspect_ratio=1.0, size=size),
                                                      topo.pattern.random.UniformRandom()])
 
@@ -542,7 +542,7 @@ topo.sim['V1Inh'] = LISSOM(nominal_density=barrel_density,nominal_bounds=Boundin
 topo.sim.connect('Ganglia0','V1Exc',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='Afferent0',
                  weights_generator=topo.pattern.random.UniformRandom(), nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=1.0,
-                 coord_mapper=BarrelMapper(xdensity=w_x,ydensity=w_y),cf_shape = topo.pattern.basic.Constant()
+                 coord_mapper=BarrelMapper(xdensity=w_x,ydensity=w_y),cf_shape = topo.pattern.Constant()
                  )#learning_fn=CFPLF_PluginScaled()) 
 
 # Intra V1  connections
@@ -556,7 +556,7 @@ topo.sim.connect('V1Exc','V1Exc', delay=0.05,
                  connection_type=CFProjection,strength=locals().get('latexloc',0.7), name='LateralExcitatory_local',
                  #output_fn=LatExloc_OF,
                  weights_generator=topo.pattern.random.UniformRandom(),
-                 #weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 #weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.04),
                  nominal_bounds_template=BoundingBox(radius=small_cf), #radius was 0.03
                  learning_rate=0.0)
 
@@ -572,7 +572,7 @@ topo.sim.connect('V1Exc','V1Inh', delay=0.05,
                  connection_type=CFProjection,strength =locals().get('exinloc',0.6), name='V1Exc_to_V1Inh_local', 
                  #output_fn=ExtoInloc_OF,
                  weights_generator=topo.pattern.random.UniformRandom(),
-                 #weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.0),
+                 #weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.0),
                  nominal_bounds_template = BoundingBox(radius=small_cf), #radius was 0.03
                  learning_rate=0.0)
 
@@ -588,7 +588,7 @@ topo.sim.connect('V1Inh','V1Exc', delay=0.05,
                  connection_type=CFProjection,strength=locals().get('inex',-0.35), name='V1Inh_to_V1Exc',
                  #output_fn=IntoEx_OF,
                  weights_generator=topo.pattern.random.UniformRandom(),
-                 #weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 #weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.04),
                  nominal_bounds_template = BoundingBox(radius=small_cf), #radius was 0.03
                  learning_rate=0.0)
 
@@ -596,7 +596,7 @@ topo.sim.connect('V1Inh','V1Inh', delay=0.05,
                  connection_type=CFProjection,strength=locals().get('inin',-0.35), name='V1Inh_to_V1Inh',
                  #output_fn=IntoIn_OF,
                  weights_generator=topo.pattern.random.UniformRandom(),
-                 #weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 #weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.04),
                  nominal_bounds_template = BoundingBox(radius=small_cf), #radius was 0.03
                  learning_rate=0.0)
 """

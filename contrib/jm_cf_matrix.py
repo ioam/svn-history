@@ -1,6 +1,6 @@
 import numpy
 import param, pattern
-from topo.projection.basic import CFProjection, MaskedCFIter
+from topo.projection import CFProjection, MaskedCFIter
 from topo.base.patterngenerator import PatternGenerator
 
 class CFProjectionM(CFProjection):

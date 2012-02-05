@@ -12,14 +12,14 @@ from math import pi, sqrt
 
 import param
 
-import topo.pattern.basic
+import topo.pattern
 import topo.pattern.random
 import __main__
 
 from topo.sheet.lissom import LISSOM, JointNormalizingCFSheet_Continuous
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
-from topo.sheet.basic import GeneratorSheet
-from topo.projection.basic import CFProjection, SharedWeightCFProjection,OneToOneProjection
+from topo.sheet import GeneratorSheet
+from topo.projection import CFProjection, SharedWeightCFProjection,OneToOneProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
@@ -27,9 +27,9 @@ from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.misc import HalfRectify
 from topo.transferfn.misc import AttributeTrackingTF
-from topo.transferfn.basic import PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt,Sigmoid
+from topo.transferfn import PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt,Sigmoid
 from topo import numbergen
-from topo.pattern.basic import Gaussian
+from topo.pattern import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
 from topo.base.functionfamily import CoordinateMapperFn
 from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeoSigmoid, Jitterer, AddGC, SimpleHomeoLinear
@@ -57,18 +57,18 @@ if dataset=="Natural":
                                 y=0,
                                 orientation=0)
                         for f in image_filenames]
-        input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02))
+        input =Jitterer(generator=topo.pattern.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),jitter_magnitude=locals().get('JM',0.02))
 
 disk_scale=locals().get('diskscale',0.35)
-ring = topo.pattern.basic.Composite(operator=numpy.add,x=numbergen.UniformRandom(lbound=-1.1,ubound=1.1,seed=12),
+ring = topo.pattern.Composite(operator=numpy.add,x=numbergen.UniformRandom(lbound=-1.1,ubound=1.1,seed=12),
                                                             y=numbergen.UniformRandom(lbound=-1.1,ubound=1.1,seed=36),
-                       generators=[topo.pattern.basic.Ring(size=2, aspect_ratio=1.0, scale=0.25,thickness=locals().get('Thickness',0.01),
+                       generators=[topo.pattern.Ring(size=2, aspect_ratio=1.0, scale=0.25,thickness=locals().get('Thickness',0.01),
                                                             offset=0.0,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.03),
                                    topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',0), scale=locals().get('rand_scale',0.05))])
 
 retinal_waves=Translator(generator=ring,orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02))
-zeroInput = topo.pattern.basic.Null();
+zeroInput = topo.pattern.Null();
 
 
 jitter  =  locals().get('Jitter',0.4)
@@ -84,7 +84,7 @@ jitterOff = Jitter(rand =numbergen.UniformRandom(seed=1023))
 
 # Specify weight initialization, response function, and learning function
 CFProjection.weights_generator=topo.pattern.random.UniformRandom()
-CFProjection.cf_shape=topo.pattern.basic.Disk(smoothing=0.0)
+CFProjection.cf_shape=topo.pattern.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
@@ -165,10 +165,10 @@ topo.sim['V1ComplexInh'] = JointNormalizingCFSheet_Continuous(nominal_density=lo
 centerg   = Gaussian(size=0.15,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
 surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
 
-on_weights = topo.pattern.basic.Composite(
+on_weights = topo.pattern.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
 
-off_weights = topo.pattern.basic.Composite(
+off_weights = topo.pattern.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 
@@ -190,7 +190,7 @@ g2._Dynamic_time_fn = None
 
 topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',70),name='LGNOnAfferent',
-                 weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
+                 weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
                      generators=[g1
                  ,topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
@@ -202,7 +202,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNorma
 
 topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',70),name='LGNOffAfferent',
-                 weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
+                 weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
                      generators=[g2
                  ,topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
@@ -252,25 +252,25 @@ topo.sim.connect('V1Complex','V1Simple',delay=0.05,
 
 topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LateralExcitatoryToExcitatory',
                  connection_type=CFProjection,strength=locals().get('CxLatExcExcStr',2.0),
-                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.06)),
+                 weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.06)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.25)),
                  learning_rate=locals().get('lat_exc_lr',0.0))
 
 topo.sim.connect('V1Complex','V1ComplexInh',delay=0.05,name='LateralExcitatoryToInhibitory',
                  connection_type=CFProjection,strength=locals().get('CxLatExcInhStr',1.5),
-                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.06)),
+                 weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.06)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.25)),
                  learning_rate=locals().get('lat_exc_lr',0.0))
 
 topo.sim.connect('V1ComplexInh','V1Complex',delay=0.05,name='LateralInhibitoryToExcitatory',
                  connection_type=CFProjection,strength=-locals().get('CxLatInhExcStr',2.0),
-                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',0.12)),
+                 weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',0.12)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('CxLatInhBB',0.12)),
                  learning_rate=locals().get('lat_inh_lr',0.0))
 
 topo.sim.connect('V1ComplexInh','V1ComplexInh',delay=0.05,name='LateralInhibitoryToInhibitory',
                  connection_type=CFProjection,strength=-locals().get('CxLatInhInhStr',1.3),
-                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',0.12)),
+                 weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',0.12)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('CxLatInhBB',0.12)),
                  learning_rate=locals().get('lat_inh_lr',0.0))
 

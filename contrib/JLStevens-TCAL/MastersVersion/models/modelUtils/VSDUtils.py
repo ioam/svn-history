@@ -1,7 +1,7 @@
 import topo
 from topo import param
-from topo.sheet.basic import JointNormalizingCFSheet_Continuous
-from topo.transferfn.basic import Hysteresis as Hysteresis
+from topo.sheet import JointNormalizingCFSheet_Continuous
+from topo.transferfn import Hysteresis as Hysteresis
 
 import numpy
 # Source: topographica/topo/base/projection.py

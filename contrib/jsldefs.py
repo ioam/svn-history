@@ -24,7 +24,7 @@ from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.cf import CFPOutputFn
 import param
 from topo.base.functionfamily import TransferFn, IdentityTF
-from topo.transferfn.basic import IdentityTF, BinaryThreshold, Threshold
+from topo.transferfn import IdentityTF, BinaryThreshold, Threshold
 from topo.pattern.random import RandomGenerator, UniformRandom
 from topo.base.patterngenerator import PatternGenerator
 import string
@@ -410,8 +410,8 @@ def rfs_jitter_analysis_function():
     from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
-    from topo.pattern.basic import Gaussian, SineGrating
-    from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
+    from topo.pattern import Gaussian, SineGrating
+    from topo.command import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
 
     #present a pattern without plasticity to ensure that values are initialized at t=0
@@ -455,8 +455,8 @@ def cf_jitter_analysis_function(rfs=False, output_fn=False, weighted_average=Tru
     from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
     from topo.sheet import GeneratorSheet
-    from topo.pattern.basic import Gaussian, SineGrating
-    from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
+    from topo.pattern import Gaussian, SineGrating
+    from topo.command import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
 
     default_analysis_plotgroups=["Activity"]
@@ -831,7 +831,7 @@ def run_lesi_batch(script_file,filename,chunk,sheet,value,endtime,rfs,snapshot,o
     print startnote
 
     # Ensure that saved state includes all parameter values
-    from topo.command.basic import save_script_repr
+    from topo.command import save_script_repr
     param.parameterized.script_repr_suppress_defaults=False
 
     # Make sure pylab plots are saved to disk
@@ -963,7 +963,7 @@ def run_param_batch(script_file,filename,chunk,sheet,value,endtime,output_direct
     print startnote
 
     # Ensure that saved state includes all parameter values
-    from topo.command.basic import save_script_repr
+    from topo.command import save_script_repr
     param.parameterized.script_repr_suppress_defaults=False
 
     # Make sure pylab plots are saved to disk
@@ -1473,8 +1473,8 @@ def param_analysis_function(data_file):
     from topo.analysis.featureresponses import PatternPresenter
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
-    from topo.pattern.basic import Gaussian, SineGrating
-    from topo.command.basic import pattern_present, wipe_out_activity
+    from topo.pattern import Gaussian, SineGrating
+    from topo.command import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
 
     # Save all plotgroups listed in default_analysis_plotgroups
@@ -1569,8 +1569,8 @@ def homeostatic_analysis_function():
     from topo.analysis.featureresponses import PatternPresenter
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
-    from topo.pattern.basic import Gaussian, SineGrating
-    from topo.command.basic import pattern_present, wipe_out_activity
+    from topo.pattern import Gaussian, SineGrating
+    from topo.command import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
 
     # Save all plotgroups listed in default_analysis_plotgroups
@@ -1688,8 +1688,8 @@ def lesi_analysis_function(data_file, snapshot, rfs):
     from topo.analysis.featureresponses import PatternPresenter
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
-    from topo.pattern.basic import Gaussian, SineGrating
-    from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
+    from topo.pattern import Gaussian, SineGrating
+    from topo.command import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
 
     measured_sheets = [s for s in topo.sim.objects(ProjectionSheet).values()
@@ -1805,8 +1805,8 @@ def species_analysis_function():
     from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
-    from topo.pattern.basic import Gaussian, SineGrating
-    from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
+    from topo.pattern import Gaussian, SineGrating
+    from topo.command import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
 
     #Save all plotgroups listed in default_analysis_plotgroups
@@ -1880,8 +1880,8 @@ def rfs_analysis_function(sheet="V1", sheets_to_measure=["V1"]):
     from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
-    from topo.pattern.basic import Gaussian, SineGrating
-    from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
+    from topo.pattern import Gaussian, SineGrating
+    from topo.command import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
 
     #topo.plotting.plotgroup.plotgroups["RF Projection"].pre_plot_hooks="measure_rfs(scale=10.0,display=False,use_full=True,l=-1.0,b=-1.0,r=1.0,t=1.0)"

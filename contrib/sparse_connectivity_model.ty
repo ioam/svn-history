@@ -8,34 +8,34 @@ import numpy
 from math import pi, sqrt
 
 
-import topo.pattern.basic
+import topo.pattern
 import topo.pattern.random
 import param
 from topo.sheet.lissom import LISSOM,JointNormalizingCFSheet_Continuous
 from topo.sheet import GeneratorSheet
-from topo.projection.basic import CFProjection, SharedWeightCFProjection
+from topo.projection import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt,CFPLF_BCMFixed_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.transferfn.misc import HalfRectify
-from topo.transferfn.basic import PiecewiseLinear,HalfRectifyAndPower,DivisiveNormalizeL1
+from topo.transferfn import PiecewiseLinear,HalfRectifyAndPower,DivisiveNormalizeL1
 from topo import numbergen
-from topo.transferfn.basic import HomeostaticMaxEnt,PipelineTF
-from topo.pattern.basic import Gaussian,Composite,SeparatedComposite
+from topo.transferfn import HomeostaticMaxEnt,PipelineTF
+from topo.pattern import Gaussian,Composite,SeparatedComposite
 from contrib.jacommands import ActivityHysteresis, Translator,Habituation, Jitterer, AddGC, SimpleHomeo
 from topo.base.functionfamily import CoordinateMapperFn
 
 num_inputs=1
-input_type=topo.pattern.basic.Gaussian
+input_type=topo.pattern.Gaussian
 cs = locals().get('CS',0.5)
 tbound = cs +0.25
 
 dataset=locals().get('dataset',"Line") #set the input type by choosing the dataset parameter
 
 if dataset=="Line":
-        input= Translator(generator=topo.pattern.basic.Line(   x=numbergen.UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=1023),   y=numbergen.UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=53),size=1.0, offset=0.5,scale=numbergen.Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.4,smoothing=0.0),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
+        input= Translator(generator=topo.pattern.Line(   x=numbergen.UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=1023),   y=numbergen.UniformRandom(lbound=-(cs+0.15),ubound=(cs+0.15),seed=53),size=1.0, offset=0.5,scale=numbergen.Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.4,smoothing=0.0),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 elif dataset=="Natural":
         import topo.pattern.image 
         input_type=topo.pattern.image.Image
@@ -47,10 +47,10 @@ elif dataset=="Natural":
                                 y=0,
                                 orientation=0)
                         for f in image_filenames]       
-        input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),jitter_magnitude=locals().get('JM',0.01))
+        input =Jitterer(generator=topo.pattern.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),jitter_magnitude=locals().get('JM',0.01))
 
 
-ring=topo.pattern.basic.Ring(x=numbergen.UniformRandom(lbound=-1.1,ubound=1.1,seed=1023),
+ring=topo.pattern.Ring(x=numbergen.UniformRandom(lbound=-1.1,ubound=1.1,seed=1023),
                                                             y=numbergen.UniformRandom(lbound=-1.1,ubound=1.1,seed=511),
                                                             size=2, aspect_ratio=1.0, scale=0.8,thickness=locals().get('Thickness',0.03),
                                                             offset=0.0,
@@ -62,7 +62,7 @@ retinal_waves=Translator(generator=ring,orientation=numbergen.UniformRandom(lbou
 
 # Specify weight initialization, response function, and learning function
 CFProjection.weights_generator=topo.pattern.random.UniformRandom()
-CFProjection.cf_shape=topo.pattern.basic.Disk(smoothing=0.0)
+CFProjection.cf_shape=topo.pattern.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
@@ -79,10 +79,10 @@ else:
 centerg   = Gaussian(size=0.15,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
     
-on_weights = topo.pattern.basic.Composite(
+on_weights = topo.pattern.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
 
-off_weights = topo.pattern.basic.Composite(
+off_weights = topo.pattern.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 jitter  =  locals().get('Jitter',0.2)
@@ -153,7 +153,7 @@ topo.sim.connect('Retina','LGNOff',delay=0.05,
 
 topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=8,name='OnAfferent',coord_mapper=jitterOn,
-                 weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
+                 weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
@@ -163,7 +163,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNorma
 
 topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=8,name='OffAfferent',coord_mapper=jitterOff,
-                 weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
+                 weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
@@ -172,14 +172,14 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
                                                                         time_constant=locals().get('afferent_tc',3200)/num_inputs)))
 
 CFProjection.same_cf_shape_for_all_cfs=False
-CFProjection.cf_shape=topo.pattern.basic.Composite(operator=numpy.multiply,generators=[topo.pattern.basic.Disk(smoothing=0.0),topo.pattern.random.BinaryUniformRandom(on_probability=locals().get('ExcDen',0.1))])
+CFProjection.cf_shape=topo.pattern.Composite(operator=numpy.multiply,generators=[topo.pattern.Disk(smoothing=0.0),topo.pattern.random.BinaryUniformRandom(on_probability=locals().get('ExcDen',0.1))])
 
 topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=1.0,
-                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.1),
+                 weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.1),
                  nominal_bounds_template=BoundingBox(radius=0.2),learning_rate=locals().get('lat_lr',0.0)) 
 
-CFProjection.cf_shape=topo.pattern.basic.Composite(operator=numpy.multiply,generators=[topo.pattern.basic.Disk(smoothing=0.0),topo.pattern.random.BinaryUniformRandom(on_probability=locals().get('InhDen',0.3))])
+CFProjection.cf_shape=topo.pattern.Composite(operator=numpy.multiply,generators=[topo.pattern.Disk(smoothing=0.0),topo.pattern.random.BinaryUniformRandom(on_probability=locals().get('InhDen',0.3))])
             
 topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-6,
@@ -189,12 +189,12 @@ topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralInhibitory',
                  nominal_bounds_template=BoundingBox(radius=2*0.229),learning_rate=locals().get('lat_lr',0.0))
 
 CFProjection.same_cf_shape_for_all_cfs=True
-CFProjection.cf_shape=topo.pattern.basic.Disk(smoothing=0.0)
+CFProjection.cf_shape=topo.pattern.Disk(smoothing=0.0)
 
 
 topo.sim.connect('V1Simple','V1Complex',delay=0.05,
                  connection_type=CFProjection,strength=1,name='V1CAfferent',
-                 weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
+                 weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=0.05),
                                                                              topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.05))

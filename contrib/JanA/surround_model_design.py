@@ -1,6 +1,6 @@
 import param
 
-import topo.pattern.basic
+import topo.pattern
 import topo.pattern.random
 import __main__
 import os
@@ -9,9 +9,9 @@ import topo
 from topo.transferfn.misc import PatternCombine
 from topo.transferfn.misc import HalfRectify
 from topo import numbergen
-from topo.pattern.basic import Gaussian
+from topo.pattern import Gaussian
 from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.command.basic import pattern_present
+from topo.command import pattern_present
 from param import normalize_path
 import numpy
 
@@ -24,17 +24,17 @@ MeasureResponseCommand.duration=4.0
 SinusoidalMeasureResponseCommand.frequencies=[2.4]
 FeatureCurveCommand.num_orientation=16
 FeatureCurveCommand.curve_parameters=[{"contrast":15},{"contrast":50},{"contrast":90}]
-from topo.command.basic import load_snapshot
+from topo.command import load_snapshot
 
 
 #load_snapshot('./DATA/LESI/LESI-NEW-SMALL/CCSimple_010000.00_ormap.typ')
 load_snapshot('./DATA/LESI/LESI-NEW-LARGE-LargeRegion/CCSimple_010000.00_with_map.typ')
     
-from topo.command.basic import wipe_out_activity, clear_event_queue
+from topo.command import wipe_out_activity, clear_event_queue
 wipe_out_activity()
 clear_event_queue()
 
-from topo.pattern.basic import SineGrating, Disk
+from topo.pattern import SineGrating, Disk
 class SineGratingDiskTemp(SineGrating):
       mask_shape = param.Parameter(default=Disk(smoothing=0,size=1.0))
 
@@ -133,7 +133,7 @@ def make_full_analysis(a,b,c,d,e,f,g,h,i,j,k,l,m):
 
     from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand,FeatureCurveCommand
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.basic import GeneratorSheet
+    from topo.sheet import GeneratorSheet
     import contrib.jacommands
     import contrib.surround_analysis
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
@@ -191,10 +191,10 @@ def plot_neural_dynamics(params):
     ip = topo.sim['Retina'].input_generator
     topo.sim['Retina'].set_input_generator(SineGratingDiskTemp(orientation=0.0,phase=0.0,size=10,scale=1.0,x=0.0,y=0.0,frequency=2.4))
 
-    from topo.pattern.basic import OrientationContrast
-    from topo.command.basic import pattern_present
+    from topo.pattern import OrientationContrast
+    from topo.command import pattern_present
     from topo.base.functionfamily import PatternDrivenAnalysis
-    from topo.pattern.basic import OrientationContrast
+    from topo.pattern import OrientationContrast
     from topo.analysis.featureresponses import PatternPresenter
     from topo.base.sheet import Sheet
     import pylab
@@ -214,9 +214,9 @@ def plot_neural_dynamics(params):
     
     topo.sim.state_push()
     
-    from topo.command.basic import pattern_present
+    from topo.command import pattern_present
     from topo.base.functionfamily import PatternDrivenAnalysis
-    from topo.pattern.basic import OrientationContrast
+    from topo.pattern import OrientationContrast
     from topo.analysis.featureresponses import PatternPresenter
     from topo.base.sheet import Sheet
     

@@ -9,7 +9,7 @@ def complex_analysis_function():
     import topo
     from topo.command.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.basic import GeneratorSheet
+    from topo.sheet import GeneratorSheet
     from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand,FeatureCurveCommand
     import contrib.jacommands
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
@@ -132,7 +132,7 @@ def complex_surround_analysis_function():
     from topo.command.analysis import save_plotgroup
     from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand,FeatureCurveCommand
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.basic import GeneratorSheet
+    from topo.sheet import GeneratorSheet
     import contrib.jacommands
     import contrib.surround_analysis
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
@@ -244,7 +244,7 @@ def v2_analysis_function():
     import topo
     from topo.command.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.basic import GeneratorSheet
+    from topo.sheet import GeneratorSheet
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
     from param import normalize_path
 
@@ -268,7 +268,7 @@ def v2_analysis_function():
 #    topo.sim["V1Complex"].measure_maps = False
         
     save_plotgroup("Corner OR Preference")
-    from topo.command.basic import save_snapshot
+    from topo.command import save_snapshot
 #    save_snapshot(normalize_path('snapshot.typ'))
 
 
@@ -280,7 +280,7 @@ def rf_analysis():
     import contrib.jacommands
     from topo.command.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.basic import GeneratorSheet
+    from topo.sheet import GeneratorSheet
     from topo.command.analysis import measure_or_tuning_fullfield, measure_or_pref
     from topo.command.pylabplots import cyclic_tuning_curve
     from param import normalize_path    
@@ -305,7 +305,7 @@ def rf_analysis():
         cyclic_tuning_curve(filename_suffix=prefix,filename="OrientationTC:V1:[0.1,-0.1]",sheet=s,coords=[(0.1,-0.1)],x_axis="orientation")
         cyclic_tuning_curve(filename_suffix=prefix,filename="OrientationTC:V1:[-0.1,0.1]",sheet=s,coords=[(-0.1,0.1)],x_axis="orientation")
     else:
-        topo.command.basic.activity_history = numpy.concatenate((contrib.jacommands.activity_history,topo.sim["V1"].activity.flatten()),axis=1)    
+        topo.command.activity_history = numpy.concatenate((contrib.jacommands.activity_history,topo.sim["V1"].activity.flatten()),axis=1)    
 
     if(float(topo.sim.time()) == 20000): 
         topo.sim["V1"].plastic=False
@@ -379,7 +379,7 @@ def gc_homeo_af():
     
 
 def saver_function():
-    from topo.command.basic import save_snapshot
+    from topo.command import save_snapshot
     save_snapshot(normalize_path('snapshot.typ'))
 
 def empty():
