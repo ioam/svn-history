@@ -24,11 +24,7 @@ from topo.pattern.basic import Gaussian
 from topo.base.functionfamily import CoordinateMapperFn
 from contrib.JanA.CCLISSOM_push_pull_extra import SimpleHomeoLinear, Expander, Jitterer, randomize_V1Simple_relative_LGN_strength, CFPLF_KeyserRule
 from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
-
 topo.sim.name = "cclissom_push_pull"
-
-import contrib.JanA.modelparametrization
-
 #### Set up retinal inputs
 
 image_filenames=["images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
@@ -277,6 +273,7 @@ FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":90}]
 
 
 # model exploration
+#import contrib.JanA.modelparametrization
 parameters = [ "topo.sim[\"V1Simple\"].projections()[\"V1SimpleExcToExc\"].strength",
                "topo.sim[\"V1Simple\"].projections()[\"V1SimpleInhToExc\"].strength",
                "topo.sim[\"V1Simple\"].projections()[\"V1SimpleFeedback\"].strength",
