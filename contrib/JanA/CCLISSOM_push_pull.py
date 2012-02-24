@@ -72,7 +72,7 @@ CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
 
 # Set up transfer function and homeostatic mechanisms
-V1Simple_OF = SimpleHomeoLinear(t_init=0.35,alpha=3,mu=__main__.__dict__.get('MU',0.003),eta=0.002)
+V1Simple_OF = SimpleHomeoLinear(t_init=0.35,alpha=3,mu=__main__.__dict__.get('MU',0.003),eta=__main__.__dict__.get('SETA',0.002))
 V1Complex_OF=HalfRectify()
 NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=0.02,offset=0.0),operator=numpy.add)
 
@@ -134,7 +134,7 @@ g1._Dynamic_time_fn = None
 g2 = Gaussian(aspect_ratio=1.0,scale=1.0,size=numbergen.UniformRandom(lbound=0.8,ubound=0.8,seed=56))
 g2._Dynamic_time_fn = None
 
-LGNStr = 4
+LGNStr = __main__.__dict__.get('LGNStr',4)
 inbalance = 0.1
 LGNOnStr = LGNStr+LGNStr*inbalance
 LGNOffStr = LGNStr-LGNStr*inbalance
@@ -188,29 +188,29 @@ topo.sim.connect('LGNOff','V1SimpleInh',delay=0.025,dest_port=('Activity','Joint
 
 
 topo.sim.connect('V1Simple','V1Simple',delay=0.025,
-                 connection_type=CFProjection,strength=0.5,name='V1SimpleExcToExc',
+                 connection_type=CFProjection,strength=__main__.__dict__.get('SEEStr',0.5),name='V1SimpleExcToExc',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
-                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=0.1)
+                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=__main__.__dict__.get('SEElr',0.1))
 
 
 topo.sim.connect('V1Simple','V1SimpleInh',delay=0.025,
-                 connection_type=CFProjection,strength=1.0,name='V1SimpleExcToInh',
+                 connection_type=CFProjection,strength=__main__.__dict__.get('SEIStr',1.0),name='V1SimpleExcToInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
-                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=0.1)
+                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=__main__.__dict__.get('SEIlr',0.1))
 
 
 topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,
-                 connection_type=CFProjection,strength=-0.5,name='V1SimpleInhToExc',
+                 connection_type=CFProjection,strength=__main__.__dict__.get('SIEStr',-0.5),name='V1SimpleInhToExc',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
                  nominal_bounds_template=BoundingBox(radius=0.3),
-                 learning_fn = CFPLF_KeyserRule("V1Simple",['V1SimpleInhToExc']),learning_rate=0.1)
+                 learning_fn = CFPLF_KeyserRule("V1Simple",['V1SimpleInhToExc']),learning_rate=__main__.__dict__.get('SIElr',0.1))
 
 
 topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,
-                 connection_type=CFProjection,strength=-0.5,name='V1SimpleInhToInh',
+                 connection_type=CFProjection,strength=__main__.__dict__.get('SIIStr',-0.5),name='V1SimpleInhToInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
                  nominal_bounds_template=BoundingBox(radius=0.3),
-                 learning_fn = CFPLF_KeyserRule("V1SimpleInh",['V1SimpleInhToInh']),learning_rate=0.1)
+                 learning_fn = CFPLF_KeyserRule("V1SimpleInh",['V1SimpleInhToInh']),learning_rate=__main__.__dict__.get('SIIlr',0.1))
 
 
 #Layer 2/3
@@ -221,14 +221,14 @@ topo.sim.connect('V1Simple','V1Complex',delay=0.025,
                 
 
 topo.sim.connect('V1Complex','V1Simple',delay=0.025,
-                 connection_type=CFProjection,strength=0.14,name='V1SimpleFeedback',
+                 connection_type=CFProjection,strength=__main__.__dict__.get('CEFeedback',0.14),name='V1SimpleFeedback',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
                  nominal_bounds_template=BoundingBox(radius=0.0025),
                  learning_rate=0)
 
 
 topo.sim.connect('V1Complex','V1SimpleInh',delay=0.025,
-                 connection_type=CFProjection,strength=0.14,name='V1SimpleInhFeedback',
+                 connection_type=CFProjection,strength=__main__.__dict__.get('CIFeedback',0.14),name='V1SimpleInhFeedback',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
                  nominal_bounds_template=BoundingBox(radius=0.0025),
                  learning_rate=0)
@@ -294,5 +294,5 @@ parameter_values = [ [0.8,0.9,1.2],
                    ]
 
 #contrib.JanA.modelparametrization.explore_initial_activity(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex","V1Complex"],None,"FakeRetina",0,4.0,'Activities')
-contrib.JanA.modelparametrization.ModelParametrization.set_parameters(parameters,[0.9,-0.9,0.1,0.7,-0.5,0.2])
+#contrib.JanA.modelparametrization.ModelParametrization.set_parameters(parameters,[0.9,-0.9,0.1,0.7,-0.5,0.2])
 
