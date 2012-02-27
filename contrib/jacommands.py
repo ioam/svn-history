@@ -738,12 +738,6 @@ class Expander(PatternGenerator):
         When pattern position should be reset, usually to the value of a dynamic parameter.
 
         The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
-        
-    visual_field_size = param.Number(default=10e8, bounds=(0.0, None), doc="""
-	Sometimes we want to expand stimuli from far positions, and thus the stimulus would not 
-	intersect with our visual field. This allows us to 'skip' the simulation time when the 
-	stimulus is not in the visual_field.
-        """)
     
     last_time = 0.0
 
@@ -751,14 +745,6 @@ class Expander(PatternGenerator):
     def __init__(self, **params):
         super(Expander, self).__init__(**params)
         self.size = params.get('size', self.size)
-        
-        x = params.get('x', self.x)
-        y = params.get('y', self.y)
-        
-        # make sure that the stimulus starts with size that intersects with our visual_field_size
-        if (numpy.sqrt(x*x + y*y) > numpy.sqrt(2)*self.visual_field_size):
-    	    self.size = (numpy.sqrt(x*x + y*y) - numpy.sqrt(2)*self.visual_field_size)
-        
         self.index = 0
         self.last_time=0.0
         
@@ -779,17 +765,12 @@ class Expander(PatternGenerator):
                 self.last_time += self.reset_period
             # time to reset the parameter
             (self.x, self.y) = (generator.x, generator.y)
-            
             if isinstance(generator, Selector):
                 self.index = generator.index
-
             generator.force_new_dynamic_value('x')
             generator.force_new_dynamic_value('y')
-            
-            
-            if (numpy.sqrt(self.x*self.x + self.y*self.y) > self.visual_field_size):
-    		self.size = 2*(numpy.sqrt(self.x*self.x + self.y*self.y) - self.visual_field_size)
 
+        (a, b) = (generator.x, generator.y)   
         # compute how much time elapsed from the last reset
         t = float(topo.sim.time()) - self.last_time
 
@@ -797,13 +778,8 @@ class Expander(PatternGenerator):
         ## generator and for this one.  (leads to redundant
         ## calculations in current lissom_oo_or usage, but will lead
         ## to problems/limitations in the future).
-        #return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=-2.4, y=2.47,size=6.0,index=self.index)
-        
-        return generator(xdensity=xdensity, ydensity=ydensity, bounds=self.bounds, x=self.x, y=self.y,
+        return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x, y=self.y,
              size=self.size + t * self.speed,index=self.index)
-
-
-
 
 
 class Jitterer(PatternGenerator):
@@ -826,9 +802,6 @@ class Jitterer(PatternGenerator):
         When pattern position should be reset, usually to the value of a dynamic parameter.
 
         The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
-
-    seed = param.Number(default=1023, bounds=(0.0, None), doc="""Seed of the jitterer""")
-
     
     last_time = 0.0
 
@@ -920,14 +893,14 @@ def measure_ot(lat_exc, lat_inh, e, t):
     
     
     import topo.command.analysis
-    import topo.command.pylabplots
+    import topo.command.pylabplot
     
     filename = "Exc=" + str(lat_exc) + "_Inh=" + str(lat_inh) + "_E=" + str(e) + "_T=" + str(t) 
      
-    topo.commands.analysis.measure_or_tuning_fullfield(display=True, num_phase=4, num_orientation=80, frequencies=[2.4],
+    topo.command.analysis.measure_or_tuning_fullfield(display=True, num_phase=4, num_orientation=80, frequencies=[2.4],
                                curve_parameters=[{"contrast":1}, {"contrast":5}, {"contrast":10}, {"contrast":50}, {"contrast":90}])
     
-    topo.commands.pylabplots.cyclic_tuning_curve(suffix="GC_with_LGNGC_HR", filename=filename, sheet=topo.sim["V1"], coords=[(0, 0)], x_axis="orientation")
+    topo.command.pylabplot.cyclic_tuning_curve(suffix="GC_with_LGNGC_HR", filename=filename, sheet=topo.sim["V1"], coords=[(0, 0)], x_axis="orientation")
     
     
 
@@ -1057,26 +1030,3 @@ def weighted_local_std(x,y,s):
 	z.append(numpy.sqrt(numpy.sum(numpy.power(numpy.multiply(y-av,b),2))/numpy.sum(b)))
     return z
 
-
-def LateralOrientationAnnisotropy():
-
-    pylab.figure()
-    orr = topo.sim["V1Complex"].sheet_views["OrientationPreference"].view()[0]
-    
-    (s,y) = numpy.shape(orr)
-    
-    w = numpy.zeros((s,y))
-    
-    
-    for x in xrange((s/3)+1,2*(s/3)-1):
-	for y in xrange((s/3)+1,2*(s/3)-1):
-	    if (orr[x,y] < 0.05) or (orr[x,y] > 0.95):
-		b = topo.sim["V1ComplexInh"].projections()["LongEI"].cfs[x,y].weights.copy()
-		#b[x-int(s/8):x+int(s/8),y-int(s/8):y+int(s/8)] = 0
-		c = b.copy()*0
-		c[x-int(s/12):x+int(s/12),y-int(s/12):y+int(s/12)] += b[x-int(s/12):x+int(s/12),y-int(s/12):y+int(s/12)]
-	        w = w + c
-	        
-	        
-    pylab.hist(numpy.pi*numpy.array(orr.ravel()),weights=numpy.array(w.ravel()))
-    pylab.savefig(normalize_path('hist.png'))

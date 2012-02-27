@@ -18,7 +18,7 @@ def showRFS(rfs,cog=False,centers=None,joinnormalize=True,axis=False):
 		if not joinnormalize:
 		   m = numpy.max([numpy.abs(numpy.min(w)),numpy.abs(numpy.max(w))])
 		
-		pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu)
+		pylab.imshow(w,vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu_r)
 		if centers != None:
 			cir = Circle( (centers[i][0],centers[i][1]), radius=1,color='r')
 			pylab.gca().add_patch(cir)
@@ -30,6 +30,48 @@ def showRFS(rfs,cog=False,centers=None,joinnormalize=True,axis=False):
 		if not axis:
 			pylab.axis('off')
 		i+=1
+
+def showRFSinCorticalSpace(rfs,locations,joinnormalize=True,scatter_value=None,scatter_value_cmap=pylab.cm.gray, colorbar=False):
+    pylab.figure(figsize=(24,24),dpi=100)
+    a = pylab.axes([0.0,0.0,1.0,1.0])
+    pylab.xticks([])
+    pylab.yticks([])
+    m = numpy.max([numpy.abs(numpy.min(rfs)),numpy.abs(numpy.max(rfs))])
+    
+    for i in xrange(0,len(rfs)):
+        x = locations[i][0]/260
+        y = locations[i][1]/260
+
+        if not joinnormalize:
+           m = numpy.max([numpy.abs(numpy.min(rfs[i])),numpy.abs(numpy.max(rfs[i]))])
+
+        if scatter_value != None:
+            pylab.axes([x-0.0225,y-0.0225,0.045,0.045])
+            rect = numpy.zeros((100,100))+ scatter_value[i]
+            pylab.imshow(rect,vmin=0,vmax=1,cmap=scatter_value_cmap,zorder=i)
+            pylab.axis('off')
+            
+            if colorbar and i == 0: 
+              ax = pylab.axes([0.85,0.05,0.1,0.3])
+              pylab.axis('off')
+              cbar = pylab.colorbar(ax = ax,ticks=[0,0.5,1.0]) 
+              for t in cbar.ax.get_yticklabels():
+                  t.set_fontsize(20)
+            
+
+
+
+        pylab.axes([x-0.02,y-0.02,0.04,0.04])
+        pylab.imshow(rfs[i],vmin=-m,vmax=m,interpolation='nearest',cmap=pylab.cm.RdBu_r,zorder = i+0.5)
+        pylab.axis('off')
+        
+        if colorbar and numpy.argmax([xxx[0] for xxx in locations]) == i:
+           ax = pylab.axes([x-0.01,y-0.02,0.04,0.04])
+           pylab.axis('off')
+           cbar = pylab.colorbar(ax = ax,shrink=1.8,aspect=7,ticks=[-m,0,m]) 
+           cbar.ax.set_yticklabels(["min", "0", "max"])
+           for t in cbar.ax.get_yticklabels():
+                  t.set_fontsize(20)
    
    
 def compareModelPerformanceWithRPI(training_set,validation_set,training_inputs,validation_inputs,pred_act,pred_val_act,raw_validation_set,sizex,sizey,modelname='Model'):
@@ -278,13 +320,6 @@ def visualize2DOF(pred_act1,pred_act2,act,num_bins=10):
     of = of - (ofn <= 0)
     ofn = ofn + (ofn <= 0)
     of = of/ofn
-    print of[0]
-    print of[1]
-    print ofn[0]
-    print ofn[1]
-
-    
-    
     showRFS(of,joinnormalize=False)
 
 def printCorrelationAnalysis(act,val_act,pred_act,pred_val_act):
@@ -294,8 +329,9 @@ def printCorrelationAnalysis(act,val_act,pred_act,pred_val_act):
     val_c=[]
     
     for i in xrange(0,num_neurons):
-	train_c.append(scipy.stats.pearsonr(numpy.array(act)[:,i].flatten(),numpy.array(pred_act)[:,i].flatten())[0])
+        train_c.append(scipy.stats.pearsonr(numpy.array(act)[:,i].flatten(),numpy.array(pred_act)[:,i].flatten())[0])
         val_c.append(scipy.stats.pearsonr(numpy.array(val_act)[:,i].flatten(),numpy.array(pred_val_act)[:,i].flatten())[0])
     
     print 'Correlation Coefficients (training/validation): ' + str(numpy.mean(train_c)) + '/' + str(numpy.mean(val_c))
     return (train_c,val_c)
+    

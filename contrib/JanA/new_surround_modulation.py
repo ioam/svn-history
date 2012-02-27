@@ -142,6 +142,7 @@ class SurroundModulationPlotting():
                 curve_data[curve_label]["measures"]["peak_supression_index"] = curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + numpy.argmin(y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + 1:]) + 1
                 curve_data[curve_label]["measures"]["peak_supression"] = x_values[curve_data[curve_label]["measures"]["peak_supression_index"]]
                 curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[-1]) /  y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
+                #curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]]) /  y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
 
                 curve_data[curve_label]["measures"]["peak_far_facilitation_index"] = curve_data[curve_label]["measures"]["peak_supression_index"] + numpy.argmax(y_values[curve_data[curve_label]["measures"]["peak_supression_index"] + 1:]) + 1
                 curve_data[curve_label]["measures"]["peak_far_facilitation"] = x_values[curve_data[curve_label]["measures"]["peak_far_facilitation_index"]]
@@ -276,7 +277,6 @@ class SurroundModulationPlotting():
             
             disable_top_right_axis(pylab.gca())
             ax = pylab.gca()
-            pylab.title(str(ssi))
             pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
             pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
             ax.set_xlim(-numpy.pi/2-0.2,numpy.pi/2.0+0.2)  
@@ -467,7 +467,7 @@ class SurroundModulationPlotting():
                     bins = numpy.arange(mmin-0.01,mmax+0.01,(mmax+0.01-(mmin-0.01))/10.0)
                     
                     if key == 'ST_contrast_dependent_shift':
-                        f.hist(histograms_hc[key],bins=bins,normed=False)
+                        f.hist(histograms_hc[key],bins=bins,color='black',normed=False)
                     else:
                         histograms_lc[key]
                         histograms_hc[key]
@@ -494,7 +494,7 @@ class SurroundModulationPlotting():
         gs = gridspec.GridSpec(44, 36)
         gs.update(left=0.05, right=0.95, top=0.95, bottom=0.05,wspace=0.2,hspace=0.2)
         
-        picked_stcs = [(53,51), (55,51) , (49,51) , (47,55) , (47,61) , (53,59) ]
+        picked_stcs = [(57,57), (55,51) , (49,51) , (47,55) ,  (53,59) , (47,61)]
         #picked_stcs = [(51,57),(51,57),(51,57),(51,57),(51,57),(51,57)]
         
         

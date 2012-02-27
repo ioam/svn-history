@@ -29,18 +29,10 @@ from topo.transferfn import PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxE
 from topo import numbergen
 from topo.pattern import Gaussian
 from topo.base.functionfamily import CoordinateMapperFn
-from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Jitterer, AddGC, SimpleHomeoLinear, ExpanderOld
+from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Jitterer, AddGC, SimpleHomeoLinear, Expander
 from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
 
 topo.sim.name = "complex_cell_lissom"
-
-
-!!!!!!!!!
-####
-Need to check out 
-LGNAff1 LGNAff2 and RingScale
-analysis_scale=0.6
-ImageScale=0.55
 
 #### Set up retinal inputs
 
@@ -59,7 +51,7 @@ ring = topo.pattern.Composite(operator=numpy.add,x=numbergen.UniformRandom(lboun
                                 		topo.pattern.random.UniformRandom(offset=0, scale=0.01)]
                                    )
 
-retinal_waves=ExpanderOld(generator=ring,orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=15,speed=0.3)
+retinal_waves=Expander(generator=ring,orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=15,speed=0.3)
 zeroInput = topo.pattern.Null();
 
 
@@ -226,7 +218,7 @@ def secondStage():
 
 
 # change the default parameters of the measuring commands to obtain better quality and match the paper
-from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand
+from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand,FeatureCurveCommand
 FeatureMaps.num_orientation=16
 MeasureResponseCommand.scale=3.0
 MeasureResponseCommand.duration=4.0

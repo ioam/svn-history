@@ -1,7 +1,7 @@
 import numpy 
 import pylab
 
-def signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act, pred_val_act):
+def signal_power_test(raw_validation_data_set, training_set, validation_set, pred_act, pred_val_act,display=False):
 	
         signal_power=[]
 	noise_power=[]
@@ -15,37 +15,39 @@ def signal_power_test(raw_validation_data_set, training_set, validation_set, pre
 	    signal_power_variance.append(spv)
 	
 	significant = numpy.mat(numpy.nonzero(((numpy.array(signal_power) - 0.5*numpy.array(signal_power_variance)) > 0.0)*1.0)).getA1()
-	pylab.figure()
-	pylab.subplot(131)
-	pylab.title('distribution of estimated signal power in neurons')
-	pylab.errorbar(noise_power,signal_power,fmt='ro',yerr=signal_power_variance)
-	#pylab.errorbar(numpy.array(noise_power)[significant],numpy.array(signal_power)[significant],fmt='bo',yerr=numpy.array(signal_power_variance)[significant])
-	pylab.ylabel('signal power')
-	pylab.xlabel('noise power')
 	
-	print numpy.shape(numpy.var(training_set,axis=0))
-	print numpy.shape(pred_act)
 	print numpy.shape(training_set)
+	print numpy.shape(numpy.var(training_set,axis=0))
+	print numpy.shape(numpy.var(pred_act - training_set,axis=0))
 	print numpy.shape(signal_power)
-	
 	
 	training_prediction_power=numpy.divide(numpy.var(training_set,axis=0) - numpy.var(pred_act - training_set,axis=0), signal_power)
 	validation_prediction_power=numpy.divide(numpy.var(validation_set,axis=0) - numpy.var(pred_val_act - validation_set,axis=0), signal_power)
-	pylab.subplot(132)
-	pylab.title('distribution of estimated prediction power ')
-	pylab.plot(numpy.array(normalized_noise_power)[significant],numpy.array(training_prediction_power)[significant],'ro',label='training')
-	pylab.plot(numpy.array(normalized_noise_power)[significant],numpy.array(validation_prediction_power)[significant],'bo',label='validation')
-	pylab.axis([20.0,100.0,-2.0,2.0])
-	pylab.xlabel('normalized noise power')
-	pylab.ylabel('prediction power')
-	pylab.legend()
+	if display: 
+	  pylab.figure()
+	  pylab.subplot(131)
+	  pylab.title('distribution of estimated signal power in neurons')
+	  pylab.errorbar(noise_power,signal_power,fmt='ro',yerr=signal_power_variance)
+	  #pylab.errorbar(numpy.array(noise_power)[significant],numpy.array(signal_power)[significant],fmt='bo',yerr=numpy.array(signal_power_variance)[significant])
+	  pylab.ylabel('signal power')
+	  pylab.xlabel('noise power')
+	  
+	  
+	  pylab.subplot(132)
+	  pylab.title('distribution of estimated prediction power ')
+	  pylab.plot(numpy.array(normalized_noise_power)[significant],numpy.array(training_prediction_power)[significant],'ro',label='training')
+	  pylab.plot(numpy.array(normalized_noise_power)[significant],numpy.array(validation_prediction_power)[significant],'bo',label='validation')
+	  pylab.axis([20.0,100.0,-2.0,2.0])
+	  pylab.xlabel('normalized noise power')
+	  pylab.ylabel('prediction power')
+	  pylab.legend()
 
-	pylab.subplot(133)
-	pylab.title('relationship between test set prediction power \n and validation prediction power')
-	pylab.plot(validation_prediction_power[significant],training_prediction_power[significant],'ro')
-	pylab.axis([-2.0,2.0,0.0,2.0])
-	pylab.xlabel('validation set prediction power')
-	pylab.ylabel('test set prediction power')
+	  pylab.subplot(133)
+	  pylab.title('relationship between test set prediction power \n and validation prediction power')
+	  pylab.plot(validation_prediction_power[significant],training_prediction_power[significant],'ro')
+	  pylab.axis([-2.0,2.0,0.0,2.0])
+	  pylab.xlabel('validation set prediction power')
+	  pylab.ylabel('test set prediction power')
 	
 
 	return (signal_power,noise_power,normalized_noise_power,training_prediction_power,validation_prediction_power,signal_power_variance)
