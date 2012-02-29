@@ -70,6 +70,9 @@ class SurroundModulationPlotting():
         (self.OR,self.OS,self.MR,self.data_dict) = pickle.load(f)
         f.close()
         
+        self.calculate_autocorrelation(self.OR)
+        return
+        
         self.recalculate_orientation_contrast_supression()
         self.recalculate_size_tuning_measures()
         
@@ -698,7 +701,24 @@ class SurroundModulationPlotting():
                     f.plot(raster_plots_lc[key][0],m*numpy.array(raster_plots_lc[key][0])+b,'-k',linewidth=2)
                     release_fig("RasterLC<" + map_feature_name + ","+ key + " Corr:"+ str(correlation)+ '|'+ str(pval) + ">")
         
+    
             return (raster_plots_lc,raster_plots_hc)
+
+    def calculate_autocorrelation(self,ormap):
+        
+        import scipy.signal
+        
+        pylab.figure()
+        pylab.subplot(2,1,1)
+        pylab.imshow(ormap,cmap='hsv')
+        pylab.axis('off')
+        pylab.xlabel('OR map')
+        
+        pylab.subplot(2,1,2)
+        pylab.imshow(scipy.signal.correlate2d(ormap,ormap),cmap='autumn')
+        pylab.axis('off')
+        pylab.xlabel('Autocorrelation')
+        
 
 def running_average(x,y):
     s = 0.1
