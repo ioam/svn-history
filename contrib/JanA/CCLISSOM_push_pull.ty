@@ -212,7 +212,7 @@ topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,
 
 #Layer 2/3
 topo.sim.connect('V1Simple','V1Complex',delay=0.025,
-                 connection_type=CFProjection,strength=2.5,name='V1SimpleAfferent',
+                 connection_type=CFProjection,strength=__main__.__dict__.get('StoCStr',2.5),name='V1SimpleAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.05),
                  nominal_bounds_template=BoundingBox(radius=0.075),learning_rate=0.0)
                 
@@ -281,17 +281,19 @@ parameters = [ "topo.sim[\"V1Simple\"].projections()[\"V1SimpleExcToExc\"].stren
                "topo.sim[\"V1SimpleInh\"].projections()[\"V1SimpleExcToInh\"].strength",
                "topo.sim[\"V1SimpleInh\"].projections()[\"V1SimpleInhToInh\"].strength",
                "topo.sim[\"V1SimpleInh\"].projections()[\"V1SimpleInhFeedback\"].strength",
+               "topo.sim[\"V1Complex\"].projections()[\"V1SimpleAfferent\"].strength",
              ]   
              
-parameter_values = [ [0.9,0.8,1.0],
-                     [-5.3],
-                     [0.15],
-                     [0.7,0.6,0.8],
-                     [-5.6],
-                     [0.2,0.18,2.2]
+parameter_values = [ [1.0],
+                     [-5.3,-5.2,-5.1,-5.4,-5.5],
+                     [0.15,0.14,0.16],
+                     [0.7],
+                     [-5.6,-5.5,-5.7,-5.8,-5.4],
+                     [0.2],
+                     [2.5,3.0,3.5,4.0],
                    ]
 import contrib.JanA.modelparametrization
 
 #contrib.JanA.modelparametrization.explore_initial_activity(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex","V1Complex"],None,"FakeRetina",0,4.0,'Activities')
-#contrib.JanA.modelparametrization.ModelParametrization.set_parameters(parameters,[0.9,-0.9,0.1,0.7,-0.5,0.2])
+contrib.JanA.modelparametrization.ModelParametrization.set_parameters(parameters,[1.0,-5.3,0.14,0.7,-5.7,0.2,3.5])
 
