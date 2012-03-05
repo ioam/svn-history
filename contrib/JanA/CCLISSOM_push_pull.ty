@@ -145,7 +145,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.025,dest_port=('Activity','JointNorm
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOn,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = 0.5,
+                               ExponentialDecay(starting_value = __main__.__dict__.get('AFF_lr',0.1),
                                                 time_constant=16000))))
 
 
@@ -157,7 +157,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.025,dest_port=('Activity','JointNor
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOff,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = 0.5,
+                               ExponentialDecay(starting_value = __main__.__dict__.get('AFF_lr',0.1),
                                                 time_constant=16000))))
 
 topo.sim.connect('LGNOn','V1SimpleInh',delay=0.025,dest_port=('Activity','JointNormalize', 'Afferent'),
@@ -168,7 +168,7 @@ topo.sim.connect('LGNOn','V1SimpleInh',delay=0.025,dest_port=('Activity','JointN
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOffInh,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = 0.5,
+                               ExponentialDecay(starting_value = __main__.__dict__.get('AFF_lr',0.1),
                                                 time_constant=16000))))
 
 
@@ -180,7 +180,7 @@ topo.sim.connect('LGNOff','V1SimpleInh',delay=0.025,dest_port=('Activity','Joint
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOnInh,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = 0.5,
+                               ExponentialDecay(starting_value =__main__.__dict__.get('AFF_lr',0.1),
                                                 time_constant=16000))))
 
 
