@@ -12,6 +12,8 @@ from param import normalize_path
 import pickle
 
 import matplotlib.gridspec as gridspec
+from matplotlib import rc
+rc('text', usetex=True)
 
 prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/'
 prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2'
@@ -32,7 +34,11 @@ def disable_top_right_axis(ax):
                spine.set_color('none') # don't draw spine
     for tick in ax.yaxis.get_major_ticks():
         tick.tick2On = False
+    for tick in ax.yaxis.get_minor_ticks():
+        tick.tick2On = False
     for tick in ax.xaxis.get_major_ticks():
+        tick.tick2On = False
+    for tick in ax.xaxis.get_minor_ticks():
         tick.tick2On = False
 
 def disable_bottom_axis(ax):
@@ -70,28 +76,28 @@ class SurroundModulationPlotting():
         (self.OR,self.OS,self.MR,self.data_dict) = pickle.load(f)
         f.close()
         
-        self.calculate_autocorrelation(self.OR)
-        return
+        #self.calculate_autocorrelation(self.OR)
         
         self.recalculate_orientation_contrast_supression()
         self.recalculate_size_tuning_measures()
         
-        for coords in self.data_dict.keys():
-            xindex,yindex = coords
-            self.plot_size_tunning(xindex,yindex)
-            self.plot_orientation_contrast_tuning(xindex,yindex)
+        #for coords in self.data_dict.keys():
+        #    xindex,yindex = coords
+        #    self.plot_size_tunning(xindex,yindex)
+        #    self.plot_orientation_contrast_tuning(xindex,yindex)
         
-        self.plot_histograms_of_measures()
-        print('1')
-        self.plot_average_size_tuning_curve()
-        print('2')
-        self.plot_average_oct()
-        print('3')
+        #self.plot_histograms_of_measures()
+        #print('1')
+        #self.plot_average_size_tuning_curve()
+        #print('2')
+        #self.plot_average_oct()
+        #print('3')
         
         self.Figure6()
         print('4')
         self.Figure8()
         print('5')
+        return
         #lhi = compute_local_homogeneity_index(self.OR*pi,1.5)    
         #f = open(prefix+'lhi1.5.pickle','wb')            
         #pickle.dump(lhi,f)
@@ -494,12 +500,10 @@ class SurroundModulationPlotting():
 
     def Figure6(self):
         self.fig = pylab.figure(facecolor='w',figsize=(14, 12),dpi=800)
-        gs = gridspec.GridSpec(44, 36)
+        gs = gridspec.GridSpec(57, 36)
         gs.update(left=0.05, right=0.95, top=0.95, bottom=0.05,wspace=0.2,hspace=0.2)
         
         picked_stcs = [(57,57), (55,51) , (49,51) , (47,55) ,  (53,59) , (47,61)]
-        #picked_stcs = [(51,57),(51,57),(51,57),(51,57),(51,57),(51,57)]
-        
         
         ax = pylab.subplot(gs[1:19,9:27])
         self.plot_average_size_tuning_curve(independent=False)
@@ -532,15 +536,84 @@ class SurroundModulationPlotting():
         disable_left_axis(pylab.gca())
         remove_y_tick_labels()
         
+        
+        # PLOT EXPERIMENTAL DATA
+        
+        x,y = zip(*[(-0.0118, 10.3038),(0.0398, 5.0943),(0.1025, 4.8631),(0.2222, 10.5367),(0.3872, 22.694),(0.6212, 21.1903),(0.9463, 25.9388),(1.4487, 16.2168),(2.219, 17.9579),(3.3435, 9.6286),(4.9921, 21.2156)])
+        ox,oy = zip(*[(0.0447, 25.4706),(0.1181, 49.6678),(0.2268, 41.2169),(0.3803, 55.4581),(0.6206, 39.3668),(0.963, 36.5901),(1.4654, 29.8782),(2.2245, 23.9781),(3.3429, 25.1424),(4.9977, 23.7626)])
+        x = numpy.array(x)
+        y = numpy.array(y)
+        ox = numpy.array(ox)
+        oy = numpy.array(oy)
+        ax = pylab.subplot(gs[47:57,1:11])  
+        ax.plot(x,y,lw=3,color='r')   
+        pylab.hold('on')   
+        ax.plot(ox,oy,lw=3,color='b')      
+        ax.set_xlim(0,5)  
+        ax.set_xticks([0,1,2,3,4,5])
+        ax.set_ylim(0,80)  
+        ax.set_yticks([0,40,80])
+        ax.set_ylabel('Response', fontsize=20)
+        disable_top_right_axis(pylab.gca())
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+        
+
+        lc_x,lc_y = zip(*[(-0.0487, -0.0419),(1.3979, 6.7485),(2.0126, 8.1943),(2.8208, 10.3224),(3.9922, 4.6368),(5.6557, 3.5735),(7.947, 5.1138),(11.0084, 4.837)])
+        mc_x,mc_y = zip(*[(-0.0487, -0.0419),(1.347, 13.4836),(1.9927, 15.4864),(2.7962, 13.3683),(4.0149, 8.2393),(5.6128, 7.3489),(7.9576, 7.1724),(11.0201, 6.5096)])
+        hc_x,hc_y = zip(*[(-0.0487, -0.0419),(1.3515, 17.7727),(1.9832, 12.9988),(2.8384, 9.8502),(4.0052, 5.8375),(5.6352, 11.0801),(7.9759, 12.4049),(10.9943, 9.9844)])        
+        lc_x = numpy.array(lc_x)
+        lc_y = numpy.array(lc_y)
+        mc_x = numpy.array(mc_x)
+        mc_y = numpy.array(mc_y)
+        hc_x = numpy.array(hc_x)
+        hc_y = numpy.array(hc_y)
+        ax = pylab.subplot(gs[47:57,13:23])  
+        ax.plot(lc_x,lc_y,lw=3,color='r')   
+        ax.plot(lc_x,mc_y,lw=3,color='g')   
+        ax.plot(lc_x,hc_y,lw=3,color='b')   
+        ax.set_xlim(0,12)  
+        ax.set_xticks([0,5,10])
+        ax.set_ylim(0,20)  
+        ax.set_yticks([0,10,20])
+        ax.set_ylabel('Response', fontsize=20)
+        disable_top_right_axis(pylab.gca())
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+
+
+        lc_x,lc_y = zip(*[(0.665, 14.9452),(1.0443, 22.295),(1.5573, 27.5117),(2.2633, 32.0173),(3.3754, 37.7079),(5.2272, 28.233),(7.5956, 30.1319),(11.9241, 32.2685),(17.7866, 40.8027),(26.8654, 43.6499)])
+        mc_x,mc_y = zip(*[(0.6909, 11.628),(1.0305, 15.8968),(1.5377, 30.3552),(2.2968, 60.2165),(3.5141, 63.0637),(5.2352, 51.9297),(8.1111, 49.5638),(12.0944, 52.4108),(18.0381, 58.8123),(27.2453, 61.6595)])
+        hc_x,hc_y = zip(*[(0.6827, 25.3719),(1.0312, 27.745),(1.5594, 48.6018),(2.3, 82.0174),(3.5202, 89.604),(5.3143, 84.6312),(8.0208, 75.867),(12.1168, 81.0838),(18.5382, 83.4571),(27.2836, 83.4604)])        
+        lc_x = numpy.array(lc_x)
+        lc_y = numpy.array(lc_y)
+        mc_x = numpy.array(mc_x)
+        mc_y = numpy.array(mc_y)
+        hc_x = numpy.array(hc_x)
+        hc_y = numpy.array(hc_y)
+        ax = pylab.subplot(gs[47:57,25:35])  
+        ax.semilogx(lc_x,lc_y,lw=3,color='r')   
+        ax.semilogx(lc_x,mc_y,lw=3,color='g')   
+        ax.semilogx(lc_x,hc_y,lw=3,color='b')   
+        ax.set_xlim(0.6,30)  
+        ax.set_xticks([0.1,0.3,1.0,3.0,10,30,100])
+        ax.set_ylim(0,100)  
+        ax.set_yticks([0,50,100])
+        ax.set_ylabel('Response', fontsize=20)
+        disable_top_right_axis(pylab.gca())
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+                
+
+        
         release_fig("Figure6") 
 
     def Figure8(self):
         self.fig = pylab.figure(facecolor='w',figsize=(14, 12),dpi=800)
-        gs = gridspec.GridSpec(44, 36)
+        gs = gridspec.GridSpec(57, 36)
         gs.update(left=0.05, right=0.95, top=0.95, bottom=0.05,wspace=0.2,hspace=0.2)
         
         picked_stcs = [(53,47),(53,49),(55,47),(51,63),(49,53),(47,63)]
-        #picked_stcs = [(54,45), (54,63) , (66,57) , (54,57) , (57,45) , (60,57)]
         
         ax = pylab.subplot(gs[1:19,9:27])
         self.plot_average_oct(independent=False)
@@ -572,6 +645,51 @@ class SurroundModulationPlotting():
         self.plot_orientation_contrast_tuning(picked_stcs[5][0], picked_stcs[5][1],independent=False)
         disable_left_axis(pylab.gca())
         remove_y_tick_labels()
+        
+        
+        # PLOT EXPERIMENTAL DATA
+        x,y = zip(*[(-88.694, 45.5367),(-81.8258, 45.0061),(-74.9654, 44.2076),(-68.0972, 43.677),(-61.2444, 42.6107),(-54.3686, 42.3479),(-47.5158, 41.2816),(-40.7245, 38.0724),(-34.0868, 29.5059),(-27.4415, 21.2073),(-20.7654, 13.9801),(-13.9357, 12.1102),(-7.006, 13.7225),(0.1156, 22.0313),(7.0299, 23.1078),(13.9364, 23.9165),(20.8891, 26.3325),(27.9186, 31.427),(34.9404, 36.2537),(41.9622, 41.0803),(48.9224, 43.7641),(55.7906, 43.2335),(62.6588, 42.7029),(69.5346, 42.4401),(76.4028, 41.9095), (83.2631, 41.1111),(90.1314, 40.5805)])
+        ox,oy = zip(*[(-89.7405, 9.108),(-82.8946, 9.3988),(-76.0487, 9.6896),(-69.1876, 10.5161),(-62.3417, 10.8069),(-55.4958, 11.0977),(-48.6423, 11.6562),(-41.7506, 13.5544),(-34.7597, 18.935),(-27.7841, 23.7797),(-20.8008, 28.8923),(-13.8557, 32.6657),(-6.8343, 39.1177),(0.1566, 44.4983),(6.8652, 39.9672),(13.505, 33.0251),(20.183, 27.4224),(26.8686, 22.0877),(33.539, 16.2172),(40.2475, 11.6861),(46.956, 7.155),(53.7942, 7.1779),(60.6172, 6.665),(67.4402, 6.1521),(74.2709, 5.9072),(81.1015, 5.6622),(87.2407, 5.147)])
+        x = numpy.array(x)
+        y = numpy.array(y)
+        oy = numpy.array(oy)
+        x = x/360.0*numpy.pi*2
+        ax = pylab.subplot(gs[47:57,5:15])  
+        ax.plot(x,y,lw=3,color='r')      
+        ax.plot(x,oy,lw=3,color='b')      
+        ax.set_xlim(-numpy.pi/2-0.2,numpy.pi/2.0+0.2)  
+        ax.set_xticks([-numpy.pi/2,0,numpy.pi/2.0])
+        ax.set_xticklabels(['-pi/2','0','pi/2'])
+        ax.set_ylim(0,50)  
+        ax.set_yticks([0,25,50])
+        ax.set_ylabel('Response', fontsize=20)
+        disable_top_right_axis(pylab.gca())
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+        
+        x,y = zip(*[(-90.5455, 0.6447),(-67.5208, 0.6732),(-45.9417, 0.572),(-22.6714, 0.4924),(-0.5531, 0.3234),(22.8077, 0.5215),(45.0244, 0.6539),(67.7793, 0.7153),(89.9339, 0.6573)])
+        x = numpy.array(x)
+        y = numpy.array(y)
+        x = x/360.0*numpy.pi*2
+        ax = pylab.subplot(gs[47:57,19:29])  
+        ax.plot(x,y,lw=3,color='r')      
+        ax.set_xlim(-numpy.pi/2-0.2,numpy.pi/2.0+0.2)  
+        ax.set_xticks([-numpy.pi/2,0,numpy.pi/2.0])
+        ax.set_xticklabels(['-pi/2','0','pi/2'])
+        ax.set_ylim(0,1.0)  
+        ax.set_yticks([0,0.5,1.0])
+        ax.set_ylabel('Relative response', fontsize=20)
+        disable_top_right_axis(pylab.gca())
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+        
+        
+            
+        
+        
+        
+        
+        
         release_fig("Figure8") 
     
     def correlations_figure(self,raster_plots):
