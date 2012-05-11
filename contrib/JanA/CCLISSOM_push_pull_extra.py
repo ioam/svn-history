@@ -6,8 +6,8 @@ import topo
 
 from topo.base.patterngenerator import PatternGenerator, Constant 
 from topo import numbergen
-from topo.transferfn.basic import TransferFnWithState 
-from topo.pattern.basic import Selector, Null
+from topo.transferfn import TransferFnWithState 
+from topo.pattern import Selector, Null
 from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.base.arrayutil import clip_lower
 
@@ -85,8 +85,10 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
             cf_on = lgn_on_proj.cfs[r, c]
             cf_off = lgn_off_proj.cfs[r, c]
             
-            cf_on._has_norm_total = False
-            cf_off._has_norm_total = False
+            #cf_on._has_norm_total = False
+            #cf_off._has_norm_total = False
+            del cf_on.norm_total
+            del cf_off.norm_total
 
             ra = rand()
             
@@ -236,19 +238,33 @@ class CFPLF_KeyserRule(CFPLearningFn):
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj_n_units,learning_rate)
         if single_connection_learning_rate==0:
             return
+	
+	z = numpy.argmax(output_activity)
+
+
+        #calculate overall incomming inhibition
+        inhibition = 0
+        for s in self.inhibitory_projection_list:
+            p = topo.sim[self.sheet].projections()[s]
+            inhibition += p.activity * abs(p.strength)
 
         
         for cf,i in iterator():
-            #calculate overall incomming inhibition
-            inhibition = 0
-            for s in self.inhibitory_projection_list:
-                p = topo.sim[self.sheet].projections()[s]
-                inhibition = p.activity.flat[i] * p.strength
             
             # Anti-hebbian part
             cf.weights -= single_connection_learning_rate * output_activity.flat[i] * cf.get_input_matrix(input_activity)
             # inhibition part
-            cf.weights += single_connection_learning_rate * inhibition * cf.get_input_matrix(input_activity)
-            cf.weights *= cf.mask                
-        
-        
+            cf.weights += single_connection_learning_rate * inhibition.flat[i] * cf.get_input_matrix(input_activity)
+	    cf.weights *= cf.mask                
+    	    
+    	    if(z == i):
+    	        print 'Z ' + str(z) 
+    	        print single_connection_learning_rate
+    	        print output_activity.flat[i] 
+    		print single_connection_learning_rate * output_activity.flat[i] 
+    		print single_connection_learning_rate  
+    		print numpy.max(cf.get_input_matrix(input_activity))
+    		print numpy.max(inhibition)
+    		print numpy.max(cf.weights)
+    	        print numpy.max(single_connection_learning_rate * output_activity.flat[i] * cf.get_input_matrix(input_activity))
+    	        print numpy.max(single_connection_learning_rate * inhibition * cf.get_input_matrix(input_activity))
