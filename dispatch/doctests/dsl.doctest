@@ -1,0 +1,54 @@
+Run with python -m doctest dsl.txt
+
+>>> from dispatch import StaticSpecs, Spec, LinearSpecs, ListSpecs
+>>> import math
+
+>>> spec1 = Spec(a=3)
+>>> spec2 = Spec(b=4)
+>>> cross = spec1.copy() * spec2.copy()
+>>> str(cross)
+'(Spec(a=3) * Spec(b=4))'
+
+>>> len(cross)
+1
+>>> spec3 = Spec(c=5)
+>>> spec4 = Spec(d=6)
+>>> cat = spec3 + spec4
+>>> str(cat)
+'(Spec(c=5) + Spec(d=6))'
+>>> [el for el in cat.copy()]
+[[{'c': '5'}, {'d': '6'}]]
+>>> [el for el in (cross.copy() * cat.copy())]
+[[{'a': '3', 'c': '5', 'b': '4'}, {'a': '3', 'b': '4', 'd': '6'}]]
+>>> linspec = LinearSpecs('k1',2,10,3)
+>>> linspeccat = linspec.copy() + cat.copy() + Spec(c=6, d=7)
+>>> linspeccat.next()
+[{'k1': '2.0000'}, {'k1': '6.0000'}, {'k1': '10.0000'}, {'c': '5'}, {'d': '6'}, {'c': '6', 'd': '7'}]
+>>> linspeccat.varying_keys()
+['c', 'd', 'k1']
+
+>>> Spec(a1=3, a2=3).next()
+[{'a1': '3', 'a2': '3'}]
+
+>>> Spec(a=3.0, fp_precision=2).next()
+[{'a': '3.00'}]
+>>> Spec(a=3.0, fp_precision=5).next()
+[{'a': '3.00000'}]
+
+>>> try: Spec(3.0)
+... except AssertionError: print "Assert error"
+Assert error
+
+Cross product should vary first key slower than second key
+>>> (LinearSpecs('a',1,2, fp_precision=2) * LinearSpecs('b',1,2, fp_precision=2)).next()
+[{'a': '1.00', 'b': '1.00'}, {'a': '1.00', 'b': '2.00'}, {'a': '2.00', 'b': '1.00'}, {'a': '2.00', 'b': '2.00'}]
+>>> (LinearSpecs('b',1,2, fp_precision=2) * LinearSpecs('a',1,2, fp_precision=2)).next()
+[{'a': '1.00', 'b': '1.00'}, {'a': '2.00', 'b': '1.00'}, {'a': '1.00', 'b': '2.00'}, {'a': '2.00', 'b': '2.00'}]
+
+
+>>> print LinearSpecs('a',1,2, fp_precision=2, mapfn=math.log)
+LinearSpecs('a', 1, end_value=2, steps=2, fp_precision=2, mapfn=<built-in function log>)
+
+>>> lister = ListSpecs('a', [1,None,3.0, False])
+>>> lister.next()
+[{'a': '1'}, {'a': 'None'}, {'a': '3.0000'}, {'a': 'False'}]
