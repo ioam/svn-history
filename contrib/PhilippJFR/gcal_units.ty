@@ -40,9 +40,10 @@ import topo.transferfn.misc
 from topo.base.arrayutil import DivideWithConstant
 
 from topo.misc import unitsupport
-unitsupport.Conversions.package = 'Unum'
+unitsupport.Conversions.set_package('Quantities')
 vdeg = unitsupport.Conversions.create_unit('vdeg', None, 'Degrees of Visual Angle')
 mm = unitsupport.Conversions.get_unit('mm')
+ms = unitsupport.Conversions.get_unit('ms')
 
 # Parameters that can be passed on the command line using -p
 from topo.misc.commandline import global_params as p
@@ -59,12 +60,16 @@ p.add(
         How many input patterns to present per unit area at each
         iteration, when using discrete patterns (e.g. Gaussians)."""),
 
+    unit_time=param.Number(default=200*ms,doc="""
+	Length of time represented by 1.0 period in Topographica
+	time"""),
+
     area=param.Number(default=1.0,bounds=(0,None),
         inclusive_bounds=(False,True),doc="""
         Linear size of cortical area to simulate.
         2.0 gives a 2.0x2.0 Sheet area in V1."""),
 
-    vdeg_area=param.Number(default=1.333333*vdeg,doc="""
+    vdeg_per_sc=param.Number(default=1.333333*vdeg,doc="""
         Degrees of visual angle per unit area in sheet coordinates."""),
 
     retina_density=param.Number(default=24.0,bounds=(0,None),
@@ -113,7 +118,7 @@ p.add(
         Learning rate for the lateral inhibitory projection to V1."""))
 
 ### Set up unit conversion objects and install unit stripping hooks where necessary
-unitsupport.Conversions.set_base_unit('sc',p.vdeg_area,'Sheet Coordinates')
+unitsupport.Conversions.set_base_units(spatial = ('sc',p.vdeg_per_sc,'Sheet Coordinates'), temporal = ('tb',p.unit_time,'Topographica time base'))
 retina_scales = unitsupport.Conversions(units = [(vdeg,p.retina_mf)])
 lgn_scales = unitsupport.Conversions(units = [(vdeg,p.lgn_mf)])
 v1_scales = unitsupport.Conversions(units = [(vdeg,p.cortex_mf)])
@@ -129,10 +134,10 @@ projection.SharedWeightCFProjection.response_fn=responsefn.optimized.CFPRF_DotPr
 if p.dataset=="Gaussian":
     input_type=pattern.Gaussian
     total_num_inputs=int(p.num_inputs*p.area*p.area)
-    inputs=[input_type(x=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
-                                                 ubound= (p.area/2.0+0.25),seed=12+i),
-                       y=numbergen.UniformRandom(lbound=-(p.area/2.0+0.25),
-                                                 ubound= (p.area/2.0+0.25),seed=35+i),
+    inputs=[input_type(x=numbergen.UniformRandom(lbound=-1.0*vdeg,
+                                                 ubound= 1.0*vdeg,seed=12+i,unit_conversions=retina_scales),
+                       y=numbergen.UniformRandom(lbound=-1.0*vdeg,
+                                                 ubound= 1.0*vdeg,seed=35+i,unit_conversions=retina_scales),
                        orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
                        size=0.11785*vdeg, aspect_ratio=4.66667, scale=p.scale, unit_conversions=retina_scales)
             for i in xrange(total_num_inputs)]
@@ -155,13 +160,13 @@ elif p.dataset=="Nature":
 ### Sheets
 topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=p.retina_density,
     input_generator=combined_inputs, period=1.0, phase=0.05, unit_conversions=retina_scales,
-    nominal_bounds=sheet.BoundingBox(radius=((p.area*p.vdeg_area)/2.0)+1.125*p.vdeg_area))
+    nominal_bounds=sheet.BoundingBox(radius=2.16667*vdeg))
 
 
 # LGN has lateral connections for divisive normalization.
 for s in ['LGNOn','LGNOff']:
     topo.sim[s]=sheet.optimized.LISSOM_Opt(nominal_density=p.lgn_density,
-        nominal_bounds=sheet.BoundingBox(radius=((p.area*p.vdeg_area)/2.0)+0.75*p.vdeg_area),
+        nominal_bounds=sheet.BoundingBox(radius=1.66667*vdeg),
         output_fns=[transferfn.misc.HalfRectify()],tsettle=2,strict_tsettle=1,
         measure_maps=False, unit_conversions=lgn_scales)
 
@@ -177,7 +182,7 @@ for s in ['LGNOn','LGNOff']:
 
 topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=p.cortex_density,
     tsettle=16, plastic=True, 
-    nominal_bounds=sheet.BoundingBox(radius=(p.area*p.vdeg_area)/2.0),
+    nominal_bounds=sheet.BoundingBox(radius=0.66667*vdeg),
     output_fns=[transferfn.misc.HomeostaticResponse()], unit_conversions=v1_scales)
 
 topo.sim['V1'].joint_norm_fn=topo.sheet.optimized.compute_joint_norm_totals_opt
