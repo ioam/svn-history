@@ -40,7 +40,7 @@ import topo.transferfn.misc
 from topo.base.arrayutil import DivideWithConstant
 
 from topo.misc import unitsupport
-unitsupport.Conversions.set_package('Quantities')
+unitsupport.Conversions.set_package('Unum')
 vdeg = unitsupport.Conversions.create_unit('vdeg', None, 'Degrees of Visual Angle')
 mm = unitsupport.Conversions.get_unit('mm')
 ms = unitsupport.Conversions.get_unit('ms')
@@ -118,7 +118,7 @@ p.add(
         Learning rate for the lateral inhibitory projection to V1."""))
 
 ### Set up unit conversion objects and install unit stripping hooks where necessary
-unitsupport.Conversions.set_base_units(spatial = ('sc',p.vdeg_per_sc,'Sheet Coordinates'), temporal = ('tb',p.unit_time,'Topographica time base'))
+unitsupport.Conversions.set_base_units([('sc',p.vdeg_per_sc,'Sheet Coordinates'),('bt',p.unit_time,'Base Time')])
 retina_scales = unitsupport.Conversions(units = [(vdeg,p.retina_mf)])
 lgn_scales = unitsupport.Conversions(units = [(vdeg,p.lgn_mf)])
 v1_scales = unitsupport.Conversions(units = [(vdeg,p.cortex_mf)])
@@ -256,4 +256,3 @@ import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=2.0
 topo.analysis.featureresponses.FeatureCurveCommand.apply_output_fns=True
 topo.analysis.featureresponses.FeatureCurveCommand.curve_parameters=[{"contrast":1},{"contrast":10},{"contrast":30},{"contrast":50},{"contrast":100}]
-
