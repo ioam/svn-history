@@ -41,7 +41,7 @@ from topo.base.arrayutil import DivideWithConstant
 
 from topo.misc import unitsupport
 unitsupport.Conversions.set_package('Quantities')
-vdeg = unitsupport.Conversions.create_unit('vdeg', None, 'Degrees of Visual Angle')
+vdeg = unitsupport.Conversions.declare_unit('vdeg', None, 'Degrees of Visual Angle')
 mm = unitsupport.Conversions.get_unit('mm')
 ms = unitsupport.Conversions.get_unit('ms')
 
@@ -118,8 +118,8 @@ p.add(
         Learning rate for the lateral inhibitory projection to V1."""))
 
 ### Set up unit conversion objects and install unit stripping hooks where necessary
-unitsupport.Conversions.declare_base_units([('sc',p.vdeg_per_sc,'Sheet Coordinates')])
-unitsupport.Conversions.declare_base_units([('bt',p.unit_time,'Base Time')])
+unitsupport.Conversions.declare_unit('sc',p.vdeg_per_sc,'Sheet Coordinates',base=True)
+unitsupport.Conversions.declare_unit('bt',p.unit_time,'Base Time',base=True)
 retina_scales = unitsupport.Conversions([(vdeg,p.retina_mf)])
 lgn_scales = unitsupport.Conversions([(vdeg,p.lgn_mf)])
 v1_scales = unitsupport.Conversions([(vdeg,p.cortex_mf)])
@@ -174,7 +174,7 @@ for s in ['LGNOn','LGNOff']:
     lgn_surroundg = pattern.Gaussian(size=0.33333*vdeg,aspect_ratio=1.0,
         output_fns=[transferfn.DivisiveNormalizeL1()], unit_conversions=lgn_scales)
 
-    topo.sim.connect(s,s,delay=0.05,name='LateralGC',dest_port=('Activity'),                     
+    topo.sim.connect(s,s,delay=10*ms,name='LateralGC',dest_port=('Activity'),                     
         activity_group=(0.6,DivideWithConstant(c=0.11)),
         connection_type=projection.SharedWeightCFProjection,
         strength=0.6,weights_generator=lgn_surroundg,
@@ -204,19 +204,19 @@ off_weights = pattern.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 topo.sim.connect(
-    'Retina','LGNOn',delay=0.05,strength=2.33,name='Afferent',
+    'Retina','LGNOn',delay=10*ms,strength=2.33,name='Afferent',
     connection_type=projection.SharedWeightCFProjection,
     nominal_bounds_template=sheet.BoundingBox(radius=0.5*vdeg),
     weights_generator=on_weights)
 
 topo.sim.connect(
-    'Retina','LGNOff',delay=0.05,strength=2.33,name='Afferent',
+    'Retina','LGNOff',delay=10*ms,strength=2.33,name='Afferent',
     connection_type=projection.SharedWeightCFProjection,
     nominal_bounds_template=sheet.BoundingBox(radius=0.5*vdeg),
     weights_generator=off_weights)
 
 topo.sim.connect(
-    'LGNOn','V1',delay=0.05,strength=p.aff_strength,name='LGNOnAfferent',
+    'LGNOn','V1',delay=10*ms,strength=p.aff_strength,name='LGNOnAfferent',
     dest_port=('Activity','JointNormalize','Afferent'),
     connection_type=projection.CFProjection,learning_rate=p.aff_lr,
     nominal_bounds_template=sheet.BoundingBox(radius=0.361106*vdeg),
@@ -224,7 +224,7 @@ topo.sim.connect(
     unit_conversions=lgn_scales),learning_fn=learningfn.optimized.CFPLF_Hebbian_opt())
                      
 topo.sim.connect(
-    'LGNOff','V1',delay=0.05,strength=p.aff_strength,name='LGNOffAfferent',
+    'LGNOff','V1',delay=10*ms,strength=p.aff_strength,name='LGNOffAfferent',
     dest_port=('Activity','JointNormalize','Afferent'),
     connection_type=projection.CFProjection,learning_rate=p.aff_lr,
     nominal_bounds_template=sheet.BoundingBox(radius=0.361107*vdeg),
@@ -232,14 +232,14 @@ topo.sim.connect(
     unit_conversions=lgn_scales),learning_fn=learningfn.optimized.CFPLF_Hebbian_opt())
 
 topo.sim.connect(
-    'V1','V1',delay=0.05,strength=p.exc_strength,name='LateralExcitatory',
+    'V1','V1',delay=10*ms,strength=p.exc_strength,name='LateralExcitatory',
     connection_type=projection.CFProjection,learning_rate=p.exc_lr,
     nominal_bounds_template=sheet.BoundingBox(radius=0.138667*vdeg),
     weights_generator=pattern.Gaussian(aspect_ratio=1.0, size=0.066667*vdeg,
     unit_conversions=v1_scales))
 
 topo.sim.connect(
-    'V1','V1',delay=0.05,strength=-1.0*p.inh_strength,name='LateralInhibitory',
+    'V1','V1',delay=10*ms,strength=-1.0*p.inh_strength,name='LateralInhibitory',
     connection_type=projection.CFProjection,learning_rate=p.inh_lr,
     nominal_bounds_template=sheet.BoundingBox(radius=0.30556*vdeg),
     weights_generator=pattern.random.GaussianCloud(gaussian_size=0.2*vdeg,
