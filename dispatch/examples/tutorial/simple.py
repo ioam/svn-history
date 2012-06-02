@@ -27,15 +27,15 @@ with open(script_path,'w') as f:     f.write('\n'.join(simple_code))
 # This is the proper way to specify where all your files will be generated
 output_directory = os.path.join(os.getcwd(), 'Demo_Output', 'Simple_Demos')
 
-# Demo I
-# This is the simplest possible example of how dispatch is used
-print "---DemoI---:"
-if __name__ == '__main__':
-    param.normalize_path.prefix = os.path.join(os.getcwd(), 'Demo_Output', 'Simple_Demos')
-    task_specifier = Spec(arg1 = 3, arg2 = 5)
-    task_command = SimplePyScriptCommand(script_path, argorder=['arg1','arg2'])
-    task_launcher = TaskLauncher('DemoI', task_specifier, task_command)
-    task_launcher.dispatch()
+# # Demo I
+# # This is the simplest possible example of how dispatch is used
+# print "---DemoI---:"
+# if __name__ == '__main__':
+#     param.normalize_path.prefix = os.path.join(os.getcwd(), 'Demo_Output', 'Simple_Demos')
+#     task_specifier = Spec(arg1 = 3, arg2 = 5)
+#     task_command = SimplePyScriptCommand(script_path, argorder=['arg1','arg2'])
+#     task_launcher = TaskLauncher('DemoI', task_specifier, task_command)
+#     task_launcher.dispatch()
 
 # Demo II
 # Here is an demo to show how using the review_and_launch decorator (recommended) is useful.
@@ -64,12 +64,11 @@ def demoIII():
     task_launcher = TaskLauncher('DemoIII', task_specifier, task_command)
     task_launcher.description='This is documentation for demoIII'
     task_launcher.tag='demo3'
-    task_launcher.print_info='stdout'
     return task_launcher
 
 message = """Hopefully, this has conveyed the basic structure of the
-system.  - For more in-depth examples, run python demos.py.  - For
-topographica examples, run topographica topoI.py
-"""
+system.  Check the 'stream's subdirectory of the root directory
+(printed above in the review) in './Demo_Output/Simple_Demos' for the
+generated output."""
 
 print "\n" + message

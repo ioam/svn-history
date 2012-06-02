@@ -73,12 +73,6 @@ for (r, r_group) in enumerate(r_groups):
 
 print grid
 
-##############
-
-# Reportlab seems the standard (pythonic) way of generating pdfs.
-# Latex with longtable.
-# Or pylab.
-##############
 
 def parse_log(log_path):
     " Parses a launcher log into a spec dictionary"

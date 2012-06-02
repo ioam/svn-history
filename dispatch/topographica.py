@@ -1,4 +1,4 @@
-import os, sys, re, pickle, imp, shutil, time
+import os, sys, re, pickle, imp, shutil, time, inspect
 import topo 
 import param
 from dispatch import TaskCommand
@@ -78,13 +78,17 @@ class TopoRunBatchCommand(TaskCommand):
        'specifications' subdirectory of the root directory.
        """
 
-   analysis = param.ObjectSelector(default='default', objects=['default', 'TopoRunBatchAnalysis', 'custom'],
+   analysis = param.ObjectSelector(default='default', 
+                                   objects=['default', 'TopoRunBatchAnalysis', 'custom'],
                                    constant=True, doc="""
               The type of analysis to use with run_batch. The options are
               'default' which runs the default run_batch analysis function,
               'TopoRunBatchAnalysis' which use the more sophisticated picklable
               analysis function and custom which requires the analysis callable
               to be created in the run_batch namespace via the custom_prelude.""")
+
+   analysis_arguments = param.List(default=[], doc='''
+         The specifier keys to be consumed as analysis function arguments''')
 
    custom_prelude = param.List(default=[], constant=True, doc="""
           Lines of code to be executed prior run_batch invocation to introduce
@@ -106,13 +110,16 @@ class TopoRunBatchCommand(TaskCommand):
    param_formatter = param.Callable(topo_param_formatter.instance(),doc="""
         If None, defaults to normal run_batch formatting.""")
 
-   def __init__(self, tyfile, analysis='default', custom_prelude=[]):
+   def __init__(self, tyfile, analysis='default', custom_prelude=[], **kwargs):
 
       if (analysis == 'custom') and (custom_prelude==[]):
          raise Exception, 'Please specify custom_prelude to use custom analysis!'
 
+      executable =  os.path.abspath(sys.argv[0])
       super(TopoRunBatchCommand, self).__init__(analysis=analysis,
-                                                custom_prelude=custom_prelude)
+                                                custom_prelude=custom_prelude,
+                                                executable=executable,
+                                                **kwargs)
 
       self.tyfile = os.path.abspath(tyfile)
       assert os.path.exists(self.tyfile), "Tyfile doesn't exist! Cannot proceed."
@@ -124,25 +131,26 @@ class TopoRunBatchCommand(TaskCommand):
          self._prelude = ["analysis = default_analysis_function"] 
                
       self._prelude = self.custom_prelude + self._prelude
-      
+
    def queue(self,tid, info):
       ''' Uses load_kwargs helper function in topo.command.misc to get the
       run_batch settings from the specifications directory. '''
       spec_path = os.path.join(info['root_directory'], 'specifications') 
       spec_file_path = os.path.join(spec_path, 't%s.spec' % tid) 
-      run_batch_cmd = "run_batch('%s',**load_kwargs('%s',globals(),locals()))" % (self.tyfile,spec_file_path)
-
       prelude = self._prelude[:]
+      prelude += ["kwargs = load_kwargs('%s',globals(),locals())" % spec_file_path]
       if self.analysis=='TopoRunBatchAnalysis':
          prelude += ["analysis=TopoRunBatchAnalysis.load(%s)" % repr(info['root_directory'])]
          prelude += ["analysis.current_tid = %s" % tid]
+         prelude += ["analysis.analysis_kwargs = dict(kwargs, times=kwargs.get('times',1.0))"]
 
+      run_batch_cmd = "run_batch('%s',**kwargs)" % self.tyfile
       return  [self.executable, '-a', '-c', ';'.join(prelude+[run_batch_cmd])]
 
    def specify(self, spec, tid, info):
       ''' Writes the specification as a Python dictionary to file (to the
-      specifications subdirectory of root directory) as required by the
-      load_kwargs helper method in topo.misc.command.'''
+          specifications subdirectory of root directory) as required by the
+          load_kwargs helper method in topo.misc.command.'''
 
       spec_path = os.path.join(info['root_directory'], 'specifications')
       spec_file_path = os.path.join(spec_path, 't%d.spec' % tid)
@@ -196,11 +204,14 @@ class TopoRunBatchCommand(TaskCommand):
       if self.analysis=='TopoRunBatchAnalysis':
          prelude += ["analysis=TopoRunBatchAnalysis.load(%s)" % repr(info['root_directory'])]
          prelude += ["analysis.current_tid = %s" % tid]
+         analysis_kwargs = ["'%s':%s" % (k,v) for (k,v) in allopts.items() 
+                            if k in self.analysis_arguments]
+         if 'times' not in allopts:  analysis_kwargs += ["'times':1.0"]
+         prelude += ["analysis.analysis_kwargs = {%s}" % ', '.join(analysis_kwargs)]
+            
 
-         # New changes....(remove once tested)
-         if 'times' in allopts:prelude += ["analysis.times = %s" % allopts['times']]
-
-      keywords = ', '.join(['%s=%s' % (k,allopts[k]) for k in sorted(kwarg_opts.keys())+sorted(spec.keys())])
+      keywords = ', '.join(['%s=%s' % (k,allopts[k]) for k in
+                            sorted(kwarg_opts.keys())+sorted(spec.keys())])
       run_batch_list = prelude + ["run_batch(%s,%s)" % (repr(self.tyfile), keywords)]
       return  [self.executable, '-a', '-c',  '; '.join(run_batch_list)]
 
@@ -245,15 +256,20 @@ class TopoRunBatchAnalysis(param.Parameterized):
          run_batch context in order to ensure the correct naming convention for
          pickles generated by the map functions (for later reduction).''')
 
-   times = param.Parameter(default=1.0, doc='''
-         The set of times specified to run_batch. Follows the definition of
-         run_batch so that a scale scales the list of standard times:
-         [0,50,100,500,1000,2000,3000,4000,5000,10000]''')
+   analysis_kwargs = param.Dict(default={}, doc='''
+         The keyword arguments to be passed to the analysis functions. The analysis
+         functions can capture any desired variables by setting the appropriate
+         keyword arguments.''')
+
+   analysis_arguments = param.Parameter(default=set([]), doc='''
+        The names of all the arguments required by the analysis functions. Used to
+        make sure that the specifiers supply all the required keys.''')
 
    @classmethod
    def load(cls, root_directory):
-      ''' Classmethod used to load the analysis callable in a Topographica run_batch context.
-          Loads the analysisfn.pickle file from the specified root directory.'''
+      ''' Classmethod used to load the analysis callable in a Topographica run_batch
+          context.  Loads the analysisfn.pickle file from the specified root
+          directory.'''
       path = os.path.join(root_directory, 'analysisfn.pickle')
       with open(path,'rb') as p:  analysisfn =  pickle.load(p) 
       analysisfn.setup(); return analysisfn
@@ -270,6 +286,7 @@ class TopoRunBatchAnalysis(param.Parameterized):
    def __init__(self):
       self.source_path = None; self.root_directory = None
       self.maps = []; self.map_reduces = []; self.metric = None
+      self.analysis_arguments = set([])
 
    def save(self):
       ''' The method to save the initial pickle file once the map, reduce and
@@ -282,28 +299,45 @@ class TopoRunBatchAnalysis(param.Parameterized):
       path = os.path.join(self.root_directory, 'analysisfn.pickle') 
       with open(path,'wb') as p: pickle.dump(self, p)
 
-   def _fn_name(self, obj):
-      if isinstance(obj, str): return obj
-      try:    return obj.__name__
-      except: raise Exception('Please specify either string name or function')
+   def _verify_mapfn(self, func):
+      ''' Helper function to establish map function name and enforce
+      correct argument signature.'''
+      fn_name = func.__name__
+      (args, varargs, keywords, defaults) = inspect.getargspec(func)
+      assert varargs is None, "Function '%s' cannot accept arglist ie. *args" % fn_name
+      assert keywords is not None, "Function '%s' must accept keywords ie. **kwargs" % fn_name
+      if len(args) == 0: return (fn_name, ())
+      assert (defaults is not None) and (len(defaults) == len(args)), \
+          "Arguments of '%s' must all be keywords" % fn_name
+      self.analysis_arguments =  self.analysis_arguments | set(args)
+      return (fn_name, tuple(args))
 
    def set_metric(self, metric_fn, description):
       ''' Used to supply a metric function (eg. for hillclimbing) along with
       appropriate description.'''
-      self.metric = {'metric_fn':self._fn_name(metric_fn), 'description':description} # .__name__
+      self.metric = {'metric_fn':metric_fn.__name__, 'description':description}
 
    def add_map_fn(self, map_fn, description):
       ''' Used to supply an additional map function (called for its side-effects
       only) along with appropriate description.'''
-      self.maps.append({'map_fn':self._fn_name(map_fn), 'description':description})
+      (map_name, map_args) =  self._verify_mapfn(map_fn)
+      self.maps.append({'map_fn':map_name, 'map_args':map_args, 'description':description})
 
    def add_map_reduce_fn(self, map_fn, reduce_fn, description):
       ''' Used to specify a map-reduce operation whereby the map_fn returns data
       from a given simulation which the reduce_fn collates across all
       simulations once the batch is complete. An appropriate description also
       needs to be supplied.'''
-      self.map_reduces.append({'map_fn':self._fn_name(map_fn), 
-                               'reduce_fn':self._fn_name(reduce_fn), 
+      (map_name, map_args) =  self._verify_mapfn(map_fn)
+      reduce_name = reduce_fn.__name__
+      (reduce_args, _, _, _) = inspect.getargspec(reduce_fn)
+      checkmsg ="Reduction '%s' must accept three arguments of form (<info>, <data>, <accumulator>)"
+      assert len(reduce_args) == 3, checkmsg % reduce_name
+
+      self.map_reduces.append({'map_fn':map_name, 
+                               'map_args':map_args,
+                               'reduce_fn':reduce_name,
+                               'reduce_args':tuple(reduce_args),
                                'description':description})
 
    def set_map_reduce_fns(self, map_fns, reduce_fns, descriptions):
@@ -342,8 +376,7 @@ class TopoRunBatchAnalysis(param.Parameterized):
           are stored in the metrics folder of the root directory as required by
           all TaskLaunchers.'''
 
-      # New changes (remove once tested)
-      times = self.times
+      times = self.analysis_kwargs['times']
       if not isinstance(times, list):
          times=[t*times for t in [0,50,100,500,1000,2000,3000,4000,5000,10000]]
 
@@ -355,10 +388,10 @@ class TopoRunBatchAnalysis(param.Parameterized):
 
       topo_time = topo.sim.time()
 
-      for mapfn in self.mapfns: mapfn() # Applying map functions in order
+      for mapfn in self.mapfns: mapfn(**self.analysis_kwargs) # Applying map functions in order
 
       for (rmapfn, info) in zip(self.rmapfns,self.map_reduces):
-         rmap_result = rmapfn()  # New change!
+         rmap_result = rmapfn(**self.analysis_kwargs)
          if rmap_result is not None:
             fname = '%s@time=%s[%d]' % (info['map_fn'], str(topo_time), self.current_tid)
             self.pickle_data(info['map_fn'], fname, (topo_time, rmap_result)) # Pickle maps of map-reduces
@@ -369,11 +402,11 @@ class TopoRunBatchAnalysis(param.Parameterized):
 
 
    def reduce(self, spec_log, root_directory):
-      ''' Method to apply all defined map-reduces. For each map function,
-      locates all the pickles in the corresponding subfolder and matches the
-      stored data to the tid in the filename. The data and Topographica
-      simulation times are extracted and passed the the appropriate reduce
-      function.'''
+      ''' Method to apply all defined map-reduces. For each map function, locates all
+      the pickles in the corresponding subfolder and matches the stored data to the
+      tid in the filename. The data, Topographica simulation times and corresponding
+      tids are extracted and passed on to the appropriate reduce function.'''
+
       reduces = [map_red['reduce_fn'] for map_red in self.map_reduces]
       reduce_maps = [map_red['map_fn'] for map_red in self.map_reduces]
 
@@ -381,32 +414,46 @@ class TopoRunBatchAnalysis(param.Parameterized):
       else:                 return
 
       reduce_fns = [getattr(module, rname) for rname in reduces]
-      # Mapping is a dictionary of form {<map_name>:<reduce_function>}
-      reduce_mapping = dict([(map_name, rfn) for (map_name, rfn) in zip(reduce_maps, reduce_fns)])
-      
-      for map_name in reduce_mapping:
-         candidate_files = os.listdir(os.path.join(root_directory, map_name))
+      reduce_mapping = [(map_name, rfn) for (map_name, rfn) in zip(reduce_maps, reduce_fns)]
+
+      previous_reduction = None 
+      for (map_name, reducefn) in reduce_mapping:
+         path = os.path.join(root_directory, map_name)
+         if not os.path.isdir(path): 
+            previous_reduction = reducefn([root_directory, spec_log], None, previous_reduction)
+            continue
          tid_pattern = map_name + '.*\[(?P<tid>\d+)\]'
-         regexp_matches = [(cf, re.match(tid_pattern,cf)) for cf in candidate_files]
+         regexp_matches = [(cf, re.match(tid_pattern,cf)) for cf in os.listdir(path)]
          tid_matches = [(cf, int(m.groupdict()['tid'])) for (cf,m) in regexp_matches if (m is not None)]
          matches, tids = zip(*tid_matches)
-
          pickle_paths = [os.path.join(root_directory, map_name, f) for f in matches]
          unpickled = [pickle.load(open(p,'rb')) for p in pickle_paths]
-         topo_times, map_data = zip(*unpickled)
-         annotated = [ (data, t, dict(spec_log)[tid]) for (data, t, tid)  
-                       in zip(map_data, topo_times, tids)]
-         reduce_mapping[map_name](annotated, root_directory)
+                 
+         specDict = dict(spec_log)
+         specs=[]; topo_times=[]; map_data =[]
+         for (tid, (topo_time, datum)) in zip(tids, unpickled):
+            specs.append(dict(specDict[tid], tid=tid, time=topo_time))
+            topo_times.append(topo_time)
+            map_data.append(datum)
+
+         previous_reduction = reducefn([root_directory, specs], map_data, previous_reduction)
          
    def __str__(self):
       ''' The printed representation of the analysis object. '''
       strList = []
-      for fn_info in self.maps:
-         strList += ["Map function '%(map_fn)s': %(description)s" % fn_info]
-      for fn_info in self.map_reduces:
-         strList += ["Map/Reduce function '%(map_fn)s': %(description)s" % fn_info]
+      for info in self.maps:
+         map_str = '(%s)' % ' ,'.join(info['map_args']+('**kwargs',))
+         strList += ["%(map_fn)s%(map_str)s\n\t%(description)s" % dict(info, map_str=map_str)]
+      for info in self.map_reduces:
+         map_str = '(%s)' % ' ,'.join(info['map_args']+('**kwargs',))
+         red_str='(%s)'% ' ,'.join(info['reduce_args'])
+         strList += ["%(map_fn)s%(map_str)s => %(reduce_fn)s%(red_str)s\n\t%(description)s" 
+                     % dict(info, map_str=map_str, red_str=red_str)]
       if strList == []: strList = ['Default TopoRunBatchAnalysis']
       if self.metric is not None: strList += ['Metric function %(metric_fn)s' % self.metric]
+      if len(self.map_reduces) > 1:
+         reduction_chain = "(..) -> ".join([map_red['reduce_fn'] for map_red in self.map_reduces])
+         strList += ["Reduction Chain: %s(..)" % reduction_chain]
       return "\n".join(strList)
 
 ####################
@@ -422,7 +469,7 @@ class topo_batch_analysis(review_and_launch):
     In order to ensure the pickled TopoRunBatchAnalysis object is in the
     appropriate root directory, this decorator takes the current timestamp to
     determine the root directory before launch.
-    '''
+     '''
 
    def review_analysis(self, task_launcher, task_command, batch_analysis):
       
@@ -432,6 +479,14 @@ class topo_batch_analysis(review_and_launch):
       print "\n" + self.section('Batch Analysis')
       print "Source path: %s" % self.script_path
       print "Analysis Info:\n%s\n" %  batch_analysis
+
+      task_specifier = task_launcher.task_specifier
+      analysis_arguments = batch_analysis.analysis_arguments
+      specifier_keys = set(task_specifier.varying_keys()+task_specifier.constant_keys())
+      if not (analysis_arguments <= specifier_keys):
+         clashes = analysis_arguments - specifier_keys
+         raise Exception("Analysis keys %s not set in the specifier" % list(clashes))
+      task_command.analysis_arguments = list(analysis_arguments)
 
    def setup_analysis(self, task_launcher, batch_analysis):
       ''' Takes the current timestamp, uses it to determine the root directory,
@@ -485,15 +540,14 @@ class topo_batch_analysis(review_and_launch):
             try: self.review_analysis(task_launcher, task_command, batch_analysis)
             except AssertionError: return
 
-            self.review_task_launcher(task_launcher,task_command)
-            self.review_task_specification(task_specifier)
-            self.review_task_command(task_command,task_specifier, task_launcher)
-                        
-            response = self.input_options(['y','n'], 'Execute?')
-            if response == 'y':  
-               self.setup_analysis(task_launcher, batch_analysis)
-               task_launcher.dispatch()
-         else: 
+            if self.review_task_specification(task_specifier) and \
+              self.review_task_command(task_command, task_specifier, task_launcher) and \
+              (self.input_options(['y','N'], 'Execute?', default='n') == 'y'):
+                print("\n*Dispatching %s ...*" % task_launcher.batch_name)
+                self.setup_analysis(task_launcher, batch_analysis)
+                task_launcher.dispatch()
+            else: print "Exiting..."
+         else:
             self.setup_analysis(task_launcher, batch_analysis)
             task_launcher.dispatch()
-            return f
+         return f
