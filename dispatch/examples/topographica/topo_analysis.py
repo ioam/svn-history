@@ -7,8 +7,7 @@ import topo
 from dispatch import QLauncher, TaskLauncher, Spec, LinearSpecs, ListSpecs
 from dispatch.topographica import TopoRunBatchAnalysis, TopoRunBatchCommand, topo_batch_analysis
 
-
-CLUSTER = True
+CLUSTER = False
 if CLUSTER:  Launcher = QLauncher; batch_name = 'topo_analysis_cluster'
 else:        Launcher = TaskLauncher; batch_name = 'topo_analysis_local'
 
@@ -17,17 +16,15 @@ else:        Launcher = TaskLauncher; batch_name = 'topo_analysis_local'
 # Analysis #
 ############
 
-from collections import defaultdict
+def V1_mean_activity(topo_times=None):  return numpy.mean(topo.sim['V1'].activity)
 
-def V1_mean_activity():  return numpy.mean(topo.sim['V1'].activity)
+def retina_std_activity(topo_times=None): return numpy.std(topo.sim['Retina'].activity)
 
-def retina_std_activity(): return numpy.std(topo.sim['Retina'].activity)
-
-def OR_plotgroup(): 
+def OR_plotgroup(topo_times=None): 
     from topo.command.analysis import save_plotgroup
     save_plotgroup("Orientation Preference",use_cached_results=True)
 
-def activity_plotgroup(): 
+def activity_plotgroup(topo_times=None): 
     from topo.command.analysis import save_plotgroup
     save_plotgroup("Activity")
 

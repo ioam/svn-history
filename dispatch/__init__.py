@@ -6,16 +6,15 @@ from itertools import chain, groupby
 from collections import defaultdict
 
 import param
-from param.external import OrderedDict
 
 # TaskCommands could be called CommandTemplates.
 # TaskSpecifiers could be called ArgumentSpecifiers
 # TaskLaunchers could be called BatchLauncher
 # task decorators could be called workflows (launch workflows?).  dispatch.
 
-##################
+#================#
 # TaskSpecifiers #
-##################
+#================#
 
 """
 TaskSpecifiers are intended to be clear, succinct and composable way of
@@ -172,7 +171,7 @@ class TaskSpecifier(param.Parameterized):
       for (group_ind, specs) in enumerated:
          if len(enumerated) > 1: print "Group %d" % group_ind         
          ordering = self.constant_keys() + self.varying_keys() # Ordered nicely by varying_keys definition.
-         spec_lines = [ ', '.join(['%s=%s' % (k, s[k]) for k in ordering]) for s in specs] 
+         spec_lines = [ ', '.join(['%s=%s' % (k, s[k]) for k in ordering if (k in s)]) for s in specs] 
          print  '\n'.join([ '%d: %s' % (i,l) for (i,l) in enumerate(spec_lines)])
       
       if self.dynamic: 
@@ -376,7 +375,7 @@ class LinearSpecs(StaticSpecs):
 
    def __repr__(self):
       modified = dict(self.get_param_values(onlychanged=True))
-      pstr = ', '.join(['%s=%s' % (k,repr(modified[k])) for k in self._pparams if k in modified])
+      pstr = ', '.join(['%s=%s' % (k, self.formatter(modified[k])) for k in self._pparams if k in modified])
       return "%s('%s', %s, %s)" % (self.__class__.__name__, self.spec_key, self.value, pstr)  
   
 class ListSpecs(StaticSpecs):
@@ -396,9 +395,9 @@ class ListSpecs(StaticSpecs):
    def __repr__(self):
       return "%s(%s,%s)" % (self.__class__.__name__, self.spec_key, self.value_list) #value_list
 
-##########################
+#========================#
 # Dynamic TaskSpecifiers #
-##########################
+#========================#
 
 class DynamicConcatenate(TaskSpecifier):
 
@@ -503,9 +502,9 @@ class DynamicCartesianProduct(TaskSpecifier):
    def __repr__(self):   return '(%s * %s)' % (repr(self.first), repr(self.second))
 
 
-###############
+#==============#
 # TaskCommands #
-################
+#==============#
 
 class TaskCommand(param.Parameterized):
    """A TaskCommand is a way of converting the general key-value dictionary
@@ -602,9 +601,9 @@ class TaskCommand(param.Parameterized):
       file_handle.flush()
 
 
-#################
+#===============#
 # TaskLaunchers #
-#################
+#===============#
 
 class TaskLauncher(param.Parameterized):
     """ A TaskLauncher takes a name, a TaskSpecifier and TaskCommand in the
@@ -1053,10 +1052,9 @@ class QLauncher(TaskLauncher):
                              stdout=subprocess.PIPE)
         (stdout, stderr) = p.communicate()
 
-
-#####################
+#===================#
 # Launch Decorators #
-#####################
+#===================#
 
 class review_and_launch:
     """ The basic example of the sort of decorator that -must- be used to start
@@ -1082,8 +1080,8 @@ class review_and_launch:
           print "Use decorator as follows: review_and_launch(<launcher_class>, review=True)" 
           sys.exit()
 
-    def section(self, text, car='#'): 
-        length=len(text)+4; return '%s\n%s %s %s\n%s' % (car*length, car, text, car, car*length)
+    def section(self, text, car='=', vertcar='|'): 
+        length=len(text)+4; return '%s\n%s %s %s\n%s' % (car*length, vertcar, text, vertcar, car*length)
 
     def input_options(self, options, prompt='Select option'):
         response = raw_input('%s [%s]: ' % (prompt, ', '.join(options)))
