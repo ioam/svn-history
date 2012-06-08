@@ -5,13 +5,15 @@ import os, random
 import numpy as np
 import topo
 
-from dispatch import QLauncher, TaskLauncher, Spec, LinearSpecs, ListSpecs
-from dispatch.topographica import TopoRunBatchAnalysis, TopoRunBatchCommand, topo_batch_analysis
+from dispatch import QLauncher, Launcher, Spec, LinearSpecs, ListSpecs
+from dispatch.topographica import RunBatchAnalysis, RunBatchCommand, launch_batch_analysis
 
 CLUSTER = False
-if CLUSTER:  Launcher = QLauncher; batch_name = 'topo_analysis_cluster'
-else:        Launcher = TaskLauncher; batch_name = 'topo_analysis_local'
-
+if CLUSTER:  
+    Launcher = QLauncher
+    batch_name = 'topo_analysis_cluster'
+else: 
+    batch_name = 'topo_analysis_local'
 
 ############
 # Analysis #
@@ -36,9 +38,9 @@ def activity_plotgroup(times=None, **kwargs):
     from topo.command.analysis import save_plotgroup
     save_plotgroup("Activity")
 
-def V1_reduce(info, data, accumulator):
+def V1_reduce(info, activity_V1, accumulator):
     import pylab
-    collation = Collate(*info, V1_activity=data)
+    collation = Collate(*info, V1_activity=activity_V1)
     s = Select(collation)
     s.view(float_keys=['time', 'retina_density', 'cortex_density', 'V1_activity'])
     
@@ -54,8 +56,8 @@ def V1_reduce(info, data, accumulator):
     print "Saved figure rd2_mean_activity.png in folder cluster_figures"
     return collation
 
-def retina_reduce(info, data, collation):
-    collation.insert_columns(retina_activity=data)
+def retina_reduce(info, activity_retina, collation):
+    collation.insert_columns(retina_activity=activity_retina)
     s = Select(collation)
     s.view(int_keys=['time'], 
            float_keys=['retina_density', 'cortex_density', 'V1_activity', 'retina_activity'])
@@ -81,7 +83,7 @@ def save_simulations(info, data, collation):
     print "Saving all simulation results to HDF5"
     h5_path = os.path.join(root_directory, 'topo_analysis.h5')
     with PyTableUtils(h5_path, 'topo_analysis', 
-                      'Analysis demonstration', title='Topo Analysis') as pytable:
+                      'Analysis demonstration', title='Analysis') as pytable:
 
         pytable.declare_group('selector', 'The Selector object for the topo analysis demo')
         pytable.store_selector('selector', Select(collation), 'topo_analysis_selector')
@@ -95,8 +97,8 @@ def save_simulations(info, data, collation):
 
 # Normally in Topographica, the prefix is set to the Documents subdirectory of home (by default)
 output_directory = os.path.join(os.getcwd(), 'Demo_Output')
-@topo_batch_analysis(Launcher, output_directory, review=True)
-def topo_analysis():
+@launch_batch_analysis(Launcher, output_directory, review=True)
+def advanced():
     cross_product_densities = (LinearSpecs("retina_density", 2,7,3)
                                * LinearSpecs("cortex_density", 1,6,3, fp_precision=2))
 
@@ -107,7 +109,7 @@ def topo_analysis():
     combined_spec = run_batch_spec * cross_product_densities    
 
     # Command
-    run_batch_command = TopoRunBatchCommand('../../../examples/tiny.ty', analysis='TopoRunBatchAnalysis')
+    run_batch_command = RunBatchCommand('../../../examples/tiny.ty', analysis='RunBatchAnalysis')
     run_batch_command.allowed_list = ['retina_density','cortex_density', 'times']
 
     run_batch_command.name_time_format = '%d-%m-%Y@%H%M'
@@ -119,7 +121,7 @@ def topo_analysis():
     # tasklauncher.timestamp_format = None
 
     # Analysis
-    batch_analysis = TopoRunBatchAnalysis()
+    batch_analysis = RunBatchAnalysis()
     # Adding map functions
     batch_analysis.add_map_fn(OR_plotgroup, 'Recording orientation preference')
     batch_analysis.add_map_fn(activity_plotgroup, 'Recording sheet activities')

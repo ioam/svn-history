@@ -1,7 +1,7 @@
 import os, shutil, tempfile, time
 
 import param
-from dispatch import TaskLauncher, TaskSpecifier, Spec, LinearSpecs, ListSpecs, review_and_launch
+from dispatch import Launcher, TaskSpecifier, Spec, LinearSpecs, ListSpecs, review_and_launch
 from dispatch.python import SimplePyScriptCommand
 
 
@@ -33,7 +33,7 @@ The custom CollatzDemo TaskSpecifier is very simple and illustrates the
 essense of a dynamic TaskSpecifier. In this example, it handles the Collatz
 conjecture step for the odd case.
 
-Now if you use this TaskSpecifier and point the TaskLauncher to the
+Now if you use this TaskSpecifier and point the Launcher to the
 appropriate metrics folder, we see how the CollatzDemo class computes new
 values to pass to the script conditioned on previous results. This is the
 basic pattern needed to implement usedul parameter search algorithms.
@@ -97,12 +97,12 @@ class CollatzDemo(TaskSpecifier):
 
 
 output_directory = os.path.join(os.getcwd(), 'Demo_Output')
-@review_and_launch(TaskLauncher, output_directory, review=True)
+@review_and_launch(Launcher, output_directory, review=True)
 def collatz():
     collatz_specifier = CollatzDemo(43, rationale='Illustrating dynamic specifiers')
     task_command = SimplePyScriptCommand(script_path)
 
-    task_launcher = TaskLauncher('Collatz_demo', collatz_specifier, task_command)
+    task_launcher = Launcher('Collatz_demo', collatz_specifier, task_command)
     task_launcher.description='This is a dynamic example'
     task_launcher.tag='collatz'
     return task_launcher

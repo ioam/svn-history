@@ -7,14 +7,16 @@ import os, tempfile, time
 import numpy
 from numpy.random import randint, permutation
 
-from dispatch import Spec, QLauncher, TaskLauncher, TaskSpecifier, LinearSpecs, ListSpecs, review_and_launch
+from dispatch import Spec, QLauncher, Launcher, TaskSpecifier, LinearSpecs, ListSpecs, review_and_launch
 from dispatch.python import SimplePyScriptCommand
 
 
 CLUSTER = True
-if CLUSTER:  Launcher = QLauncher; batch_name = 'Haystack_demo_cluster'
-else:        Launcher = TaskLauncher; batch_name = 'Haystack_demo_local'
-
+if CLUSTER:  
+    Launcher = QLauncher
+    batch_name = 'Haystack_demo_cluster'
+else:        
+    batch_name = 'Haystack_demo_local'
 
 ##############################
 # Setting up the demo script #

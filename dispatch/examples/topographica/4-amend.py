@@ -2,7 +2,7 @@ import os
 import topo
 
 from dispatch import StaticSpecs
-from dispatch.topographica import TopoRunBatchAnalysis
+from dispatch.topographica import RunBatchAnalysis
 
 def V1_mean_activity():  return numpy.mean(topo.sim['V1'].activity)
 
@@ -24,7 +24,7 @@ def V1_reduce(map_data, root_directory):
 root_directory = os.path.abspath('./Demo_Output/2012-05-15_1110-topo_analysis_cluster')
 log_path = os.path.join(root_directory, 'topo_analysis_cluster.log')
 
-analysisfn = TopoRunBatchAnalysis.load(root_directory)
+analysisfn = RunBatchAnalysis.load(root_directory)
 analysisfn.source_path = os.path.abspath('./topo_amend.py')
 analysisfn.set_map_reduce_fns([V1_mean_activity],[V1_reduce],['Amending the plot'])
 specs = StaticSpecs.extract_log_specification(log_path)

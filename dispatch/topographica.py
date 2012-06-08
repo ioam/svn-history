@@ -2,11 +2,11 @@ import os, sys, re, pickle, imp, shutil, time, inspect
 import topo 
 import param
 from dispatch import TaskCommand
-from dispatch import TaskLauncher
+from dispatch import Launcher
 from dispatch import review_and_launch
 
 
-class topo_param_formatter(param.ParameterizedFunction):
+class param_formatter(param.ParameterizedFunction):
    ''' This class is closely related to the param_formatter class in
        topo/command/__init__.py.  Like that default class, it formats parameters
        as a string for use in a directory name.  Unlike that default, it does
@@ -59,8 +59,8 @@ class topo_param_formatter(param.ParameterizedFunction):
       return self.separator.join(['%s=%s' % (k, v[:self.truncation_limit]) for (k,v) in abbreved])
       
 
-class TopoRunBatchCommand(TaskCommand):
-   """ TopoRunBatchCommand is designed to to format task specifications into
+class RunBatchCommand(TaskCommand):
+   """ RunBatchCommand is designed to to format task specifications into
        Topographica run_batch tasks in a way that should be flexible enough to
        be used generally. Note that Topographica is invoked with the -a flag so
        all of topo.command is imported.
@@ -78,22 +78,42 @@ class TopoRunBatchCommand(TaskCommand):
        'specifications' subdirectory of the root directory.
        """
 
+   topo_switches = param.List(default=['-a'], doc = """
+          Specifies the Topographica qsub switches (flags without arguments) as a
+          list of strings. By default the -a switch is always used to auto import
+          commands.""")
+
+   topo_flag_options = param.Dict(default={}, doc="""
+          Specifies Topographica flags and their corresponding options as a
+          dictionary.  This parameter is suitable for setting -c and -p flags for
+          Topographica (eg. to customize OpenMP settings). This parameter is also
+          important to introduce an analysis callable into the namespace if the
+          analysis function is set to 'custom'.
+
+          Tuples can be used to indicate groups of options using the same flag:
+          {'-p':'retina_density=5'} => -p retina_density=5
+          {'-p':('retina_density=5', 'scale=2') => -p retina_density=5 -p scale=2
+          {'-p':'
+
+          If a plain Python dictionary is used, the keys are alphanumerically sorted,
+          otherwise the dictionary is assumed to be an OrderedDict (Python 2.7+,
+          Python3 or param.external.OrderedDict) and the key ordering will be
+          preserved. Finally note that the '-' is added to the key if missing (to
+          make into a valid flag) to allow you to specify keywords in a dict
+          constructor ie. dict(key1=value1, key2=value2,....)""")
+
    analysis = param.ObjectSelector(default='default', 
-                                   objects=['default', 'TopoRunBatchAnalysis', 'custom'],
+                                   objects=['default', 'RunBatchAnalysis', 'custom'],
                                    constant=True, doc="""
-              The type of analysis to use with run_batch. The options are
-              'default' which runs the default run_batch analysis function,
-              'TopoRunBatchAnalysis' which use the more sophisticated picklable
-              analysis function and custom which requires the analysis callable
-              to be created in the run_batch namespace via the custom_prelude.""")
+              The type of analysis to use with run_batch. The options are 'default'
+              which runs the default run_batch analysis function,
+              'RunBatchAnalysis' which use the more sophisticated picklable
+              analysis function and custom which requires the analysis callable to be
+              created in the run_batch namespace via a -c option with
+              topo_flag_options""")
 
    analysis_arguments = param.List(default=[], doc='''
          The specifier keys to be consumed as analysis function arguments''')
-
-   custom_prelude = param.List(default=[], constant=True, doc="""
-          Lines of code to be executed prior run_batch invocation to introduce
-          any desired classes/object into the namespace. This must be used to
-          create the 'analysis' callable if a custom analysis option is selected.""")
 
    name_time_format = param.String(default='%Y%m%d%H%M', doc=""" 
          The timestamp format for directories created by run_batch in python
@@ -107,17 +127,16 @@ class TopoRunBatchCommand(TaskCommand):
    
    save_global_params = param.Boolean(default=True, doc="Equivalent to the run_batch parameter of same name.")
 
-   param_formatter = param.Callable(topo_param_formatter.instance(),doc="""
+   param_formatter = param.Callable(param_formatter.instance(),doc="""
         If None, defaults to normal run_batch formatting.""")
 
-   def __init__(self, tyfile, analysis='default', custom_prelude=[], **kwargs):
+   def __init__(self, tyfile, analysis='default', **kwargs):
 
-      if (analysis == 'custom') and (custom_prelude==[]):
-         raise Exception, 'Please specify custom_prelude to use custom analysis!'
+      if (analysis == 'custom') and ('-c' not in topo_flag_options):
+         raise Exception, 'Please use -c option to introduce custom analysis to namespace!'
 
       executable =  os.path.abspath(sys.argv[0])
-      super(TopoRunBatchCommand, self).__init__(analysis=analysis,
-                                                custom_prelude=custom_prelude,
+      super(RunBatchCommand, self).__init__(analysis=analysis,
                                                 executable=executable,
                                                 **kwargs)
 
@@ -125,12 +144,39 @@ class TopoRunBatchCommand(TaskCommand):
       assert os.path.exists(self.tyfile), "Tyfile doesn't exist! Cannot proceed."
 
       self._prelude = []
-      if self.analysis=='TopoRunBatchAnalysis':
-         self._prelude = ['from dispatch.topographica import TopoRunBatchAnalysis']
+      if self.analysis=='RunBatchAnalysis':
+         self._prelude = ['from dispatch.topographica import RunBatchAnalysis']
       if self.analysis=='default':
          self._prelude = ["analysis = default_analysis_function"] 
                
-      self._prelude = self.custom_prelude + self._prelude
+
+   def topo_args(self, switch_override=[]):
+      """ Method to generate Popen style argument list for Topographica using the
+      topo_switches and topo_flag_options parameters. Switches are returned first,
+      sorted alphanumerically.  The qsub_flag_options follow in keys() ordered if
+      not a vanilla Python dictionary (ie. a Python 2.7+ or param.external
+      OrderedDict). Otherwise the keys are sorted alphanumerically."""
+      
+      opt_dict = type(self.topo_flag_options)()
+      opt_dict.update(self.topo_flag_options)
+      
+      if type(self.topo_flag_options) == dict:   # Alphanumeric sort if vanilla Python dictionary
+            ordered_options = [(k, opt_dict[k]) for k in sorted(opt_dict)]
+      else:
+         ordered_options =  list(opt_dict.items())
+
+      # Unpack tuple values so flag:(v1, v2,...)) => ..., flag:v1, flag:v2, ...
+      unpacked_groups = [[(k,v) for v in val] if type(val)==tuple else [(k,val)] 
+                           for (k,val) in ordered_options]
+      unpacked_kvs = [el for group in unpacked_groups for el in group]
+
+      # Adds '-' if missing (eg, keywords in dict constructor) and flattens lists.
+      ordered_pairs = [(k,v) if (k[0]=='-') else ('-%s' % (k), v) for (k,v) in  unpacked_kvs]
+      ordered_options = [[k]+([v] if type(v) == str else v) for (k,v) in ordered_pairs]
+      flattened_options = [el for kvs in ordered_options for el in kvs]
+      switches =  [s for s in switch_override if (s not in self.topo_switches)] + self.topo_switches
+      return sorted(switches) + flattened_options
+
 
    def queue(self,tid, info):
       ''' Uses load_kwargs helper function in topo.command.misc to get the
@@ -139,13 +185,14 @@ class TopoRunBatchCommand(TaskCommand):
       spec_file_path = os.path.join(spec_path, 't%s.spec' % tid) 
       prelude = self._prelude[:]
       prelude += ["kwargs = load_kwargs('%s',globals(),locals())" % spec_file_path]
-      if self.analysis=='TopoRunBatchAnalysis':
-         prelude += ["analysis=TopoRunBatchAnalysis.load(%s)" % repr(info['root_directory'])]
+      if self.analysis=='RunBatchAnalysis':
+         prelude += ["analysis=RunBatchAnalysis.load(%s)" % repr(info['root_directory'])]
          prelude += ["analysis.current_tid = %s" % tid]
-         prelude += ["analysis.analysis_kwargs = dict(kwargs, times=kwargs.get('times',1.0))"]
+         prelude += ["analysis.analysis_kwargs = dict(kwargs)"]
 
       run_batch_cmd = "run_batch('%s',**kwargs)" % self.tyfile
-      return  [self.executable, '-a', '-c', ';'.join(prelude+[run_batch_cmd])]
+      topo_args = self.topo_args(['-a'])
+      return  [self.executable] + topo_args + ['-c', ';'.join(prelude+[run_batch_cmd])]
 
    def specify(self, spec, tid, info):
       ''' Writes the specification as a Python dictionary to file (to the
@@ -201,23 +248,23 @@ class TopoRunBatchCommand(TaskCommand):
       allopts = dict(spec,**kwarg_opts) # Override spec values if mistakenly included.
       
       prelude = self._prelude[:]
-      if self.analysis=='TopoRunBatchAnalysis':
-         prelude += ["analysis=TopoRunBatchAnalysis.load(%s)" % repr(info['root_directory'])]
+      if self.analysis=='RunBatchAnalysis':
+         prelude += ["analysis=RunBatchAnalysis.load(%s)" % repr(info['root_directory'])]
          prelude += ["analysis.current_tid = %s" % tid]
          analysis_kwargs = ["'%s':%s" % (k,v) for (k,v) in allopts.items() 
                             if k in self.analysis_arguments]
-         if 'times' not in allopts:  analysis_kwargs += ["'times':1.0"]
          prelude += ["analysis.analysis_kwargs = {%s}" % ', '.join(analysis_kwargs)]
             
 
       keywords = ', '.join(['%s=%s' % (k,allopts[k]) for k in
                             sorted(kwarg_opts.keys())+sorted(spec.keys())])
       run_batch_list = prelude + ["run_batch(%s,%s)" % (repr(self.tyfile), keywords)]
-      return  [self.executable, '-a', '-c',  '; '.join(run_batch_list)]
+      topo_args = self.topo_args(['-a'])
+      return  [self.executable] + topo_args + ['-c',  '; '.join(run_batch_list)]
 
 
 
-class TopoRunBatchAnalysis(param.Parameterized):
+class RunBatchAnalysis(param.Parameterized):
    """ This analysis class is a generalization of the normal analysis functions
    use in Topographica's run_batch command. It allows you to factor out and
    document steps in your analysis, offers a standard mechanism to collate data
@@ -250,6 +297,14 @@ class TopoRunBatchAnalysis(param.Parameterized):
    defined. Note that this class is a callable (no arguments) as it is designed
    to interface with run_batch like a normal analysis function.
    """
+
+   @classmethod
+   def analysis_dir(cls):
+      """ A helper method pointing to where the analysis function (map functions
+      specifically) is executing. For use in analysis functions written by the
+      user. Typically used to output custom files (ie. non-plotgroup) to the appropriate
+      directory."""
+      return param.normalize_path.prefix
 
    current_tid = param.Integer(default=None, allow_None=True, doc='''
          The task identifier for the current task. This needs to be set in the
@@ -374,11 +429,7 @@ class TopoRunBatchAnalysis(param.Parameterized):
           The pickles for map-reductions are stored in the root_directory under
           a subdirectory of the supplied map function name. The metric pickles
           are stored in the metrics folder of the root directory as required by
-          all TaskLaunchers.'''
-
-      times = self.analysis_kwargs['times']
-      if not isinstance(times, list):
-         times=[t*times for t in [0,50,100,500,1000,2000,3000,4000,5000,10000]]
+          all Launchers.'''
 
       if self.source_path is None:
          print "Source path was not set! Running default analysis function instead."
@@ -449,7 +500,7 @@ class TopoRunBatchAnalysis(param.Parameterized):
          red_str='(%s)'% ' ,'.join(info['reduce_args'])
          strList += ["%(map_fn)s%(map_str)s => %(reduce_fn)s%(red_str)s\n\t%(description)s" 
                      % dict(info, map_str=map_str, red_str=red_str)]
-      if strList == []: strList = ['Default TopoRunBatchAnalysis']
+      if strList == []: strList = ['Default RunBatchAnalysis']
       if self.metric is not None: strList += ['Metric function %(metric_fn)s' % self.metric]
       if len(self.map_reduces) > 1:
          reduction_chain = "(..) -> ".join([map_red['reduce_fn'] for map_red in self.map_reduces])
@@ -460,21 +511,21 @@ class TopoRunBatchAnalysis(param.Parameterized):
 # Launch Decorator #
 ####################
 
-class topo_batch_analysis(review_and_launch):
+class launch_batch_analysis(review_and_launch):
    ''' Decorator designed to codify the correct workflow for using Topographica
     with run_batch. It coordinates the settings of the task launcher and the
-    analysis object ensuring that a TopoRunBatchAnalysis is being used correctly
-    with a TopoRunBatchCommand object. 
+    analysis object ensuring that a RunBatchAnalysis is being used correctly
+    with a RunBatchCommand object. 
 
-    In order to ensure the pickled TopoRunBatchAnalysis object is in the
+    In order to ensure the pickled RunBatchAnalysis object is in the
     appropriate root directory, this decorator takes the current timestamp to
     determine the root directory before launch.
      '''
 
    def review_analysis(self, task_launcher, task_command, batch_analysis):
       
-      if not isinstance(task_command,TopoRunBatchCommand):
-         print "Command object must be a TopoRunBatchCommand. Cannot continue."
+      if not isinstance(task_command,RunBatchCommand):
+         print "Command object must be a RunBatchCommand. Cannot continue."
          
       print "\n" + self.section('Batch Analysis')
       print "Source path: %s" % self.script_path
@@ -497,7 +548,9 @@ class topo_batch_analysis(review_and_launch):
       batch_analysis.root_directory = root_directory
       batch_analysis.source_path = self.script_path
       batch_analysis.save()
-      task_launcher.exit_callable = TopoRunBatchAnalysis.reduce_batch(root_directory)
+      task_launcher.timestamp = timestamp
+      if batch_analysis.map_reduces != []:
+         task_launcher.exit_callable = RunBatchAnalysis.reduce_batch(root_directory)
         
    def __call__(self,f):
 
@@ -512,21 +565,21 @@ class topo_batch_analysis(review_and_launch):
          return_value = f() 
          try:  (task_launcher, batch_analysis) = return_value
          except: 
-            print "Function must return a tuple (TaskLauncher, batch_analysis)"; return
+            print "Function must return a tuple (Launcher, batch_analysis)"; return
 
-         if not isinstance(task_launcher, TaskLauncher): 
+         if not isinstance(task_launcher, Launcher): 
             print "First element of returned tuple is not a Tasklauncher."; return
 
-         if not isinstance(batch_analysis, TopoRunBatchAnalysis): 
-            print "Second element of returned tuple if not a TopoRunBatchAnalysis object"; return
+         if not isinstance(batch_analysis, RunBatchAnalysis): 
+            print "Second element of returned tuple if not a RunBatchAnalysis object"; return
 
-         if not isinstance(task_launcher.task_command, TopoRunBatchCommand):
-            print "TaskCommand specified in the launcher is not a TopoRunBatchCommand object."; return
+         if not isinstance(task_launcher.task_command, RunBatchCommand):
+            print "TaskCommand specified in the launcher is not a RunBatchCommand object."; return
 
-         if not (task_launcher.task_command.analysis =='TopoRunBatchAnalysis'):
-            print "TaskCommand must be using the 'TopoRunBatchAnalysis' analysis type"; return
+         if not (task_launcher.task_command.analysis =='RunBatchAnalysis'):
+            print "TaskCommand must be using the 'RunBatchAnalysis' analysis type"; return
 
-          # Finding and setting the script path (needed for TaskLauncher that use the commandline)
+          # Finding and setting the script path (needed for Launcher that use the commandline)
          self.script_path = os.path.join(os.getcwd(), sys.argv[-1])
          if not os.path.exists(self.script_path):
             print "Cannot extract script path: %s" % self.script_path; sys.exit()
