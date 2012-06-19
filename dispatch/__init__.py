@@ -468,7 +468,7 @@ class DynamicConcatenate(TaskSpecifier):
         if (self.first.dynamic and not self._exhausted): self.first.update(data)
         elif (self.second.dynamic and self._first_sent): self.second.update(data)
 
-    def next_(self):
+    def next(self):
         if self._first_cached is None:
             try:  return next(self.first)
             except StopIteration:

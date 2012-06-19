@@ -7,6 +7,26 @@ import param
 import os, sys, json
 from dispatch import TaskCommand
 
+
+# IDEA:
+
+# spec.kwargs(review=False, log_path=None, info_path=None)
+
+# for kwargs in spec.kwargs():
+#    result = func(**kwargs)
+#    spec.update(result)
+
+# This method flattens, performs eval step. Optional review and log/info files output
+# If eval fails for a string, warn and return string
+
+# Returns a generator - allows dynamic specifiers. Ie. use yield The
+# generator caches result of self.next() , returns the elements one by
+# one till empty then calls till StopIteration.
+
+# def tokwargs(spec):
+#     return (dict([(k,eval(v)) for (k,v) in el.items()]) for grp in spec for el in grp)
+
+
 class SimplePyScriptCommand(TaskCommand):
    """ A very simple way to invoke a Python script and pass it some
    arguments. The order in which the arguments are passed in can
@@ -14,7 +34,7 @@ class SimplePyScriptCommand(TaskCommand):
    first.
 
    0,       1,      2,     3...
-   Script, tid, root_dir, 
+   Script, tid, root_dir,
    Also: tid_arg_first, root_path_second
    """
 
@@ -28,11 +48,11 @@ class SimplePyScriptCommand(TaskCommand):
 
    def __init__(self, script_path, argorder=[]):
       script_path = os.path.abspath(script_path)
-      super(SimplePyScriptCommand, self).__init__(script_path=script_path, 
+      super(SimplePyScriptCommand, self).__init__(script_path=script_path,
                                                  argorder=argorder)
 
-   def __call__(self, spec, tid=None, info={}): 
-      prefix = ['python', self.script_path, 
+   def __call__(self, spec, tid=None, info={}):
+      prefix = ['python', self.script_path,
                 str(tid), param.normalize_path(info['root_directory'])]
 
       if self.argorder == []:  return prefix + spec.values()
