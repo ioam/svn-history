@@ -8,7 +8,7 @@ import topo
 from dispatch import QLauncher, Launcher, Spec, LinearSpecs, ListSpecs
 from dispatch.topographica import RunBatchAnalysis, RunBatchCommand, launch_batch_analysis
 
-CLUSTER = False
+CLUSTER = True#False
 if CLUSTER:  
     Launcher = QLauncher
     batch_name = 'topo_analysis_cluster'
@@ -117,7 +117,6 @@ def advanced():
 
     # Launcher
     tasklauncher = Launcher(batch_name,combined_spec,run_batch_command)
-    tasklauncher.print_info = 'stdout'
     # tasklauncher.timestamp_format = None
 
     # Analysis
