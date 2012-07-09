@@ -546,20 +546,23 @@ def save_movie():
     movie.save()
     
 def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
+    print 'Start'
     lgn_on_proj = topo.sim[sheet_name].in_connections[0]
     lgn_off_proj = topo.sim[sheet_name].in_connections[1]
     
     rand =numbergen.UniformRandom(seed=513)
     
     rows, cols = lgn_on_proj.cfs.shape
+    print 'For'
     for r in xrange(rows):
         for c in xrange(cols):
             cf_on = lgn_on_proj.cfs[r, c]
             cf_off = lgn_off_proj.cfs[r, c]
             
-            cf_on._has_norm_total = False
-            cf_off._has_norm_total = False
-
+            #cf_on._has_norm_total = False
+            #cf_off._has_norm_total = False
+	    del cf_on.norm_total
+	    del cf_off.norm_total
             ra = rand()
             
             ra = (ra-0.5)*2.0 * prob
@@ -571,7 +574,7 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
             
             #cf_on.weights*=a 
             #cf_off.weights*=(1-a)
-            
+    print 'End'            
 
 import topo.transferfn
 ActivityHysteresis = topo.transferfn.Hysteresis

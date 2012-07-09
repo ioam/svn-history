@@ -27,10 +27,10 @@ from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
 topo.sim.name = "cclissom_push_pull"
 #### Set up retinal inputs
 
-image_filenames=["images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
+image_filenames=["topographica/images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
 inputs=[topo.pattern.image.FileImage(filename=f,
 	            size=10.0,  #size_normalization='original',(size=10.0)
-	            x=0,y=0,scale=0.55,orientation=0)
+	            x=0,y=0,scale=__main__.__dict__.get('ImageScale',0.55),orientation=0)
         for f in image_filenames]
 
 input = Jitterer(generator=topo.pattern.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=15,jitter_magnitude=0.4)
@@ -66,6 +66,8 @@ CFProjection.cf_shape=topo.pattern.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
+SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
+
 
 # Set up transfer function and homeostatic mechanisms
 V1Simple_OF = SimpleHomeoLinear(t_init=0.35,alpha=3,mu=__main__.__dict__.get('MUE',0.003),eta=__main__.__dict__.get('SETAE',0.002))
@@ -196,18 +198,30 @@ topo.sim.connect('V1Simple','V1SimpleInh',delay=0.025,
                  nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=__main__.__dict__.get('SEIlr',0.1))
 
 
-topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,
+if __main__.__dict__.get('AHRule',False):
+    topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SIEStr',-0.5),name='V1SimpleInhToExc',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
                  nominal_bounds_template=BoundingBox(radius=0.3),
                  learning_fn = CFPLF_KeyserRule("V1Simple",['V1SimpleInhToExc']),learning_rate=__main__.__dict__.get('SIElr',0.1))
 
 
-topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,
+    topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SIIStr',-0.5),name='V1SimpleInhToInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
                  nominal_bounds_template=BoundingBox(radius=0.3),
                  learning_fn = CFPLF_KeyserRule("V1SimpleInh",['V1SimpleInhToInh']),learning_rate=__main__.__dict__.get('SIIlr',0.1))
+else:	
+    topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,
+                 connection_type=CFProjection,strength=__main__.__dict__.get('SIEStr',-0.5),name='V1SimpleInhToExc',
+                 weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
+                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=__main__.__dict__.get('SIElr',0.1))
+
+
+    topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,
+                 connection_type=CFProjection,strength=__main__.__dict__.get('SIIStr',-0.5),name='V1SimpleInhToInh',
+                 weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
+                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=__main__.__dict__.get('SIIlr',0.1))
 
 
 #Layer 2/3
@@ -245,14 +259,15 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.025,name='LateralInhibitory',
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value=0.2,time_constant=8000))))
 
-topo.sim.schedule_command(5000,"secondStage()")
+topo.sim.schedule_command(__main__.__dict__.get('SS',5000),"secondStage()")
 
 def secondStage():
+    print 'Strarting second stage'
     topo.sim.connect('Retina','LGNOn',delay=0.05,
                     connection_type=SharedWeightCFProjection,strength=7.0,
                     nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOnAfferent3',
                     weights_generator=on_weights)
-    
+
     topo.sim.connect('Retina','LGNOff',delay = 0.05,
                     connection_type=SharedWeightCFProjection,strength=7.0,
                     nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOffAfferent4',
@@ -262,38 +277,14 @@ def secondStage():
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
     randomize_V1Simple_relative_LGN_strength(prob=0.5)
-
+    print 'Finished second stage'
 
 # change the default parameters of the measuring commands to obtain better quality and match the paper
 from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand,FeatureCurveCommand
 FeatureMaps.num_orientation=16
 MeasureResponseCommand.scale=3.0
 MeasureResponseCommand.duration=4.0
+SinusoidalMeasureResponseCommand.duration=16.0
 FeatureCurveCommand.num_orientation=20
 FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":90}]
-
-
-# model exploration
-#import contrib.JanA.modelparametrization
-parameters = [ "topo.sim[\"V1Simple\"].projections()[\"V1SimpleExcToExc\"].strength",
-               "topo.sim[\"V1Simple\"].projections()[\"V1SimpleInhToExc\"].strength",
-               "topo.sim[\"V1Simple\"].projections()[\"V1SimpleFeedback\"].strength",
-               "topo.sim[\"V1SimpleInh\"].projections()[\"V1SimpleExcToInh\"].strength",
-               "topo.sim[\"V1SimpleInh\"].projections()[\"V1SimpleInhToInh\"].strength",
-               "topo.sim[\"V1SimpleInh\"].projections()[\"V1SimpleInhFeedback\"].strength",
-               "topo.sim[\"V1Complex\"].projections()[\"V1SimpleAfferent\"].strength",
-             ]   
-             
-parameter_values = [ [1.0],
-                     [-5.3,-5.2,-5.1,-5.4,-5.5],
-                     [0.15,0.14,0.16],
-                     [0.7],
-                     [-5.6,-5.5,-5.7,-5.8,-5.4],
-                     [0.2],
-                     [2.5,3.0,3.5,4.0],
-                   ]
-import contrib.JanA.modelparametrization
-
-#contrib.JanA.modelparametrization.explore_initial_activity(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex","V1Complex"],None,"FakeRetina",0,4.0,'Activities')
-contrib.JanA.modelparametrization.ModelParametrization.set_parameters(parameters,[1.0,-5.3,0.14,0.7,-5.7,0.2,3.5])
 

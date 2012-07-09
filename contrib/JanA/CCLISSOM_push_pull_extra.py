@@ -252,19 +252,21 @@ class CFPLF_KeyserRule(CFPLearningFn):
         for cf,i in iterator():
             
             # Anti-hebbian part
-            cf.weights -= single_connection_learning_rate * output_activity.flat[i] * cf.get_input_matrix(input_activity)
+            if output_activity.flat[i] != 0:
+                cf.weights -= single_connection_learning_rate * output_activity.flat[i] * cf.get_input_matrix(input_activity)
+            
             # inhibition part
-            cf.weights += single_connection_learning_rate * inhibition.flat[i] * cf.get_input_matrix(input_activity)
+            if inhibition.flat[i] != 0:
+                cf.weights += single_connection_learning_rate * inhibition.flat[i] * cf.get_input_matrix(input_activity)
 	    cf.weights *= cf.mask                
     	    
-    	    if(z == i):
+    	    if True and (i == z):
     	        print 'Z ' + str(z) 
     	        print single_connection_learning_rate
     	        print output_activity.flat[i] 
     		print single_connection_learning_rate * output_activity.flat[i] 
-    		print single_connection_learning_rate  
     		print numpy.max(cf.get_input_matrix(input_activity))
-    		print numpy.max(inhibition)
+    		print numpy.max(inhibition.flat[i])
     		print numpy.max(cf.weights)
     	        print numpy.max(single_connection_learning_rate * output_activity.flat[i] * cf.get_input_matrix(input_activity))
-    	        print numpy.max(single_connection_learning_rate * inhibition * cf.get_input_matrix(input_activity))
+    	        print numpy.max(single_connection_learning_rate * inhibition.flat[i] * cf.get_input_matrix(input_activity))
