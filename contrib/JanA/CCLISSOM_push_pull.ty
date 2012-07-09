@@ -189,13 +189,13 @@ topo.sim.connect('LGNOff','V1SimpleInh',delay=0.025,dest_port=('Activity','Joint
 topo.sim.connect('V1Simple','V1Simple',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SEEStr',0.5),name='V1SimpleExcToExc',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.5),
-                 nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=__main__.__dict__.get('SEElr',0.1))
+                 nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=__main__.__dict__.get('SEElr',10.1))
 
 
 topo.sim.connect('V1Simple','V1SimpleInh',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SEIStr',1.0),name='V1SimpleExcToInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.5),
-                 nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=__main__.__dict__.get('SEIlr',0.1))
+                 nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=__main__.__dict__.get('SEIlr',10.1))
 
 
 if __main__.__dict__.get('AHRule',False):

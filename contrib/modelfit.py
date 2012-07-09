@@ -12,7 +12,6 @@ from topo.transferfn.misc import HalfRectify
 from topo.transferfn import PiecewiseLinear, DivisiveNormalizeL1, IdentityTF, ActivityAveragingTF, Sigmoid
 from topo.base.cf import CFSheet
 from topo.projection import CFProjection, SharedWeightCFProjection
-from fixedpoint import FixedPoint
 import topo
 
 from topo.sheet import GeneratorSheet 

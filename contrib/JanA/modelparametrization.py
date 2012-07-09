@@ -1,5 +1,5 @@
 import matplotlib.gridspec as gridspec
-from topo.command.basic import wipe_out_activity, clear_event_queue
+from topo.command import  wipe_out_activity, clear_event_queue
 import topo 
 import pylab
 
