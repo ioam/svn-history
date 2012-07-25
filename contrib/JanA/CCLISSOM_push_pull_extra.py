@@ -11,8 +11,6 @@ from topo.pattern import Selector, Null
 from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.base.arrayutil import clip_lower
 
-
-
 class Jitterer(PatternGenerator):
     """
     PatternGenerator that moves another PatternGenerator over time.
@@ -239,7 +237,7 @@ class CFPLF_KeyserRule(CFPLearningFn):
         if single_connection_learning_rate==0:
             return
 	
-	z = numpy.argmax(output_activity)
+        z = numpy.argmax(output_activity)
 
 
         #calculate overall incomming inhibition
@@ -258,15 +256,101 @@ class CFPLF_KeyserRule(CFPLearningFn):
             # inhibition part
             if inhibition.flat[i] != 0:
                 cf.weights += single_connection_learning_rate * inhibition.flat[i] * cf.get_input_matrix(input_activity)
-	    cf.weights *= cf.mask                
-    	    
-    	    if True and (i == z):
-    	        print 'Z ' + str(z) 
-    	        print single_connection_learning_rate
-    	        print output_activity.flat[i] 
-    		print single_connection_learning_rate * output_activity.flat[i] 
-    		print numpy.max(cf.get_input_matrix(input_activity))
-    		print numpy.max(inhibition.flat[i])
-    		print numpy.max(cf.weights)
-    	        print numpy.max(single_connection_learning_rate * output_activity.flat[i] * cf.get_input_matrix(input_activity))
-    	        print numpy.max(single_connection_learning_rate * inhibition.flat[i] * cf.get_input_matrix(input_activity))
+            
+            cf.weights *= (cf.weights>0) * cf.mask
+
+def rad_to_complex(vector):
+    """
+    Converts a vector/matrix of angles (0,2*pi) to vector/matrix of complex numbers (that will lie on the unit circle)
+    """
+    return numpy.cos(vector)+1j*numpy.sin(vector)
+    
+
+def angle_two_pi(array):
+    """
+    returns angles of complex numbers in array but in (0,2*pi) interval unlike numpy.angle the returns it in (-pi,pi)
+    """
+    return (numpy.angle(array)+ 4*numpy.pi) % (numpy.pi*2)
+    
+
+def circ_mean(matrix,weights=None,axis=None,low=0,high=numpy.pi*2,normalize=False):
+    """
+    Circular mean of matrix. Weighted if weights are not none.
+    
+    matrix   - 2d ndarray of data. Mean will be computed for each column.
+    weights  - if not none, a vector of the same length as number of matrix rows.
+    low,high - the min and max values that will be mapped onto the periodic interval of (0,2pi)
+    axis     - axis along which to compute the circular mean. default = 1
+    normalize - if True weights will be normalized along axis. If any weights that are to be jointly normalized are all zero they will be kept zero!
+    
+    return (angle,length)  - where angle is the circular mean, and len is the length of the resulting mean vector
+    """
+    
+    # check whether matrix and weights are ndarrays
+    if not isinstance(matrix,numpy.ndarray):
+       logger.error("circ_mean: array not type ndarray ") 
+       raise TypeError("circ_mean: array not type ndarray ") 
+
+    if weights!= None and not isinstance(weights,numpy.ndarray):
+       logger.error("circ_mean: weights not type ndarray ") 
+       raise TypeError("circ_mean: weights not type ndarray ") 
+    
+    # convert the periodic matrix to corresponding complex numbers
+    
+    m = rad_to_complex((matrix - low)/(high-low) * numpy.pi*2)
+    
+    if axis == None:
+       axis == 1
+    
+    # normalize weights
+    if normalize:
+       row_sums = numpy.sum(numpy.abs(weights),axis=axis)
+       row_sums[numpy.where(row_sums == 0)] = 1.0
+       weights = weights / row_sums[:, numpy.newaxis]
+       
+           
+    if weights == None:
+       m  = numpy.mean(m,axis=axis) 
+    else:
+       z = m*weights
+       m = numpy.mean(z,axis=axis) 
+        
+    return ((angle_two_pi(m) / (numpy.pi*2))*(high-low) + low, abs(m))
+    
+
+def analyse_push_pull_connectivity():
+    _analyse_push_pull_connectivity('V1Simple','V1SimpleExcToExc')
+    _analyse_push_pull_connectivity('V1Simple','V1SimpleInhToExc')
+    _analyse_push_pull_connectivity('V1Complex','LateralExcitatory')
+
+def _analyse_push_pull_connectivity(sheet_name,proj_name):
+    """
+    It assumes orientation preference was already measured.
+    """
+    ExcToExc = topo.sim[sheet_name].projections()[proj_name]
+    or_pref = topo.sim[sheet_name].sheet_views['OrientationPreference'].view()[0]
+    
+    cm  = []
+    for cf in ExcToExc.cfs.flatten():
+        # lets do this only for full connections fields
+        assert numpy.shape(cf.weights*cf.mask*cf.input_sheet_slice.submatrix(or_pref)) == numpy.shape(cf.weights)
+        
+        ors = cf.input_sheet_slice.submatrix(or_pref).flatten()
+        weights = cf.weights*cf.mask
+        z = circ_mean(numpy.array([ors]),weights=numpy.array([weights.flatten()]),axis=1,low=0.0,high=1.0,normalize=False)
+        cm.append(z[0])
+    
+
+    import pylab
+    pylab.figure()
+    pylab.subplot(2,1,1)
+    pylab.plot(numpy.array(cm),or_pref.flatten(),'ro')
+    pylab.subplot(2,1,2)
+    pylab.hist(or_pref.flatten())
+    from param import normalize_path
+    pylab.savefig(normalize_path('PPconnectivity: ' + sheet_name + '|' + proj_name));
+    
+    
+    
+    
+    
