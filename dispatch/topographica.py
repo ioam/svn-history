@@ -1,7 +1,8 @@
 import os, sys, re, pickle, imp, shutil, time, inspect
+from collections import defaultdict
 import topo
 import param
-from dispatch import TaskCommand
+from dispatch import CommandTemplate
 from dispatch import Launcher
 from dispatch import review_and_launch
 
@@ -59,7 +60,7 @@ class param_formatter(param.ParameterizedFunction):
       return self.separator.join(['%s=%s' % (k, v[:self.truncation_limit]) for (k,v) in abbreved])
 
 
-class RunBatchCommand(TaskCommand):
+class RunBatchCommand(CommandTemplate):
    """ RunBatchCommand is designed to to format task specifications into
        Topographica run_batch tasks in a way that should be flexible enough to
        be used generally. Note that Topographica is invoked with the -a flag so
@@ -67,7 +68,7 @@ class RunBatchCommand(TaskCommand):
 
        Though some of the parameters required appear to duplicate those in
        run_batch, they are necessary to ensure some basic consistency in the use
-       of run_batch between tasks. This TaskCommand class constrains -all- the
+       of run_batch between tasks. This CommandTemplate class constrains -all- the
        options for run_batch with the exception of 'times' which is free to vary
        as part of the task specification. This is allowed as you may wish to
        change the times at which the analysis function is invoked across
@@ -256,12 +257,11 @@ class RunBatchCommand(TaskCommand):
          prelude += ["analysis.analysis_kwargs = {%s}" % ', '.join(analysis_kwargs)]
 
 
-      keywords = ', '.join(['%s=%s' % (k,allopts[k]) for k in
+      keywords = ', '.join(['%s=%s' % (k,allopts[k]) for k in  # Was %s
                             sorted(kwarg_opts.keys())+sorted(spec.keys())])
       run_batch_list = prelude + ["run_batch(%s,%s)" % (repr(self.tyfile), keywords)]
       topo_args = self.topo_args(['-a'])
       return  [self.executable] + topo_args + ['-c',  '; '.join(run_batch_list)]
-
 
 
 class RunBatchAnalysis(param.Parameterized):
@@ -331,16 +331,20 @@ class RunBatchAnalysis(param.Parameterized):
 
    @classmethod
    def reduce_batch(cls, root_directory):
-      ''' Classmethod used to load the analysis object then apply all reductions.
-          Loads the analysisfn.pickle file from the specified root directory.'''
+      '''
+      Classmethod used to load the analysis object then apply all reductions.
+      Loads the analysisfn.pickle file from the specified root directory.
+      '''
       path = os.path.join(root_directory, 'analysisfn.pickle')
       with open(path,'rb') as p:
          analysis_obj = pickle.load(p)
          return analysis_obj.reduce
 
    def __init__(self):
-      self.source_path = None; self.root_directory = None
-      self.maps = []; self.map_reduces = []; self.metric = None
+      self.source_path = None
+      self.root_directory = None
+      self.maps = []; self.map_reduces = []
+      self.metric = None
       self.analysis_arguments = set([])
 
    def save(self):
@@ -419,18 +423,17 @@ class RunBatchAnalysis(param.Parameterized):
          self.metricfn = getattr(module, metric['metric_fn'])
 
    def __call__(self):
-      ''' The call that occurs in run_batch. Calls all the defined map
-          functions, pickles the data returned from the map component of
-          map-reductions and computes and pickles the metric. The pickled data
-          is a tuple that includes the topographica simulation time at which the
-          data was generated as run_batch typically applies the analysis
-          functions at multiple simulation times.
+      '''
+      The call that occurs in run_batch. Calls all the defined map functions, pickles
+      the data returned from the map component of map-reductions and computes and
+      pickles the metric. The pickled data is a tuple that includes the topographica
+      simulation time at which the data was generated as run_batch typically applies
+      the analysis functions at multiple simulation times.
 
-          The pickles for map-reductions are stored in the root_directory under
-          a subdirectory of the supplied map function name. The metric pickles
-          are stored in the metrics folder of the root directory as required by
-          all Launchers.'''
-
+      The pickles for map-reductions are stored in the root_directory under a
+      subdirectory of the supplied map function name. The metric pickles are stored
+      in the metrics folder of the root directory as required by all Launchers.
+      '''
       if self.source_path is None:
          print "Source path was not set! Running default analysis function instead."
          topo.command.default_analysis_function(); return
@@ -453,11 +456,14 @@ class RunBatchAnalysis(param.Parameterized):
 
 
    def reduce(self, spec_log, root_directory):
-      ''' Method to apply all defined map-reduces. For each map function, locates all
+      '''
+      Method to apply all defined map-reduces. For each map function, locates all
       the pickles in the corresponding subfolder and matches the stored data to the
       tid in the filename. The data, Topographica simulation times and corresponding
-      tids are extracted and passed on to the appropriate reduce function.'''
-
+      tids are extracted and passed on to the appropriate reduce function.
+      '''
+      # NOTE: root_directory argument redundant!
+      param.normalize_path.prefix = self.root_directory
       reduces = [map_red['reduce_fn'] for map_red in self.map_reduces]
       reduce_maps = [map_red['map_fn'] for map_red in self.map_reduces]
 
@@ -469,25 +475,26 @@ class RunBatchAnalysis(param.Parameterized):
 
       previous_reduction = None
       for (map_name, reducefn) in reduce_mapping:
+         ddict = defaultdict(list)
          path = os.path.join(root_directory, map_name)
          if not os.path.isdir(path):
             previous_reduction = reducefn([root_directory, spec_log], None, previous_reduction)
             continue
          tid_pattern = map_name + '.*\[(?P<tid>\d+)\]'
          regexp_matches = [(cf, re.match(tid_pattern,cf)) for cf in os.listdir(path)]
-         tid_matches = [(cf, int(m.groupdict()['tid'])) for (cf,m) in regexp_matches if (m is not None)]
-         matches, tids = zip(*tid_matches)
-         pickle_paths = [os.path.join(root_directory, map_name, f) for f in matches]
-         unpickled = [pickle.load(open(p,'rb')) for p in pickle_paths]
-
+         tid_matches = [(int(m.groupdict()['tid']),  cf) for (cf,m) in regexp_matches if (m is not None)]
+         for (tid, match) in tid_matches: ddict[tid].append(match)
          specDict = dict(spec_log)
-         specs=[]; topo_times=[]; map_data =[]
-         for (tid, (topo_time, datum)) in zip(tids, unpickled):
-            specs.append(dict(specDict[tid], tid=tid, time=topo_time))
-            topo_times.append(topo_time)
-            map_data.append(datum)
+         specs=[]; map_data =[]
+         for tid in sorted(ddict.keys()):
+            matches = ddict[tid]
+            pickle_paths = [os.path.join(root_directory, map_name, f) for f in matches]
+            unpickled = [pickle.load(open(p,'rb')) for p in pickle_paths]
+            for (topo_time, datum) in sorted(unpickled, key=lambda tp: tp[0]):
+               specs.append(dict(specDict[tid], tid=tid, time=float(topo_time)))
+               map_data.append(datum)
 
-         previous_reduction = reducefn([root_directory, specs], map_data, previous_reduction)
+         previous_reduction = reducefn(specs, map_data, previous_reduction)
 
    def __str__(self):
       ''' The printed representation of the analysis object. '''
@@ -522,87 +529,82 @@ class launch_batch_analysis(review_and_launch):
     determine the root directory before launch.
      '''
 
-   def review_analysis(self, task_launcher, task_command, batch_analysis):
-
-      if not isinstance(task_command,RunBatchCommand):
-         print "Command object must be a RunBatchCommand. Cannot continue."
-
+   def review_analysis(self, task_launcher, batch_analysis):
       print "\n" + self.section('Batch Analysis')
       print "Source path: %s" % self.script_path
       print "Analysis Info:\n%s\n" %  batch_analysis
 
-      task_specifier = task_launcher.task_specifier
+   def setup_analysis(self, task_launcher, command_template, batch_analysis):
+      '''
+      Takes the current timestamp, uses it to determine the root directory,
+      configures the analysis object appropriately, saved it and finally sets
+      up the launcher's exit callable.
+      '''
+
+      arg_specifier = task_launcher.arg_specifier
       analysis_arguments = batch_analysis.analysis_arguments
-      specifier_keys = set(task_specifier.varying_keys()+task_specifier.constant_keys())
+      specifier_keys = set(arg_specifier.varying_keys()+arg_specifier.constant_keys())
       if not (analysis_arguments <= specifier_keys):
          clashes = analysis_arguments - specifier_keys
          raise Exception("Analysis keys %s not set in the specifier" % list(clashes))
-      task_command.analysis_arguments = list(analysis_arguments)
+      command_template.analysis_arguments = list(analysis_arguments)
 
-   def setup_analysis(self, task_launcher, batch_analysis):
-      ''' Takes the current timestamp, uses it to determine the root directory,
-      configures the analysis object appropriately, saved it and finally sets
-      up the launcher's exit callable. '''
-      timestamp = tuple(time.localtime())
-      root_directory = param.normalize_path(task_launcher.root_directory_name(timestamp))
+      root_directory = param.normalize_path(task_launcher.root_directory_name())
       batch_analysis.root_directory = root_directory
       batch_analysis.source_path = self.script_path
       batch_analysis.save()
-      task_launcher.timestamp = timestamp
       if batch_analysis.map_reduces != []:
          task_launcher.exit_callable = RunBatchAnalysis.reduce_batch(root_directory)
 
    def __call__(self,f):
 
       if f.__module__ == '__main__':
+         if self.launcher_class.resume_launch(): return None
+      else: return None
 
-         commandline_used = self.launcher_class.commandline(sys.argv)
-         if commandline_used: sys.exit()
+      # Must be set in __main__ only and not on import of user-define analysis functions.
+      param.normalize_path.prefix = self.output_directory
 
-         # Must be set in __main__ only and not on import of user-define analysis functions.
-         param.normalize_path.prefix = self.output_directory
+      return_value = f()
+      try:  (task_launcher, batch_analysis) = return_value
+      except:
+         print "Function must return a tuple (Launcher, batch_analysis)"; return
 
-         return_value = f()
-         try:  (task_launcher, batch_analysis) = return_value
-         except:
-            print "Function must return a tuple (Launcher, batch_analysis)"; return
+      if not isinstance(task_launcher, Launcher):
+         print "First element of returned tuple is not a Tasklauncher."; return
 
-         if not isinstance(task_launcher, Launcher):
-            print "First element of returned tuple is not a Tasklauncher."; return
+      if not isinstance(batch_analysis, RunBatchAnalysis):
+         print "Second element of returned tuple if not a RunBatchAnalysis object"; return
 
-         if not isinstance(batch_analysis, RunBatchAnalysis):
-            print "Second element of returned tuple if not a RunBatchAnalysis object"; return
+      if not isinstance(task_launcher.command_template, RunBatchCommand):
+         print "CommandTemplate specified in the launcher is not a RunBatchCommand object."; return
 
-         if not isinstance(task_launcher.task_command, RunBatchCommand):
-            print "TaskCommand specified in the launcher is not a RunBatchCommand object."; return
+      if not (task_launcher.command_template.analysis =='RunBatchAnalysis'):
+         print "CommandTemplate must be using the 'RunBatchAnalysis' analysis type"; return
 
-         if not (task_launcher.task_command.analysis =='RunBatchAnalysis'):
-            print "TaskCommand must be using the 'RunBatchAnalysis' analysis type"; return
+      # Finding and setting the script path (needed for Launcher that use the commandline)
+      self.script_path = os.path.join(os.getcwd(), sys.argv[-1])
+      if not os.path.exists(self.script_path):
+         print "Cannot extract script path: %s" % self.script_path; sys.exit()
 
-          # Finding and setting the script path (needed for Launcher that use the commandline)
-         self.script_path = os.path.join(os.getcwd(), sys.argv[-1])
-         if not os.path.exists(self.script_path):
-            print "Cannot extract script path: %s" % self.script_path; sys.exit()
+      task_launcher.script_path = self.script_path
+      command_template = task_launcher.command_template
 
-         task_launcher.script_path = self.script_path
+      if self.review:
+         arg_specifier = task_launcher.arg_specifier
+         try: self.review_analysis(task_launcher, batch_analysis)
+         except AssertionError: return
 
-         if self.review:
-            task_specifier = task_launcher.task_specifier
-            task_command = task_launcher.task_command
+         self.review_task_launcher(task_launcher,command_template)
 
-            try: self.review_analysis(task_launcher, task_command, batch_analysis)
-            except AssertionError: return
-
-            self.review_task_launcher(task_launcher,task_command)
-
-            if self.review_task_specification(task_specifier) and \
-              self.review_task_command(task_command, task_specifier, task_launcher) and \
-              (self.input_options(['y','N'], 'Execute?', default='n') == 'y'):
-                print("\n*Dispatching %s ...*" % task_launcher.batch_name)
-                self.setup_analysis(task_launcher, batch_analysis)
-                task_launcher.dispatch()
-            else: print "Exiting..."
-         else:
-            self.setup_analysis(task_launcher, batch_analysis)
+         if self.review_arg_specification(arg_specifier) and \
+                self.review_command_template(command_template, arg_specifier, task_launcher) and \
+                (self.input_options(['y','N'], 'Execute?', default='n') == 'y'):
+            print("\n*Dispatching %s ...*" % task_launcher.batch_name)
+            self.setup_analysis(task_launcher,  command_template, batch_analysis)
             task_launcher.dispatch()
-         return f
+         else: print "Exiting..."
+      else:
+         self.setup_analysis(task_launcher, command_template, batch_analysis)
+         task_launcher.dispatch()
+      return f

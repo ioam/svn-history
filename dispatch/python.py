@@ -7,25 +7,13 @@ import param
 import os, sys, json
 from dispatch import TaskCommand
 
+# Idea: running MakeFiles could be both useful and good for learning
+# In the Makefile, different operations on /usr/share/dict/words (pointless but simple, standard demo)
 
-# IDEA:
-
-# spec.kwargs(review=False, log_path=None, info_path=None)
-
-# for kwargs in spec.kwargs():
-#    result = func(**kwargs)
-#    spec.update(result)
-
-# This method flattens, performs eval step. Optional review and log/info files output
-# If eval fails for a string, warn and return string
-
-# Returns a generator - allows dynamic specifiers. Ie. use yield The
-# generator caches result of self.next() , returns the elements one by
-# one till empty then calls till StopIteration.
-
-# def tokwargs(spec):
-#     return (dict([(k,eval(v)) for (k,v) in el.items()]) for grp in spec for el in grp)
-
+# Example file...
+# target = [prefix | suffix], variables = 'match', length
+# egrep -i "ion$" | egrep -i ".{24}" /usr/share/dict/words  # words ending in 'ion' longer than 24 chars
+# egrep -i "^ion" | egrep -i ".{24}" /usr/share/dict/words  # words starting with 'ion' longer than 24 chars
 
 class SimplePyScriptCommand(TaskCommand):
    """ A very simple way to invoke a Python script and pass it some
@@ -54,7 +42,6 @@ class SimplePyScriptCommand(TaskCommand):
    def __call__(self, spec, tid=None, info={}):
       prefix = ['python', self.script_path,
                 str(tid), param.normalize_path(info['root_directory'])]
-
       if self.argorder == []:  return prefix + spec.values()
       else:                    return prefix + [spec[k] for k in self.argorder]
 

@@ -12,14 +12,14 @@ class FileLoader(object):
         self.extensions = extensions
         self.transform = transform
 
-class PILImageLoader(FileLoader):    
+class PILImageLoader(FileLoader):
     def __init__(self, extensions, transform=lambda x:x, mode='RGB'):
         if Image is None:
             raise Exception("Cannot use PILImageLoader without PIL")
         super(PILImageLoader, self).__init__(extensions, transform)
         self.mode = mode
 
-    def filedata(self, path): 
+    def filedata(self, path):
         im = Image.open(path)
         return self.transform(im.convert(self.mode))
 
@@ -28,11 +28,11 @@ class PILImageLoader(FileLoader):
         meta_info =  fdata.size+(fdata.info, fdata.format, fdata.mode)
         return dict(zip(meta_keys, meta_info))
 
-class Base64ImageLoader(PILImageLoader): 
+class Base64ImageLoader(PILImageLoader):
     def __init__(self, extensions, transform=lambda x:x):
         super(Base64ImageLoader, self).__init__(extensions, transform)
-            
-    def filedata(self, path): 
+
+    def filedata(self, path):
         (_, extension) = os.path.splitext(path)
         prefix = 'data:image/%s;base64,' % extension[1:]
         with open(path,"rb") as f:
@@ -40,14 +40,14 @@ class Base64ImageLoader(PILImageLoader):
             return prefix + b64
 
     def metadata(self, path, fdata):
-        try: 
+        try:
             fdata = Image.open(path)
             return super(Base64Image, self).metadata(path, fdata)
-        except:  
+        except:
             logging.info("Cannot use PIL to extract metadata")
-            return {} 
+            return {}
 
-class NumpyLoader(FileLoader): 
+class NumpyLoader(FileLoader):
     def __init__(self, extensions, transform=lambda x:x):
         super(NumpyLoader, self).__init__(extensions, transform)
 
@@ -63,14 +63,14 @@ class Collate(param.Parameterized):
     the specifications that were executed. You can use the constructor or the
     insert_columns method to associate a list of values to the corresponding
     specifications. This class is particularly useful for extracting the filenames of
-    interest and associating them to a given key. 
+    interest and associating them to a given key.
 
     Note that all the inserted data is converted to string representation to allow
     conversion to a StaticSpecs specifier. Supplying a Collate object to a Select
     object allows you to handle numeric values easily without affecting the
     underlying string representation."""
 
-    root_directory = param.String(default=None, allow_None=True, doc=''' 
+    root_directory = param.String(default=None, allow_None=True, doc='''
              The absolute path to the root directory. Required in order to be able to
              extract file data from the dispatches.''')
 
@@ -83,11 +83,11 @@ class Collate(param.Parameterized):
         Collate(*Collate.from_log())
         """
         log_path = os.path.abspath(param.normalize_path(log_path))
-        (root_directory,_) = os.path.split(log_path) 
-       
+        (root_directory,_) = os.path.split(log_path)
+
         with open(log_path,'r') as log:
             splits = (str(line).split() for line in log)
-            
+
             split_tuples =  [(split[0], json.loads(" ".join(split[1:]))  ) for split in splits]
             split_tuples =[(str(tid), spec) for (tid, spec) in split_tuples]
 
@@ -100,7 +100,7 @@ class Collate(param.Parameterized):
         return [root_directory, specs]
 
     def __init__(self, root_directory, spec_list, **columns):
-        
+
         spec_list = [dict([(str(k),str(v)) for (k,v) in spec.items()]) for spec in spec_list]
         assert all([len(columns[k]) == len(spec_list) for k in columns]), \
             'All result lists must be the same length as the spec_list.'
@@ -122,7 +122,7 @@ class Collate(param.Parameterized):
 
     def fields(self):
         return sorted(set([k for spec in self.spec_list for k in spec.keys()]))
-    
+
     def insert_columns(self, **columns):
         collated_list =[]
         for (i,spec) in enumerate(self.spec_list):
@@ -167,14 +167,14 @@ class Collate(param.Parameterized):
             "Cannot use key already used in specification keys"
         assert set(format_keys) == supplied_key_set, \
             'Keys provided must exactly match set of keys used in pattern'
-        
+
         partitioned_specs = []
         for spec in self.spec_list:
             for vals in itertools.product(*[values[k] for k in format_keys]):
                 extension = dict(zip(format_keys, vals))
                 matches = [path for path in spec[src_key].rsplit(' ')
                            if fnmatch.fnmatch(os.path.basename(path), pattern.format(**extension))]
-                items = (spec.items() 
+                items = (spec.items()
                          + [ (k,str(v)) for (k,v) in extension.items() ]
                          + [(dest_key,' '.join(matches))])
                 partitioned_specs.append(dict([(k,v) for (k,v) in items if k != src_key]))
@@ -184,54 +184,54 @@ class Collate(param.Parameterized):
         self._partitionedkeys += format_keys
         self.spec_list = partitioned_specs
 
-    def extract_files(self, fileloader, source_key, label_key=None): 
+    def extract_files(self, fileloader, source_key, label_key=None):
 
         extracted = []; label_vals = []; ind=0
         for spec in list(self):
             all_fpaths = self.filelist(spec[source_key], basename=False)
-            fpaths = [fpath for fpath in all_fpaths 
+            fpaths = [fpath for fpath in all_fpaths
                       if os.path.splitext(fpath)[1] in fileloader.extensions]
             label_inds = range(ind, ind+len(fpaths)); ind += len(fpaths)
             labels = ['%s_%d' % (source_key, i) for i in label_inds]
             label_vals.append(' '.join(labels))
 
             fdata = [fileloader.filedata(path) for path in fpaths]
-            metadata = [ fileloader.metadata(fpath, fdatum) 
+            metadata = [ fileloader.metadata(fpath, fdatum)
                          for (fpath, fdatum) in zip(fpaths, fdata)]
             extracted.append((fdata, metadata, labels))
-            
+
         if label_key is not None: self.insert_columns(**{label_key:label_vals})
         return zip(*extracted)
-        
-    def show(self, summary=False, basename=True, spec_keys=[]): 
-        
+
+    def show(self, summary=False, basename=True, spec_keys=[]):
+
         pkeys =  "Partitioned keys: %s" % ', '.join(["'%s'" % el for el in self._partitionedkeys])
         dkeys =  "Data keys: %s" % ', '.join(["'%s'" % el for el in self._datakeys])
         fkeys =  "File keys: %s" % ', '.join(["'%s'" % el for el in self._filekeys])
         print '\n'.join([pkeys, dkeys, fkeys])
         if summary: return
-        
+
         for spec in  list(self):
             pinfo = ', '.join(['%s=%s' % (pkey, spec[pkey]) for pkey in self._partitionedkeys]) + ' | '
             dinfo = ', '.join(['%s=%s' % (dkey, spec[dkey]) for dkey in self._datakeys]) + ' | '
             finfo = ', '.join(['%s=%s' % (fkey, self.filelist(spec[fkey], basename)) for fkey in self._filekeys])
             print ''.join([pinfo, dinfo, finfo])
-                
+
     def __repr__(self):
         (_, root_dir) = os.path.split(self.root_directory)
         logging.info('Collate contains %d entries ' % len(self.spec_list))
         return "Collate('%s', %s)" % (root_dir, '<spec_list>')
 
 class Select:
-    """ Only accepts string data type - but can view fields numerically 
+    """ Only accepts string data type - but can view fields numerically
         Accepts specifier or list of dictionaries
         """
 
-    def __init__(self, spec=[], float_keys=[], int_keys=[], hidden_keys=None, visible_keys=None): 
-        
-        specs = list(self._valid_spec(spec) if not isinstance(spec, TaskSpecifier) 
+    def __init__(self, spec=[], float_keys=[], int_keys=[], hidden_keys=None, visible_keys=None):
+
+        specs = list(self._valid_spec(spec) if not isinstance(spec, TaskSpecifier)
                              else itertools.chain.from_iterable(spec))
-   
+
         self._hidden_keys = None
         self._visible_keys = None
         self.speclist = None
@@ -242,11 +242,11 @@ class Select:
         self._fromlist(specs, float_keys, int_keys)
 
         if None not in [hidden_keys, visible_keys]:
-            raise Exception('Both hidden_keys and visible_keys cannot be set')                
+            raise Exception('Both hidden_keys and visible_keys cannot be set')
         if   hidden_keys is not None:   self.set_hidden(hidden_keys)
         elif visible_keys is not None:  self.set_visible(visible_keys)
         else: self.set_hidden([])
-                
+
     def _valid_spec(self, speclist):
         str_types = [str, np.string_]
         all_strings = all([type(k) in str_types and type(v) in str_types
@@ -263,11 +263,11 @@ class Select:
 
     def __array__(self): return self.selector_array
 
-    def __getattr__(self, name):  
+    def __getattr__(self, name):
         if name in self._hidden_keys: raise Exception('Desired key available but hidden')
         if self.selector_array != []:
             view = self.view_array[self._visible_keys].view(np.recarray)
-            return getattr(view, name).flatten()        
+            return getattr(view, name).flatten()
         else: raise Exception('No data loaded')
 
     def __getitem__(self, name):
@@ -285,7 +285,7 @@ class Select:
 
     def keys(self): return list(self.selector_array.dtype.names)
 
-    def fromarray(self, array, float_keys=[], int_keys=[]): 
+    def fromarray(self, array, float_keys=[], int_keys=[]):
         allowed_types = ['S', 'U']
         kinds = [array.dtype[name].kind for name in array.dtype.names]
         assert all(k in allowed_types for k in kinds), 'All dtypes must be of string type'
@@ -295,7 +295,7 @@ class Select:
         self.speclist = self.tolist()
         return self
 
-    def tolist(self, selection=None, include_hidden=False): 
+    def tolist(self, selection=None, include_hidden=False):
         length = self.selector_array.shape[0]
         only_visible = (self._visible_keys is not None) and not include_hidden
         sel = selection if (selection is not None) else [True] * length
@@ -303,7 +303,7 @@ class Select:
         selected = self.selector_array[visible_keys][selection].flatten()
         return [ dict(zip(visible_keys, line)) for line in selected]
 
-    def subselector(self, condition): 
+    def subselector(self, condition):
         return Select(self.tolist(condition), visible_keys=self._visible_keys)
 
     def select(self, selection, *data):
@@ -318,13 +318,13 @@ class Select:
         selected = []
         for d in data:
             if isinstance(d,np.ndarray): selected.append(d[selection])
-            else:                        selected.append([el for (i,el) 
-                                                          in enumerate(list(d)) 
+            else:                        selected.append([el for (i,el)
+                                                          in enumerate(list(d))
                                                           if selection[i]])
         if len(selected) == 1: return selected[0]
         else:                  return tuple(selected)
 
-    def view(self, float_keys=[], int_keys=[],  tid_key='tid'): 
+    def view(self, float_keys=[], int_keys=[],  tid_key='tid'):
         ''' Called without arguments resets the view to the underlying strings '''
         all_int_keys = (int_keys+[tid_key] if (tid_key in self.keys()) else int_keys)
         self.float_keys = float_keys; self.int_keys = int_keys
@@ -338,6 +338,6 @@ class Select:
         self.view_array = self.view_array.astype(dtype)
 
     def __repr__(self):
-        info = (repr(self.float_keys), repr(self.int_keys), 
+        info = (repr(self.float_keys), repr(self.int_keys),
                 self.selector_array.shape, ', '.join(self.keys()))
         return "Select(float_keys=%s, int_keys=%s)\n#Shape %s, Fields: %s" % info

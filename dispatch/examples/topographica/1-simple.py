@@ -5,7 +5,7 @@ from dispatch.topographica import RunBatchCommand
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-CLUSTER = True
+CLUSTER = False#True
 if CLUSTER: Launcher = QLauncher
 batch_name = 'topo_cluster' if CLUSTER else 'topo_local'
 max_concurrency = None if CLUSTER else 2

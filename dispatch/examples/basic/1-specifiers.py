@@ -2,6 +2,14 @@ from dispatch import Spec, LinearSpecs, ListSpecs, review_and_launch
 
 # WORK IN PROGRESS
 
+        # for kwargs in spec():  # Static
+        #    result = func(**kwargs)
+        #    spec.update(result)
+
+        # for arg_group in spec():  # Dynamic
+        #    for args, kwargs in arg_group:
+        #       result = func(*args, **kwargs)
+
 def invoke(function, specifier):
     for spec in next(specifier):
         function(**spec)

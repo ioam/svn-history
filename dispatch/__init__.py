@@ -1,3 +1,55 @@
+"""
+Dispatch consists of three fundamental class types: Argument Specifiers, Command
+Templates and Launchers. Launch Helpers are useful helper functions for using
+dispatch.
+
+Argument Specifiers
+-------------------
+
+Argument specifiers are intended to be clear, succinct and composable way of
+specifying large parameter sets. High-dimensional parameter sets are typical of
+large-scale scientific models and can make managing such models and simulations
+difficult. Using argument specifiers, you can document how the parameters of
+your model vary across runs without long, flat lists of arguments or requiring
+deeply nested loops.
+
+Argument specifiers can be freely intermixed with Python code, simplifying the
+use of scientific software with a Python interface. They also invoke commandline
+programs using command template objects to build commands and launchers to
+execute them. In this way they can help simplify the management of simulation,
+analysis and visualisation tools with Python.
+
+Typical usage includes specification of constant arguments, description of
+parameter ranges or even search procedures (such as hillclimbing, bisection
+optimisation etc). Argument specifiers can compose together using Cartesian
+products or Concatenation to express huge numbers of argument sets concisely.
+
+Command Templates
+------------------
+
+When working with external tools, a command template is needed to turn an
+argument specifier into an executable command. These objects are designed to be
+customisable with sensible defaults to handle as much boilerplate as
+possible. They may require argument specifiers with a certain structure (certain
+argument names and value types) to operate correctly.
+
+Launchers
+---------
+
+A launcher is designed to execute commands on a given computational platform,
+making use of as much concurrency where possible. The default Launcher class
+executes commands locally while the QLauncher class is designed to launch
+commands on Sun Grid Engine clusters.
+
+Launch Helpers
+--------------
+
+These helper functions help verify correct usage of dispatch for specific
+use-cases. They check for consistent useage automatically and offer an in-depth
+review of all settings specified before launch. The goal is to help users
+identify mistakes early before consuming computational time and resources.
+"""
+
 import os, sys, copy, re, glob, json, pickle, fnmatch
 import time, pipes, subprocess
 import logging
@@ -8,121 +60,110 @@ from collections import defaultdict
 
 import param
 
-# TaskCommands could be called CommandTemplates.
-# TaskSpecifiers could be called ArgumentSpecifiers
-# TaskLaunchers could be called BatchLauncher  [renamed to Launcher for now]
-# task decorators could be called workflows (launch workflows?).  dispatch.
+#=====================#
+# Argument Specifiers #
+#=====================#
 
-#================#
-# TaskSpecifiers #
-#================#
-
-"""
-TaskSpecifiers are intended to be clear, succinct and composable way of
-specifying the large parameter sets. High-dimensional parameter sets are typical
-of large-scale scientific models and can make working with such models
-difficult. Using TaskSpecifiers, you can document how the parameters of your
-model change across runs without having to handle any flat representations
-explicitly.
-
-TaskSpecifiers are designed to allow parameters to be varied on the commandline
-for visualisation, analysis or parameter search and are based on the string
-representations that invokes the target process at the commandline. Users can
-specify parameter ranges, Cartesian products or dynamic parameter search
-strategies (such as hillclimbing, bisection optimisation etc) independent of
-executable invocation, computational platform and environment.
-
-To help enforce a declarative style, public parameters are declared constant
-after initialization and should not be mutated. Instead, TaskSpecifiers objects
-need to be declared correctly when instantiated.
-
-Internally, the core of a TaskSpecifier is a Python iterator which returns a
-list of dictionaries on each call to next(). Each item in the dictionaries is
-labelled value where a parameter name keys is associated to its corresponding
-string representation. When used in conjunction with a TaskCommand, these
-dictionaries allow commands to built in a flexible manner.
-"""
-
-
-
-class TaskSpecifier(param.Parameterized):
+class BaseArgs(param.Parameterized):
     """
-    The base class for all TaskSpecifiers. On each iteration, a Taskspecifier
-    can returns a list of dictionaries (parameter specifications). The keys of
-    each specification are the parameter names while the string values specify
-    the values of the parameter that can be later built into commandline
-    strings.
+    The base class for all argument specifiers. Argument specifiers implement
+    Python's iterator protocol, returning arguments on each call to next(). Note
+    that these objects should not be written as generators as they often need to
+    be pickled.
 
-    When dynamic=False, StopIteration should be raised after the first
-    iteration. This is because no runtime data is necessary to determine the
-    specifications so they should all be returned all in one go.
+    On each iteration, an argument specifier returns a list of
+    dictionaries. Each key-value pair assigns a value to an argument and each
+    dictionary defines a set of arguments.  The dictionaries in the list
+    correspond to the currently available argument sets. Subsequent iterations
+    may return further arguments for specifiers that were waiting for runtime
+    feedback to continue (eg. hillclimbing).
 
-    For some search strategies (eg. hillclimbing), feedback is needed at runtime
-    before the next sample of the parameter space is taken. In these cases,
-    dynamic=True and the state of the TaskSpecifier is updated between
-    iterations using data generated at runtime via the update() method.
+    Such argument specifiers that require feedback are dynamic: in these cases
+    dynamic=True and the state of the specifier must be updated between
+    iterations via update(). Whenever possible, the schedule() method specifies
+    the expected number of argument dictionaries on future iterations. Such
+    expected counts may be incorrect - for example, an initial hillclimbing seed
+    may already happen to be very close to a local optimum. Note that the
+    update() and schedule() methods do not need to be implemented if
+    dynamic=False.
 
-    Even if the values in the specifications cannot be known till runtime
-    (ie. dynamic=True), it can be extremely useful to know the *number* of
-    specifications are expected on future iterations. Therefore, if a dynamic
-    TaskSpecifier always follows a particular pattern of operation, the
-    schedule() method should be implemented accordingly. This can allows
-    placeholder jobs to be reserved (eg. on a compute cluster).
+    To help enforce a declarative style, public parameters are declared constant
+    and cannot be mutated after initialisation. Argument specifiers need to be
+    declared correctly where they are used.
 
-    Note that the update and schedule methods are only ever used in dynamic
-    TaskSpecifiers and do not need to be implemented if dynamic=False.
-
-    The varying_keys and constant_keys methods help make a distinction between
-    the parameters we wish to manipulate between runs (informative) and constant
-    settings (less informative).
+    The varying_keys and constant_keys methods makes the distinction between
+    arguments that are manipulated between runs and the ones that stay constant.
+    The values of the arguments that vary is often of more interest than the
+    values of the arguments held constant and varying arguments are sorted by
+    how fast they vary.
     """
-    __abstract=True
 
     dynamic = param.Boolean(default=False, constant=True, doc='''
-            Flag to indicate whether the TaskSpecifier needs to have its state
-            updated via the update() method between iterations (ie. between
-            calls to the next method). If all the specifications cannot be known
-            ahead of time (eg. parameter search), dynamic must be set to True.''')
+            Flag to indicate whether the argument specifier needs to have its
+            state updated via the update() method between iterations. In other
+            words, if the arguments cannot be known ahead of time (eg. parameter
+            search), dynamic must be set to True.''')
 
     rationale = param.String(default='',  allow_None=True, doc='''
-      Allows documentation metadata to be associated with each TaskSpecifier.
-      This allows a justification to be given of why the given TaskSpecifier is
-      to used and why the parameters chosen are suitable for the task at hand.
-      Note that rationale is one of the few TaskSpecifier parameters not
-      declared constant''')
+         Allows documentation to be associated with each argument specfier.
+         This allows a justification of the arguments are chosen and their
+         method of generation. Note that rationale is one of the few
+         argument specifier parameters not declared constant''')
 
     fp_precision = param.Integer(default=4,  constant=True, doc='''
          The floating point precision to use for floating point values.  Unlike
-         other basic Python types, floats need care with their representation (on
-         the commandline) as using repr() is not sufficient control.''')
+         other basic Python types, floats need care with their representation as
+         you only want to display up to the precision actually specified.''')
 
-    def __init__(self, rationale='', dynamic=False, **params):
-        super(TaskSpecifier,self).__init__(dynamic=dynamic, **params)
+    format = param.Boolean(default=True, doc= '''
+        Whether the objects in the input specs should be formatted to strings
+        upon iteration. It is can be useful to set format to False when loading
+        specifications from log files where stromg formatting has already been
+        applied.''')
+
+    def __init__(self, rationale='',  **params):
+        self.format_map = defaultdict(dict)
+        super(BaseArgs,self).__init__(**params)
 
         if rationale != '': rationale = "\n[ %s ]\n%s" % (repr(self), rationale)
         self.rationale += rationale
 
     def __iter__(self): return self
 
-    def formatter(self, obj):
-        " Helper function that helps format floating point values appropriately "
-        if type(obj) == float: return ('%%0.%df' % self.fp_precision) % obj
-        return repr(obj)
+    def _float_format(self, key, precision):
+        assert key not in self.format_map, 'Floating format already set for key'
+        self._object_format(key, tuple([float]+np.sctypes['float']), '%%0.%df' % precision)
+
+    def _object_format(self, key, type_tuple, format):
+        assert key not in self.format_map, 'Key already in the format map'
+        self.format_map[key].update({type_tuple:format})
+
+    def _formatter(self, key, value):
+        " Helper function that helps format Python objects appropriately "
+        if not self.format: return value
+
+        if (key in self.format_map):
+            for type_group in self.format_map[key]:
+                if type(value) in type_group:
+                    return self.format_map[key][type_group] % value
+        elif type(value) in [float]+np.sctypes['float']: # Default behaviour for floats
+            return ('%%0.%df' % self.fp_precision) % value
+        return str(value)
 
     def constant_keys(self):
         """
-        Returns the list of parameter names whose values vary as the
-        TaskSpecifer is iterated.  Note that constant_keys() + varying_keys()
-        should cover the entire set of keys.
+        Returns the list of parameter names whose values are constant as the
+        argument specifier is iterated.  Note that constant_keys() +
+        varying_keys() should span the entire set of keys.
         """
         raise NotImplementedError
 
     def varying_keys(self):
         """
-        Returns the list of parameters whose values are constant as the
-        TaskSpecifer is iterated.  Whenever it is possible, keys should be
-        sorted from slowest varying to fastest varying and sorted
-        alphanumerically within groups varying at the same rate.
+        Returns the list of parameters whose values vary as the argument
+        specifier is iterated.  Whenever it is possible, keys should be sorted
+        from those slowest to faster varying and sorted alphanumerically within
+        groups that vary at the same rate.
         """
         raise NotImplementedError
 
@@ -146,21 +187,18 @@ class TaskSpecifier(param.Parameterized):
     def schedule(self):
         """
         Specifies the expected number of specifications that will be returned on
-        future iterations. This is simply a list of integers specifying the
-        number of specifications that will be returned on each call to
-        next. Only invoked if dynamic=True and returns None if scheduling is not
-        possible.
-
-        N.B: If dynamic=False, schedule := [len(specs) for specs in  static_task_specifier]
+        future iterations if dynamic=True. This is simply a list of integers
+        specifying the number of argument sets to be returned on each subsequent
+        call to next(). Return None if scheduling information cnanot be
+        estimated.
         """
         raise NotImplementedError
 
     def copy(self):
         """
-        Convenience method to allow the TaskSpecifiers to be inspected without
-        exhausting it.
+        Convenience method to avoid using the specifier without exhausting it.
         """
-        return copy.deepcopy(self)
+        return copy.copy(self)
 
     def _collect_by_key(self,specs):
         """
@@ -176,39 +214,35 @@ class TaskSpecifier(param.Parameterized):
 
     def show(self):
         """
-        Convenience method to inspect the available values generated by the
-        TaskSpecifier in human-readable format. When not dynamic, allows you to
-        easily see how many specifications will be generated.
-
-        When dynamic=True, as many specifications will be listed as possible
-        before update is required.
+        Convenience method to inspect the available argument values in
+        human-readable format. When dynamic, not all argument values may be
+        available.
         """
 
         copied = self.copy()
         enumerated = [el for el in enumerate(copied)]
         for (group_ind, specs) in enumerated:
             if len(enumerated) > 1: print("Group %d" % group_ind)
-            ordering = self.constant_keys() + self.varying_keys() # Ordered nicely by varying_keys definition.
+            ordering = self.constant_keys() + self.varying_keys()
+            # Ordered nicely by varying_keys definition.
             spec_lines = [ ', '.join(['%s=%s' % (k, s[k]) for k in ordering]) for s in specs]
             print('\n'.join([ '%d: %s' % (i,l) for (i,l) in enumerate(spec_lines)]))
 
         if self.dynamic:
-            print('No data available to show remaining output of dynamic TaskSpecifier %s' %
-                  self.__class__.__name__)
+            print('Remaining arguments not available for %s' % self.__class__.__name__)
 
     def __str__(self):
         """
-        TaskSpecifiers are expected to have a succinct representation that is
-        human-readable but correctly functions as a proper object representation
-        (rationale may be omitted however).
+        Argument specifiers are expected to have a succinct representation that
+        is both human-readable but correctly functions as a proper object
+        representation ie. repr. Only rationale can be omitted.
         """
         return repr(self)
 
     def __add__(self, other):
         """
-        Concatenates TaskSpecifiers appropriately based according to whether
-        they are dynamic or not. See StaticConcatenate and DynamicConcatenate
-        documentation.
+        Concatenates two argument specifiers. See StaticConcatenate and
+        DynamicConcatenate documentation respectively.
         """
         assert not (self.dynamic and other.dynamic), 'Cannot concatenate two dynamic specifiers.'
 
@@ -217,7 +251,7 @@ class TaskSpecifier(param.Parameterized):
 
     def __mul__(self, other):
         """
-        Takes the Cartesian product of the two TaskSpecifiers. See
+        Takes the cartesian product of two argument specifiers. See
         StaticCartesianProduct and DynamicCartesianProduct documentation.
         """
         assert not (self.dynamic and other.dynamic), \
@@ -239,34 +273,133 @@ class TaskSpecifier(param.Parameterized):
                       ))
                  for s1 in first_specs for s2 in second_specs ]
 
-class StaticSpecs(TaskSpecifier):
+    def _args_kwargs(self, spec, args):
+        """
+        Separates out args from kwargs given a list of non-kwarg arguments. When
+         args list is empty, kwargs alone are returned.
+        """
+        if args ==[]: return spec
+        arg_list = [v for (k,v) in spec.items() if k in args]
+        kwarg_dict = dict((k,v) for (k,v) in spec.items() if (k not in args))
+        return (arg_list, kwarg_dict)
+
+    def _setup_generator(self, args, review, log_file):
+        """
+        Basic setup before returning the arg-kwarg generator. Allows review and
+        logging to be consistent with other dispatch useage.
+        """
+        all_keys =  self.constant_keys() + self.varying_keys()
+        assert set(args) <= set(all_keys), 'Specified args must belong to the set of keys'
+
+        if log_file is not None:
+            try: log_file = open(os.path.abspath(log_file), 'w')
+            except: raise Exception('Could not create log file at log_path')
+
+        if review:
+            self.show()
+            response =  None
+            while response not in ['y','N', '']:
+                response = raw_input('Continue? [y, N]: ')
+            if response != 'y': return
+
+        return log_file
+
+    def _write_log(self, log_file, specs, line_no):
+        """
+        Writes out a log file to the root directory consistent Launcher useage.
+        """
+        lines = ['%d %s' % (line_no+i, json.dumps(spec)) for (i, spec) in enumerate(specs)]
+        log_file.write('\n'.join(lines))
+        return line_no + len(specs)
+
+    def __call__(self, args=[], review=True, log_file=None):
+        """
+        A generator that allows argument specifiers to be used nicely with
+        Python. For static specifiers, the args and kwargs are returned directly
+        allowing iteration without unpacking. For dynamic specifiers, they are
+        returned as lists for each concurrent group. By default all parameters
+        are returned as kwargs but they can also returned as (args, kwargs) if
+        the the arg keys are specified.
+        """
+        log_file = self._setup_generator(args, review, log_file)
+        accumulator = []
+        line_no = 0
+        old_format = self.format
+        spec_iter = iter(self)
+        while True:
+            if self.dynamic:
+                try:
+                    self.format = False
+                    specs = next(spec_iter)
+                    retval = [self._args_kwargs(spec, args) for spec in specs]
+                except: break
+                finally:
+                    self.format = old_format
+            if not self.dynamic and accumulator==[]:
+                try:
+                    self.format = False
+                    accumulator = next(spec_iter)
+                except: break
+                finally:
+                    self.format = old_format
+            if not self.dynamic:
+                specs = accumulator[:1]
+                retval = self._args_kwargs(specs[0], args)
+                accumulator=accumulator[1:]
+
+            if log_file is not None:
+                line_no = self._write_log(log_file, specs, line_no)
+            yield retval
+
+        if log_file is not None: log_file.close()
+
+
+class StaticArgs(BaseArgs):
     """
-    Base class for many important static TaskSpecifiers (dynamic=False) but is
-    useful in its own right. Can be constructed from launcher log files and used
-    to manipulate output data using Tables.  Accepts the full static
-    specifications directly as primary argument and provides all necessary
-    mechanisms to collect varying and constant keys, implements next()
-    appropriately and has useful support for len().  Note that specs (list of
-    dictionaries) are expected to have string keys *and* values.
+    Base class for many important static argument specifiers (dynamic=False)
+    though also useful in its own right. Can be constructed from launcher log
+    files and gives full control over the output arguments.Accepts the full
+    static specification as a list of dictionaries, provides all necessary
+    mechanisms for identifying varying and constant keys, implements next()
+    appropriately, does not exhaust like dynamic specifiers and has useful
+    support for len().
     """
 
-    def __init__(self, specs, rationale='', fp_precision=4, **kwargs):
+    @staticmethod
+    def extract_log_specification(log_path):
+        """
+        Parses the log file generated by a launcher and returns the corresponding
+        tids and specification list. The specification list can be used to build a
+        valid StaticArgs object as long as format is set to False.
+        """
+        with open(log_path,'r') as log:
+            splits = (line.split() for line in log)
+            zipped = [(int(split[0]), json.loads(" ".join(split[1:]))) for split in splits]
+
+        return dict(zipped)
+
+    def __init__(self, specs, **kwargs):
         self._specs = list(specs)
+        super(StaticArgs, self).__init__(dynamic=False, **kwargs)
+
+    def __iter__(self):
         self._exhausted = False
-        super(StaticSpecs, self).__init__(dynamic=False,
-                                          rationale=rationale,
-                                          fp_precision=fp_precision, **kwargs)
+        return self
 
     def next(self):
-        if self._exhausted: raise StopIteration
-        else: self._exhausted=True
-        return self._specs
+        if self._exhausted:
+            raise StopIteration
+        else:
+            self._exhausted=True
+            returnVal =  [dict((k,self._formatter(k, v))for (k,v) in spec.items())
+                    for spec in self._specs]
+            return returnVal
 
     def _unique(self, sequence, idfun=repr):
         """
         Note: repr() must be implemented properly on all objects. This is
-        assumed by all Taskspecifiers objects anyway as values are always
-        converted to string representation.
+        assumed by dispatch when Python objects need to be formatted to string
+        representation.
         """
         seen = {}
         return [seen.setdefault(idfun(e),e) for e in sequence
@@ -292,14 +425,15 @@ class StaticSpecs(TaskSpecifier):
     def __len__(self): return len(self._specs)
 
     def __repr__(self):
-        return "StaticSpecs(%s)" % (self._specs)
+        return "StaticArgs(%s)" % (self._specs)
 
 
-class StaticConcatenate(StaticSpecs):
+class StaticConcatenate(StaticArgs):
     """
-    StaticConcatenate is the sequential composition of two Static
-    Specifiers. The specifier (firstspec + secondspec) will return the
-    specifications in firstspec followed by the specification in secondspec.
+    StaticConcatenate is the sequential composition of two StaticArg
+    specifiers. The specifier created by the compositon (firsts + second)
+    generates the arguments in first followed by the arguments in
+    second.
     """
 
     def __init__(self, first, second, rationale=''):
@@ -307,25 +441,26 @@ class StaticConcatenate(StaticSpecs):
         self.first = first
         self.second = second
 
+        specs = list(first.copy()(review=False)) + list(second.copy()(review=False))
+
         rationales = [rationale, first.rationale, second.rationale]
         if rationale == '': rationales = rationales[1:]
         rationale = "\n\n".join([r for r in rationales if (r is not '')])
 
-        super(StaticConcatenate, self).__init__(next(first.copy())
-                                              + next(second.copy()),
-                                                rationale=rationale)
+        super(StaticConcatenate, self).__init__(specs, rationale=rationale)
+        merged_format_map = dict(first.format_map, **second.format_map) # FIXME! Max of fp_precision!
+        self.format_map = defaultdict(dict, merged_format_map)          # Method in base class?
 
     def __repr__(self):
         return "(%s + %s)" % (repr(self.first), repr(self.second))
 
-class StaticCartesianProduct(StaticSpecs):
+class StaticCartesianProduct(StaticArgs):
     """
-    StaticCartesianProduct is the cartesian product of two Static
-    Specifiers. The specifier (firstspec * secondspec) returns the Cartesian
-    product of the specifications in firstspec and the specification in
-    secondspec (ie. len(firstspec)*len(secondspec) combined specifications.
+    StaticCartesianProduct is the cartesian product of two StaticArg
+    specifiers. The specifier created by the compositon (firsts * second)
+    generates the cartesian produce of the arguments in first followed by the
+    arguments in second. Note that len(first * second) = len(first)*len(second)
     """
-
     def __init__(self, first, second, rationale=''):
 
         self.first = first
@@ -335,103 +470,114 @@ class StaticCartesianProduct(StaticSpecs):
         if rationale == '': rationales = rationales[1:]
         rationale = "\n\n".join([r for r in rationales if (r is not '')])
 
-        specs = self._cartesian_product(next(first), next(second))
-        overlap = set(self.first.varying_keys()) &  set(self.second.varying_keys())
-        assert overlap == set(), 'Sets of keys cannot overlap between TaskSpecifiers in cartesian product.'
+        specs = self._cartesian_product(list(first.copy()(review=False)),
+                                        list(second.copy()(review=False)))
+
+        overlap = (set(self.first.varying_keys() + self.first.constant_keys())
+                   &  set(self.second.varying_keys() + self.second.constant_keys()))
+        assert overlap == set(), 'Sets of keys cannot overlap between argument specifiers in cartesian product.'
 
         super(StaticCartesianProduct, self).__init__(specs, rationale=rationale)
+        merged_format_map = dict(first.format_map, **second.format_map)
+        self.format_map = defaultdict(dict, merged_format_map)
 
     def __repr__(self):   return '(%s * %s)' % (repr(self.first), repr(self.second))
 
 
-class Spec(StaticSpecs):
+class Args(StaticArgs):
     """
-    Allows easy instantiation of a single specification using keywords.  Useful
-    for instantiating constant settings before a cartesian product.
+    Allows easy instantiation of a single set of arguments using keywords.
+    Useful for instantiating constant arguments before applying a cartesian
+    product.
     """
 
     def __init__(self, rationale='', fp_precision=4, **kwargs):
         assert kwargs != {}, "Empty specification not allowed."
-        specs = [kwargs]
-        super(Spec,self).__init__(specs, rationale=rationale,
-                                  fp_precision=fp_precision)
-        self._specs = [dict([ (k, self.formatter(kwargs[k])) for k in kwargs])]
+        specs = [dict((k, kwargs[k]) for k in kwargs)]
+        super(Args,self).__init__(specs, format=True,
+                                  rationale=rationale, fp_precision=fp_precision)
+        for key in specs[0]:
+            self._float_format(key, fp_precision)
 
     def __repr__(self):
         spec = self._specs[0]
-        return "Spec(%s)"  % ', '.join(['%s=%s' % (k, spec[k]) for k in spec])
+        return "Args(%s)"  % ', '.join(['%s=%s' % (k, self._formatter(k, spec[k])) for k in spec])
 
 
 def identityfn(x): return x
 
-class LinearSpecs(StaticSpecs):
+class LinearArgs(StaticArgs):
     """
-    LinearSpecs generates a range of specifications with linearly interpolated
-    numeric values to a certain floating-point precision.
+    LinearArgs generates an argument that has a numerically interpolated range
+    (linear by default). Values formatted to the given floating-point precision.
     """
 
-    spec_key = param.String(default='default',doc='''
-         The key name that is to be linearly varied over a numeric range.''')
+    arg_name = param.String(default='arg_name',doc='''
+         The name of the argument that is to be linearly varied over a numeric range.''')
 
     value =  param.Number(default=None, allow_None=True, constant=True, doc='''
          The starting numeric value of the linear interpolation.''')
 
     end_value = param.Number(default=None, allow_None=True, constant=True, doc='''
          The ending numeric value of the linear interpolation (inclusive).
-         If not specified, a LinearSpec ''')
+         If not specified,  If not specified, will return 'value' (no interpolation).''')
 
     steps = param.Integer(default=1, constant=True, doc='''
          The number of steps to use in the interpolation. Default is 1.''')
 
-    mapfn = param.Callable(default=identityfn, constant=True)
+    # Can't this be a lambda?
+    mapfn = param.Callable(default=identityfn, constant=True, doc='''
+         The function to be mapped across the linear range. Identity  by default ''')
 
-    def __init__(self, spec_key, value, end_value=None,
+    def __init__(self, arg_name, value, end_value=None,
                  steps=2, fp_precision=4, mapfn=identityfn, rationale=''):
 
-        formatter = '%%0.%df' % fp_precision
         if end_value is not None:
             values = np.linspace(value, end_value, steps, endpoint=True)
-            self._specs = [{spec_key:(formatter % mapfn(val))} for val in values ]
-        else:    self._specs = [{spec_key:(formatter % mapfn(value))}]
-
-        self._exhausted = False
+            _specs = [{arg_name:mapfn(val)} for val in values ]
+        else:
+            _specs = [{arg_name:mapfn(value)}]
         self._pparams = ['end_value', 'steps', 'fp_precision', 'mapfn']
 
-        super(TaskSpecifier, self).__init__(spec_key=spec_key, value=value,
-                                            end_value=end_value, steps=steps,
-                                            fp_precision=fp_precision, rationale=rationale,
-                                            dynamic=False, mapfn=mapfn)
+        super(LinearArgs, self).__init__(_specs, format=True, arg_name=arg_name, value=value,
+                                          end_value=end_value, steps=steps,
+                                          fp_precision=fp_precision, rationale=rationale,
+                                          mapfn=mapfn)
+
+        self._float_format(arg_name, fp_precision)
 
     def __repr__(self):
         modified = dict(self.get_param_values(onlychanged=True))
-        pstr = ', '.join(['%s=%s' % (k,self.formatter(modified[k])) for k in self._pparams if k in modified])
-        return "%s('%s', %s, %s)" % (self.__class__.__name__, self.spec_key, self.value, pstr)
+        pstr = ', '.join(['%s=%s' % (k,self._formatter(k,modified[k])) for k in self._pparams if k in modified])
+        return "%s('%s', %s, %s)" % (self.__class__.__name__, self.arg_name, self.value, pstr)
 
-class ListSpecs(StaticSpecs):
+class ListArgs(StaticArgs):
     """
-    A TaskSpecifier that takes its values from a given list.
+    An argument specifier that takes its values from a given list.
     """
 
-    spec_key = param.String(default='default',doc='''
+    arg_name = param.String(default='default',doc='''
          The key name that take its values from the given list.''')
 
-    def __init__(self, spec_key, value_list, fp_precision=4, rationale=''):
+    def __init__(self, arg_name, value_list, fp_precision=4, rationale=''):
 
-        self._specs = []
-        self._exhausted = False
-        super(TaskSpecifier, self).__init__(spec_key=spec_key, rationale=rationale,
-                                            fp_precision=fp_precision, dynamic=False)
-        self._specs = [ {spec_key:self.formatter(val)} for val in value_list]
-        self.value_list = [self.formatter(val) for val in value_list]
+        self._value_list = value_list
+        _specs = [ {arg_name:val} for val in value_list]
+        super(ListArgs, self).__init__(_specs, format=True, arg_name=arg_name,
+                                        rationale=rationale,
+                                        fp_precision=fp_precision)
+
+        self._float_format(arg_name, fp_precision)
 
     def __repr__(self):
-        return "%s(%s,%s)" % (self.__class__.__name__, self.spec_key, self.value_list) #value_list
+        value_list = [self._formatter(self.arg_name, val) for val in self._value_list]
+        return "%s('%s',[%s])" % (self.__class__.__name__, self.arg_name, ', '.join(value_list))
 
-#========================#
-# Dynamic TaskSpecifiers #
-#========================#
+#=============================#
+# Dynamic argument specifiers #
+#=============================#
 
-class DynamicConcatenate(TaskSpecifier):
+class DynamicConcatenate(BaseArgs):
     def __init__(self, first, second, rationale=''):
         self.first = first
         self.second = second
@@ -484,7 +630,7 @@ class DynamicConcatenate(TaskSpecifier):
     def __repr__(self):
         return "(%s + %s)" % (repr(self.first), repr(self.second))
 
-class DynamicCartesianProduct(TaskSpecifier):
+class DynamicCartesianProduct(BaseArgs):
 
     def __init__(self, first, second, rationale=''):
 
@@ -496,7 +642,7 @@ class DynamicCartesianProduct(TaskSpecifier):
         rationale = "\n\n".join([r for r in rationales if (r is not '')])
 
         overlap = set(self.first.varying_keys()) &  set(self.second.varying_keys())
-        assert overlap == set(), 'Sets of keys cannot overlap between TaskSpecifiers in cartesian product.'
+        assert overlap == set(), 'Sets of keys cannot overlap between argument specifiers in cartesian product.'
 
         super(CartesianProduct, self).__init__(dynamic=True, rationale=rationale)
 
@@ -536,94 +682,87 @@ class DynamicCartesianProduct(TaskSpecifier):
     def __repr__(self):   return '(%s * %s)' % (repr(self.first), repr(self.second))
 
 
-#==============#
-# TaskCommands #
-#==============#
+#===================#
+# Commands Template #
+#===================#
 
-class TaskCommand(param.Parameterized):
+class CommandTemplate(param.Parameterized):
     """
-    A TaskCommand is a way of converting the general key-value dictionary format
-    of a single task specification to a particular command that needs
-    execution. TaskCommands are objects that when called return a command to be
-    executed at the commandline as a list of strings (Popen format).
-
-    TaskCommands should avoid all platform specific logic (this is the job of
-    the Launcher) but there are some important cases where the specification
-    needs to be read from file in order for a task to be queued before the
-    specification has been generated. To achieve this two extra methods (other
-    than __call__) should be implemented where possible:
+    A command template is a way of converting the key-value dictionary format
+    returned by argument specifiers into a particular command. When called with
+    an argument specifier, a command template returns a list of strings
+    corresponding to a subprocess Popen argument list.
 
     __call__(self, spec, tid=None, info={}):
 
-    The method that must be implemented in all TaskCommands. The tid argument is
-    the task id and info is a dictionary of run-time information provided by the
-    launcher. Info consists of the following information : root_directory,
-    timestamp, varying_keys, constant_keys, batch_name, batch_tag and
-    batch_description.
+    All CommandTemplates must be callable. The tid argument is the task id and
+    info is a dictionary of run-time information supplied by the launcher. Info
+    contains of the following information : root_directory, timestamp,
+    varying_keys, constant_keys, batch_name, batch_tag and batch_description.
+
+    Command templates should avoid all platform specific logic (this is the job
+    of the Launcher) but there are cases where the specification needs to be
+    read from file. This allows tasks to be queued (typically on a cluster)
+    before the required arguments are known. To achieve this two extra methods
+    should be implemented if possible:
 
     specify(spec, tid, info):
 
     Takes a specification for the task and writes it to a file in the
-    'specifications' subdirectory of the root directory. The specification file
-    names should include the tid to ensure uniqueness.
+    'specifications' subdirectory of the root directory. Each specification
+    filename must include the tid to ensure uniqueness.
 
     queue(self,tid, info):
 
-    The command (Popen args format) that retrieves the run-time information from
-    the specification file of the given tid in the 'specifications' subdirectory
-    of the root directory.
+    The subprocess Popen argument list that upon execution runs the desired
+    command using the arguments in the specification file of the given tid
+    located in the 'specifications' folder of the root directory.
     """
 
-    __abstract = True
-
-    allowed_list = param.List(default=[],  doc='''
-        An explicit list of specification keys that the TaskCommand is expected
-        to accept. This allows some degree of error checking before tasks are
-        launched (if set). Note that one alternate safeguard is to instruct your
-        command to exit if invalid parameters are provided if such an option is
-        available.  For example, Topographica can be told to promote warnings to
-        exceptions. This way warnings about unrecognised parameters are not
-        ignored resulting in invalid simulations results.''')
+    allowed_args = param.List(default=[],  doc='''
+        An explicit list of the argument names that the CommandTemplate is
+        expected to accept. This allows some degree of error checking before
+        tasks are launched. Your command may exit if invalid parameters are
+        supplied but it may be best to do an explicit check to avoid waiting in
+        a queue or allowing invalid simulations due to unrecognised parameters.''')
 
     executable = param.String(default='python', constant=True, doc='''
-        The executable that is to be run by this TaskCommand. Unless the
-        executable is a standard command that can be expected on the system
-        path, this should be an absolute path to the executable. By default this
-        invokes python or the python environment used to invoke the TaskCommand
-        (eg. the topographica script).  Note: This can be overridden by the user
-        but really should be set by the TaskCommand object with a sensible
-        default behaviour.''')
+        The executable that is to be run by this CommandTemplate. Unless the
+        executable is a standard command expected on the system path, this
+        should be an absolute path. By default this invokes python or the python
+        environment used to invoke the CommandTemplate (eg. the topographica
+        script).''')
 
     def __init__(self, executable=None, **kwargs):
         if executable is None:
             executable = sys.executable
-        super(TaskCommand,self).__init__(executable=executable, **kwargs)
+        super(CommandTemplate,self).__init__(executable=executable, **kwargs)
 
     def __call__(self, spec, tid=None, info={}):
         """
-        Formats a single specification - a dictionary with string keys and
-        string values.  The info dictionary includes the root_directory,
+        Formats a single argument specification - a dictionary of argument
+        name/value pairs. The info dictionary includes the root_directory,
         batch_name, batch_tag, batch_description, timestamp, varying_keys,
         constant_keys.
         """
         raise NotImplementedError
 
-    def show(self, task_specifier, file_handle = sys.stdout , queue_cmd_only=False):
+    def show(self, arg_specifier, file_handle = sys.stdout , queue_cmd_only=False):
         info = {'root_directory':     '<root_directory>',
                 'batch_name':         '<batch_name>',
                 'batch_tag':          '<batch_tag>',
                 'batch_description':  '<batch_description>',
                 'timestamp':          tuple(time.localtime()),
-                'varying_keys':       task_specifier.varying_keys(),
-                'constant_keys':      task_specifier.constant_keys()}
+                'varying_keys':       arg_specifier.varying_keys(),
+                'constant_keys':      arg_specifier.constant_keys()}
 
         if queue_cmd_only and not hasattr(self, 'queue'):
-            print("Cannot show queue: TaskCommand not queueable")
+            print("Cannot show queue: CommandTemplate does not allow queueing")
             return
         elif queue_cmd_only:
             full_string = 'Queue command: '+ ' '.join([pipes.quote(el) for el in self.queue('<tid>',info)])
-        else:
-            copied = task_specifier.copy()
+        elif (queue_cmd_only is False):
+            copied = arg_specifier.copy()
             full_string = ''
             enumerated = [el for el in enumerate(copied)]
             for (group_ind, specs) in enumerated:
@@ -641,19 +780,21 @@ class TaskCommand(param.Parameterized):
 
 class Launcher(param.Parameterized):
     """
-    A Launcher takes a name, a TaskSpecifier and TaskCommand in the constructor
-    and launches the corresponding tasks appropriately when invoked.
+    A Launcher is constructed using a name, an argument specifier and a command
+    template and launches the corresponding tasks appropriately when invoked.
 
-    This default Launcher uses subprocess to launch the tasks. It is intended to
+    This default Launcher uses subprocess to launch tasks. It is intended to
     illustrate the basic design and should be used as a base class for more
-    complex Launchers.
+    complex Launchers. In particular all Launchers should retain the same
+    behaviour of writing stdout/stderr to the streams directory, writing a log
+    file and recording launch information.
     """
 
-    task_specifier = param.ClassSelector(TaskSpecifier, constant=True, doc='''
+    arg_specifier = param.ClassSelector(BaseArgs, constant=True, doc='''
               The task specifier used to generate the varying parameters for the tasks.''')
 
-    task_command = param.ClassSelector(TaskCommand, constant=True, doc='''
-              The task command used to generate the commands for the tasks.''')
+    command_template = param.ClassSelector(CommandTemplate, constant=True, doc='''
+              The command template used to generate the commands for the current tasks.''')
 
     tag = param.String(default='', doc='''
                A very short, identifiable human-readable string that
@@ -664,8 +805,8 @@ class Launcher(param.Parameterized):
               A short description of the purpose of the current set of tasks.''')
 
     max_concurrency = param.Integer(default=2, allow_None=True, doc='''
-             Concurrency limit to impose on specifier. As the current class uses
-             subprocess locally, two concurrent processes is the limit. Set to
+             Concurrency limit to impose on the launch. As the current class
+             uses subprocess locally, two processes are allowed at once. Set to
              None for no limit (eg. for clusters)''')
 
     exit_callable = param.Callable(default=None, doc='''
@@ -683,9 +824,8 @@ class Launcher(param.Parameterized):
             analysis (eg. pickles) in the same location as everything else.""")
 
     timestamp_format = param.String(default='%Y-%m-%d_%H%M', allow_None=True, doc="""
-             The timestamp format for directories created by run_batch in python
-             datetime format. If None is used, timestamp is omitted from root
-             directory.""")
+             The timestamp format for the root directories in python datetime
+             format. If None, the timestamp is omitted from root directory name.""")
 
     metric_loader = param.Callable(default=pickle.load, doc='''
              The function that will load the metric files generated by the
@@ -696,28 +836,27 @@ class Launcher(param.Parameterized):
              loader.''')
 
     @classmethod
-    def commandline(cls, argsv):
+    def resume_launch(cls):
         """
-        Class method to allow Launchers to be controlled from the commandline.
-        If commandline is processed, should return True - note that decorator
-        will exit immediately after (prevents the calling decorator from
-        relaunching)
+        Class method to allow Launchers to be controlled from the
+        environment.  If the environment is processed and the launcher
+        is resuming, return True, otherwise return False.
         """
         return False
 
 
-    def __init__(self, batch_name, task_specifier, task_command, **kwargs):
+    def __init__(self, batch_name, arg_specifier, command_template, **kwargs):
 
-        super(Launcher,self).__init__(task_specifier=task_specifier,
-                                          task_command = task_command,
+        super(Launcher,self).__init__(arg_specifier=arg_specifier,
+                                          command_template = command_template,
                                           **kwargs)
-
         self.batch_name = batch_name
         self._spec_log = []
         self.timestamp = tuple(time.localtime())
 
-    def root_directory_name(self, timestamp):
+    def root_directory_name(self, timestamp=None):
         " A helper method that gives the root direcory name given a timestamp "
+        if timestamp is None: timestamp = self.timestamp
         if self.timestamp_format is not None:
             return time.strftime(self.timestamp_format, timestamp) + '-' + self.batch_name
         else:
@@ -738,7 +877,7 @@ class Launcher(param.Parameterized):
 
     def record_info(self):
         """
-        All Tasklaunchers should call this method to write the info file at the
+        All launchers should call this method to write the info file at the
         end of the launch.  The info file saves the full timestamp and launcher
         description. The file is written to the root_directory.
         """
@@ -755,30 +894,29 @@ class Launcher(param.Parameterized):
 
     def _setup_launch(self):
         """
-        Method to be used by all launchers that prepares the rootdirectory and
-        generate basic launch information for task specifiers to use. Prepends
-        some basic information to the description, registers a timestamp and
-        return a dictionary of useful information constant across all tasks.
+        Method to be used by all launchers that prepares the root directory and
+        generate basic launch information for command templates to use. Prepends
+        some information to the description, registers a timestamp and return a
+        dictionary of useful launch information constant across all tasks.
         """
-
-        root_name = self.root_directory_name(self.timestamp)
+        root_name = self.root_directory_name()
         self.root_directory = param.normalize_path(root_name)
 
         if not os.path.isdir(self.root_directory): os.makedirs(self.root_directory)
         metrics_dir = os.path.join(self.root_directory, 'metrics')
-        if not os.path.isdir(metrics_dir) and self.task_specifier.dynamic:
+        if not os.path.isdir(metrics_dir) and self.arg_specifier.dynamic:
             os.makedirs(metrics_dir)
 
         formatstr = "Batch '%s' of tasks specified by %s and %s launched by %s with tag '%s':\n"
         classnames= [el.__class__.__name__ for el in
-                [self.task_specifier, self.task_command, self]]
+                [self.arg_specifier, self.command_template, self]]
         self.description = (formatstr % tuple([self.batch_name] + \
                 classnames + [self.tag]))+self.description
 
         return {'root_directory':    self.root_directory,
                 'timestamp':         self.timestamp,
-                'varying_keys':      self.task_specifier.varying_keys(),
-                'constant_keys':     self.task_specifier.constant_keys(),
+                'varying_keys':      self.arg_specifier.varying_keys(),
+                'constant_keys':     self.arg_specifier.constant_keys(),
                 'batch_name':        self.batch_name,
                 'batch_tag':         self.tag,
                 'batch_description': self.description }
@@ -789,22 +927,19 @@ class Launcher(param.Parameterized):
 
         try: os.makedirs(streams_path)
         except: pass
-
         # Waiting till these directories exist (otherwise potential qstat error)
         while not os.path.isdir(streams_path): pass
-
         return streams_path
 
     def extract_metrics(self, tids, launchinfo):
         """
         Method to extract the metrics generated by the tasks required to update
-        the TaskSpecifier (if dynamic). Uses the metric loaded to extract the
-        metrics of specified tids in the metrics subdirectory of the root
-        directory. Convention is that metric files should always be prefixed
-        with metric-<tid>- in this directory. Note the trailing '-' and if there
-        are multiple files with same tid prefix, they will all be returned.
+        the argument specifier (if dynamic). Uses the metric loader to extract
+        the metric files of the 'metrics' subdirectory in the root
+        directory. Metric files should always include the tid in their name for
+        uniqueness and all metric files of the same tid will be returned
+        together.
         """
-
         metrics_dir = os.path.join(self.root_directory, 'metrics')
         listing = os.listdir(metrics_dir)
         try:
@@ -814,7 +949,7 @@ class Launcher(param.Parameterized):
             return [self.metric_loader(pfile) for pfile in pfiles]
         except:
             logging.error("Cannot load required metric files. Cannot continue.")
-            return None # StopIteration should be raised by the TaskSpecifier.
+            return None # StopIteration should be raised by the argument specifier
 
     def limit_concurrency(self, elements):
         """
@@ -829,20 +964,20 @@ class Launcher(param.Parameterized):
 
     def dispatch(self):
         """
-        The method that starts Launcher execution. Typically called by a task
-        decorator.  This could be called directly by the users but the risk is
-        that if __name__=='__main__' is omitted, the launcher may rerun on any
-        import of the script effectively creating a fork-bomb.
+        The method that starts Launcher execution. Typically called by a launch
+        helper.  This could be called directly by the users but the risk is that
+        if __name__=='__main__' is omitted, the launcher may rerun on any import
+        of the script effectively creating a fork-bomb.
         """
         launchinfo = self._setup_launch()
         streams_path = self._setup_streams_path()
 
         last_tid = 0
         last_tids = []
-        for gid, groupspecs in enumerate(self.task_specifier):
+        for gid, groupspecs in enumerate(self.arg_specifier):
             tids = list(range(last_tid, last_tid+len(groupspecs)))
             last_tid += len(groupspecs)
-            allcommands = [self.task_command(spec, tid, launchinfo) for (spec,tid) in zip(groupspecs,tids)]
+            allcommands = [self.command_template(spec, tid, launchinfo) for (spec,tid) in zip(groupspecs,tids)]
 
             self.append_log(list(zip(tids,groupspecs)))
             batches = self.limit_concurrency(list(zip(allcommands,tids)))
@@ -860,15 +995,15 @@ class Launcher(param.Parameterized):
                 logging.info("Batch of %d (%d:%d/%d) subprocesses started..." % \
                             (len(processes), gid, bid, len(batches)-1))
 
-                [p.wait() for p in processes]
+                for p in processes: p.wait()
 
-                [stdout_handle.close() for stdout_handle in stdout_handles]
-                [stderr_handle.close() for stderr_handle in stderr_handles]
+                for stdout_handle in stdout_handles: stdout_handle.close()
+                for stderr_handle in stderr_handles: stderr_handle.close()
 
             last_tids = tids[:]
 
-            if self.task_specifier.dynamic:
-                self.task_specifier.update(self.extract_metrics(last_tids, launchinfo))
+            if self.arg_specifier.dynamic:
+                self.arg_specifier.update(self.extract_metrics(last_tids, launchinfo))
 
         self.record_info()
         if self.exit_callable is not None: self.exit_callable(self._spec_log, self.root_directory)
@@ -876,9 +1011,9 @@ class Launcher(param.Parameterized):
 class QLauncher(Launcher):
     """
     Launcher that operates the Sun Grid Engine using default arguments suitable
-    for runnign on the Edinburgh Eddie cluster. Allows automatic parameter
-    search strategies such as hillclimbing to be used where parameters used
-    depend on previously generated results without blocking waiting on results.
+    for running on the Edinburgh Eddie cluster. Allows automatic parameter
+    search strategies such as hillclimbing to be used, queueing jobs without
+    arguments without blocking (via specification files).
 
     One of the main features of this class is that it is non-blocking - it alway
     exits shortly after invoking qsub. This means that the script is not left
@@ -888,13 +1023,13 @@ class QLauncher(Launcher):
     results from runs (eg. waiting for results from 100 seeds to update your
     hillclimbing algorithm).
 
-    To achieve this, QLauncher qsubs a command back to the launching user script
-    which instructs Qlauncher to continue with 'collate_and_launch'
-    step. Collating refers to either collecting output from a subset of runs to
-    update the TaskSpecifier or to the final collation of all the results at the
-    end of all runs. Each task depends on the previous collate step completing
-    and in turn each collate step depends on the necessary tasks steps reaching
-    completion.
+    To achieve this, QLauncher qsubs a job that relaunches the user's dispatch
+    script which can then instructs the Qlauncher to continue with
+    'collate_and_launch' step (via environment variable). Collating refers to
+    either collecting output from a subset of runs to update the argument specifier
+    or to a final reduction operation over all the results. Jobs are qsubbed
+    with dependencies on the previous collate step and conversely each collate
+    step depends on the all the necessary tasks steps reaching completion.
 
     By convention the standard output and error streams go to the corresponding
     folders in the 'streams' subfolder of the root directory - any -o or -e qsub
@@ -902,12 +1037,12 @@ class QLauncher(Launcher):
     automatically and any user value will be ignored.
     """
 
-    qsub_switches = param.List(default=['-V', '-cwd'], doc = """
+    qsub_switches = param.List(default=['-V', '-cwd'], doc = '''
           Specifies the qsub switches (flags without arguments) as a list of
           strings. By default the -V switch is used to exports all environment
-          variables in the host environment to the batch job.""")
+          variables in the host environment to the batch job.''')
 
-    qsub_flag_options = param.Dict(default={'-b':'y'}, doc="""
+    qsub_flag_options = param.Dict(default={'-b':'y'}, doc='''
           Specifies qsub flags and their corresponding options as a
           dictionary. Valid values may be strings or lists of string.  If a
           plain Python dictionary is used, the keys are alphanumerically sorted,
@@ -919,27 +1054,41 @@ class QLauncher(Launcher):
           directly invoked. Note that the '-' is added to the key if missing (to
           make into a valid flag) so you can specify using keywords in the dict
           constructor: ie. using qsub_flag_options=dict(key1=value1,
-          key2=value2, ....)
-        """)
+          key2=value2, ....)''')
+
+    script_path = param.String(default=os.path.abspath(__file__) if '__file__' in dir() else None,
+                               allow_None = True, doc='''
+         For python environments, this is the path to the dispatch script
+         allowing the QLauncher to collate jobs. The dispatch script is run with
+         the DISPATCH_COLLATE_DIR environment variable set appropriately. This
+         allows the launcher to resume dispatching jobs when using dynamic
+         argument specifiers or when performing a reduction step.
+
+         If set to None, the command template executable (whatever it may be) is
+         executed with the environment variable set.''')
 
     @classmethod
-    def commandline(cls, args):
+    def resume_launch(cls):
         """
-        Continues the execution of the launcher if argument 'collate_and_launch'
-        is last argument on the commandline. In this case, the root directory is
-        expected to be the preceeding argument. This information allows the
-        launcher.pickle file to be unpickled to resume launch.
+        Resumes the execution of the launcher if environment contains
+        DISPATCH_COLLATE_DIR. This information allows the
+        launcher.pickle file to be unpickled to resume the launch.
         """
-        if args[-1] != 'collate_and_launch': return False
-        root_path = param.normalize_path(args[-2])
+        if "DISPATCH_COLLATE_DIR" not in os.environ: return False
+
+        root_path = param.normalize_path(os.environ["DISPATCH_COLLATE_DIR"])
+        del os.environ["DISPATCH_COLLATE_DIR"]
         pickle_path = os.path.join(root_path, 'launcher.pickle')
         launcher = pickle.load(open(pickle_path,'rb'))
         launcher.collate_and_launch()
+
         return True
 
-    def __init__(self, batch_name, task_specifier, task_command, **kwargs):
-        super(QLauncher, self).__init__(batch_name, task_specifier,
-                task_command, **kwargs)
+    def __init__(self, batch_name, arg_specifier, command_template, **kwargs):
+        assert "DISPATCH_COLLATE_DIR" not in os.environ, "DISPATCH_COLLATE_DIR already in environment!"
+
+        super(QLauncher, self).__init__(batch_name, arg_specifier,
+                command_template, **kwargs)
 
         self._launchinfo = None
         self.schedule = None
@@ -948,16 +1097,17 @@ class QLauncher(Launcher):
         self.last_tid = 0
         self.last_scheduled_tid = 0
         self.collate_count = 0
+        self.spec_iter = iter(self.arg_specifier)
 
         self.max_concurrency = None # Inherited
 
         # The necessary conditions for reserving jobs before specification known.
-        self.is_dynamic_qsub = all([self.task_specifier.dynamic,
-                                    hasattr(self.task_specifier, 'schedule'),
-                                    hasattr(self.task_command,   'queue'),
-                                    hasattr(self.task_command,   'specify')])
+        self.is_dynamic_qsub = all([self.arg_specifier.dynamic,
+                                    hasattr(self.arg_specifier, 'schedule'),
+                                    hasattr(self.command_template,   'queue'),
+                                    hasattr(self.command_template,   'specify')])
 
-    def qsub_args(self, override_options, cmd_args):
+    def qsub_args(self, override_options, cmd_args, append_options=[]):
         """
         Method to generate Popen style argument list for qsub using the
         qsub_switches and qsub_flag_options parameters. Switches are returned
@@ -977,14 +1127,16 @@ class QLauncher(Launcher):
         else:
             ordered_options =  list(opt_dict.items())
 
-        unpacked_groups = [[(k,v) for v in val] if type(val)==tuple else [(k,val)]
+        ordered_options += append_options
+
+        unpacked_groups = [[(k,v) for v in val] if type(val)==list else [(k,val)]
                            for (k,val) in ordered_options]
         unpacked_kvs = [el for group in unpacked_groups for el in group]
 
         # Adds '-' if missing (eg, keywords in dict constructor) and flattens lists.
         ordered_pairs = [(k,v) if (k[0]=='-') else ('-%s' % (k), v)
                          for (k,v) in unpacked_kvs]
-        ordered_options = [[k]+([v] if type(v) == str else v) for (k,v) in ordered_pairs]
+        ordered_options = [[k]+([v] if type(v) == str else list(v)) for (k,v) in ordered_pairs]
         flattened_options = [el for kvs in ordered_options for el in kvs]
 
         return (['qsub'] + sorted(self.qsub_switches)
@@ -1009,14 +1161,13 @@ class QLauncher(Launcher):
     def collate_and_launch(self):
         """
         Method that collates the previous jobs and launches the next block of
-        concurrent jobs. The launch type can be either static or dynamic
-        (ie. using schedule, queue and specify with dynamic TaskSpecifiers).
-        This method is invoked on initial dispatch and then subsequently via the
-        commandline to collate the previously run jobs and launching the next
-        block of jobs.
+        concurrent jobs. The launch type can be either static or dynamic (using
+        schedule, queue and specify for dynamic argument specifiers).  This method is
+        invoked on initial dispatch and then subsequently via the commandline to
+        collate the previously run jobs and launching the next block of jobs.
         """
 
-        try:   specs = next(self.task_specifier)
+        try:   specs = next(self.spec_iter)
         except StopIteration:
             self.qdel_batch()
             if self.exit_callable is not None:
@@ -1028,9 +1179,9 @@ class QLauncher(Launcher):
         self.last_tid += len(specs)
         self.append_log(tid_specs)
 
-        # Updating the TaskSpecifier
-        if self.task_specifier.dynamic:
-            self.task_specifier.update(self.extract_metrics(self.last_tids, self._launchinfo))
+        # Updating the argument specifier
+        if self.arg_specifier.dynamic:
+            self.arg_specifier.update(self.extract_metrics(self.last_tids, self._launchinfo))
         self.last_tids = [tid for (tid,_) in tid_specs]
 
         output_dir = self.qsub_flag_options['-o']
@@ -1039,27 +1190,30 @@ class QLauncher(Launcher):
         else:            self.static_qsub(output_dir, error_dir, tid_specs)
 
         # Pickle launcher before exit if necessary.
-        if (self.task_specifier.dynamic) or (self.exit_callable is not None):
+        if (self.arg_specifier.dynamic) or (self.exit_callable is not None):
             root_path = param.normalize_path(self.root_directory)
             pickle_path = os.path.join(root_path, 'launcher.pickle')
             pickle.dump(self, open(pickle_path,'wb'))
 
     def qsub_collate_and_launch(self, output_dir, error_dir, job_names):
         """
-        The method that qsubs a call to the user launch script with the
-        necessary commandline arguments for collating and launching the next
-        block of jobs.
+        The method that actually runs qsub to invoke the user launch script with
+        the necessary environment variable to trigger the next collation step
+        and next block of jobs.
         """
 
-        job_name = "%s_%s_collate_%d" % (self.batch_name, self.job_timestamp,
-                self.collate_count)
+        job_name = "%s_%s_collate_%d" % (self.batch_name,
+                                         self.job_timestamp,
+                                         self.collate_count)
 
         overrides = [("-e",error_dir), ('-N',job_name), ("-o",output_dir),
                      ('-hold_jid',','.join(job_names))]
 
-        cmd_args = [self.task_command.executable, self.script_path,
-                    self.root_directory, 'collate_and_launch']
-        popen_args = self.qsub_args(overrides, cmd_args)
+        cmd_args = [self.command_template.executable]
+        if self.script_path is not None: cmd_args += [self.script_path]
+
+        popen_args = self.qsub_args(overrides, cmd_args,
+                        [("-v", "DISPATCH_COLLATE_DIR=%s" % self.root_directory)])
 
         p = subprocess.Popen(popen_args, stdout=subprocess.PIPE)
         (stdout, stderr) = p.communicate()
@@ -1071,8 +1225,8 @@ class QLauncher(Launcher):
 
     def static_qsub(self, output_dir, error_dir, tid_specs):
         """
-        This method handles static TaskSpecifiers and cases where the dynamic
-        TaskSpecifiers cannot be queued ahead of specification.
+        This method handles static argument specifiers and cases where the
+        dynamic specifiers cannot be queued before the arguments are known.
         """
         processes = []
         job_names = []
@@ -1080,7 +1234,7 @@ class QLauncher(Launcher):
         for (tid, spec) in tid_specs:
             job_name = "%s_%s_job_%d" % (self.batch_name, self.job_timestamp, tid)
             job_names.append(job_name)
-            cmd_args = self.task_command(spec, tid, self._launchinfo)
+            cmd_args = self.command_template(spec, tid, self._launchinfo)
             popen_args = self.qsub_args([("-e",error_dir), ('-N',job_name), ("-o",output_dir)],
                                         cmd_args)
             p = subprocess.Popen(popen_args, stdout=subprocess.PIPE)
@@ -1094,23 +1248,23 @@ class QLauncher(Launcher):
 
     def dynamic_qsub(self, output_dir, error_dir, tid_specs):
         """
-        This method handles dynamic TaskSpecifiers where the dynamic
-        TaskSpecifiers can be queued ahead of specification.
+        This method handles dynamic argument specifiers where the dynamic
+        argument specifier can be queued before the arguments are computed.
         """
 
         # Write out the specification files in anticipation of execution
-        [self.task_command.specify(spec,tid, self._launchinfo) for (tid, spec) in tid_specs]
+        for (tid, spec) in tid_specs: self.command_template.specify(spec,tid, self._launchinfo)
 
         # If schedule is empty (or on first initialization)...
         if (self.schedule == []) or (self.schedule is None):
-            self.schedule = self.task_specifier.schedule()
+            self.schedule = self.arg_specifier.schedule()
             assert len(tid_specs)== self.schedule[0], "Number of specs don't match schedule!"
 
             # Generating the scheduled tasks (ie the queue commands)
             collate_name = None
             for batch_size in self.schedule:
                 schedule_tids = [tid + self.last_scheduled_tid for tid in range(batch_size) ]
-                schedule_tasks = [(tid, self.task_command.queue(tid, self._launchinfo)) for
+                schedule_tasks = [(tid, self.command_template.queue(tid, self._launchinfo)) for
                                       tid in schedule_tids]
 
                 # Queueing with the scheduled tasks with appropriate job id dependencies
@@ -1143,26 +1297,26 @@ class QLauncher(Launcher):
         (stdout, stderr) = p.communicate()
 
 
-#===================#
-# Launch Decorators #
-#===================#
+#===============#
+# Launch Helper #
+#===============#
 
 class review_and_launch:
     """
-    The basic example of the sort of decorator that -must- be used to start
-    Launcher execution for the following reasons:
+    The basic example of the sort of helper that is highly recommended for
+    launching:
 
-    1) The definition script may include objects/class that need to be imported
+    1) The dispatch script may include objects/class that need to be imported
     (eg. for accessing analysis functions) to execute the tasks. By default this
     would execute the whole script and therefore re-run the Launcher which would
-    cause a fork-bomb! This decorator only executes the Tasklauncher that is
+    cause a fork-bomb! This decorator only executes the launcher that is
     returned by the wrapped function if __name__=='__main__'
 
-    2) Code in the script after Launcher execution has been invoked is *not*
-    guaranteed to execute after all tasks are complete (eg. due to forking,
-    subprocess, qsub etc). This decorator solves this issue, making sure
-    execution is the last thing that happens. The exit_callable parameter is the
-    proper way of executing code after the Launcher exits.
+    Code in the script after Launcher execution has been invoked is not
+    guaranteed to execute *after* all tasks are complete (eg. due to forking,
+    subprocess, qsub etc). This decorator helps solves this issue, making sure
+    launch is the last thing in the definition function. The exit_callable
+    parameter is the proper way of executing code after the Launcher exits.
     """
 
     def __init__(self, launcher_class, output_directory=None, review=True, check_main=True):
@@ -1170,7 +1324,7 @@ class review_and_launch:
         self.launcher_class = launcher_class
         self.output_directory = output_directory
         self.check_main = check_main
-        # The launcher classmethod 'commandline' is called before function invocation.
+
         if not isinstance(launcher_class,type) \
                 or not issubclass(launcher_class, Launcher):
             raise Exception("Use decorator as follows: review_and_launch(<launcher_class>, review=True)")
@@ -1190,59 +1344,58 @@ class review_and_launch:
             elif response == '' and default is not None:
                 return default.lower()
 
-    def review_task_specification(self, task_specifier):
-        print(self.section('TaskSpecifier'))
-        print("Type: %s (dynamic=%s)" % (task_specifier.__class__.__name__,
-            task_specifier.dynamic))
-        print("Varying Keys: %s" % task_specifier.varying_keys())
-        print("Constant Keys: %s" % task_specifier.constant_keys())
-        print("Definition: %s" % task_specifier)
+    def review_arg_specification(self, arg_specifier):
+        print(self.section('Argument Specification'))
+        print("Type: %s (dynamic=%s)" % (arg_specifier.__class__.__name__,
+            arg_specifier.dynamic))
+        print("Varying Keys: %s" % arg_specifier.varying_keys())
+        print("Constant Keys: %s" % arg_specifier.constant_keys())
+        print("Definition: %s" % arg_specifier)
 
-        if task_specifier.rationale != '':
-            print("\nRationale:\n%s\n" % task_specifier.rationale)
+        if arg_specifier.rationale != '':
+            print("\nRationale:\n%s\n" % arg_specifier.rationale)
 
         response = self.input_options(['Y', 'n','quit'],
-                '\nShow available taskspecifier entries?', default='y')
+                '\nShow available argument specifier entries?', default='y')
 
         if response == 'quit': return False
-        if response == 'y':  task_specifier.show()
+        if response == 'y':  arg_specifier.show()
         print
         return True
 
-    def review_task_command(self, task_command, task_specifier, task_launcher):
-        print(self.section('TaskCommand'))
-        print("Type: %s" % task_command.__class__.__name__)
-        if task_command.allowed_list != []:
-            print("Allowed List: %s" % task_command.allowed_list)
-        if isinstance(task_launcher, QLauncher):
-            task_command.show(task_specifier.copy(),
-                    queue_cmd_only=task_launcher.is_dynamic_qsub)
+    def review_command_template(self, command_template, arg_specifier, task_launcher):
+        print(self.section('Command'))
+        print("Type: %s" % command_template.__class__.__name__)
+        if command_template.allowed_args != []:
+            print("Allowed List: %s" % command_template.allowed_args)
+        if isinstance(task_launcher, QLauncher) and task_launcher.is_dynamic_qsub:
+            command_template.show(arg_specifier.copy(), queue_cmd_only=True)
 
-        if task_command.allowed_list != []:
-            allowed_list = set(task_command.allowed_list)
-            all_keys = set(task_specifier.varying_keys()+task_specifier.constant_keys())
-            if not (all_keys <= allowed_list):
-                clashes = all_keys - allowed_list
-                raise Exception("Keys %s not in the allowed list of the TaskCommand!" % list(clashes))
+        if command_template.allowed_args != []:
+            allowed_args = set(command_template.allowed_args)
+            all_keys = set(arg_specifier.varying_keys()+arg_specifier.constant_keys())
+            if not (all_keys <= allowed_args):
+                clashes = all_keys - allowed_args
+                raise Exception("Keys %s not in the allowed list of the CommandTemplate!" % list(clashes))
 
         response = self.input_options(['Y', 'n','quit','savefile'],
                 '\nShow available taskcommand entries?', default='y')
         if response == 'quit': return False
         if response == 'y':
-            task_command.show(task_specifier.copy())
+            command_template.show(arg_specifier.copy())
         if response == 'savefile':
             fname = input('Filename: ').replace(' ','_')
             with open(fname,'w') as f:
-                task_command.show(task_specifier.copy(),file_handle=f)
+                command_template.show(arg_specifier.copy(),file_handle=f)
         print
         return True
 
-    def review_task_launcher(self, task_launcher,task_command):
+    def review_task_launcher(self, task_launcher,command_template):
         print(self.section('Launcher'))
         print("Type: %s" % task_launcher.__class__.__name__)
         print("Batch Name: %s" % task_launcher.batch_name)
-        print("Command executable: %s" % task_command.executable)
-        root_directory = task_launcher.root_directory_name(task_launcher.timestamp)
+        print("Command executable: %s" % command_template.executable)
+        root_directory = task_launcher.root_directory_name()
         print("Root directory: %s" % param.normalize_path(root_directory))
         print("Maximum concurrency: %s" % task_launcher.max_concurrency)
 
@@ -1257,35 +1410,28 @@ class review_and_launch:
 
     def __call__(self, f):
         if not self.check_main or f.__module__ == '__main__':
-            commandline_used = self.launcher_class.commandline(sys.argv)
-        if commandline_used: return None
+            if self.launcher_class.resume_launch(): return None
+        else: return None
 
         if self.output_directory is not None:
             param.normalize_path.prefix = self.output_directory
         task_launcher = f()
 
-        # Finding and setting the script path (needed for Launcher that use the commandline)
-        script_path = os.path.join(os.getcwd(), sys.argv[-1])
-        if not os.path.exists(script_path):
-            print "Cannot extract script path: %s" % script_path; sys.exit()
-
-        task_launcher.script_path = script_path
-
         if not isinstance(task_launcher, Launcher):
-            raise Exception("Function must return a Tasklauncher not '%s'" % str(task_launcher))
+            raise Exception("Function must return a launcher not '%s'" % str(task_launcher))
 
         if self.review:
-            task_specifier = task_launcher.task_specifier
-            task_command = task_launcher.task_command
+            arg_specifier = task_launcher.arg_specifier
+            command_template = task_launcher.command_template
 
-            self.review_task_launcher(task_launcher, task_command)
+            self.review_task_launcher(task_launcher, command_template)
 
-            if self.review_task_specification(task_specifier) and \
-              self.review_task_command(task_command, task_specifier, task_launcher) and \
+            if self.review_arg_specification(arg_specifier) and \
+              self.review_command_template(command_template, arg_specifier, task_launcher) and \
               (self.input_options(['y','N'], 'Execute?', default='n') == 'y'):
                 print("== Dispatching '%s' ==" % task_launcher.batch_name)
                 task_launcher.dispatch()
-            else: print("Aborting dispatch...")
+            else: print("Aborting dispatch.")
         else:
             task_launcher.dispatch()
 
