@@ -412,7 +412,6 @@ class RunBatchAnalysis(param.Parameterized):
           the given subdirectory on the appropriate path'''
       pickle_dir = os.path.join(self.root_directory, subdir)
       if not os.path.isdir(pickle_dir): os.makedirs(pickle_dir)
-      print "PICKLING TO DIR: %s" % pickle_dir
       with open(os.path.join(self.root_directory, subdir, fname),'wb') as p: pickle.dump(data, p)
 
    def setup(self):

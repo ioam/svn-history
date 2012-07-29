@@ -1341,12 +1341,11 @@ class review_and_launch(param.Parameterized):
                  statistics over runs that are not deterministic or are affected
                  by a random seed for example.''')
 
-    def __init__(self, launcher_class, output_directory='.', dispatch_args=None, review=True, main_script=True):
-        self.launcher_class = launcher_class
-        self.output_directory = output_directory
-        self.dispatch_args = dispatch_args
-        self.review = review
-        self.main_script = main_script
+    def __init__(self, launcher_class, output_directory='.', **kwargs):
+
+        super(review_and_launch, self).__init__(launcher_class=launcher_class,
+                                                output_directory=output_directory,
+                                                **kwargs)
         self._get_launcher = lambda x:x
         self._cross_checks = [(self._get_launcher, self.cross_check_launchers)]
         self._reviewers = [(self._get_launcher, self.review_launcher ),
@@ -1406,7 +1405,7 @@ class review_and_launch(param.Parameterized):
         clashes = [used - allowed for (used, allowed) in zip(used_args, allowed_args)
                    if (used - allowed) != set()]
 
-        if clashes != []: raise Exception("Keys %s not in CommandTemplate allowed list" % list(clash_sets[0]))
+        if clashes != []: raise Exception("Keys %s not in CommandTemplate allowed list" % list(clashes[0]))
 
     def __call__(self, f):
         if self.main_script and f.__module__ != '__main__': return None
@@ -1453,7 +1452,7 @@ class review_and_launch(param.Parameterized):
         if response == 'y':
             for dval in dispatch_vals:
                 launcher =  self._get_launcher(dval)
-                print("Launching %s" % launcher.batch_name)
+                print("== Launching  %s ==" % launcher.batch_name)
                 launcher.dispatch()
 
     def review_launcher(self, launcher):
