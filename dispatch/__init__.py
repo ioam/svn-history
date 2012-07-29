@@ -55,7 +55,7 @@ import time, pipes, subprocess
 import logging
 
 import numpy as np
-from itertools import chain, groupby
+import itertools
 from collections import defaultdict
 
 import param
@@ -207,7 +207,7 @@ class BaseArgs(param.Parameterized):
         find how fast keys vary.
         """
         # Collects key, value tuples as list of lists then flatten using chain
-        allkeys = chain.from_iterable([[(k, run[k])  for k in run] for run in specs])
+        allkeys = itertools.chain.from_iterable([[(k, run[k])  for k in run] for run in specs])
         collection = defaultdict(list)
         for (k,v) in allkeys: collection[k].append(v)
         return collection
@@ -300,7 +300,7 @@ class BaseArgs(param.Parameterized):
             response =  None
             while response not in ['y','N', '']:
                 response = raw_input('Continue? [y, N]: ')
-            if response != 'y': return
+            if response != 'y': return False
 
         return log_file
 
@@ -322,6 +322,7 @@ class BaseArgs(param.Parameterized):
         the the arg keys are specified.
         """
         log_file = self._setup_generator(args, review, log_file)
+        if log_file is False: return
         accumulator = []
         line_no = 0
         old_format = self.format
@@ -414,7 +415,7 @@ class StaticArgs(BaseArgs):
         constant_set = set(self.constant_keys())
         unordered_varying = set(collection.keys()).difference(constant_set)
         # Finding out how fast keys are varying
-        grouplens = [(len([len(list(y)) for (_,y) in groupby(collection[k])]),k) for k in collection ]
+        grouplens = [(len([len(list(y)) for (_,y) in itertools.groupby(collection[k])]),k) for k in collection]
         varying_counts = [ (n,k) for (n,k) in sorted(grouplens) if (k in unordered_varying)]
         # Grouping keys with common frequency alphanumerically (desired behaviour).
         ddict = defaultdict(list)
@@ -520,7 +521,7 @@ class LinearArgs(StaticArgs):
 
     end_value = param.Number(default=None, allow_None=True, constant=True, doc='''
          The ending numeric value of the linear interpolation (inclusive).
-         If not specified,  If not specified, will return 'value' (no interpolation).''')
+         If not specified, will return 'value' (no interpolation).''')
 
     steps = param.Integer(default=1, constant=True, doc='''
          The number of steps to use in the interpolation. Default is 1.''')
@@ -719,12 +720,13 @@ class CommandTemplate(param.Parameterized):
     located in the 'specifications' folder of the root directory.
     """
 
-    allowed_args = param.List(default=[],  doc='''
-        An explicit list of the argument names that the CommandTemplate is
-        expected to accept. This allows some degree of error checking before
-        tasks are launched. Your command may exit if invalid parameters are
-        supplied but it may be best to do an explicit check to avoid waiting in
-        a queue or allowing invalid simulations due to unrecognised parameters.''')
+    allowed_list = param.List(default=[], doc='''
+        An optional, explicit list of the argument names that the
+        CommandTemplate is expected to accept. If the empty list, no checking is
+        performed. This allows some degree of error checking before tasks are
+        launched. A command may exit if invalid parameters are supplied but it
+        is often better to explicitly check: this avoids waiting in a cluster
+        queue or invalid simulations due to unrecognised parameters.''')
 
     executable = param.String(default='python', constant=True, doc='''
         The executable that is to be run by this CommandTemplate. Unless the
@@ -791,7 +793,7 @@ class Launcher(param.Parameterized):
     """
 
     arg_specifier = param.ClassSelector(BaseArgs, constant=True, doc='''
-              The task specifier used to generate the varying parameters for the tasks.''')
+              The specifier used to generate the varying parameters for the tasks.''')
 
     command_template = param.ClassSelector(CommandTemplate, constant=True, doc='''
               The command template used to generate the commands for the current tasks.''')
@@ -816,7 +818,7 @@ class Launcher(param.Parameterized):
              RunBatchAnalysis), inform the user of completion (eg. send an
              e-mail) among other possibilities.''')
 
-    timestamp = param.NumericTuple(default= (0, 0, 0, 0, 0, 0, 0, 0, 0), doc="""
+    timestamp = param.NumericTuple(default=(0,)*9, doc="""
             Optional override of timestamp (default timestamp set on dispatch
             call) in Python struct_time 9-tuple format.  Useful when you need to
             have a known root_directory path (see root_directory documentation)
@@ -852,7 +854,8 @@ class Launcher(param.Parameterized):
                                           **kwargs)
         self.batch_name = batch_name
         self._spec_log = []
-        self.timestamp = tuple(time.localtime())
+        if self.timestamp == (0,)*9:
+            self.timestamp = tuple(time.localtime())
 
     def root_directory_name(self, timestamp=None):
         " A helper method that gives the root direcory name given a timestamp "
@@ -861,7 +864,6 @@ class Launcher(param.Parameterized):
             return time.strftime(self.timestamp_format, timestamp) + '-' + self.batch_name
         else:
             return self.batch_name
-
 
     def append_log(self, specs):
         """
@@ -1056,8 +1058,7 @@ class QLauncher(Launcher):
           constructor: ie. using qsub_flag_options=dict(key1=value1,
           key2=value2, ....)''')
 
-    script_path = param.String(default=os.path.abspath(__file__) if '__file__' in dir() else None,
-                               allow_None = True, doc='''
+    script_path = param.String(default=None, allow_None = True, doc='''
          For python environments, this is the path to the dispatch script
          allowing the QLauncher to collate jobs. The dispatch script is run with
          the DISPATCH_COLLATE_DIR environment variable set appropriately. This
@@ -1301,7 +1302,7 @@ class QLauncher(Launcher):
 # Launch Helper #
 #===============#
 
-class review_and_launch:
+class review_and_launch(param.Parameterized):
     """
     The basic example of the sort of helper that is highly recommended for
     launching:
@@ -1316,18 +1317,48 @@ class review_and_launch:
     guaranteed to execute *after* all tasks are complete (eg. due to forking,
     subprocess, qsub etc). This decorator helps solves this issue, making sure
     launch is the last thing in the definition function. The exit_callable
-    parameter is the proper way of executing code after the Launcher exits.
-    """
+    parameter is the proper way of executing code after the Launcher exits."""
 
-    def __init__(self, launcher_class, output_directory=None, review=True, check_main=True):
-        self.review = review
+    launcher_class = param.Parameter(doc='''
+         The launcher class used for this dispatch script.  Necessary to access
+         launcher classmethods (to resume dispatch for example).''')
+
+    output_directory = param.String(default='.', doc='''
+         The output directory - the directory that will contain all the root
+         directories for the individual dispatches.''')
+
+    review = param.Boolean(default=True, doc='''
+         Whether or not to perform a detailed review of the dispatch before
+         launching.''')
+
+    main_script = param.Boolean(default=True, doc='''
+         Whether the launch is occuring from a dispatch script running as
+         main. Set to False for projects using dispatch not in the main script.''')
+
+    dispatch_args = param.ClassSelector(default=None, allow_None=True, class_=StaticArgs,
+         doc= '''An optional argument specifier to parameterise dispatch,
+                 allowing multi-dispatch scripts.  Useful for collecting
+                 statistics over runs that are not deterministic or are affected
+                 by a random seed for example.''')
+
+    def __init__(self, launcher_class, output_directory='.', dispatch_args=None, review=True, main_script=True):
         self.launcher_class = launcher_class
         self.output_directory = output_directory
-        self.check_main = check_main
+        self.dispatch_args = dispatch_args
+        self.review = review
+        self.main_script = main_script
+        self._get_launcher = lambda x:x
+        self._cross_checks = [(self._get_launcher, self.cross_check_launchers)]
+        self._reviewers = [(self._get_launcher, self.review_launcher ),
+                           (self._get_launcher, self.review_args),
+                           (self._get_launcher, self.review_command_template)]
 
-        if not isinstance(launcher_class,type) \
-                or not issubclass(launcher_class, Launcher):
-            raise Exception("Use decorator as follows: review_and_launch(<launcher_class>, review=True)")
+    def configure_launch(self, dval):
+        """
+        Hook to allow the Launch helper to autoconfigure dispatches as appropriate.
+        For example, can be used to save objects in their final state.
+        """
+        return
 
     def section(self, text, car='=', carvert='|'):
         length=len(text)+4
@@ -1335,19 +1366,121 @@ class review_and_launch:
                                      carvert, car*length)
 
     def input_options(self, options, prompt='Select option', default=None):
+        """
+        Helper to prompt the user for input on the commandline.
+        """
         check_options = [x.lower() for x in options]
-
         while True:
             response = raw_input('%s [%s]: ' % (prompt, ', '.join(options))).lower()
-            if response in check_options:
-                return response
+            if response in check_options: return response.strip()
             elif response == '' and default is not None:
-                return default.lower()
+                return default.lower().strip()
 
-    def review_arg_specification(self, arg_specifier):
-        print(self.section('Argument Specification'))
-        print("Type: %s (dynamic=%s)" % (arg_specifier.__class__.__name__,
-            arg_specifier.dynamic))
+    def cross_check_launchers(self, launchers):
+        """
+        Performs consistency checks across all the launchers to be dispatched.
+        """
+        if len(launchers) == 0: raise Exception('Empty launcher list')
+        batch_names = [launcher.batch_name for launcher in launchers]
+        timestamps = [launcher.timestamp for launcher in launchers]
+        launcher_classes = [launcher.__class__ for launcher in launchers]
+
+        if len(set(batch_names)) != len(launchers):
+            raise Exception('Each launcher requires a unique batch name.')
+
+        if not all(timestamps[0] == tstamp for tstamp in timestamps):
+            raise Exception("Launcher timestamps not all equal. Consider setting timestamp explicitly.")
+
+        if not all(lclass == self.launcher_class for lclass in launcher_classes):
+            raise Exception("Launcher class inconsistent with returned launcher instances.")
+
+        # Argument name consistency checks
+        checkable_launchers = [launcher for launcher in launchers
+                               if (launcher.command_template.allowed_list != [])]
+
+        used_args = [set(launcher.arg_specifier.varying_keys()
+                         + launcher.arg_specifier.constant_keys()) for launcher in checkable_launchers]
+
+        allowed_args = [set(launcher.command_template.allowed_list) for launcher in checkable_launchers]
+
+        clashes = [used - allowed for (used, allowed) in zip(used_args, allowed_args)
+                   if (used - allowed) != set()]
+
+        if clashes != []: raise Exception("Keys %s not in CommandTemplate allowed list" % list(clash_sets[0]))
+
+    def __call__(self, f):
+        if self.main_script and f.__module__ != '__main__': return None
+
+        # Resuming launch as necessary
+        if self.launcher_class.resume_launch(): return None
+
+        # Setting the output directory via param
+        if self.output_directory is not None:
+            param.normalize_path.prefix = self.output_directory
+
+        # Calling the wrapped function with appropriate arguments
+        kwargs_list = [{}] if (self.dispatch_args is None) else list(self.dispatch_args(review=False))
+        dispatch_vals = [f(**kwargs_list[0])]
+        if self.dispatch_args is not None:
+            self.launcher_class.timestamp = self._get_launcher(dispatch_vals[0]).timestamp
+            dispatch_vals += [f(**kwargs) for kwargs in kwargs_list[1:]]
+
+        # Cross checks
+        for (accessor, checker) in self._cross_checks:
+            checker([accessor(dval) for dval in dispatch_vals])
+
+        if self.review:
+            # Run review of dispatch args only if necessary
+            if self.dispatch_args is not None:
+                proceed = self.review_args(self.dispatch_args, heading='Dispatch Meta Parameters')
+                if not proceed: return None
+
+            for (count, dval) in enumerate(dispatch_vals):
+                proceed = all(r(access(dval)) for (access, r) in self._reviewers)
+                if not proceed:
+                    print("Aborting dispatch.")
+                    return None
+
+                if len(dispatch_vals)!= 1 and count < len(dispatch_vals)-1:
+                    skip_remaining = self.input_options(['Y', 'n','quit'],
+                                     '\nSkip remaining reviews?', default='y')
+                    if skip_remaining == 'quit': return None
+                    if skip_remaining == 'y': break
+
+        for dval in dispatch_vals: self.configure_launch(dval) # Configure hook
+
+        response = self.input_options(['y','N'], 'Execute?', default='n')
+        if response == 'y':
+            for dval in dispatch_vals:
+                launcher =  self._get_launcher(dval)
+                print("Launching %s" % launcher.batch_name)
+                launcher.dispatch()
+
+    def review_launcher(self, launcher):
+        command_template = launcher.command_template
+        print(self.section('Launcher'))
+        print("Type: %s" % launcher.__class__.__name__)
+        print("Batch Name: %s" % launcher.batch_name)
+        print("Command executable: %s" % command_template.executable)
+        root_directory = launcher.root_directory_name()
+        print("Root directory: %s" % param.normalize_path(root_directory))
+        print("Maximum concurrency: %s" % launcher.max_concurrency)
+
+        description = '<No description>' if launcher.description == '' else launcher.description
+        tag = '<No tag>' if launcher.tag == '' else launcher.tag
+        print("Description: %s" % description)
+        print("Tag: %s" % tag)
+        print
+        return True
+
+    def review_args(self, obj, heading='Argument Specification'):
+        """
+        Input argument obj can be a Launcher or an ArgSpec object.
+        """
+        arg_specifier = obj.arg_specifier if isinstance(obj, Launcher) else obj
+        print(self.section(heading))
+        print("Type: %s (dynamic=%s)" %
+              (arg_specifier.__class__.__name__, arg_specifier.dynamic))
         print("Varying Keys: %s" % arg_specifier.varying_keys())
         print("Constant Keys: %s" % arg_specifier.constant_keys())
         print("Definition: %s" % arg_specifier)
@@ -1357,82 +1490,29 @@ class review_and_launch:
 
         response = self.input_options(['Y', 'n','quit'],
                 '\nShow available argument specifier entries?', default='y')
-
         if response == 'quit': return False
         if response == 'y':  arg_specifier.show()
         print
         return True
 
-    def review_command_template(self, command_template, arg_specifier, task_launcher):
-        print(self.section('Command'))
-        print("Type: %s" % command_template.__class__.__name__)
-        if command_template.allowed_args != []:
-            print("Allowed List: %s" % command_template.allowed_args)
-        if isinstance(task_launcher, QLauncher) and task_launcher.is_dynamic_qsub:
+    def review_command_template(self, launcher):
+        command_template = launcher.command_template
+        arg_specifier = launcher.arg_specifier
+        print(self.section(command_template.__class__.__name__))
+        if command_template.allowed_list != []:
+            print("Allowed List: %s" % command_template.allowed_list)
+        if isinstance(launcher, QLauncher) and launcher.is_dynamic_qsub:
             command_template.show(arg_specifier.copy(), queue_cmd_only=True)
 
-        if command_template.allowed_args != []:
-            allowed_args = set(command_template.allowed_args)
-            all_keys = set(arg_specifier.varying_keys()+arg_specifier.constant_keys())
-            if not (all_keys <= allowed_args):
-                clashes = all_keys - allowed_args
-                raise Exception("Keys %s not in the allowed list of the CommandTemplate!" % list(clashes))
-
-        response = self.input_options(['Y', 'n','quit','savefile'],
-                '\nShow available taskcommand entries?', default='y')
+        response = self.input_options(['Y', 'n','quit','save'],
+                                      '\nShow available command entries?', default='y')
         if response == 'quit': return False
         if response == 'y':
             command_template.show(arg_specifier.copy())
-        if response == 'savefile':
-            fname = input('Filename: ').replace(' ','_')
-            with open(fname,'w') as f:
+        if response == 'save':
+            fname = raw_input('Filename: ').replace(' ','_')
+            with open(os.path.abspath(fname),'w') as f:
                 command_template.show(arg_specifier.copy(),file_handle=f)
         print
         return True
 
-    def review_task_launcher(self, task_launcher,command_template):
-        print(self.section('Launcher'))
-        print("Type: %s" % task_launcher.__class__.__name__)
-        print("Batch Name: %s" % task_launcher.batch_name)
-        print("Command executable: %s" % command_template.executable)
-        root_directory = task_launcher.root_directory_name()
-        print("Root directory: %s" % param.normalize_path(root_directory))
-        print("Maximum concurrency: %s" % task_launcher.max_concurrency)
-
-        if task_launcher.description == '': description = '<No description>'
-        else:                               description = task_launcher.description
-        print("Description: %s" % description)
-
-        if task_launcher.tag == '':         tag = '<No tag>'
-        else:                               tag = task_launcher.tag
-        print("Tag: %s" % tag)
-        print
-
-    def __call__(self, f):
-        if not self.check_main or f.__module__ == '__main__':
-            if self.launcher_class.resume_launch(): return None
-        else: return None
-
-        if self.output_directory is not None:
-            param.normalize_path.prefix = self.output_directory
-        task_launcher = f()
-
-        if not isinstance(task_launcher, Launcher):
-            raise Exception("Function must return a launcher not '%s'" % str(task_launcher))
-
-        if self.review:
-            arg_specifier = task_launcher.arg_specifier
-            command_template = task_launcher.command_template
-
-            self.review_task_launcher(task_launcher, command_template)
-
-            if self.review_arg_specification(arg_specifier) and \
-              self.review_command_template(command_template, arg_specifier, task_launcher) and \
-              (self.input_options(['y','N'], 'Execute?', default='n') == 'y'):
-                print("== Dispatching '%s' ==" % task_launcher.batch_name)
-                task_launcher.dispatch()
-            else: print("Aborting dispatch.")
-        else:
-            task_launcher.dispatch()
-
-        return None
