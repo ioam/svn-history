@@ -497,7 +497,7 @@ class RunBatchAnalysis(param.Parameterized):
 
          previous_reduction = reducefn(specs, map_data, previous_reduction)
          # Must be restored for multiple launches (global state)
-         param.normalize_path.prefix = prefix
+      param.normalize_path.prefix = prefix
 
    def __str__(self):
       ''' The printed representation of the analysis object. '''

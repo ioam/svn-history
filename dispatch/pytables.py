@@ -31,7 +31,7 @@ class GCALTable:
     def write_table(self, table_name, specs, exclude_keys = [],
                     description='', primary_key = 'id', **array_lists):
 
-        del_keys = ['dataset', 'times'] + exclude_keys
+        del_keys = ['dataset', 'times', 'model'] + exclude_keys
         (arrays, dtypes) = self._register_array_lists(array_lists)
         cols = [(k,tables.Col.from_dtype(dt)) for (k,dt) in dtypes.items()
                 if (k not in del_keys)]
@@ -70,6 +70,7 @@ class GCALTable:
         return vlarray
 
     def __contains__(self, item):
+        ''' Note, only seem to work for the leaves. Need _v_name for Groups '''
         return item in [t.name for t in  self.h5file.listNodes(self.group)]
 
     def close(self):
@@ -139,6 +140,10 @@ class PyTableUtils:
     def __exit__(self, type, value, traceback): self.close()
 
 
+#=========================#
+# Depracated (hopefully!) #
+#=========================#
+
 import numpy as np
 import json, os
 import tables
@@ -185,6 +190,49 @@ def table_from_log(log_path ='GCAL/2012-07-13_1207-GCAL/GCAL.log',times=[i*1000 
                 table_row.append()
     h5file.flush()
     h5file.close()
+
+
+
+
+'''
+# h5py for comparison
+
+# - Closer to HDF5/better interoperability
+# - Python 3 compatible
+# - Lacking query features
+
+import h5py
+import numpy as np
+f = h5py.File('./test.h5')
+group = f.create_group('group_example')
+f['group_example']['data'] = np.array([('aaaa', 1.0, 8.0, [[1, 1, 1], [1, 1, 1]]),
+        ('aaaa', 2.0, 7.4000000000000004, [[2, 2, 2], [2, 2, 2]]),
+        ('bbbb', 3.5, 8.5, [[3, 3, 3], [3, 3, 3]]),
+        ('aaaa', 6.4000000000000004, 4.0, [[4, 4, 4], [4, 4, 4]]),
+        ('aaaa', 8.8000000000000007, 4.0999999999999996, [[5, 5, 5],
+[5, 5, 5]]),
+        ('bbbb', 5.5, 9.0999999999999996, [[6, 6, 6], [6, 6, 6]]),
+        ('bbbb', 7.7000000000000002, 8.5, [[7, 7, 7], [7, 7, 7]])],
+       dtype=[('name', '|S4'), ('x', 'f8'), ('y', 'f8'), ('block',
+'i8', (2, 3))])
+
+# NOTE: Instantiates whole recarray
+# Can slice block: f['group_example']['data'][3:4]
+[el['block'].shape for el in f['group_example']['data'][:]]
+
+# Access from dataset
+f['group_example']['data']['block']
+f['group_example']['data'].attrs['some_metadata'] = 'This is METADATA'
+
+# Supports numpy mask array indexing
+
+# Specify the array data in constructor of create_dataset
+
+# Use list() to see contents of files/groups
+f.flush()
+f.close()
+'''
+
 
 #h5f = tables.openFile('GCAL.h5', mode="a")
 # ob = pickle.load(open('./GCAL/2012-07-13_1207-GCAL/OR_preference/OR_preference@time=20000[4]','r'))
