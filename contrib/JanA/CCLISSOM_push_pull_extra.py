@@ -237,14 +237,12 @@ class CFPLF_KeyserRule(CFPLearningFn):
         if single_connection_learning_rate==0:
             return
 	
-        z = numpy.argmax(output_activity)
-
 
         #calculate overall incomming inhibition
         inhibition = 0
         for s in self.inhibitory_projection_list:
             p = topo.sim[self.sheet].projections()[s]
-            inhibition += p.activity * abs(p.strength)
+            inhibition += abs(p.activity)
 
         
         for cf,i in iterator():
@@ -257,7 +255,15 @@ class CFPLF_KeyserRule(CFPLearningFn):
             if inhibition.flat[i] != 0:
                 cf.weights += single_connection_learning_rate * inhibition.flat[i] * cf.get_input_matrix(input_activity)
             
-            cf.weights *= (cf.weights>0) * cf.mask
+            cf.weights *= numpy.multiply((cf.weights>0),cf.mask)
+
+
+def circular_dist(a,b,period):
+    """
+    The distance between a and b (scalars) in the periodic. 
+    a,b have to be in (0,period)
+    """
+    return  numpy.minimum(abs(a-b), period - abs(a-b))
 
 def rad_to_complex(vector):
     """
@@ -327,30 +333,78 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
     """
     It assumes orientation preference was already measured.
     """
-    ExcToExc = topo.sim[sheet_name].projections()[proj_name]
-    or_pref = topo.sim[sheet_name].sheet_views['OrientationPreference'].view()[0]
+    projection = topo.sim[sheet_name].projections()[proj_name]
+    or_pref = topo.sim[sheet_name].sheet_views['OrientationPreference'].view()[0]*numpy.pi
+    phase_pref = topo.sim[sheet_name].sheet_views['PhasePreference'].view()[0]*numpy.pi*2
     
-    cm  = []
-    for cf in ExcToExc.cfs.flatten():
-        # lets do this only for full connections fields
-        assert numpy.shape(cf.weights*cf.mask*cf.input_sheet_slice.submatrix(or_pref)) == numpy.shape(cf.weights)
-        
+    app  = []
+    av1 = []
+    av2 = []
+    for (i,cf) in enumerate(projection.cfs.flatten()):
+        this_or = or_pref.flatten()[i]
+        this_phase = phase_pref.flatten()[i]
         ors = cf.input_sheet_slice.submatrix(or_pref).flatten()
-        weights = cf.weights*cf.mask
-        z = circ_mean(numpy.array([ors]),weights=numpy.array([weights.flatten()]),axis=1,low=0.0,high=1.0,normalize=False)
-        cm.append(z[0])
-    
+        phases = cf.input_sheet_slice.submatrix(phase_pref).flatten()
+        weights = numpy.multiply(cf.weights,cf.mask)
+        
+        #First lets compute the average phase of neurons which are within 30 degrees of the given neuron
+        within_30_degrees = numpy.nonzero((circular_dist(ors,this_or,numpy.pi) < (numpy.pi/6.0))*1.0)[0]
+        if len(within_30_degrees) != 0:
+            z = circ_mean(numpy.array([phases[within_30_degrees]]),weights=numpy.array([weights.flatten()[within_30_degrees]]),axis=1,low=0.0,high=numpy.pi*2,normalize=False)
+            app.append(z[0])
+        else:
+            app.append(0.0)
+            
+        #Now lets compare the average connection strength to neurons oriented within 30 degrees and having the same phase (within 60 degrees), with the average connections strength to neurons more than 30 degrees off in orientation
+        outside_30_degrees = numpy.nonzero(circular_dist(ors,this_or,numpy.pi) > numpy.pi/6.0)[0]
+        within_30_degrees_and_same_phase = numpy.nonzero(numpy.multiply(circular_dist(ors,this_or,numpy.pi) < numpy.pi/6.0,circular_dist(phases,this_phase,2*numpy.pi) < numpy.pi/3.0))[0]
+        
+        if len(outside_30_degrees) != 0:
+            av1.append(numpy.mean(weights.flatten()[outside_30_degrees])/max(len(outside_30_degrees),1.0))
+        else:
+            av1.append(0.0)
+        if len(within_30_degrees_and_same_phase) != 0:
+            av2.append(numpy.mean(weights.flatten()[within_30_degrees_and_same_phase])/max(len(within_30_degrees_and_same_phase),1.0))
+        else:
+            av2.append(0.0)
+        
+        
 
     import pylab
     pylab.figure()
-    pylab.subplot(2,1,1)
-    pylab.plot(numpy.array(cm),or_pref.flatten(),'ro')
-    pylab.subplot(2,1,2)
-    pylab.hist(or_pref.flatten())
+    pylab.subplot(3,1,1)
+    pylab.plot(numpy.array(app),phase_pref.flatten()*numpy.pi*2,'ro')
+    pylab.subplot(3,1,2)
+    pylab.hist(phase_pref.flatten()*numpy.pi*2)
+    pylab.subplot(3,1,3)
+    pylab.bar(numpy.arange(2), (numpy.mean(av1),numpy.mean(av2)),   0.35, color='b')
+    
     from param import normalize_path
     pylab.savefig(normalize_path('PPconnectivity: ' + sheet_name + '|' + proj_name));
+
+
+import matplotlib.gridspec as gridspec
+import pylab
+
+def plot_domains_stability(gs,mr):
+      gs = gridspec.GridSpecFromSubplotSpec(2, len(mr.records.keys()), subplot_spec=gs)  
+      for i,s in enumerate(mr.records.keys()):
+          
+          ax = pylab.subplot(gs[0,i])
+          ax.imshow(mr.records[s]['activity'][7],cmap='gray') 
+
+          ax = pylab.subplot(gs[1,i])
+          ax.imshow(sum(mr.records[s]['activity']),cmap='gray') 
+    
+def domains_stability_test(parameters,parameter_values,sheets,sheets_to_record,retina,reset_homeo,directory):
+    from modelparametrization import ModelRecording,ModelParametrization
+    mr = ModelRecording(sheets, retina, sheets_to_record = sheets_to_record, reset_homeo = reset_homeo)
+    f = lambda : mr.present_stimulus_sequence(1.0,[None,None,None,None,None,None,None,None])
     
     
+    mp = ModelParametrization(parameters,parameter_values,f,plot_domains_stability,{'mr' : mr},directory)
+    mp.go(initial_run=True)
+
     
     
     
