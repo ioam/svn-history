@@ -170,7 +170,7 @@ topo.sim.connect('LGNOn','V1SimpleInh',delay=0.025,dest_port=('Activity','JointN
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOffInh,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = __main__.__dict__.get('AFF_lr',0.1),
+                               ExponentialDecay(starting_value = __main__.__dict__.get('AFF_lr_inh',__main__.__dict__.get('AFF_lr',0.1)),
                                                 time_constant=16000))))
 
 
@@ -182,20 +182,20 @@ topo.sim.connect('LGNOff','V1SimpleInh',delay=0.025,dest_port=('Activity','Joint
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOnInh,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value =__main__.__dict__.get('AFF_lr',0.1),
+                               ExponentialDecay(starting_value =__main__.__dict__.get('AFF_lr_inh',__main__.__dict__.get('AFF_lr',0.1)),
                                                 time_constant=16000))))
 
 
 topo.sim.connect('V1Simple','V1Simple',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SEEStr',0.5),name='V1SimpleExcToExc',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.5),
-                 nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=__main__.__dict__.get('SEElr',10.1))
+                 nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=0)
 
 
 topo.sim.connect('V1Simple','V1SimpleInh',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SEIStr',1.0),name='V1SimpleExcToInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.5),
-                 nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=__main__.__dict__.get('SEIlr',10.1))
+                 nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=0)
 
 
 if __main__.__dict__.get('AHRule',False):
@@ -203,25 +203,25 @@ if __main__.__dict__.get('AHRule',False):
                  connection_type=CFProjection,strength=__main__.__dict__.get('SIEStr',-0.5),name='V1SimpleInhToExc',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
                  nominal_bounds_template=BoundingBox(radius=0.3),
-                 learning_fn = CFPLF_KeyserRule("V1Simple",['V1SimpleInhToExc']),learning_rate=__main__.__dict__.get('SIElr',0.1))
+                 learning_fn = CFPLF_KeyserRule("V1Simple",['V1SimpleInhToExc']),learning_rate=0)
 
 
     topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SIIStr',-0.5),name='V1SimpleInhToInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
                  nominal_bounds_template=BoundingBox(radius=0.3),
-                 learning_fn = CFPLF_KeyserRule("V1SimpleInh",['V1SimpleInhToInh']),learning_rate=__main__.__dict__.get('SIIlr',0.1))
+                 learning_fn = CFPLF_KeyserRule("V1SimpleInh",['V1SimpleInhToInh']),learning_rate=0)
 else:	
     topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SIEStr',-0.5),name='V1SimpleInhToExc',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
-                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=__main__.__dict__.get('SIElr',0.1))
+                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=0)
 
 
     topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SIIStr',-0.5),name='V1SimpleInhToInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
-                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=__main__.__dict__.get('SIIlr',0.1))
+                 nominal_bounds_template=BoundingBox(radius=0.3),learning_rate=0)
 
 
 #Layer 2/3
@@ -277,6 +277,11 @@ def secondStage():
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
     randomize_V1Simple_relative_LGN_strength(prob=0.5)
+    
+    topo.sim['V1SimpleInh'].projections()['V1SimpleInhToInh'].learning_rate = __main__.__dict__.get('SIIlr',0.1)
+    topo.sim['V1SimpleInh'].projections()['V1SimpleExcToInh'].learning_rate = __main__.__dict__.get('SEIlr',0.1)
+    topo.sim['V1Simple'].projections()['V1SimpleExcToExc'].learning_rate = __main__.__dict__.get('SEElr',0.1)
+    topo.sim['V1Simple'].projections()['V1SimpleInhToExc'].learning_rate = __main__.__dict__.get('SIElr',0.1)
     print 'Finished second stage'
 
 # change the default parameters of the measuring commands to obtain better quality and match the paper
