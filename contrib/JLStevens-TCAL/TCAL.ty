@@ -413,11 +413,11 @@ makeDelayedLaterals('V1', 'LateralInhibitory' , V1InhParams, 'MAX',
 
 connections = dict([(el.name,el) for el in topo.sim.connections()])
 
-for (ind,excName) in enumerate(['LateralExcitatory-%d'% i for i in range(4)]):
+for (ind,excName) in enumerate(['LateralExcitatory%d'% i for i in range(4)]):
      excDelay = (ind+1) * p.distance_delay # Zero-delays are bad hence the +1
      connections[excName].delay = excDelay
 
-for (ind,inhName) in enumerate(['LateralInhibitory-%d'% i for i in range(11)]):
+for (ind,inhName) in enumerate(['LateralInhibitory%d'% i for i in range(11)]):
      inhDelay = (ind+1) * p.distance_delay # Zero-delays are bad hence the +1
      connections[inhName].delay = inhDelay
 
