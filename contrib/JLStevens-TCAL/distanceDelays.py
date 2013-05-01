@@ -45,10 +45,10 @@ def weightsFromGCALtoTCAL():
     connections = pickleObj['Connections']; del pickleObj['Connections']
 
     afferents = ['LGNOffAfferent',  'LGNOnAfferent']
-    excitatory= ['LateralExcitatory-0', 'LateralExcitatory-1', 'LateralExcitatory-2', 'LateralExcitatory-3']
-    inhibitory = ['LateralInhibitory-0','LateralInhibitory-1', 'LateralInhibitory-2', 'LateralInhibitory-3',
-                  'LateralInhibitory-4','LateralInhibitory-5','LateralInhibitory-6', 'LateralInhibitory-7',
-                  'LateralInhibitory-8','LateralInhibitory-9', 'LateralInhibitory-10']
+    excitatory= ['LateralExcitatory0', 'LateralExcitatory1', 'LateralExcitatory2', 'LateralExcitatory3']
+    inhibitory = ['LateralInhibitory0','LateralInhibitory1', 'LateralInhibitory2', 'LateralInhibitory3',
+                  'LateralInhibitory4','LateralInhibitory5','LateralInhibitory6', 'LateralInhibitory7',
+                  'LateralInhibitory8','LateralInhibitory9', 'LateralInhibitory10']
 
     for connectionName in connections:
         allWeights = pickleObj[connectionName];group = None
@@ -119,7 +119,7 @@ def boundsChanged(bounds, sheetName, connName, center_row, center_col):
 
     sheetObj = topo.sim[sheetName]
     # First connection (ring) will always exist.
-    ringCf = sheetObj.projections('%s-0' % connName).cfs[center_row,center_col]
+    ringCf = sheetObj.projections('%s0' % connName).cfs[center_row,center_col]
     ringBounds = ringCf.input_sheet_slice.compute_bounds(sheetObj)
     
     return (ringBounds.lbrt() != bounds.lbrt())
@@ -151,7 +151,7 @@ def rawWeightPattern(wPatternClass, wPatternParams, bbwidth, extraParams):
 def squareErrorPlots(weights, sheetName, connName, ringNumber,center_row,center_col, PLOTS=True):
 
     sheetObj = topo.sim[sheetName]
-    ringNames = [ "%s-%d" % (connName, i) for i in range(ringNumber)]
+    ringNames = [ "%s%d" % (connName, i) for i in range(ringNumber)]
     ringWeightList = [sheetObj.projections(name).cfs[center_row,center_col].weights for name in ringNames]
     ringWeights = numpy.add.reduce(ringWeightList)
 
@@ -214,7 +214,7 @@ def makeDelayedLaterals(sheetName, connName, connectionParams, ringNumber, wPatt
             ring_size = 2*thickness*i+thickness
             mask = pattern.Ring(size=ring_size, thickness=thickness, smoothing=0.0)
         
-        delayName = '%s-%d' % (connName,i)
+        delayName = '%s%d' % (connName,i)
 
         originalWeightOutputFns = None
         if 'weights_output_fns' in connectionParams:
